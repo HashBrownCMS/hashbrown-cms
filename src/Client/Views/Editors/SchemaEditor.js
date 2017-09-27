@@ -337,8 +337,13 @@ class SchemaEditor extends Crisp.View {
         
         $element.empty();
 
-        $element.append(this.renderField('Name', this.renderNameEditor())); 
+        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
+            value: this.model.name,
+            onChange: (newValue) => { this.model.name = newValue; }
+        }).$element)); 
+
         $element.append(this.renderField('Icon', this.renderIconEditor()));   
+
         $element.append(this.renderField('Parent', this.renderParentEditor()));
         
         switch(this.model.type) {

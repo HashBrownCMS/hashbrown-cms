@@ -79,87 +79,119 @@ class StructEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.struct = config.struct || {};
 
-        let $element = _.div();
+        let $element = _.div({class: 'editor--schema__struct'});
 
         let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
             
         let renderEditor = () => {
             _.append($element.empty(),
-                _.each(config.struct, (key, value) => {
-                    // Sanity check
-                    value.config = value.config || {};
+                _.div({class: 'editor__field vertical'},
+                    _.div({class: 'editor__field__key'}, 'Struct fields'),
+                    _.div({class: 'editor__field__value'},
+                        _.each(config.struct, (fieldKey, fieldValue) => {
+                            // Sanity check
+                            fieldValue.config = fieldValue.config || {};
 
-                    let $field = _.div({class: 'field-properties'});
+                            let $field = _.div({class: 'editor__field', draggable: true})
+                                .on('mousedown', (e) => {
+                                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
+                                })
+                                .on('dragstart', (e) => {
+                                    if(e.currentTarget.dataset.canDrag !== 'true') { return e.preventDefault(); }
+                                })
+                                .on('dragstop', (e) => {
+                                    var siblings = e.parentElement.children;
 
-                    let renderField = () => {
-                        _.append($field.empty(),
-                            _.button({class: 'btn btn-remove'},
-                                _.span({class: 'fa fa-remove'})
+                                    for(let i = 0; i < siblings.length; i++) {
+                                        if(siblings[i] == e.currentTarget) { continue; }
+
+                                        let siblingOffset = siblings[i].getBoundingClientRect();
+
+                                        // TODO: Placement logic
+                                    }
+                                });
+
+                            let renderField = () => {
+                                _.append($field.empty(),
+                                    _.div({class: 'editor__field__drag fa fa-bars'}),
+                                    _.div({class: 'editor__field__key'},
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'text',
+                                            placeholder: 'A variable name, e.g. "myField"',
+                                            tooltip: 'The field variable name',
+                                            value: fieldKey,
+                                            onChange: (newKey) => {
+                                                delete config.struct[fieldKey];
+
+                                                fieldKey = newKey;
+
+                                                config.struct[fieldKey] = fieldValue;
+                                            }
+                                        }).$element,
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'text',
+                                            placeholder: 'A label, e.g. "My field"',
+                                            tooltip: 'The field label',
+                                            value: fieldValue.label,
+                                            onChange: (newValue) => { fieldValue.label = newValue; }
+                                        }).$element
+                                    ),
+                                    _.div({class: 'editor__field__value'},
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Schema'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Dropdown({
+                                                    useTypeAhead: true,
+                                                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                                                    value: fieldValue.schemaId,
+                                                    labelKey: 'name',
+                                                    valueKey: 'id',
+                                                    onChange: (newValue) => {
+                                                        fieldValue.schemaId = newValue;
+
+                                                        renderField();
+                                                    }
+                                                }).$element
+                                            )
+                                        ),
+                                        _.do(() => {
+                                            let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                                            if(!schema) { return; }
+
+                                            let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                                            if(!editor) { return; }
+
+                                            return editor.renderConfigEditor(fieldValue.config);
+                                        })
+                                    ),
+                                    _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
+                                        .click(() => {
+                                            delete config.struct[fieldKey];
+
+                                            renderEditor();
+                                        })
+                                )
+                            };
+
+                            renderField();
+
+                            return $field;
+                        }),
+                        _.button({class: 'widget widget--button round right fa fa-plus'},
                             ).click(() => {
-                                delete config.struct[key];
+                                if(config.struct.newField) { return; }
+                            
+                                config.struct.newField = {
+                                    label: 'New field',
+                                    schemaId: 'array'
+                                };
 
                                 renderEditor();
-                            }),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Variable name'),
-                                _.div({class: 'field-value'},
-                                    _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
-                                        .change((e) => {
-                                            delete config.struct[key];
-
-                                            key = e.currentTarget.value;
-
-                                            config.struct[key] = value;
-                                        })
-                                )
-                            ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Label'),
-                                _.div({class: 'field-value'},
-                                    _.input({class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"',  title: 'This is the label that will be visible in the Content editor'})
-                                        .change((e) => {
-                                            value.label = e.currentTarget.value;  
-                                        })
-                                )
-                            ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Schema'),
-                                _.div({class: 'field-value'},
-                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
-                                        value.schemaId = newSchemaId;
-
-                                        renderField();
-                                    })
-                                )
-                            ),
-                            _.do(() => {
-                                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
-
-                                if(!schema) { return; }
-
-                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                                if(!editor) { return; }
-
-                                return editor.renderConfigEditor(value.config);
                             })
-                        )
-                    };
-
-                    renderField();
-
-                    return $field;
-                }),
-                _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
-                    _.span({class: 'fa fa-plus'})
-                ).click(() => {
-                    config.struct.newField = {
-                        label: 'New field',
-                        schemaId: 'string'
-                    };
-
-                    renderEditor();
-                })
+                    )
+                )
             );
         };
 

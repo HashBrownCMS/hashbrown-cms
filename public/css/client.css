@@ -2488,9 +2488,16 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 
 .editor__field {
   display: flex;
-  margin: 0 0 1rem 0; }
+  margin: 0 0 1rem 0;
+  position: relative; }
+  .editor__field:last-child {
+    margin-bottom: 0; }
   .editor__field.vertical {
     flex-direction: column; }
+  .editor__field.vertical > .editor__field__key {
+    flex-basis: 2rem; }
+  .editor__field.vertical > .editor__field__value {
+    margin-left: 1rem; }
   .editor__field__key {
     flex-basis: 10rem;
     flex-shrink: 0;
@@ -2498,15 +2505,85 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     line-height: 2rem; }
   .editor__field__value {
     flex-grow: 1; }
+  .editor__field__drag {
+    cursor: move;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    line-height: 2rem; }
+  .editor__field__remove {
+    background-color: transparent;
+    line-height: 2rem;
+    height: 2rem;
+    width: 2rem;
+    border: 0;
+    display: block;
+    cursor: pointer;
+    color: #e70d3b;
+    z-index: 90;
+    padding: 0; }
+    .editor__field__remove:hover::after {
+      position: absolute;
+      display: block;
+      content: '';
+      border: 1px solid #e70d3b;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; }
+
+/**
+ * The editor for Schemas
+ */
+.editor--schema .editor__body > .editor__field > .editor__field__value > .editor__field:not(:first-child), .editor--schema__struct > .editor__field > .editor__field__value > .editor__field:not(:first-child) {
+  margin-top: 3rem; }
+  .editor--schema .editor__body > .editor__field > .editor__field__value > .editor__field:not(:first-child):before, .editor--schema__struct > .editor__field > .editor__field__value > .editor__field:not(:first-child):before {
+    display: block;
+    position: absolute;
+    width: 2rem;
+    margin-left: -1rem;
+    left: 50%;
+    top: -2rem;
+    font-family: 'FontAwesome';
+    text-align: center;
+    content: '\F141';
+    color: #999999; }
 
 /**
  * A generic widget
  */
+@keyframes widget__spinner {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
+
+.widget {
+  position: relative; }
+  .widget.working:after {
+    font-family: 'FontAwesome';
+    content: '\F1CE';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -1rem;
+    width: 2rem;
+    line-height: 2rem;
+    height: 2rem;
+    text-align: center;
+    z-index: 10;
+    animation: widget__spinner 1s linear infinite; }
+
 /**
  * A versatile button
  */
 .widget--button {
   border: 0;
+  border-radius: 0.2rem;
   box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
   background-color: #e70d3b;
   color: #ffffff;
@@ -2536,7 +2613,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
  */
 .widget--chips__chip {
   display: inline-block;
-  margin-right: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
   position: relative;
   border-radius: 2rem;
   line-height: 2rem;
@@ -2544,12 +2622,18 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   padding: 0 0.5rem;
   background-color: #e70d3b;
   color: #ffffff; }
+  .widget--chips__chip:last-of-type {
+    margin-bottom: 0; }
   .widget--chips__chip__input {
     border: 0;
     text-align: center;
-    background-color: transparent; }
+    background-color: transparent;
+    display: inline-block;
+    width: 9.5rem; }
     .widget--chips__chip__input:focus {
       outline: 0; }
+    .widget--chips__chip__input:nth-child(2) {
+      border-left: 1px solid rgba(255, 255, 255, 0.5); }
   .widget--chips__chip__remove {
     position: absolute;
     top: 0;
@@ -2577,11 +2661,106 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   display: block;
   line-height: 2rem;
   margin-bottom: 0.5rem; }
-  .widget--input[type="text"], .widget--input[type="number"] {
+  .widget--input:last-of-type {
+    margin-bottom: 0; }
+  .widget--input.text, .widget--input.number {
+    border-radius: 0.2rem;
+    border: 1px solid #999999;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
     max-width: 20rem; }
+  .widget--input.range {
+    max-width: 20rem; }
+  .widget--input__range-input {
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: transparent;
+    line-height: 2rem;
+    height: 2rem; }
+    .widget--input__range-input:focus {
+      outline: none; }
+    .widget--input__range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; }
+    .widget--input__range-input::-ms-track {
+      width: 100%;
+      cursor: pointer;
+      background-color: transparent;
+      border-color: transparent;
+      color: transparent; }
+    .widget--input__range-input::-webkit-slider-thumb {
+      border: 0;
+      background-color: #e70d3b;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: scale(3); }
+    .widget--input__range-input::-moz-range-thumb {
+      border: 0;
+      background-color: #e70d3b;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: scale(3); }
+    .widget--input__range-input::-ms-thumb {
+      border: 0;
+      background-color: #e70d3b;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: scale(3); }
+    .widget--input__range-input::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 0.5rem;
+      border-radius: 0.25rem;
+      background-color: #999999; }
+    .widget--input__range-input::-moz-range-track {
+      width: 100%;
+      height: 0.5rem;
+      border-radius: 0.25rem;
+      background-color: #999999; }
+    .widget--input__range-input::-ms-track {
+      width: 100%;
+      height: 0.5rem;
+      border-radius: 0.25rem;
+      background-color: #999999; }
+  .widget--input__range-extra {
+    position: absolute;
+    left: calc(100% + 0.5rem);
+    top: 0;
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    font-weight: bold;
+    width: 2rem;
+    overflow: hidden; }
+  .widget--input.checkbox {
+    margin: 0.25rem 0.25rem 0.75rem 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #e70d3b;
+    border-radius: 0.2rem; }
+  .widget--input__checkbox-input, .widget--input__checkbox-extra {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important; }
+  .widget--input__checkbox-input {
+    cursor: pointer;
+    opacity: 0; }
+  .widget--input__checkbox-extra {
+    pointer-events: none;
+    display: none;
+    line-height: 1.5rem;
+    text-align: center;
+    color: #ffffff; }
+  .widget--input__checkbox-input:checked + .widget--input__checkbox-extra {
+    display: block; }
 
 /**
  * A dropdown widget with typeahead
@@ -2590,7 +2769,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   display: flex;
   position: relative;
   max-width: 20rem;
-  background-color: #e70d3b; }
+  background-color: #e70d3b;
+  border-radius: 0.2rem; }
   .widget--dropdown__value {
     height: 2rem;
     width: calc(100% - 2rem);
@@ -2613,6 +2793,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     z-index: 20; }
   .widget--dropdown__toggle:checked ~ .widget--dropdown__options,
   .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead,
+  .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead__icon,
   .widget--dropdown__toggle:checked ~ .widget--dropdown__obscure {
     display: block; }
   .widget--dropdown__typeahead {
@@ -2620,12 +2801,30 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     position: absolute;
     line-height: 2rem;
     width: 100%;
+    border: 0;
+    border-top-right-radius: 0.2rem;
+    border-top-left-radius: 0.2rem;
     top: 0;
     left: 0;
     height: 2rem;
     padding: 0 0.5rem;
     z-index: 910; }
+    .widget--dropdown__typeahead__icon {
+      position: absolute;
+      z-index: 920;
+      opacity: 0.5;
+      display: block;
+      line-height: 2rem;
+      width: 2rem;
+      height: 2rem;
+      pointer-events: none;
+      right: 0;
+      top: 0;
+      text-align: center;
+      display: none; }
   .widget--dropdown__options {
+    border-bottom-right-radius: 0.2rem;
+    border-bottom-left-radius: 0.2rem;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
     z-index: 910;
     display: none;

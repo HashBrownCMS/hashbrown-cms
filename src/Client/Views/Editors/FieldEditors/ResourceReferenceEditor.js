@@ -24,61 +24,32 @@ class ResourceReferenceEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.resourceKeys = config.resourceKeys || [];
 
-        let $element = _.div();
-
-        let render = () => {
-            let isValidResource = config.resource && resources[config.resource] !== null;
-            let keyOptions = [];
-            let resourceOptions = [];
-
-            for(let resourceName in window.resources) {
-                resourceOptions.push({
-                    value: resourceName,
-                    label: resourceName
-                });
-            }
-
-            if(!isValidResource) {
-                config.resourceKeys = [];
-            
-            } else if(resources[config.resource].length > 0) {
-                for(let resourceKey in resources[config.resource][0]) {
-                    keyOptions.push({
-                        label: resourceKey,
-                        value: resourceKey
-                    });
-                }
-
-            }
-
-            _.append($element.empty(),
-                _.div({class: 'field-container'},
-                    _.div({class: 'field-key'}, 'Resource'),
-                    _.div({class: 'field-value'},
-                        UI.inputDropdown(config.resource, resourceOptions, (newValue) => {
-                            config.resource = newValue;
-                            config.resourceKeys = [];
-
-                            render();
-                        })
-                    )
-                ),
-                _.if(isValidResource,
-                    _.div({class: 'field-container'},
-                        _.div({class: 'field-key'}, 'Resource keys'),
-                        _.div({class: 'field-value'},
-                            UI.inputChipGroup(config.resourceKeys, keyOptions, (newValue) => {
-                                config.resourceKeys = newValue;
-                            }, true)
-                        )
-                    )
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Resource'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: config.resource,
+                        options: Object.keys(resources),
+                        onChange: (newValue) => {
+                            config.resource = newValue
+                        }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Resource keys'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Chips({
+                        value: config.resourceKeys,
+                        placeholder: 'keyName',
+                        onChange: (newValue) => {
+                            config.resourceKeys = newValue;
+                        }
+                    }).$element
                 )
             )
-        };
-
-        render();
-
-        return $element;
+        ];
     }
 
     /**

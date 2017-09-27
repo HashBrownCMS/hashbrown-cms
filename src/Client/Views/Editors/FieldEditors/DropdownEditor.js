@@ -58,45 +58,20 @@ class DropdownEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.options = config.options || [];
 
-        let $element = _.div({class: 'field-container'});
-
-        let render = () => {
-            _.append($element.empty(),
-                _.div({class: 'field-key'}, 'Options'),
-                _.div({class: 'field-value'},
-                    _.each(config.options, (i, option) => {
-                        return _.div({class: 'field-container'},
-                            _.div({class: 'field-key'},
-                                _.input({class: 'form-control', type: 'text', value: option.label})
-                                    .change((e) => {
-                                        option.label = e.currentTarget.value;
-                                    })
-                            ),
-                            _.div({class: 'field-value'},
-                                _.input({class: 'form-control', type: 'text', value: option.value})
-                                    .change((e) => {
-                                        option.value = e.currentTarget.value;
-                                    })
-                            )
-                        );
-                    }),
-                    _.button({class: 'btn btn-round btn-primary raised'},
-                        _.span({class: 'fa fa-plus'})
-                    ).click(() => {
-                        config.options.push({
-                            label: 'Option label',
-                            value: 'optionValue'
-                        });
-
-                        render();
-                    })
-                )
-            );
-        };
-
-        render();
-
-        return $element;
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'}, 'Options'),
+            _.div({class: 'editor__field__value'},
+                new HashBrown.Views.Widgets.Chips({
+                    value: config.options,
+                    valueKey: 'value',
+                    labelKey: 'label',
+                    placeholder: 'New option',
+                    onChange: (newValue) => {
+                        config.options = newValue;
+                    }
+                }).$element
+            )
+        );
     }
 
     /**

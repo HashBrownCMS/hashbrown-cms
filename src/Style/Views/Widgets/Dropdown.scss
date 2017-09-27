@@ -6,6 +6,7 @@
     position: relative;
     max-width: 20rem;
     background-color: $primary;
+    border-radius: 0.2rem;
 
     // Value
     &__value {
@@ -36,6 +37,7 @@
     // Toggle active
     &__toggle:checked ~ &__options,
     &__toggle:checked ~ &__typeahead,
+    &__toggle:checked ~ &__typeahead__icon,
     &__toggle:checked ~ &__obscure {
         display: block;
     }
@@ -46,15 +48,35 @@
         position: absolute;
         line-height: 2rem;
         width: 100%;
+        border: 0;
+        border-top-right-radius: 0.2rem;
+        border-top-left-radius: 0.2rem;
         top: 0;
         left: 0;
         height: 2rem;
         padding: 0 0.5rem;
         z-index: 910;
+
+        &__icon {
+            position: absolute;
+            z-index: 920;
+            opacity: 0.5;
+            display: block;
+            line-height: 2rem;
+            width: 2rem;
+            height: 2rem;
+            pointer-events: none;
+            right: 0;
+            top: 0;
+            text-align: center;
+            display: none;
+        }
     }
 
     // Options
     &__options {
+        border-bottom-right-radius: 0.2rem;
+        border-bottom-left-radius: 0.2rem;
         box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
         z-index: 910;
         display: none;

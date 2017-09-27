@@ -23,7 +23,15 @@ class Dropdown extends Widget {
 
             let optionLabel = this.labelKey ? value[this.labelKey] : value;
             let optionValue = this.valueKey ? value[this.valueKey] : value;
+           
+            if(typeof optionValue !== 'string') { 
+                optionValue = optionValue.toString();
+            }
             
+            if(typeof optionLabel !== 'string') { 
+                optionLabel = optionLabel.toString();
+            }
+
             options[optionValue] = optionLabel;
         }
 
@@ -55,7 +63,7 @@ class Dropdown extends Widget {
             label = multipleLabel || label;
 
         } else {
-            label = options[this.value] || label;
+            label = options[this.value] === 0 ? '0' : options[this.value] || label;
         
         }
 
@@ -191,6 +199,7 @@ class Dropdown extends Widget {
             
             // Typeahead input
             _.if(this.useTypeAhead,
+                _.span({class: 'widget--dropdown__typeahead__icon fa fa-search'}),
                 _.input({class: 'widget--dropdown__typeahead', type: 'text'})
                     .on('input', (e) => { this.onTypeahead(e.currentTarget.value); })
             ),
@@ -208,9 +217,8 @@ class Dropdown extends Widget {
 
             // Clear button
             _.if(this.useClearButton,
-                _.button({class: 'widget--dropdown__clear'},
-                    _.span({class: 'fa fa-remove'})
-                ).click((e) => {
+                _.button({class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection'})
+                    .click((e) => {
                     this.onChangeInternal(null);
                 })
             ),

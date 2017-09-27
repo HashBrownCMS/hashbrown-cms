@@ -65,15 +65,30 @@
         }
     }
 
-    // A container for displaying field keys and values
+    // Field container
     &__field {
         display: flex;
         margin: 0 0 1rem 0;
-        
+        position: relative;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        // Vertical mode
         &.vertical {
             flex-direction: column;
         }
 
+        &.vertical > &__key {
+            flex-basis: 2rem;
+        }
+
+        &.vertical > &__value {
+            margin-left: 1rem;
+        }
+
+        // Key
         &__key {
             flex-basis: 10rem;
             flex-shrink: 0;
@@ -81,8 +96,49 @@
             line-height: 2rem;
         }
 
+        // Value
         &__value {
             flex-grow: 1;
+        }
+
+        // Drag handle
+        &__drag {
+            cursor: move;
+            width: 2rem;
+            height: 2rem;
+            text-align: center;
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            line-height: 2rem;
+        }
+
+        // Remove button
+        &__remove {
+            background-color: transparent;
+            line-height: 2rem;
+            height: 2rem;
+            width: 2rem;
+            border: 0;
+            display: block;
+            cursor: pointer;
+            color: $primary;
+            z-index: 90;
+            padding: 0;
+
+            &:hover {
+                &::after {
+                   position: absolute;
+                   display: block;
+                   content: '';
+                   border: 1px solid $primary;
+                   top: 0;
+                   left: 0;
+                   width: 100%;
+                   height: 100%;
+                   pointer-events: none;
+                }
+            }
         }
     }
 }

@@ -211,7 +211,7 @@ class ArrayEditor extends FieldEditor {
                         min: 0,
                         step: 1,
                         tooltip: 'How many items are required in this array (0 is unlimited)',
-                        value: config.minItems,
+                        value: config.minItems || 0,
                         onChange: (newValue) => { config.minItems = newValue; }
                     }).$element
                 )
@@ -224,7 +224,7 @@ class ArrayEditor extends FieldEditor {
                         min: 0,
                         step: 1,
                         tooltip: 'How many items are allowed in this array (0 is unlimited)',
-                        value: config.maxItems,
+                        value: config.maxItems || 0,
                         onChange: (newValue) => { config.maxItems = newValue; }
                     }).$element
                 )

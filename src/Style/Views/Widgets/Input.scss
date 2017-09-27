@@ -6,11 +6,126 @@
     line-height: 2rem;
     margin-bottom: 0.5rem;
 
-    &[type="text"],
-    &[type="number"] {
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+
+    // Text and number
+    &.text,
+    &.number {
+        border-radius: 0.2rem;
+        border: 1px solid $standard-darker;
         padding: 0 0.5rem;
         height: 2rem;
         width: 100%;
         max-width: 20rem;
+    }
+
+    // Range
+    &.range {
+        max-width: 20rem;
+    }
+
+    &__range {
+        &-input {
+            // Reset
+            -webkit-appearance: none;
+            width: 100%;
+            background-color: transparent;
+            line-height: 2rem;
+            height: 2rem;
+
+            &:focus {
+                outline: none;
+            }
+
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none;
+            }
+
+            &::-ms-track {
+                width: 100%;
+                cursor: pointer;
+                background-color: transparent;
+                border-color: transparent;
+                color: transparent;
+            }
+
+            // Thumb
+            @mixin thumb {
+                border: 0;
+                background-color: $primary;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+                cursor: pointer;
+                transform: scale(3);
+            }
+
+            &::-webkit-slider-thumb { @include thumb; }
+            &::-moz-range-thumb { @include thumb }
+            &::-ms-thumb { @include thumb; }
+
+            // Track
+            @mixin track {
+                width: 100%;
+                height: 0.5rem;
+                border-radius: 0.25rem; 
+                background-color: $standard-darker;
+            }
+
+            &::-webkit-slider-runnable-track { @include track; }
+            &::-moz-range-track { @include track; }
+            &::-ms-track { @include track; }
+        }
+
+        &-extra {
+            position: absolute;
+            left: calc(100% + 0.5rem);
+            top: 0;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            font-weight: bold;
+            width: 2rem;
+            overflow: hidden;
+        }
+    }
+
+    // Checkbox
+    &.checkbox {
+        margin: 0.25rem 0.25rem 0.75rem 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        background-color: $primary;
+        border-radius: 0.2rem;
+    }
+
+    &__checkbox {
+        &-input, &-extra {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0 !important;
+        }
+
+        &-input {
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        &-extra {
+            pointer-events: none;
+            display: none;
+            line-height: 1.5rem;
+            text-align: center;
+            color: $primary-text;
+        }
+
+        &-input:checked + &-extra {
+            display: block;
+        }
     }
 }

@@ -33,7 +33,7 @@ class ContentSchemaEditor extends SchemaEditor {
                 this.model.tabs = {};
 
                 for(let tab of newValue) {
-                    this.model.tabs[tab.toLowerCase().replace(/ /g, '-')] = tab;
+                    this.model.tabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
                 }
             }
         }).$element));
@@ -53,7 +53,7 @@ class ContentSchemaEditor extends SchemaEditor {
         }).$element));
         
         // Field properties
-        let $fieldProperties = _.div({class: 'editor__field'});
+        let $fieldProperties = _.div({class: 'editor__field vertical'});
         
         $element.append($fieldProperties);
 
@@ -62,10 +62,17 @@ class ContentSchemaEditor extends SchemaEditor {
                 _.div({class: 'editor__field__key'}, 'Properties'),
                 _.div({class: 'editor__field__value'},
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
-                        let $field = _.div({class: 'editor__field'});
+                        let $field = _.div({class: 'editor__field', draggable: true})
+                            .on('mousedown', (e) => {
+                                e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
+                            })
+                            .on('dragstart', (e) => {
+                                if(e.currentTarget.dataset.canDrag !== 'true') { return e.preventDefault(); }
+                            });
 
                         let renderField = () => {
                             _.append($field.empty(),
+                                _.div({class: 'editor__field__drag fa fa-bars'}),
                                 _.div({class: 'editor__field__key'},
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
@@ -132,7 +139,13 @@ class ContentSchemaEditor extends SchemaEditor {
 
                                         return editor.renderConfigEditor(fieldValue.config);
                                     })
-                                )
+                                ),
+                                _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
+                                    .click(() => {
+                                        delete this.model.fields.properties[fieldKey];
+
+                                        renderFieldProperties();
+                                    })
                             );
                         };
 
@@ -140,16 +153,17 @@ class ContentSchemaEditor extends SchemaEditor {
 
                         return $field;
                     }),
-                    _.button({title: 'Add a property', class: 'widget widget--button round right'},
-                        _.span({class: 'fa fa-plus'})
-                    ).click(() => {
-                        this.model.fields.properties.newField = {
-                            label: 'New field',
-                            schemaId: 'array'
-                        };
+                    _.button({title: 'Add a property', class: 'widget widget--button round right fa fa-plus'})
+                        .click(() => {
+                            if(this.model.fields.properties.newField) { return; }
 
-                        renderFieldProperties();
-                    })
+                            this.model.fields.properties.newField = {
+                                label: 'New field',
+                                schemaId: 'array'
+                            };
+
+                            renderFieldProperties();
+                        })
                 )
             );
         };

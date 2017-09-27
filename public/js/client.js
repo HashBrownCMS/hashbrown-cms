@@ -39176,14 +39176,23 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.renderFields = function renderFields() {
+        var _this6 = this;
+
         var id = parseInt(this.model.id);
 
         var $element = _.div({ class: 'editor__body' });
 
         $element.empty();
 
-        $element.append(this.renderField('Name', this.renderNameEditor()));
+        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
+            value: this.model.name,
+            onChange: function onChange(newValue) {
+                _this6.model.name = newValue;
+            }
+        }).$element));
+
         $element.append(this.renderField('Icon', this.renderIconEditor()));
+
         $element.append(this.renderField('Parent', this.renderParentEditor()));
 
         switch (this.model.type) {
@@ -39207,12 +39216,12 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.template = function template() {
-        var _this6 = this;
+        var _this7 = this;
 
         return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
-            _this6.onClickAdvanced();
+            _this7.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
-            _this6.onClickSave();
+            _this7.onClickSave();
         })))));
     };
 
@@ -41218,6 +41227,14 @@ var Dropdown = function (_Widget) {
             var optionLabel = this.labelKey ? value[this.labelKey] : value;
             var optionValue = this.valueKey ? value[this.valueKey] : value;
 
+            if (typeof optionValue !== 'string') {
+                optionValue = optionValue.toString();
+            }
+
+            if (typeof optionLabel !== 'string') {
+                optionLabel = optionLabel.toString();
+            }
+
             options[optionValue] = optionLabel;
         }
 
@@ -41250,7 +41267,7 @@ var Dropdown = function (_Widget) {
 
             label = multipleLabel || label;
         } else {
-            label = options[this.value] || label;
+            label = options[this.value] === 0 ? '0' : options[this.value] || label;
         }
 
         return label;
@@ -41404,7 +41421,7 @@ var Dropdown = function (_Widget) {
         _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }),
 
         // Typeahead input
-        _.if(this.useTypeAhead, _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
+        _.if(this.useTypeAhead, _.span({ class: 'widget--dropdown__typeahead__icon fa fa-search' }), _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
             _this2.onTypeahead(e.currentTarget.value);
         })),
 
@@ -41416,7 +41433,7 @@ var Dropdown = function (_Widget) {
         })),
 
         // Clear button
-        _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
+        _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection' }).click(function (e) {
             _this2.onChangeInternal(null);
         })),
 
@@ -41437,6 +41454,8 @@ module.exports = Dropdown;
 
 "use strict";
 
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -41476,26 +41495,55 @@ var Chips = function (_Widget) {
 
 
     Chips.prototype.prerender = function prerender() {
-        // Check format
-        if (!this.value || !Array.isArray(this.value)) {
-            this.value = [];
-        }
-
-        if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
-            this.disabledValue = [];
-        }
-
-        // Check empty values
-        for (var i = this.value.length - 1; i >= 0; i--) {
-            if (!this.value[i]) {
-                this.value.splice(i, 1);
+        // Array check
+        // NOTE: Array is the default mode for this widget
+        if (this.useArray === true || typeof this.useArray === 'undefined') {
+            // Check format
+            if (!this.value || !Array.isArray(this.value)) {
+                this.value = [];
             }
-        }
 
-        // CHeck for empty values or duplicates in disabled value
-        for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
-            if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
-                this.disabledValue.splice(_i, 1);
+            if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
+                this.disabledValue = [];
+            }
+
+            // Check empty values
+            for (var i = this.value.length - 1; i >= 0; i--) {
+                if (!this.value[i]) {
+                    this.value.splice(i, 1);
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
+                if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
+                    this.disabledValue.splice(_i, 1);
+                }
+            }
+
+            // Object check
+        } else if (this.useArray === false || this.useObject === true) {
+            // Check format
+            if (!this.value || Array.isArray(this.value) || _typeof(this.value) !== 'object') {
+                this.value = {};
+            }
+
+            if (!this.disabledValue || Array.isArray(this.disabledValue) || _typeof(this.disabledValue) !== 'object') {
+                this.disabledValue = {};
+            }
+
+            // Check empty values
+            for (var k in this.value) {
+                if (!k || !this.value[k]) {
+                    delete this.value[k];
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _k in this.disabledValue) {
+                if (!_k || !this.disabledValue[_k] || this.value[_k]) {
+                    delete this.value[_k];
+                }
             }
         }
     };
@@ -41511,19 +41559,47 @@ var Chips = function (_Widget) {
         return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
             return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
         }), _.each(this.value, function (i, item) {
-            return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', type: 'text', value: item }).on('input', function (e) {
-                _this2.value[i] = e.currentTarget.value || '';
+            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.valueKey) {
+                    item[_this2.valueKey] = e.currentTarget.value || '';
+                } else {
+                    i = e.currentTarget.value || '';
+
+                    _this2.value[i] = item;
+                }
 
                 _this2.onChangeInternal();
-            }), _.button({ class: 'widget--chips__chip__remove fa fa-remove' }).click(function () {
+            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.labelKey) {
+                    item[_this2.labelKey] = e.currentTarget.value || '';
+                } else {
+                    _this2.value[i] = e.currentTarget.value || '';
+                }
+
+                _this2.onChangeInternal();
+            }), _.button({ class: 'widget--chips__chip__remove fa fa-remove', title: 'Remove item' }).click(function () {
                 _this2.value.splice(i, 1);
 
                 _this2.onChangeInternal();
 
                 _this2.init();
             }));
-        }), _.button({ class: 'widget widget--button round widget--chips__add' }, _.span({ class: 'fa fa-plus' })).click(function () {
-            _this2.value.push(_this2.placeholder || '(new item)');
+        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            var newValue = _this2.placeholder || 'New item';
+            var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+
+            if (_this2.useObject === true || _this2.useArray === false) {
+                _this2.value[newKey] = newValue;
+            } else if (_this2.valueKey && _this2.labelKey) {
+                var newObject = {};
+
+                newObject[_this2.valueKey] = newKey;
+                newObject[_this2.labelKey] = newValue;
+
+                _this2.value.push(newObject);
+            } else {
+                _this2.value.push(newValue);
+            }
 
             _this2.onChangeInternal();
 
@@ -41565,8 +41641,25 @@ var Input = function (_Widget) {
     }
 
     /**
+     * Event: Change value
+     *
+     * @param {Anything} newValue
+     */
+    Input.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.value = newValue;
+
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
      * Template
      */
+
+
     Input.prototype.template = function template() {
         var _this2 = this;
 
@@ -41574,25 +41667,34 @@ var Input = function (_Widget) {
             placeholder: this.placeholder,
             title: this.tooltip,
             type: this.type || 'text',
-            class: 'widget widget--input',
+            class: 'widget widget--input ' + this.type || 'text',
             value: this.value
         };
 
-        if (this.type === 'number') {
+        if (this.type === 'number' || this.type === 'range') {
             config.step = this.step || 'any';
             config.min = this.min;
             config.max = this.max;
         }
 
-        return _.input(config).on('input', function (e) {
-            _this2.value = e.currentTarget.value;
+        switch (this.type) {
+            case 'range':
+                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__range-input', type: 'range', value: this.value, min: config.min, max: config.max, step: config.step }).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
 
-            if (typeof _this2.onChange !== 'function') {
-                return;
-            }
+                    e.currentTarget.nextElementSibling.innerHTML = e.currentTarget.value;
+                }), _.div({ class: 'widget--input__range-extra' }, this.value));
 
-            _this2.onChange(_this2.value);
-        });
+            case 'checkbox':
+                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.checked);
+                }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
+
+            default:
+                return _.input(config).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
+                });
+        }
     };
 
     return Input;
@@ -43993,7 +44095,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 
                     var tab = _ref;
 
-                    _this2.model.tabs[tab.toLowerCase().replace(/ /g, '-')] = tab;
+                    _this2.model.tabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
                 }
             }
         }).$element));
@@ -44013,16 +44115,22 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         }).$element));
 
         // Field properties
-        var $fieldProperties = _.div({ class: 'editor__field' });
+        var $fieldProperties = _.div({ class: 'editor__field vertical' });
 
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
             _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties'), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
-                var $field = _.div({ class: 'editor__field' });
+                var $field = _.div({ class: 'editor__field', draggable: true }).on('mousedown', function (e) {
+                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
+                }).on('dragstart', function (e) {
+                    if (e.currentTarget.dataset.canDrag !== 'true') {
+                        return e.preventDefault();
+                    }
+                });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__drag fa fa-bars' }), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -44076,13 +44184,21 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                         fieldValue.config = fieldValue.config || {};
 
                         return editor.renderConfigEditor(fieldValue.config);
-                    })));
+                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                        delete _this2.model.fields.properties[fieldKey];
+
+                        renderFieldProperties();
+                    }));
                 };
 
                 renderField();
 
                 return $field;
-            }), _.button({ title: 'Add a property', class: 'widget widget--button round right' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            }), _.button({ title: 'Add a property', class: 'widget widget--button round right fa fa-plus' }).click(function () {
+                if (_this2.model.fields.properties.newField) {
+                    return;
+                }
+
                 _this2.model.fields.properties.newField = {
                     label: 'New field',
                     schemaId: 'array'
@@ -45185,7 +45301,7 @@ var ArrayEditor = function (_FieldEditor) {
             min: 0,
             step: 1,
             tooltip: 'How many items are required in this array (0 is unlimited)',
-            value: config.minItems,
+            value: config.minItems || 0,
             onChange: function onChange(newValue) {
                 config.minItems = newValue;
             }
@@ -45194,7 +45310,7 @@ var ArrayEditor = function (_FieldEditor) {
             min: 0,
             step: 1,
             tooltip: 'How many items are allowed in this array (0 is unlimited)',
-            value: config.maxItems,
+            value: config.maxItems || 0,
             onChange: function onChange(newValue) {
                 config.maxItems = newValue;
             }
@@ -46276,28 +46392,15 @@ var DropdownEditor = function (_FieldEditor) {
     DropdownEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.options = config.options || [];
 
-        var $element = _.div({ class: 'field-container' });
-
-        var render = function render() {
-            _.append($element.empty(), _.div({ class: 'field-key' }, 'Options'), _.div({ class: 'field-value' }, _.each(config.options, function (i, option) {
-                return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, _.input({ class: 'form-control', type: 'text', value: option.label }).change(function (e) {
-                    option.label = e.currentTarget.value;
-                })), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: option.value }).change(function (e) {
-                    option.value = e.currentTarget.value;
-                })));
-            }), _.button({ class: 'btn btn-round btn-primary raised' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                config.options.push({
-                    label: 'Option label',
-                    value: 'optionValue'
-                });
-
-                render();
-            })));
-        };
-
-        render();
-
-        return $element;
+        return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Options'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            value: config.options,
+            valueKey: 'value',
+            labelKey: 'label',
+            placeholder: 'New option',
+            onChange: function onChange(newValue) {
+                config.options = newValue;
+            }
+        }).$element));
     };
 
     /**
@@ -46634,9 +46737,42 @@ var NumberEditor = function (_FieldEditor) {
     NumberEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.step = config.step || 'any';
 
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Step'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: config.step }).change(function (e) {
-            config.step = e.currentTarget.value;
-        })));
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Step'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            step: 'any',
+            tooltip: 'The division by which the input number is allowed (0 is any division)',
+            value: config.step === 'any' ? 0 : config.step,
+            onChange: function onChange(newValue) {
+                if (newValue == 0) {
+                    newValue = 'any';
+                }
+
+                config.step = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Min value'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'The minimum required value',
+            type: 'number',
+            step: 'any',
+            value: config.min || 0,
+            onChange: function onChange(newValue) {
+                config.min = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Max value'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'The maximum allowed value (0 is infinite)',
+            type: 'number',
+            step: 'any',
+            value: config.max || 0,
+            onChange: function onChange(newValue) {
+                config.max = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is slider'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'Whether or not this number should be edited as a range slider',
+            type: 'checkbox',
+            value: config.isSlider || false,
+            onChange: function onChange(newValue) {
+                config.isSlider = newValue;
+            }
+        }).$element))];
     };
 
     /**
@@ -46644,15 +46780,21 @@ var NumberEditor = function (_FieldEditor) {
      */
 
 
-    NumberEditor.prototype.render = function render() {
-        var editor = this;
+    NumberEditor.prototype.template = function template() {
+        var _this2 = this;
 
-        // Main element
-        this.$element = _.div({ class: 'field-editor string-editor' },
-        // Render preview
-        this.renderPreview(), _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any' }).on('change propertychange paste keyup', function () {
-            editor.onChange();
-        })));
+        return new HashBrown.Views.Widgets.Input({
+            value: this.value,
+            type: this.config.isSlider ? 'range' : 'number',
+            step: this.config.step || 'any',
+            min: this.config.min || '0',
+            max: this.config.max || '0',
+            onChange: function onChange(newValue) {
+                _this2.value = parseFloat(newValue);
+
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element;
     };
 
     return NumberEditor;
@@ -46705,44 +46847,19 @@ var ResourceReferenceEditor = function (_FieldEditor) {
     ResourceReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.resourceKeys = config.resourceKeys || [];
 
-        var $element = _.div();
-
-        var render = function render() {
-            var isValidResource = config.resource && resources[config.resource] !== null;
-            var keyOptions = [];
-            var resourceOptions = [];
-
-            for (var resourceName in window.resources) {
-                resourceOptions.push({
-                    value: resourceName,
-                    label: resourceName
-                });
-            }
-
-            if (!isValidResource) {
-                config.resourceKeys = [];
-            } else if (resources[config.resource].length > 0) {
-                for (var resourceKey in resources[config.resource][0]) {
-                    keyOptions.push({
-                        label: resourceKey,
-                        value: resourceKey
-                    });
-                }
-            }
-
-            _.append($element.empty(), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Resource'), _.div({ class: 'field-value' }, UI.inputDropdown(config.resource, resourceOptions, function (newValue) {
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Resource'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            value: config.resource,
+            options: Object.keys(resources),
+            onChange: function onChange(newValue) {
                 config.resource = newValue;
-                config.resourceKeys = [];
-
-                render();
-            }))), _.if(isValidResource, _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Resource keys'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.resourceKeys, keyOptions, function (newValue) {
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Resource keys'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            value: config.resourceKeys,
+            placeholder: 'keyName',
+            onChange: function onChange(newValue) {
                 config.resourceKeys = newValue;
-            }, true)))));
-        };
-
-        render();
-
-        return $element;
+            }
+        }).$element))];
     };
 
     /**
@@ -47288,36 +47405,69 @@ var StructEditor = function (_FieldEditor) {
     StructEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.struct = config.struct || {};
 
-        var $element = _.div();
+        var $element = _.div({ class: 'editor--schema__struct' });
 
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         var renderEditor = function renderEditor() {
-            _.append($element.empty(), _.each(config.struct, function (key, value) {
+            _.append($element.empty(), _.div({ class: 'editor__field vertical' }, _.div({ class: 'editor__field__key' }, 'Struct fields'), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
                 // Sanity check
-                value.config = value.config || {};
+                fieldValue.config = fieldValue.config || {};
 
-                var $field = _.div({ class: 'field-properties' });
+                var $field = _.div({ class: 'editor__field', draggable: true }).on('mousedown', function (e) {
+                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
+                }).on('dragstart', function (e) {
+                    if (e.currentTarget.dataset.canDrag !== 'true') {
+                        return e.preventDefault();
+                    }
+                }).on('dragstop', function (e) {
+                    var siblings = e.parentElement.children;
+
+                    for (var i = 0; i < siblings.length; i++) {
+                        if (siblings[i] == e.currentTarget) {
+                            continue;
+                        }
+
+                        var siblingOffset = siblings[i].getBoundingClientRect();
+
+                        // TODO: Placement logic
+                    }
+                });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        delete config.struct[key];
+                    _.append($field.empty(), _.div({ class: 'editor__field__drag fa fa-bars' }), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A variable name, e.g. "myField"',
+                        tooltip: 'The field variable name',
+                        value: fieldKey,
+                        onChange: function onChange(newKey) {
+                            delete config.struct[fieldKey];
 
-                        renderEditor();
-                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
-                        delete config.struct[key];
+                            fieldKey = newKey;
 
-                        key = e.currentTarget.value;
+                            config.struct[fieldKey] = fieldValue;
+                        }
+                    }).$element, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A label, e.g. "My field"',
+                        tooltip: 'The field label',
+                        value: fieldValue.label,
+                        onChange: function onChange(newValue) {
+                            fieldValue.label = newValue;
+                        }
+                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useTypeAhead: true,
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        value: fieldValue.schemaId,
+                        labelKey: 'name',
+                        valueKey: 'id',
+                        onChange: function onChange(newValue) {
+                            fieldValue.schemaId = newValue;
 
-                        config.struct[key] = value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
-                        value.label = e.currentTarget.value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
-                        value.schemaId = newSchemaId;
-
-                        renderField();
-                    }))), _.do(function () {
-                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+                            renderField();
+                        }
+                    }).$element)), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
 
                         if (!schema) {
                             return;
@@ -47329,21 +47479,29 @@ var StructEditor = function (_FieldEditor) {
                             return;
                         }
 
-                        return editor.renderConfigEditor(value.config);
+                        return editor.renderConfigEditor(fieldValue.config);
+                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                        delete config.struct[fieldKey];
+
+                        renderEditor();
                     }));
                 };
 
                 renderField();
 
                 return $field;
-            }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            }), _.button({ class: 'widget widget--button round right fa fa-plus' }).click(function () {
+                if (config.struct.newField) {
+                    return;
+                }
+
                 config.struct.newField = {
                     label: 'New field',
-                    schemaId: 'string'
+                    schemaId: 'array'
                 };
 
                 renderEditor();
-            }));
+            }))));
         };
 
         renderEditor();
