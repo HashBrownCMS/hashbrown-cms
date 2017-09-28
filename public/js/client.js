@@ -29860,6 +29860,63 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {Boolean} isActive
+     *
+     * @return {Promise} On drag stop
+     */
+    UIHelper.sortable = function sortable(parentElement, isActive) {
+        return new Promise(function (resolve) {
+            var children = parentElement.children;
+
+            if (!children || children.length < 2) {
+                return resolve();
+            }
+
+            if (typeof isActive === 'undefined') {
+                isActive = !parentElement.classList.contains('sorting');
+            }
+
+            parentElement.classList.toggle('sorting', isActive);
+
+            _.each(children, function (i, child) {
+                if (child instanceof HTMLElement === false) {
+                    return;
+                }
+
+                if (isActive) {
+                    child.setAttribute('draggable', true);
+                } else {
+                    child.removeAttribute('draggable');
+                }
+
+                if (isActive) {
+                    child.ondragstart = function (e) {};
+
+                    child.ondrag = function (e) {
+                        // TODO: Run through siblings and place the element
+                    };
+
+                    child.ondragstop = function (e) {
+                        resolve(child);
+                    };
+
+                    child.ondragcancel = function (e) {
+                        resolve(child);
+                    };
+                } else {
+                    child.ondragstart = null;
+                    child.ondrag = null;
+                    child.ondragstop = null;
+                    child.ondragcancel = null;
+                }
+            });
+        });
+    };
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue
@@ -29867,6 +29924,8 @@ var UIHelper = function () {
      *
      * @returns {HTMLElement} Switch element
      */
+
+
     UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
         var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
         var $input = void 0;
@@ -44115,22 +44174,48 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         }).$element));
 
         // Field properties
-        var $fieldProperties = _.div({ class: 'editor__field vertical' });
+        var $fieldProperties = _.div({ class: 'editor__field' });
 
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
-            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties'), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
-                var $field = _.div({ class: 'editor__field', draggable: true }).on('mousedown', function (e) {
-                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
-                }).on('dragstart', function (e) {
-                    if (e.currentTarget.dataset.canDrag !== 'true') {
-                        return e.preventDefault();
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'wdiget widget--button' }, 'Sort').click(function (e) {
+                var $field = $(e.currentTarget).parents('.editor__field');
+                var $value = $field.children('.editor__field__value');
+
+                HashBrown.Helpers.UIHelper.sortable($value[0]).then(function (element) {
+                    var itemKey = element.dataset.key;
+                    var itemValue = _this2.model.fields.properties[key];
+
+                    delete _this2.model.fields.properties[itemKey];
+
+                    var nextElement = element.nextElementSibling;
+
+                    var newProperties = {};
+
+                    for (var fieldKey in _this2.model.fields.properties) {
+                        // If there is a next element, the item has not been inserted at the bottom
+                        if (nextElement && fieldKey === nextElement.dataset.key) {
+                            newProperties[itemKey] = itemValue;
+                        }
+
+                        newProperties[fieldKey] = fieldValue;
                     }
+
+                    // If the item wasn't reinserted, insert it now
+                    if (!newProperties[itemKey]) {
+                        newProperties[itemKey] = itemValue;
+                    }
+
+                    _this2.model.fields.properties = newProperties;
+
+                    renderFieldProperties();
                 });
+            }))), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
+                var $field = _.div({ class: 'editor__field', 'data-key': fieldKey });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__drag fa fa-bars' }), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-label' }, fieldValue.label), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -45585,7 +45670,7 @@ var ArrayEditor = function (_FieldEditor) {
         }
 
         // The value was below the required amount
-        if (this.value.items.length < this.config.minItems) {
+        if (this.value.length < this.config.minItems) {
             var diff = this.config.minItems - this.value.items.length;
 
             for (var _i2 = 0; _i2 < diff; _i2++) {
@@ -47410,32 +47495,14 @@ var StructEditor = function (_FieldEditor) {
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         var renderEditor = function renderEditor() {
-            _.append($element.empty(), _.div({ class: 'editor__field vertical' }, _.div({ class: 'editor__field__key' }, 'Struct fields'), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Struct fields'), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
                 // Sanity check
                 fieldValue.config = fieldValue.config || {};
 
-                var $field = _.div({ class: 'editor__field', draggable: true }).on('mousedown', function (e) {
-                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
-                }).on('dragstart', function (e) {
-                    if (e.currentTarget.dataset.canDrag !== 'true') {
-                        return e.preventDefault();
-                    }
-                }).on('dragstop', function (e) {
-                    var siblings = e.parentElement.children;
-
-                    for (var i = 0; i < siblings.length; i++) {
-                        if (siblings[i] == e.currentTarget) {
-                            continue;
-                        }
-
-                        var siblingOffset = siblings[i].getBoundingClientRect();
-
-                        // TODO: Placement logic
-                    }
-                });
+                var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__drag fa fa-bars' }), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',

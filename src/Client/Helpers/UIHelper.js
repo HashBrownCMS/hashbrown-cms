@@ -9,6 +9,64 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  */
 class UIHelper {
     /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {Boolean} isActive
+     *
+     * @return {Promise} On drag stop
+     */
+    static sortable(parentElement, isActive) {
+        return new Promise((resolve) => {
+            var children = parentElement.children;
+
+            if(!children || children.length < 2) { return resolve(); }
+
+            if(typeof isActive === 'undefined') {
+                isActive = !parentElement.classList.contains('sorting');
+            }
+
+            parentElement.classList.toggle('sorting', isActive);
+
+            _.each(children, (i, child) => {
+                if(child instanceof HTMLElement === false) { return; }
+
+                if(isActive) {
+                    child.setAttribute('draggable', true);
+                } else {
+                    child.removeAttribute('draggable');
+                }
+
+                if(isActive) {
+                    child.ondragstart = (e) => {
+                        
+                    };
+
+                    child.ondrag = (e) => {
+                        // TODO: Run through siblings and place the element
+                    };
+
+                    child.ondragstop = (e) => {
+                        resolve(child);
+                    };
+
+                    child.ondragcancel = (e) => {
+                        resolve(child);
+                    };
+
+                } else {
+                    child.ondragstart = null;
+                    child.ondrag = null;
+                    child.ondragstop = null;
+                    child.ondragcancel = null;
+                }
+
+            });
+        });
+    }
+
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue

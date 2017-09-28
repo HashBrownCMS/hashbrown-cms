@@ -85,35 +85,17 @@ class StructEditor extends FieldEditor {
             
         let renderEditor = () => {
             _.append($element.empty(),
-                _.div({class: 'editor__field vertical'},
+                _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'}, 'Struct fields'),
                     _.div({class: 'editor__field__value'},
                         _.each(config.struct, (fieldKey, fieldValue) => {
                             // Sanity check
                             fieldValue.config = fieldValue.config || {};
 
-                            let $field = _.div({class: 'editor__field', draggable: true})
-                                .on('mousedown', (e) => {
-                                    e.currentTarget.dataset.canDrag = e.target.classList.contains('editor__field__drag');
-                                })
-                                .on('dragstart', (e) => {
-                                    if(e.currentTarget.dataset.canDrag !== 'true') { return e.preventDefault(); }
-                                })
-                                .on('dragstop', (e) => {
-                                    var siblings = e.parentElement.children;
-
-                                    for(let i = 0; i < siblings.length; i++) {
-                                        if(siblings[i] == e.currentTarget) { continue; }
-
-                                        let siblingOffset = siblings[i].getBoundingClientRect();
-
-                                        // TODO: Placement logic
-                                    }
-                                });
+                            let $field = _.div({class: 'editor__field'});
 
                             let renderField = () => {
                                 _.append($field.empty(),
-                                    _.div({class: 'editor__field__drag fa fa-bars'}),
                                     _.div({class: 'editor__field__key'},
                                         new HashBrown.Views.Widgets.Input({
                                             type: 'text',

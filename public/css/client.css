@@ -2498,6 +2498,13 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     flex-basis: 2rem; }
   .editor__field.vertical > .editor__field__value {
     margin-left: 1rem; }
+  .editor__field__sort-label {
+    display: none;
+    color: #ffffff;
+    font-weight: bold;
+    line-height: 3rem;
+    height: 3rem;
+    padding: 0 1rem; }
   .editor__field__key {
     flex-basis: 10rem;
     flex-shrink: 0;
@@ -2505,6 +2512,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     line-height: 2rem; }
   .editor__field__value {
     flex-grow: 1; }
+    .editor__field__value.sorting .editor__field {
+      background-color: #e70d3b;
+      cursor: move;
+      height: 3rem;
+      margin-top: 1rem !important; }
+      .editor__field__value.sorting .editor__field:before {
+        display: none !important; }
+      .editor__field__value.sorting .editor__field__sort-label {
+        display: block; }
+      .editor__field__value.sorting .editor__field__value, .editor__field__value.sorting .editor__field__key, .editor__field__value.sorting .editor__field__remove {
+        display: none; }
   .editor__field__drag {
     cursor: move;
     width: 2rem;

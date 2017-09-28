@@ -499,7 +499,7 @@ class ArrayEditor extends FieldEditor {
         }
 
         // The value was below the required amount
-        if(this.value.items.length < this.config.minItems) {
+        if(this.value.length < this.config.minItems) {
             let diff = this.config.minItems - this.value.items.length;
 
             for(let i = 0; i < diff; i++) {

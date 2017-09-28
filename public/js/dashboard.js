@@ -25185,6 +25185,63 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {Boolean} isActive
+     *
+     * @return {Promise} On drag stop
+     */
+    UIHelper.sortable = function sortable(parentElement, isActive) {
+        return new Promise(function (resolve) {
+            var children = parentElement.children;
+
+            if (!children || children.length < 2) {
+                return resolve();
+            }
+
+            if (typeof isActive === 'undefined') {
+                isActive = !parentElement.classList.contains('sorting');
+            }
+
+            parentElement.classList.toggle('sorting', isActive);
+
+            _.each(children, function (i, child) {
+                if (child instanceof HTMLElement === false) {
+                    return;
+                }
+
+                if (isActive) {
+                    child.setAttribute('draggable', true);
+                } else {
+                    child.removeAttribute('draggable');
+                }
+
+                if (isActive) {
+                    child.ondragstart = function (e) {};
+
+                    child.ondrag = function (e) {
+                        // TODO: Run through siblings and place the element
+                    };
+
+                    child.ondragstop = function (e) {
+                        resolve(child);
+                    };
+
+                    child.ondragcancel = function (e) {
+                        resolve(child);
+                    };
+                } else {
+                    child.ondragstart = null;
+                    child.ondrag = null;
+                    child.ondragstop = null;
+                    child.ondragcancel = null;
+                }
+            });
+        });
+    };
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue
@@ -25192,6 +25249,8 @@ var UIHelper = function () {
      *
      * @returns {HTMLElement} Switch element
      */
+
+
     UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
         var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
         var $input = void 0;

@@ -88,6 +88,16 @@
             margin-left: 1rem;
         }
 
+        // Sort label (only used when sorting)
+        &__sort-label {
+            display: none;
+            color: $primary-text;
+            font-weight: bold;
+            line-height: 3rem;
+            height: 3rem;
+            padding: 0 1rem;
+        }
+
         // Key
         &__key {
             flex-basis: 10rem;
@@ -99,6 +109,28 @@
         // Value
         &__value {
             flex-grow: 1;
+            
+            // Sorting mode
+            &.sorting .editor__field {
+                background-color: $primary;
+                cursor: move;
+                height: 3rem;
+                margin-top: 1rem !important;
+
+                &:before {
+                    display: none !important;
+                }
+            
+                &__sort-label {
+                    display: block;
+                }
+
+                &__value,
+                &__key,
+                &__remove {
+                    display: none;
+                }
+            }
         }
 
         // Drag handle
