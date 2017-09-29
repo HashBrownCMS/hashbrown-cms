@@ -101,7 +101,7 @@ class StructEditor extends FieldEditor {
                                 })
                         )
                     ),
-                    _.div({class: 'editor__field__value'},
+                    _.div({class: 'editor__field__value segmented'},
                         _.each(config.struct, (fieldKey, fieldValue) => {
                             // Sanity check
                             fieldValue.config = fieldValue.config || {};

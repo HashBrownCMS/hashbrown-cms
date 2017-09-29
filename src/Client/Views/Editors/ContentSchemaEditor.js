@@ -74,7 +74,7 @@ class ContentSchemaEditor extends SchemaEditor {
                             })
                     )
                 ),
-                _.div({class: 'editor__field__value'},
+                _.div({class: 'editor__field__value segmented'},
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                         let $field = _.div({class: 'editor__field'});
 

@@ -19,39 +19,29 @@ const FieldEditor = require('./FieldEditor');
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class StringEditor extends FieldEditor {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
 
         this.init();
     }
-
-    /**
-     * Event: Change
-     */
-    onChange() {
-        this.value = this.$input.val();
-
-        this.trigger('change', this.value);
-    }
     
-    render() {
-        var editor = this;
+    /**
+     * Render this editor
+     */
+    template() {
+        return _.div({class: 'editor__field__value'},
+            new HashBrown.Views.Widgets.Input({
+                type: 'text',
+                value: this.value,
+                onChange: (newValue) => {
+                    this.value = newValue;
 
-        // Main element
-        this.$element = _.div({class: 'field-editor string-editor'},
-            _.if(this.disabled,
-                _.p(this.value || '(none)')
-            ),
-            _.if(!this.disabled,
-                _.if((!this.config.type || this.config.type == 'text') && this.config.multiline,
-                    this.$input = _.textarea({class: 'form-control'}, this.value || '')
-                        .on('change propertychange paste keyup', function() { editor.onChange(); })
-                ),
-                _.if((this.config.type && this.config.type != 'text') || !this.config.multiline,
-                    this.$input = _.input({class: 'form-control', value: this.value || '', type: this.config.type || 'text'})
-                        .on('change propertychange paste keyup', function() { editor.onChange(); })
-                )
-            )
+                    this.trigger('change', this.value);
+                }
+            }).$element.toggleClass('editor__field__sort-key', true)
         );
     }
 }

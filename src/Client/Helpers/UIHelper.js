@@ -9,6 +9,49 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  */
 class UIHelper {
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        let items = field.querySelector('.editor__field__value').children;
+
+        for(let i = 0; i < items.length; i++) {
+            if(items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) { continue; }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, (element) => {
+            if(!element) { return; }
+
+            let oldIndex = element.dataset.index;
+            let newIndex = 0;
+
+            // Discover new index
+            let items = field.querySelector('.editor__field__value').children;
+
+            for(let i = 0; i < items.length; i++) {
+                if(items[i] === element) {
+                    newIndex = i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
+
+            onChange(array);
+        });
+    }
+
+    /**
      * Creates a sortable context specific to objects using editor fields
      *
      * @param {Object} object
@@ -75,6 +118,7 @@ class UIHelper {
 
         if(this.sortable(divValue, 'editor__field', isSorting, onChange)) {
             btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
         }
     }
 
@@ -91,7 +135,7 @@ class UIHelper {
     static sortable(parentElement, sortableClassName, isActive, onChange) {
         let children = Array.prototype.slice.call(parentElement.children || []);
         let canSort = true;
-
+        
         children = children.filter((child) => {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });

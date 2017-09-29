@@ -25186,12 +25186,61 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        var items = field.querySelector('.editor__field__value').children;
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
+                continue;
+            }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var oldIndex = element.dataset.index;
+            var newIndex = 0;
+
+            // Discover new index
+            var items = field.querySelector('.editor__field__value').children;
+
+            for (var _i = 0; _i < items.length; _i++) {
+                if (items[_i] === element) {
+                    newIndex = _i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+
+            onChange(array);
+        });
+    };
+
+    /**
      * Creates a sortable context specific to objects using editor fields
      *
      * @param {Object} object
      * @param {HTMLElement} field
      * @param {Function} onChange
      */
+
+
     UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
         object = object || {};
 
@@ -25258,6 +25307,7 @@ var UIHelper = function () {
 
         if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
             btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
         }
     };
 
@@ -25427,16 +25477,16 @@ var UIHelper = function () {
                 var label = item.label || item.name || item.title;
 
                 if (!label) {
-                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
                         var _ref;
 
                         if (_isArray) {
-                            if (_i >= _iterator.length) break;
-                            _ref = _iterator[_i++];
+                            if (_i2 >= _iterator.length) break;
+                            _ref = _iterator[_i2++];
                         } else {
-                            _i = _iterator.next();
-                            if (_i.done) break;
-                            _ref = _i.value;
+                            _i2 = _iterator.next();
+                            if (_i2.done) break;
+                            _ref = _i2.value;
                         }
 
                         var dropdownItem = _ref;
@@ -25459,16 +25509,16 @@ var UIHelper = function () {
                 _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, label), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
                     // Look for unique dropdown items
                     if (isDropdownUnique) {
-                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
                             var _ref2;
 
                             if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
+                                if (_i3 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i3++];
                             } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
+                                _i3 = _iterator2.next();
+                                if (_i3.done) break;
+                                _ref2 = _i3.value;
                             }
 
                             var _item = _ref2;
@@ -25515,32 +25565,32 @@ var UIHelper = function () {
             _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
                 if (Array.isArray(dropdownItems)) {
                     if (isDropdownUnique) {
-                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
                             var _ref3;
 
                             if (_isArray3) {
-                                if (_i3 >= _iterator3.length) break;
-                                _ref3 = _iterator3[_i3++];
+                                if (_i4 >= _iterator3.length) break;
+                                _ref3 = _iterator3[_i4++];
                             } else {
-                                _i3 = _iterator3.next();
-                                if (_i3.done) break;
-                                _ref3 = _i3.value;
+                                _i4 = _iterator3.next();
+                                if (_i4.done) break;
+                                _ref3 = _i4.value;
                             }
 
                             var dropdownItem = _ref3;
 
                             var isSelected = false;
 
-                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
                                 var _ref4;
 
                                 if (_isArray4) {
-                                    if (_i4 >= _iterator4.length) break;
-                                    _ref4 = _iterator4[_i4++];
+                                    if (_i5 >= _iterator4.length) break;
+                                    _ref4 = _iterator4[_i5++];
                                 } else {
-                                    _i4 = _iterator4.next();
-                                    if (_i4.done) break;
-                                    _ref4 = _i4.value;
+                                    _i5 = _iterator4.next();
+                                    if (_i5.done) break;
+                                    _ref4 = _i5.value;
                                 }
 
                                 var item = _ref4;
@@ -25625,16 +25675,16 @@ var UIHelper = function () {
                 return;
             }
 
-            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
                 var _ref5;
 
                 if (_isArray5) {
-                    if (_i5 >= _iterator5.length) break;
-                    _ref5 = _iterator5[_i5++];
+                    if (_i6 >= _iterator5.length) break;
+                    _ref5 = _iterator5[_i6++];
                 } else {
-                    _i5 = _iterator5.next();
-                    if (_i5.done) break;
-                    _ref5 = _i5.value;
+                    _i6 = _iterator5.next();
+                    if (_i6.done) break;
+                    _ref5 = _i6.value;
                 }
 
                 var option = _ref5;
@@ -25699,8 +25749,8 @@ var UIHelper = function () {
         _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
 
         // Render all options
-        for (var _i6 in options || []) {
-            $element.trigger('addOption', options[_i6]);
+        for (var _i7 in options || []) {
+            $element.trigger('addOption', options[_i7]);
         }
 
         return $element;

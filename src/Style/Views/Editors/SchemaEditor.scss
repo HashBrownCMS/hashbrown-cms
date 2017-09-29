@@ -2,23 +2,4 @@
  * The editor for Schemas
  */
 .editor--schema {
-    .editor__body, 
-    &__struct {
-        & > .editor__field > .editor__field__value > .editor__field:not(:first-child) {
-            margin-top: 3rem;
-            
-            &:before {
-                display: block;
-                position: absolute;
-                width: 2rem;
-                margin-left: -1rem;
-                left: 50%;
-                top: -2rem;
-                font-family: 'FontAwesome';
-                text-align: center;
-                content: '\f141';
-                color: $standard-darker;
-            }
-        }
-    }
 }

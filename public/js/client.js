@@ -6101,6 +6101,15 @@ var FieldEditor = function (_Crisp$View) {
     };
 
     /**
+     * Renders key actions
+     *
+     * @returns {HTMLElement} Actions
+     */
+
+
+    FieldEditor.prototype.renderKeyActions = function renderKeyActions() {};
+
+    /**
      * Renders a field preview template
      *
      * @returns {HTMLElement} Element
@@ -28952,7 +28961,7 @@ var ContentEditor = function (_Crisp$View) {
         var $follow = void 0;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.field-container').each(function (i, field) {
+        this.$element.find('.editor__field').each(function (i, field) {
             var $field = $(field);
             $field.removeClass('following');
 
@@ -29178,9 +29187,7 @@ var ContentEditor = function (_Crisp$View) {
                     onChange(newValue);
                 });
 
-                if (fieldEditorInstance.$keyContent) {
-                    $keyContent.append(fieldEditorInstance.$keyContent);
-                }
+                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
             } else {
@@ -29243,12 +29250,12 @@ var ContentEditor = function (_Crisp$View) {
             // Render the field container
             var $keyContent = void 0;
 
-            return _.div({ class: 'field-container', 'data-key': key },
+            return _.div({ class: 'editor__field', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'field-key' }, $keyContent = _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
+            _.div({ class: 'editor__field__key' }, fieldDefinition.label || key, $keyContent = _.div({ class: 'editor__field__key__actions' })),
 
             // Render the field editor
-            _.div({ class: 'field-value' }, view.renderField(
+            view.renderField(
             // If the field definition is set to multilingual, pass value from object
             fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
@@ -29272,7 +29279,7 @@ var ContentEditor = function (_Crisp$View) {
             fieldDefinition.config || fieldSchema.config,
 
             // Pass the key content container, so the field editor can populate it
-            $keyContent)));
+            $keyContent));
         });
     };
 
@@ -30103,12 +30110,61 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        var items = field.querySelector('.editor__field__value').children;
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
+                continue;
+            }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var oldIndex = element.dataset.index;
+            var newIndex = 0;
+
+            // Discover new index
+            var items = field.querySelector('.editor__field__value').children;
+
+            for (var _i = 0; _i < items.length; _i++) {
+                if (items[_i] === element) {
+                    newIndex = _i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+
+            onChange(array);
+        });
+    };
+
+    /**
      * Creates a sortable context specific to objects using editor fields
      *
      * @param {Object} object
      * @param {HTMLElement} field
      * @param {Function} onChange
      */
+
+
     UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
         object = object || {};
 
@@ -30175,6 +30231,7 @@ var UIHelper = function () {
 
         if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
             btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
         }
     };
 
@@ -30344,16 +30401,16 @@ var UIHelper = function () {
                 var label = item.label || item.name || item.title;
 
                 if (!label) {
-                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
                         var _ref;
 
                         if (_isArray) {
-                            if (_i >= _iterator.length) break;
-                            _ref = _iterator[_i++];
+                            if (_i2 >= _iterator.length) break;
+                            _ref = _iterator[_i2++];
                         } else {
-                            _i = _iterator.next();
-                            if (_i.done) break;
-                            _ref = _i.value;
+                            _i2 = _iterator.next();
+                            if (_i2.done) break;
+                            _ref = _i2.value;
                         }
 
                         var dropdownItem = _ref;
@@ -30376,16 +30433,16 @@ var UIHelper = function () {
                 _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, label), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
                     // Look for unique dropdown items
                     if (isDropdownUnique) {
-                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
                             var _ref2;
 
                             if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
+                                if (_i3 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i3++];
                             } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
+                                _i3 = _iterator2.next();
+                                if (_i3.done) break;
+                                _ref2 = _i3.value;
                             }
 
                             var _item = _ref2;
@@ -30432,32 +30489,32 @@ var UIHelper = function () {
             _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
                 if (Array.isArray(dropdownItems)) {
                     if (isDropdownUnique) {
-                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
                             var _ref3;
 
                             if (_isArray3) {
-                                if (_i3 >= _iterator3.length) break;
-                                _ref3 = _iterator3[_i3++];
+                                if (_i4 >= _iterator3.length) break;
+                                _ref3 = _iterator3[_i4++];
                             } else {
-                                _i3 = _iterator3.next();
-                                if (_i3.done) break;
-                                _ref3 = _i3.value;
+                                _i4 = _iterator3.next();
+                                if (_i4.done) break;
+                                _ref3 = _i4.value;
                             }
 
                             var dropdownItem = _ref3;
 
                             var isSelected = false;
 
-                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
                                 var _ref4;
 
                                 if (_isArray4) {
-                                    if (_i4 >= _iterator4.length) break;
-                                    _ref4 = _iterator4[_i4++];
+                                    if (_i5 >= _iterator4.length) break;
+                                    _ref4 = _iterator4[_i5++];
                                 } else {
-                                    _i4 = _iterator4.next();
-                                    if (_i4.done) break;
-                                    _ref4 = _i4.value;
+                                    _i5 = _iterator4.next();
+                                    if (_i5.done) break;
+                                    _ref4 = _i5.value;
                                 }
 
                                 var item = _ref4;
@@ -30542,16 +30599,16 @@ var UIHelper = function () {
                 return;
             }
 
-            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
                 var _ref5;
 
                 if (_isArray5) {
-                    if (_i5 >= _iterator5.length) break;
-                    _ref5 = _iterator5[_i5++];
+                    if (_i6 >= _iterator5.length) break;
+                    _ref5 = _iterator5[_i6++];
                 } else {
-                    _i5 = _iterator5.next();
-                    if (_i5.done) break;
-                    _ref5 = _i5.value;
+                    _i6 = _iterator5.next();
+                    if (_i6.done) break;
+                    _ref5 = _i6.value;
                 }
 
                 var option = _ref5;
@@ -30616,8 +30673,8 @@ var UIHelper = function () {
         _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
 
         // Render all options
-        for (var _i6 in options || []) {
-            $element.trigger('addOption', options[_i6]);
+        for (var _i7 in options || []) {
+            $element.trigger('addOption', options[_i7]);
         }
 
         return $element;
@@ -45073,7 +45130,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
                     _this2.model.fields.properties = newProperties;
                 });
-            }))), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
+            }))), _.div({ class: 'editor__field__value segmented' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
                 var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
@@ -45516,170 +45573,40 @@ var ContentEditor = __webpack_require__(188);
 var ArrayEditor = function (_FieldEditor) {
     _inherits(ArrayEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function ArrayEditor(params) {
         _classCallCheck(this, ArrayEditor);
 
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
-
-        _this.$keyContent = _.div({ class: 'array-field-key' }, _.div({ class: 'widget-sorting' }, _.button({ class: 'btn btn-default' }, 'Done').click(function () {
-            _this.onClickSort();
-        })), _.div({ class: 'widget-default' }, _.button({ class: 'btn btn-default' }, 'Sort').click(function () {
-            _this.onClickSort();
-        }), _.button({ class: 'default btn btn-default' }, 'Collapse').click(function () {
-            _this.onClickCollapseAll();
-        }), _.button({ class: 'btn btn-default' }, 'Expand').click(function () {
-            _this.onClickExpandAll();
-        })));
 
         _this.init();
         return _this;
     }
 
     /**
-     * Event: Click expand all items
-     */
-
-
-    ArrayEditor.prototype.onClickExpandAll = function onClickExpandAll() {
-        this.$element.find('.item').each(function (e, element) {
-            $(element).toggleClass('collapsed', false);
-        });
-    };
-
-    /**
-     * Event: Click collapse all items
-     */
-
-
-    ArrayEditor.prototype.onClickCollapseAll = function onClickCollapseAll() {
-        this.$element.find('.item').each(function (e, element) {
-            $(element).toggleClass('collapsed', true);
-        });
-    };
-
-    /**
-     * Event: Click remove item
+     * Render key actions
      *
-     * @param {HTMLElement} element
+     * @returns {HTMLElement} Actions
      */
 
 
-    ArrayEditor.prototype.onClickRemoveItem = function onClickRemoveItem($element) {
-        var i = $element.attr('data-index');
-
-        this.value.splice(i, 1);
-
-        $element.remove();
-
-        this.updateDOMIndices();
-    };
-
-    /**
-     * Event: Click add item
-     */
-
-
-    ArrayEditor.prototype.onClickAddItem = function onClickAddItem() {
-        var index = this.value.length;
-
-        if (this.config.maxItems && index >= this.config.maxItems) {
-            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
-            return;
-        }
-
-        this.value[index] = { value: null, schemaId: null };
-
-        this.$element.children('.items').append(this.renderItem(index));
-
-        this.updateDOMIndices();
-    };
-
-    /**
-     * Event: Change value
-     *
-     * @param {Object} newValue
-     * @param {Number} index
-     * @param {Schema} itemSchema
-     */
-
-
-    ArrayEditor.prototype.onChangeValue = function onChangeValue(newValue, i, itemSchema) {
-        if (itemSchema.multilingual) {
-            // Sanity check to make sure multilingual fields are accomodated for
-            if (!this.value[i] || _typeof(this.value[i]) !== 'object') {
-                this.value[i] = { value: null, schemaId: null };
-            }
-
-            this.value[i].value._multilingual = true;
-            this.value[i].value[window.language] = newValue;
-        } else {
-            this.value[i].value = newValue;
-        }
-    };
-
-    /**
-     * Event: Change
-     */
-
-
-    ArrayEditor.prototype.onChange = function onChange(newValue, i, itemSchema) {
-        this.onChangeValue(newValue, i, itemSchema);
-
-        this.trigger('change', this.value);
-    };
-
-    /**
-     * Event: Silent change
-     */
-
-
-    ArrayEditor.prototype.onSilentChange = function onSilentChange(newValue, i, itemSchema) {
-        this.onChangeValue(newValue, i, itemSchema);
-
-        this.trigger('silentchange', this.value);
-    };
-
-    /**
-     * Event: Click sort
-     */
-
-
-    ArrayEditor.prototype.onClickSort = function onClickSort() {
+    ArrayEditor.prototype.renderKeyActions = function renderKeyActions() {
         var _this2 = this;
 
-        this.$element.toggleClass('sorting');
+        return [_.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+            HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
+                _this2.value = newArray;
 
-        var isSorting = this.$element.hasClass('sorting');
-
-        this.$keyContent.toggleClass('sorting', isSorting);
-
-        if (isSorting) {
-            this.$element.children('.items').children('.item').each(function (oldIndex, item) {
-                $(item).crdragdrop({
-                    lockX: true,
-                    dropContainers: _this2.$element[0].querySelectorAll('.items'),
-                    scrollContainer: document.querySelector('.content-editor .tab-content'),
-                    onEndDrag: function onEndDrag(instance) {
-                        _this2.updateDOMIndices();
-
-                        var newIndex = parseInt(instance.element.dataset.index);
-
-                        // Change the index in the items array
-                        var item = _this2.value[oldIndex];
-                        _this2.value.splice(oldIndex, 1);
-                        _this2.value.splice(newIndex, 0, item);
-
-                        _this2.trigger('change', _this2.value);
-                    }
-                });
+                _this2.trigger('change', _this2.value);
             });
-        } else {
-            this.updateDOMIndices();
+        }), _.button({ class: 'editor__field__key__action editor__field__key__action--collapse' }).click(function (e) {
+            var isCollapsed = !e.currentTarget.classList.contains('collapsed');
 
-            this.$element.children('.items').children('.item').each(function () {
-                $(this).crdragdrop('destroy');
-            });
-        }
+            e.currentTarget.classList.toggle('collapsed', isCollapsed);
+            $(e.currentTarget).parents('.editor__field').children('.editor__field__value')[0].classList.toggle('collapsed', isCollapsed);
+        })];
     };
 
     /**
@@ -45724,216 +45651,12 @@ var ArrayEditor = function (_FieldEditor) {
     };
 
     /**
-     * Updates DOM indices
-     */
-
-
-    ArrayEditor.prototype.updateDOMIndices = function updateDOMIndices() {
-        this.$element.children('.items').children('.item').each(function (i, element) {
-            element.dataset.index = i;
-        });
-    };
-
-    /**
-     * Renders an item
-     *
-     * @param {Number} index
-     *
-     * @returns {HTMLElement} Item
-     */
-
-
-    ArrayEditor.prototype.renderItem = function renderItem(index) {
-        var _this3 = this;
-
-        var $element = _.div({ class: 'item raised', 'data-index': index });
-
-        // Returns the correct index, even if it's updated
-        var getIndex = function getIndex() {
-            return parseInt($element.attr('data-index'));
-        };
-
-        // Renders this item
-        var rerenderItem = function rerenderItem() {
-            // Check if item exists
-            var item = _this3.value[getIndex()];
-
-            if (!item) {
-                return UI.errorModal(new Error('Index "' + getIndex() + '" is out of bounds'));
-            }
-
-            // Account for large arrays
-            if (_this3.value.length >= 20) {
-                $element.addClass('collapsed');
-            }
-
-            var itemSchemaId = _this3.value[getIndex()].schemaId;
-
-            // Schema could not be found, assign first allowed Schema
-            if (!itemSchemaId || _this3.config.allowedSchemas.indexOf(itemSchemaId) < 0) {
-                itemSchemaId = _this3.config.allowedSchemas[0];
-                _this3.value[getIndex()].schemaId = itemSchemaId;
-            }
-
-            // Assign the Schema id as a DOM attribute
-            $element.attr('data-schema', itemSchemaId);
-
-            // Make sure we have the item schema and the editor we need for each array item
-            var itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
-
-            if (!itemSchema) {
-                return UI.errorModal(new Error('Schema by id "' + itemSchemaId + '" not found'));
-            }
-
-            var fieldEditor = ContentEditor.getFieldEditor(itemSchema.editorId);
-
-            if (!fieldEditor) {
-                return UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
-            }
-
-            // Perform sanity check on item value
-            item.value = ContentHelper.fieldSanityCheck(item.value, itemSchema);
-
-            // Create dropdown array for Schema selector
-            var dropdownOptions = [];
-
-            for (var _iterator = _this3.config.allowedSchemas, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var allowedSchemaId = _ref;
-
-                var allowedSchema = SchemaHelper.getSchemaByIdSync(allowedSchemaId);
-
-                dropdownOptions[dropdownOptions.length] = {
-                    value: allowedSchema.id,
-                    label: allowedSchema.name,
-                    selected: allowedSchema.id == itemSchemaId
-                };
-            }
-
-            // Render the Schema selector
-            var $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
-                // Set new value in Schema bindings
-                item.schemaId = newValue;
-
-                // Re-render this item
-                rerenderItem();
-            })));
-
-            // Set schema label (used when sorting items)
-            var schemaLabel = '';
-
-            // Get the label from the item
-            // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
-            if (item.value) {
-                // This item is a string
-                if (typeof item.value === 'string') {
-                    // This item is an id
-                    if (item.value.length === 40) {
-                        var content = ContentHelper.getContentByIdSync(item.value);
-
-                        if (content) {
-                            schemaLabel = content.prop('title', window.language) || content.id || schemaLabel;
-                        } else {
-                            var media = MediaHelper.getMediaByIdSync(item.value);
-
-                            if (media) {
-                                schemaLabel = media.name || media.url || schemaLabel;
-                            }
-                        }
-
-                        // This item is another type of string
-                    } else {
-                        schemaLabel = item.value || schemaLabel;
-                    }
-
-                    // This item is a struct
-                } else if (item instanceof Object) {
-                    // Try to get a field based on the usual suspects
-                    schemaLabel = item.value.name || item.value.title || item.value.text || item.value.heading || item.value.header || item.value.body || item.value.description || item.value.type || item.value.body || item.value.id || schemaLabel;
-
-                    if (!schemaLabel) {
-                        // Find the first available field
-                        for (var configKey in itemSchema.config || {}) {
-                            var configValue = itemSchema.config[configKey];
-
-                            // If a label field was found, check if it has a value
-                            if (item.value[configKey]) {
-                                schemaLabel = item.value[configKey] || schemaLabel;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // If the schema label is multilingual, pick the appropriate string
-            if (schemaLabel && schemaLabel._multilingual) {
-                schemaLabel = schemaLabel[window.language];
-            }
-
-            // If no schema label was found, or it's not a string, resort to generic naming
-            if (!schemaLabel || typeof schemaLabel !== 'string') {
-                schemaLabel = 'Item #' + (getIndex() + 1);
-
-                // Add the Schema name in case we don't find the label field
-                if (itemSchema) {
-                    schemaLabel += ' (' + itemSchema.name + ')';
-                }
-            }
-
-            // Create label element 
-            var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
-
-            // Expanding/collapsing an item
-            var $btnToggle = _.button({ title: 'Collapse/expand item', class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
-                $element.toggleClass('collapsed');
-            });
-
-            // Init the field editor
-            var fieldEditorInstance = new fieldEditor({
-                value: itemSchema.multilingual ? item.value[window.language] : item.value,
-                disabled: itemSchema.disabled || false,
-                config: itemSchema.config || {},
-                schema: itemSchema
-            });
-
-            // Hook up the change events
-            fieldEditorInstance.on('change', function (newValue) {
-                _this3.onChange(newValue, getIndex(), itemSchema);
-            });
-
-            fieldEditorInstance.on('silentchange', function (newValue) {
-                _this3.onSilentChange(newValue, getIndex(), itemSchema);
-            });
-
-            // Render the DOM element
-            _.append($element.empty(), $btnToggle, _.button({ title: 'Remove item', class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                _this3.onClickRemoveItem($element);
-            }), $schemaLabel, _this3.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
-        };
-
-        rerenderItem();
-
-        return $element;
-    };
-
-    /**
      * Sanity check
      */
 
 
     ArrayEditor.prototype.sanityCheck = function sanityCheck() {
-        var _this4 = this;
+        var _this3 = this;
 
         // The value was null
         if (!this.value) {
@@ -45976,7 +45699,7 @@ var ArrayEditor = function (_FieldEditor) {
             this.value = newItems;
 
             setTimeout(function () {
-                _this4.trigger('change', _this4.value);
+                _this3.trigger('change', _this3.value);
             }, 500);
         }
 
@@ -45984,15 +45707,15 @@ var ArrayEditor = function (_FieldEditor) {
         if (this.value.length < this.config.minItems) {
             var diff = this.config.minItems - this.value.items.length;
 
-            for (var _i2 = 0; _i2 < diff; _i2++) {
+            for (var _i = 0; _i < diff; _i++) {
                 this.value.push({ value: null, schemaId: null });
             }
         }
 
         // The value was above the required amount
         if (this.value.length > this.config.maxItems) {
-            for (var _i3 = this.config.maxItems; _i3 < this.value.length; _i3++) {
-                delete this.value[_i3];
+            for (var _i2 = this.config.maxItems; _i2 < this.value.length; _i2++) {
+                delete this.value[_i2];
             }
         }
     };
@@ -46012,75 +45735,59 @@ var ArrayEditor = function (_FieldEditor) {
 
 
     ArrayEditor.prototype.template = function template() {
-        var _this5 = this;
+        var _this4 = this;
 
-        return _.div(_.each(this.value, function (i, item) {
+        return _.div({ class: 'editor__field__value segmented' }, _.each(this.value, function (i, item) {
             var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
             // Schema could not be found, assign first allowed Schema
-            if (!schema || _this5.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-                item.schemaId = _this5.config.allowedSchemas[0];
+            if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                item.schemaId = _this4.config.allowedSchemas[0];
 
                 schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
             }
 
-            var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+            var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
-            if (!editor) {
+            if (!editorClass) {
                 return;
             }
 
             // Perform sanity check on item value
             item.value = ContentHelper.fieldSanityCheck(item.value, schema);
 
-            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__value' }, new editor({
+            // Instantiate editor
+            var editorInstance = new editorClass({
                 value: item.value,
                 config: schema.config,
                 schema: schema
-            }).$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
-                // TODO: Remove
-            })));
-        }), _.button({ title: 'Add an array item', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
-            var index = _this5.value.length;
+            });
 
-            if (_this5.config.maxItems && index >= _this5.config.maxItems) {
-                UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this5.config.maxItems + ' items here');
+            editorInstance.on('change', function (newValue) {
+                item.value = newValue;
+            });
+
+            return _.div({ class: 'editor__field' }, editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                _this4.value.splice(i, 1);
+
+                _this4.trigger('change', _this4.value);
+
+                _this4.init();
+            }));
+        }), _.button({ title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
+            var index = _this4.value.length;
+
+            if (_this4.config.maxItems && index >= _this4.config.maxItems) {
+                UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this4.config.maxItems + ' items here');
                 return;
             }
 
-            _this5.value[index] = { value: null, schemaId: null };
+            _this4.value[index] = { value: null, schemaId: null };
 
-            _this5.init();
+            _this4.trigger('change', _this4.value);
+
+            _this4.init();
         }));
-
-        // Render editor
-        _.append(this.$element.empty(), _.div({ class: 'items' }),
-
-        // Render the add item button
-        _.button({ title: 'Add item', class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-            _this5.onClickAddItem();
-        }));
-
-        // Render items asynchronously to accommodate for large arrays
-        var renderNextItem = function renderNextItem(i) {
-            // Update DOM indices after all items have been rendered
-            if (i >= _this5.value.length) {
-                _this5.updateDOMIndices();
-
-                ContentEditor.restoreScrollPos();
-                return;
-            }
-
-            // Append the item to the DOM
-            _this5.$element.children('.items').append(_this5.renderItem(i));
-
-            // Render next item in the next CPU cycle
-            setTimeout(function () {
-                renderNextItem(i + 1);
-            }, 1);
-        };
-
-        renderNextItem(0);
     };
 
     return ArrayEditor;
@@ -47717,6 +47424,9 @@ var FieldEditor = __webpack_require__(11);
 var StringEditor = function (_FieldEditor) {
     _inherits(StringEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function StringEditor(params) {
         _classCallCheck(this, StringEditor);
 
@@ -47727,25 +47437,22 @@ var StringEditor = function (_FieldEditor) {
     }
 
     /**
-     * Event: Change
+     * Render this editor
      */
 
 
-    StringEditor.prototype.onChange = function onChange() {
-        this.value = this.$input.val();
+    StringEditor.prototype.template = function template() {
+        var _this2 = this;
 
-        this.trigger('change', this.value);
-    };
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'text',
+            value: this.value,
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-    StringEditor.prototype.render = function render() {
-        var editor = this;
-
-        // Main element
-        this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, _.if((!this.config.type || this.config.type == 'text') && this.config.multiline, this.$input = _.textarea({ class: 'form-control' }, this.value || '').on('change propertychange paste keyup', function () {
-            editor.onChange();
-        })), _.if(this.config.type && this.config.type != 'text' || !this.config.multiline, this.$input = _.input({ class: 'form-control', value: this.value || '', type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
-            editor.onChange();
-        }))));
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element.toggleClass('editor__field__sort-key', true));
     };
 
     return StringEditor;
@@ -47865,7 +47572,7 @@ var StructEditor = function (_FieldEditor) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
                     config.struct = newStruct;
                 });
-            }))), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
+            }))), _.div({ class: 'editor__field__value segmented' }, _.each(config.struct, function (fieldKey, fieldValue) {
                 // Sanity check
                 fieldValue.config = fieldValue.config || {};
 

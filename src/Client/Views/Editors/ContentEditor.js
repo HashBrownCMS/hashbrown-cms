@@ -30,7 +30,7 @@ class ContentEditor extends Crisp.View {
         let $follow;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.field-container').each((i, field) => {
+        this.$element.find('.editor__field').each((i, field) => {
             let $field = $(field);
             $field.removeClass('following');
 
@@ -232,9 +232,7 @@ class ContentEditor extends Crisp.View {
                     onChange(newValue);
                 });
 
-                if(fieldEditorInstance.$keyContent) {
-                    $keyContent.append(fieldEditorInstance.$keyContent);
-                }
+                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
 
@@ -297,43 +295,39 @@ class ContentEditor extends Crisp.View {
             // Render the field container
             let $keyContent;
 
-            return _.div({class: 'field-container', 'data-key': key},
+            return _.div({class: 'editor__field', 'data-key': key},
                 // Render the label and icon
-                _.div({class: 'field-key'},
-                    $keyContent = _.div({class: 'field-key-content'},
-                        _.span({class: 'field-key-icon fa fa-' + fieldSchema.icon}),
-                        _.span({class: 'field-key-label'}, fieldDefinition.label || key)
-                    )
+                _.div({class: 'editor__field__key'},
+                    fieldDefinition.label || key,
+                    $keyContent = _.div({class: 'editor__field__key__actions'})
                 ),
 
                 // Render the field editor
-                _.div({class: 'field-value'},
-                    view.renderField(
-                        // If the field definition is set to multilingual, pass value from object
-                        fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
+                view.renderField(
+                    // If the field definition is set to multilingual, pass value from object
+                    fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
-                        // Pass the field definition
-                        fieldDefinition,
+                    // Pass the field definition
+                    fieldDefinition,
 
-                        // On change function
-                        function(newValue) {
-                            // If field definition is set to multilingual, assign flag and value onto object...
-                            if(fieldDefinition.multilingual) {
-                                fieldValues[key]._multilingual = true;
-                                fieldValues[key][window.language] = newValue;
+                    // On change function
+                    (newValue) => {
+                        // If field definition is set to multilingual, assign flag and value onto object...
+                        if(fieldDefinition.multilingual) {
+                            fieldValues[key]._multilingual = true;
+                            fieldValues[key][window.language] = newValue;
 
-                            // ...if not, assign the value directly
-                            } else {
-                                fieldValues[key] = newValue;
-                            }
-                        },
+                        // ...if not, assign the value directly
+                        } else {
+                            fieldValues[key] = newValue;
+                        }
+                    },
 
-                        // Pass the field definition config, and use the field's schema config as fallback
-                        fieldDefinition.config || fieldSchema.config,
+                    // Pass the field definition config, and use the field's schema config as fallback
+                    fieldDefinition.config || fieldSchema.config,
 
-                        // Pass the key content container, so the field editor can populate it
-                        $keyContent
-                    )
+                    // Pass the key content container, so the field editor can populate it
+                    $keyContent
                 )
             );
         });

@@ -68,12 +68,13 @@
     // Field container
     &__field {
         display: flex;
-        margin: 0 0 1rem 0;
+        padding: 1rem 0;
         position: relative;
         transition: background-color 0.5s ease, transform 0.5s ease;
+        border-bottom: 1px solid $standard-darker;
 
-        &:last-child {
-            margin-bottom: 0;
+        &:last-of-type {
+            border-bottom: 0;
         }
 
         // Vertical mode
@@ -101,12 +102,14 @@
             
             }
 
+            // Key action button
             &__action {
                 border: 0px;
                 line-height: 2rem;
                 height: 2rem;
                 display: block;
                 padding: 0;
+                margin-top: 0.5rem;
                 float: left;
                 clear: both;
                 background-color: transparent;
@@ -117,31 +120,62 @@
                 transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
                 cursor: pointer;
                 border-radius: 0.2rem;
+                padding: 0 0.5rem 0 0;
 
                 &:hover {
                     color: $primary-text;
                     background-color: $primary;
-                    padding: 0 0.5rem;
+                }
+                
+                // Icon
+                &:before {
+                    font-family: 'FontAwesome';
+                    display: inline-block;
+                    line-height: 2rem;
+                    height: 2rem;
+                    width: 2rem;
+                    text-align: center;
                 }
 
-                &--sort {
+                // Collapse/expand
+                &--collapse {
+                    &:after {
+                        content: 'Collapse all';
+                    }
+
                     &:before {
+                        content: '\f066';
+                    }
+
+                    // Collapsed state
+                    &.collapsed {
+                        &:after {
+                            content: 'Expand all';
+                        }
+
+                        &:before {
+                            content: '\f065';
+                        }
+                    }
+                }
+
+                // Sort
+                &--sort {
+                    &:after {
                         content: 'Sort items'
                     }
 
-                    &:after {
-                        font-family: 'FontAwesome';
+                    &:before {
                         content: '\f0dc';
-                        margin-left: 0.5rem;
                     }
 
                     // Sorting state
                     &.sorting {
-                        &:before {
+                        &:after {
                             content: 'Done sorting'
                         }
 
-                        &:after {
+                        &:before {
                             content: '\f00c';
                         }
                     }
@@ -156,21 +190,33 @@
             border-radius: 0.2rem;
             transition: border 0.5s ease, padding 0.5s ease;
 
-            // Sorting mode
-            &.sorting {
+            // Segmented
+            &.segmented > .editor__field {
+                border-bottom: 0;
                 padding: 1rem;
-                border: 0.15rem dashed $standard-darker;
-        
-                // Hide the add button
-                .editor__field__add {
-                    display: none;
-                }
+                margin-bottom: 1rem;
+                background-color: $standard;
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
 
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            // Nested segmentation
+            &.segmented .editor__field__value.segmented {
+                padding: 1rem;
+                background-color: $standard-dark;
+                border-radius: 0.2rem;
+                box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+            }
+
+            // Collapsed & sorting mode
+            &.collapsed, &.sorting {
                 // Style the sort key
                 .editor__field__sort-key {
                     background-color: transparent;
                     font-weight: bold;
-                    color: $primary-text;
                     padding: 0 1rem;
                     border: 0;
                     pointer-events: none;
@@ -181,10 +227,9 @@
 
                 // Style the items inside
                 .editor__field {
-                    background-color: $primary;
-                    cursor: move;
                     height: 3rem;
                     border-radius: 0.2rem;
+                    padding: 0;
 
                     &:not(:first-of-type) {
                         margin-top: 1rem !important;
@@ -198,12 +243,41 @@
                         display: none !important;
                     }
                 
-                    &__sort-label {
-                        display: block;
+                    &__value > *:not(.editor__field__sort-key),
+                    &__key > *:not(.editor__field__sort-key) {
+                        display: none;
                     }
+                }
+            }
 
-                    &__value,
-                    &__key > *:not(.editor__field__sort-key),
+            // Collapsed mode
+            &.collapsed {
+                // Style the items inside
+                .editor__field {
+                    background-color: $standard;
+                }
+            }
+
+            // Sorting mode
+            &.sorting {
+                padding: 1rem;
+                border: 0.15rem dashed $standard-darker;
+        
+                // Hide the add button
+                .editor__field__add {
+                    display: none;
+                }
+
+                // Style the sort key
+                .editor__field__sort-key {
+                    color: $primary-text;
+                }
+
+                // Style the items inside
+                .editor__field {
+                    background-color: $primary;
+                    cursor: move;
+
                     &__remove {
                         display: none;
                     }
@@ -213,6 +287,7 @@
 
         // Add button
         &__add {
+            margin-top: 1rem;
             margin-left: auto;
         }
 

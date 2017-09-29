@@ -18,6 +18,13 @@ class FieldEditor extends Crisp.View {
     }
 
     /**
+     * Renders key actions
+     *
+     * @returns {HTMLElement} Actions
+     */
+    renderKeyActions() {}
+
+    /**
      * Renders a field preview template
      *
      * @returns {HTMLElement} Element
