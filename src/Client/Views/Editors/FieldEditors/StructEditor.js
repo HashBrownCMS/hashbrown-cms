@@ -89,7 +89,7 @@ class StructEditor extends FieldEditor {
                     _.div({class: 'editor__field__key'},
                         'Properties',
                         _.div({class: 'editor__field__key__actions'},
-                            _.button({class: 'widget widget--button editor__field__key__action--sort'}, 'Sort')
+                            _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                                 .click((e) => {
                                     HashBrown.Helpers.UIHelper.fieldSortableObject(
                                         config.struct,
@@ -175,7 +175,7 @@ class StructEditor extends FieldEditor {
 
                             return $field;
                         }),
-                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a property'},
+                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property'},
                             ).click(() => {
                                 if(config.struct.newField) { return; }
                             

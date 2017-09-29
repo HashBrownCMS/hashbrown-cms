@@ -32,6 +32,27 @@ class Dropdown extends Widget {
                 optionLabel = optionLabel.toString();
             }
 
+            // Check for disabled options
+            let isDisabled = false;
+
+            if(this.disabledOptions && Array.isArray(this.disabledOptions)) {
+                for(let disabledKey in this.disabledOptions) {
+                    let disabledValue = this.disabledOptions[disabledKey];
+                    let disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
+                   
+                    if(typeof disabledOptionValue !== 'string') { 
+                        disabledOptionValue = disabledOptionValue.toString();
+                    }
+               
+                    if(optionValue === disabledOptionValue) {
+                        isDisabled = true;
+                        break;
+                    }
+                }
+            }
+
+            if(isDisabled) { continue; }
+
             options[optionValue] = optionLabel;
         }
 

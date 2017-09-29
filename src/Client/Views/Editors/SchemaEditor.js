@@ -51,143 +51,21 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-    renderEditorPicker() {
-        if(this.model.isPropertyHidden('editorId')) { return; }  
-
-        let editorOptions = [];
-
-        for(let i in HashBrown.Views.Editors.FieldEditors) {
-            let editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        let editorName = this.model.editorId || '(none)';
-        
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-        
-        let $element = _.div({class: 'editor-picker'},
-            _.if(!this.model.isLocked,
-                UI.inputDropdownTypeAhead(editorName, editorOptions, (newValue) => {
-                    this.model.editorId = newValue;
-
-                    this.render();
-                })
-            ),
-            _.if(this.model.isLocked,
-                _.p({class: 'read-only'},
-                    editorName
-                )
-            )
-        );
-
-        return $element;
-    }
-
-    /**
-     * Renders the name editor
-     *
-     * @return {Object} element
-     */
-    renderNameEditor() {
-        if(this.model.isPropertyHidden('name')) { return; }  
-        
-        let view = this;
-
-        function onInputChange() {
-            view.model.name = $(this).val();
-        }
-
-        let $element = _.div({class: 'name-editor'},
-            _.if(!this.model.isLocked,
-                _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here'})
-                    .on('change', onInputChange)
-            ),
-            _.if(this.model.isLocked,
-                _.p({class: 'read-only'},
-                    view.model.name
-                )
-            )
-        );
-
-        return $element;
-    }
-
-    /**
      * Renders the icon editor
      *  
      * @return {Object} element
      */
     renderIconEditor() {
-        if(this.model.isPropertyHidden('icon')) { return; }  
-        
-        let view = this;
+        return _.button({class: 'widget widget--button fa fa-' + this.model.icon})
+            .click((e) => {
+                let modal = new HashBrown.Views.Modals.IconModal();
 
-        function onClickBrowse() {
-            function onSearch() {
-                let query = modal.$element.find('.icon-search input').val().toLowerCase();
+                modal.on('change', (newIcon) => {
+                    this.model.icon = newIcon;
 
-                if(query.length > 2 || query.length == 0) {
-                    modal.$element.find('.btn-icon').each(function(i) {
-                        let $btn = $(this);
-                        let name = $btn.children('.icon-name').html();
-
-                        $btn.toggle(name.indexOf(query) > -1);
-                    });
-                }
-            }
-
-            let modal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-icon-picker',
-                    title: 'Pick an icon',
-                    body: [   
-                        _.div({class: 'icon-search'},
-                            _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
-                                .on('change', function(e) {
-                                    onSearch();
-                                })
-                        ),
-                        _.each(icons, function(i, icon) {
-                            function onClickButton() {
-                                view.model.icon = icon;
-
-                                view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
-
-                                modal.hide();
-                            }
-                            
-                            return _.button({class: 'btn btn-icon'},
-                                _.span({class: 'fa fa-' + icon}),
-                                _.span({class: 'icon-name'}, icon)
-                            ).click(onClickButton);
-                        })
-                    ]
-                }
+                    e.currentTarget.className = 'widget widget--button fa fa-' + this.model.icon;
+                });
             });
-        }
-
-        let $element = _.div({class: 'icon-editor'},
-            _.if(!this.model.isLocked,
-                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '')},
-                    _.span({class: 'fa fa-' + this.model.icon})
-                ).click(onClickBrowse)
-            ),
-            _.if(this.model.isLocked,
-                _.span({class: 'fa fa-' + this.model.icon})
-            )
-        );
-        
-        return $element;
     }
 
     /**
@@ -260,50 +138,6 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
-     * Renders the field config editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-    renderFieldConfigEditor() {
-        let editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-        if(!editor) { return; }
-
-        return _.div({class: 'config'},
-            editor.renderConfigEditor(this.model.config)
-        );
-    }
-
-	/**
-	 * Render template editor
-	 *
-	 * @returns {HTMLElement} Element
-	 */
-	renderTemplateEditor() {
-        let $element = _.div({class: 'field-properties-editor'});
-
-		setTimeout(() => {
-			this.templateEditor = CodeMirror($element[0], {
-				value: this.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-			});
-
-			this.templateEditor.on('change', () => {
-				this.model.previewTemplate = this.templateEditor.getDoc().getValue();
-			});
-		}, 1);
-
-		return $element;
-	}
-
-    /**
      * Renders a single field
      *
      * @param {String} label
@@ -344,16 +178,21 @@ class SchemaEditor extends Crisp.View {
 
         $element.append(this.renderField('Icon', this.renderIconEditor()));   
 
-        $element.append(this.renderField('Parent', this.renderParentEditor()));
+        $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.parentSchemaId,
+            options: resources.schemas,
+            valueKey: 'id',
+            labelKey: 'name',
+            disabledOptions: [ { id: this.model.id, name: this.model.name } ],
+            onChange: (newParent) => {
+                this.model.parentSchemaId = newParent;
+
+                this.render();
+            }
+        }).$element));
         
         switch(this.model.type) {
             case 'field':
-                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
-                
-                if(!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
-                }
        
                 break;
         }

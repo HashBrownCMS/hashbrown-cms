@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 268);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -15091,7 +15091,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
-var LanguageHelperCommon = __webpack_require__(189);
+var LanguageHelperCommon = __webpack_require__(190);
 
 /**
  * The client side language helper
@@ -24729,7 +24729,8 @@ module.exports = ConnectionHelper;
 
 /***/ }),
 /* 188 */,
-/* 189 */
+/* 189 */,
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24837,7 +24838,7 @@ var LanguageHelper = function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24850,19 +24851,19 @@ module.exports = LanguageHelper;
 module.exports = {
     ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
-    DebugHelper: __webpack_require__(191),
+    DebugHelper: __webpack_require__(192),
     LanguageHelper: __webpack_require__(94),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
-    TemplateHelper: __webpack_require__(193),
-    UIHelper: __webpack_require__(194)
+    TemplateHelper: __webpack_require__(194),
+    UIHelper: __webpack_require__(195)
 };
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24874,7 +24875,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(192);
+var DebugHelperCommon = __webpack_require__(193);
 
 /**
  * The client side debug helper
@@ -24937,7 +24938,7 @@ var DebugHelper = function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25100,7 +25101,7 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25163,7 +25164,7 @@ var TemplateHelper = function () {
 module.exports = TemplateHelper;
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25194,13 +25195,7 @@ var UIHelper = function () {
     UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
         object = object || {};
 
-        var btnSort = field.querySelector('.editor__field__key__action--sort');
-        var divValue = field.querySelector('.editor__field__value');
-        var isSorting = !divValue.classList.contains('sorting');
-
-        btnSort.innerHTML = isSorting ? 'done' : 'sort';
-
-        this.sortable(divValue, 'editor__field', isSorting, function (element) {
+        this.fieldSortable(field, function (element) {
             if (!element) {
                 return;
             }
@@ -25208,8 +25203,14 @@ var UIHelper = function () {
             var itemKey = element.querySelector('.editor__field__sort-key').value;
             var itemValue = object[itemKey];
 
-            var nextElement = element.nextElementSibling;
+            // Try to get the next key
+            var nextKey = '';
 
+            if (element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
+
+            // Construct a new object based on the old one
             var newObject = {};
 
             for (var fieldKey in object) {
@@ -25220,8 +25221,9 @@ var UIHelper = function () {
 
                 var fieldValue = object[fieldKey];
 
-                // If there is a next element, the item has not been inserted at the bottom
-                if (nextElement && fieldKey === nextElement.dataset.key) {
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if (nextKey === fieldKey) {
                     newObject[itemKey] = itemValue;
                 }
 
@@ -25242,12 +25244,32 @@ var UIHelper = function () {
     };
 
     /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortable = function fieldSortable(field, onChange) {
+        var btnSort = field.querySelector('.editor__field__key__action--sort');
+        var divValue = field.querySelector('.editor__field__value');
+        var isSorting = !divValue.classList.contains('sorting');
+
+        if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+        }
+    };
+
+    /**
      * Creates a sortable context
      *
      * @param {HTMLElement} parentElement
      * @param {String} sortableClassName
      * @param {Boolean} isActive
      * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
      */
 
 
@@ -25260,7 +25282,7 @@ var UIHelper = function () {
         });
 
         if (!children || children.length < 2) {
-            return resolve();
+            return false;
         }
 
         if (typeof isActive === 'undefined') {
@@ -25337,6 +25359,8 @@ var UIHelper = function () {
         });
 
         parentElement.classList.toggle('sorting', isActive);
+
+        return true;
     };
 
     /**
@@ -25921,12 +25945,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(196);
-window.marked = __webpack_require__(197);
-window.toMarkdown = __webpack_require__(198);
+window.Promise = __webpack_require__(197);
+window.marked = __webpack_require__(198);
+window.toMarkdown = __webpack_require__(199);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -26025,13 +26049,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(206);
+window.app = __webpack_require__(207);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -31362,7 +31386,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -32551,7 +32575,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32567,10 +32591,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(199);
-var gfmConverters = __webpack_require__(200);
-var HtmlParser = __webpack_require__(201);
-var collapse = __webpack_require__(203);
+var mdConverters = __webpack_require__(200);
+var gfmConverters = __webpack_require__(201);
+var HtmlParser = __webpack_require__(202);
+var collapse = __webpack_require__(204);
 
 /*
  * Utilities
@@ -32778,7 +32802,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32911,7 +32935,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33011,7 +33035,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33045,7 +33069,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(202);
+    var jsdom = __webpack_require__(203);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -33092,25 +33116,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(204);
+var voidElements = __webpack_require__(205);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(205).forEach(function (name) {
+__webpack_require__(206).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -33240,7 +33264,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -33268,7 +33292,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports) {
 
 /**
@@ -33279,7 +33303,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 206 */
+/* 207 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -33331,7 +33355,6 @@ module.exports = {
 };
 
 /***/ }),
-/* 207 */,
 /* 208 */,
 /* 209 */,
 /* 210 */,
@@ -33392,7 +33415,10 @@ module.exports = {
 /* 265 */,
 /* 266 */,
 /* 267 */,
-/* 268 */
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33404,10 +33430,10 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Helpers = __webpack_require__(190);
+HashBrown.Helpers = __webpack_require__(191);
 
 // Helper functions
-__webpack_require__(195);
+__webpack_require__(196);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -33443,7 +33469,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(269);
+            var ProjectEditor = __webpack_require__(272);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33709,7 +33735,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 269 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33724,11 +33750,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(270);
-var SyncEditor = __webpack_require__(271);
-var LanguageEditor = __webpack_require__(272);
-var BackupEditor = __webpack_require__(273);
-var MigrationEditor = __webpack_require__(274);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33970,7 +33996,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 270 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34088,7 +34114,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 271 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34294,7 +34320,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 272 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34377,7 +34403,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 273 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34643,7 +34669,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 274 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

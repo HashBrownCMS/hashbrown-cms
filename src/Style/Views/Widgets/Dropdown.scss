@@ -5,8 +5,9 @@
     display: flex;
     position: relative;
     max-width: 20rem;
-    background-color: $primary;
+    background-color: $standard;
     border-radius: 0.2rem;
+    border: 0.1rem solid $standard-darker;
 
     // Value
     &__value {
@@ -14,7 +15,7 @@
         width: calc(100% - 2rem);
         line-height: 2rem;
         padding: 0 0.5rem;
-        color: $primary-text;
+        color: $standard-text;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -137,7 +138,7 @@
         background: transparent;
         right: 0;
         top: 0;
-        color: $primary-text;
+        color: $primary;
     }
 
     // Obscure

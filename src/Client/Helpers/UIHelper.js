@@ -18,20 +18,20 @@ class UIHelper {
     static fieldSortableObject(object, field, onChange) {
         object = object || {};
 
-        let btnSort = field.querySelector('.editor__field__key__action--sort');
-        let divValue = field.querySelector('.editor__field__value');
-        let isSorting = !divValue.classList.contains('sorting');
-
-        btnSort.innerHTML = isSorting ? 'done' : 'sort';
-
-        this.sortable(divValue, 'editor__field', isSorting, (element) => {
+        this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
             let itemKey = element.querySelector('.editor__field__sort-key').value;
             let itemValue = object[itemKey];
 
-            let nextElement = element.nextElementSibling;
+            // Try to get the next key
+            let nextKey = '';
+            
+            if(element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
 
+            // Construct a new object based on the old one
             let newObject = {};
 
             for(let fieldKey in object) {
@@ -40,8 +40,9 @@ class UIHelper {
 
                 let fieldValue = object[fieldKey];
 
-                // If there is a next element, the item has not been inserted at the bottom
-                if(nextElement && fieldKey === nextElement.dataset.key) {
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if(nextKey === fieldKey) {
                     newObject[itemKey] = itemValue;
                 }
 
@@ -62,12 +63,30 @@ class UIHelper {
     }
 
     /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortable(field, onChange) {
+        let btnSort = field.querySelector('.editor__field__key__action--sort');
+        let divValue = field.querySelector('.editor__field__value');
+        let isSorting = !divValue.classList.contains('sorting');
+
+        if(this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+        }
+    }
+
+    /**
      * Creates a sortable context
      *
      * @param {HTMLElement} parentElement
      * @param {String} sortableClassName
      * @param {Boolean} isActive
      * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
      */
     static sortable(parentElement, sortableClassName, isActive, onChange) {
         let children = Array.prototype.slice.call(parentElement.children || []);
@@ -77,7 +96,7 @@ class UIHelper {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });
 
-        if(!children || children.length < 2) { return resolve(); }
+        if(!children || children.length < 2) { return false; }
 
         if(typeof isActive === 'undefined') {
             isActive = !parentElement.classList.contains('sorting');
@@ -150,6 +169,8 @@ class UIHelper {
         });
         
         parentElement.classList.toggle('sorting', isActive);
+
+        return true;
     }
 
 

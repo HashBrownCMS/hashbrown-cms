@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 215);
+/******/ 	return __webpack_require__(__webpack_require__.s = 216);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9388,7 +9388,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(237);
+        _this.template = __webpack_require__(240);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.CMSPane.init();
@@ -15898,7 +15898,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
-var LanguageHelperCommon = __webpack_require__(189);
+var LanguageHelperCommon = __webpack_require__(190);
 
 /**
  * The client side language helper
@@ -25108,7 +25108,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(226).js_beautify;
+var beautify = __webpack_require__(227).js_beautify;
 var SchemaHelper = __webpack_require__(16);
 var RequestHelper = __webpack_require__(2);
 
@@ -29410,6 +29410,249 @@ module.exports = ContentEditor;
 "use strict";
 
 
+// Icons
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(215).icons;
+
+var Schema = __webpack_require__(42);
+var SchemaHelper = __webpack_require__(16);
+var ContentHelper = __webpack_require__(41);
+var RequestHelper = __webpack_require__(2);
+var JSONEditor = __webpack_require__(180);
+
+/**
+ * The editor for schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var SchemaEditor = function (_Crisp$View) {
+    _inherits(SchemaEditor, _Crisp$View);
+
+    function SchemaEditor(params) {
+        _classCallCheck(this, SchemaEditor);
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+
+
+    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
+        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
+    };
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+
+
+    SchemaEditor.prototype.onClickSave = function onClickSave() {
+        var _this2 = this;
+
+        if (this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
+        this.$saveBtn.toggleClass('working', true);
+
+        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
+            _this2.$saveBtn.toggleClass('working', false);
+
+            return RequestHelper.reloadResource('schemas');
+        }).then(function () {
+            Crisp.View.get('NavbarMain').reload();
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Renders the icon editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
+        var _this3 = this;
+
+        return _.button({ class: 'widget widget--button fa fa-' + this.model.icon }).click(function (e) {
+            var modal = new HashBrown.Views.Modals.IconModal();
+
+            modal.on('change', function (newIcon) {
+                _this3.model.icon = newIcon;
+
+                e.currentTarget.className = 'widget widget--button fa fa-' + _this3.model.icon;
+            });
+        });
+    };
+
+    /**
+     * Renders the parent editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
+        var _this4 = this;
+
+        if (this.model.isPropertyHidden('parentSchemaId')) {
+            return;
+        }
+
+        var schemaOptions = [];
+
+        // Filter out irrelevant schemas, self and children of self
+        var excludedParents = {};
+        excludedParents[this.model.id] = true;
+
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            // Check if this Schema has a parent in the excluded list
+            // If so, add this id to the excluded list
+            // This is to prevent making a Schema a child of its own children
+            if (excludedParents[schema.parentSchemaId] == true) {
+                excludedParents[schema.id] = true;
+                continue;
+            }
+
+            // If this Schema is not of the same type as the model, or has the same id, exclude it
+            if (schema.type != this.model.type || schema.id == this.model.id) {
+                continue;
+            }
+
+            schemaOptions[schemaOptions.length] = {
+                label: schema.name,
+                value: schema.id
+            };
+        }
+
+        // Assign fallback schema name
+        var parentName = '(none)';
+
+        if (schemaOptions[this.model.parentSchemaId]) {
+            parentName = schemaOptions[this.model.parentSchemaId].name;
+        }
+
+        // Render element
+        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
+            if (!newValue) {
+                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
+            }
+
+            _this4.model.parentSchemaId = newValue;
+
+            return newValue;
+        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     *
+     * @return {HTMLElement} Editor element
+     */
+
+
+    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
+        if (!$content) {
+            return;
+        }
+
+        return _.div({ class: 'editor__field ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'editor__field__key' }, label), _.div({ class: 'editor__field__value' }, $content));
+    };
+
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderFields = function renderFields() {
+        var _this5 = this;
+
+        var id = parseInt(this.model.id);
+
+        var $element = _.div({ class: 'editor__body' });
+
+        $element.empty();
+
+        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
+            value: this.model.name,
+            onChange: function onChange(newValue) {
+                _this5.model.name = newValue;
+            }
+        }).$element));
+
+        $element.append(this.renderField('Icon', this.renderIconEditor()));
+
+        $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.parentSchemaId,
+            options: resources.schemas,
+            valueKey: 'id',
+            labelKey: 'name',
+            disabledOptions: [{ id: this.model.id, name: this.model.name }],
+            onChange: function onChange(newParent) {
+                _this5.model.parentSchemaId = newParent;
+
+                _this5.render();
+            }
+        }).$element));
+
+        switch (this.model.type) {
+            case 'field':
+
+                break;
+        }
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    SchemaEditor.prototype.template = function template() {
+        var _this6 = this;
+
+        return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+            _this6.onClickAdvanced();
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
+            _this6.onClickSave();
+        })))));
+    };
+
+    return SchemaEditor;
+}(Crisp.View);
+
+module.exports = SchemaEditor;
+
+/***/ }),
+/* 190 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 /**
  * A helper for language
  *
@@ -29512,7 +29755,7 @@ var LanguageHelper = function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29525,19 +29768,19 @@ module.exports = LanguageHelper;
 module.exports = {
     ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
-    DebugHelper: __webpack_require__(191),
+    DebugHelper: __webpack_require__(192),
     LanguageHelper: __webpack_require__(94),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
-    TemplateHelper: __webpack_require__(193),
-    UIHelper: __webpack_require__(194)
+    TemplateHelper: __webpack_require__(194),
+    UIHelper: __webpack_require__(195)
 };
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29549,7 +29792,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(192);
+var DebugHelperCommon = __webpack_require__(193);
 
 /**
  * The client side debug helper
@@ -29612,7 +29855,7 @@ var DebugHelper = function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29775,7 +30018,7 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29838,7 +30081,7 @@ var TemplateHelper = function () {
 module.exports = TemplateHelper;
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29869,13 +30112,7 @@ var UIHelper = function () {
     UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
         object = object || {};
 
-        var btnSort = field.querySelector('.editor__field__key__action--sort');
-        var divValue = field.querySelector('.editor__field__value');
-        var isSorting = !divValue.classList.contains('sorting');
-
-        btnSort.innerHTML = isSorting ? 'done' : 'sort';
-
-        this.sortable(divValue, 'editor__field', isSorting, function (element) {
+        this.fieldSortable(field, function (element) {
             if (!element) {
                 return;
             }
@@ -29883,8 +30120,14 @@ var UIHelper = function () {
             var itemKey = element.querySelector('.editor__field__sort-key').value;
             var itemValue = object[itemKey];
 
-            var nextElement = element.nextElementSibling;
+            // Try to get the next key
+            var nextKey = '';
 
+            if (element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
+
+            // Construct a new object based on the old one
             var newObject = {};
 
             for (var fieldKey in object) {
@@ -29895,8 +30138,9 @@ var UIHelper = function () {
 
                 var fieldValue = object[fieldKey];
 
-                // If there is a next element, the item has not been inserted at the bottom
-                if (nextElement && fieldKey === nextElement.dataset.key) {
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if (nextKey === fieldKey) {
                     newObject[itemKey] = itemValue;
                 }
 
@@ -29917,12 +30161,32 @@ var UIHelper = function () {
     };
 
     /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortable = function fieldSortable(field, onChange) {
+        var btnSort = field.querySelector('.editor__field__key__action--sort');
+        var divValue = field.querySelector('.editor__field__value');
+        var isSorting = !divValue.classList.contains('sorting');
+
+        if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+        }
+    };
+
+    /**
      * Creates a sortable context
      *
      * @param {HTMLElement} parentElement
      * @param {String} sortableClassName
      * @param {Boolean} isActive
      * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
      */
 
 
@@ -29935,7 +30199,7 @@ var UIHelper = function () {
         });
 
         if (!children || children.length < 2) {
-            return resolve();
+            return false;
         }
 
         if (typeof isActive === 'undefined') {
@@ -30012,6 +30276,8 @@ var UIHelper = function () {
         });
 
         parentElement.classList.toggle('sorting', isActive);
+
+        return true;
     };
 
     /**
@@ -30596,12 +30862,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(196);
-window.marked = __webpack_require__(197);
-window.toMarkdown = __webpack_require__(198);
+window.Promise = __webpack_require__(197);
+window.marked = __webpack_require__(198);
+window.toMarkdown = __webpack_require__(199);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -30700,13 +30966,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(206);
+window.app = __webpack_require__(207);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -36037,7 +36303,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -37226,7 +37492,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37242,10 +37508,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(199);
-var gfmConverters = __webpack_require__(200);
-var HtmlParser = __webpack_require__(201);
-var collapse = __webpack_require__(203);
+var mdConverters = __webpack_require__(200);
+var gfmConverters = __webpack_require__(201);
+var HtmlParser = __webpack_require__(202);
+var collapse = __webpack_require__(204);
 
 /*
  * Utilities
@@ -37453,7 +37719,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37586,7 +37852,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37686,7 +37952,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -37720,7 +37986,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(202);
+    var jsdom = __webpack_require__(203);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -37767,25 +38033,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(204);
+var voidElements = __webpack_require__(205);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(205).forEach(function (name) {
+__webpack_require__(206).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -37915,7 +38181,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -37943,7 +38209,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports) {
 
 /**
@@ -37954,7 +38220,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 206 */
+/* 207 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -38006,7 +38272,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 207 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38058,7 +38324,7 @@ var MediaViewer = function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 208 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38184,7 +38450,7 @@ var TemplateEditor = function (_Crisp$View) {
 module.exports = TemplateEditor;
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38534,7 +38800,7 @@ var FormEditor = function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 210 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38550,17 +38816,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    index: __webpack_require__(210),
+    index: __webpack_require__(211),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Resource: __webpack_require__(15),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(211),
+    Template: __webpack_require__(212),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 211 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38637,7 +38903,7 @@ var Template = function (_Resource) {
 module.exports = Template;
 
 /***/ }),
-/* 212 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38863,7 +39129,7 @@ var MediaUploader = function (_Crisp$View) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 213 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39004,391 +39270,710 @@ var MediaBrowser = function (_Crisp$View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 214 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Icons
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var icons = __webpack_require__(249).icons;
-
-var Schema = __webpack_require__(42);
-var SchemaHelper = __webpack_require__(16);
-var ContentHelper = __webpack_require__(41);
-var RequestHelper = __webpack_require__(2);
-var JSONEditor = __webpack_require__(180);
-
-/**
- * The editor for schemas
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-var SchemaEditor = function (_Crisp$View) {
-    _inherits(SchemaEditor, _Crisp$View);
-
-    function SchemaEditor(params) {
-        _classCallCheck(this, SchemaEditor);
-
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.fetch();
-        return _this;
-    }
-
-    /**
-     * Event: Click advanced. Routes to the JSON editor
-     */
-
-
-    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
-        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
-    };
-
-    /**
-     * Event: Click save. Posts the model to the modelUrl
-     */
-
-
-    SchemaEditor.prototype.onClickSave = function onClickSave() {
-        var _this2 = this;
-
-        if (this.jsonEditor && this.jsonEditor.isValid == false) {
-            return;
-        }
-
-        this.$saveBtn.toggleClass('working', true);
-
-        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
-            _this2.$saveBtn.toggleClass('working', false);
-
-            return RequestHelper.reloadResource('schemas');
-        }).then(function () {
-            Crisp.View.get('NavbarMain').reload();
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
-        var _this3 = this;
-
-        if (this.model.isPropertyHidden('editorId')) {
-            return;
-        }
-
-        var editorOptions = [];
-
-        for (var i in HashBrown.Views.Editors.FieldEditors) {
-            var editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        var editorName = this.model.editorId || '(none)';
-
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
-            _this3.model.editorId = newValue;
-
-            _this3.render();
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the name editor
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderNameEditor = function renderNameEditor() {
-        if (this.model.isPropertyHidden('name')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange() {
-            view.model.name = $(this).val();
-        }
-
-        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.isLocked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, view.model.name)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the icon editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
-        if (this.model.isPropertyHidden('icon')) {
-            return;
-        }
-
-        var view = this;
-
-        function onClickBrowse() {
-            function onSearch() {
-                var query = modal.$element.find('.icon-search input').val().toLowerCase();
-
-                if (query.length > 2 || query.length == 0) {
-                    modal.$element.find('.btn-icon').each(function (i) {
-                        var $btn = $(this);
-                        var name = $btn.children('.icon-name').html();
-
-                        $btn.toggle(name.indexOf(query) > -1);
-                    });
-                }
-            }
-
-            var modal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-icon-picker',
-                    title: 'Pick an icon',
-                    body: [_.div({ class: 'icon-search' }, _.input({ type: 'text', class: 'form-control', placeholder: 'Search for icons' }).on('change', function (e) {
-                        onSearch();
-                    })), _.each(icons, function (i, icon) {
-                        function onClickButton() {
-                            view.model.icon = icon;
-
-                            view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
-
-                            modal.hide();
-                        }
-
-                        return _.button({ class: 'btn btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
-                    })]
-                }
-            });
-        }
-
-        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.isLocked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.isLocked, _.span({ class: 'fa fa-' + this.model.icon })));
-
-        return $element;
-    };
-
-    /**
-     * Renders the parent editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
-        var _this4 = this;
-
-        if (this.model.isPropertyHidden('parentSchemaId')) {
-            return;
-        }
-
-        var schemaOptions = [];
-
-        // Filter out irrelevant schemas, self and children of self
-        var excludedParents = {};
-        excludedParents[this.model.id] = true;
-
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            // Check if this Schema has a parent in the excluded list
-            // If so, add this id to the excluded list
-            // This is to prevent making a Schema a child of its own children
-            if (excludedParents[schema.parentSchemaId] == true) {
-                excludedParents[schema.id] = true;
-                continue;
-            }
-
-            // If this Schema is not of the same type as the model, or has the same id, exclude it
-            if (schema.type != this.model.type || schema.id == this.model.id) {
-                continue;
-            }
-
-            schemaOptions[schemaOptions.length] = {
-                label: schema.name,
-                value: schema.id
-            };
-        }
-
-        // Assign fallback schema name
-        var parentName = '(none)';
-
-        if (schemaOptions[this.model.parentSchemaId]) {
-            parentName = schemaOptions[this.model.parentSchemaId].name;
-        }
-
-        // Render element
-        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
-            if (!newValue) {
-                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
-            }
-
-            _this4.model.parentSchemaId = newValue;
-
-            return newValue;
-        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the field config editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-
-
-    SchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
-        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-        if (!editor) {
-            return;
-        }
-
-        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
-    };
-
-    /**
-     * Render template editor
-     *
-     * @returns {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
-        var _this5 = this;
-
-        var $element = _.div({ class: 'field-properties-editor' });
-
-        setTimeout(function () {
-            _this5.templateEditor = CodeMirror($element[0], {
-                value: _this5.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-            });
-
-            _this5.templateEditor.on('change', function () {
-                _this5.model.previewTemplate = _this5.templateEditor.getDoc().getValue();
-            });
-        }, 1);
-
-        return $element;
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     * @param {Boolean} isVertical
-     *
-     * @return {HTMLElement} Editor element
-     */
-
-
-    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
-        if (!$content) {
-            return;
-        }
-
-        return _.div({ class: 'editor__field ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'editor__field__key' }, label), _.div({ class: 'editor__field__value' }, $content));
-    };
-
-    /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderFields = function renderFields() {
-        var _this6 = this;
-
-        var id = parseInt(this.model.id);
-
-        var $element = _.div({ class: 'editor__body' });
-
-        $element.empty();
-
-        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
-            value: this.model.name,
-            onChange: function onChange(newValue) {
-                _this6.model.name = newValue;
-            }
-        }).$element));
-
-        $element.append(this.renderField('Icon', this.renderIconEditor()));
-
-        $element.append(this.renderField('Parent', this.renderParentEditor()));
-
-        switch (this.model.type) {
-            case 'field':
-                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
-
-                if (!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
-                }
-
-                break;
-        }
-
-        return $element;
-    };
-
-    /**
-     * Renders this editor
-     */
-
-
-    SchemaEditor.prototype.template = function template() {
-        var _this7 = this;
-
-        return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
-            _this7.onClickAdvanced();
-        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
-            _this7.onClickSave();
-        })))));
-    };
-
-    return SchemaEditor;
-}(Crisp.View);
-
-module.exports = SchemaEditor;
+/* 215 */
+/***/ (function(module, exports) {
+
+module.exports = {
+	"icons": [
+		"500px",
+		"adjust",
+		"adn",
+		"align-center",
+		"align-justify",
+		"align-left",
+		"align-right",
+		"amazon",
+		"ambulance",
+		"anchor",
+		"android",
+		"angellist",
+		"angle-double-down",
+		"angle-double-left",
+		"angle-double-right",
+		"angle-double-up",
+		"angle-down",
+		"angle-left",
+		"angle-right",
+		"angle-up",
+		"apple",
+		"archive",
+		"area-chart",
+		"arrow-circle-down",
+		"arrow-circle-left",
+		"arrow-circle-o-down",
+		"arrow-circle-o-left",
+		"arrow-circle-o-right",
+		"arrow-circle-o-up",
+		"arrow-circle-right",
+		"arrow-circle-up",
+		"arrow-down",
+		"arrow-left",
+		"arrow-right",
+		"arrow-up",
+		"arrows",
+		"arrows-alt",
+		"arrows-h",
+		"arrows-v",
+		"asterisk",
+		"at",
+		"automobile",
+		"backward",
+		"balance-scale",
+		"ban",
+		"bank",
+		"bar-chart",
+		"bar-chart-o",
+		"barcode",
+		"bars",
+		"battery-0",
+		"battery-1",
+		"battery-2",
+		"battery-3",
+		"battery-4",
+		"battery-empty",
+		"battery-full",
+		"battery-half",
+		"battery-quarter",
+		"battery-three-quarters",
+		"bed",
+		"beer",
+		"behance",
+		"behance-square",
+		"bell",
+		"bell-o",
+		"bell-slash",
+		"bell-slash-o",
+		"bicycle",
+		"binoculars",
+		"birthday-cake",
+		"bitbucket",
+		"bitbucket-square",
+		"bitcoin",
+		"black-tie",
+		"bluetooth",
+		"bluetooth-b",
+		"bold",
+		"bolt",
+		"bomb",
+		"book",
+		"bookmark",
+		"bookmark-o",
+		"briefcase",
+		"btc",
+		"bug",
+		"building",
+		"building-o",
+		"bullhorn",
+		"bullseye",
+		"bus",
+		"buysellads",
+		"cab",
+		"calculator",
+		"calendar",
+		"calendar-check-o",
+		"calendar-minus-o",
+		"calendar-o",
+		"calendar-plus-o",
+		"calendar-times-o",
+		"camera",
+		"camera-retro",
+		"car",
+		"caret-down",
+		"caret-left",
+		"caret-right",
+		"caret-square-o-down",
+		"caret-square-o-left",
+		"caret-square-o-right",
+		"caret-square-o-up",
+		"caret-up",
+		"cart-arrow-down",
+		"cart-plus",
+		"cc",
+		"cc-amex",
+		"cc-diners-club",
+		"cc-discover",
+		"cc-jcb",
+		"cc-mastercard",
+		"cc-paypal",
+		"cc-stripe",
+		"cc-visa",
+		"certificate",
+		"chain",
+		"chain-broken",
+		"check",
+		"check-circle",
+		"check-circle-o",
+		"check-square",
+		"check-square-o",
+		"chevron-circle-down",
+		"chevron-circle-left",
+		"chevron-circle-right",
+		"chevron-circle-up",
+		"chevron-down",
+		"chevron-left",
+		"chevron-right",
+		"chevron-up",
+		"child",
+		"chrome",
+		"circle",
+		"circle-o",
+		"circle-o-notch",
+		"circle-thin",
+		"clipboard",
+		"clock-o",
+		"clone",
+		"close",
+		"cloud",
+		"cloud-download",
+		"cloud-upload",
+		"cny",
+		"code",
+		"code-fork",
+		"codepen",
+		"codiepie",
+		"coffee",
+		"cog",
+		"cogs",
+		"columns",
+		"comment",
+		"comment-o",
+		"commenting",
+		"commenting-o",
+		"comments",
+		"comments-o",
+		"compass",
+		"compress",
+		"connectdevelop",
+		"contao",
+		"copy",
+		"copyright",
+		"creative-commons",
+		"credit-card",
+		"credit-card-alt",
+		"crop",
+		"crosshairs",
+		"css3",
+		"cube",
+		"cubes",
+		"cut",
+		"cutlery",
+		"dashboard",
+		"dashcube",
+		"database",
+		"dedent",
+		"delicious",
+		"desktop",
+		"deviantart",
+		"diamond",
+		"digg",
+		"dollar",
+		"dot-circle-o",
+		"download",
+		"dribbble",
+		"dropbox",
+		"drupal",
+		"edge",
+		"edit",
+		"eject",
+		"ellipsis-h",
+		"ellipsis-v",
+		"empire",
+		"envelope",
+		"envelope-o",
+		"envelope-square",
+		"eraser",
+		"eur",
+		"euro",
+		"exchange",
+		"exclamation",
+		"exclamation-circle",
+		"exclamation-triangle",
+		"expand",
+		"expeditedssl",
+		"external-link",
+		"external-link-square",
+		"eye",
+		"eye-slash",
+		"eyedropper",
+		"facebook",
+		"facebook-f",
+		"facebook-official",
+		"facebook-square",
+		"fast-backward",
+		"fast-forward",
+		"fax",
+		"feed",
+		"female",
+		"fighter-jet",
+		"file",
+		"file-archive-o",
+		"file-audio-o",
+		"file-code-o",
+		"file-excel-o",
+		"file-image-o",
+		"file-movie-o",
+		"file-o",
+		"file-pdf-o",
+		"file-photo-o",
+		"file-picture-o",
+		"file-powerpoint-o",
+		"file-sound-o",
+		"file-text",
+		"file-text-o",
+		"file-video-o",
+		"file-word-o",
+		"file-zip-o",
+		"files-o",
+		"film",
+		"filter",
+		"fire",
+		"fire-extinguisher",
+		"firefox",
+		"flag",
+		"flag-checkered",
+		"flag-o",
+		"flash",
+		"flask",
+		"flickr",
+		"floppy-o",
+		"folder",
+		"folder-o",
+		"folder-open",
+		"folder-open-o",
+		"font",
+		"fonticons",
+		"fort-awesome",
+		"forumbee",
+		"forward",
+		"foursquare",
+		"frown-o",
+		"futbol-o",
+		"gamepad",
+		"gavel",
+		"gbp",
+		"ge",
+		"gear",
+		"gears",
+		"genderless",
+		"get-pocket",
+		"gg",
+		"gg-circle",
+		"gift",
+		"git",
+		"git-square",
+		"github",
+		"github-alt",
+		"github-square",
+		"gittip",
+		"glass",
+		"globe",
+		"google",
+		"google-plus",
+		"google-plus-square",
+		"google-wallet",
+		"graduation-cap",
+		"gratipay",
+		"group",
+		"h-square",
+		"hacker-news",
+		"hand-grab-o",
+		"hand-lizard-o",
+		"hand-o-down",
+		"hand-o-left",
+		"hand-o-right",
+		"hand-o-up",
+		"hand-paper-o",
+		"hand-peace-o",
+		"hand-pointer-o",
+		"hand-rock-o",
+		"hand-scissors-o",
+		"hand-spock-o",
+		"hand-stop-o",
+		"hashtag",
+		"hdd-o",
+		"header",
+		"headphones",
+		"heart",
+		"heart-o",
+		"heartbeat",
+		"history",
+		"home",
+		"hospital-o",
+		"hotel",
+		"hourglass",
+		"hourglass-1",
+		"hourglass-2",
+		"hourglass-3",
+		"hourglass-end",
+		"hourglass-half",
+		"hourglass-o",
+		"hourglass-start",
+		"houzz",
+		"html5",
+		"i-cursor",
+		"ils",
+		"image",
+		"inbox",
+		"indent",
+		"industry",
+		"info",
+		"info-circle",
+		"inr",
+		"instagram",
+		"institution",
+		"internet-explorer",
+		"intersex",
+		"ioxhost",
+		"italic",
+		"joomla",
+		"jpy",
+		"jsfiddle",
+		"key",
+		"keyboard-o",
+		"krw",
+		"language",
+		"laptop",
+		"lastfm",
+		"lastfm-square",
+		"leaf",
+		"leanpub",
+		"legal",
+		"lemon-o",
+		"level-down",
+		"level-up",
+		"life-bouy",
+		"life-buoy",
+		"life-ring",
+		"life-saver",
+		"lightbulb-o",
+		"line-chart",
+		"link",
+		"linkedin",
+		"linkedin-square",
+		"linux",
+		"list",
+		"list-alt",
+		"list-ol",
+		"list-ul",
+		"location-arrow",
+		"lock",
+		"long-arrow-down",
+		"long-arrow-left",
+		"long-arrow-right",
+		"long-arrow-up",
+		"magic",
+		"magnet",
+		"mail-forward",
+		"mail-reply",
+		"mail-reply-all",
+		"male",
+		"map",
+		"map-marker",
+		"map-o",
+		"map-pin",
+		"map-signs",
+		"mars",
+		"mars-double",
+		"mars-stroke",
+		"mars-stroke-h",
+		"mars-stroke-v",
+		"maxcdn",
+		"meanpath",
+		"medium",
+		"medkit",
+		"meh-o",
+		"mercury",
+		"microphone",
+		"microphone-slash",
+		"minus",
+		"minus-circle",
+		"minus-square",
+		"minus-square-o",
+		"mixcloud",
+		"mobile",
+		"mobile-phone",
+		"modx",
+		"money",
+		"moon-o",
+		"mortar-board",
+		"motorcycle",
+		"mouse-pointer",
+		"music",
+		"navicon",
+		"neuter",
+		"newspaper-o",
+		"object-group",
+		"object-ungroup",
+		"odnoklassniki",
+		"odnoklassniki-square",
+		"opencart",
+		"openid",
+		"opera",
+		"optin-monster",
+		"outdent",
+		"pagelines",
+		"paint-brush",
+		"paper-plane",
+		"paper-plane-o",
+		"paperclip",
+		"paragraph",
+		"paste",
+		"pause",
+		"pause-circle",
+		"pause-circle-o",
+		"paw",
+		"paypal",
+		"pencil",
+		"pencil-square",
+		"pencil-square-o",
+		"percent",
+		"phone",
+		"phone-square",
+		"photo",
+		"picture-o",
+		"pie-chart",
+		"pied-piper",
+		"pied-piper-alt",
+		"pinterest",
+		"pinterest-p",
+		"pinterest-square",
+		"plane",
+		"play",
+		"play-circle",
+		"play-circle-o",
+		"plug",
+		"plus",
+		"plus-circle",
+		"plus-square",
+		"plus-square-o",
+		"power-off",
+		"print",
+		"product-hunt",
+		"puzzle-piece",
+		"qq",
+		"qrcode",
+		"question",
+		"question-circle",
+		"quote-left",
+		"quote-right",
+		"ra",
+		"random",
+		"rebel",
+		"recycle",
+		"reddit",
+		"reddit-alien",
+		"reddit-square",
+		"refresh",
+		"registered",
+		"remove",
+		"renren",
+		"reorder",
+		"repeat",
+		"reply",
+		"reply-all",
+		"retweet",
+		"rmb",
+		"road",
+		"rocket",
+		"rotate-left",
+		"rotate-right",
+		"rouble",
+		"rss",
+		"rss-square",
+		"rub",
+		"ruble",
+		"rupee",
+		"safari",
+		"save",
+		"scissors",
+		"scribd",
+		"search",
+		"search-minus",
+		"search-plus",
+		"sellsy",
+		"send",
+		"send-o",
+		"server",
+		"share",
+		"share-alt",
+		"share-alt-square",
+		"share-square",
+		"share-square-o",
+		"shekel",
+		"sheqel",
+		"shield",
+		"ship",
+		"shirtsinbulk",
+		"shopping-bag",
+		"shopping-basket",
+		"shopping-cart",
+		"sign-in",
+		"sign-out",
+		"signal",
+		"simplybuilt",
+		"sitemap",
+		"skyatlas",
+		"skype",
+		"slack",
+		"sliders",
+		"slideshare",
+		"smile-o",
+		"soccer-ball-o",
+		"sort",
+		"sort-alpha-asc",
+		"sort-alpha-desc",
+		"sort-amount-asc",
+		"sort-amount-desc",
+		"sort-asc",
+		"sort-desc",
+		"sort-down",
+		"sort-numeric-asc",
+		"sort-numeric-desc",
+		"sort-up",
+		"soundcloud",
+		"space-shuttle",
+		"spinner",
+		"spoon",
+		"spotify",
+		"square",
+		"square-o",
+		"stack-exchange",
+		"stack-overflow",
+		"star",
+		"star-half",
+		"star-half-empty",
+		"star-half-full",
+		"star-half-o",
+		"star-o",
+		"steam",
+		"steam-square",
+		"step-backward",
+		"step-forward",
+		"stethoscope",
+		"sticky-note",
+		"sticky-note-o",
+		"stop",
+		"stop-circle",
+		"stop-circle-o",
+		"street-view",
+		"strikethrough",
+		"stumbleupon",
+		"stumbleupon-circle",
+		"subscript",
+		"subway",
+		"suitcase",
+		"sun-o",
+		"superscript",
+		"support",
+		"table",
+		"tablet",
+		"tachometer",
+		"tag",
+		"tags",
+		"tasks",
+		"taxi",
+		"television",
+		"tencent-weibo",
+		"terminal",
+		"text-height",
+		"text-width",
+		"th",
+		"th-large",
+		"th-list",
+		"thumb-tack",
+		"thumbs-down",
+		"thumbs-o-down",
+		"thumbs-o-up",
+		"thumbs-up",
+		"ticket",
+		"times",
+		"times-circle",
+		"times-circle-o",
+		"tint",
+		"toggle-down",
+		"toggle-left",
+		"toggle-off",
+		"toggle-on",
+		"toggle-right",
+		"toggle-up",
+		"trademark",
+		"train",
+		"transgender",
+		"transgender-alt",
+		"trash",
+		"trash-o",
+		"tree",
+		"trello",
+		"tripadvisor",
+		"trophy",
+		"truck",
+		"try",
+		"tty",
+		"tumblr",
+		"tumblr-square",
+		"turkish-lira",
+		"tv",
+		"twitch",
+		"twitter",
+		"twitter-square",
+		"umbrella",
+		"underline",
+		"undo",
+		"university",
+		"unlink",
+		"unlock",
+		"unlock-alt",
+		"unsorted",
+		"upload",
+		"usb",
+		"usd",
+		"user",
+		"user-md",
+		"user-plus",
+		"user-secret",
+		"user-times",
+		"users",
+		"venus",
+		"venus-double",
+		"venus-mars",
+		"viacoin",
+		"video-camera",
+		"vimeo",
+		"vimeo-square",
+		"vine",
+		"vk",
+		"volume-down",
+		"volume-off",
+		"volume-up",
+		"warning",
+		"wechat",
+		"weibo",
+		"weixin",
+		"whatsapp",
+		"wheelchair",
+		"wifi",
+		"wikipedia-w",
+		"windows",
+		"won",
+		"wordpress",
+		"wrench",
+		"xing",
+		"xing-square",
+		"y-combinator",
+		"y-combinator-square",
+		"yahoo",
+		"yc",
+		"yc-square",
+		"yelp",
+		"yen",
+		"youtube",
+		"youtube-play",
+		"youtube-square"
+	]
+};
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39400,10 +39985,10 @@ module.exports = SchemaEditor;
 
 // Style
 
-__webpack_require__(216);
+__webpack_require__(217);
 
 // Get routes
-__webpack_require__(217);
+__webpack_require__(218);
 
 // Resource cache
 window.resources = {
@@ -39421,22 +40006,22 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Models = __webpack_require__(228);
+HashBrown.Models = __webpack_require__(229);
 HashBrown.Views = {};
-HashBrown.Views.Widgets = __webpack_require__(230);
-HashBrown.Views.Modals = __webpack_require__(234);
-HashBrown.Views.Navigation = __webpack_require__(235);
-HashBrown.Views.Editors = __webpack_require__(246);
+HashBrown.Views.Widgets = __webpack_require__(231);
+HashBrown.Views.Modals = __webpack_require__(235);
+HashBrown.Views.Navigation = __webpack_require__(238);
+HashBrown.Views.Editors = __webpack_require__(249);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(251);
-HashBrown.Helpers = __webpack_require__(190);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(254);
+HashBrown.Helpers = __webpack_require__(191);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
 // Helper functions
-__webpack_require__(195);
+__webpack_require__(196);
 
 // Preload resources 
 document.addEventListener('DOMContentLoaded', function () {
@@ -39499,19 +40084,18 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /***/ }),
-/* 216 */
+/* 217 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 217 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(218);
 __webpack_require__(219);
 __webpack_require__(220);
 __webpack_require__(221);
@@ -39519,9 +40103,10 @@ __webpack_require__(222);
 __webpack_require__(223);
 __webpack_require__(224);
 __webpack_require__(225);
+__webpack_require__(226);
 
 /***/ }),
-/* 218 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39578,7 +40163,7 @@ Crisp.Router.route('/license/', function () {
 });
 
 /***/ }),
-/* 219 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39642,7 +40227,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 });
 
 /***/ }),
-/* 220 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39692,13 +40277,13 @@ Crisp.Router.route('/connections/json/:id', function () {
 });
 
 /***/ }),
-/* 221 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var MediaViewer = __webpack_require__(207);
+var MediaViewer = __webpack_require__(208);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -39720,7 +40305,7 @@ Crisp.Router.route('/media/:id', function () {
 });
 
 /***/ }),
-/* 222 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39767,7 +40352,7 @@ Crisp.Router.route('/schemas/:id', function () {
                     compiledSchema: compiledSchema
                 });
             } else {
-                schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
+                schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
                     model: schema,
                     compiledSchema: compiledSchema
                 });
@@ -39804,7 +40389,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 });
 
 /***/ }),
-/* 223 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39834,13 +40419,13 @@ Crisp.Router.route('/settings/providers/', function () {
 });
 
 /***/ }),
-/* 224 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var TemplateEditor = __webpack_require__(208);
+var TemplateEditor = __webpack_require__(209);
 var RequestHelper = __webpack_require__(2);
 
 // Templates
@@ -39870,14 +40455,14 @@ Crisp.Router.route('/templates/:type/:id', function () {
 });
 
 /***/ }),
-/* 225 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var JSONEditor = __webpack_require__(180);
-var FormEditor = __webpack_require__(209);
+var FormEditor = __webpack_require__(210);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -39911,7 +40496,7 @@ Crisp.Router.route('/forms/json/:id', function () {
 });
 
 /***/ }),
-/* 226 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -39978,7 +40563,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(227)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(228)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -39993,7 +40578,7 @@ if (true) {
 }
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -41121,7 +41706,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 228 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41137,17 +41722,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    Form: __webpack_require__(229),
-    index: __webpack_require__(210),
+    Form: __webpack_require__(230),
+    index: __webpack_require__(211),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(211),
+    Template: __webpack_require__(212),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 229 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41320,7 +41905,7 @@ var Form = function (_Resource) {
 module.exports = Form;
 
 /***/ }),
-/* 230 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41331,13 +41916,13 @@ module.exports = Form;
  */
 
 module.exports = {
-    Dropdown: __webpack_require__(231),
-    Chips: __webpack_require__(232),
-    Input: __webpack_require__(233)
+    Dropdown: __webpack_require__(232),
+    Chips: __webpack_require__(233),
+    Input: __webpack_require__(234)
 };
 
 /***/ }),
-/* 231 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41390,6 +41975,29 @@ var Dropdown = function (_Widget) {
 
             if (typeof optionLabel !== 'string') {
                 optionLabel = optionLabel.toString();
+            }
+
+            // Check for disabled options
+            var isDisabled = false;
+
+            if (this.disabledOptions && Array.isArray(this.disabledOptions)) {
+                for (var disabledKey in this.disabledOptions) {
+                    var disabledValue = this.disabledOptions[disabledKey];
+                    var disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
+
+                    if (typeof disabledOptionValue !== 'string') {
+                        disabledOptionValue = disabledOptionValue.toString();
+                    }
+
+                    if (optionValue === disabledOptionValue) {
+                        isDisabled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isDisabled) {
+                continue;
             }
 
             options[optionValue] = optionLabel;
@@ -41606,7 +42214,7 @@ var Dropdown = function (_Widget) {
 module.exports = Dropdown;
 
 /***/ }),
-/* 232 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41770,7 +42378,7 @@ var Chips = function (_Widget) {
 module.exports = Chips;
 
 /***/ }),
-/* 233 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41824,7 +42432,7 @@ var Input = function (_Widget) {
             placeholder: this.placeholder,
             title: this.tooltip,
             type: this.type || 'text',
-            class: 'widget widget--input ' + this.type || 'text',
+            class: 'widget widget--input ' + (this.type || 'text'),
             value: this.value
         };
 
@@ -41860,7 +42468,7 @@ var Input = function (_Widget) {
 module.exports = Input;
 
 /***/ }),
-/* 234 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41871,13 +42479,196 @@ module.exports = Input;
  */
 
 module.exports = {
-    MediaUploader: __webpack_require__(212),
-    MediaBrowser: __webpack_require__(213),
-    MessageModal: __webpack_require__(17)
+    MediaUploader: __webpack_require__(213),
+    MediaBrowser: __webpack_require__(214),
+    MessageModal: __webpack_require__(17),
+    IconModal: __webpack_require__(236)
 };
 
 /***/ }),
-/* 235 */
+/* 236 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(215).icons;
+
+var Modal = __webpack_require__(237);
+
+/**
+ * A modal for picking icons
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var IconModal = function (_Modal) {
+    _inherits(IconModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function IconModal(params) {
+        _classCallCheck(this, IconModal);
+
+        params = params || {};
+        params.title = params.title || 'Pick an icon';
+
+        return _possibleConstructorReturn(this, _Modal.call(this, params));
+    }
+
+    /**
+     * Post render
+     */
+
+
+    IconModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--icon', true);
+    };
+
+    /**
+     * Event: Search
+     *
+     * @param {String} query
+     */
+
+
+    IconModal.prototype.onSearch = function onSearch(query) {
+        var icons = this.element.querySelectorAll('.modal--icon__icon');
+
+        if (!icons) {
+            return;
+        }
+
+        for (var i = 0; i < icons.length; i++) {
+            if (query.length < 3 || icons[i].title.indexOf(query) > -1) {
+                icons[i].style.display = 'block';
+            } else {
+                icons[i].style.display = 'none';
+            }
+        }
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    IconModal.prototype.renderBody = function renderBody() {
+        var _this2 = this;
+
+        return [_.input({ type: 'text', class: 'widget widget--input text modal--icon__search', placeholder: 'Search for icons' }).on('input', function (e) {
+            _this2.onSearch(e.currentTarget.value);
+        }), _.div({ class: 'modal--icon__icons' }, _.each(icons, function (i, icon) {
+            return _.button({ class: 'modal--icon__icon widget widget--button fa fa-' + icon, title: icon }).click(function () {
+                _this2.trigger('change', icon);
+
+                _this2.close();
+            });
+        }))];
+    };
+
+    return IconModal;
+}(Modal);
+
+module.exports = IconModal;
+
+/***/ }),
+/* 237 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A generic modal
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = function (_Crisp$View) {
+    _inherits(Modal, _Crisp$View);
+
+    /**
+     * Constructor
+     */
+    function Modal(params) {
+        _classCallCheck(this, Modal);
+
+        params = params || {};
+        params.actions = params.actions || [];
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+
+        document.body.appendChild(_this.element);
+
+        setTimeout(function () {
+            _this.element.classList.toggle('in', true);
+        }, 50);
+        return _this;
+    }
+
+    /**
+     * Close this modal
+     *
+     */
+
+
+    Modal.prototype.close = function close() {
+        var _this2 = this;
+
+        this.element.classList.toggle('in', false);
+
+        setTimeout(function () {
+            _this2.remove();
+        }, 500);
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    Modal.prototype.renderBody = function renderBody() {};
+
+    /**
+     * Renders this modal
+     */
+
+
+    Modal.prototype.template = function template() {
+        var _this3 = this;
+
+        return _.div({ class: 'modal' }, _.div({ class: 'modal__dialog' }, _.if(this.title, _.div({ class: 'modal__header' }, _.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this3.close();
+        }))), _.div({ class: 'modal__body' }, this.renderBody()), _.if(this.actions.length > 0, _.div({ class: 'modal__footer' }))));
+    };
+
+    return Modal;
+}(Crisp.View);
+
+module.exports = Modal;
+
+/***/ }),
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41888,21 +42679,21 @@ module.exports = {
  */
 
 module.exports = {
-    CMSPane: __webpack_require__(236),
-    ConnectionPane: __webpack_require__(238),
-    ContentPane: __webpack_require__(239),
-    FormsPane: __webpack_require__(240),
-    MainMenu: __webpack_require__(241),
-    MediaPane: __webpack_require__(242),
+    CMSPane: __webpack_require__(239),
+    ConnectionPane: __webpack_require__(241),
+    ContentPane: __webpack_require__(242),
+    FormsPane: __webpack_require__(243),
+    MainMenu: __webpack_require__(244),
+    MediaPane: __webpack_require__(245),
     NavbarMain: __webpack_require__(39),
     NavbarPane: __webpack_require__(40),
-    SchemaPane: __webpack_require__(243),
-    SettingsPane: __webpack_require__(244),
-    TemplatePane: __webpack_require__(245)
+    SchemaPane: __webpack_require__(246),
+    SettingsPane: __webpack_require__(247),
+    TemplatePane: __webpack_require__(248)
 };
 
 /***/ }),
-/* 236 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41955,7 +42746,7 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 237 */
+/* 240 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -42054,7 +42845,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 238 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42279,7 +43070,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 239 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42777,7 +43568,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 240 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43011,7 +43802,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 241 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43176,7 +43967,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 242 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43190,7 +43981,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(40);
 var NavbarMain = __webpack_require__(39);
-var MediaUploader = __webpack_require__(212);
+var MediaUploader = __webpack_require__(213);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(2);
@@ -43390,7 +44181,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 243 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43627,7 +44418,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 244 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43676,7 +44467,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 245 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43940,7 +44731,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 246 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43951,20 +44742,21 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(247),
+    ConnectionEditor: __webpack_require__(250),
     ContentEditor: __webpack_require__(188),
-    ContentSchemaEditor: __webpack_require__(248),
-    FormEditor: __webpack_require__(209),
+    ContentSchemaEditor: __webpack_require__(251),
+    FieldSchemaEditor: __webpack_require__(252),
+    FormEditor: __webpack_require__(210),
     JSONEditor: __webpack_require__(180),
-    MediaViewer: __webpack_require__(207),
-    ProvidersSettings: __webpack_require__(250),
-    SchemaEditor: __webpack_require__(214),
-    TemplateEditor: __webpack_require__(208),
+    MediaViewer: __webpack_require__(208),
+    ProvidersSettings: __webpack_require__(253),
+    SchemaEditor: __webpack_require__(189),
+    TemplateEditor: __webpack_require__(209),
     UserEditor: __webpack_require__(97)
 };
 
 /***/ }),
-/* 247 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44183,7 +44975,7 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 248 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44195,7 +44987,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SchemaEditor = __webpack_require__(214);
+var SchemaEditor = __webpack_require__(189);
 
 /**
  * The editor for Content Schemas
@@ -44277,12 +45069,12 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
-            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'widget widget--button editor__field__key__action--sort' }, 'Sort').click(function (e) {
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
                     _this2.model.fields.properties = newProperties;
                 });
             }))), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
-                var $field = _.div({ class: 'editor__field', 'data-key': fieldKey });
+                var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
                     _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
@@ -44349,7 +45141,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 renderField();
 
                 return $field;
-            }), _.button({ title: 'Add a property', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
+            }), _.button({ title: 'Add a Content property', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
                 if (_this2.model.fields.properties.newField) {
                     return;
                 }
@@ -44374,710 +45166,161 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 249 */
-/***/ (function(module, exports) {
+/* 252 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = {
-	"icons": [
-		"500px",
-		"adjust",
-		"adn",
-		"align-center",
-		"align-justify",
-		"align-left",
-		"align-right",
-		"amazon",
-		"ambulance",
-		"anchor",
-		"android",
-		"angellist",
-		"angle-double-down",
-		"angle-double-left",
-		"angle-double-right",
-		"angle-double-up",
-		"angle-down",
-		"angle-left",
-		"angle-right",
-		"angle-up",
-		"apple",
-		"archive",
-		"area-chart",
-		"arrow-circle-down",
-		"arrow-circle-left",
-		"arrow-circle-o-down",
-		"arrow-circle-o-left",
-		"arrow-circle-o-right",
-		"arrow-circle-o-up",
-		"arrow-circle-right",
-		"arrow-circle-up",
-		"arrow-down",
-		"arrow-left",
-		"arrow-right",
-		"arrow-up",
-		"arrows",
-		"arrows-alt",
-		"arrows-h",
-		"arrows-v",
-		"asterisk",
-		"at",
-		"automobile",
-		"backward",
-		"balance-scale",
-		"ban",
-		"bank",
-		"bar-chart",
-		"bar-chart-o",
-		"barcode",
-		"bars",
-		"battery-0",
-		"battery-1",
-		"battery-2",
-		"battery-3",
-		"battery-4",
-		"battery-empty",
-		"battery-full",
-		"battery-half",
-		"battery-quarter",
-		"battery-three-quarters",
-		"bed",
-		"beer",
-		"behance",
-		"behance-square",
-		"bell",
-		"bell-o",
-		"bell-slash",
-		"bell-slash-o",
-		"bicycle",
-		"binoculars",
-		"birthday-cake",
-		"bitbucket",
-		"bitbucket-square",
-		"bitcoin",
-		"black-tie",
-		"bluetooth",
-		"bluetooth-b",
-		"bold",
-		"bolt",
-		"bomb",
-		"book",
-		"bookmark",
-		"bookmark-o",
-		"briefcase",
-		"btc",
-		"bug",
-		"building",
-		"building-o",
-		"bullhorn",
-		"bullseye",
-		"bus",
-		"buysellads",
-		"cab",
-		"calculator",
-		"calendar",
-		"calendar-check-o",
-		"calendar-minus-o",
-		"calendar-o",
-		"calendar-plus-o",
-		"calendar-times-o",
-		"camera",
-		"camera-retro",
-		"car",
-		"caret-down",
-		"caret-left",
-		"caret-right",
-		"caret-square-o-down",
-		"caret-square-o-left",
-		"caret-square-o-right",
-		"caret-square-o-up",
-		"caret-up",
-		"cart-arrow-down",
-		"cart-plus",
-		"cc",
-		"cc-amex",
-		"cc-diners-club",
-		"cc-discover",
-		"cc-jcb",
-		"cc-mastercard",
-		"cc-paypal",
-		"cc-stripe",
-		"cc-visa",
-		"certificate",
-		"chain",
-		"chain-broken",
-		"check",
-		"check-circle",
-		"check-circle-o",
-		"check-square",
-		"check-square-o",
-		"chevron-circle-down",
-		"chevron-circle-left",
-		"chevron-circle-right",
-		"chevron-circle-up",
-		"chevron-down",
-		"chevron-left",
-		"chevron-right",
-		"chevron-up",
-		"child",
-		"chrome",
-		"circle",
-		"circle-o",
-		"circle-o-notch",
-		"circle-thin",
-		"clipboard",
-		"clock-o",
-		"clone",
-		"close",
-		"cloud",
-		"cloud-download",
-		"cloud-upload",
-		"cny",
-		"code",
-		"code-fork",
-		"codepen",
-		"codiepie",
-		"coffee",
-		"cog",
-		"cogs",
-		"columns",
-		"comment",
-		"comment-o",
-		"commenting",
-		"commenting-o",
-		"comments",
-		"comments-o",
-		"compass",
-		"compress",
-		"connectdevelop",
-		"contao",
-		"copy",
-		"copyright",
-		"creative-commons",
-		"credit-card",
-		"credit-card-alt",
-		"crop",
-		"crosshairs",
-		"css3",
-		"cube",
-		"cubes",
-		"cut",
-		"cutlery",
-		"dashboard",
-		"dashcube",
-		"database",
-		"dedent",
-		"delicious",
-		"desktop",
-		"deviantart",
-		"diamond",
-		"digg",
-		"dollar",
-		"dot-circle-o",
-		"download",
-		"dribbble",
-		"dropbox",
-		"drupal",
-		"edge",
-		"edit",
-		"eject",
-		"ellipsis-h",
-		"ellipsis-v",
-		"empire",
-		"envelope",
-		"envelope-o",
-		"envelope-square",
-		"eraser",
-		"eur",
-		"euro",
-		"exchange",
-		"exclamation",
-		"exclamation-circle",
-		"exclamation-triangle",
-		"expand",
-		"expeditedssl",
-		"external-link",
-		"external-link-square",
-		"eye",
-		"eye-slash",
-		"eyedropper",
-		"facebook",
-		"facebook-f",
-		"facebook-official",
-		"facebook-square",
-		"fast-backward",
-		"fast-forward",
-		"fax",
-		"feed",
-		"female",
-		"fighter-jet",
-		"file",
-		"file-archive-o",
-		"file-audio-o",
-		"file-code-o",
-		"file-excel-o",
-		"file-image-o",
-		"file-movie-o",
-		"file-o",
-		"file-pdf-o",
-		"file-photo-o",
-		"file-picture-o",
-		"file-powerpoint-o",
-		"file-sound-o",
-		"file-text",
-		"file-text-o",
-		"file-video-o",
-		"file-word-o",
-		"file-zip-o",
-		"files-o",
-		"film",
-		"filter",
-		"fire",
-		"fire-extinguisher",
-		"firefox",
-		"flag",
-		"flag-checkered",
-		"flag-o",
-		"flash",
-		"flask",
-		"flickr",
-		"floppy-o",
-		"folder",
-		"folder-o",
-		"folder-open",
-		"folder-open-o",
-		"font",
-		"fonticons",
-		"fort-awesome",
-		"forumbee",
-		"forward",
-		"foursquare",
-		"frown-o",
-		"futbol-o",
-		"gamepad",
-		"gavel",
-		"gbp",
-		"ge",
-		"gear",
-		"gears",
-		"genderless",
-		"get-pocket",
-		"gg",
-		"gg-circle",
-		"gift",
-		"git",
-		"git-square",
-		"github",
-		"github-alt",
-		"github-square",
-		"gittip",
-		"glass",
-		"globe",
-		"google",
-		"google-plus",
-		"google-plus-square",
-		"google-wallet",
-		"graduation-cap",
-		"gratipay",
-		"group",
-		"h-square",
-		"hacker-news",
-		"hand-grab-o",
-		"hand-lizard-o",
-		"hand-o-down",
-		"hand-o-left",
-		"hand-o-right",
-		"hand-o-up",
-		"hand-paper-o",
-		"hand-peace-o",
-		"hand-pointer-o",
-		"hand-rock-o",
-		"hand-scissors-o",
-		"hand-spock-o",
-		"hand-stop-o",
-		"hashtag",
-		"hdd-o",
-		"header",
-		"headphones",
-		"heart",
-		"heart-o",
-		"heartbeat",
-		"history",
-		"home",
-		"hospital-o",
-		"hotel",
-		"hourglass",
-		"hourglass-1",
-		"hourglass-2",
-		"hourglass-3",
-		"hourglass-end",
-		"hourglass-half",
-		"hourglass-o",
-		"hourglass-start",
-		"houzz",
-		"html5",
-		"i-cursor",
-		"ils",
-		"image",
-		"inbox",
-		"indent",
-		"industry",
-		"info",
-		"info-circle",
-		"inr",
-		"instagram",
-		"institution",
-		"internet-explorer",
-		"intersex",
-		"ioxhost",
-		"italic",
-		"joomla",
-		"jpy",
-		"jsfiddle",
-		"key",
-		"keyboard-o",
-		"krw",
-		"language",
-		"laptop",
-		"lastfm",
-		"lastfm-square",
-		"leaf",
-		"leanpub",
-		"legal",
-		"lemon-o",
-		"level-down",
-		"level-up",
-		"life-bouy",
-		"life-buoy",
-		"life-ring",
-		"life-saver",
-		"lightbulb-o",
-		"line-chart",
-		"link",
-		"linkedin",
-		"linkedin-square",
-		"linux",
-		"list",
-		"list-alt",
-		"list-ol",
-		"list-ul",
-		"location-arrow",
-		"lock",
-		"long-arrow-down",
-		"long-arrow-left",
-		"long-arrow-right",
-		"long-arrow-up",
-		"magic",
-		"magnet",
-		"mail-forward",
-		"mail-reply",
-		"mail-reply-all",
-		"male",
-		"map",
-		"map-marker",
-		"map-o",
-		"map-pin",
-		"map-signs",
-		"mars",
-		"mars-double",
-		"mars-stroke",
-		"mars-stroke-h",
-		"mars-stroke-v",
-		"maxcdn",
-		"meanpath",
-		"medium",
-		"medkit",
-		"meh-o",
-		"mercury",
-		"microphone",
-		"microphone-slash",
-		"minus",
-		"minus-circle",
-		"minus-square",
-		"minus-square-o",
-		"mixcloud",
-		"mobile",
-		"mobile-phone",
-		"modx",
-		"money",
-		"moon-o",
-		"mortar-board",
-		"motorcycle",
-		"mouse-pointer",
-		"music",
-		"navicon",
-		"neuter",
-		"newspaper-o",
-		"object-group",
-		"object-ungroup",
-		"odnoklassniki",
-		"odnoklassniki-square",
-		"opencart",
-		"openid",
-		"opera",
-		"optin-monster",
-		"outdent",
-		"pagelines",
-		"paint-brush",
-		"paper-plane",
-		"paper-plane-o",
-		"paperclip",
-		"paragraph",
-		"paste",
-		"pause",
-		"pause-circle",
-		"pause-circle-o",
-		"paw",
-		"paypal",
-		"pencil",
-		"pencil-square",
-		"pencil-square-o",
-		"percent",
-		"phone",
-		"phone-square",
-		"photo",
-		"picture-o",
-		"pie-chart",
-		"pied-piper",
-		"pied-piper-alt",
-		"pinterest",
-		"pinterest-p",
-		"pinterest-square",
-		"plane",
-		"play",
-		"play-circle",
-		"play-circle-o",
-		"plug",
-		"plus",
-		"plus-circle",
-		"plus-square",
-		"plus-square-o",
-		"power-off",
-		"print",
-		"product-hunt",
-		"puzzle-piece",
-		"qq",
-		"qrcode",
-		"question",
-		"question-circle",
-		"quote-left",
-		"quote-right",
-		"ra",
-		"random",
-		"rebel",
-		"recycle",
-		"reddit",
-		"reddit-alien",
-		"reddit-square",
-		"refresh",
-		"registered",
-		"remove",
-		"renren",
-		"reorder",
-		"repeat",
-		"reply",
-		"reply-all",
-		"retweet",
-		"rmb",
-		"road",
-		"rocket",
-		"rotate-left",
-		"rotate-right",
-		"rouble",
-		"rss",
-		"rss-square",
-		"rub",
-		"ruble",
-		"rupee",
-		"safari",
-		"save",
-		"scissors",
-		"scribd",
-		"search",
-		"search-minus",
-		"search-plus",
-		"sellsy",
-		"send",
-		"send-o",
-		"server",
-		"share",
-		"share-alt",
-		"share-alt-square",
-		"share-square",
-		"share-square-o",
-		"shekel",
-		"sheqel",
-		"shield",
-		"ship",
-		"shirtsinbulk",
-		"shopping-bag",
-		"shopping-basket",
-		"shopping-cart",
-		"sign-in",
-		"sign-out",
-		"signal",
-		"simplybuilt",
-		"sitemap",
-		"skyatlas",
-		"skype",
-		"slack",
-		"sliders",
-		"slideshare",
-		"smile-o",
-		"soccer-ball-o",
-		"sort",
-		"sort-alpha-asc",
-		"sort-alpha-desc",
-		"sort-amount-asc",
-		"sort-amount-desc",
-		"sort-asc",
-		"sort-desc",
-		"sort-down",
-		"sort-numeric-asc",
-		"sort-numeric-desc",
-		"sort-up",
-		"soundcloud",
-		"space-shuttle",
-		"spinner",
-		"spoon",
-		"spotify",
-		"square",
-		"square-o",
-		"stack-exchange",
-		"stack-overflow",
-		"star",
-		"star-half",
-		"star-half-empty",
-		"star-half-full",
-		"star-half-o",
-		"star-o",
-		"steam",
-		"steam-square",
-		"step-backward",
-		"step-forward",
-		"stethoscope",
-		"sticky-note",
-		"sticky-note-o",
-		"stop",
-		"stop-circle",
-		"stop-circle-o",
-		"street-view",
-		"strikethrough",
-		"stumbleupon",
-		"stumbleupon-circle",
-		"subscript",
-		"subway",
-		"suitcase",
-		"sun-o",
-		"superscript",
-		"support",
-		"table",
-		"tablet",
-		"tachometer",
-		"tag",
-		"tags",
-		"tasks",
-		"taxi",
-		"television",
-		"tencent-weibo",
-		"terminal",
-		"text-height",
-		"text-width",
-		"th",
-		"th-large",
-		"th-list",
-		"thumb-tack",
-		"thumbs-down",
-		"thumbs-o-down",
-		"thumbs-o-up",
-		"thumbs-up",
-		"ticket",
-		"times",
-		"times-circle",
-		"times-circle-o",
-		"tint",
-		"toggle-down",
-		"toggle-left",
-		"toggle-off",
-		"toggle-on",
-		"toggle-right",
-		"toggle-up",
-		"trademark",
-		"train",
-		"transgender",
-		"transgender-alt",
-		"trash",
-		"trash-o",
-		"tree",
-		"trello",
-		"tripadvisor",
-		"trophy",
-		"truck",
-		"try",
-		"tty",
-		"tumblr",
-		"tumblr-square",
-		"turkish-lira",
-		"tv",
-		"twitch",
-		"twitter",
-		"twitter-square",
-		"umbrella",
-		"underline",
-		"undo",
-		"university",
-		"unlink",
-		"unlock",
-		"unlock-alt",
-		"unsorted",
-		"upload",
-		"usb",
-		"usd",
-		"user",
-		"user-md",
-		"user-plus",
-		"user-secret",
-		"user-times",
-		"users",
-		"venus",
-		"venus-double",
-		"venus-mars",
-		"viacoin",
-		"video-camera",
-		"vimeo",
-		"vimeo-square",
-		"vine",
-		"vk",
-		"volume-down",
-		"volume-off",
-		"volume-up",
-		"warning",
-		"wechat",
-		"weibo",
-		"weixin",
-		"whatsapp",
-		"wheelchair",
-		"wifi",
-		"wikipedia-w",
-		"windows",
-		"won",
-		"wordpress",
-		"wrench",
-		"xing",
-		"xing-square",
-		"y-combinator",
-		"y-combinator-square",
-		"yahoo",
-		"yc",
-		"yc-square",
-		"yelp",
-		"yen",
-		"youtube",
-		"youtube-play",
-		"youtube-square"
-	]
-};
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SchemaEditor = __webpack_require__(189);
+
+/**
+ * The editor for field Schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var FieldSchemaEditor = function (_SchemaEditor) {
+    _inherits(FieldSchemaEditor, _SchemaEditor);
+
+    function FieldSchemaEditor() {
+        _classCallCheck(this, FieldSchemaEditor);
+
+        return _possibleConstructorReturn(this, _SchemaEditor.apply(this, arguments));
+    }
+
+    /**
+     * Render template editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    FieldSchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
+        var _this2 = this;
+
+        var $element = _.div({ class: 'field-properties-editor' });
+
+        setTimeout(function () {
+            _this2.templateEditor = CodeMirror($element[0], {
+                value: _this2.model.previewTemplate || '',
+                mode: {
+                    name: 'xml'
+                },
+                lineWrapping: true,
+                lineNumbers: true,
+                tabSize: 4,
+                indentUnit: 4,
+                indentWithTabs: true
+            });
+
+            _this2.templateEditor.on('change', function () {
+                _this2.model.previewTemplate = _this2.templateEditor.getDoc().getValue();
+            });
+        }, 1);
+
+        return $element;
+    };
+
+    /**
+     * Renders the field config editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+
+
+    FieldSchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
+        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+        if (!editor) {
+            return;
+        }
+
+        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
+    };
+
+    /**
+     * Renders the editor picker
+     *
+     * @return {Object} element
+     */
+
+
+    FieldSchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
+        var _this3 = this;
+
+        if (this.model.isPropertyHidden('editorId')) {
+            return;
+        }
+
+        var editorOptions = [];
+
+        for (var i in HashBrown.Views.Editors.FieldEditors) {
+            var editor = HashBrown.Views.Editors.FieldEditors[i];
+
+            editorOptions[editorOptions.length] = {
+                value: editor.name,
+                label: editor.name
+            };
+        }
+
+        // The editorId is actually a name more than an id
+        var editorName = this.model.editorId || '(none)';
+
+        // Backwards compatible check
+        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
+
+        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
+            _this3.model.editorId = newValue;
+
+            _this3.render();
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders the editor fields
+     */
+
+
+    FieldSchemaEditor.prototype.renderFields = function renderFields() {
+        var _this4 = this;
+
+        var $element = _SchemaEditor.prototype.renderFields.call(this);
+
+        $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
+            useTypeahead: true,
+            value: this.model.editorId,
+            options: HashBrown.Views.Editors.FieldEditors,
+            valueKey: 'name',
+            labelKey: 'name',
+            onChange: function onChange(newEditor) {
+                _this4.model.editorId = newEditor;
+
+                _this4.render();
+            }
+        }).$element));
+
+        if (!this.model.isLocked) {
+            $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
+            $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
+        }
+
+        return $element;
+    };
+
+    return FieldSchemaEditor;
+}(SchemaEditor);
+
+module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 250 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45197,7 +45440,7 @@ var ProvidersSettings = function (_Crisp$View) {
 module.exports = ProvidersSettings;
 
 /***/ }),
-/* 251 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45208,27 +45451,27 @@ module.exports = ProvidersSettings;
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(252),
-    BooleanEditor: __webpack_require__(253),
-    ContentReferenceEditor: __webpack_require__(254),
-    ContentSchemaReferenceEditor: __webpack_require__(255),
-    DateEditor: __webpack_require__(256),
-    DropdownEditor: __webpack_require__(257),
+    ArrayEditor: __webpack_require__(255),
+    BooleanEditor: __webpack_require__(256),
+    ContentReferenceEditor: __webpack_require__(257),
+    ContentSchemaReferenceEditor: __webpack_require__(258),
+    DateEditor: __webpack_require__(259),
+    DropdownEditor: __webpack_require__(260),
     FieldEditor: __webpack_require__(11),
-    LanguageEditor: __webpack_require__(258),
-    MediaReferenceEditor: __webpack_require__(259),
-    NumberEditor: __webpack_require__(260),
-    ResourceReferenceEditor: __webpack_require__(261),
-    RichTextEditor: __webpack_require__(262),
-    StringEditor: __webpack_require__(263),
-    StructEditor: __webpack_require__(264),
-    TagsEditor: __webpack_require__(265),
-    TemplateReferenceEditor: __webpack_require__(266),
-    UrlEditor: __webpack_require__(267)
+    LanguageEditor: __webpack_require__(261),
+    MediaReferenceEditor: __webpack_require__(262),
+    NumberEditor: __webpack_require__(263),
+    ResourceReferenceEditor: __webpack_require__(264),
+    RichTextEditor: __webpack_require__(265),
+    StringEditor: __webpack_require__(266),
+    StructEditor: __webpack_require__(267),
+    TagsEditor: __webpack_require__(268),
+    TemplateReferenceEditor: __webpack_require__(269),
+    UrlEditor: __webpack_require__(270)
 };
 
 /***/ }),
-/* 252 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45278,8 +45521,6 @@ var ArrayEditor = function (_FieldEditor) {
 
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'array-editor field-editor' });
-
         _this.$keyContent = _.div({ class: 'array-field-key' }, _.div({ class: 'widget-sorting' }, _.button({ class: 'btn btn-default' }, 'Done').click(function () {
             _this.onClickSort();
         })), _.div({ class: 'widget-default' }, _.button({ class: 'btn btn-default' }, 'Sort').click(function () {
@@ -45290,7 +45531,7 @@ var ArrayEditor = function (_FieldEditor) {
             _this.onClickExpandAll();
         })));
 
-        _this.fetch();
+        _this.init();
         return _this;
     }
 
@@ -45757,15 +45998,60 @@ var ArrayEditor = function (_FieldEditor) {
     };
 
     /**
+     * Prerender
+     */
+
+
+    ArrayEditor.prototype.prerender = function prerender() {
+        this.sanityCheck();
+    };
+
+    /**
      * Renders this editor
      */
 
 
-    ArrayEditor.prototype.render = function render() {
+    ArrayEditor.prototype.template = function template() {
         var _this5 = this;
 
-        // Perform sanity check
-        this.sanityCheck();
+        return _.div(_.each(this.value, function (i, item) {
+            var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+
+            // Schema could not be found, assign first allowed Schema
+            if (!schema || _this5.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                item.schemaId = _this5.config.allowedSchemas[0];
+
+                schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+            }
+
+            var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+            if (!editor) {
+                return;
+            }
+
+            // Perform sanity check on item value
+            item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__value' }, new editor({
+                value: item.value,
+                config: schema.config,
+                schema: schema
+            }).$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                // TODO: Remove
+            })));
+        }), _.button({ title: 'Add an array item', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
+            var index = _this5.value.length;
+
+            if (_this5.config.maxItems && index >= _this5.config.maxItems) {
+                UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this5.config.maxItems + ' items here');
+                return;
+            }
+
+            _this5.value[index] = { value: null, schemaId: null };
+
+            _this5.init();
+        }));
 
         // Render editor
         _.append(this.$element.empty(), _.div({ class: 'items' }),
@@ -45803,7 +46089,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 253 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45837,39 +46123,49 @@ var FieldEditor = __webpack_require__(11);
 var BooleanEditor = function (_FieldEditor) {
     _inherits(BooleanEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function BooleanEditor(params) {
         _classCallCheck(this, BooleanEditor);
 
+        // Sanity check
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
+
+        if (typeof _this.value === 'undefined') {
+            _this.value = false;
+        } else if (typeof _this.value === 'string') {
+            _this.value = _this.value == 'true';
+        } else if (typeof _this.value !== 'boolean') {
+            _this.value = false;
+        }
+
+        // Just to make sure the model has the right type of value
+        setTimeout(function () {
+            _this.trigger('silentchange', _this.value);
+        }, 20);
 
         _this.init();
         return _this;
     }
 
-    BooleanEditor.prototype.render = function render() {
+    /**
+     * Render this editor
+     */
+
+
+    BooleanEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // Sanity check
-        if (typeof this.value === 'undefined') {
-            this.value = false;
-        } else if (typeof this.value === 'string') {
-            this.value = this.value == 'true';
-        } else if (typeof this.value !== 'boolean') {
-            this.value = false;
-        }
+        return new HashBrown.Views.Widgets.Input({
+            type: 'checkbox',
+            value: this.value,
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-        this.$element = _.div({ class: 'field-editor switch-editor' },
-        // Render preview
-        this.renderPreview(), UI.inputSwitch(this.value, function (newValue) {
-            _this2.value = newValue;
-
-            _this2.trigger('change', _this2.value);
-        }));
-
-        // Just to make sure the model has the right type of value
-        setTimeout(function () {
-            _this2.trigger('silentchange', _this2.value);
-        }, 20);
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element;
     };
 
     return BooleanEditor;
@@ -45878,7 +46174,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 254 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46029,7 +46325,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 255 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46228,7 +46524,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 256 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46467,7 +46763,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 257 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46611,7 +46907,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 258 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46706,7 +47002,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 259 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46721,7 +47017,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Media = __webpack_require__(27);
 var MediaHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
-var MediaBrowser = __webpack_require__(213);
+var MediaBrowser = __webpack_require__(214);
 
 var FieldEditor = __webpack_require__(11);
 
@@ -46823,7 +47119,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 260 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46958,7 +47254,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 261 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47078,7 +47374,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 262 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47387,7 +47683,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 263 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47458,7 +47754,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 264 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47565,7 +47861,7 @@ var StructEditor = function (_FieldEditor) {
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         var renderEditor = function renderEditor() {
-            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'widget widget--button editor__field__key__action--sort' }, 'Sort').click(function (e) {
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
                     config.struct = newStruct;
                 });
@@ -47631,7 +47927,7 @@ var StructEditor = function (_FieldEditor) {
                 renderField();
 
                 return $field;
-            }), _.button({ class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a property' }).click(function () {
+            }), _.button({ class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property' }).click(function () {
                 if (config.struct.newField) {
                     return;
                 }
@@ -47712,7 +48008,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 265 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47885,7 +48181,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 266 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47961,16 +48257,26 @@ var TemplateReferenceEditor = function (_FieldEditor) {
         var $element = _.div();
 
         var render = function render() {
-            var templateOptions = HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type);
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                options: ['page', 'partial'],
+                value: config.type,
+                onChange: function onChange(newType) {
+                    config.type = newType;
 
-            _.append($element.empty(), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, UI.inputDropdown(config.type, [{ label: 'page', value: 'page' }, { label: 'partial', value: 'partial' }], function (newValue) {
-                config.type = newValue;
-                config.allowedTemplates = [];
-
-                render();
-            }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Templates'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedTemplates, templateOptions, function (newValue) {
-                config.allowedTemplates = newValue;
-            }, true))));
+                    render();
+                }
+            }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                options: HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type),
+                value: config.allowedTemplates,
+                labelKey: 'name',
+                valueKey: 'id',
+                useMultiple: true,
+                useClearButton: true,
+                useTypeAhead: true,
+                onChange: function onChange(newValue) {
+                    config.allowedTemplates = newValue;
+                }
+            }))));
         };
 
         render();
@@ -48072,7 +48378,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 267 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

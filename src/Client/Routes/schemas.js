@@ -50,7 +50,7 @@ Crisp.Router.route('/schemas/:id', () => {
                     compiledSchema: compiledSchema
                 });
             } else {
-                schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
+                schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
                     model: schema,
                     compiledSchema: compiledSchema
                 });

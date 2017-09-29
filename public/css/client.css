@@ -2504,9 +2504,40 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     flex-shrink: 0;
     margin-right: 1rem;
     line-height: 2rem; }
+    .editor__field__key__action {
+      border: 0px;
+      line-height: 2rem;
+      height: 2rem;
+      display: block;
+      padding: 0;
+      float: left;
+      clear: both;
+      background-color: transparent;
+      color: #e70d3b;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: left;
+      transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+      cursor: pointer;
+      border-radius: 0.2rem; }
+      .editor__field__key__action:hover {
+        color: #ffffff;
+        background-color: #e70d3b;
+        padding: 0 0.5rem; }
+      .editor__field__key__action--sort:before {
+        content: 'Sort items'; }
+      .editor__field__key__action--sort:after {
+        font-family: 'FontAwesome';
+        content: '\F0DC';
+        margin-left: 0.5rem; }
+      .editor__field__key__action--sort.sorting:before {
+        content: 'Done sorting'; }
+      .editor__field__key__action--sort.sorting:after {
+        content: '\F00C'; }
   .editor__field__value {
     flex-grow: 1;
     border: 0 dashed transparent;
+    border-radius: 0.2rem;
     transition: border 0.5s ease, padding 0.5s ease; }
     .editor__field__value.sorting {
       padding: 1rem;
@@ -2517,7 +2548,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
         background-color: transparent;
         font-weight: bold;
         color: #ffffff;
-        padding: 0 0.5rem;
+        padding: 0 1rem;
         border: 0;
         pointer-events: none;
         line-height: 3rem;
@@ -2526,7 +2557,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       .editor__field__value.sorting .editor__field {
         background-color: #e70d3b;
         cursor: move;
-        height: 3rem; }
+        height: 3rem;
+        border-radius: 0.2rem; }
         .editor__field__value.sorting .editor__field:not(:first-of-type) {
           margin-top: 1rem !important; }
         .editor__field__value.sorting .editor__field:last-of-type {
@@ -2578,6 +2610,81 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     text-align: center;
     content: '\F141';
     color: #999999; }
+
+/**
+ * A generic modal
+ */
+.modal {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.25);
+  transition: opacity 0.5s ease;
+  overflow-y: auto;
+  opacity: 0;
+  display: block; }
+  .modal.in {
+    opacity: 1; }
+  .modal.in .modal__dialog {
+    transform: none; }
+  .modal__dialog {
+    transform: translateY(-2rem);
+    margin: 10rem auto 10rem auto;
+    transition: transform 0.5s ease;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+    border-radius: 0.2rem;
+    width: calc(100% - 2rem);
+    max-width: 50rem; }
+  .modal__close {
+    border: 0;
+    background-color: transparent;
+    position: absolute;
+    line-height: 2rem;
+    height: 2rem;
+    display: block;
+    width: 2rem;
+    color: #ffffff;
+    background-color: #21303b;
+    border-radius: 0.2rem;
+    cursor: pointer;
+    top: 1rem;
+    right: 1rem; }
+    .modal__close:hover {
+      background-color: black; }
+  .modal__header {
+    background-color: #21303b;
+    color: #ffffff;
+    padding: 1rem;
+    position: relative; }
+  .modal__title {
+    line-height: 2rem;
+    height: 2rem;
+    margin: 0; }
+  .modal__body {
+    padding: 1rem;
+    background-color: #ffffff; }
+  .modal__footer {
+    background-color: #21303b;
+    padding: 1rem;
+    color: #ffffff; }
+
+/**
+ * A modal for picking icons
+ */
+.modal--icon__search {
+  margin-bottom: 1rem !important;
+  max-width: 100% !important; }
+
+.modal--icon__icons {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.5rem; }
+
+.modal--icon__icon {
+  flex-basis: 3rem;
+  flex-grow: 1;
+  min-width: 0 !important;
+  width: 3rem;
+  margin: 0.5rem;
+  max-width: 3.1rem; }
 
 /**
  * A generic widget
@@ -2646,8 +2753,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   line-height: 2rem;
   height: 2rem;
   padding: 0 0.5rem;
-  background-color: #e70d3b;
-  color: #ffffff; }
+  background-color: #ffffff;
+  color: #333333;
+  border: 0.1rem solid #999999; }
   .widget--chips__chip:last-of-type {
     margin-bottom: 0; }
   .widget--chips__chip__input {
@@ -2655,6 +2763,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     text-align: center;
     background-color: transparent;
     display: inline-block;
+    padding: 0;
+    margin: 0;
     width: 9.5rem; }
     .widget--chips__chip__input:focus {
       outline: 0; }
@@ -2667,7 +2777,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     display: block;
     width: 2rem;
     height: 2rem;
-    color: #ffffff;
+    color: #e70d3b;
     border: 0;
     margin: 0;
     padding: 0;
@@ -2691,7 +2801,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     margin-bottom: 0; }
   .widget--input.text, .widget--input.number {
     border-radius: 0.2rem;
-    border: 1px solid #999999;
+    border: 0.1rem solid #999999;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
@@ -2795,14 +2905,15 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   display: flex;
   position: relative;
   max-width: 20rem;
-  background-color: #e70d3b;
-  border-radius: 0.2rem; }
+  background-color: #ffffff;
+  border-radius: 0.2rem;
+  border: 0.1rem solid #999999; }
   .widget--dropdown__value {
     height: 2rem;
     width: calc(100% - 2rem);
     line-height: 2rem;
     padding: 0 0.5rem;
-    color: #ffffff;
+    color: #333333;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden; }
@@ -2899,7 +3010,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     background: transparent;
     right: 0;
     top: 0;
-    color: #ffffff; }
+    color: #e70d3b; }
   .widget--dropdown__obscure {
     position: relative;
     display: none; }

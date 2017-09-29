@@ -31,8 +31,6 @@ class ArrayEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'array-editor field-editor'});
-
         this.$keyContent = _.div({class: 'array-field-key'},
             _.div({class: 'widget-sorting'},
                 _.button({class: 'btn btn-default'},
@@ -60,7 +58,7 @@ class ArrayEditor extends FieldEditor {
             )
         );
 
-        this.fetch();
+        this.init();
     }
     
     /**
@@ -516,11 +514,62 @@ class ArrayEditor extends FieldEditor {
     }
 
     /**
+     * Prerender
+     */
+    prerender() {
+        this.sanityCheck();
+    }
+
+    /**
      * Renders this editor
      */
-    render() {
-        // Perform sanity check
-        this.sanityCheck();
+    template() {
+        return _.div(
+            _.each(this.value, (i, item) => {
+                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+
+                // Schema could not be found, assign first allowed Schema
+                if(!schema || this.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                    item.schemaId = this.config.allowedSchemas[0];
+                
+                    schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                }
+
+                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                if(!editor) { return; }
+                
+                // Perform sanity check on item value
+                item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+
+                return _.div({class: 'editor__field'}, 
+                    _.div({class: 'editor__field__value'},
+                        new editor({
+                            value: item.value,
+                            config: schema.config,
+                            schema: schema
+                        }).$element,
+                        _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
+                        .click(() => {
+                            // TODO: Remove
+                        })
+                    )
+                );
+            }),
+            _.button({title: 'Add an array item', class: 'editor__field__add widget widget--button round fa fa-plus'})
+                .click(() => {
+                    let index = this.value.length;
+
+                    if(this.config.maxItems && index >= this.config.maxItems) {
+                        UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+                        return;
+                    }
+
+                    this.value[index] = { value: null, schemaId: null };
+
+                    this.init();
+                })
+        );
 
         // Render editor
         _.append(this.$element.empty(),

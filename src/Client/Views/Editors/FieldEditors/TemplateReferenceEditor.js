@@ -54,26 +54,36 @@ class TemplateReferenceEditor extends FieldEditor {
         let $element = _.div();
 
         let render = () => {
-            let templateOptions = HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type);
-            
             _.append($element.empty(), 
-                _.div({class: 'field-container'},
-                    _.div({class: 'field-key'}, 'Type'),
-                    _.div({class: 'field-value'},
-                        UI.inputDropdown(config.type, [ { label: 'page', value: 'page' }, { label: 'partial', value: 'partial' } ], (newValue) => {
-                            config.type = newValue;
-                            config.allowedTemplates = [];   
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Type'),
+                    _.div({class: 'editor__field__value'},
+                        new HashBrown.Views.Widgets.Dropdown({
+                            options: [ 'page', 'partial' ],
+                            value: config.type,
+                            onChange: (newType) => {
+                                config.type = newType;
 
-                            render();
-                        })
+                                render();
+                            }
+                        }).$element
                     )
                 ),
-                _.div({class: 'field-container'},
-                    _.div({class: 'field-key'}, 'Allowed Templates'),
-                    _.div({class: 'field-value'},
-                        UI.inputChipGroup(config.allowedTemplates, templateOptions, (newValue) => {
-                            config.allowedTemplates = newValue;
-                        }, true)
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Allowed Templates'),
+                    _.div({class: 'editor__field__value'},
+                        new HashBrown.Views.Widgets.Dropdown({
+                            options: HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type),
+                            value: config.allowedTemplates,
+                            labelKey: 'name',
+                            valueKey: 'id',
+                            useMultiple: true,
+                            useClearButton: true,
+                            useTypeAhead: true,
+                            onChange: (newValue) => {
+                                config.allowedTemplates = newValue;
+                            }
+                        })
                     )
                 )
             );

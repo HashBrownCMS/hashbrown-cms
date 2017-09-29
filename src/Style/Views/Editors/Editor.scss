@@ -95,12 +95,65 @@
             flex-shrink: 0;
             margin-right: 1rem;
             line-height: 2rem;
+
+            // Key actions
+            &__actions {
+            
+            }
+
+            &__action {
+                border: 0px;
+                line-height: 2rem;
+                height: 2rem;
+                display: block;
+                padding: 0;
+                float: left;
+                clear: both;
+                background-color: transparent;
+                color: $primary;
+                text-transform: uppercase;
+                font-weight: bold;
+                text-align: left;
+                transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+                cursor: pointer;
+                border-radius: 0.2rem;
+
+                &:hover {
+                    color: $primary-text;
+                    background-color: $primary;
+                    padding: 0 0.5rem;
+                }
+
+                &--sort {
+                    &:before {
+                        content: 'Sort items'
+                    }
+
+                    &:after {
+                        font-family: 'FontAwesome';
+                        content: '\f0dc';
+                        margin-left: 0.5rem;
+                    }
+
+                    // Sorting state
+                    &.sorting {
+                        &:before {
+                            content: 'Done sorting'
+                        }
+
+                        &:after {
+                            content: '\f00c';
+                        }
+                    }
+                }
+            }
         }
 
         // Value
         &__value {
             flex-grow: 1;
             border: 0 dashed transparent;
+            border-radius: 0.2rem;
             transition: border 0.5s ease, padding 0.5s ease;
 
             // Sorting mode
@@ -118,7 +171,7 @@
                     background-color: transparent;
                     font-weight: bold;
                     color: $primary-text;
-                    padding: 0 0.5rem;
+                    padding: 0 1rem;
                     border: 0;
                     pointer-events: none;
                     line-height: 3rem;
@@ -131,6 +184,7 @@
                     background-color: $primary;
                     cursor: move;
                     height: 3rem;
+                    border-radius: 0.2rem;
 
                     &:not(:first-of-type) {
                         margin-top: 1rem !important;

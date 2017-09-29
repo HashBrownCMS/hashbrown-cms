@@ -6,5 +6,6 @@
 module.exports = {
     MediaUploader: require('./MediaUploader'),
     MediaBrowser: require('./MediaBrowser'),
-    MessageModal: require('./MessageModal')
+    MessageModal: require('./MessageModal'),
+    IconModal: require('./IconModal')
 };

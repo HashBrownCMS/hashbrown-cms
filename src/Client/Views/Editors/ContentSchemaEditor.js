@@ -62,7 +62,7 @@ class ContentSchemaEditor extends SchemaEditor {
                 _.div({class: 'editor__field__key'},
                     'Properties',
                     _.div({class: 'editor__field__key__actions'},
-                        _.button({class: 'widget widget--button editor__field__key__action--sort'}, 'Sort')
+                        _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                             .click((e) => {
                                 HashBrown.Helpers.UIHelper.fieldSortableObject(
                                     this.model.fields.properties,
@@ -76,7 +76,7 @@ class ContentSchemaEditor extends SchemaEditor {
                 ),
                 _.div({class: 'editor__field__value'},
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
-                        let $field = _.div({class: 'editor__field', 'data-key': fieldKey});
+                        let $field = _.div({class: 'editor__field'});
 
                         let renderField = () => {
                             _.append($field.empty(),
@@ -160,7 +160,7 @@ class ContentSchemaEditor extends SchemaEditor {
 
                         return $field;
                     }),
-                    _.button({title: 'Add a property', class: 'editor__field__add widget widget--button round fa fa-plus'})
+                    _.button({title: 'Add a Content property', class: 'editor__field__add widget widget--button round fa fa-plus'})
                         .click(() => {
                             if(this.model.fields.properties.newField) { return; }
 

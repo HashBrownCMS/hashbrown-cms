@@ -1,0 +1,24 @@
+/**
+ * A modal for picking icons
+ */
+.modal--icon {
+    &__search {
+        margin-bottom: 1rem !important;
+        max-width: 100% !important; 
+    }
+
+    &__icons {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -0.5rem;
+    }
+
+    &__icon {
+        flex-basis: 3rem;
+        flex-grow: 1;
+        min-width: 0 !important;
+        width: 3rem;
+        margin: 0.5rem;
+        max-width: 3.1rem;
+    }
+}

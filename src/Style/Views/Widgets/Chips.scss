@@ -11,8 +11,9 @@
         line-height: 2rem;
         height: 2rem;
         padding: 0 0.5rem;
-        background-color: $primary;
-        color: $primary-text;
+        background-color: $standard;
+        color: $standard-text;
+        border: 0.1rem solid $standard-darker;
 
         &:last-of-type {
             margin-bottom: 0;
@@ -23,6 +24,8 @@
             text-align: center;
             background-color: transparent;
             display: inline-block;
+            padding: 0;
+            margin: 0;
             width: 9.5rem;
 
             &:focus {
@@ -41,7 +44,7 @@
             display: block;
             width: 2rem;
             height: 2rem;
-            color: $primary-text;
+            color: $primary;
             border: 0;
             margin: 0;
             padding: 0;
