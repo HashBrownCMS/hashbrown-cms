@@ -29001,7 +29001,7 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        var saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        var saveAction = this.$element.find('.editor__footer__buttons widget--button-group__appendix').val();
         var postSaveUrl = void 0;
 
         var setContent = function setContent() {
@@ -29033,7 +29033,7 @@ var ContentEditor = function (_Crisp$View) {
 
             return RequestHelper.reloadResource('content');
         }).then(function () {
-            _this2.$saveBtn.toggleClass('saving', false);
+            _this2.$saveBtn.toggleClass('working', false);
 
             _this2.reload();
 
@@ -29045,7 +29045,7 @@ var ContentEditor = function (_Crisp$View) {
                 UI.iframeModal('Preview', postSaveUrl);
             }
         }).catch(function (e) {
-            _this2.$saveBtn.toggleClass('saving', false);
+            _this2.$saveBtn.toggleClass('working', false);
             UI.errorModal();
         });
     };
@@ -29056,7 +29056,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.reload = function reload() {
-        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop;
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
 
         this.model = null;
 
@@ -29109,7 +29109,7 @@ var ContentEditor = function (_Crisp$View) {
 
     ContentEditor.prototype.restoreScrollPos = function restoreScrollPos() {
         if (this.lastScrollPos) {
-            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
         }
     };
 
@@ -29317,22 +29317,30 @@ var ContentEditor = function (_Crisp$View) {
         }
 
         // Render editor
-        return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
-            return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
-                _this5.onClickTab(tabId);
-            }));
-        }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
-            _this5.onClickTab('meta');
-        }))), this.$body = _.div({ class: 'tab-content editor-body' },
+        return _.div({ class: 'object' }, _.ul({ class: 'nav editor__header nav-tabs' }),
+        /*    _.each(schema.tabs, (tabId, tab) => {
+                return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
+                    _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
+                        tab
+                    ).click(() => { this.onClickTab(tabId); })
+                );
+            }),
+            _.li({class: isTabActive('meta') ? 'active' : ''}, 
+                _.a({'data-toggle': 'tab', href: '#tab-meta'},
+                    'meta'
+                ).click(() => { this.onClickTab('meta'); })
+            )
+        ),*/
+        this.$body = _.div({ class: 'editor__body' },
         // Render content properties
         _.each(schema.tabs, function (tabId, tab) {
-            return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+            return _.div({ class: 'widget widget--tab' }, _.input({ type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive(tabId) }), _.div({ class: 'widget--tab__content' }, _this5.renderFields(tabId, schema.fields.properties, content.properties)));
         }),
 
         // Render meta properties
-        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
+        _.div({ class: 'widget widget--tab' }, _.input({ type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive('meta') }), _.div({ class: 'widget--tab__content' }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties)))).on('scroll', function (e) {
             _this5.onScroll(e);
-        }), _.div({ class: 'editor-footer' }));
+        }), _.div({ class: 'editor__footer' }));
     };
 
     /**
@@ -29361,19 +29369,24 @@ var ContentEditor = function (_Crisp$View) {
             }
         }
 
-        _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
+        _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
-        _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
             _this6.onClickAdvanced();
         }),
 
         // View remote
-        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'btn btn-primary' }, 'View')), _.if(!this.model.isLocked,
+        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button embedded' }, 'View')), _.if(!this.model.isLocked,
         // Save & publish
-        _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+        _.div({ class: 'widget widget--button-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connection, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span('&'), _.select({ class: 'widget widget--button-group__appendix' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
+
+    /**
+     * Render this editor
+     */
+
 
     ContentEditor.prototype.render = function render() {
         var _this7 = this;
@@ -29391,9 +29404,7 @@ var ContentEditor = function (_Crisp$View) {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
             contentSchema = schema;
 
-            _this7.$element.html(
-            // Render editor
-            _this7.renderEditor(_this7.model, contentSchema));
+            _this7.$element.html(_this7.renderEditor(_this7.model, contentSchema));
 
             _this7.renderButtons();
 

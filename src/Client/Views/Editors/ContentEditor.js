@@ -65,7 +65,7 @@ class ContentEditor extends Crisp.View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        let saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        let saveAction = this.$element.find('.editor__footer__buttons widget--button-group__appendix').val();
         let postSaveUrl;
 
         let setContent = () => {
@@ -100,7 +100,7 @@ class ContentEditor extends Crisp.View {
             return RequestHelper.reloadResource('content');
         })
         .then(() => {
-            this.$saveBtn.toggleClass('saving', false);
+            this.$saveBtn.toggleClass('working', false);
             
             this.reload();
             
@@ -116,7 +116,7 @@ class ContentEditor extends Crisp.View {
             }
         })
         .catch((e) => {
-            this.$saveBtn.toggleClass('saving', false);
+            this.$saveBtn.toggleClass('working', false);
             UI.errorModal();
         });
     }
@@ -125,7 +125,7 @@ class ContentEditor extends Crisp.View {
      * Reload this view
      */
     reload() {
-        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop; 
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
 
         this.model = null;
 
@@ -162,7 +162,7 @@ class ContentEditor extends Crisp.View {
      */
     restoreScrollPos() {
         if(this.lastScrollPos) {
-            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
         }
     }
 
@@ -362,8 +362,8 @@ class ContentEditor extends Crisp.View {
 
         // Render editor
         return _.div({class: 'object'},
-            _.ul({class: 'nav editor-header nav-tabs'}, 
-                _.each(schema.tabs, (tabId, tab) => {
+            _.ul({class: 'nav editor__header nav-tabs'}), 
+            /*    _.each(schema.tabs, (tabId, tab) => {
                     return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
                         _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
                             tab
@@ -375,24 +375,30 @@ class ContentEditor extends Crisp.View {
                         'meta'
                     ).click(() => { this.onClickTab('meta'); })
                 )
-            ),
-            this.$body = _.div({class: 'tab-content editor-body'},
+            ),*/
+            this.$body = _.div({class: 'editor__body'},
                 // Render content properties
                 _.each(schema.tabs, (tabId, tab) => {
-                    return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '')},
-                        this.renderFields(tabId, schema.fields.properties, content.properties)
+                    return _.div({class: 'widget widget--tab'},
+                        _.input({type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive(tabId)}),
+                        _.div({class: 'widget--tab__content'},
+                            this.renderFields(tabId, schema.fields.properties, content.properties)
+                        )
                     );
                 }),
 
                 // Render meta properties
-                _.div({id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '')},
-                    this.renderFields('meta', schema.fields, content),
-                    this.renderFields('meta', schema.fields.properties, content.properties)
+                _.div({class: 'widget widget--tab'},
+                    _.input({type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive('meta')}),
+                    _.div({class: 'widget--tab__content'},
+                        this.renderFields('meta', schema.fields, content),
+                        this.renderFields('meta', schema.fields.properties, content.properties)
+                    )
                 )
             ).on('scroll', (e) => {
                 this.onScroll(e);
             }),
-            _.div({class: 'editor-footer'})
+            _.div({class: 'editor__footer'})
         );
     }
 
@@ -418,28 +424,28 @@ class ContentEditor extends Crisp.View {
             }
         }
             
-        _.append($('.editor-footer').empty(), 
-            _.div({class: 'btn-group'},
+        _.append($('.editor__footer').empty(), 
+            _.div({class: 'editor__footer__buttons'},
                 // JSON editor
-                _.button({class: 'btn btn-embedded'},
+                _.button({class: 'widget widget--button embedded'},
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
                 _.if(this.model.isPublished && remoteUrl,
-                    _.a({target: '_blank', href: remoteUrl, class: 'btn btn-primary'}, 'View')
+                    _.a({target: '_blank', href: remoteUrl, class: 'widget widget--button embedded'}, 'View')
                 ),
 
                 _.if(!this.model.isLocked,
                     // Save & publish
-                    _.div({class: 'btn-group-save-publish raised'},
-                        this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
-                            _.span({class: 'text-default'}, 'Save'),
-                            _.span({class: 'text-working'}, 'Saving')
+                    _.div({class: 'widget widget--button-group'},
+                        this.$saveBtn = _.button({class: 'widget widget--button'},
+                            _.span({class: 'widget--button__text-default'}, 'Save'),
+                            _.span({class: 'widget--button__text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
                         _.if(connection,
                             _.span('&'),
-                            _.select({class: 'form-control select-publishing'},
+                            _.select({class: 'widget widget--button-group__appendix'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
                                 _.if(this.model.isPublished, 
@@ -454,6 +460,9 @@ class ContentEditor extends Crisp.View {
         );
     }
 
+    /**
+     * Render this editor
+     */
     render() {
         // Make sure the model data is using the Content model
         if(this.model instanceof HashBrown.Models.Content === false) {
@@ -470,7 +479,6 @@ class ContentEditor extends Crisp.View {
             contentSchema = schema;
 
             this.$element.html(
-                // Render editor
                 this.renderEditor(this.model, contentSchema)
             );
            

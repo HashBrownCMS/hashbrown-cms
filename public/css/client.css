@@ -2733,6 +2733,22 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     animation: widget__spinner 1s linear infinite; }
 
 /**
+ * Tabs
+ */
+.widget--tab__content {
+  display: none; }
+
+.widget--tab__button {
+  position: absolute;
+  bottom: 100%;
+  height: 3rem;
+  line-height: 3rem;
+  display: block; }
+
+.widget--tab__button:checked + .widget--tab__content {
+  display: block; }
+
+/**
  * A versatile button
  */
 .widget--button {
