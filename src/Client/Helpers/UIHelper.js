@@ -9,60 +9,147 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  */
 class UIHelper {
     /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortableObject(object, field, onChange) {
+        object = object || {};
+
+        let btnSort = field.querySelector('.editor__field__key__action--sort');
+        let divValue = field.querySelector('.editor__field__value');
+        let isSorting = !divValue.classList.contains('sorting');
+
+        btnSort.innerHTML = isSorting ? 'done' : 'sort';
+
+        this.sortable(divValue, 'editor__field', isSorting, (element) => {
+            if(!element) { return; }
+
+            let itemKey = element.querySelector('.editor__field__sort-key').value;
+            let itemValue = object[itemKey];
+
+            let nextElement = element.nextElementSibling;
+
+            let newObject = {};
+
+            for(let fieldKey in object) {
+                // Omit existing key
+                if(fieldKey === itemKey) { continue; }
+
+                let fieldValue = object[fieldKey];
+
+                // If there is a next element, the item has not been inserted at the bottom
+                if(nextElement && fieldKey === nextElement.dataset.key) {
+                    newObject[itemKey] = itemValue;
+                }
+
+                newObject[fieldKey] = fieldValue;
+            }
+
+            // If the item wasn't reinserted, insert it now
+            if(!newObject[itemKey]) {
+                newObject[itemKey] = itemValue;
+            }
+
+            // Assign the new object to the old one
+            object = newObject;
+
+            // Fire the change event
+            onChange(newObject);
+        });
+    }
+
+    /**
      * Creates a sortable context
      *
      * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
      * @param {Boolean} isActive
-     *
-     * @return {Promise} On drag stop
+     * @param {Function} onChange
      */
-    static sortable(parentElement, isActive) {
-        return new Promise((resolve) => {
-            var children = parentElement.children;
+    static sortable(parentElement, sortableClassName, isActive, onChange) {
+        let children = Array.prototype.slice.call(parentElement.children || []);
+        let canSort = true;
 
-            if(!children || children.length < 2) { return resolve(); }
+        children = children.filter((child) => {
+            return child instanceof HTMLElement && child.classList.contains(sortableClassName);
+        });
 
-            if(typeof isActive === 'undefined') {
-                isActive = !parentElement.classList.contains('sorting');
+        if(!children || children.length < 2) { return resolve(); }
+
+        if(typeof isActive === 'undefined') {
+            isActive = !parentElement.classList.contains('sorting');
+        }
+
+        _.each(children, (i, child) => {
+            if(isActive) {
+                child.setAttribute('draggable', true);
+            } else {
+                child.removeAttribute('draggable');
             }
 
-            parentElement.classList.toggle('sorting', isActive);
+            if(isActive) {
+                child.ondrag = (e) => {
+                    if(!canSort) { return; }
+                    
+                    _.each(children, (i, sibling) => {
+                        if(sibling === child || !canSort || e.pageY < 1) { return; }
 
-            _.each(children, (i, child) => {
-                if(child instanceof HTMLElement === false) { return; }
+                        let cursorY = e.pageY;
+                        let childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let hasMoved = false;
 
-                if(isActive) {
-                    child.setAttribute('draggable', true);
-                } else {
-                    child.removeAttribute('draggable');
-                }
+                        // Dragging above a sibling
+                        if(cursorY < siblingY && childY > siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling);    
+                            hasMoved = true;
+                        }
 
-                if(isActive) {
-                    child.ondragstart = (e) => {
-                        
-                    };
+                        // Dragging below a sibling
+                        if(cursorY > siblingY && childY < siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
+                            hasMoved = true;
+                        }
 
-                    child.ondrag = (e) => {
-                        // TODO: Run through siblings and place the element
-                    };
+                        // Init transition
+                        if(hasMoved) {
+                            canSort = false;
 
-                    child.ondragstop = (e) => {
-                        resolve(child);
-                    };
+                            let newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                            let newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
 
-                    child.ondragcancel = (e) => {
-                        resolve(child);
-                    };
+                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
 
-                } else {
-                    child.ondragstart = null;
-                    child.ondrag = null;
-                    child.ondragstop = null;
-                    child.ondragcancel = null;
-                }
+                            setTimeout(() => {
+                                child.removeAttribute('style');
+                                sibling.removeAttribute('style');
+                                canSort = true;
+                            }, 100);
+                        }
+                    });
+                };
 
-            });
+                child.ondragend = (e) => {
+                    onChange(child);
+                };
+
+                child.ondragcancel = (e) => {
+                    onChange(child);
+                };
+
+            } else {
+                child.ondragstart = null;
+                child.ondrag = null;
+                child.ondragstop = null;
+                child.ondragcancel = null;
+            }
         });
+        
+        parentElement.classList.toggle('sorting', isActive);
     }
 
 

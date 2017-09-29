@@ -62,40 +62,15 @@ class ContentSchemaEditor extends SchemaEditor {
                 _.div({class: 'editor__field__key'},
                     'Properties',
                     _.div({class: 'editor__field__key__actions'},
-                        _.button({class: 'wdiget widget--button'}, 'Sort')
+                        _.button({class: 'widget widget--button editor__field__key__action--sort'}, 'Sort')
                             .click((e) => {
-                                let $field = $(e.currentTarget).parents('.editor__field');
-                                let $value = $field.children('.editor__field__value');
-                                
-                                HashBrown.Helpers.UIHelper.sortable($value[0])
-                                .then((element) => {
-                                    let itemKey = element.dataset.key;
-                                    let itemValue = this.model.fields.properties[key];
-
-                                    delete this.model.fields.properties[itemKey];
-
-                                    let nextElement = element.nextElementSibling;
-
-                                    let newProperties = {};
-
-                                    for(let fieldKey in this.model.fields.properties) {
-                                        // If there is a next element, the item has not been inserted at the bottom
-                                        if(nextElement && fieldKey === nextElement.dataset.key) {
-                                            newProperties[itemKey] = itemValue;
-                                        }
-
-                                        newProperties[fieldKey] = fieldValue;
+                                HashBrown.Helpers.UIHelper.fieldSortableObject(
+                                    this.model.fields.properties,
+                                    $(e.currentTarget).parents('.editor__field')[0],
+                                    (newProperties) => {
+                                        this.model.fields.properties = newProperties;
                                     }
-
-                                    // If the item wasn't reinserted, insert it now
-                                    if(!newProperties[itemKey]) {
-                                        newProperties[itemKey] = itemValue;
-                                    }
-
-                                    this.model.fields.properties = newProperties;
-
-                                    renderFieldProperties();
-                                });
+                                );
                             })
                     )
                 ),
@@ -105,7 +80,6 @@ class ContentSchemaEditor extends SchemaEditor {
 
                         let renderField = () => {
                             _.append($field.empty(),
-                                _.div({class: 'editor__field__sort-label'}, fieldValue.label),
                                 _.div({class: 'editor__field__key'},
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
@@ -119,7 +93,7 @@ class ContentSchemaEditor extends SchemaEditor {
 
                                             this.model.fields.properties[fieldKey] = fieldValue;
                                         }
-                                    }).$element,
+                                    }).$element.addClass('editor__field__sort-key'),
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
                                         placeholder: 'A label, e.g. "My field"',
@@ -186,7 +160,7 @@ class ContentSchemaEditor extends SchemaEditor {
 
                         return $field;
                     }),
-                    _.button({title: 'Add a property', class: 'widget widget--button round right fa fa-plus'})
+                    _.button({title: 'Add a property', class: 'editor__field__add widget widget--button round fa fa-plus'})
                         .click(() => {
                             if(this.model.fields.properties.newField) { return; }
 

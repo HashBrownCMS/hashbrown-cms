@@ -86,7 +86,21 @@ class StructEditor extends FieldEditor {
         let renderEditor = () => {
             _.append($element.empty(),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Struct fields'),
+                    _.div({class: 'editor__field__key'},
+                        'Properties',
+                        _.div({class: 'editor__field__key__actions'},
+                            _.button({class: 'widget widget--button editor__field__key__action--sort'}, 'Sort')
+                                .click((e) => {
+                                    HashBrown.Helpers.UIHelper.fieldSortableObject(
+                                        config.struct,
+                                        $(e.currentTarget).parents('.editor__field')[0],
+                                        (newStruct) => {
+                                            config.struct = newStruct;
+                                        }
+                                    );
+                                })
+                        )
+                    ),
                     _.div({class: 'editor__field__value'},
                         _.each(config.struct, (fieldKey, fieldValue) => {
                             // Sanity check
@@ -109,7 +123,7 @@ class StructEditor extends FieldEditor {
 
                                                 config.struct[fieldKey] = fieldValue;
                                             }
-                                        }).$element,
+                                        }).$element.addClass('editor__field__sort-key'),
                                         new HashBrown.Views.Widgets.Input({
                                             type: 'text',
                                             placeholder: 'A label, e.g. "My field"',
@@ -161,7 +175,7 @@ class StructEditor extends FieldEditor {
 
                             return $field;
                         }),
-                        _.button({class: 'widget widget--button round right fa fa-plus'},
+                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a property'},
                             ).click(() => {
                                 if(config.struct.newField) { return; }
                             

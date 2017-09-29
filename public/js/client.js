@@ -29860,60 +29860,158 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
+        object = object || {};
+
+        var btnSort = field.querySelector('.editor__field__key__action--sort');
+        var divValue = field.querySelector('.editor__field__value');
+        var isSorting = !divValue.classList.contains('sorting');
+
+        btnSort.innerHTML = isSorting ? 'done' : 'sort';
+
+        this.sortable(divValue, 'editor__field', isSorting, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var itemKey = element.querySelector('.editor__field__sort-key').value;
+            var itemValue = object[itemKey];
+
+            var nextElement = element.nextElementSibling;
+
+            var newObject = {};
+
+            for (var fieldKey in object) {
+                // Omit existing key
+                if (fieldKey === itemKey) {
+                    continue;
+                }
+
+                var fieldValue = object[fieldKey];
+
+                // If there is a next element, the item has not been inserted at the bottom
+                if (nextElement && fieldKey === nextElement.dataset.key) {
+                    newObject[itemKey] = itemValue;
+                }
+
+                newObject[fieldKey] = fieldValue;
+            }
+
+            // If the item wasn't reinserted, insert it now
+            if (!newObject[itemKey]) {
+                newObject[itemKey] = itemValue;
+            }
+
+            // Assign the new object to the old one
+            object = newObject;
+
+            // Fire the change event
+            onChange(newObject);
+        });
+    };
+
+    /**
      * Creates a sortable context
      *
      * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
      * @param {Boolean} isActive
-     *
-     * @return {Promise} On drag stop
+     * @param {Function} onChange
      */
-    UIHelper.sortable = function sortable(parentElement, isActive) {
-        return new Promise(function (resolve) {
-            var children = parentElement.children;
 
-            if (!children || children.length < 2) {
-                return resolve();
-            }
 
-            if (typeof isActive === 'undefined') {
-                isActive = !parentElement.classList.contains('sorting');
-            }
+    UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
+        var children = Array.prototype.slice.call(parentElement.children || []);
+        var canSort = true;
 
-            parentElement.classList.toggle('sorting', isActive);
-
-            _.each(children, function (i, child) {
-                if (child instanceof HTMLElement === false) {
-                    return;
-                }
-
-                if (isActive) {
-                    child.setAttribute('draggable', true);
-                } else {
-                    child.removeAttribute('draggable');
-                }
-
-                if (isActive) {
-                    child.ondragstart = function (e) {};
-
-                    child.ondrag = function (e) {
-                        // TODO: Run through siblings and place the element
-                    };
-
-                    child.ondragstop = function (e) {
-                        resolve(child);
-                    };
-
-                    child.ondragcancel = function (e) {
-                        resolve(child);
-                    };
-                } else {
-                    child.ondragstart = null;
-                    child.ondrag = null;
-                    child.ondragstop = null;
-                    child.ondragcancel = null;
-                }
-            });
+        children = children.filter(function (child) {
+            return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });
+
+        if (!children || children.length < 2) {
+            return resolve();
+        }
+
+        if (typeof isActive === 'undefined') {
+            isActive = !parentElement.classList.contains('sorting');
+        }
+
+        _.each(children, function (i, child) {
+            if (isActive) {
+                child.setAttribute('draggable', true);
+            } else {
+                child.removeAttribute('draggable');
+            }
+
+            if (isActive) {
+                child.ondrag = function (e) {
+                    if (!canSort) {
+                        return;
+                    }
+
+                    _.each(children, function (i, sibling) {
+                        if (sibling === child || !canSort || e.pageY < 1) {
+                            return;
+                        }
+
+                        var cursorY = e.pageY;
+                        var childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var hasMoved = false;
+
+                        // Dragging above a sibling
+                        if (cursorY < siblingY && childY > siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling);
+                            hasMoved = true;
+                        }
+
+                        // Dragging below a sibling
+                        if (cursorY > siblingY && childY < siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
+                            hasMoved = true;
+                        }
+
+                        // Init transition
+                        if (hasMoved) {
+                            canSort = false;
+
+                            var newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                            setTimeout(function () {
+                                child.removeAttribute('style');
+                                sibling.removeAttribute('style');
+                                canSort = true;
+                            }, 100);
+                        }
+                    });
+                };
+
+                child.ondragend = function (e) {
+                    onChange(child);
+                };
+
+                child.ondragcancel = function (e) {
+                    onChange(child);
+                };
+            } else {
+                child.ondragstart = null;
+                child.ondrag = null;
+                child.ondragstop = null;
+                child.ondragcancel = null;
+            }
+        });
+
+        parentElement.classList.toggle('sorting', isActive);
     };
 
     /**
@@ -44179,43 +44277,15 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
-            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'wdiget widget--button' }, 'Sort').click(function (e) {
-                var $field = $(e.currentTarget).parents('.editor__field');
-                var $value = $field.children('.editor__field__value');
-
-                HashBrown.Helpers.UIHelper.sortable($value[0]).then(function (element) {
-                    var itemKey = element.dataset.key;
-                    var itemValue = _this2.model.fields.properties[key];
-
-                    delete _this2.model.fields.properties[itemKey];
-
-                    var nextElement = element.nextElementSibling;
-
-                    var newProperties = {};
-
-                    for (var fieldKey in _this2.model.fields.properties) {
-                        // If there is a next element, the item has not been inserted at the bottom
-                        if (nextElement && fieldKey === nextElement.dataset.key) {
-                            newProperties[itemKey] = itemValue;
-                        }
-
-                        newProperties[fieldKey] = fieldValue;
-                    }
-
-                    // If the item wasn't reinserted, insert it now
-                    if (!newProperties[itemKey]) {
-                        newProperties[itemKey] = itemValue;
-                    }
-
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'widget widget--button editor__field__key__action--sort' }, 'Sort').click(function (e) {
+                HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
                     _this2.model.fields.properties = newProperties;
-
-                    renderFieldProperties();
                 });
             }))), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
                 var $field = _.div({ class: 'editor__field', 'data-key': fieldKey });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__sort-label' }, fieldValue.label), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -44227,7 +44297,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 
                             _this2.model.fields.properties[fieldKey] = fieldValue;
                         }
-                    }).$element, new HashBrown.Views.Widgets.Input({
+                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -44279,7 +44349,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 renderField();
 
                 return $field;
-            }), _.button({ title: 'Add a property', class: 'widget widget--button round right fa fa-plus' }).click(function () {
+            }), _.button({ title: 'Add a property', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
                 if (_this2.model.fields.properties.newField) {
                     return;
                 }
@@ -47495,7 +47565,11 @@ var StructEditor = function (_FieldEditor) {
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         var renderEditor = function renderEditor() {
-            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Struct fields'), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'widget widget--button editor__field__key__action--sort' }, 'Sort').click(function (e) {
+                HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
+                    config.struct = newStruct;
+                });
+            }))), _.div({ class: 'editor__field__value' }, _.each(config.struct, function (fieldKey, fieldValue) {
                 // Sanity check
                 fieldValue.config = fieldValue.config || {};
 
@@ -47514,7 +47588,7 @@ var StructEditor = function (_FieldEditor) {
 
                             config.struct[fieldKey] = fieldValue;
                         }
-                    }).$element, new HashBrown.Views.Widgets.Input({
+                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -47557,7 +47631,7 @@ var StructEditor = function (_FieldEditor) {
                 renderField();
 
                 return $field;
-            }), _.button({ class: 'widget widget--button round right fa fa-plus' }).click(function () {
+            }), _.button({ class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a property' }).click(function () {
                 if (config.struct.newField) {
                     return;
                 }

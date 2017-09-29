@@ -70,6 +70,7 @@
         display: flex;
         margin: 0 0 1rem 0;
         position: relative;
+        transition: background-color 0.5s ease, transform 0.5s ease;
 
         &:last-child {
             margin-bottom: 0;
@@ -88,16 +89,6 @@
             margin-left: 1rem;
         }
 
-        // Sort label (only used when sorting)
-        &__sort-label {
-            display: none;
-            color: $primary-text;
-            font-weight: bold;
-            line-height: 3rem;
-            height: 3rem;
-            padding: 0 1rem;
-        }
-
         // Key
         &__key {
             flex-basis: 10rem;
@@ -109,40 +100,66 @@
         // Value
         &__value {
             flex-grow: 1;
-            
-            // Sorting mode
-            &.sorting .editor__field {
-                background-color: $primary;
-                cursor: move;
-                height: 3rem;
-                margin-top: 1rem !important;
+            border: 0 dashed transparent;
+            transition: border 0.5s ease, padding 0.5s ease;
 
-                &:before {
-                    display: none !important;
+            // Sorting mode
+            &.sorting {
+                padding: 1rem;
+                border: 0.15rem dashed $standard-darker;
+        
+                // Hide the add button
+                .editor__field__add {
+                    display: none;
                 }
-            
-                &__sort-label {
+
+                // Style the sort key
+                .editor__field__sort-key {
+                    background-color: transparent;
+                    font-weight: bold;
+                    color: $primary-text;
+                    padding: 0 0.5rem;
+                    border: 0;
+                    pointer-events: none;
+                    line-height: 3rem;
+                    height: 3rem;
                     display: block;
                 }
 
-                &__value,
-                &__key,
-                &__remove {
-                    display: none;
+                // Style the items inside
+                .editor__field {
+                    background-color: $primary;
+                    cursor: move;
+                    height: 3rem;
+
+                    &:not(:first-of-type) {
+                        margin-top: 1rem !important;
+                    }
+
+                    &:last-of-type {
+                        margin-bottom: 0 !important;
+                    }
+
+                    &:before {
+                        display: none !important;
+                    }
+                
+                    &__sort-label {
+                        display: block;
+                    }
+
+                    &__value,
+                    &__key > *:not(.editor__field__sort-key),
+                    &__remove {
+                        display: none;
+                    }
                 }
             }
         }
 
-        // Drag handle
-        &__drag {
-            cursor: move;
-            width: 2rem;
-            height: 2rem;
-            text-align: center;
-            position: absolute;
-            left: -2rem;
-            top: 0;
-            line-height: 2rem;
+        // Add button
+        &__add {
+            margin-left: auto;
         }
 
         // Remove button
