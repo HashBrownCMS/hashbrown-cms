@@ -40,8 +40,11 @@ class StructEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'struct-editor field-editor'});
-
+        // A sanity check to make sure we're working with an object
+        if(!this.value || typeof this.value !== 'object') {
+            this.value = {};
+        }
+        
         this.fetch();
     }
 
@@ -199,14 +202,8 @@ class StructEditor extends FieldEditor {
     /**
      * Renders this editor
      */
-    render() {
-        // A sanity check to make sure we're working with an object
-        if(!this.value || typeof this.value !== 'object') {
-            this.value = {};
-        }
-    
-        // Render editor
-        _.append(this.$element.empty(),
+   template() {
+        return _.div({class: 'editor__field__value'},
             // Render preview
             this.renderPreview(),
 
@@ -244,17 +241,17 @@ class StructEditor extends FieldEditor {
                 });
 
                 // Return the DOM element
-                return _.div({class: 'kvp'},
-                    _.div({class: 'key'},
+                return _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
                         keySchema.label,
                         fieldEditorInstance.$keyContent
                     ),
-                    _.div({class: 'value'},
+                    _.div({class: 'editor__field__value'},
                         fieldEditorInstance.$element
                     )
                 );
             })    
-        )
+        );
     }    
 }
 

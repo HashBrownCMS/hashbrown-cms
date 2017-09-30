@@ -205,9 +205,17 @@ class ArrayEditor extends FieldEditor {
                     schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
                 }
 
+                // Obtain the field editor
+                if(schema.editorId.indexOf('Editor') < 0) {
+                    schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+                }
+                
                 let editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
-                if(!editorClass) { return; }
+                if(!editorClass) {
+                    UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));    
+                    return;
+                }
                 
                 // Perform sanity check on item value
                 item.value = ContentHelper.fieldSanityCheck(item.value, schema);
@@ -223,7 +231,9 @@ class ArrayEditor extends FieldEditor {
                     item.value = newValue;
                 });
 
-                return _.div({class: 'editor__field'}, 
+                return _.div({class: 'editor__field'},
+                    // TODO: Render schema picker
+
                     editorInstance.$element,
                     _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove item'})
                         .click(() => {

@@ -12,11 +12,11 @@
     // Header
     &__header {
         background-color: $secondary;
-        padding: 20px 0px 0px 20px;
+        padding: 2rem 0 0 2rem;
         color: $secondary-text;
-        height: 61px;
+        height: 5rem;
         flex-shrink: 0;
-        flex-basis: 61px;
+        flex-basis: 5rem;
 
         @include background('secondary');
 
@@ -46,9 +46,17 @@
             font-weight: bold;
             border: 0;
             background-color: transparent;
-            border-bottom: 0.2rem solid transparent;
+            color: $secondary-text;
+            background-color: $secondary-light;
+            margin-right: 0.5rem;
+
+            &:hover {
+                color: $primary-text;
+                background-color: $primary;
+            }
 
             &.active {
+                pointer-events: none;
                 color: $standard-text;
                 background-color: $standard-dark;
             }
@@ -308,6 +316,24 @@
                     &__remove {
                         display: none;
                     }
+                }
+            }
+
+            // Warning
+            &__warning {
+                background-color: $warning;
+                color: $warning-text;
+                font-weight: bold;
+                line-height: 2rem;
+                height: 2rem;
+                display: inline-block;
+                border-radius: 0.2rem;
+                padding: 0 0.5rem;
+
+                &:before {
+                    font-family: 'FontAwesome';
+                    content: '\f071';
+                    margin-right: 0.5rem;
                 }
             }
         }

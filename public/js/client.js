@@ -45749,9 +45749,15 @@ var ArrayEditor = function (_FieldEditor) {
                 schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
             }
 
+            // Obtain the field editor
+            if (schema.editorId.indexOf('Editor') < 0) {
+                schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+            }
+
             var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
             if (!editorClass) {
+                UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
                 return;
             }
 
@@ -45769,7 +45775,10 @@ var ArrayEditor = function (_FieldEditor) {
                 item.value = newValue;
             });
 
-            return _.div({ class: 'editor__field' }, editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+            return _.div({ class: 'editor__field' },
+            // TODO: Render schema picker
+
+            editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
                 _this4.value.splice(i, 1);
 
                 _this4.trigger('change', _this4.value);
@@ -47520,9 +47529,12 @@ var StructEditor = function (_FieldEditor) {
     function StructEditor(params) {
         _classCallCheck(this, StructEditor);
 
+        // A sanity check to make sure we're working with an object
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'struct-editor field-editor' });
+        if (!_this.value || _typeof(_this.value) !== 'object') {
+            _this.value = {};
+        }
 
         _this.fetch();
         return _this;
@@ -47660,16 +47672,10 @@ var StructEditor = function (_FieldEditor) {
      */
 
 
-    StructEditor.prototype.render = function render() {
+    StructEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // A sanity check to make sure we're working with an object
-        if (!this.value || _typeof(this.value) !== 'object') {
-            this.value = {};
-        }
-
-        // Render editor
-        _.append(this.$element.empty(),
+        return _.div({ class: 'editor__field__value' },
         // Render preview
         this.renderPreview(),
 
@@ -47707,7 +47713,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             // Return the DOM element
-            return _.div({ class: 'kvp' }, _.div({ class: 'key' }, keySchema.label, fieldEditorInstance.$keyContent), _.div({ class: 'value' }, fieldEditorInstance.$element));
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, keySchema.label, fieldEditorInstance.$keyContent), _.div({ class: 'editor__field__value' }, fieldEditorInstance.$element));
         }));
     };
 
@@ -47928,6 +47934,9 @@ var FieldEditor = __webpack_require__(11);
 var TemplateReferenceEditor = function (_FieldEditor) {
     _inherits(TemplateReferenceEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function TemplateReferenceEditor(params) {
         _classCallCheck(this, TemplateReferenceEditor);
 
@@ -47936,19 +47945,6 @@ var TemplateReferenceEditor = function (_FieldEditor) {
         _this.init();
         return _this;
     }
-
-    /**
-     * Event: Change value
-     *
-     * @param {String} newValue
-     */
-
-
-    TemplateReferenceEditor.prototype.onChange = function onChange(newValue) {
-        this.value = newValue;
-
-        this.trigger('change', this.value);
-    };
 
     /**
      * Renders the config editor
@@ -47994,17 +47990,12 @@ var TemplateReferenceEditor = function (_FieldEditor) {
     };
 
     /**
-     * Renders this editor
+     * Sanity check
      */
 
 
-    TemplateReferenceEditor.prototype.render = function render() {
+    TemplateReferenceEditor.prototype.sanityCheck = function sanityCheck() {
         var _this2 = this;
-
-        this.$element = _.div({ class: 'field-editor template-reference-editor' });
-
-        var resource = window.resources.templates;
-        var dropdownOptions = [];
 
         // Sanity check for template type
         this.config.type = this.config.type || 'page';
@@ -48019,34 +48010,30 @@ var TemplateReferenceEditor = function (_FieldEditor) {
             this.config.allowedTemplates = [];
         }
 
-        // If no templates are available, display a warning
-        if (resource.length < 1) {
-            this.$element.html(_.span({ class: 'field-warning' }, 'No templates configured'));
-            return;
-        }
-
-        // If no allowed templates are configured, display a warning
-        if (this.config.allowedTemplates.length < 1) {
-            this.$element.html(_.span({ class: 'field-warning' }, 'No allowed templates configured'));
-            return;
-        }
-
         // If no allowed template is set, apply the first of the allowed templates
         if (!this.value || this.config.allowedTemplates.indexOf(this.value) < 0) {
+            // This will be null if no allwoed templates are set
             this.value = this.config.allowedTemplates[0];
-
-            // Set values in dropdown element    
-            this.$element.find('.dropdown-menu-toggle').html(this.value);
-            this.$element.find('.dropdown-menu li[data-value="' + this.value + '"]').addClass('active');
 
             // Apply changes on next CPU cycle
             setTimeout(function () {
                 _this2.trigger('change', _this2.value);
+                _this2.render();
             }, 1);
         }
+    };
 
-        // Generate dropdown options
-        for (var _iterator = resource, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    /**
+     * Generates dropdown options
+     *
+     * @returns {Array} Options
+     */
+
+
+    TemplateReferenceEditor.prototype.getOptions = function getOptions() {
+        var dropdownOptions = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
 
             if (_isArray) {
@@ -48066,19 +48053,51 @@ var TemplateReferenceEditor = function (_FieldEditor) {
                 continue;
             }
 
-            dropdownOptions[dropdownOptions.length] = {
-                label: template.name,
-                value: template.id,
-                selected: template.id == this.value
-            };
+            dropdownOptions[dropdownOptions.length] = template;
         }
 
-        // Render picker
-        _.append(this.$element,
-        // Render preview
-        this.renderPreview(), UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
-            _this2.onChange(newValue);
-        }, false));
+        return dropdownOptions;
+    };
+
+    /**
+     * Pre render
+     */
+
+
+    TemplateReferenceEditor.prototype.prerender = function prerender() {
+        this.sanityCheck();
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    TemplateReferenceEditor.prototype.template = function template() {
+        var _this3 = this;
+
+        // If no templates are available, display a warning
+        if (resources.templates.length < 1) {
+            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning', title: 'You need to set up your Connection to provide Templates before they can be used' }, 'No templates available'));
+        }
+
+        // If no allowed templates are configured, display a warning
+        if (this.config.allowedTemplates.length < 1) {
+            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning' }, 'No allowed templates configured'));
+        }
+
+        return _.div({ class: 'editor__field__value' }, this.renderPreview(), new HashBrown.Views.Widgets.Dropdown({
+            useTypeAhead: true,
+            value: this.value,
+            options: this.getOptions(),
+            labelKey: 'name',
+            valueKey: 'id',
+            onChange: function onChange(newValue) {
+                _this3.value = newValue;
+
+                _this3.trigger('change', _this3.value);
+            }
+        }).$element);
     };
 
     return TemplateReferenceEditor;

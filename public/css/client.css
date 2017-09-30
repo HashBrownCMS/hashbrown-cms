@@ -587,7 +587,7 @@ body.dashboard-container {
     position: relative;
     z-index: 5;
     box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2);
-    border-right: 1px solid #cccccc; }
+    border-right: 1px solid #dddddd; }
     .navspace .navbar-main .tab-panes .pane-container {
       display: none;
       height: 100%; }
@@ -625,7 +625,7 @@ body.dashboard-container {
         pointer-events: none;
         opacity: 0.5; }
       .navspace .navbar-main .tab-panes .pane-container .pane-toolbar {
-        border-bottom: 1px solid #cccccc;
+        border-bottom: 1px solid #dddddd;
         display: flex;
         padding: 10px 5px;
         height: 61px; }
@@ -652,14 +652,14 @@ body.dashboard-container {
         flex-shrink: 0; }
         .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
           margin: 10px;
-          border: 2px dashed #cccccc;
+          border: 2px dashed #dddddd;
           height: 40px;
           padding: 0px;
           background-color: transparent;
           width: calc(100% - 20px);
           text-align: center;
           font-weight: 700;
-          color: #cccccc;
+          color: #dddddd;
           display: none; }
           .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
             border-color: #e70d3b;
@@ -846,7 +846,7 @@ body.dashboard-container {
     border-top-width: 1px;
     border-radius: 0px;
     background-color: #eeeeee;
-    border-top: 1px solid #cccccc;
+    border-top: 1px solid #dddddd;
     color: #333333; }
     .editor .editor-footer .btn-group {
       float: right; }
@@ -1062,7 +1062,7 @@ body.dashboard-container {
       padding-bottom: 2rem;
       margin-top: 2rem; }
     .schema-editor > .schema .field-properties {
-      border-bottom: 0.1rem solid #cccccc; }
+      border-bottom: 0.1rem solid #dddddd; }
     .schema-editor > .schema .btn-add-item {
       margin: 2rem 0 0 auto;
       display: block; }
@@ -1323,13 +1323,13 @@ body.dashboard-container {
       .array-editor .items .item > .btn-remove {
         right: 0px; }
         .array-editor .items .item > .btn-remove .fa {
-          color: #cccccc; }
+          color: #dddddd; }
           .array-editor .items .item > .btn-remove .fa:hover {
             color: #21303b; }
       .array-editor .items .item > .btn-toggle {
         right: 34px; }
         .array-editor .items .item > .btn-toggle .fa {
-          color: #cccccc; }
+          color: #dddddd; }
           .array-editor .items .item > .btn-toggle .fa:hover {
             color: #21303b; }
         .array-editor .items .item > .btn-toggle .fa-window-minimize {
@@ -1785,7 +1785,7 @@ body.dashboard-container {
       right: 10px; }
   .dropdown .dropdown-menu {
     padding: 10px 0px !important;
-    border: 1px solid #cccccc;
+    border: 1px solid #dddddd;
     border-radius: 2px;
     color: #333333;
     left: 0px;
@@ -2067,15 +2067,15 @@ body.dashboard-container {
       border-color: #ca0b34; }
   .btn.btn-default {
     background-color: #ffffff;
-    border-color: #cccccc;
+    border-color: #dddddd;
     color: #333333;
     border-width: 1px; }
     .btn.btn-default:hover {
       background-color: white;
-      border-color: #dbdbdb; }
+      border-color: #ececec; }
     .btn.btn-default:active {
       background-color: #f0f0f0;
-      border-color: #bdbdbd; }
+      border-color: #cecece; }
   .btn:active {
     box-shadow: none; }
   .btn.btn-primary {
@@ -2215,7 +2215,7 @@ body.dashboard-container {
     background-color: #ffffff;
     border-radius: 0px;
     box-shadow: none;
-    border: 1px solid #cccccc;
+    border: 1px solid #dddddd;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     border-radius: 2px; }
@@ -2443,11 +2443,11 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 
 .editor__header {
   background-color: #21303b;
-  padding: 20px 0px 0px 20px;
+  padding: 2rem 0 0 2rem;
   color: #ffffff;
-  height: 61px;
+  height: 5rem;
   flex-shrink: 0;
-  flex-basis: 61px;
+  flex-basis: 5rem;
   background-image: url("/img/bg-secondary.jpg");
   background-attachment: fixed;
   background-position: 0px 0px; }
@@ -2472,8 +2472,14 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     font-weight: bold;
     border: 0;
     background-color: transparent;
-    border-bottom: 0.2rem solid transparent; }
+    color: #ffffff;
+    background-color: #283b48;
+    margin-right: 0.5rem; }
+    .editor__header__tab:hover {
+      color: #ffffff;
+      background-color: #e70d3b; }
     .editor__header__tab.active {
+      pointer-events: none;
       color: #333333;
       background-color: #eeeeee; }
 
@@ -2496,7 +2502,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   border-top-width: 1px;
   border-radius: 0px;
   background-color: #eeeeee;
-  border-top: 1px solid #cccccc;
+  border-top: 1px solid #dddddd;
   color: #333333; }
   .editor__footer__buttons {
     margin: 0 0 0 auto;
@@ -2508,7 +2514,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   padding: 1rem 0;
   position: relative;
   transition: background-color 0.5s ease, transform 0.5s ease;
-  border-bottom: 1px solid #cccccc; }
+  border-bottom: 1px solid #dddddd; }
   .editor__field:last-of-type {
     border-bottom: 0; }
   .editor__field.vertical {
@@ -2611,7 +2617,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       background-color: #ffffff; }
     .editor__field__value.sorting {
       padding: 1rem;
-      border: 0.15rem dashed #cccccc; }
+      border: 0.15rem dashed #dddddd; }
       .editor__field__value.sorting .editor__field__add {
         display: none; }
       .editor__field__value.sorting .editor__field__sort-key {
@@ -2621,6 +2627,19 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
         cursor: move; }
         .editor__field__value.sorting .editor__field__remove {
           display: none; }
+    .editor__field__value__warning {
+      background-color: #FFB300;
+      color: #664800;
+      font-weight: bold;
+      line-height: 2rem;
+      height: 2rem;
+      display: inline-block;
+      border-radius: 0.2rem;
+      padding: 0 0.5rem; }
+      .editor__field__value__warning:before {
+        font-family: 'FontAwesome';
+        content: '\F071';
+        margin-right: 0.5rem; }
   .editor__field__add {
     margin-top: 1rem;
     margin-left: auto; }
@@ -2815,7 +2834,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   padding: 0 0.5rem;
   background-color: #ffffff;
   color: #333333;
-  border: 0.1rem solid #cccccc; }
+  border: 0.1rem solid #dddddd; }
   .widget--chips__chip:last-of-type {
     margin-bottom: 0; }
   .widget--chips__chip__input {
@@ -2861,7 +2880,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     margin-bottom: 0; }
   .widget--input.text, .widget--input.number {
     border-radius: 0.2rem;
-    border: 0.1rem solid #cccccc;
+    border: 0.1rem solid #dddddd;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
@@ -2912,17 +2931,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       width: 100%;
       height: 0.5rem;
       border-radius: 0.25rem;
-      background-color: #cccccc; }
+      background-color: #dddddd; }
     .widget--input__range-input::-moz-range-track {
       width: 100%;
       height: 0.5rem;
       border-radius: 0.25rem;
-      background-color: #cccccc; }
+      background-color: #dddddd; }
     .widget--input__range-input::-ms-track {
       width: 100%;
       height: 0.5rem;
       border-radius: 0.25rem;
-      background-color: #cccccc; }
+      background-color: #dddddd; }
   .widget--input__range-extra {
     position: absolute;
     left: calc(100% + 0.5rem);
@@ -2967,7 +2986,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   max-width: 20rem;
   background-color: #ffffff;
   border-radius: 0.2rem;
-  border: 0.1rem solid #cccccc; }
+  border: 0.1rem solid #dddddd; }
   .widget--dropdown__value {
     height: 2rem;
     width: calc(100% - 2rem);
