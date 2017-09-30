@@ -353,53 +353,44 @@ class ContentEditor extends Crisp.View {
     renderEditor(content, schema) {
         let view = this;
 
-        // Check for active tab
-        function isTabActive(tabId) {
-            let targetTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
-
-            return tabId == targetTab;
-        }
+        let activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
         // Render editor
-        return _.div({class: 'object'},
-            _.ul({class: 'nav editor__header nav-tabs'}), 
-            /*    _.each(schema.tabs, (tabId, tab) => {
-                    return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
-                        _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
-                            tab
-                        ).click(() => { this.onClickTab(tabId); })
-                    );
+        return [
+            _.div({class: 'editor__header'}, 
+                _.each(schema.tabs, (tabId, tabName) => {
+                    return _.button({'data-id': tabId, class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
+                        .click(() => {
+                            $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
+                                tab.classList.toggle('active', tab.dataset.id === tabId);
+                            });
+                        });
                 }),
-                _.li({class: isTabActive('meta') ? 'active' : ''}, 
-                    _.a({'data-toggle': 'tab', href: '#tab-meta'},
-                        'meta'
-                    ).click(() => { this.onClickTab('meta'); })
-                )
-            ),*/
+                _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
+                    .click(() => {
+                        $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
+                            tab.classList.toggle('active', tab.dataset.id === 'meta');
+                        });
+                    })
+            ),
             this.$body = _.div({class: 'editor__body'},
                 // Render content properties
-                _.each(schema.tabs, (tabId, tab) => {
-                    return _.div({class: 'widget widget--tab'},
-                        _.input({type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive(tabId)}),
-                        _.div({class: 'widget--tab__content'},
-                            this.renderFields(tabId, schema.fields.properties, content.properties)
-                        )
+                _.each(schema.tabs, (tabId, tabName) => {
+                    return _.div({class: 'editor__body__tab' + (tabId === activeTab ? ' active' : ''), 'data-id': tabId},
+                        this.renderFields(tabId, schema.fields.properties, content.properties)
                     );
                 }),
 
                 // Render meta properties
-                _.div({class: 'widget widget--tab'},
-                    _.input({type: 'radio', name: 'editor--content__tabs', class: 'widget--tab__button', checked: isTabActive('meta')}),
-                    _.div({class: 'widget--tab__content'},
-                        this.renderFields('meta', schema.fields, content),
-                        this.renderFields('meta', schema.fields.properties, content.properties)
-                    )
+                _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
+                    this.renderFields('meta', schema.fields, content),
+                    this.renderFields('meta', schema.fields.properties, content.properties)
                 )
             ).on('scroll', (e) => {
                 this.onScroll(e);
             }),
             _.div({class: 'editor__footer'})
-        );
+        ];
     }
 
     /**

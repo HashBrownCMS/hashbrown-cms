@@ -2461,12 +2461,29 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     display: inline-block;
     position: relative;
     top: 1px; }
+  .editor__header__tab {
+    padding: 0 2rem;
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
+    display: inline-block;
+    height: 3rem;
+    line-height: 3rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: 0;
+    background-color: transparent;
+    border-bottom: 0.2rem solid transparent; }
+    .editor__header__tab.active {
+      color: #333333;
+      background-color: #eeeeee; }
 
 .editor__body {
   padding: 15px;
   flex-grow: 1;
   overflow: auto;
   position: relative; }
+  .editor__body__tab:not(.active) {
+    display: none; }
 
 .editor__footer {
   position: relative;
@@ -2743,7 +2760,13 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   bottom: 100%;
   height: 3rem;
   line-height: 3rem;
-  display: block; }
+  display: block;
+  width: 6rem;
+  cursor: pointer;
+  border-bottom: 0.2rem solid transparent;
+  z-index: 90; }
+  .widget--tab__button:checked {
+    border-color: #e70d3b; }
 
 .widget--tab__button:checked + .widget--tab__content {
   display: block; }

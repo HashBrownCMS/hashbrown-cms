@@ -33,6 +33,26 @@
             position: relative;
             top: 1px;
         }
+
+        // Tab
+        &__tab {
+            padding: 0 2rem;
+            border-top-left-radius: 0.2rem;
+            border-top-right-radius: 0.2rem;
+            display: inline-block;
+            height: 3rem;
+            line-height: 3rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 0;
+            background-color: transparent;
+            border-bottom: 0.2rem solid transparent;
+
+            &.active {
+                color: $standard-text;
+                background-color: $standard-dark;
+            }
+        }
     }
 
     // Body
@@ -41,6 +61,13 @@
         flex-grow: 1;
         overflow: auto;
         position: relative;
+
+        // Tab
+        &__tab {
+            &:not(.active) { 
+                display: none;
+            }
+        }
     }
 
     // Footer

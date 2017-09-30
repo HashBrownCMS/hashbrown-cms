@@ -12,6 +12,14 @@
         height: 3rem;
         line-height: 3rem;
         display: block;
+        width: 6rem;
+        cursor: pointer;
+        border-bottom: 0.2rem solid transparent;
+        z-index: 90;
+
+        &:checked {
+            border-color: $primary;
+        }
     }
 
     &__button:checked + &__content {
