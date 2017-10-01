@@ -28958,29 +28958,31 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.onScroll = function onScroll(e) {
-        var $follow = void 0;
+        var followingField = void 0;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.editor__field').each(function (i, field) {
-            var $field = $(field);
-            $field.removeClass('following');
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each(function (i, field) {
+            field.classList.remove('following');
 
-            var top = $field.position().top;
+            var rect = field.getBoundingClientRect();
 
-            if (top < 40) {
-                // The closest field to the viewport top with an outer height above 100 should follow
-                if (top != 0 && $field.outerHeight() > 100) {
-                    $follow = $field;
+            // Ignore smaller fields
+            if (rect.height < 100) {
+                return;
+            }
 
-                    /*// If a smaller field is closer, cancel following
-                    } else {
-                        $follow = null;*/
-                }
+            // TODO: Compare to other discovered fields
+
+            console.log(rect.top, field.innerHTML);
+
+            // The closest field to the viewport top
+            if (rect.top < 40 && rect.top > 0) {
+                followingField = field;
             }
         });
 
-        if ($follow) {
-            $follow.addClass('following');
+        if (followingField) {
+            followingField.classList.add('following');
         }
     };
 
@@ -45740,51 +45742,74 @@ var ArrayEditor = function (_FieldEditor) {
         var _this4 = this;
 
         return _.div({ class: 'editor__field__value segmented' }, _.each(this.value, function (i, item) {
-            var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+            // Render field
+            var $field = _.div({ class: 'editor__field' });
 
-            // Schema could not be found, assign first allowed Schema
-            if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-                item.schemaId = _this4.config.allowedSchemas[0];
+            var renderField = function renderField() {
+                var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
-                schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-            }
+                // Schema could not be found, assign first allowed Schema
+                if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                    item.schemaId = _this4.config.allowedSchemas[0];
 
-            // Obtain the field editor
-            if (schema.editorId.indexOf('Editor') < 0) {
-                schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
-            }
+                    schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                }
 
-            var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+                // Obtain the field editor
+                if (schema.editorId.indexOf('Editor') < 0) {
+                    schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+                }
 
-            if (!editorClass) {
-                UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
-                return;
-            }
+                var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
-            // Perform sanity check on item value
-            item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+                if (!editorClass) {
+                    UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
+                    return;
+                }
 
-            // Instantiate editor
-            var editorInstance = new editorClass({
-                value: item.value,
-                config: schema.config,
-                schema: schema
-            });
+                // Perform sanity check on item value
+                item.value = ContentHelper.fieldSanityCheck(item.value, schema);
 
-            editorInstance.on('change', function (newValue) {
-                item.value = newValue;
-            });
+                // Instantiate editor
+                var editorInstance = new editorClass({
+                    value: item.value,
+                    config: schema.config,
+                    schema: schema
+                });
 
-            return _.div({ class: 'editor__field' },
-            // TODO: Render schema picker
+                editorInstance.on('change', function (newValue) {
+                    item.value = newValue;
+                });
 
-            editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
-                _this4.value.splice(i, 1);
+                // Render Schema picker
+                editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    value: item.schemaId,
+                    valueKey: 'id',
+                    labelKey: 'name',
+                    options: resources.schemas.filter(function (schema) {
+                        return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
+                    }),
+                    onChange: function onChange(newSchemaId) {
+                        item.schemaId = newSchemaId;
 
-                _this4.trigger('change', _this4.value);
+                        renderField();
 
-                _this4.init();
-            }));
+                        _this4.trigger('change', _this4.value);
+                    }
+                }).$element)));
+
+                _.append($field.empty(), editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                    _this4.value.splice(i, 1);
+
+                    _this4.trigger('change', _this4.value);
+
+                    _this4.init();
+                }));
+            };
+
+            renderField();
+
+            return $field;
         }), _.button({ title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
             var index = _this4.value.length;
 

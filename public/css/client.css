@@ -2443,11 +2443,11 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 
 .editor__header {
   background-color: #21303b;
-  padding: 2rem 0 0 2rem;
+  padding: 1rem 0 0 1rem;
   color: #ffffff;
-  height: 5rem;
+  height: 4rem;
   flex-shrink: 0;
-  flex-basis: 5rem;
+  flex-basis: 4rem;
   background-image: url("/img/bg-secondary.jpg");
   background-attachment: fixed;
   background-position: 0px 0px; }

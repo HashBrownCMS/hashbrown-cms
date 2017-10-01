@@ -27,30 +27,29 @@ class ContentEditor extends Crisp.View {
      * Event: Scroll
      */
     onScroll(e) {
-        let $follow;
+        let followingField;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.editor__field').each((i, field) => {
-            let $field = $(field);
-            $field.removeClass('following');
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each((i, field) => {
+            field.classList.remove('following');
+           
+            let rect = field.getBoundingClientRect();
 
-            let top = $field.position().top;
+            // Ignore smaller fields
+            if(rect.height < 100) { return; }
+            
+            // TODO: Compare to other discovered fields
 
-            if(top < 40) {
-                // The closest field to the viewport top with an outer height above 100 should follow
-                if(top != 0 && $field.outerHeight() > 100) {
-                    $follow = $field;    
+            console.log(rect.top, field.innerHTML);
 
-                /*// If a smaller field is closer, cancel following
-                } else {
-                    $follow = null;*/
-
-                }
+            // The closest field to the viewport top
+            if(rect.top < 40 && rect.top > 0) {
+                followingField = field;    
             }
         });
 
-        if($follow) {
-            $follow.addClass('following');
+        if(followingField) {
+            followingField.classList.add('following');
         }
     }
 

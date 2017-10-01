@@ -196,54 +196,85 @@ class ArrayEditor extends FieldEditor {
     template() {
         return _.div({class: 'editor__field__value segmented'},
             _.each(this.value, (i, item) => {
-                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                // Render field
+                let $field = _.div({class: 'editor__field'});
 
-                // Schema could not be found, assign first allowed Schema
-                if(!schema || this.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-                    item.schemaId = this.config.allowedSchemas[0];
-                
-                    schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-                }
+                let renderField = () => {
+                    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
-                // Obtain the field editor
-                if(schema.editorId.indexOf('Editor') < 0) {
-                    schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
-                }
-                
-                let editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                if(!editorClass) {
-                    UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));    
-                    return;
-                }
-                
-                // Perform sanity check on item value
-                item.value = ContentHelper.fieldSanityCheck(item.value, schema);
-
-                // Instantiate editor
-                let editorInstance = new editorClass({
-                    value: item.value,
-                    config: schema.config,
-                    schema: schema
-                });
-
-                editorInstance.on('change', (newValue) => {
-                    item.value = newValue;
-                });
-
-                return _.div({class: 'editor__field'},
-                    // TODO: Render schema picker
-
-                    editorInstance.$element,
-                    _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove item'})
-                        .click(() => {
-                            this.value.splice(i, 1);
+                    // Schema could not be found, assign first allowed Schema
+                    if(!schema || this.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                        item.schemaId = this.config.allowedSchemas[0];
                     
-                            this.trigger('change', this.value);
+                        schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                    }
 
-                            this.init();
-                        })
-                );
+                    // Obtain the field editor
+                    if(schema.editorId.indexOf('Editor') < 0) {
+                        schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+                    }
+                    
+                    let editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                    if(!editorClass) {
+                        UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));    
+                        return;
+                    }
+                    
+                    // Perform sanity check on item value
+                    item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+
+                    // Instantiate editor
+                    let editorInstance = new editorClass({
+                        value: item.value,
+                        config: schema.config,
+                        schema: schema
+                    });
+
+                    editorInstance.on('change', (newValue) => {
+                        item.value = newValue;
+                    });
+
+                    // Render Schema picker
+                    editorInstance.$element.prepend(
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Schema'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Dropdown({
+                                    value: item.schemaId,
+                                    valueKey: 'id',
+                                    labelKey: 'name',
+                                    options: resources.schemas.filter((schema) => {
+                                        return this.config.allowedSchemas.indexOf(schema.id) > -1;
+                                    }),
+                                    onChange: (newSchemaId) => {
+                                        item.schemaId = newSchemaId;
+
+                                        renderField();
+
+                                        this.trigger('change', this.value);
+                                    }
+                                }).$element
+                            )
+                        )
+                    );
+                
+                    _.append($field.empty(),
+                        editorInstance.$element,
+                        _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove item'})
+                            .click(() => {
+                                this.value.splice(i, 1);
+                        
+                                this.trigger('change', this.value);
+
+                                this.init();
+                            })
+                    );
+                };
+
+                renderField();
+
+                return $field;
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
                 .click(() => {

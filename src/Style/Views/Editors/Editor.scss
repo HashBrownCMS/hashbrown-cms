@@ -12,11 +12,11 @@
     // Header
     &__header {
         background-color: $secondary;
-        padding: 2rem 0 0 2rem;
+        padding: 1rem 0 0 1rem;
         color: $secondary-text;
-        height: 5rem;
+        height: 4rem;
         flex-shrink: 0;
-        flex-basis: 5rem;
+        flex-basis: 4rem;
 
         @include background('secondary');
 
