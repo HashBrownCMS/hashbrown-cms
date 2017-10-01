@@ -240,6 +240,7 @@ class ArrayEditor extends FieldEditor {
                         _.div({class: 'editor__field'},
                             _.div({class: 'editor__field__key'}, 'Schema'),
                             _.div({class: 'editor__field__value'},
+
                                 new HashBrown.Views.Widgets.Dropdown({
                                     value: item.schemaId,
                                     valueKey: 'id',

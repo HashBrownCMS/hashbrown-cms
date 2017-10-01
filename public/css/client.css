@@ -2528,6 +2528,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     flex-shrink: 0;
     margin-right: 1rem;
     line-height: 2rem; }
+    .editor__field__key__actions.following {
+      position: fixed;
+      top: 80px; }
     .editor__field__key__action {
       border: 0px;
       line-height: 2rem;

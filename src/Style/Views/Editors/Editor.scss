@@ -134,7 +134,11 @@
 
             // Key actions
             &__actions {
-            
+                // Following state
+                &.following {
+                    position: fixed;
+                    top: 80px;
+                }
             }
 
             // Key action button

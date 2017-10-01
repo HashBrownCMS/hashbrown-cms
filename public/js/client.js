@@ -28961,22 +28961,17 @@ var ContentEditor = function (_Crisp$View) {
         var followingField = void 0;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each(function (i, field) {
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key > .editor__field__key__actions').each(function (i, field) {
             field.classList.remove('following');
 
-            var rect = field.getBoundingClientRect();
-
             // Ignore smaller fields
-            if (rect.height < 100) {
+            if (field.parentElement.getBoundingClientRect().height < 100) {
                 return;
             }
 
-            // TODO: Compare to other discovered fields
+            var rect = field.getBoundingClientRect();
 
-            console.log(rect.top, field.innerHTML);
-
-            // The closest field to the viewport top
-            if (rect.top < 40 && rect.top > 0) {
+            if (rect.top <= 80 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
                 followingField = field;
             }
         });
