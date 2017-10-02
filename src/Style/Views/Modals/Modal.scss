@@ -1,0 +1,80 @@
+/**
+ * A generic modal
+ */
+.modal {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.25);
+    transition: opacity 0.5s ease;
+    overflow-y: auto;
+    opacity: 0;
+    display: block;
+
+    // In state
+    &.in {
+        opacity: 1;
+    }
+
+    &.in &__dialog {
+        transform: none;
+    }
+
+    // Dialog
+    &__dialog {
+        transform: translateY(-2rem);
+        margin: 10rem auto 10rem auto;
+        transition: transform 0.5s ease;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+        border-radius: 0.2rem;
+        width: calc(100% - 2rem);
+        max-width: 50rem;
+    }
+
+    // Close button
+    &__close {
+        border: 0;
+        background-color: transparent;
+        position: absolute;
+        line-height: 2rem;
+        height: 2rem;
+        display: block;
+        width: 2rem;
+        color: $secondary-text;
+        background-color: $secondary;
+        border-radius: 0.2rem;
+        cursor: pointer;
+        top: 1rem;
+        right: 1rem;
+
+        &:hover {
+            background-color: $secondary-darker;
+        }
+    }
+
+    // Header
+    &__header {
+        background-color: $secondary;
+        color: $secondary-text;
+        padding: 1rem;
+        position: relative;
+    }
+    
+    // Title
+    &__title {
+        line-height: 2rem;
+        height: 2rem;
+        margin: 0;
+    }
+
+    // Body
+    &__body {
+        padding: 1rem;
+        background-color: $standard;
+    }
+
+    // Footer
+    &__footer {
+        background-color: $secondary;
+        padding: 1rem;
+        color: $secondary-text;
+    }
+}

@@ -27,30 +27,24 @@ class ContentEditor extends Crisp.View {
      * Event: Scroll
      */
     onScroll(e) {
-        let $follow;
+        let followingField;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.field-container').each((i, field) => {
-            let $field = $(field);
-            $field.removeClass('following');
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key > .editor__field__key__actions').each((i, field) => {
+            field.classList.remove('following');
+           
+            // Ignore smaller fields
+            if(field.parentElement.getBoundingClientRect().height < 100) { return; }
+            
+            let rect = field.getBoundingClientRect();
 
-            let top = $field.position().top;
-
-            if(top < 40) {
-                // The closest field to the viewport top with an outer height above 100 should follow
-                if(top != 0 && $field.outerHeight() > 100) {
-                    $follow = $field;    
-
-                /*// If a smaller field is closer, cancel following
-                } else {
-                    $follow = null;*/
-
-                }
+            if(rect.top <= 80 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
+                followingField = field;
             }
         });
 
-        if($follow) {
-            $follow.addClass('following');
+        if(followingField) {
+            followingField.classList.add('following');
         }
     }
 
@@ -65,7 +59,7 @@ class ContentEditor extends Crisp.View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        let saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        let saveAction = this.$element.find('.editor__footer__buttons widget--button-group__appendix').val();
         let postSaveUrl;
 
         let setContent = () => {
@@ -100,7 +94,7 @@ class ContentEditor extends Crisp.View {
             return RequestHelper.reloadResource('content');
         })
         .then(() => {
-            this.$saveBtn.toggleClass('saving', false);
+            this.$saveBtn.toggleClass('working', false);
             
             this.reload();
             
@@ -116,7 +110,7 @@ class ContentEditor extends Crisp.View {
             }
         })
         .catch((e) => {
-            this.$saveBtn.toggleClass('saving', false);
+            this.$saveBtn.toggleClass('working', false);
             UI.errorModal();
         });
     }
@@ -125,7 +119,7 @@ class ContentEditor extends Crisp.View {
      * Reload this view
      */
     reload() {
-        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop; 
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
 
         this.model = null;
 
@@ -162,7 +156,7 @@ class ContentEditor extends Crisp.View {
      */
     restoreScrollPos() {
         if(this.lastScrollPos) {
-            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
         }
     }
 
@@ -232,9 +226,7 @@ class ContentEditor extends Crisp.View {
                     onChange(newValue);
                 });
 
-                if(fieldEditorInstance.$keyContent) {
-                    $keyContent.append(fieldEditorInstance.$keyContent);
-                }
+                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
 
@@ -297,43 +289,39 @@ class ContentEditor extends Crisp.View {
             // Render the field container
             let $keyContent;
 
-            return _.div({class: 'field-container', 'data-key': key},
+            return _.div({class: 'editor__field', 'data-key': key},
                 // Render the label and icon
-                _.div({class: 'field-key'},
-                    $keyContent = _.div({class: 'field-key-content'},
-                        _.span({class: 'field-key-icon fa fa-' + fieldSchema.icon}),
-                        _.span({class: 'field-key-label'}, fieldDefinition.label || key)
-                    )
+                _.div({class: 'editor__field__key'},
+                    fieldDefinition.label || key,
+                    $keyContent = _.div({class: 'editor__field__key__actions'})
                 ),
 
                 // Render the field editor
-                _.div({class: 'field-value'},
-                    view.renderField(
-                        // If the field definition is set to multilingual, pass value from object
-                        fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
+                view.renderField(
+                    // If the field definition is set to multilingual, pass value from object
+                    fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
-                        // Pass the field definition
-                        fieldDefinition,
+                    // Pass the field definition
+                    fieldDefinition,
 
-                        // On change function
-                        function(newValue) {
-                            // If field definition is set to multilingual, assign flag and value onto object...
-                            if(fieldDefinition.multilingual) {
-                                fieldValues[key]._multilingual = true;
-                                fieldValues[key][window.language] = newValue;
+                    // On change function
+                    (newValue) => {
+                        // If field definition is set to multilingual, assign flag and value onto object...
+                        if(fieldDefinition.multilingual) {
+                            fieldValues[key]._multilingual = true;
+                            fieldValues[key][window.language] = newValue;
 
-                            // ...if not, assign the value directly
-                            } else {
-                                fieldValues[key] = newValue;
-                            }
-                        },
+                        // ...if not, assign the value directly
+                        } else {
+                            fieldValues[key] = newValue;
+                        }
+                    },
 
-                        // Pass the field definition config, and use the field's schema config as fallback
-                        fieldDefinition.config || fieldSchema.config,
+                    // Pass the field definition config, and use the field's schema config as fallback
+                    fieldDefinition.config || fieldSchema.config,
 
-                        // Pass the key content container, so the field editor can populate it
-                        $keyContent
-                    )
+                    // Pass the key content container, so the field editor can populate it
+                    $keyContent
                 )
             );
         });
@@ -359,47 +347,44 @@ class ContentEditor extends Crisp.View {
     renderEditor(content, schema) {
         let view = this;
 
-        // Check for active tab
-        function isTabActive(tabId) {
-            let targetTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
-
-            return tabId == targetTab;
-        }
+        let activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
         // Render editor
-        return _.div({class: 'object'},
-            _.ul({class: 'nav editor-header nav-tabs'}, 
-                _.each(schema.tabs, (tabId, tab) => {
-                    return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
-                        _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
-                            tab
-                        ).click(() => { this.onClickTab(tabId); })
-                    );
+        return [
+            _.div({class: 'editor__header'}, 
+                _.each(schema.tabs, (tabId, tabName) => {
+                    return _.button({'data-id': tabId, class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
+                        .click(() => {
+                            $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
+                                tab.classList.toggle('active', tab.dataset.id === tabId);
+                            });
+                        });
                 }),
-                _.li({class: isTabActive('meta') ? 'active' : ''}, 
-                    _.a({'data-toggle': 'tab', href: '#tab-meta'},
-                        'meta'
-                    ).click(() => { this.onClickTab('meta'); })
-                )
+                _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
+                    .click(() => {
+                        $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
+                            tab.classList.toggle('active', tab.dataset.id === 'meta');
+                        });
+                    })
             ),
-            this.$body = _.div({class: 'tab-content editor-body'},
+            this.$body = _.div({class: 'editor__body'},
                 // Render content properties
-                _.each(schema.tabs, (tabId, tab) => {
-                    return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '')},
+                _.each(schema.tabs, (tabId, tabName) => {
+                    return _.div({class: 'editor__body__tab' + (tabId === activeTab ? ' active' : ''), 'data-id': tabId},
                         this.renderFields(tabId, schema.fields.properties, content.properties)
                     );
                 }),
 
                 // Render meta properties
-                _.div({id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '')},
+                _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
                     this.renderFields('meta', schema.fields, content),
                     this.renderFields('meta', schema.fields.properties, content.properties)
                 )
             ).on('scroll', (e) => {
                 this.onScroll(e);
             }),
-            _.div({class: 'editor-footer'})
-        );
+            _.div({class: 'editor__footer'})
+        ];
     }
 
     /**
@@ -424,28 +409,28 @@ class ContentEditor extends Crisp.View {
             }
         }
             
-        _.append($('.editor-footer').empty(), 
-            _.div({class: 'btn-group'},
+        _.append($('.editor__footer').empty(), 
+            _.div({class: 'editor__footer__buttons'},
                 // JSON editor
-                _.button({class: 'btn btn-embedded'},
+                _.button({class: 'widget widget--button embedded'},
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
                 _.if(this.model.isPublished && remoteUrl,
-                    _.a({target: '_blank', href: remoteUrl, class: 'btn btn-primary'}, 'View')
+                    _.a({target: '_blank', href: remoteUrl, class: 'widget widget--button embedded'}, 'View')
                 ),
 
                 _.if(!this.model.isLocked,
                     // Save & publish
-                    _.div({class: 'btn-group-save-publish raised'},
-                        this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
-                            _.span({class: 'text-default'}, 'Save'),
-                            _.span({class: 'text-working'}, 'Saving')
+                    _.div({class: 'widget widget--button-group'},
+                        this.$saveBtn = _.button({class: 'widget widget--button'},
+                            _.span({class: 'widget--button__text-default'}, 'Save'),
+                            _.span({class: 'widget--button__text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
                         _.if(connection,
                             _.span('&'),
-                            _.select({class: 'form-control select-publishing'},
+                            _.select({class: 'widget widget--button-group__appendix'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
                                 _.if(this.model.isPublished, 
@@ -460,6 +445,9 @@ class ContentEditor extends Crisp.View {
         );
     }
 
+    /**
+     * Render this editor
+     */
     render() {
         // Make sure the model data is using the Content model
         if(this.model instanceof HashBrown.Models.Content === false) {
@@ -476,7 +464,6 @@ class ContentEditor extends Crisp.View {
             contentSchema = schema;
 
             this.$element.html(
-                // Render editor
                 this.renderEditor(this.model, contentSchema)
             );
            

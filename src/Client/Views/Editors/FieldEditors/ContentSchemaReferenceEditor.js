@@ -130,7 +130,37 @@ class ContentSchemaReferenceEditor extends FieldEditor {
 
         return contentSchemas;
     }
+    
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.allowedSchemas = config.allowedSchemas || [];
+        
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
+            _.div({class: 'editor__field__value'},
+                new HashBrown.Views.Widgets.Dropdown({
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+                    useMultiple: true,
+                    useClearButton: true,
+                    valueKey: 'id',
+                    labelKey: 'name',
+                    onChange: (newValue) => {
+                        config.allowedSchemas = newValue;
+                    }
+                }).$element
+            )
+        );
+    }
 
+    /**
+     * Renders this editor
+     */
     render() {
         _.append(this.$element.empty(),
             // Render preview

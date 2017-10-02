@@ -12,7 +12,7 @@ const FieldEditor = require('./FieldEditor');
  *         "label": "My number",
  *         "tabId": "content",
  *         "schemaId": "number",
- *         {
+ *         "config": {
  *             "step": 0.5
  *         }
  *     }
@@ -36,23 +36,95 @@ class NumberEditor extends FieldEditor {
 
         this.trigger('change', this.value);
     }
-    
-    render() {
-        var editor = this;
+   
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config)
+    {
+        config.step = config.step || 'any';
 
-        // Main element
-        this.$element = _.div({class: 'field-editor string-editor'},
-            // Render preview
-            this.renderPreview(),
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Step'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'number',
+                        step: 'any',
+                        tooltip: 'The division by which the input number is allowed (0 is any division)',
+                        value: config.step === 'any' ? 0 : config.step,
+                        onChange: (newValue) => {
+                            if(newValue == 0) { newValue = 'any'; }
 
-            _.if(this.disabled,
-                _.p(this.value || '(none)')
+                            config.step = newValue;
+                        }
+                    }).$element
+                )
             ),
-            _.if(!this.disabled,
-                this.$input = _.input({class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any'})
-                    .on('change propertychange paste keyup', function() { editor.onChange(); })
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Min value'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        tooltip: 'The minimum required value',
+                        type: 'number',
+                        step: 'any',
+                        value: config.min || 0,
+                        onChange: (newValue) => {
+                            config.min = newValue;
+                        }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Max value'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        tooltip: 'The maximum allowed value (0 is infinite)',
+                        type: 'number',
+                        step: 'any',
+                        value: config.max || 0,
+                        onChange: (newValue) => {
+                            config.max = newValue;
+                        }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Is slider'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        tooltip: 'Whether or not this number should be edited as a range slider',
+                        type: 'checkbox',
+                        value: config.isSlider || false,
+                        onChange: (newValue) => {
+                            config.isSlider = newValue;
+                        }
+                    }).$element
+                )
             )
-        );
+        ];
+    }
+
+    /**
+     * Renders this editor
+     */
+    template() {
+        return new HashBrown.Views.Widgets.Input({
+            value: this.value,
+            type: this.config.isSlider ? 'range' : 'number',
+            step: this.config.step || 'any',
+            min: this.config.min || '0',
+            max: this.config.max || '0',
+            onChange: (newValue) => {
+                this.value = parseFloat(newValue);
+
+                this.trigger('change', this.value);
+            }
+        }).$element;
     }
 }
 

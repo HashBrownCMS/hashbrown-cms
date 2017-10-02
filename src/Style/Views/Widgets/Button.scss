@@ -1,0 +1,38 @@
+/**
+ * A versatile button
+ */
+.widget--button {
+    border: 0;
+    border-radius: 0.2rem;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+    background-color: $primary;
+    color: $primary-text;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 0.5rem;
+    text-transform: uppercase;
+    display: block;
+    font-weight: bold;
+    min-width: 10rem;
+
+    &.round {
+        width: 3rem;
+        min-width: 0;
+        border-radius: 50%;
+    }
+
+    &.right {
+        margin-left: auto;
+    }
+
+    &.embedded {
+        color: $primary;
+        background-color: transparent;
+        box-shadow: none;
+    }
+
+    &.working &__text-default,
+    &:not(.working) &__text-working {
+        display: none;
+    }
+}

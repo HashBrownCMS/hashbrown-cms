@@ -14,6 +14,47 @@ class ResourceReferenceEditor extends FieldEditor {
         this.init();
     }
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.resourceKeys = config.resourceKeys || [];
+
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Resource'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: config.resource,
+                        options: Object.keys(resources),
+                        onChange: (newValue) => {
+                            config.resource = newValue
+                        }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Resource keys'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Chips({
+                        value: config.resourceKeys,
+                        placeholder: 'keyName',
+                        onChange: (newValue) => {
+                            config.resourceKeys = newValue;
+                        }
+                    }).$element
+                )
+            )
+        ];
+    }
+
+    /**
+     * Renders this editor
+     */
     render() {
         let resource = resources[this.config.resource];
         let value;

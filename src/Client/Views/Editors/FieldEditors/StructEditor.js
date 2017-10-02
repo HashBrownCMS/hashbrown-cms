@@ -40,8 +40,11 @@ class StructEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'struct-editor field-editor'});
-
+        // A sanity check to make sure we're working with an object
+        if(!this.value || typeof this.value !== 'object') {
+            this.value = {};
+        }
+        
         this.fetch();
     }
 
@@ -69,14 +72,138 @@ class StructEditor extends FieldEditor {
         this.trigger('change', this.value);
     }
 
-    render() {
-        // A sanity check to make sure we're working with an object
-        if(!this.value || typeof this.value !== 'object') {
-            this.value = {};
-        }
-    
-        // Render editor
-        _.append(this.$element.empty(),
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.struct = config.struct || {};
+
+        let $element = _.div({class: 'editor--schema__struct'});
+
+        let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+            
+        let renderEditor = () => {
+            _.append($element.empty(),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
+                        'Properties',
+                        _.div({class: 'editor__field__key__actions'},
+                            _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
+                                .click((e) => {
+                                    HashBrown.Helpers.UIHelper.fieldSortableObject(
+                                        config.struct,
+                                        $(e.currentTarget).parents('.editor__field')[0],
+                                        (newStruct) => {
+                                            config.struct = newStruct;
+                                        }
+                                    );
+                                })
+                        )
+                    ),
+                    _.div({class: 'editor__field__value segmented'},
+                        _.each(config.struct, (fieldKey, fieldValue) => {
+                            // Sanity check
+                            fieldValue.config = fieldValue.config || {};
+
+                            let $field = _.div({class: 'editor__field'});
+
+                            let renderField = () => {
+                                _.append($field.empty(),
+                                    _.div({class: 'editor__field__key'},
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'text',
+                                            placeholder: 'A variable name, e.g. "myField"',
+                                            tooltip: 'The field variable name',
+                                            value: fieldKey,
+                                            onChange: (newKey) => {
+                                                delete config.struct[fieldKey];
+
+                                                fieldKey = newKey;
+
+                                                config.struct[fieldKey] = fieldValue;
+                                            }
+                                        }).$element.addClass('editor__field__sort-key'),
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'text',
+                                            placeholder: 'A label, e.g. "My field"',
+                                            tooltip: 'The field label',
+                                            value: fieldValue.label,
+                                            onChange: (newValue) => { fieldValue.label = newValue; }
+                                        }).$element
+                                    ),
+                                    _.div({class: 'editor__field__value'},
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Schema'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Dropdown({
+                                                    useTypeAhead: true,
+                                                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                                                    value: fieldValue.schemaId,
+                                                    labelKey: 'name',
+                                                    valueKey: 'id',
+                                                    onChange: (newValue) => {
+                                                        fieldValue.schemaId = newValue;
+
+                                                        renderField();
+                                                    }
+                                                }).$element
+                                            )
+                                        ),
+                                        _.do(() => {
+                                            let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                                            if(!schema) { return; }
+
+                                            let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                                            if(!editor) { return; }
+
+                                            return editor.renderConfigEditor(fieldValue.config);
+                                        })
+                                    ),
+                                    _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
+                                        .click(() => {
+                                            delete config.struct[fieldKey];
+
+                                            renderEditor();
+                                        })
+                                )
+                            };
+
+                            renderField();
+
+                            return $field;
+                        }),
+                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property'},
+                            ).click(() => {
+                                if(config.struct.newField) { return; }
+                            
+                                config.struct.newField = {
+                                    label: 'New field',
+                                    schemaId: 'array'
+                                };
+
+                                renderEditor();
+                            })
+                    )
+                )
+            );
+        };
+
+        renderEditor();
+
+        return $element;
+    }
+
+    /**
+     * Renders this editor
+     */
+   template() {
+        return _.div({class: 'editor__field__value'},
             // Render preview
             this.renderPreview(),
 
@@ -114,17 +241,15 @@ class StructEditor extends FieldEditor {
                 });
 
                 // Return the DOM element
-                return _.div({class: 'kvp'},
-                    _.div({class: 'key'},
+                return _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
                         keySchema.label,
-                        fieldEditorInstance.$keyContent
+                        fieldEditorInstance.renderKeyActions()
                     ),
-                    _.div({class: 'value'},
-                        fieldEditorInstance.$element
-                    )
+                    fieldEditorInstance.$element
                 );
             })    
-        )
+        );
     }    
 }
 

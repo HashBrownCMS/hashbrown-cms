@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 212);
+/******/ 	return __webpack_require__(__webpack_require__.s = 216);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -6090,10 +6090,32 @@ var FieldEditor = function (_Crisp$View) {
     }
 
     /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    FieldEditor.renderConfigEditor = function renderConfigEditor(config) {
+        return null;
+    };
+
+    /**
+     * Renders key actions
+     *
+     * @returns {HTMLElement} Actions
+     */
+
+
+    FieldEditor.prototype.renderKeyActions = function renderKeyActions() {};
+
+    /**
      * Renders a field preview template
      *
      * @returns {HTMLElement} Element
      */
+
+
     FieldEditor.prototype.renderPreview = function renderPreview() {
         if (!this.schema || !this.schema.previewTemplate) {
             return null;
@@ -6591,6 +6613,29 @@ var SchemaHelper = function (_SchemaHelperCommon) {
 
         return RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
             return Promise.resolve(_this2.getModel(schema));
+        });
+    };
+
+    /**
+     * Gets all Schemas by type (sync)
+     *
+     * @param {String} type
+     *
+     * @returns {Array} All Schemas
+     */
+
+
+    SchemaHelper.getAllSchemasSync = function getAllSchemasSync(type) {
+        if (!type) {
+            return resources.schemas;
+        }
+
+        return resources.schemas.filter(function (schema) {
+            if (schema.id == type + 'Base') {
+                return false;
+            }
+
+            return schema.type === type;
         });
     };
 
@@ -7121,7 +7166,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var SettingsHelperCommon = __webpack_require__(184);
+var SettingsHelperCommon = __webpack_require__(185);
 
 /**
  * The client side settings helper
@@ -9179,7 +9224,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MediaHelperCommon = __webpack_require__(183);
+var MediaHelperCommon = __webpack_require__(184);
 
 var RequestHelper = __webpack_require__(2);
 
@@ -9352,7 +9397,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(230);
+        _this.template = __webpack_require__(240);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.CMSPane.init();
@@ -10060,7 +10105,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var ContentHelperCommon = __webpack_require__(185);
+var ContentHelperCommon = __webpack_require__(186);
 
 var Content = __webpack_require__(57);
 
@@ -12028,6 +12073,19 @@ var ContentSchema = function (_Schema) {
 
         this.name = 'New content schema';
         this.type = 'content';
+    };
+
+    /**
+     * Checks whether a tab is the default one
+     *
+     * @param {String} tabId
+     *
+     * @returns {Boolean} Is the tab default
+     */
+
+
+    ContentSchema.prototype.isDefaultTab = function isDefaultTab(tabId) {
+        return !this.defaultTabId && tabId === 'meta' || this.defaultTabId === tabId;
     };
 
     return ContentSchema;
@@ -15695,7 +15753,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(186);
+var ConnectionHelperCommon = __webpack_require__(187);
 var Connection = __webpack_require__(37);
 var ProjectHelper = __webpack_require__(6);
 var RequestHelper = __webpack_require__(2);
@@ -15849,7 +15907,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
-var LanguageHelperCommon = __webpack_require__(188);
+var LanguageHelperCommon = __webpack_require__(190);
 
 /**
  * The client side language helper
@@ -25059,7 +25117,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(223).js_beautify;
+var beautify = __webpack_require__(227).js_beautify;
 var SchemaHelper = __webpack_require__(16);
 var RequestHelper = __webpack_require__(2);
 
@@ -28385,6 +28443,45 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
 "use strict";
 
 
+/**
+ * A standard widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = function (_Crisp$View) {
+  _inherits(Widget, _Crisp$View);
+
+  /**
+   * Constructor
+   */
+  function Widget(params) {
+    _classCallCheck(this, Widget);
+
+    var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+    _this.fetch();
+    return _this;
+  }
+
+  return Widget;
+}(Crisp.View);
+
+module.exports = Widget;
+
+/***/ }),
+/* 184 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 // Models
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28463,7 +28560,7 @@ var MediaHelper = function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28484,7 +28581,7 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28646,7 +28743,7 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28814,7 +28911,7 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28861,29 +28958,26 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.onScroll = function onScroll(e) {
-        var $follow = void 0;
+        var followingField = void 0;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.field-container').each(function (i, field) {
-            var $field = $(field);
-            $field.removeClass('following');
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key > .editor__field__key__actions').each(function (i, field) {
+            field.classList.remove('following');
 
-            var top = $field.position().top;
+            // Ignore smaller fields
+            if (field.parentElement.getBoundingClientRect().height < 100) {
+                return;
+            }
 
-            if (top < 40) {
-                // The closest field to the viewport top with an outer height above 100 should follow
-                if (top != 0 && $field.outerHeight() > 100) {
-                    $follow = $field;
+            var rect = field.getBoundingClientRect();
 
-                    /*// If a smaller field is closer, cancel following
-                    } else {
-                        $follow = null;*/
-                }
+            if (rect.top <= 80 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
+                followingField = field;
             }
         });
 
-        if ($follow) {
-            $follow.addClass('following');
+        if (followingField) {
+            followingField.classList.add('following');
         }
     };
 
@@ -28904,7 +28998,7 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        var saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        var saveAction = this.$element.find('.editor__footer__buttons widget--button-group__appendix').val();
         var postSaveUrl = void 0;
 
         var setContent = function setContent() {
@@ -28936,7 +29030,7 @@ var ContentEditor = function (_Crisp$View) {
 
             return RequestHelper.reloadResource('content');
         }).then(function () {
-            _this2.$saveBtn.toggleClass('saving', false);
+            _this2.$saveBtn.toggleClass('working', false);
 
             _this2.reload();
 
@@ -28948,7 +29042,7 @@ var ContentEditor = function (_Crisp$View) {
                 UI.iframeModal('Preview', postSaveUrl);
             }
         }).catch(function (e) {
-            _this2.$saveBtn.toggleClass('saving', false);
+            _this2.$saveBtn.toggleClass('working', false);
             UI.errorModal();
         });
     };
@@ -28959,7 +29053,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.reload = function reload() {
-        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop;
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
 
         this.model = null;
 
@@ -29012,7 +29106,7 @@ var ContentEditor = function (_Crisp$View) {
 
     ContentEditor.prototype.restoreScrollPos = function restoreScrollPos() {
         if (this.lastScrollPos) {
-            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
         }
     };
 
@@ -29090,9 +29184,7 @@ var ContentEditor = function (_Crisp$View) {
                     onChange(newValue);
                 });
 
-                if (fieldEditorInstance.$keyContent) {
-                    $keyContent.append(fieldEditorInstance.$keyContent);
-                }
+                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
             } else {
@@ -29155,12 +29247,12 @@ var ContentEditor = function (_Crisp$View) {
             // Render the field container
             var $keyContent = void 0;
 
-            return _.div({ class: 'field-container', 'data-key': key },
+            return _.div({ class: 'editor__field', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'field-key' }, $keyContent = _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
+            _.div({ class: 'editor__field__key' }, fieldDefinition.label || key, $keyContent = _.div({ class: 'editor__field__key__actions' })),
 
             // Render the field editor
-            _.div({ class: 'field-value' }, view.renderField(
+            view.renderField(
             // If the field definition is set to multilingual, pass value from object
             fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
@@ -29184,7 +29276,7 @@ var ContentEditor = function (_Crisp$View) {
             fieldDefinition.config || fieldSchema.config,
 
             // Pass the key content container, so the field editor can populate it
-            $keyContent)));
+            $keyContent));
         });
     };
 
@@ -29214,30 +29306,29 @@ var ContentEditor = function (_Crisp$View) {
 
         var view = this;
 
-        // Check for active tab
-        function isTabActive(tabId) {
-            var targetTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
-
-            return tabId == targetTab;
-        }
+        var activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
         // Render editor
-        return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
-            return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
-                _this5.onClickTab(tabId);
-            }));
-        }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
-            _this5.onClickTab('meta');
-        }))), this.$body = _.div({ class: 'tab-content editor-body' },
+        return [_.div({ class: 'editor__header' }, _.each(schema.tabs, function (tabId, tabName) {
+            return _.button({ 'data-id': tabId, class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '') }, tabName).click(function () {
+                $('.editor__body__tab, .editor__header__tab').each(function (i, tab) {
+                    tab.classList.toggle('active', tab.dataset.id === tabId);
+                });
+            });
+        }), _.button({ 'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '') }, 'Meta').click(function () {
+            $('.editor__body__tab, .editor__header__tab').each(function (i, tab) {
+                tab.classList.toggle('active', tab.dataset.id === 'meta');
+            });
+        })), this.$body = _.div({ class: 'editor__body' },
         // Render content properties
-        _.each(schema.tabs, function (tabId, tab) {
-            return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+        _.each(schema.tabs, function (tabId, tabName) {
+            return _.div({ class: 'editor__body__tab' + (tabId === activeTab ? ' active' : ''), 'data-id': tabId }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
         }),
 
         // Render meta properties
-        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
+        _.div({ class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta' }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
             _this5.onScroll(e);
-        }), _.div({ class: 'editor-footer' }));
+        }), _.div({ class: 'editor__footer' })];
     };
 
     /**
@@ -29266,19 +29357,24 @@ var ContentEditor = function (_Crisp$View) {
             }
         }
 
-        _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
+        _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
-        _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
             _this6.onClickAdvanced();
         }),
 
         // View remote
-        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'btn btn-primary' }, 'View')), _.if(!this.model.isLocked,
+        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button embedded' }, 'View')), _.if(!this.model.isLocked,
         // Save & publish
-        _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+        _.div({ class: 'widget widget--button-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connection, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span('&'), _.select({ class: 'widget widget--button-group__appendix' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
+
+    /**
+     * Render this editor
+     */
+
 
     ContentEditor.prototype.render = function render() {
         var _this7 = this;
@@ -29296,9 +29392,7 @@ var ContentEditor = function (_Crisp$View) {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
             contentSchema = schema;
 
-            _this7.$element.html(
-            // Render editor
-            _this7.renderEditor(_this7.model, contentSchema));
+            _this7.$element.html(_this7.renderEditor(_this7.model, contentSchema));
 
             _this7.renderButtons();
 
@@ -29316,7 +29410,250 @@ var ContentEditor = function (_Crisp$View) {
 module.exports = ContentEditor;
 
 /***/ }),
-/* 188 */
+/* 189 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Icons
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(215).icons;
+
+var Schema = __webpack_require__(42);
+var SchemaHelper = __webpack_require__(16);
+var ContentHelper = __webpack_require__(41);
+var RequestHelper = __webpack_require__(2);
+var JSONEditor = __webpack_require__(180);
+
+/**
+ * The editor for schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var SchemaEditor = function (_Crisp$View) {
+    _inherits(SchemaEditor, _Crisp$View);
+
+    function SchemaEditor(params) {
+        _classCallCheck(this, SchemaEditor);
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+
+
+    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
+        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
+    };
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+
+
+    SchemaEditor.prototype.onClickSave = function onClickSave() {
+        var _this2 = this;
+
+        if (this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
+        this.$saveBtn.toggleClass('working', true);
+
+        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
+            _this2.$saveBtn.toggleClass('working', false);
+
+            return RequestHelper.reloadResource('schemas');
+        }).then(function () {
+            Crisp.View.get('NavbarMain').reload();
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Renders the icon editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
+        var _this3 = this;
+
+        return _.button({ class: 'widget widget--button fa fa-' + this.model.icon }).click(function (e) {
+            var modal = new HashBrown.Views.Modals.IconModal();
+
+            modal.on('change', function (newIcon) {
+                _this3.model.icon = newIcon;
+
+                e.currentTarget.className = 'widget widget--button fa fa-' + _this3.model.icon;
+            });
+        });
+    };
+
+    /**
+     * Renders the parent editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
+        var _this4 = this;
+
+        if (this.model.isPropertyHidden('parentSchemaId')) {
+            return;
+        }
+
+        var schemaOptions = [];
+
+        // Filter out irrelevant schemas, self and children of self
+        var excludedParents = {};
+        excludedParents[this.model.id] = true;
+
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            // Check if this Schema has a parent in the excluded list
+            // If so, add this id to the excluded list
+            // This is to prevent making a Schema a child of its own children
+            if (excludedParents[schema.parentSchemaId] == true) {
+                excludedParents[schema.id] = true;
+                continue;
+            }
+
+            // If this Schema is not of the same type as the model, or has the same id, exclude it
+            if (schema.type != this.model.type || schema.id == this.model.id) {
+                continue;
+            }
+
+            schemaOptions[schemaOptions.length] = {
+                label: schema.name,
+                value: schema.id
+            };
+        }
+
+        // Assign fallback schema name
+        var parentName = '(none)';
+
+        if (schemaOptions[this.model.parentSchemaId]) {
+            parentName = schemaOptions[this.model.parentSchemaId].name;
+        }
+
+        // Render element
+        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
+            if (!newValue) {
+                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
+            }
+
+            _this4.model.parentSchemaId = newValue;
+
+            return newValue;
+        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     *
+     * @return {HTMLElement} Editor element
+     */
+
+
+    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
+        if (!$content) {
+            return;
+        }
+
+        return _.div({ class: 'editor__field ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'editor__field__key' }, label), _.div({ class: 'editor__field__value' }, $content));
+    };
+
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderFields = function renderFields() {
+        var _this5 = this;
+
+        var id = parseInt(this.model.id);
+
+        var $element = _.div({ class: 'editor__body' });
+
+        $element.empty();
+
+        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
+            value: this.model.name,
+            onChange: function onChange(newValue) {
+                _this5.model.name = newValue;
+            }
+        }).$element));
+
+        $element.append(this.renderField('Icon', this.renderIconEditor()));
+
+        $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.parentSchemaId,
+            options: resources.schemas,
+            valueKey: 'id',
+            labelKey: 'name',
+            disabledOptions: [{ id: this.model.id, name: this.model.name }],
+            onChange: function onChange(newParent) {
+                _this5.model.parentSchemaId = newParent;
+
+                _this5.render();
+            }
+        }).$element));
+
+        switch (this.model.type) {
+            case 'field':
+
+                break;
+        }
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    SchemaEditor.prototype.template = function template() {
+        var _this6 = this;
+
+        return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+            _this6.onClickAdvanced();
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
+            _this6.onClickSave();
+        })))));
+    };
+
+    return SchemaEditor;
+}(Crisp.View);
+
+module.exports = SchemaEditor;
+
+/***/ }),
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29424,7 +29761,7 @@ var LanguageHelper = function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 189 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29437,18 +29774,19 @@ module.exports = LanguageHelper;
 module.exports = {
     ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
-    DebugHelper: __webpack_require__(190),
+    DebugHelper: __webpack_require__(192),
     LanguageHelper: __webpack_require__(94),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
-    UIHelper: __webpack_require__(192)
+    TemplateHelper: __webpack_require__(194),
+    UIHelper: __webpack_require__(195)
 };
 
 /***/ }),
-/* 190 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29460,7 +29798,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(191);
+var DebugHelperCommon = __webpack_require__(193);
 
 /**
  * The client side debug helper
@@ -29523,7 +29861,7 @@ var DebugHelper = function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 191 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29686,7 +30024,70 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 192 */
+/* 194 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Template resources
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TemplateHelper = function () {
+    function TemplateHelper() {
+        _classCallCheck(this, TemplateHelper);
+    }
+
+    /**
+     * Gets all templates
+     *
+     * @param {String} type
+     *
+     * @returns {Array} Templates
+     */
+    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
+        if (!type) {
+            return resources.templates;
+        }
+
+        var templates = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var template = _ref;
+
+            if (template.type !== type) {
+                continue;
+            }
+
+            templates.push(template);
+        }
+
+        return templates;
+    };
+
+    return TemplateHelper;
+}();
+
+module.exports = TemplateHelper;
+
+/***/ }),
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29708,6 +30109,234 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        var items = field.querySelector('.editor__field__value').children;
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
+                continue;
+            }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var oldIndex = element.dataset.index;
+            var newIndex = 0;
+
+            // Discover new index
+            var items = field.querySelector('.editor__field__value').children;
+
+            for (var _i = 0; _i < items.length; _i++) {
+                if (items[_i] === element) {
+                    newIndex = _i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+
+            onChange(array);
+        });
+    };
+
+    /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
+        object = object || {};
+
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var itemKey = element.querySelector('.editor__field__sort-key').value;
+            var itemValue = object[itemKey];
+
+            // Try to get the next key
+            var nextKey = '';
+
+            if (element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
+
+            // Construct a new object based on the old one
+            var newObject = {};
+
+            for (var fieldKey in object) {
+                // Omit existing key
+                if (fieldKey === itemKey) {
+                    continue;
+                }
+
+                var fieldValue = object[fieldKey];
+
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if (nextKey === fieldKey) {
+                    newObject[itemKey] = itemValue;
+                }
+
+                newObject[fieldKey] = fieldValue;
+            }
+
+            // If the item wasn't reinserted, insert it now
+            if (!newObject[itemKey]) {
+                newObject[itemKey] = itemValue;
+            }
+
+            // Assign the new object to the old one
+            object = newObject;
+
+            // Fire the change event
+            onChange(newObject);
+        });
+    };
+
+    /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortable = function fieldSortable(field, onChange) {
+        var btnSort = field.querySelector('.editor__field__key__action--sort');
+        var divValue = field.querySelector('.editor__field__value');
+        var isSorting = !divValue.classList.contains('sorting');
+
+        if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
+        }
+    };
+
+    /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
+     * @param {Boolean} isActive
+     * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
+     */
+
+
+    UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
+        var children = Array.prototype.slice.call(parentElement.children || []);
+        var canSort = true;
+
+        children = children.filter(function (child) {
+            return child instanceof HTMLElement && child.classList.contains(sortableClassName);
+        });
+
+        if (!children || children.length < 1) {
+            return false;
+        }
+
+        if (typeof isActive === 'undefined') {
+            isActive = !parentElement.classList.contains('sorting');
+        }
+
+        _.each(children, function (i, child) {
+            if (isActive) {
+                child.setAttribute('draggable', true);
+            } else {
+                child.removeAttribute('draggable');
+            }
+
+            if (isActive) {
+                child.ondrag = function (e) {
+                    if (!canSort) {
+                        return;
+                    }
+
+                    _.each(children, function (i, sibling) {
+                        if (sibling === child || !canSort || e.pageY < 1) {
+                            return;
+                        }
+
+                        var cursorY = e.pageY;
+                        var childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var hasMoved = false;
+
+                        // Dragging above a sibling
+                        if (cursorY < siblingY && childY > siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling);
+                            hasMoved = true;
+                        }
+
+                        // Dragging below a sibling
+                        if (cursorY > siblingY && childY < siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
+                            hasMoved = true;
+                        }
+
+                        // Init transition
+                        if (hasMoved) {
+                            canSort = false;
+
+                            var newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                            setTimeout(function () {
+                                child.removeAttribute('style');
+                                sibling.removeAttribute('style');
+                                canSort = true;
+                            }, 100);
+                        }
+                    });
+                };
+
+                child.ondragend = function (e) {
+                    onChange(child);
+                };
+
+                child.ondragcancel = function (e) {
+                    onChange(child);
+                };
+            } else {
+                child.ondragstart = null;
+                child.ondrag = null;
+                child.ondragstop = null;
+                child.ondragcancel = null;
+            }
+        });
+
+        parentElement.classList.toggle('sorting', isActive);
+
+        return true;
+    };
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue
@@ -29715,6 +30344,8 @@ var UIHelper = function () {
      *
      * @returns {HTMLElement} Switch element
      */
+
+
     UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
         var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
         var $input = void 0;
@@ -29766,25 +30397,54 @@ var UIHelper = function () {
 
             // Render individual chips
             _.each(items, function (itemIndex, item) {
+                var label = item.label || item.name || item.title;
+
+                if (!label) {
+                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                        var _ref;
+
+                        if (_isArray) {
+                            if (_i2 >= _iterator.length) break;
+                            _ref = _iterator[_i2++];
+                        } else {
+                            _i2 = _iterator.next();
+                            if (_i2.done) break;
+                            _ref = _i2.value;
+                        }
+
+                        var dropdownItem = _ref;
+
+                        var value = dropdownItem.id || dropdownItem.value || dropdownItem;
+
+                        if (value === item) {
+                            label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                        }
+                    }
+                }
+
+                if (!label) {
+                    label = item;
+                }
+
                 var $chip = _.div({ class: 'chip' },
 
                 // Dropdown
-                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, label), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
                     // Look for unique dropdown items
                     if (isDropdownUnique) {
-                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                            var _ref;
+                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref2;
 
-                            if (_isArray) {
-                                if (_i >= _iterator.length) break;
-                                _ref = _iterator[_i++];
+                            if (_isArray2) {
+                                if (_i3 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i3++];
                             } else {
-                                _i = _iterator.next();
-                                if (_i.done) break;
-                                _ref = _i.value;
+                                _i3 = _iterator2.next();
+                                if (_i3.done) break;
+                                _ref2 = _i3.value;
                             }
 
-                            var _item = _ref;
+                            var _item = _ref2;
 
                             if (_item == dropdownItem) {
                                 return;
@@ -29795,7 +30455,7 @@ var UIHelper = function () {
                     return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
                         e.preventDefault();
 
-                        items[itemIndex] = dropdownItem;
+                        items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
 
                         render();
 
@@ -29828,35 +30488,35 @@ var UIHelper = function () {
             _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
                 if (Array.isArray(dropdownItems)) {
                     if (isDropdownUnique) {
-                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                            var _ref2;
+                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                            var _ref3;
 
-                            if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
+                            if (_isArray3) {
+                                if (_i4 >= _iterator3.length) break;
+                                _ref3 = _iterator3[_i4++];
                             } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
+                                _i4 = _iterator3.next();
+                                if (_i4.done) break;
+                                _ref3 = _i4.value;
                             }
 
-                            var dropdownItem = _ref2;
+                            var dropdownItem = _ref3;
 
                             var isSelected = false;
 
-                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-                                var _ref3;
+                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                                var _ref4;
 
-                                if (_isArray3) {
-                                    if (_i3 >= _iterator3.length) break;
-                                    _ref3 = _iterator3[_i3++];
+                                if (_isArray4) {
+                                    if (_i5 >= _iterator4.length) break;
+                                    _ref4 = _iterator4[_i5++];
                                 } else {
-                                    _i3 = _iterator3.next();
-                                    if (_i3.done) break;
-                                    _ref3 = _i3.value;
+                                    _i5 = _iterator4.next();
+                                    if (_i5.done) break;
+                                    _ref4 = _i5.value;
                                 }
 
-                                var item = _ref3;
+                                var item = _ref4;
 
                                 if (item == dropdownItem) {
                                     isSelected = true;
@@ -29865,12 +30525,12 @@ var UIHelper = function () {
                             }
 
                             if (!isSelected) {
-                                items.push(dropdownItem);
+                                items.push(dropdownItem.value || dropdownItem);
                                 break;
                             }
                         }
                     } else {
-                        items.push(dropdownItems[0]);
+                        items.push(dropdownItems[0].value || dropdownItems[0]);
                     }
                 } else if (typeof dropdownItems === 'string') {
                     items.push(dropdownItems);
@@ -29938,19 +30598,19 @@ var UIHelper = function () {
                 return;
             }
 
-            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
+            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+                var _ref5;
 
-                if (_isArray4) {
-                    if (_i4 >= _iterator4.length) break;
-                    _ref4 = _iterator4[_i4++];
+                if (_isArray5) {
+                    if (_i6 >= _iterator5.length) break;
+                    _ref5 = _iterator5[_i6++];
                 } else {
-                    _i4 = _iterator4.next();
-                    if (_i4.done) break;
-                    _ref4 = _i4.value;
+                    _i6 = _iterator5.next();
+                    if (_i6.done) break;
+                    _ref5 = _i6.value;
                 }
 
-                var option = _ref4;
+                var option = _ref5;
 
                 if (option.value == defaultValue) {
                     $toggle.html(option.label);
@@ -30012,8 +30672,8 @@ var UIHelper = function () {
         _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
 
         // Render all options
-        for (var _i5 in options || []) {
-            $element.trigger('addOption', options[_i5]);
+        for (var _i7 in options || []) {
+            $element.trigger('addOption', options[_i7]);
         }
 
         return $element;
@@ -30258,12 +30918,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 193 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(194);
-window.marked = __webpack_require__(195);
-window.toMarkdown = __webpack_require__(196);
+window.Promise = __webpack_require__(197);
+window.marked = __webpack_require__(198);
+window.toMarkdown = __webpack_require__(199);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -30362,13 +31022,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(204);
+window.app = __webpack_require__(207);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 194 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -35699,7 +36359,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 195 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -36888,7 +37548,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 196 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36904,10 +37564,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(197);
-var gfmConverters = __webpack_require__(198);
-var HtmlParser = __webpack_require__(199);
-var collapse = __webpack_require__(201);
+var mdConverters = __webpack_require__(200);
+var gfmConverters = __webpack_require__(201);
+var HtmlParser = __webpack_require__(202);
+var collapse = __webpack_require__(204);
 
 /*
  * Utilities
@@ -37115,7 +37775,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 197 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37248,7 +37908,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 198 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37348,7 +38008,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 199 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -37382,7 +38042,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(200);
+    var jsdom = __webpack_require__(203);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -37429,25 +38089,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 200 */
+/* 203 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 201 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(202);
+var voidElements = __webpack_require__(205);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(203).forEach(function (name) {
+__webpack_require__(206).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -37577,7 +38237,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 202 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -37605,7 +38265,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 203 */
+/* 206 */
 /***/ (function(module, exports) {
 
 /**
@@ -37616,7 +38276,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -37668,7 +38328,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 205 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37720,7 +38380,7 @@ var MediaViewer = function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 206 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37846,7 +38506,7 @@ var TemplateEditor = function (_Crisp$View) {
 module.exports = TemplateEditor;
 
 /***/ }),
-/* 207 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38196,7 +38856,7 @@ var FormEditor = function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 208 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38212,17 +38872,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    index: __webpack_require__(208),
+    index: __webpack_require__(211),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Resource: __webpack_require__(15),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(209),
+    Template: __webpack_require__(212),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 209 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38299,7 +38959,7 @@ var Template = function (_Resource) {
 module.exports = Template;
 
 /***/ }),
-/* 210 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38525,7 +39185,7 @@ var MediaUploader = function (_Crisp$View) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 211 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38666,7 +39326,710 @@ var MediaBrowser = function (_Crisp$View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 212 */
+/* 215 */
+/***/ (function(module, exports) {
+
+module.exports = {
+	"icons": [
+		"500px",
+		"adjust",
+		"adn",
+		"align-center",
+		"align-justify",
+		"align-left",
+		"align-right",
+		"amazon",
+		"ambulance",
+		"anchor",
+		"android",
+		"angellist",
+		"angle-double-down",
+		"angle-double-left",
+		"angle-double-right",
+		"angle-double-up",
+		"angle-down",
+		"angle-left",
+		"angle-right",
+		"angle-up",
+		"apple",
+		"archive",
+		"area-chart",
+		"arrow-circle-down",
+		"arrow-circle-left",
+		"arrow-circle-o-down",
+		"arrow-circle-o-left",
+		"arrow-circle-o-right",
+		"arrow-circle-o-up",
+		"arrow-circle-right",
+		"arrow-circle-up",
+		"arrow-down",
+		"arrow-left",
+		"arrow-right",
+		"arrow-up",
+		"arrows",
+		"arrows-alt",
+		"arrows-h",
+		"arrows-v",
+		"asterisk",
+		"at",
+		"automobile",
+		"backward",
+		"balance-scale",
+		"ban",
+		"bank",
+		"bar-chart",
+		"bar-chart-o",
+		"barcode",
+		"bars",
+		"battery-0",
+		"battery-1",
+		"battery-2",
+		"battery-3",
+		"battery-4",
+		"battery-empty",
+		"battery-full",
+		"battery-half",
+		"battery-quarter",
+		"battery-three-quarters",
+		"bed",
+		"beer",
+		"behance",
+		"behance-square",
+		"bell",
+		"bell-o",
+		"bell-slash",
+		"bell-slash-o",
+		"bicycle",
+		"binoculars",
+		"birthday-cake",
+		"bitbucket",
+		"bitbucket-square",
+		"bitcoin",
+		"black-tie",
+		"bluetooth",
+		"bluetooth-b",
+		"bold",
+		"bolt",
+		"bomb",
+		"book",
+		"bookmark",
+		"bookmark-o",
+		"briefcase",
+		"btc",
+		"bug",
+		"building",
+		"building-o",
+		"bullhorn",
+		"bullseye",
+		"bus",
+		"buysellads",
+		"cab",
+		"calculator",
+		"calendar",
+		"calendar-check-o",
+		"calendar-minus-o",
+		"calendar-o",
+		"calendar-plus-o",
+		"calendar-times-o",
+		"camera",
+		"camera-retro",
+		"car",
+		"caret-down",
+		"caret-left",
+		"caret-right",
+		"caret-square-o-down",
+		"caret-square-o-left",
+		"caret-square-o-right",
+		"caret-square-o-up",
+		"caret-up",
+		"cart-arrow-down",
+		"cart-plus",
+		"cc",
+		"cc-amex",
+		"cc-diners-club",
+		"cc-discover",
+		"cc-jcb",
+		"cc-mastercard",
+		"cc-paypal",
+		"cc-stripe",
+		"cc-visa",
+		"certificate",
+		"chain",
+		"chain-broken",
+		"check",
+		"check-circle",
+		"check-circle-o",
+		"check-square",
+		"check-square-o",
+		"chevron-circle-down",
+		"chevron-circle-left",
+		"chevron-circle-right",
+		"chevron-circle-up",
+		"chevron-down",
+		"chevron-left",
+		"chevron-right",
+		"chevron-up",
+		"child",
+		"chrome",
+		"circle",
+		"circle-o",
+		"circle-o-notch",
+		"circle-thin",
+		"clipboard",
+		"clock-o",
+		"clone",
+		"close",
+		"cloud",
+		"cloud-download",
+		"cloud-upload",
+		"cny",
+		"code",
+		"code-fork",
+		"codepen",
+		"codiepie",
+		"coffee",
+		"cog",
+		"cogs",
+		"columns",
+		"comment",
+		"comment-o",
+		"commenting",
+		"commenting-o",
+		"comments",
+		"comments-o",
+		"compass",
+		"compress",
+		"connectdevelop",
+		"contao",
+		"copy",
+		"copyright",
+		"creative-commons",
+		"credit-card",
+		"credit-card-alt",
+		"crop",
+		"crosshairs",
+		"css3",
+		"cube",
+		"cubes",
+		"cut",
+		"cutlery",
+		"dashboard",
+		"dashcube",
+		"database",
+		"dedent",
+		"delicious",
+		"desktop",
+		"deviantart",
+		"diamond",
+		"digg",
+		"dollar",
+		"dot-circle-o",
+		"download",
+		"dribbble",
+		"dropbox",
+		"drupal",
+		"edge",
+		"edit",
+		"eject",
+		"ellipsis-h",
+		"ellipsis-v",
+		"empire",
+		"envelope",
+		"envelope-o",
+		"envelope-square",
+		"eraser",
+		"eur",
+		"euro",
+		"exchange",
+		"exclamation",
+		"exclamation-circle",
+		"exclamation-triangle",
+		"expand",
+		"expeditedssl",
+		"external-link",
+		"external-link-square",
+		"eye",
+		"eye-slash",
+		"eyedropper",
+		"facebook",
+		"facebook-f",
+		"facebook-official",
+		"facebook-square",
+		"fast-backward",
+		"fast-forward",
+		"fax",
+		"feed",
+		"female",
+		"fighter-jet",
+		"file",
+		"file-archive-o",
+		"file-audio-o",
+		"file-code-o",
+		"file-excel-o",
+		"file-image-o",
+		"file-movie-o",
+		"file-o",
+		"file-pdf-o",
+		"file-photo-o",
+		"file-picture-o",
+		"file-powerpoint-o",
+		"file-sound-o",
+		"file-text",
+		"file-text-o",
+		"file-video-o",
+		"file-word-o",
+		"file-zip-o",
+		"files-o",
+		"film",
+		"filter",
+		"fire",
+		"fire-extinguisher",
+		"firefox",
+		"flag",
+		"flag-checkered",
+		"flag-o",
+		"flash",
+		"flask",
+		"flickr",
+		"floppy-o",
+		"folder",
+		"folder-o",
+		"folder-open",
+		"folder-open-o",
+		"font",
+		"fonticons",
+		"fort-awesome",
+		"forumbee",
+		"forward",
+		"foursquare",
+		"frown-o",
+		"futbol-o",
+		"gamepad",
+		"gavel",
+		"gbp",
+		"ge",
+		"gear",
+		"gears",
+		"genderless",
+		"get-pocket",
+		"gg",
+		"gg-circle",
+		"gift",
+		"git",
+		"git-square",
+		"github",
+		"github-alt",
+		"github-square",
+		"gittip",
+		"glass",
+		"globe",
+		"google",
+		"google-plus",
+		"google-plus-square",
+		"google-wallet",
+		"graduation-cap",
+		"gratipay",
+		"group",
+		"h-square",
+		"hacker-news",
+		"hand-grab-o",
+		"hand-lizard-o",
+		"hand-o-down",
+		"hand-o-left",
+		"hand-o-right",
+		"hand-o-up",
+		"hand-paper-o",
+		"hand-peace-o",
+		"hand-pointer-o",
+		"hand-rock-o",
+		"hand-scissors-o",
+		"hand-spock-o",
+		"hand-stop-o",
+		"hashtag",
+		"hdd-o",
+		"header",
+		"headphones",
+		"heart",
+		"heart-o",
+		"heartbeat",
+		"history",
+		"home",
+		"hospital-o",
+		"hotel",
+		"hourglass",
+		"hourglass-1",
+		"hourglass-2",
+		"hourglass-3",
+		"hourglass-end",
+		"hourglass-half",
+		"hourglass-o",
+		"hourglass-start",
+		"houzz",
+		"html5",
+		"i-cursor",
+		"ils",
+		"image",
+		"inbox",
+		"indent",
+		"industry",
+		"info",
+		"info-circle",
+		"inr",
+		"instagram",
+		"institution",
+		"internet-explorer",
+		"intersex",
+		"ioxhost",
+		"italic",
+		"joomla",
+		"jpy",
+		"jsfiddle",
+		"key",
+		"keyboard-o",
+		"krw",
+		"language",
+		"laptop",
+		"lastfm",
+		"lastfm-square",
+		"leaf",
+		"leanpub",
+		"legal",
+		"lemon-o",
+		"level-down",
+		"level-up",
+		"life-bouy",
+		"life-buoy",
+		"life-ring",
+		"life-saver",
+		"lightbulb-o",
+		"line-chart",
+		"link",
+		"linkedin",
+		"linkedin-square",
+		"linux",
+		"list",
+		"list-alt",
+		"list-ol",
+		"list-ul",
+		"location-arrow",
+		"lock",
+		"long-arrow-down",
+		"long-arrow-left",
+		"long-arrow-right",
+		"long-arrow-up",
+		"magic",
+		"magnet",
+		"mail-forward",
+		"mail-reply",
+		"mail-reply-all",
+		"male",
+		"map",
+		"map-marker",
+		"map-o",
+		"map-pin",
+		"map-signs",
+		"mars",
+		"mars-double",
+		"mars-stroke",
+		"mars-stroke-h",
+		"mars-stroke-v",
+		"maxcdn",
+		"meanpath",
+		"medium",
+		"medkit",
+		"meh-o",
+		"mercury",
+		"microphone",
+		"microphone-slash",
+		"minus",
+		"minus-circle",
+		"minus-square",
+		"minus-square-o",
+		"mixcloud",
+		"mobile",
+		"mobile-phone",
+		"modx",
+		"money",
+		"moon-o",
+		"mortar-board",
+		"motorcycle",
+		"mouse-pointer",
+		"music",
+		"navicon",
+		"neuter",
+		"newspaper-o",
+		"object-group",
+		"object-ungroup",
+		"odnoklassniki",
+		"odnoklassniki-square",
+		"opencart",
+		"openid",
+		"opera",
+		"optin-monster",
+		"outdent",
+		"pagelines",
+		"paint-brush",
+		"paper-plane",
+		"paper-plane-o",
+		"paperclip",
+		"paragraph",
+		"paste",
+		"pause",
+		"pause-circle",
+		"pause-circle-o",
+		"paw",
+		"paypal",
+		"pencil",
+		"pencil-square",
+		"pencil-square-o",
+		"percent",
+		"phone",
+		"phone-square",
+		"photo",
+		"picture-o",
+		"pie-chart",
+		"pied-piper",
+		"pied-piper-alt",
+		"pinterest",
+		"pinterest-p",
+		"pinterest-square",
+		"plane",
+		"play",
+		"play-circle",
+		"play-circle-o",
+		"plug",
+		"plus",
+		"plus-circle",
+		"plus-square",
+		"plus-square-o",
+		"power-off",
+		"print",
+		"product-hunt",
+		"puzzle-piece",
+		"qq",
+		"qrcode",
+		"question",
+		"question-circle",
+		"quote-left",
+		"quote-right",
+		"ra",
+		"random",
+		"rebel",
+		"recycle",
+		"reddit",
+		"reddit-alien",
+		"reddit-square",
+		"refresh",
+		"registered",
+		"remove",
+		"renren",
+		"reorder",
+		"repeat",
+		"reply",
+		"reply-all",
+		"retweet",
+		"rmb",
+		"road",
+		"rocket",
+		"rotate-left",
+		"rotate-right",
+		"rouble",
+		"rss",
+		"rss-square",
+		"rub",
+		"ruble",
+		"rupee",
+		"safari",
+		"save",
+		"scissors",
+		"scribd",
+		"search",
+		"search-minus",
+		"search-plus",
+		"sellsy",
+		"send",
+		"send-o",
+		"server",
+		"share",
+		"share-alt",
+		"share-alt-square",
+		"share-square",
+		"share-square-o",
+		"shekel",
+		"sheqel",
+		"shield",
+		"ship",
+		"shirtsinbulk",
+		"shopping-bag",
+		"shopping-basket",
+		"shopping-cart",
+		"sign-in",
+		"sign-out",
+		"signal",
+		"simplybuilt",
+		"sitemap",
+		"skyatlas",
+		"skype",
+		"slack",
+		"sliders",
+		"slideshare",
+		"smile-o",
+		"soccer-ball-o",
+		"sort",
+		"sort-alpha-asc",
+		"sort-alpha-desc",
+		"sort-amount-asc",
+		"sort-amount-desc",
+		"sort-asc",
+		"sort-desc",
+		"sort-down",
+		"sort-numeric-asc",
+		"sort-numeric-desc",
+		"sort-up",
+		"soundcloud",
+		"space-shuttle",
+		"spinner",
+		"spoon",
+		"spotify",
+		"square",
+		"square-o",
+		"stack-exchange",
+		"stack-overflow",
+		"star",
+		"star-half",
+		"star-half-empty",
+		"star-half-full",
+		"star-half-o",
+		"star-o",
+		"steam",
+		"steam-square",
+		"step-backward",
+		"step-forward",
+		"stethoscope",
+		"sticky-note",
+		"sticky-note-o",
+		"stop",
+		"stop-circle",
+		"stop-circle-o",
+		"street-view",
+		"strikethrough",
+		"stumbleupon",
+		"stumbleupon-circle",
+		"subscript",
+		"subway",
+		"suitcase",
+		"sun-o",
+		"superscript",
+		"support",
+		"table",
+		"tablet",
+		"tachometer",
+		"tag",
+		"tags",
+		"tasks",
+		"taxi",
+		"television",
+		"tencent-weibo",
+		"terminal",
+		"text-height",
+		"text-width",
+		"th",
+		"th-large",
+		"th-list",
+		"thumb-tack",
+		"thumbs-down",
+		"thumbs-o-down",
+		"thumbs-o-up",
+		"thumbs-up",
+		"ticket",
+		"times",
+		"times-circle",
+		"times-circle-o",
+		"tint",
+		"toggle-down",
+		"toggle-left",
+		"toggle-off",
+		"toggle-on",
+		"toggle-right",
+		"toggle-up",
+		"trademark",
+		"train",
+		"transgender",
+		"transgender-alt",
+		"trash",
+		"trash-o",
+		"tree",
+		"trello",
+		"tripadvisor",
+		"trophy",
+		"truck",
+		"try",
+		"tty",
+		"tumblr",
+		"tumblr-square",
+		"turkish-lira",
+		"tv",
+		"twitch",
+		"twitter",
+		"twitter-square",
+		"umbrella",
+		"underline",
+		"undo",
+		"university",
+		"unlink",
+		"unlock",
+		"unlock-alt",
+		"unsorted",
+		"upload",
+		"usb",
+		"usd",
+		"user",
+		"user-md",
+		"user-plus",
+		"user-secret",
+		"user-times",
+		"users",
+		"venus",
+		"venus-double",
+		"venus-mars",
+		"viacoin",
+		"video-camera",
+		"vimeo",
+		"vimeo-square",
+		"vine",
+		"vk",
+		"volume-down",
+		"volume-off",
+		"volume-up",
+		"warning",
+		"wechat",
+		"weibo",
+		"weixin",
+		"whatsapp",
+		"wheelchair",
+		"wifi",
+		"wikipedia-w",
+		"windows",
+		"won",
+		"wordpress",
+		"wrench",
+		"xing",
+		"xing-square",
+		"y-combinator",
+		"y-combinator-square",
+		"yahoo",
+		"yc",
+		"yc-square",
+		"yelp",
+		"yen",
+		"youtube",
+		"youtube-play",
+		"youtube-square"
+	]
+};
+
+/***/ }),
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38678,10 +40041,10 @@ module.exports = MediaBrowser;
 
 // Style
 
-__webpack_require__(213);
+__webpack_require__(217);
 
 // Get routes
-__webpack_require__(214);
+__webpack_require__(218);
 
 // Resource cache
 window.resources = {
@@ -38699,21 +40062,22 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Models = __webpack_require__(225);
+HashBrown.Models = __webpack_require__(229);
 HashBrown.Views = {};
-HashBrown.Views.Modals = __webpack_require__(227);
-HashBrown.Views.Navigation = __webpack_require__(228);
-HashBrown.Views.Editors = __webpack_require__(239);
+HashBrown.Views.Widgets = __webpack_require__(231);
+HashBrown.Views.Modals = __webpack_require__(235);
+HashBrown.Views.Navigation = __webpack_require__(238);
+HashBrown.Views.Editors = __webpack_require__(249);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(244);
-HashBrown.Helpers = __webpack_require__(189);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(254);
+HashBrown.Helpers = __webpack_require__(191);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
 // Helper functions
-__webpack_require__(193);
+__webpack_require__(196);
 
 // Preload resources 
 document.addEventListener('DOMContentLoaded', function () {
@@ -38776,29 +40140,29 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /***/ }),
-/* 213 */
+/* 217 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 214 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(215);
-__webpack_require__(216);
-__webpack_require__(217);
-__webpack_require__(218);
 __webpack_require__(219);
 __webpack_require__(220);
 __webpack_require__(221);
 __webpack_require__(222);
+__webpack_require__(223);
+__webpack_require__(224);
+__webpack_require__(225);
+__webpack_require__(226);
 
 /***/ }),
-/* 215 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38855,7 +40219,7 @@ Crisp.Router.route('/license/', function () {
 });
 
 /***/ }),
-/* 216 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38919,7 +40283,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 });
 
 /***/ }),
-/* 217 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38969,13 +40333,13 @@ Crisp.Router.route('/connections/json/:id', function () {
 });
 
 /***/ }),
-/* 218 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var MediaViewer = __webpack_require__(205);
+var MediaViewer = __webpack_require__(208);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -38997,7 +40361,7 @@ Crisp.Router.route('/media/:id', function () {
 });
 
 /***/ }),
-/* 219 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39020,13 +40384,38 @@ Crisp.Router.route('/schemas/', function () {
 // Edit
 Crisp.Router.route('/schemas/:id', function () {
     if (currentUserHasScope('schemas')) {
-        var schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
-            modelUrl: RequestHelper.environmentUrl('schemas/' + this.id)
+        var schema = void 0;
+        var compiledSchema = void 0;
+
+        Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
+
+        // First get the Schema model
+        SchemaHelper.getSchemaById(Crisp.Router.params.id).then(function (result) {
+            schema = SchemaHelper.getModel(result);
+
+            return SchemaHelper.getSchemaWithParentFields(Crisp.Router.params.id);
+        })
+
+        // Then get the compiled Schema
+        .then(function (result) {
+            compiledSchema = SchemaHelper.getModel(result);
+
+            var schemaEditor = void 0;
+
+            if (schema instanceof HashBrown.Models.ContentSchema) {
+                schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
+                    model: schema,
+                    compiledSchema: compiledSchema
+                });
+            } else {
+                schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
+                    model: schema,
+                    compiledSchema: compiledSchema
+                });
+            }
+
+            populateWorkspace(schemaEditor.$element);
         });
-
-        Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
-
-        populateWorkspace(schemaEditor.$element);
     } else {
         location.hash = '/';
     }
@@ -39056,7 +40445,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 });
 
 /***/ }),
-/* 220 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39086,13 +40475,13 @@ Crisp.Router.route('/settings/providers/', function () {
 });
 
 /***/ }),
-/* 221 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var TemplateEditor = __webpack_require__(206);
+var TemplateEditor = __webpack_require__(209);
 var RequestHelper = __webpack_require__(2);
 
 // Templates
@@ -39122,14 +40511,14 @@ Crisp.Router.route('/templates/:type/:id', function () {
 });
 
 /***/ }),
-/* 222 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var JSONEditor = __webpack_require__(180);
-var FormEditor = __webpack_require__(207);
+var FormEditor = __webpack_require__(210);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -39163,7 +40552,7 @@ Crisp.Router.route('/forms/json/:id', function () {
 });
 
 /***/ }),
-/* 223 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -39230,7 +40619,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(224)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(228)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -39245,7 +40634,7 @@ if (true) {
 }
 
 /***/ }),
-/* 224 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -40373,7 +41762,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 225 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40389,17 +41778,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    Form: __webpack_require__(226),
-    index: __webpack_require__(208),
+    Form: __webpack_require__(230),
+    index: __webpack_require__(211),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(209),
+    Template: __webpack_require__(212),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 226 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40572,7 +41961,570 @@ var Form = function (_Resource) {
 module.exports = Form;
 
 /***/ }),
-/* 227 */
+/* 231 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @namespace HashBrown.Client.Views.Widgets
+ */
+
+module.exports = {
+    Dropdown: __webpack_require__(232),
+    Chips: __webpack_require__(233),
+    Input: __webpack_require__(234)
+};
+
+/***/ }),
+/* 232 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A generic dropdown
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+var Dropdown = function (_Widget) {
+    _inherits(Dropdown, _Widget);
+
+    function Dropdown() {
+        _classCallCheck(this, Dropdown);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Converts options into a flattened structure
+     *
+     * @returns {Object} Options
+     */
+    Dropdown.prototype.getFlattenedOptions = function getFlattenedOptions() {
+        if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
+            return this.options;
+        }
+
+        var options = {};
+
+        for (var key in this.options) {
+            var value = this.options[key];
+
+            var optionLabel = this.labelKey ? value[this.labelKey] : value;
+            var optionValue = this.valueKey ? value[this.valueKey] : value;
+
+            if (typeof optionValue !== 'string') {
+                optionValue = optionValue.toString();
+            }
+
+            if (typeof optionLabel !== 'string') {
+                optionLabel = optionLabel.toString();
+            }
+
+            // Check for disabled options
+            var isDisabled = false;
+
+            if (this.disabledOptions && Array.isArray(this.disabledOptions)) {
+                for (var disabledKey in this.disabledOptions) {
+                    var disabledValue = this.disabledOptions[disabledKey];
+                    var disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
+
+                    if (typeof disabledOptionValue !== 'string') {
+                        disabledOptionValue = disabledOptionValue.toString();
+                    }
+
+                    if (optionValue === disabledOptionValue) {
+                        isDisabled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isDisabled) {
+                continue;
+            }
+
+            options[optionValue] = optionLabel;
+        }
+
+        return options;
+    };
+
+    /**
+     * Gets the current value label
+     *
+     * @returns {String} Value label
+     */
+
+
+    Dropdown.prototype.getValueLabel = function getValueLabel() {
+        this.sanityCheck();
+
+        var label = this.placeholder || '(none)';
+        var options = this.getFlattenedOptions();
+
+        if (this.useMultiple) {
+            var multipleLabel = '';
+
+            for (var key in options) {
+                var value = options[key];
+
+                if (this.value.indexOf(key) > -1) {
+                    multipleLabel += value + ', ';
+                }
+            }
+
+            label = multipleLabel || label;
+        } else {
+            label = options[this.value] === 0 ? '0' : options[this.value] || label;
+        }
+
+        return label;
+    };
+
+    /**
+     * Performs a sanity check of the value
+     */
+
+
+    Dropdown.prototype.sanityCheck = function sanityCheck() {
+        if (this.useMultiple && !Array.isArray(this.value)) {
+            this.value = [];
+        } else if (!this.useMultiple && Array.isArray(this.value)) {
+            this.value = null;
+        }
+    };
+
+    /**
+     * Updates all selected classes
+     */
+
+
+    Dropdown.prototype.updateSelectedClasses = function updateSelectedClasses() {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var value = btnOptions[i].dataset.value;
+            var hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
+
+            btnOptions[i].classList.toggle('selected', hasValue);
+        }
+    };
+
+    /**
+     * Event: Change value
+     *
+     * @param {Object} newValue
+     */
+
+
+    Dropdown.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.sanityCheck();
+
+        // Change multiple value
+        if (this.useMultiple) {
+            // First check if value was already selected, remove if found
+            var foundValue = false;
+
+            for (var i in this.value) {
+                if (this.value[i] === newValue) {
+                    this.value.splice(i, 1);
+                    foundValue = true;
+                    break;
+                }
+            }
+
+            // If value was not selected, add it
+            if (!foundValue) {
+                if (!newValue) {
+                    this.value = [];
+                } else {
+                    this.value.push(newValue);
+                }
+            }
+
+            // Change single value
+        } else {
+            this.value = newValue;
+        }
+
+        // Update classes
+        this.updateSelectedClasses();
+
+        // Update value label
+        var divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if (divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+
+        // Cancel
+        this.onCancel();
+
+        // Change event
+        if (typeof this.onChange === 'function') {
+            this.onChange(this.value);
+        }
+    };
+
+    /**
+     * Event: Typeahead
+     *
+     * @param {String} query
+     */
+
+
+    Dropdown.prototype.onTypeahead = function onTypeahead(query) {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+
+            btnOptions[i].classList.toggle('hidden', !isMatch);
+        }
+    };
+
+    /**
+     * Event: Cancel
+     */
+
+
+    Dropdown.prototype.onCancel = function onCancel() {
+        var toggle = this.element.querySelector('.widget--dropdown__toggle');
+
+        if (toggle) {
+            toggle.checked = false;
+        }
+    };
+
+    /**
+     * Post render
+     */
+
+
+    Dropdown.prototype.postrender = function postrender() {
+        this.updateSelectedClasses();
+    };
+
+    /**
+     * Template
+     */
+
+
+    Dropdown.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' },
+        // Value
+        _.div({ class: 'widget--dropdown__value' }, this.getValueLabel()),
+
+        // Toggle
+        _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }),
+
+        // Typeahead input
+        _.if(this.useTypeAhead, _.span({ class: 'widget--dropdown__typeahead__icon fa fa-search' }), _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
+            _this2.onTypeahead(e.currentTarget.value);
+        })),
+
+        // Dropdown options
+        _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+            return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
+                _this2.onChangeInternal(optionValue);
+            });
+        })),
+
+        // Clear button
+        _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection' }).click(function (e) {
+            _this2.onChangeInternal(null);
+        })),
+
+        // Obscure
+        _.div({ class: 'widget--dropdown__obscure' }, _.div({ class: 'widget--dropdown__obscure__inner' }).click(function (e) {
+            _this2.onCancel();
+        })));
+    };
+
+    return Dropdown;
+}(Widget);
+
+module.exports = Dropdown;
+
+/***/ }),
+/* 233 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A group of chips
+ */
+
+var Chips = function (_Widget) {
+    _inherits(Chips, _Widget);
+
+    function Chips() {
+        _classCallCheck(this, Chips);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Event: Change
+     */
+    Chips.prototype.onChangeInternal = function onChangeInternal() {
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
+     * Pre render
+     */
+
+
+    Chips.prototype.prerender = function prerender() {
+        // Array check
+        // NOTE: Array is the default mode for this widget
+        if (this.useArray === true || typeof this.useArray === 'undefined') {
+            // Check format
+            if (!this.value || !Array.isArray(this.value)) {
+                this.value = [];
+            }
+
+            if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
+                this.disabledValue = [];
+            }
+
+            // Check empty values
+            for (var i = this.value.length - 1; i >= 0; i--) {
+                if (!this.value[i]) {
+                    this.value.splice(i, 1);
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
+                if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
+                    this.disabledValue.splice(_i, 1);
+                }
+            }
+
+            // Object check
+        } else if (this.useArray === false || this.useObject === true) {
+            // Check format
+            if (!this.value || Array.isArray(this.value) || _typeof(this.value) !== 'object') {
+                this.value = {};
+            }
+
+            if (!this.disabledValue || Array.isArray(this.disabledValue) || _typeof(this.disabledValue) !== 'object') {
+                this.disabledValue = {};
+            }
+
+            // Check empty values
+            for (var k in this.value) {
+                if (!k || !this.value[k]) {
+                    delete this.value[k];
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _k in this.disabledValue) {
+                if (!_k || !this.disabledValue[_k] || this.value[_k]) {
+                    delete this.value[_k];
+                }
+            }
+        }
+    };
+
+    /**
+     * Template
+     */
+
+
+    Chips.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
+        }), _.each(this.value, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.valueKey) {
+                    item[_this2.valueKey] = e.currentTarget.value || '';
+                } else {
+                    i = e.currentTarget.value || '';
+
+                    _this2.value[i] = item;
+                }
+
+                _this2.onChangeInternal();
+            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.labelKey) {
+                    item[_this2.labelKey] = e.currentTarget.value || '';
+                } else {
+                    _this2.value[i] = e.currentTarget.value || '';
+                }
+
+                _this2.onChangeInternal();
+            }), _.button({ class: 'widget--chips__chip__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                _this2.value.splice(i, 1);
+
+                _this2.onChangeInternal();
+
+                _this2.init();
+            }));
+        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            var newValue = _this2.placeholder || 'New item';
+            var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+
+            if (_this2.useObject === true || _this2.useArray === false) {
+                _this2.value[newKey] = newValue;
+            } else if (_this2.valueKey && _this2.labelKey) {
+                var newObject = {};
+
+                newObject[_this2.valueKey] = newKey;
+                newObject[_this2.labelKey] = newValue;
+
+                _this2.value.push(newObject);
+            } else {
+                _this2.value.push(newValue);
+            }
+
+            _this2.onChangeInternal();
+
+            _this2.init();
+        }));
+    };
+
+    return Chips;
+}(Widget);
+
+module.exports = Chips;
+
+/***/ }),
+/* 234 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A versatile input widget
+ */
+
+var Input = function (_Widget) {
+    _inherits(Input, _Widget);
+
+    function Input() {
+        _classCallCheck(this, Input);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Event: Change value
+     *
+     * @param {Anything} newValue
+     */
+    Input.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.value = newValue;
+
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
+     * Template
+     */
+
+
+    Input.prototype.template = function template() {
+        var _this2 = this;
+
+        var config = {
+            placeholder: this.placeholder,
+            title: this.tooltip,
+            type: this.type || 'text',
+            class: 'widget widget--input ' + (this.type || 'text'),
+            value: this.value
+        };
+
+        if (this.type === 'number' || this.type === 'range') {
+            config.step = this.step || 'any';
+            config.min = this.min;
+            config.max = this.max;
+        }
+
+        switch (this.type) {
+            case 'range':
+                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__range-input', type: 'range', value: this.value, min: config.min, max: config.max, step: config.step }).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
+
+                    e.currentTarget.nextElementSibling.innerHTML = e.currentTarget.value;
+                }), _.div({ class: 'widget--input__range-extra' }, this.value));
+
+            case 'checkbox':
+                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.checked);
+                }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
+
+            default:
+                return _.input(config).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
+                });
+        }
+    };
+
+    return Input;
+}(Widget);
+
+module.exports = Input;
+
+/***/ }),
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40583,13 +42535,196 @@ module.exports = Form;
  */
 
 module.exports = {
-    MediaUploader: __webpack_require__(210),
-    MediaBrowser: __webpack_require__(211),
-    MessageModal: __webpack_require__(17)
+    MediaUploader: __webpack_require__(213),
+    MediaBrowser: __webpack_require__(214),
+    MessageModal: __webpack_require__(17),
+    IconModal: __webpack_require__(236)
 };
 
 /***/ }),
-/* 228 */
+/* 236 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(215).icons;
+
+var Modal = __webpack_require__(237);
+
+/**
+ * A modal for picking icons
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var IconModal = function (_Modal) {
+    _inherits(IconModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function IconModal(params) {
+        _classCallCheck(this, IconModal);
+
+        params = params || {};
+        params.title = params.title || 'Pick an icon';
+
+        return _possibleConstructorReturn(this, _Modal.call(this, params));
+    }
+
+    /**
+     * Post render
+     */
+
+
+    IconModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--icon', true);
+    };
+
+    /**
+     * Event: Search
+     *
+     * @param {String} query
+     */
+
+
+    IconModal.prototype.onSearch = function onSearch(query) {
+        var icons = this.element.querySelectorAll('.modal--icon__icon');
+
+        if (!icons) {
+            return;
+        }
+
+        for (var i = 0; i < icons.length; i++) {
+            if (query.length < 3 || icons[i].title.indexOf(query) > -1) {
+                icons[i].style.display = 'block';
+            } else {
+                icons[i].style.display = 'none';
+            }
+        }
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    IconModal.prototype.renderBody = function renderBody() {
+        var _this2 = this;
+
+        return [_.input({ type: 'text', class: 'widget widget--input text modal--icon__search', placeholder: 'Search for icons' }).on('input', function (e) {
+            _this2.onSearch(e.currentTarget.value);
+        }), _.div({ class: 'modal--icon__icons' }, _.each(icons, function (i, icon) {
+            return _.button({ class: 'modal--icon__icon widget widget--button fa fa-' + icon, title: icon }).click(function () {
+                _this2.trigger('change', icon);
+
+                _this2.close();
+            });
+        }))];
+    };
+
+    return IconModal;
+}(Modal);
+
+module.exports = IconModal;
+
+/***/ }),
+/* 237 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A generic modal
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = function (_Crisp$View) {
+    _inherits(Modal, _Crisp$View);
+
+    /**
+     * Constructor
+     */
+    function Modal(params) {
+        _classCallCheck(this, Modal);
+
+        params = params || {};
+        params.actions = params.actions || [];
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+
+        document.body.appendChild(_this.element);
+
+        setTimeout(function () {
+            _this.element.classList.toggle('in', true);
+        }, 50);
+        return _this;
+    }
+
+    /**
+     * Close this modal
+     *
+     */
+
+
+    Modal.prototype.close = function close() {
+        var _this2 = this;
+
+        this.element.classList.toggle('in', false);
+
+        setTimeout(function () {
+            _this2.remove();
+        }, 500);
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    Modal.prototype.renderBody = function renderBody() {};
+
+    /**
+     * Renders this modal
+     */
+
+
+    Modal.prototype.template = function template() {
+        var _this3 = this;
+
+        return _.div({ class: 'modal' }, _.div({ class: 'modal__dialog' }, _.if(this.title, _.div({ class: 'modal__header' }, _.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this3.close();
+        }))), _.div({ class: 'modal__body' }, this.renderBody()), _.if(this.actions.length > 0, _.div({ class: 'modal__footer' }))));
+    };
+
+    return Modal;
+}(Crisp.View);
+
+module.exports = Modal;
+
+/***/ }),
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40600,21 +42735,21 @@ module.exports = {
  */
 
 module.exports = {
-    CMSPane: __webpack_require__(229),
-    ConnectionPane: __webpack_require__(231),
-    ContentPane: __webpack_require__(232),
-    FormsPane: __webpack_require__(233),
-    MainMenu: __webpack_require__(234),
-    MediaPane: __webpack_require__(235),
+    CMSPane: __webpack_require__(239),
+    ConnectionPane: __webpack_require__(241),
+    ContentPane: __webpack_require__(242),
+    FormsPane: __webpack_require__(243),
+    MainMenu: __webpack_require__(244),
+    MediaPane: __webpack_require__(245),
     NavbarMain: __webpack_require__(39),
     NavbarPane: __webpack_require__(40),
-    SchemaPane: __webpack_require__(236),
-    SettingsPane: __webpack_require__(237),
-    TemplatePane: __webpack_require__(238)
+    SchemaPane: __webpack_require__(246),
+    SettingsPane: __webpack_require__(247),
+    TemplatePane: __webpack_require__(248)
 };
 
 /***/ }),
-/* 229 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40667,7 +42802,7 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 230 */
+/* 240 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -40766,7 +42901,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 231 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40995,7 +43130,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 232 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41493,7 +43628,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 233 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41727,7 +43862,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 234 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41892,7 +44027,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 235 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41906,7 +44041,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(40);
 var NavbarMain = __webpack_require__(39);
-var MediaUploader = __webpack_require__(210);
+var MediaUploader = __webpack_require__(213);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(2);
@@ -42106,7 +44241,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 236 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42347,7 +44482,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 237 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42396,7 +44531,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 238 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42664,7 +44799,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 239 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42675,19 +44810,21 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(240),
-    ContentEditor: __webpack_require__(187),
-    FormEditor: __webpack_require__(207),
+    ConnectionEditor: __webpack_require__(250),
+    ContentEditor: __webpack_require__(188),
+    ContentSchemaEditor: __webpack_require__(251),
+    FieldSchemaEditor: __webpack_require__(252),
+    FormEditor: __webpack_require__(210),
     JSONEditor: __webpack_require__(180),
-    MediaViewer: __webpack_require__(205),
-    ProvidersSettings: __webpack_require__(241),
-    SchemaEditor: __webpack_require__(242),
-    TemplateEditor: __webpack_require__(206),
+    MediaViewer: __webpack_require__(208),
+    ProvidersSettings: __webpack_require__(253),
+    SchemaEditor: __webpack_require__(189),
+    TemplateEditor: __webpack_require__(209),
     UserEditor: __webpack_require__(97)
 };
 
 /***/ }),
-/* 240 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42906,7 +45043,352 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 241 */
+/* 251 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SchemaEditor = __webpack_require__(189);
+
+/**
+ * The editor for Content Schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var ContentSchemaEditor = function (_SchemaEditor) {
+    _inherits(ContentSchemaEditor, _SchemaEditor);
+
+    function ContentSchemaEditor() {
+        _classCallCheck(this, ContentSchemaEditor);
+
+        return _possibleConstructorReturn(this, _SchemaEditor.apply(this, arguments));
+    }
+
+    /**
+     * Renders the editor fields
+     */
+    ContentSchemaEditor.prototype.renderFields = function renderFields() {
+        var _this2 = this;
+
+        var $element = _SchemaEditor.prototype.renderFields.call(this);
+
+        // Default tab
+        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
+            options: this.compiledSchema.tabs,
+            value: this.model.defaultTabId,
+            useClearButton: true,
+            onChange: function onChange(newValue) {
+                _this2.model.defaultTabId = newValue;
+            }
+        }).$element));
+
+        // Tabs
+        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+            disabledValue: Object.values(this.compiledSchema.tabs),
+            value: Object.values(this.model.tabs),
+            placeholder: 'New tab',
+            onChange: function onChange(newValue) {
+                _this2.model.tabs = {};
+
+                for (var _iterator = newValue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                    var _ref;
+
+                    if (_isArray) {
+                        if (_i >= _iterator.length) break;
+                        _ref = _iterator[_i++];
+                    } else {
+                        _i = _iterator.next();
+                        if (_i.done) break;
+                        _ref = _i.value;
+                    }
+
+                    var tab = _ref;
+
+                    _this2.model.tabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
+                }
+            }
+        }).$element));
+
+        // Allowed child Schemas
+        $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+            value: this.model.allowedChildSchemas,
+            labelKey: 'name',
+            valueKey: 'id',
+            useMultiple: true,
+            useClearButton: true,
+            useTypeAhead: true,
+            onChange: function onChange(newValue) {
+                _this2.model.allowedChildSchemas = newValue;
+            }
+        }).$element));
+
+        // Field properties
+        var $fieldProperties = _.div({ class: 'editor__field' });
+
+        $element.append($fieldProperties);
+
+        var renderFieldProperties = function renderFieldProperties() {
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+                HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
+                    _this2.model.fields.properties = newProperties;
+                });
+            }))), _.div({ class: 'editor__field__value segmented' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
+                var $field = _.div({ class: 'editor__field' });
+
+                var renderField = function renderField() {
+                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A variable name, e.g. "myField"',
+                        tooltip: 'The field variable name',
+                        value: fieldKey,
+                        onChange: function onChange(newKey) {
+                            delete _this2.model.fields.properties[fieldKey];
+
+                            fieldKey = newKey;
+
+                            _this2.model.fields.properties[fieldKey] = fieldValue;
+                        }
+                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A label, e.g. "My field"',
+                        tooltip: 'The field label',
+                        value: fieldValue.label,
+                        onChange: function onChange(newValue) {
+                            fieldValue.label = newValue;
+                        }
+                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useClearButton: true,
+                        options: _this2.compiledSchema.tabs,
+                        value: fieldValue.tabId,
+                        onChange: function onChange(newValue) {
+                            fieldValue.tabId = newValue;
+                        }
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useTypeAhead: true,
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        value: fieldValue.schemaId,
+                        labelKey: 'name',
+                        valueKey: 'id',
+                        onChange: function onChange(newValue) {
+                            fieldValue.schemaId = newValue;
+
+                            renderField();
+                        }
+                    }).$element)), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                        if (!schema) {
+                            return;
+                        }
+
+                        var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                        if (!editor) {
+                            return;
+                        }
+
+                        fieldValue.config = fieldValue.config || {};
+
+                        return editor.renderConfigEditor(fieldValue.config);
+                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                        delete _this2.model.fields.properties[fieldKey];
+
+                        renderFieldProperties();
+                    }));
+                };
+
+                renderField();
+
+                return $field;
+            }), _.button({ title: 'Add a Content property', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
+                if (_this2.model.fields.properties.newField) {
+                    return;
+                }
+
+                _this2.model.fields.properties.newField = {
+                    label: 'New field',
+                    schemaId: 'array'
+                };
+
+                renderFieldProperties();
+            })));
+        };
+
+        renderFieldProperties();
+
+        return $element;
+    };
+
+    return ContentSchemaEditor;
+}(SchemaEditor);
+
+module.exports = ContentSchemaEditor;
+
+/***/ }),
+/* 252 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SchemaEditor = __webpack_require__(189);
+
+/**
+ * The editor for field Schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var FieldSchemaEditor = function (_SchemaEditor) {
+    _inherits(FieldSchemaEditor, _SchemaEditor);
+
+    function FieldSchemaEditor() {
+        _classCallCheck(this, FieldSchemaEditor);
+
+        return _possibleConstructorReturn(this, _SchemaEditor.apply(this, arguments));
+    }
+
+    /**
+     * Render template editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    FieldSchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
+        var _this2 = this;
+
+        var $element = _.div({ class: 'field-properties-editor' });
+
+        setTimeout(function () {
+            _this2.templateEditor = CodeMirror($element[0], {
+                value: _this2.model.previewTemplate || '',
+                mode: {
+                    name: 'xml'
+                },
+                lineWrapping: true,
+                lineNumbers: true,
+                tabSize: 4,
+                indentUnit: 4,
+                indentWithTabs: true
+            });
+
+            _this2.templateEditor.on('change', function () {
+                _this2.model.previewTemplate = _this2.templateEditor.getDoc().getValue();
+            });
+        }, 1);
+
+        return $element;
+    };
+
+    /**
+     * Renders the field config editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+
+
+    FieldSchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
+        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+        if (!editor) {
+            return;
+        }
+
+        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
+    };
+
+    /**
+     * Renders the editor picker
+     *
+     * @return {Object} element
+     */
+
+
+    FieldSchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
+        var _this3 = this;
+
+        if (this.model.isPropertyHidden('editorId')) {
+            return;
+        }
+
+        var editorOptions = [];
+
+        for (var i in HashBrown.Views.Editors.FieldEditors) {
+            var editor = HashBrown.Views.Editors.FieldEditors[i];
+
+            editorOptions[editorOptions.length] = {
+                value: editor.name,
+                label: editor.name
+            };
+        }
+
+        // The editorId is actually a name more than an id
+        var editorName = this.model.editorId || '(none)';
+
+        // Backwards compatible check
+        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
+
+        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
+            _this3.model.editorId = newValue;
+
+            _this3.render();
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders the editor fields
+     */
+
+
+    FieldSchemaEditor.prototype.renderFields = function renderFields() {
+        var _this4 = this;
+
+        var $element = _SchemaEditor.prototype.renderFields.call(this);
+
+        $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
+            useTypeahead: true,
+            value: this.model.editorId,
+            options: HashBrown.Views.Editors.FieldEditors,
+            valueKey: 'name',
+            labelKey: 'name',
+            onChange: function onChange(newEditor) {
+                _this4.model.editorId = newEditor;
+
+                _this4.render();
+            }
+        }).$element));
+
+        if (!this.model.isLocked) {
+            $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
+            $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
+        }
+
+        return $element;
+    };
+
+    return FieldSchemaEditor;
+}(SchemaEditor);
+
+module.exports = FieldSchemaEditor;
+
+/***/ }),
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43026,1350 +45508,7 @@ var ProvidersSettings = function (_Crisp$View) {
 module.exports = ProvidersSettings;
 
 /***/ }),
-/* 242 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// Icons
-var icons = __webpack_require__(243).icons;
-
-var Schema = __webpack_require__(42);
-var SchemaHelper = __webpack_require__(16);
-var ContentHelper = __webpack_require__(41);
-var RequestHelper = __webpack_require__(2);
-var JSONEditor = __webpack_require__(180);
-
-/**
- * The editor for schemas
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-var SchemaEditor = function (_Crisp$View) {
-    _inherits(SchemaEditor, _Crisp$View);
-
-    function SchemaEditor(params) {
-        _classCallCheck(this, SchemaEditor);
-
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.$element = _.div({ class: 'editor schema-editor' });
-
-        _this.fetch();
-        return _this;
-    }
-
-    /**
-     * Event: Click advanced. Routes to the JSON editor
-     */
-
-
-    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
-        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
-    };
-
-    /**
-     * Event: Click save. Posts the model to the modelUrl
-     */
-
-
-    SchemaEditor.prototype.onClickSave = function onClickSave() {
-        var _this2 = this;
-
-        if (this.jsonEditor && this.jsonEditor.isValid == false) {
-            return;
-        }
-
-        this.$saveBtn.toggleClass('working', true);
-
-        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
-            _this2.$saveBtn.toggleClass('working', false);
-
-            return RequestHelper.reloadResource('schemas');
-        }).then(function () {
-            Crisp.View.get('NavbarMain').reload();
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
-        var _this3 = this;
-
-        if (this.model.isPropertyHidden('editorId')) {
-            return;
-        }
-
-        var editorOptions = [];
-
-        for (var i in HashBrown.Views.Editors.FieldEditors) {
-            var editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        var editorName = this.model.editorId || '(none)';
-
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
-            _this3.model.editorId = newValue;
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the name editor
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderNameEditor = function renderNameEditor() {
-        if (this.model.isPropertyHidden('name')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange() {
-            view.model.name = $(this).val();
-        }
-
-        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.isLocked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, view.model.name)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the tabs editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderTabsEditor = function renderTabsEditor() {
-        if (this.model.isPropertyHidden('tabs')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange($input) {
-            var $chip = $input.parents('.chip');
-            var oldId = $chip.attr('data-id');
-            var newLabel = $input.val();
-            var newId = ContentHelper.getSlug(newLabel);
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Assign new id to data attribute
-            $chip.attr('data-id', newId);
-
-            // Remove old id from model
-            delete view.model.tabs[oldId];
-
-            // Add new id and label to model
-            view.model.tabs[newId] = newLabel;
-
-            // Remove old tab from select element
-            $defaultTab.trigger('changeOption', [oldId, { id: newId, label: newLabel }]);
-
-            // If the default tab id was the old id, update the select element
-            if (view.model.defaultTabId == oldId) {
-                view.model.defaultTabId = newId;
-
-                $defaultTab.trigger('setValue', newId);
-            }
-        }
-
-        function onClickRemove($btn) {
-            var $chip = $btn.parents('.chip');
-            var id = $chip.attr('data-id');
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Remove the id from the tabs list
-            delete view.model.tabs[id];
-
-            // Remove the chip element
-            $chip.remove();
-
-            // Remove the tab from select element
-            $defaultTab.trigger('removeOption', id);
-
-            // If default tab id was this tab, revert to 'meta'
-            if (view.model.defaultTabId == id) {
-                view.model.defaultTabId = 'meta';
-
-                $defaultTab.trigger('setValue', 'meta');
-            }
-        }
-
-        function onClickAdd() {
-            var name = 'New tab';
-            var id = 'new-tab';
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Add new tab to model
-            view.model.tabs[id] = name;
-
-            // Redraw the tab editor
-            render();
-
-            // Add new tab to default tab select element
-            $defaultTab.trigger('addOption', { value: id, label: name });
-        }
-
-        function render() {
-            // Prepend parent tabs if applicable
-            if (view.model.parentSchemaId) {
-                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(function (parentSchema) {
-                    var parentTabs = parentSchema.tabs;
-
-                    $tabs.prepend(_.each(parentTabs, function (id, label) {
-                        return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
-                    }));
-                }).catch(UI.errorModal);
-            }
-
-            var $tabs = _.div({ class: 'chip-group' });
-
-            $element.html($tabs);
-
-            $tabs.append(_.each(view.model.tabs, function (id, label) {
-                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label }).change(function (e) {
-                    onInputChange($(this));
-                }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
-                    onClickRemove($(this));
-                })));
-            }));
-
-            if (!view.model.isLocked) {
-                $tabs.append(_.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd));
-            }
-        }
-
-        var $element = _.div({ class: 'tabs-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders the icon editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
-        if (this.model.isPropertyHidden('icon')) {
-            return;
-        }
-
-        var view = this;
-
-        function onClickBrowse() {
-            function onSearch() {
-                var query = modal.$element.find('.icon-search input').val().toLowerCase();
-
-                if (query.length > 2 || query.length == 0) {
-                    modal.$element.find('.btn-icon').each(function (i) {
-                        var $btn = $(this);
-                        var name = $btn.children('.icon-name').html();
-
-                        $btn.toggle(name.indexOf(query) > -1);
-                    });
-                }
-            }
-
-            var modal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-icon-picker',
-                    title: 'Pick an icon',
-                    body: [_.div({ class: 'icon-search' }, _.input({ type: 'text', class: 'form-control', placeholder: 'Search for icons' }).on('change', function (e) {
-                        onSearch();
-                    })), _.each(icons, function (i, icon) {
-                        function onClickButton() {
-                            view.model.icon = icon;
-
-                            view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
-
-                            modal.hide();
-                        }
-
-                        return _.button({ class: 'btn btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
-                    })]
-                }
-            });
-        }
-
-        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.isLocked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.isLocked, _.span({ class: 'fa fa-' + this.model.icon })));
-
-        return $element;
-    };
-
-    /**
-     * Renders the parent editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
-        var _this4 = this;
-
-        if (this.model.isPropertyHidden('parentSchemaId')) {
-            return;
-        }
-
-        var schemaOptions = [];
-
-        // Filter out irrelevant schemas, self and children of self
-        var excludedParents = {};
-        excludedParents[this.model.id] = true;
-
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            // Check if this Schema has a parent in the excluded list
-            // If so, add this id to the excluded list
-            // This is to prevent making a Schema a child of its own children
-            if (excludedParents[schema.parentSchemaId] == true) {
-                excludedParents[schema.id] = true;
-                continue;
-            }
-
-            // If this Schema is not of the same type as the model, or has the same id, exclude it
-            if (schema.type != this.model.type || schema.id == this.model.id) {
-                continue;
-            }
-
-            schemaOptions[schemaOptions.length] = {
-                label: schema.name,
-                value: schema.id
-            };
-        }
-
-        // Assign fallback schema name
-        var parentName = '(none)';
-
-        if (schemaOptions[this.model.parentSchemaId]) {
-            parentName = schemaOptions[this.model.parentSchemaId].name;
-        }
-
-        // Render element
-        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
-            if (!newValue) {
-                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
-            }
-
-            _this4.model.parentSchemaId = newValue;
-
-            return newValue;
-        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the default tab editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderDefaultTabEditor = function renderDefaultTabEditor() {
-        var _this5 = this;
-
-        if (this.model.isPropertyHidden('defaultTabId')) {
-            return;
-        }
-
-        var tabOptions = [{ value: 'meta', label: 'Meta' }];
-
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
-
-        for (var value in this.compiledSchema.tabs) {
-            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
-        }
-
-        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.isLocked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
-            _this5.model.defaultTabId = newValue;
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
-
-        return $element;
-    };
-
-    /**
-     * Renders the allowed child Schemas editor (ContentSchema only)
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderAllowedChildSchemasEditor = function renderAllowedChildSchemasEditor() {
-        if (this.model.isPropertyHidden('allowedChildSchemas')) {
-            return;
-        }
-
-        var view = this;
-
-        function onChange() {
-            view.model.allowedChildSchemas = [];
-
-            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function () {
-                view.model.allowedChildSchemas.push($(this).attr('data-id'));
-            });
-
-            render();
-        }
-
-        function onClickAdd() {
-            var newSchemaId = '';
-
-            for (var i in resources.schemas) {
-                var schema = resources.schemas[i];
-
-                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(schema.id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
-                    newSchemaId = schema.id;
-                    break;
-                }
-            }
-
-            if (newSchemaId) {
-                view.model.allowedChildSchemas.push(newSchemaId);
-
-                render();
-            }
-        }
-
-        function render() {
-            _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
-                try {
-                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.isLocked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
-                        if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
-                            return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
-                                e.preventDefault();
-
-                                var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-                                $btn.text($(this).text());
-                                $btn.attr('data-id', $(this).attr('data-id'));
-
-                                onChange();
-                            }));
-                        }
-                    })))).change(onChange), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        $schema.remove();
-
-                        onChange();
-                    })));
-
-                    return $schema;
-                } catch (e) {
-                    UI.errorModal(e);
-                }
-            }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
-        }
-
-        var $element = _.div({ class: 'allowed-child-schemas-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders the field properties editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-
-
-    SchemaEditor.prototype.renderFieldPropertiesEditor = function renderFieldPropertiesEditor() {
-        var _this6 = this;
-
-        if (this.model.type == 'content') {
-            if (!this.model.fields) {
-                this.model.fields = {};
-            }
-
-            if (!this.model.fields.properties) {
-                this.model.fields.properties = {};
-            }
-
-            this.jsonEditor = new JSONEditor({
-                model: this.model.fields.properties,
-                embedded: true
-            });
-
-            this.jsonEditor.on('change', function (newValue) {
-                _this6.model.fields.properties = newValue;
-            });
-        } else if (this.model.type == 'field') {
-            if (!this.model.config) {
-                this.model.config = {};
-            }
-
-            this.jsonEditor = new JSONEditor({
-                model: this.model.config,
-                embedded: true
-            });
-
-            this.jsonEditor.on('change', function (newValue) {
-                _this6.model.config = newValue;
-            });
-        }
-
-        var $element = _.div({ class: 'field-properties-editor' }, this.jsonEditor.$element);
-
-        return $element;
-    };
-
-    /**
-     * Render template editor
-     *
-     * @returns {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
-        var _this7 = this;
-
-        var $element = _.div({ class: 'field-properties-editor' });
-
-        setTimeout(function () {
-            _this7.templateEditor = CodeMirror($element[0], {
-                value: _this7.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-            });
-
-            _this7.templateEditor.on('change', function () {
-                _this7.model.previewTemplate = _this7.templateEditor.getDoc().getValue();
-            });
-        }, 1);
-
-        return $element;
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     * @param {Boolean} isVertical
-     *
-     * @return {HTMLElement} Editor element
-     */
-
-
-    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
-        if (!$content) {
-            return;
-        }
-
-        return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-    };
-
-    /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderFields = function renderFields() {
-        var id = parseInt(this.model.id);
-
-        var $element = _.div({ class: 'schema editor-body' });
-
-        $element.empty();
-
-        $element.append(this.renderField('Name', this.renderNameEditor()));
-        $element.append(this.renderField('Icon', this.renderIconEditor()));
-        $element.append(this.renderField('Parent', this.renderParentEditor()));
-
-        switch (this.model.type) {
-            case 'content':
-                $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
-                $element.append(this.renderField('Tabs', this.renderTabsEditor()));
-                $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
-
-                if (!this.model.isLocked) {
-                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
-                }
-
-                break;
-
-            case 'field':
-                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
-
-                if (!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
-                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
-                }
-
-                break;
-        }
-
-        return $element;
-    };
-
-    SchemaEditor.prototype.render = function render() {
-        var _this8 = this;
-
-        if (this.model instanceof Schema === false) {
-            this.model = SchemaHelper.getModel(this.model);
-        }
-
-        this.$element.toggleClass('locked', this.model.isLocked);
-
-        SchemaHelper.getSchemaWithParentFields(this.model.id).then(function (compiledSchema) {
-            _this8.compiledSchema = compiledSchema;
-
-            _.append(_this8.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this8.compiledSchema.icon }), _.h4(_this8.model.name)), _this8.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-                _this8.onClickAdvanced();
-            }), _.if(!_this8.model.isLocked, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-                _this8.onClickSave();
-            })))));
-        });
-    };
-
-    return SchemaEditor;
-}(Crisp.View);
-
-module.exports = SchemaEditor;
-
-/***/ }),
-/* 243 */
-/***/ (function(module, exports) {
-
-module.exports = {
-	"icons": [
-		"500px",
-		"adjust",
-		"adn",
-		"align-center",
-		"align-justify",
-		"align-left",
-		"align-right",
-		"amazon",
-		"ambulance",
-		"anchor",
-		"android",
-		"angellist",
-		"angle-double-down",
-		"angle-double-left",
-		"angle-double-right",
-		"angle-double-up",
-		"angle-down",
-		"angle-left",
-		"angle-right",
-		"angle-up",
-		"apple",
-		"archive",
-		"area-chart",
-		"arrow-circle-down",
-		"arrow-circle-left",
-		"arrow-circle-o-down",
-		"arrow-circle-o-left",
-		"arrow-circle-o-right",
-		"arrow-circle-o-up",
-		"arrow-circle-right",
-		"arrow-circle-up",
-		"arrow-down",
-		"arrow-left",
-		"arrow-right",
-		"arrow-up",
-		"arrows",
-		"arrows-alt",
-		"arrows-h",
-		"arrows-v",
-		"asterisk",
-		"at",
-		"automobile",
-		"backward",
-		"balance-scale",
-		"ban",
-		"bank",
-		"bar-chart",
-		"bar-chart-o",
-		"barcode",
-		"bars",
-		"battery-0",
-		"battery-1",
-		"battery-2",
-		"battery-3",
-		"battery-4",
-		"battery-empty",
-		"battery-full",
-		"battery-half",
-		"battery-quarter",
-		"battery-three-quarters",
-		"bed",
-		"beer",
-		"behance",
-		"behance-square",
-		"bell",
-		"bell-o",
-		"bell-slash",
-		"bell-slash-o",
-		"bicycle",
-		"binoculars",
-		"birthday-cake",
-		"bitbucket",
-		"bitbucket-square",
-		"bitcoin",
-		"black-tie",
-		"bluetooth",
-		"bluetooth-b",
-		"bold",
-		"bolt",
-		"bomb",
-		"book",
-		"bookmark",
-		"bookmark-o",
-		"briefcase",
-		"btc",
-		"bug",
-		"building",
-		"building-o",
-		"bullhorn",
-		"bullseye",
-		"bus",
-		"buysellads",
-		"cab",
-		"calculator",
-		"calendar",
-		"calendar-check-o",
-		"calendar-minus-o",
-		"calendar-o",
-		"calendar-plus-o",
-		"calendar-times-o",
-		"camera",
-		"camera-retro",
-		"car",
-		"caret-down",
-		"caret-left",
-		"caret-right",
-		"caret-square-o-down",
-		"caret-square-o-left",
-		"caret-square-o-right",
-		"caret-square-o-up",
-		"caret-up",
-		"cart-arrow-down",
-		"cart-plus",
-		"cc",
-		"cc-amex",
-		"cc-diners-club",
-		"cc-discover",
-		"cc-jcb",
-		"cc-mastercard",
-		"cc-paypal",
-		"cc-stripe",
-		"cc-visa",
-		"certificate",
-		"chain",
-		"chain-broken",
-		"check",
-		"check-circle",
-		"check-circle-o",
-		"check-square",
-		"check-square-o",
-		"chevron-circle-down",
-		"chevron-circle-left",
-		"chevron-circle-right",
-		"chevron-circle-up",
-		"chevron-down",
-		"chevron-left",
-		"chevron-right",
-		"chevron-up",
-		"child",
-		"chrome",
-		"circle",
-		"circle-o",
-		"circle-o-notch",
-		"circle-thin",
-		"clipboard",
-		"clock-o",
-		"clone",
-		"close",
-		"cloud",
-		"cloud-download",
-		"cloud-upload",
-		"cny",
-		"code",
-		"code-fork",
-		"codepen",
-		"codiepie",
-		"coffee",
-		"cog",
-		"cogs",
-		"columns",
-		"comment",
-		"comment-o",
-		"commenting",
-		"commenting-o",
-		"comments",
-		"comments-o",
-		"compass",
-		"compress",
-		"connectdevelop",
-		"contao",
-		"copy",
-		"copyright",
-		"creative-commons",
-		"credit-card",
-		"credit-card-alt",
-		"crop",
-		"crosshairs",
-		"css3",
-		"cube",
-		"cubes",
-		"cut",
-		"cutlery",
-		"dashboard",
-		"dashcube",
-		"database",
-		"dedent",
-		"delicious",
-		"desktop",
-		"deviantart",
-		"diamond",
-		"digg",
-		"dollar",
-		"dot-circle-o",
-		"download",
-		"dribbble",
-		"dropbox",
-		"drupal",
-		"edge",
-		"edit",
-		"eject",
-		"ellipsis-h",
-		"ellipsis-v",
-		"empire",
-		"envelope",
-		"envelope-o",
-		"envelope-square",
-		"eraser",
-		"eur",
-		"euro",
-		"exchange",
-		"exclamation",
-		"exclamation-circle",
-		"exclamation-triangle",
-		"expand",
-		"expeditedssl",
-		"external-link",
-		"external-link-square",
-		"eye",
-		"eye-slash",
-		"eyedropper",
-		"facebook",
-		"facebook-f",
-		"facebook-official",
-		"facebook-square",
-		"fast-backward",
-		"fast-forward",
-		"fax",
-		"feed",
-		"female",
-		"fighter-jet",
-		"file",
-		"file-archive-o",
-		"file-audio-o",
-		"file-code-o",
-		"file-excel-o",
-		"file-image-o",
-		"file-movie-o",
-		"file-o",
-		"file-pdf-o",
-		"file-photo-o",
-		"file-picture-o",
-		"file-powerpoint-o",
-		"file-sound-o",
-		"file-text",
-		"file-text-o",
-		"file-video-o",
-		"file-word-o",
-		"file-zip-o",
-		"files-o",
-		"film",
-		"filter",
-		"fire",
-		"fire-extinguisher",
-		"firefox",
-		"flag",
-		"flag-checkered",
-		"flag-o",
-		"flash",
-		"flask",
-		"flickr",
-		"floppy-o",
-		"folder",
-		"folder-o",
-		"folder-open",
-		"folder-open-o",
-		"font",
-		"fonticons",
-		"fort-awesome",
-		"forumbee",
-		"forward",
-		"foursquare",
-		"frown-o",
-		"futbol-o",
-		"gamepad",
-		"gavel",
-		"gbp",
-		"ge",
-		"gear",
-		"gears",
-		"genderless",
-		"get-pocket",
-		"gg",
-		"gg-circle",
-		"gift",
-		"git",
-		"git-square",
-		"github",
-		"github-alt",
-		"github-square",
-		"gittip",
-		"glass",
-		"globe",
-		"google",
-		"google-plus",
-		"google-plus-square",
-		"google-wallet",
-		"graduation-cap",
-		"gratipay",
-		"group",
-		"h-square",
-		"hacker-news",
-		"hand-grab-o",
-		"hand-lizard-o",
-		"hand-o-down",
-		"hand-o-left",
-		"hand-o-right",
-		"hand-o-up",
-		"hand-paper-o",
-		"hand-peace-o",
-		"hand-pointer-o",
-		"hand-rock-o",
-		"hand-scissors-o",
-		"hand-spock-o",
-		"hand-stop-o",
-		"hashtag",
-		"hdd-o",
-		"header",
-		"headphones",
-		"heart",
-		"heart-o",
-		"heartbeat",
-		"history",
-		"home",
-		"hospital-o",
-		"hotel",
-		"hourglass",
-		"hourglass-1",
-		"hourglass-2",
-		"hourglass-3",
-		"hourglass-end",
-		"hourglass-half",
-		"hourglass-o",
-		"hourglass-start",
-		"houzz",
-		"html5",
-		"i-cursor",
-		"ils",
-		"image",
-		"inbox",
-		"indent",
-		"industry",
-		"info",
-		"info-circle",
-		"inr",
-		"instagram",
-		"institution",
-		"internet-explorer",
-		"intersex",
-		"ioxhost",
-		"italic",
-		"joomla",
-		"jpy",
-		"jsfiddle",
-		"key",
-		"keyboard-o",
-		"krw",
-		"language",
-		"laptop",
-		"lastfm",
-		"lastfm-square",
-		"leaf",
-		"leanpub",
-		"legal",
-		"lemon-o",
-		"level-down",
-		"level-up",
-		"life-bouy",
-		"life-buoy",
-		"life-ring",
-		"life-saver",
-		"lightbulb-o",
-		"line-chart",
-		"link",
-		"linkedin",
-		"linkedin-square",
-		"linux",
-		"list",
-		"list-alt",
-		"list-ol",
-		"list-ul",
-		"location-arrow",
-		"lock",
-		"long-arrow-down",
-		"long-arrow-left",
-		"long-arrow-right",
-		"long-arrow-up",
-		"magic",
-		"magnet",
-		"mail-forward",
-		"mail-reply",
-		"mail-reply-all",
-		"male",
-		"map",
-		"map-marker",
-		"map-o",
-		"map-pin",
-		"map-signs",
-		"mars",
-		"mars-double",
-		"mars-stroke",
-		"mars-stroke-h",
-		"mars-stroke-v",
-		"maxcdn",
-		"meanpath",
-		"medium",
-		"medkit",
-		"meh-o",
-		"mercury",
-		"microphone",
-		"microphone-slash",
-		"minus",
-		"minus-circle",
-		"minus-square",
-		"minus-square-o",
-		"mixcloud",
-		"mobile",
-		"mobile-phone",
-		"modx",
-		"money",
-		"moon-o",
-		"mortar-board",
-		"motorcycle",
-		"mouse-pointer",
-		"music",
-		"navicon",
-		"neuter",
-		"newspaper-o",
-		"object-group",
-		"object-ungroup",
-		"odnoklassniki",
-		"odnoklassniki-square",
-		"opencart",
-		"openid",
-		"opera",
-		"optin-monster",
-		"outdent",
-		"pagelines",
-		"paint-brush",
-		"paper-plane",
-		"paper-plane-o",
-		"paperclip",
-		"paragraph",
-		"paste",
-		"pause",
-		"pause-circle",
-		"pause-circle-o",
-		"paw",
-		"paypal",
-		"pencil",
-		"pencil-square",
-		"pencil-square-o",
-		"percent",
-		"phone",
-		"phone-square",
-		"photo",
-		"picture-o",
-		"pie-chart",
-		"pied-piper",
-		"pied-piper-alt",
-		"pinterest",
-		"pinterest-p",
-		"pinterest-square",
-		"plane",
-		"play",
-		"play-circle",
-		"play-circle-o",
-		"plug",
-		"plus",
-		"plus-circle",
-		"plus-square",
-		"plus-square-o",
-		"power-off",
-		"print",
-		"product-hunt",
-		"puzzle-piece",
-		"qq",
-		"qrcode",
-		"question",
-		"question-circle",
-		"quote-left",
-		"quote-right",
-		"ra",
-		"random",
-		"rebel",
-		"recycle",
-		"reddit",
-		"reddit-alien",
-		"reddit-square",
-		"refresh",
-		"registered",
-		"remove",
-		"renren",
-		"reorder",
-		"repeat",
-		"reply",
-		"reply-all",
-		"retweet",
-		"rmb",
-		"road",
-		"rocket",
-		"rotate-left",
-		"rotate-right",
-		"rouble",
-		"rss",
-		"rss-square",
-		"rub",
-		"ruble",
-		"rupee",
-		"safari",
-		"save",
-		"scissors",
-		"scribd",
-		"search",
-		"search-minus",
-		"search-plus",
-		"sellsy",
-		"send",
-		"send-o",
-		"server",
-		"share",
-		"share-alt",
-		"share-alt-square",
-		"share-square",
-		"share-square-o",
-		"shekel",
-		"sheqel",
-		"shield",
-		"ship",
-		"shirtsinbulk",
-		"shopping-bag",
-		"shopping-basket",
-		"shopping-cart",
-		"sign-in",
-		"sign-out",
-		"signal",
-		"simplybuilt",
-		"sitemap",
-		"skyatlas",
-		"skype",
-		"slack",
-		"sliders",
-		"slideshare",
-		"smile-o",
-		"soccer-ball-o",
-		"sort",
-		"sort-alpha-asc",
-		"sort-alpha-desc",
-		"sort-amount-asc",
-		"sort-amount-desc",
-		"sort-asc",
-		"sort-desc",
-		"sort-down",
-		"sort-numeric-asc",
-		"sort-numeric-desc",
-		"sort-up",
-		"soundcloud",
-		"space-shuttle",
-		"spinner",
-		"spoon",
-		"spotify",
-		"square",
-		"square-o",
-		"stack-exchange",
-		"stack-overflow",
-		"star",
-		"star-half",
-		"star-half-empty",
-		"star-half-full",
-		"star-half-o",
-		"star-o",
-		"steam",
-		"steam-square",
-		"step-backward",
-		"step-forward",
-		"stethoscope",
-		"sticky-note",
-		"sticky-note-o",
-		"stop",
-		"stop-circle",
-		"stop-circle-o",
-		"street-view",
-		"strikethrough",
-		"stumbleupon",
-		"stumbleupon-circle",
-		"subscript",
-		"subway",
-		"suitcase",
-		"sun-o",
-		"superscript",
-		"support",
-		"table",
-		"tablet",
-		"tachometer",
-		"tag",
-		"tags",
-		"tasks",
-		"taxi",
-		"television",
-		"tencent-weibo",
-		"terminal",
-		"text-height",
-		"text-width",
-		"th",
-		"th-large",
-		"th-list",
-		"thumb-tack",
-		"thumbs-down",
-		"thumbs-o-down",
-		"thumbs-o-up",
-		"thumbs-up",
-		"ticket",
-		"times",
-		"times-circle",
-		"times-circle-o",
-		"tint",
-		"toggle-down",
-		"toggle-left",
-		"toggle-off",
-		"toggle-on",
-		"toggle-right",
-		"toggle-up",
-		"trademark",
-		"train",
-		"transgender",
-		"transgender-alt",
-		"trash",
-		"trash-o",
-		"tree",
-		"trello",
-		"tripadvisor",
-		"trophy",
-		"truck",
-		"try",
-		"tty",
-		"tumblr",
-		"tumblr-square",
-		"turkish-lira",
-		"tv",
-		"twitch",
-		"twitter",
-		"twitter-square",
-		"umbrella",
-		"underline",
-		"undo",
-		"university",
-		"unlink",
-		"unlock",
-		"unlock-alt",
-		"unsorted",
-		"upload",
-		"usb",
-		"usd",
-		"user",
-		"user-md",
-		"user-plus",
-		"user-secret",
-		"user-times",
-		"users",
-		"venus",
-		"venus-double",
-		"venus-mars",
-		"viacoin",
-		"video-camera",
-		"vimeo",
-		"vimeo-square",
-		"vine",
-		"vk",
-		"volume-down",
-		"volume-off",
-		"volume-up",
-		"warning",
-		"wechat",
-		"weibo",
-		"weixin",
-		"whatsapp",
-		"wheelchair",
-		"wifi",
-		"wikipedia-w",
-		"windows",
-		"won",
-		"wordpress",
-		"wrench",
-		"xing",
-		"xing-square",
-		"y-combinator",
-		"y-combinator-square",
-		"yahoo",
-		"yc",
-		"yc-square",
-		"yelp",
-		"yen",
-		"youtube",
-		"youtube-play",
-		"youtube-square"
-	]
-};
-
-/***/ }),
-/* 244 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44380,27 +45519,27 @@ module.exports = {
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(245),
-    BooleanEditor: __webpack_require__(246),
-    ContentReferenceEditor: __webpack_require__(247),
-    ContentSchemaReferenceEditor: __webpack_require__(248),
-    DateEditor: __webpack_require__(249),
-    DropdownEditor: __webpack_require__(250),
+    ArrayEditor: __webpack_require__(255),
+    BooleanEditor: __webpack_require__(256),
+    ContentReferenceEditor: __webpack_require__(257),
+    ContentSchemaReferenceEditor: __webpack_require__(258),
+    DateEditor: __webpack_require__(259),
+    DropdownEditor: __webpack_require__(260),
     FieldEditor: __webpack_require__(11),
-    LanguageEditor: __webpack_require__(251),
-    MediaReferenceEditor: __webpack_require__(252),
-    NumberEditor: __webpack_require__(253),
-    ResourceReferenceEditor: __webpack_require__(254),
-    RichTextEditor: __webpack_require__(255),
-    StringEditor: __webpack_require__(256),
-    StructEditor: __webpack_require__(257),
-    TagsEditor: __webpack_require__(258),
-    TemplateReferenceEditor: __webpack_require__(259),
-    UrlEditor: __webpack_require__(260)
+    LanguageEditor: __webpack_require__(261),
+    MediaReferenceEditor: __webpack_require__(262),
+    NumberEditor: __webpack_require__(263),
+    ResourceReferenceEditor: __webpack_require__(264),
+    RichTextEditor: __webpack_require__(265),
+    StringEditor: __webpack_require__(266),
+    StructEditor: __webpack_require__(267),
+    TagsEditor: __webpack_require__(268),
+    TemplateReferenceEditor: __webpack_require__(269),
+    UrlEditor: __webpack_require__(270)
 };
 
 /***/ }),
-/* 245 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44418,7 +45557,7 @@ var FieldEditor = __webpack_require__(11);
 var SchemaHelper = __webpack_require__(16);
 var MediaHelper = __webpack_require__(38);
 var ContentHelper = __webpack_require__(41);
-var ContentEditor = __webpack_require__(187);
+var ContentEditor = __webpack_require__(188);
 
 /**
  * An array editor for editing a list of other field values
@@ -44431,7 +45570,9 @@ var ContentEditor = __webpack_require__(187);
  *         "tabId": "content",
  *         "schemaId": "array",
  *         "config": {
- *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ],
+ *             "minItems": 5,
+ *             "maxItems": 5
  *         }
  *     }
  * }
@@ -44443,376 +45584,81 @@ var ContentEditor = __webpack_require__(187);
 var ArrayEditor = function (_FieldEditor) {
     _inherits(ArrayEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function ArrayEditor(params) {
         _classCallCheck(this, ArrayEditor);
 
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'array-editor field-editor' });
-
-        _this.$keyContent = _.div({ class: 'array-field-key' }, _.div({ class: 'widget-sorting' }, _.button({ class: 'btn btn-default' }, 'Done').click(function () {
-            _this.onClickSort();
-        })), _.div({ class: 'widget-default' }, _.button({ class: 'btn btn-default' }, 'Sort').click(function () {
-            _this.onClickSort();
-        }), _.button({ class: 'default btn btn-default' }, 'Collapse').click(function () {
-            _this.onClickCollapseAll();
-        }), _.button({ class: 'btn btn-default' }, 'Expand').click(function () {
-            _this.onClickExpandAll();
-        })));
-
-        _this.fetch();
+        _this.init();
         return _this;
     }
 
     /**
-     * Event: Click expand all items
-     */
-
-
-    ArrayEditor.prototype.onClickExpandAll = function onClickExpandAll() {
-        this.$element.find('.item').each(function (e, element) {
-            $(element).toggleClass('collapsed', false);
-        });
-    };
-
-    /**
-     * Event: Click collapse all items
-     */
-
-
-    ArrayEditor.prototype.onClickCollapseAll = function onClickCollapseAll() {
-        this.$element.find('.item').each(function (e, element) {
-            $(element).toggleClass('collapsed', true);
-        });
-    };
-
-    /**
-     * Event: Click remove item
+     * Render key actions
      *
-     * @param {HTMLElement} element
+     * @returns {HTMLElement} Actions
      */
 
 
-    ArrayEditor.prototype.onClickRemoveItem = function onClickRemoveItem($element) {
-        var i = $element.attr('data-index');
-
-        this.value.splice(i, 1);
-
-        $element.remove();
-
-        this.updateDOMIndices();
-    };
-
-    /**
-     * Event: Click add item
-     */
-
-
-    ArrayEditor.prototype.onClickAddItem = function onClickAddItem() {
-        var index = this.value.length;
-
-        if (this.config.maxItems && index >= this.config.maxItems) {
-            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
-            return;
-        }
-
-        this.value[index] = { value: null, schemaId: null };
-
-        this.$element.children('.items').append(this.renderItem(index));
-
-        this.updateDOMIndices();
-    };
-
-    /**
-     * Event: Change value
-     *
-     * @param {Object} newValue
-     * @param {Number} index
-     * @param {Schema} itemSchema
-     */
-
-
-    ArrayEditor.prototype.onChangeValue = function onChangeValue(newValue, i, itemSchema) {
-        if (itemSchema.multilingual) {
-            // Sanity check to make sure multilingual fields are accomodated for
-            if (!this.value[i] || _typeof(this.value[i]) !== 'object') {
-                this.value[i] = { value: null, schemaId: null };
-            }
-
-            this.value[i].value._multilingual = true;
-            this.value[i].value[window.language] = newValue;
-        } else {
-            this.value[i].value = newValue;
-        }
-    };
-
-    /**
-     * Event: Change
-     */
-
-
-    ArrayEditor.prototype.onChange = function onChange(newValue, i, itemSchema) {
-        this.onChangeValue(newValue, i, itemSchema);
-
-        this.trigger('change', this.value);
-    };
-
-    /**
-     * Event: Silent change
-     */
-
-
-    ArrayEditor.prototype.onSilentChange = function onSilentChange(newValue, i, itemSchema) {
-        this.onChangeValue(newValue, i, itemSchema);
-
-        this.trigger('silentchange', this.value);
-    };
-
-    /**
-     * Event: Click sort
-     */
-
-
-    ArrayEditor.prototype.onClickSort = function onClickSort() {
+    ArrayEditor.prototype.renderKeyActions = function renderKeyActions() {
         var _this2 = this;
 
-        this.$element.toggleClass('sorting');
+        return [_.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+            HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
+                _this2.value = newArray;
 
-        var isSorting = this.$element.hasClass('sorting');
-
-        this.$keyContent.toggleClass('sorting', isSorting);
-
-        if (isSorting) {
-            this.$element.children('.items').children('.item').each(function (oldIndex, item) {
-                $(item).crdragdrop({
-                    lockX: true,
-                    dropContainers: _this2.$element[0].querySelectorAll('.items'),
-                    scrollContainer: document.querySelector('.content-editor .tab-content'),
-                    onEndDrag: function onEndDrag(instance) {
-                        _this2.updateDOMIndices();
-
-                        var newIndex = parseInt(instance.element.dataset.index);
-
-                        // Change the index in the items array
-                        var item = _this2.value[oldIndex];
-                        _this2.value.splice(oldIndex, 1);
-                        _this2.value.splice(newIndex, 0, item);
-
-                        _this2.trigger('change', _this2.value);
-                    }
-                });
+                _this2.trigger('change', _this2.value);
             });
-        } else {
-            this.updateDOMIndices();
+        }), _.button({ class: 'editor__field__key__action editor__field__key__action--collapse' }).click(function (e) {
+            var isCollapsed = !e.currentTarget.classList.contains('collapsed');
 
-            this.$element.children('.items').children('.item').each(function () {
-                $(this).crdragdrop('destroy');
-            });
-        }
+            e.currentTarget.classList.toggle('collapsed', isCollapsed);
+            $(e.currentTarget).parents('.editor__field').children('.editor__field__value')[0].classList.toggle('collapsed', isCollapsed);
+        })];
     };
 
     /**
-     * Updates DOM indices
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
      */
 
 
-    ArrayEditor.prototype.updateDOMIndices = function updateDOMIndices() {
-        this.$element.children('.items').children('.item').each(function (i, element) {
-            element.dataset.index = i;
-        });
-    };
-
-    /**
-     * Renders an item
-     *
-     * @param {Number} index
-     *
-     * @returns {HTMLElement} Item
-     */
-
-
-    ArrayEditor.prototype.renderItem = function renderItem(index) {
-        var _this3 = this;
-
-        var $element = _.div({ class: 'item raised', 'data-index': index });
-
-        // Returns the correct index, even if it's updated
-        var getIndex = function getIndex() {
-            return parseInt($element.attr('data-index'));
-        };
-
-        // Renders this item
-        var rerenderItem = function rerenderItem() {
-            // Check if item exists
-            var item = _this3.value[getIndex()];
-
-            if (!item) {
-                return UI.errorModal(new Error('Index "' + getIndex() + '" is out of bounds'));
+    ArrayEditor.renderConfigEditor = function renderConfigEditor(config) {
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Min items'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            min: 0,
+            step: 1,
+            tooltip: 'How many items are required in this array (0 is unlimited)',
+            value: config.minItems || 0,
+            onChange: function onChange(newValue) {
+                config.minItems = newValue;
             }
-
-            // Account for large arrays
-            if (_this3.value.length >= 20) {
-                $element.addClass('collapsed');
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Max items'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            min: 0,
+            step: 1,
+            tooltip: 'How many items are allowed in this array (0 is unlimited)',
+            value: config.maxItems || 0,
+            onChange: function onChange(newValue) {
+                config.maxItems = newValue;
             }
-
-            var itemSchemaId = _this3.value[getIndex()].schemaId;
-
-            // Schema could not be found, assign first allowed Schema
-            if (!itemSchemaId || _this3.config.allowedSchemas.indexOf(itemSchemaId) < 0) {
-                itemSchemaId = _this3.config.allowedSchemas[0];
-                _this3.value[getIndex()].schemaId = itemSchemaId;
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            useMultiple: true,
+            labelKey: 'name',
+            valueKey: 'id',
+            value: config.allowedSchemas,
+            useClearButton: true,
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+            onChange: function onChange(newValue) {
+                config.allowedSchemas = newValue;
             }
-
-            // Assign the Schema id as a DOM attribute
-            $element.attr('data-schema', itemSchemaId);
-
-            // Make sure we have the item schema and the editor we need for each array item
-            var itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
-
-            if (!itemSchema) {
-                return UI.errorModal(new Error('Schema by id "' + itemSchemaId + '" not found'));
-            }
-
-            var fieldEditor = ContentEditor.getFieldEditor(itemSchema.editorId);
-
-            if (!fieldEditor) {
-                return UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
-            }
-
-            // Perform sanity check on item value
-            item.value = ContentHelper.fieldSanityCheck(item.value, itemSchema);
-
-            // Create dropdown array for Schema selector
-            var dropdownOptions = [];
-
-            for (var _iterator = _this3.config.allowedSchemas, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var allowedSchemaId = _ref;
-
-                var allowedSchema = SchemaHelper.getSchemaByIdSync(allowedSchemaId);
-
-                dropdownOptions[dropdownOptions.length] = {
-                    value: allowedSchema.id,
-                    label: allowedSchema.name,
-                    selected: allowedSchema.id == itemSchemaId
-                };
-            }
-
-            // Render the Schema selector
-            var $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
-                // Set new value in Schema bindings
-                item.schemaId = newValue;
-
-                // Re-render this item
-                rerenderItem();
-            })));
-
-            // Set schema label (used when sorting items)
-            var schemaLabel = '';
-
-            // Get the label from the item
-            // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
-            if (item.value) {
-                // This item is a string
-                if (typeof item.value === 'string') {
-                    // This item is an id
-                    if (item.value.length === 40) {
-                        var content = ContentHelper.getContentByIdSync(item.value);
-
-                        if (content) {
-                            schemaLabel = content.prop('title', window.language) || content.id || schemaLabel;
-                        } else {
-                            var media = MediaHelper.getMediaByIdSync(item.value);
-
-                            if (media) {
-                                schemaLabel = media.name || media.url || schemaLabel;
-                            }
-                        }
-
-                        // This item is another type of string
-                    } else {
-                        schemaLabel = item.value || schemaLabel;
-                    }
-
-                    // This item is a struct
-                } else if (item instanceof Object) {
-                    // Try to get a field based on the usual suspects
-                    schemaLabel = item.value.name || item.value.title || item.value.text || item.value.heading || item.value.header || item.value.body || item.value.description || item.value.type || item.value.body || item.value.id || schemaLabel;
-
-                    if (!schemaLabel) {
-                        // Find the first available field
-                        for (var configKey in itemSchema.config || {}) {
-                            var configValue = itemSchema.config[configKey];
-
-                            // If a label field was found, check if it has a value
-                            if (item.value[configKey]) {
-                                schemaLabel = item.value[configKey] || schemaLabel;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // If the schema label is multilingual, pick the appropriate string
-            if (schemaLabel && schemaLabel._multilingual) {
-                schemaLabel = schemaLabel[window.language];
-            }
-
-            // If no schema label was found, or it's not a string, resort to generic naming
-            if (!schemaLabel || typeof schemaLabel !== 'string') {
-                schemaLabel = 'Item #' + (getIndex() + 1);
-
-                // Add the Schema name in case we don't find the label field
-                if (itemSchema) {
-                    schemaLabel += ' (' + itemSchema.name + ')';
-                }
-            }
-
-            // Create label element 
-            var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
-
-            // Expanding/collapsing an item
-            var $btnToggle = _.button({ title: 'Collapse/expand item', class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
-                $element.toggleClass('collapsed');
-            });
-
-            // Init the field editor
-            var fieldEditorInstance = new fieldEditor({
-                value: itemSchema.multilingual ? item.value[window.language] : item.value,
-                disabled: itemSchema.disabled || false,
-                config: itemSchema.config || {},
-                schema: itemSchema
-            });
-
-            // Hook up the change events
-            fieldEditorInstance.on('change', function (newValue) {
-                _this3.onChange(newValue, getIndex(), itemSchema);
-            });
-
-            fieldEditorInstance.on('silentchange', function (newValue) {
-                _this3.onSilentChange(newValue, getIndex(), itemSchema);
-            });
-
-            // Render the DOM element
-            _.append($element.empty(), $btnToggle, _.button({ title: 'Remove item', class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                _this3.onClickRemoveItem($element);
-            }), $schemaLabel, _this3.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
-        };
-
-        rerenderItem();
-
-        return $element;
+        }).$element))];
     };
 
     /**
@@ -44821,7 +45667,7 @@ var ArrayEditor = function (_FieldEditor) {
 
 
     ArrayEditor.prototype.sanityCheck = function sanityCheck() {
-        var _this4 = this;
+        var _this3 = this;
 
         // The value was null
         if (!this.value) {
@@ -44864,45 +45710,127 @@ var ArrayEditor = function (_FieldEditor) {
             this.value = newItems;
 
             setTimeout(function () {
-                _this4.trigger('change', _this4.value);
+                _this3.trigger('change', _this3.value);
             }, 500);
+        }
+
+        // The value was below the required amount
+        if (this.value.length < this.config.minItems) {
+            var diff = this.config.minItems - this.value.items.length;
+
+            for (var _i = 0; _i < diff; _i++) {
+                this.value.push({ value: null, schemaId: null });
+            }
+        }
+
+        // The value was above the required amount
+        if (this.value.length > this.config.maxItems) {
+            for (var _i2 = this.config.maxItems; _i2 < this.value.length; _i2++) {
+                delete this.value[_i2];
+            }
         }
     };
 
-    ArrayEditor.prototype.render = function render() {
-        var _this5 = this;
+    /**
+     * Prerender
+     */
 
-        // Perform sanity check
+
+    ArrayEditor.prototype.prerender = function prerender() {
         this.sanityCheck();
+    };
 
-        // Render editor
-        _.append(this.$element.empty(), _.div({ class: 'items' }),
+    /**
+     * Renders this editor
+     */
 
-        // Render the add item button
-        _.button({ title: 'Add item', class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-            _this5.onClickAddItem();
-        }));
 
-        // Render items asynchronously to accommodate for large arrays
-        var renderNextItem = function renderNextItem(i) {
-            // Update DOM indices after all items have been rendered
-            if (i >= _this5.value.length) {
-                _this5.updateDOMIndices();
+    ArrayEditor.prototype.template = function template() {
+        var _this4 = this;
 
-                ContentEditor.restoreScrollPos();
+        return _.div({ class: 'editor__field__value segmented' }, _.each(this.value, function (i, item) {
+            // Render field
+            var $field = _.div({ class: 'editor__field' });
+
+            var renderField = function renderField() {
+                var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+
+                // Schema could not be found, assign first allowed Schema
+                if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+                    item.schemaId = _this4.config.allowedSchemas[0];
+
+                    schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                }
+
+                // Obtain the field editor
+                if (schema.editorId.indexOf('Editor') < 0) {
+                    schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+                }
+
+                var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                if (!editorClass) {
+                    UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
+                    return;
+                }
+
+                // Perform sanity check on item value
+                item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+
+                // Instantiate editor
+                var editorInstance = new editorClass({
+                    value: item.value,
+                    config: schema.config,
+                    schema: schema
+                });
+
+                editorInstance.on('change', function (newValue) {
+                    item.value = newValue;
+                });
+
+                // Render Schema picker
+                editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    value: item.schemaId,
+                    valueKey: 'id',
+                    labelKey: 'name',
+                    options: resources.schemas.filter(function (schema) {
+                        return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
+                    }),
+                    onChange: function onChange(newSchemaId) {
+                        item.schemaId = newSchemaId;
+
+                        renderField();
+
+                        _this4.trigger('change', _this4.value);
+                    }
+                }))));
+
+                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                    _this4.value.splice(i, 1);
+
+                    _this4.trigger('change', _this4.value);
+
+                    _this4.init();
+                }));
+            };
+
+            renderField();
+
+            return $field;
+        }), _.button({ title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus' }).click(function () {
+            var index = _this4.value.length;
+
+            if (_this4.config.maxItems && index >= _this4.config.maxItems) {
+                UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this4.config.maxItems + ' items here');
                 return;
             }
 
-            // Append the item to the DOM
-            _this5.$element.children('.items').append(_this5.renderItem(i));
+            _this4.value[index] = { value: null, schemaId: null };
 
-            // Render next item in the next CPU cycle
-            setTimeout(function () {
-                renderNextItem(i + 1);
-            }, 1);
-        };
+            _this4.trigger('change', _this4.value);
 
-        renderNextItem(0);
+            _this4.init();
+        }));
     };
 
     return ArrayEditor;
@@ -44911,7 +45839,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 246 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44945,39 +45873,49 @@ var FieldEditor = __webpack_require__(11);
 var BooleanEditor = function (_FieldEditor) {
     _inherits(BooleanEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function BooleanEditor(params) {
         _classCallCheck(this, BooleanEditor);
 
+        // Sanity check
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
+
+        if (typeof _this.value === 'undefined') {
+            _this.value = false;
+        } else if (typeof _this.value === 'string') {
+            _this.value = _this.value == 'true';
+        } else if (typeof _this.value !== 'boolean') {
+            _this.value = false;
+        }
+
+        // Just to make sure the model has the right type of value
+        setTimeout(function () {
+            _this.trigger('silentchange', _this.value);
+        }, 20);
 
         _this.init();
         return _this;
     }
 
-    BooleanEditor.prototype.render = function render() {
+    /**
+     * Render this editor
+     */
+
+
+    BooleanEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // Sanity check
-        if (typeof this.value === 'undefined') {
-            this.value = false;
-        } else if (typeof this.value === 'string') {
-            this.value = this.value == 'true';
-        } else if (typeof this.value !== 'boolean') {
-            this.value = false;
-        }
+        return new HashBrown.Views.Widgets.Input({
+            type: 'checkbox',
+            value: this.value,
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-        this.$element = _.div({ class: 'field-editor switch-editor' },
-        // Render preview
-        this.renderPreview(), UI.inputSwitch(this.value, function (newValue) {
-            _this2.value = newValue;
-
-            _this2.trigger('change', _this2.value);
-        }));
-
-        // Just to make sure the model has the right type of value
-        setTimeout(function () {
-            _this2.trigger('silentchange', _this2.value);
-        }, 20);
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element;
     };
 
     return BooleanEditor;
@@ -44986,7 +45924,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 247 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45088,6 +46026,35 @@ var ContentReferenceEditor = function (_FieldEditor) {
         return allowedContent;
     };
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    ContentReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.allowedSchemas = config.allowedSchemas || [];
+
+        return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+            useMultiple: true,
+            useClearButton: true,
+            valueKey: 'id',
+            labelKey: 'name',
+            onChange: function onChange(newValue) {
+                config.allowedSchemas = newValue;
+            }
+        }).$element));
+    };
+
+    /**
+     * Render this editor
+     */
+
+
     ContentReferenceEditor.prototype.render = function render() {
         var _this2 = this;
 
@@ -45108,7 +46075,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 248 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45262,6 +46229,35 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
         return contentSchemas;
     };
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    ContentSchemaReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.allowedSchemas = config.allowedSchemas || [];
+
+        return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+            useMultiple: true,
+            useClearButton: true,
+            valueKey: 'id',
+            labelKey: 'name',
+            onChange: function onChange(newValue) {
+                config.allowedSchemas = newValue;
+            }
+        }).$element));
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
     ContentSchemaReferenceEditor.prototype.render = function render() {
         var _this2 = this;
 
@@ -45278,7 +46274,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 249 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45517,7 +46513,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 250 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45585,6 +46581,34 @@ var DropdownEditor = function (_FieldEditor) {
         this.trigger('change', this.value);
     };
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    DropdownEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.options = config.options || [];
+
+        return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Options'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            value: config.options,
+            valueKey: 'value',
+            labelKey: 'label',
+            placeholder: 'New option',
+            onChange: function onChange(newValue) {
+                config.options = newValue;
+            }
+        }).$element));
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
     DropdownEditor.prototype.render = function render() {
         var _this2 = this;
 
@@ -45633,7 +46657,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 251 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45728,7 +46752,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 252 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45743,7 +46767,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Media = __webpack_require__(27);
 var MediaHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
-var MediaBrowser = __webpack_require__(211);
+var MediaBrowser = __webpack_require__(214);
 
 var FieldEditor = __webpack_require__(11);
 
@@ -45845,7 +46869,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 253 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45869,7 +46893,7 @@ var FieldEditor = __webpack_require__(11);
  *         "label": "My number",
  *         "tabId": "content",
  *         "schemaId": "number",
- *         {
+ *         "config": {
  *             "step": 0.5
  *         }
  *     }
@@ -45902,15 +46926,76 @@ var NumberEditor = function (_FieldEditor) {
         this.trigger('change', this.value);
     };
 
-    NumberEditor.prototype.render = function render() {
-        var editor = this;
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
 
-        // Main element
-        this.$element = _.div({ class: 'field-editor string-editor' },
-        // Render preview
-        this.renderPreview(), _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any' }).on('change propertychange paste keyup', function () {
-            editor.onChange();
-        })));
+
+    NumberEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.step = config.step || 'any';
+
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Step'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            step: 'any',
+            tooltip: 'The division by which the input number is allowed (0 is any division)',
+            value: config.step === 'any' ? 0 : config.step,
+            onChange: function onChange(newValue) {
+                if (newValue == 0) {
+                    newValue = 'any';
+                }
+
+                config.step = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Min value'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'The minimum required value',
+            type: 'number',
+            step: 'any',
+            value: config.min || 0,
+            onChange: function onChange(newValue) {
+                config.min = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Max value'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'The maximum allowed value (0 is infinite)',
+            type: 'number',
+            step: 'any',
+            value: config.max || 0,
+            onChange: function onChange(newValue) {
+                config.max = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is slider'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            tooltip: 'Whether or not this number should be edited as a range slider',
+            type: 'checkbox',
+            value: config.isSlider || false,
+            onChange: function onChange(newValue) {
+                config.isSlider = newValue;
+            }
+        }).$element))];
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    NumberEditor.prototype.template = function template() {
+        var _this2 = this;
+
+        return new HashBrown.Views.Widgets.Input({
+            value: this.value,
+            type: this.config.isSlider ? 'range' : 'number',
+            step: this.config.step || 'any',
+            min: this.config.min || '0',
+            max: this.config.max || '0',
+            onChange: function onChange(newValue) {
+                _this2.value = parseFloat(newValue);
+
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element;
     };
 
     return NumberEditor;
@@ -45919,7 +47004,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 254 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45950,6 +47035,38 @@ var ResourceReferenceEditor = function (_FieldEditor) {
         _this.init();
         return _this;
     }
+
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    ResourceReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.resourceKeys = config.resourceKeys || [];
+
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Resource'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            value: config.resource,
+            options: Object.keys(resources),
+            onChange: function onChange(newValue) {
+                config.resource = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Resource keys'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            value: config.resourceKeys,
+            placeholder: 'keyName',
+            onChange: function onChange(newValue) {
+                config.resourceKeys = newValue;
+            }
+        }).$element))];
+    };
+
+    /**
+     * Renders this editor
+     */
+
 
     ResourceReferenceEditor.prototype.render = function render() {
         var resource = resources[this.config.resource];
@@ -46007,7 +47124,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 255 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46088,33 +47205,11 @@ var RichTextEditor = function (_FieldEditor) {
 
 
     RichTextEditor.prototype.onClickTab = function onClickTab(source) {
-        var _this2 = this;
-
         this.silentChange = true;
 
-        switch (source) {
-            case 'wysiwyg':
-                this.wysiwyg.setData(this.value);
-                break;
-
-            case 'html':
-                this.html.getDoc().setValue(this.value);
-
-                setTimeout(function () {
-                    _this2.html.refresh();
-                }, 1);
-                break;
-
-            case 'markdown':
-                this.markdown.getDoc().setValue(toMarkdown(this.value));
-
-                setTimeout(function () {
-                    _this2.markdown.refresh();
-                }, 1);
-                break;
-        }
-
         document.cookie = 'rteview = ' + source;
+
+        this.init();
     };
 
     /**
@@ -46123,7 +47218,7 @@ var RichTextEditor = function (_FieldEditor) {
 
 
     RichTextEditor.prototype.onClickInsertMedia = function onClickInsertMedia() {
-        var _this3 = this;
+        var _this2 = this;
 
         var mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
@@ -46141,42 +47236,43 @@ var RichTextEditor = function (_FieldEditor) {
 
                 switch (source) {
                     case 'wysiwyg':
-                        _this3.wysiwyg.insertHtml(html);
+                        _this2.wysiwyg.insertHtml(html);
                         break;
 
                     case 'html':
-                        _this3.html.replaceSelection(html, 'end');
+                        _this2.html.replaceSelection(html, 'end');
                         break;
 
                     case 'markdown':
-                        _this3.markdown.replaceSelection(toMarkdown(html), 'end');
+                        _this2.markdown.replaceSelection(toMarkdown(html), 'end');
                         break;
                 }
             }).catch(UI.errorModal);
         });
     };
 
-    RichTextEditor.prototype.render = function render() {
-        var _this4 = this;
+    /**
+     * Gets the tab content
+     *
+     * @returns {HTMLElement} Tab content
+     */
 
-        var $wysiwyg = void 0;
-        var $markdown = void 0;
-        var $html = void 0;
 
-        var activeView = getCookie('rteview') || 'wysiwyg';
+    RichTextEditor.prototype.getTabContent = function getTabContent() {
+        return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+    };
 
-        // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
-            return _.li({ class: activeView == alias ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + _this4.guid + '-' + alias }, label).click(function () {
-                _this4.onClickTab(alias);
-            }));
-        }), _.button({ class: 'btn btn-primary btn-insert-media' }, 'Add media').click(function () {
-            _this4.onClickInsertMedia();
-        })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '') }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '') }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '') }, $html = _.textarea({}))));
+    /**
+     * Initialises the HTML editor
+     */
 
-        // Init HTML editor
+
+    RichTextEditor.prototype.initHtmlEditor = function initHtmlEditor() {
+        var _this3 = this;
+
         setTimeout(function () {
-            _this4.html = CodeMirror.fromTextArea($html[0], {
+            // Kepp reference to editor
+            _this3.html = CodeMirror.fromTextArea(_this3.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'xml'
@@ -46186,23 +47282,31 @@ var RichTextEditor = function (_FieldEditor) {
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: 'default',
-                value: _this4.value
+                value: _this3.value
             });
 
-            _this4.html.on('change', function () {
-                _this4.onChange(_this4.html.getDoc().getValue());
+            // Change event
+            _this3.html.on('change', function () {
+                _this3.onChange(_this3.html.getDoc().getValue());
             });
 
-            // Set value
-            if (activeView == 'html') {
-                _this4.silentChange = true;
-                _this4.html.getDoc().setValue(_this4.value);
-            }
+            // Set value initially
+            _this3.silentChange = true;
+            _this3.html.getDoc().setValue(_this3.value);
         }, 1);
+    };
 
-        // Init markdown editor
+    /**
+     * Initialises the markdown editor
+     */
+
+
+    RichTextEditor.prototype.initMarkdownEditor = function initMarkdownEditor() {
+        var _this4 = this;
+
         setTimeout(function () {
-            _this4.markdown = CodeMirror.fromTextArea($markdown[0], {
+            // Keep reference to editor
+            _this4.markdown = CodeMirror.fromTextArea(_this4.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'markdown'
@@ -46215,99 +47319,159 @@ var RichTextEditor = function (_FieldEditor) {
                 value: toMarkdown(_this4.value)
             });
 
+            // Change event
             _this4.markdown.on('change', function () {
                 _this4.onChange(marked(_this4.markdown.getDoc().getValue()));
             });
 
-            // Set value
-            if (activeView == 'markdown') {
-                _this4.silentChange = true;
-                _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
-            }
+            // Set value initially
+            _this4.silentChange = true;
+            _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
         }, 1);
+    };
 
-        // Init WYSIWYG editor
-        this.wysiwyg = CKEDITOR.replace($wysiwyg[0], {
-            removePlugins: 'contextmenu,liststyle,tabletools',
-            allowedContent: true,
-            height: 400,
-            toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
+    /**
+     * Initialises the WYSIWYG editor
+     */
 
-            extraPlugins: 'justify,divarea',
 
-            removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+    RichTextEditor.prototype.initWYSIWYGEditor = function initWYSIWYGEditor() {
+        var _this5 = this;
 
-            removeDialogTabs: 'image:advanced;link:advanced'
-        });
+        setTimeout(function () {
+            _this5.wysiwyg = CKEDITOR.replace(_this5.getTabContent(), {
+                removePlugins: 'contextmenu,liststyle,tabletools',
+                allowedContent: true,
+                height: 400,
+                toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
-        this.wysiwyg.on('change', function () {
-            _this4.onChange(_this4.wysiwyg.getData());
-        });
+                extraPlugins: 'justify,divarea',
 
-        this.wysiwyg.on('instanceReady', function () {
-            // Strips the style information
-            var stripStyle = function stripStyle(element) {
-                delete element.attributes.style;
-            };
+                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-            // Filtering rules
-            _this4.wysiwyg.dataProcessor.dataFilter.addRules({
-                elements: {
-                    // Strip styling from these elements
-                    p: stripStyle,
-                    h1: stripStyle,
-                    h2: stripStyle,
-                    h3: stripStyle,
-                    h4: stripStyle,
-                    h5: stripStyle,
-                    h6: stripStyle,
-                    span: stripStyle,
-                    div: stripStyle,
-                    section: stripStyle,
-                    hr: stripStyle,
-                    header: stripStyle,
-                    aside: stripStyle,
-                    footer: stripStyle,
-                    ul: stripStyle,
-                    li: stripStyle,
-                    blockquote: stripStyle,
-
-                    // Refactor image src url to fit MediaController
-                    img: function img(element) {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if (element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-
-                            // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        }
-                    },
-
-                    // Refactor video src url to fit MediaController
-                    video: function video(element) {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if (element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-
-                            // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        }
-                    }
-                }
+                removeDialogTabs: 'image:advanced;link:advanced'
             });
 
-            // Set value
-            if (activeView == 'wysiwyg') {
-                _this4.silentChange = true;
-                _this4.wysiwyg.setData(_this4.value);
-            }
-        });
+            _this5.wysiwyg.on('change', function () {
+                _this5.onChange(_this5.wysiwyg.getData());
+            });
+
+            _this5.wysiwyg.on('instanceReady', function () {
+                // Strips the style information
+                var stripStyle = function stripStyle(element) {
+                    delete element.attributes.style;
+                };
+
+                // Filtering rules
+                _this5.wysiwyg.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        // Strip styling from these elements
+                        p: stripStyle,
+                        h1: stripStyle,
+                        h2: stripStyle,
+                        h3: stripStyle,
+                        h4: stripStyle,
+                        h5: stripStyle,
+                        h6: stripStyle,
+                        span: stripStyle,
+                        div: stripStyle,
+                        section: stripStyle,
+                        hr: stripStyle,
+                        header: stripStyle,
+                        aside: stripStyle,
+                        footer: stripStyle,
+                        ul: stripStyle,
+                        li: stripStyle,
+                        blockquote: stripStyle,
+
+                        // Refactor image src url to fit MediaController
+                        img: function img(element) {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if (element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+
+                                // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            }
+                        },
+
+                        // Refactor video src url to fit MediaController
+                        video: function video(element) {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if (element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+
+                                // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            }
+                        }
+                    }
+                });
+
+                // Set value initially
+                _this5.silentChange = true;
+                _this5.wysiwyg.setData(_this5.value);
+            });
+        }, 1);
+    };
+
+    /**
+     * Prerender
+     */
+
+
+    RichTextEditor.prototype.prerender = function prerender() {
+        this.markdown = null;
+        this.wysiwyg = null;
+        this.html = null;
+    };
+
+    /** 
+     * Renders this editor
+     */
+
+
+    RichTextEditor.prototype.template = function template() {
+        var _this6 = this;
+
+        var activeView = getCookie('rteview') || 'wysiwyg';
+
+        return _.div({ class: 'editor__field__value editor__field--rich-text-editor' }, _.div({ class: 'editor__field--rich-text-editor__header' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
+            return _.button({ class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab' }, label).click(function () {
+                _this6.onClickTab(alias);
+            });
+        }), _.button({ class: 'editor__field--rich-text-editor__header__add-media' }, 'Add media').click(function () {
+            _this6.onClickInsertMedia();
+        })), _.div({ class: 'editor__field--rich-text-editor__body' }, _.if(activeView === 'wysiwyg', _.div({ class: 'editor__field--rich-text-editor__tab wysiwyg' }, _.div({ class: 'editor__field--rich-text-editor__tab__content', 'contenteditable': true }))), _.if(activeView === 'markdown', _.div({ class: 'editor__field--rich-text-editor__tab markdown' }, _.textarea({ class: 'editor__field--rich-text-editor__tab__content' }))), _.if(activeView === 'html', _.div({ class: 'editor__field--rich-text-editor__tab html' }, _.textarea({ class: 'editor__field--rich-text-editor__tab__content' })))));
+    };
+
+    /**
+     * Post render
+     */
+
+
+    RichTextEditor.prototype.postrender = function postrender() {
+        var activeView = getCookie('rteview') || 'wysiwyg';
+
+        switch (activeView) {
+            case 'html':
+                this.initHtmlEditor();
+                break;
+
+            case 'markdown':
+                this.initMarkdownEditor();
+                break;
+
+            case 'wysiwyg':
+                this.initWYSIWYGEditor();
+                break;
+        }
     };
 
     return RichTextEditor;
@@ -46316,7 +47480,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 256 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46350,6 +47514,9 @@ var FieldEditor = __webpack_require__(11);
 var StringEditor = function (_FieldEditor) {
     _inherits(StringEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function StringEditor(params) {
         _classCallCheck(this, StringEditor);
 
@@ -46360,25 +47527,22 @@ var StringEditor = function (_FieldEditor) {
     }
 
     /**
-     * Event: Change
+     * Render this editor
      */
 
 
-    StringEditor.prototype.onChange = function onChange() {
-        this.value = this.$input.val();
+    StringEditor.prototype.template = function template() {
+        var _this2 = this;
 
-        this.trigger('change', this.value);
-    };
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'text',
+            value: this.value,
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-    StringEditor.prototype.render = function render() {
-        var editor = this;
-
-        // Main element
-        this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, _.if((!this.config.type || this.config.type == 'text') && this.config.multiline, this.$input = _.textarea({ class: 'form-control' }, this.value || '').on('change propertychange paste keyup', function () {
-            editor.onChange();
-        })), _.if(this.config.type && this.config.type != 'text' || !this.config.multiline, this.$input = _.input({ class: 'form-control', value: this.value || '', type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
-            editor.onChange();
-        }))));
+                _this2.trigger('change', _this2.value);
+            }
+        }));
     };
 
     return StringEditor;
@@ -46387,7 +47551,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 257 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46404,7 +47568,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var FieldEditor = __webpack_require__(11);
 var SchemaHelper = __webpack_require__(16);
 var ContentHelper = __webpack_require__(41);
-var ContentEditor = __webpack_require__(187);
+var ContentEditor = __webpack_require__(188);
 
 /**
  * A struct editor for editing any arbitrary object value
@@ -46444,9 +47608,12 @@ var StructEditor = function (_FieldEditor) {
     function StructEditor(params) {
         _classCallCheck(this, StructEditor);
 
+        // A sanity check to make sure we're working with an object
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'struct-editor field-editor' });
+        if (!_this.value || _typeof(_this.value) !== 'object') {
+            _this.value = {};
+        }
 
         _this.fetch();
         return _this;
@@ -46477,16 +47644,117 @@ var StructEditor = function (_FieldEditor) {
         this.trigger('change', this.value);
     };
 
-    StructEditor.prototype.render = function render() {
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    StructEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.struct = config.struct || {};
+
+        var $element = _.div({ class: 'editor--schema__struct' });
+
+        var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+
+        var renderEditor = function renderEditor() {
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+                HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
+                    config.struct = newStruct;
+                });
+            }))), _.div({ class: 'editor__field__value segmented' }, _.each(config.struct, function (fieldKey, fieldValue) {
+                // Sanity check
+                fieldValue.config = fieldValue.config || {};
+
+                var $field = _.div({ class: 'editor__field' });
+
+                var renderField = function renderField() {
+                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A variable name, e.g. "myField"',
+                        tooltip: 'The field variable name',
+                        value: fieldKey,
+                        onChange: function onChange(newKey) {
+                            delete config.struct[fieldKey];
+
+                            fieldKey = newKey;
+
+                            config.struct[fieldKey] = fieldValue;
+                        }
+                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A label, e.g. "My field"',
+                        tooltip: 'The field label',
+                        value: fieldValue.label,
+                        onChange: function onChange(newValue) {
+                            fieldValue.label = newValue;
+                        }
+                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useTypeAhead: true,
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        value: fieldValue.schemaId,
+                        labelKey: 'name',
+                        valueKey: 'id',
+                        onChange: function onChange(newValue) {
+                            fieldValue.schemaId = newValue;
+
+                            renderField();
+                        }
+                    }).$element)), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                        if (!schema) {
+                            return;
+                        }
+
+                        var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                        if (!editor) {
+                            return;
+                        }
+
+                        return editor.renderConfigEditor(fieldValue.config);
+                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                        delete config.struct[fieldKey];
+
+                        renderEditor();
+                    }));
+                };
+
+                renderField();
+
+                return $field;
+            }), _.button({ class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property' }).click(function () {
+                if (config.struct.newField) {
+                    return;
+                }
+
+                config.struct.newField = {
+                    label: 'New field',
+                    schemaId: 'array'
+                };
+
+                renderEditor();
+            }))));
+        };
+
+        renderEditor();
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    StructEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // A sanity check to make sure we're working with an object
-        if (!this.value || _typeof(this.value) !== 'object') {
-            this.value = {};
-        }
-
-        // Render editor
-        _.append(this.$element.empty(),
+        return _.div({ class: 'editor__field__value' },
         // Render preview
         this.renderPreview(),
 
@@ -46524,7 +47792,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             // Return the DOM element
-            return _.div({ class: 'kvp' }, _.div({ class: 'key' }, keySchema.label, fieldEditorInstance.$keyContent), _.div({ class: 'value' }, fieldEditorInstance.$element));
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, keySchema.label, fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
         }));
     };
 
@@ -46534,7 +47802,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 258 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46707,7 +47975,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 259 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46745,6 +48013,9 @@ var FieldEditor = __webpack_require__(11);
 var TemplateReferenceEditor = function (_FieldEditor) {
     _inherits(TemplateReferenceEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function TemplateReferenceEditor(params) {
         _classCallCheck(this, TemplateReferenceEditor);
 
@@ -46755,25 +48026,55 @@ var TemplateReferenceEditor = function (_FieldEditor) {
     }
 
     /**
-     * Event: Change value
+     * Renders the config editor
      *
-     * @param {String} newValue
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
      */
 
 
-    TemplateReferenceEditor.prototype.onChange = function onChange(newValue) {
-        this.value = newValue;
+    TemplateReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.type = config.type || 'page';
+        config.allowedTemplates = config.allowedTemplates || [];
 
-        this.trigger('change', this.value);
+        var $element = _.div();
+
+        var render = function render() {
+            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                options: ['page', 'partial'],
+                value: config.type,
+                onChange: function onChange(newType) {
+                    config.type = newType;
+
+                    render();
+                }
+            }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                options: HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type),
+                value: config.allowedTemplates,
+                labelKey: 'name',
+                valueKey: 'id',
+                useMultiple: true,
+                useClearButton: true,
+                useTypeAhead: true,
+                onChange: function onChange(newValue) {
+                    config.allowedTemplates = newValue;
+                }
+            }))));
+        };
+
+        render();
+
+        return $element;
     };
 
-    TemplateReferenceEditor.prototype.render = function render() {
+    /**
+     * Sanity check
+     */
+
+
+    TemplateReferenceEditor.prototype.sanityCheck = function sanityCheck() {
         var _this2 = this;
-
-        this.$element = _.div({ class: 'field-editor template-reference-editor' });
-
-        var resource = window.resources.templates;
-        var dropdownOptions = [];
 
         // Sanity check for template type
         this.config.type = this.config.type || 'page';
@@ -46788,34 +48089,30 @@ var TemplateReferenceEditor = function (_FieldEditor) {
             this.config.allowedTemplates = [];
         }
 
-        // If no templates are available, display a warning
-        if (resource.length < 1) {
-            this.$element.html(_.span({ class: 'field-warning' }, 'No templates configured'));
-            return;
-        }
-
-        // If no allowed templates are configured, display a warning
-        if (this.config.allowedTemplates.length < 1) {
-            this.$element.html(_.span({ class: 'field-warning' }, 'No allowed templates configured'));
-            return;
-        }
-
         // If no allowed template is set, apply the first of the allowed templates
         if (!this.value || this.config.allowedTemplates.indexOf(this.value) < 0) {
+            // This will be null if no allwoed templates are set
             this.value = this.config.allowedTemplates[0];
-
-            // Set values in dropdown element    
-            this.$element.find('.dropdown-menu-toggle').html(this.value);
-            this.$element.find('.dropdown-menu li[data-value="' + this.value + '"]').addClass('active');
 
             // Apply changes on next CPU cycle
             setTimeout(function () {
                 _this2.trigger('change', _this2.value);
+                _this2.render();
             }, 1);
         }
+    };
 
-        // Generate dropdown options
-        for (var _iterator = resource, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    /**
+     * Generates dropdown options
+     *
+     * @returns {Array} Options
+     */
+
+
+    TemplateReferenceEditor.prototype.getOptions = function getOptions() {
+        var dropdownOptions = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
 
             if (_isArray) {
@@ -46835,19 +48132,51 @@ var TemplateReferenceEditor = function (_FieldEditor) {
                 continue;
             }
 
-            dropdownOptions[dropdownOptions.length] = {
-                label: template.name,
-                value: template.id,
-                selected: template.id == this.value
-            };
+            dropdownOptions[dropdownOptions.length] = template;
         }
 
-        // Render picker
-        _.append(this.$element,
-        // Render preview
-        this.renderPreview(), UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
-            _this2.onChange(newValue);
-        }, false));
+        return dropdownOptions;
+    };
+
+    /**
+     * Pre render
+     */
+
+
+    TemplateReferenceEditor.prototype.prerender = function prerender() {
+        this.sanityCheck();
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    TemplateReferenceEditor.prototype.template = function template() {
+        var _this3 = this;
+
+        // If no templates are available, display a warning
+        if (resources.templates.length < 1) {
+            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning', title: 'You need to set up your Connection to provide Templates before they can be used' }, 'No templates available'));
+        }
+
+        // If no allowed templates are configured, display a warning
+        if (this.config.allowedTemplates.length < 1) {
+            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning' }, 'No allowed templates configured'));
+        }
+
+        return _.div({ class: 'editor__field__value' }, this.renderPreview(), new HashBrown.Views.Widgets.Dropdown({
+            useTypeAhead: true,
+            value: this.value,
+            options: this.getOptions(),
+            labelKey: 'name',
+            valueKey: 'id',
+            onChange: function onChange(newValue) {
+                _this3.value = newValue;
+
+                _this3.trigger('change', _this3.value);
+            }
+        }).$element);
     };
 
     return TemplateReferenceEditor;
@@ -46856,7 +48185,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 260 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

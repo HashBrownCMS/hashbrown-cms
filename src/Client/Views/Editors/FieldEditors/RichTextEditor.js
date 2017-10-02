@@ -63,29 +63,9 @@ class RichTextEditor extends FieldEditor {
     onClickTab(source) {
         this.silentChange = true;
 
-        switch(source) {
-            case 'wysiwyg':
-                this.wysiwyg.setData(this.value);
-                break;
-            
-            case 'html':
-                this.html.getDoc().setValue(this.value);
-
-                setTimeout(() => {
-                    this.html.refresh();
-                }, 1);
-                break;
-            
-            case 'markdown':
-                this.markdown.getDoc().setValue(toMarkdown(this.value));
-                
-                setTimeout(() => {
-                    this.markdown.refresh();
-                }, 1);
-                break;
-        }
-        
         document.cookie = 'rteview = ' + source;
+        
+        this.init();
     }
 
     /**
@@ -124,44 +104,23 @@ class RichTextEditor extends FieldEditor {
             .catch(UI.errorModal);
         });
     }
+    
+    /**
+     * Gets the tab content
+     *
+     * @returns {HTMLElement} Tab content
+     */
+    getTabContent() {
+        return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+    }
 
-    render() {
-        let $wysiwyg;
-        let $markdown;
-        let $html;
-       
-        let activeView = getCookie('rteview') || 'wysiwyg';
-
-        // Main element
-        this.$element = _.div({class: 'field-editor rich-text-editor panel panel-default'},
-            _.ul({class: 'nav nav-tabs'},
-                _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
-                    return _.li({class: activeView == alias ? 'active' : ''},
-                        _.a({'data-toggle': 'tab', href: '#' + this.guid + '-' + alias},
-                            label
-                        ).click(() => { this.onClickTab(alias); })
-                    );
-                }),
-                _.button({class: 'btn btn-primary btn-insert-media'},
-                    'Add media'
-                ).click(() => { this.onClickInsertMedia(); })
-            ),
-            _.div({class: 'tab-content'},
-                _.div({id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '')},
-                    $wysiwyg = _.div({'contenteditable': true})
-                ),
-                _.div({id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '')},
-                    $markdown = _.textarea({})
-                ),
-                _.div({id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '')},
-                    $html = _.textarea({})
-                )
-            )
-        );
-        
-        // Init HTML editor
+    /**
+     * Initialises the HTML editor
+     */
+    initHtmlEditor() {
         setTimeout(() => {
-            this.html = CodeMirror.fromTextArea($html[0], {
+            // Kepp reference to editor
+            this.html = CodeMirror.fromTextArea(this.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'xml'
@@ -174,20 +133,24 @@ class RichTextEditor extends FieldEditor {
                 value: this.value
             });
 
+            // Change event
             this.html.on('change', () => {
                 this.onChange(this.html.getDoc().getValue());
             });
-            
-            // Set value
-            if(activeView == 'html') {
-                this.silentChange = true;
-                this.html.getDoc().setValue(this.value);
-            }
-        }, 1);
 
-        // Init markdown editor
+            // Set value initially
+            this.silentChange = true;
+            this.html.getDoc().setValue(this.value);
+        }, 1);
+    }
+    
+    /**
+     * Initialises the markdown editor
+     */
+    initMarkdownEditor() {
         setTimeout(() => {
-            this.markdown = CodeMirror.fromTextArea($markdown[0], {
+            // Keep reference to editor
+            this.markdown = CodeMirror.fromTextArea(this.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'markdown'
@@ -200,118 +163,185 @@ class RichTextEditor extends FieldEditor {
                 value: toMarkdown(this.value)
             });
 
+            // Change event
             this.markdown.on('change', () => {
                 this.onChange(marked(this.markdown.getDoc().getValue()));
             });
 
-            // Set value
-            if(activeView == 'markdown') {
-                this.silentChange = true;
-                this.markdown.getDoc().setValue(toMarkdown(this.value));
-            }
+            // Set value initially
+            this.silentChange = true;
+            this.markdown.getDoc().setValue(toMarkdown(this.value));
         }, 1);
+    }
 
-        
+    /**
+     * Initialises the WYSIWYG editor
+     */
+    initWYSIWYGEditor() {
+        setTimeout(() => {
+            this.wysiwyg = CKEDITOR.replace(
+                this.getTabContent(),
+                {
+                    removePlugins: 'contextmenu,liststyle,tabletools',
+                    allowedContent: true,
+                    height: 400,
+                    toolbarGroups: [
+                        { name: 'styles' },
+                        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+                        { name: 'links' },
+                        { name: 'insert' },
+                        { name: 'forms' },
+                        { name: 'tools' },
+                        { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
+                        { name: 'others' },
+                    ],
+               
+                    extraPlugins: 'justify,divarea',
 
-        // Init WYSIWYG editor
-        this.wysiwyg = CKEDITOR.replace(
-            $wysiwyg[0],
-            {
-                removePlugins: 'contextmenu,liststyle,tabletools',
-                allowedContent: true,
-                height: 400,
-                toolbarGroups: [
-                    { name: 'styles' },
-                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                    { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-                    { name: 'links' },
-                    { name: 'insert' },
-                    { name: 'forms' },
-                    { name: 'tools' },
-                    { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-                    { name: 'others' },
-                ],
-           
-                extraPlugins: 'justify,divarea',
+                    removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
-
-                removeDialogTabs: 'image:advanced;link:advanced'
-            }
-        );
-
-        this.wysiwyg.on('change', () => {
-            this.onChange(this.wysiwyg.getData());
-        });
-
-        this.wysiwyg.on('instanceReady', () => {
-            // Strips the style information
-            let stripStyle = (element) => {
-                delete element.attributes.style;
-            };
-
-            // Filtering rules
-            this.wysiwyg.dataProcessor.dataFilter.addRules({
-                elements: {
-                    // Strip styling from these elements
-                    p: stripStyle,
-                    h1: stripStyle,
-                    h2: stripStyle,
-                    h3: stripStyle,
-                    h4: stripStyle,
-                    h5: stripStyle,
-                    h6: stripStyle,
-                    span: stripStyle,
-                    div: stripStyle,
-                    section: stripStyle,
-                    hr: stripStyle,
-                    header: stripStyle,
-                    aside: stripStyle,
-                    footer: stripStyle,
-                    ul: stripStyle,
-                    li: stripStyle,
-                    blockquote: stripStyle,
-
-                    // Refactor image src url to fit MediaController
-                    img: (element) => {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                        
-                        // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        
-                        }
-                        
-                    },
-                    
-                    // Refactor video src url to fit MediaController
-                    video: (element) => {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                        
-                        // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        
-                        }
-                        
-                    }
+                    removeDialogTabs: 'image:advanced;link:advanced'
                 }
+            );
+
+            this.wysiwyg.on('change', () => {
+                this.onChange(this.wysiwyg.getData());
             });
 
-            // Set value
-            if(activeView == 'wysiwyg') {
+            this.wysiwyg.on('instanceReady', () => {
+                // Strips the style information
+                let stripStyle = (element) => {
+                    delete element.attributes.style;
+                };
+
+                // Filtering rules
+                this.wysiwyg.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        // Strip styling from these elements
+                        p: stripStyle,
+                        h1: stripStyle,
+                        h2: stripStyle,
+                        h3: stripStyle,
+                        h4: stripStyle,
+                        h5: stripStyle,
+                        h6: stripStyle,
+                        span: stripStyle,
+                        div: stripStyle,
+                        section: stripStyle,
+                        hr: stripStyle,
+                        header: stripStyle,
+                        aside: stripStyle,
+                        footer: stripStyle,
+                        ul: stripStyle,
+                        li: stripStyle,
+                        blockquote: stripStyle,
+
+                        // Refactor image src url to fit MediaController
+                        img: (element) => {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if(element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                            
+                            // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            
+                            }
+                            
+                        },
+                        
+                        // Refactor video src url to fit MediaController
+                        video: (element) => {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if(element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                            
+                            // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            
+                            }
+                            
+                        }
+                    }
+                });
+
+                // Set value initially
                 this.silentChange = true;
                 this.wysiwyg.setData(this.value);
-            }
-        });
+            });
+        }, 1);
+    }
+
+    /**
+     * Prerender
+     */
+    prerender() {
+        this.markdown = null;
+        this.wysiwyg = null;
+        this.html = null;
+    }
+
+    /** 
+     * Renders this editor
+     */
+    template() {
+        let activeView = getCookie('rteview') || 'wysiwyg';
+
+        return _.div({class: 'editor__field__value editor__field--rich-text-editor'},
+            _.div({class: 'editor__field--rich-text-editor__header'},
+                _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
+                    return _.button({class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'}, label)
+                        .click(() => { this.onClickTab(alias); })
+                }),
+                _.button({class: 'editor__field--rich-text-editor__header__add-media'},
+                    'Add media'
+                ).click(() => { this.onClickInsertMedia(); })
+            ),
+            _.div({class: 'editor__field--rich-text-editor__body'},
+                _.if(activeView === 'wysiwyg',
+                    _.div({class: 'editor__field--rich-text-editor__tab wysiwyg'},
+                        _.div({class: 'editor__field--rich-text-editor__tab__content', 'contenteditable': true})
+                    )
+                ),
+                _.if(activeView === 'markdown',
+                    _.div({class: 'editor__field--rich-text-editor__tab markdown'},
+                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    )
+                ),
+                _.if(activeView === 'html',
+                    _.div({class: 'editor__field--rich-text-editor__tab html'},
+                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    )
+                )
+            )
+        );
+    }
+     
+    /**
+     * Post render
+     */
+    postrender() {
+        let activeView = getCookie('rteview') || 'wysiwyg';
+       
+        switch(activeView) {
+            case 'html':
+                this.initHtmlEditor();
+                break;
+
+            case 'markdown':
+                this.initMarkdownEditor();
+                break;
+
+            case 'wysiwyg':
+                this.initWYSIWYGEditor();
+                break;
+        }
     }
 }
 

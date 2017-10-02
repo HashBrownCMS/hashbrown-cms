@@ -19,13 +19,12 @@ const FieldEditor = require('./FieldEditor');
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class BooleanEditor extends FieldEditor {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
 
-        this.init();
-    }
-
-    render() {
         // Sanity check
         if(typeof this.value === 'undefined') {
             this.value = false;
@@ -38,21 +37,27 @@ class BooleanEditor extends FieldEditor {
 
         }
 
-        this.$element = _.div({class: 'field-editor switch-editor'},
-            // Render preview
-            this.renderPreview(),
-
-            UI.inputSwitch(this.value, (newValue) => {
-                this.value = newValue;        
-                
-                this.trigger('change', this.value);
-            })
-        );
-
         // Just to make sure the model has the right type of value
         setTimeout(() => {
             this.trigger('silentchange', this.value);
         }, 20);
+        
+        this.init();
+    }
+
+    /**
+     * Render this editor
+     */
+    template() {
+        return new HashBrown.Views.Widgets.Input({
+            type: 'checkbox',
+            value: this.value,
+            onChange: (newValue) => {
+                this.value = newValue;
+                
+                this.trigger('change', this.value);
+            }
+        }).$element;
     }
 }
 

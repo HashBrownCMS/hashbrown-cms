@@ -9,6 +9,216 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  */
 class UIHelper {
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        let items = field.querySelector('.editor__field__value').children;
+
+        for(let i = 0; i < items.length; i++) {
+            if(items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) { continue; }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, (element) => {
+            if(!element) { return; }
+
+            let oldIndex = element.dataset.index;
+            let newIndex = 0;
+
+            // Discover new index
+            let items = field.querySelector('.editor__field__value').children;
+
+            for(let i = 0; i < items.length; i++) {
+                if(items[i] === element) {
+                    newIndex = i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
+
+            onChange(array);
+        });
+    }
+
+    /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortableObject(object, field, onChange) {
+        object = object || {};
+
+        this.fieldSortable(field, (element) => {
+            if(!element) { return; }
+
+            let itemKey = element.querySelector('.editor__field__sort-key').value;
+            let itemValue = object[itemKey];
+
+            // Try to get the next key
+            let nextKey = '';
+            
+            if(element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
+
+            // Construct a new object based on the old one
+            let newObject = {};
+
+            for(let fieldKey in object) {
+                // Omit existing key
+                if(fieldKey === itemKey) { continue; }
+
+                let fieldValue = object[fieldKey];
+
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if(nextKey === fieldKey) {
+                    newObject[itemKey] = itemValue;
+                }
+
+                newObject[fieldKey] = fieldValue;
+            }
+
+            // If the item wasn't reinserted, insert it now
+            if(!newObject[itemKey]) {
+                newObject[itemKey] = itemValue;
+            }
+
+            // Assign the new object to the old one
+            object = newObject;
+
+            // Fire the change event
+            onChange(newObject);
+        });
+    }
+
+    /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    static fieldSortable(field, onChange) {
+        let btnSort = field.querySelector('.editor__field__key__action--sort');
+        let divValue = field.querySelector('.editor__field__value');
+        let isSorting = !divValue.classList.contains('sorting');
+
+        if(this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
+        }
+    }
+
+    /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
+     * @param {Boolean} isActive
+     * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
+     */
+    static sortable(parentElement, sortableClassName, isActive, onChange) {
+        let children = Array.prototype.slice.call(parentElement.children || []);
+        let canSort = true;
+        
+        children = children.filter((child) => {
+            return child instanceof HTMLElement && child.classList.contains(sortableClassName);
+        });
+
+        if(!children || children.length < 1) { return false; }
+
+        if(typeof isActive === 'undefined') {
+            isActive = !parentElement.classList.contains('sorting');
+        }
+
+        _.each(children, (i, child) => {
+            if(isActive) {
+                child.setAttribute('draggable', true);
+            } else {
+                child.removeAttribute('draggable');
+            }
+
+            if(isActive) {
+                child.ondrag = (e) => {
+                    if(!canSort) { return; }
+                    
+                    _.each(children, (i, sibling) => {
+                        if(sibling === child || !canSort || e.pageY < 1) { return; }
+
+                        let cursorY = e.pageY;
+                        let childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let hasMoved = false;
+
+                        // Dragging above a sibling
+                        if(cursorY < siblingY && childY > siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling);    
+                            hasMoved = true;
+                        }
+
+                        // Dragging below a sibling
+                        if(cursorY > siblingY && childY < siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
+                            hasMoved = true;
+                        }
+
+                        // Init transition
+                        if(hasMoved) {
+                            canSort = false;
+
+                            let newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                            let newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                            setTimeout(() => {
+                                child.removeAttribute('style');
+                                sibling.removeAttribute('style');
+                                canSort = true;
+                            }, 100);
+                        }
+                    });
+                };
+
+                child.ondragend = (e) => {
+                    onChange(child);
+                };
+
+                child.ondragcancel = (e) => {
+                    onChange(child);
+                };
+
+            } else {
+                child.ondragstart = null;
+                child.ondrag = null;
+                child.ondragstop = null;
+                child.ondragcancel = null;
+            }
+        });
+        
+        parentElement.classList.toggle('sorting', isActive);
+
+        return true;
+    }
+
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue
@@ -66,13 +276,29 @@ class UIHelper {
 
                 // Render individual chips
                 _.each(items, (itemIndex, item) => {
+                    let label = item.label || item.name || item.title;
+                    
+                    if(!label) {
+                        for(let dropdownItem of dropdownItems) {
+                            let value = dropdownItem.id || dropdownItem.value || dropdownItem;
+
+                            if(value === item) {
+                                label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                            }
+                        }
+                    }
+
+                    if(!label) { 
+                        label = item;
+                    }
+
                     let $chip = _.div({class: 'chip'},
 
                         // Dropdown
                         _.if(Array.isArray(dropdownItems),
                             _.div({class: 'chip-label dropdown'},
                                 _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                    item.label || item.name || item.title || item 
+                                    label
                                 ),
                                 _.if(onChange,
                                     _.ul({class: 'dropdown-menu'},
@@ -92,7 +318,7 @@ class UIHelper {
                                                 ).click(function(e) {
                                                     e.preventDefault();
                                                         
-                                                    items[itemIndex] = dropdownItem;
+                                                    items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
 
                                                     render();
                                 
@@ -157,12 +383,12 @@ class UIHelper {
                                     }
 
                                     if(!isSelected) {
-                                        items.push(dropdownItem);
+                                        items.push(dropdownItem.value || dropdownItem);
                                         break;
                                     }
                                 }
                             } else {
-                                items.push(dropdownItems[0]);
+                                items.push(dropdownItems[0].value || dropdownItems[0]);
                             }
                         
                         } else if(typeof dropdownItems === 'string') {

@@ -48,6 +48,35 @@ class DropdownEditor extends FieldEditor {
         this.trigger('change', this.value);
     }
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.options = config.options || [];
+
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'}, 'Options'),
+            _.div({class: 'editor__field__value'},
+                new HashBrown.Views.Widgets.Chips({
+                    value: config.options,
+                    valueKey: 'value',
+                    labelKey: 'label',
+                    placeholder: 'New option',
+                    onChange: (newValue) => {
+                        config.options = newValue;
+                    }
+                }).$element
+            )
+        );
+    }
+
+    /**
+     * Renders this editor
+     */
     render() {
         // Wait until next CPU cycle to trigger an eventual change if needed
         setTimeout(() => {         

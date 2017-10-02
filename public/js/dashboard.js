@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 261);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -6519,6 +6519,29 @@ var SchemaHelper = function (_SchemaHelperCommon) {
     };
 
     /**
+     * Gets all Schemas by type (sync)
+     *
+     * @param {String} type
+     *
+     * @returns {Array} All Schemas
+     */
+
+
+    SchemaHelper.getAllSchemasSync = function getAllSchemasSync(type) {
+        if (!type) {
+            return resources.schemas;
+        }
+
+        return resources.schemas.filter(function (schema) {
+            if (schema.id == type + 'Base') {
+                return false;
+            }
+
+            return schema.type === type;
+        });
+    };
+
+    /**
      * Gets a Schema by id (sync)
      *
      * @param {String} id
@@ -7045,7 +7068,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var SettingsHelperCommon = __webpack_require__(184);
+var SettingsHelperCommon = __webpack_require__(185);
 
 /**
  * The client side settings helper
@@ -9103,7 +9126,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MediaHelperCommon = __webpack_require__(183);
+var MediaHelperCommon = __webpack_require__(184);
 
 var RequestHelper = __webpack_require__(2);
 
@@ -9266,7 +9289,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var ContentHelperCommon = __webpack_require__(185);
+var ContentHelperCommon = __webpack_require__(186);
 
 var Content = __webpack_require__(57);
 
@@ -11234,6 +11257,19 @@ var ContentSchema = function (_Schema) {
 
         this.name = 'New content schema';
         this.type = 'content';
+    };
+
+    /**
+     * Checks whether a tab is the default one
+     *
+     * @param {String} tabId
+     *
+     * @returns {Boolean} Is the tab default
+     */
+
+
+    ContentSchema.prototype.isDefaultTab = function isDefaultTab(tabId) {
+        return !this.defaultTabId && tabId === 'meta' || this.defaultTabId === tabId;
     };
 
     return ContentSchema;
@@ -14901,7 +14937,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(186);
+var ConnectionHelperCommon = __webpack_require__(187);
 var Connection = __webpack_require__(37);
 var ProjectHelper = __webpack_require__(6);
 var RequestHelper = __webpack_require__(2);
@@ -15055,7 +15091,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
-var LanguageHelperCommon = __webpack_require__(188);
+var LanguageHelperCommon = __webpack_require__(190);
 
 /**
  * The client side language helper
@@ -24256,7 +24292,8 @@ module.exports = SchemaHelper;
 /* 180 */,
 /* 181 */,
 /* 182 */,
-/* 183 */
+/* 183 */,
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24340,7 +24377,7 @@ var MediaHelper = function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24361,7 +24398,7 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24523,7 +24560,7 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24691,8 +24728,9 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 187 */,
-/* 188 */
+/* 188 */,
+/* 189 */,
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24800,7 +24838,7 @@ var LanguageHelper = function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 189 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24813,18 +24851,19 @@ module.exports = LanguageHelper;
 module.exports = {
     ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
-    DebugHelper: __webpack_require__(190),
+    DebugHelper: __webpack_require__(192),
     LanguageHelper: __webpack_require__(94),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
-    UIHelper: __webpack_require__(192)
+    TemplateHelper: __webpack_require__(194),
+    UIHelper: __webpack_require__(195)
 };
 
 /***/ }),
-/* 190 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24836,7 +24875,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(191);
+var DebugHelperCommon = __webpack_require__(193);
 
 /**
  * The client side debug helper
@@ -24899,7 +24938,7 @@ var DebugHelper = function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 191 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25062,7 +25101,70 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 192 */
+/* 194 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Template resources
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TemplateHelper = function () {
+    function TemplateHelper() {
+        _classCallCheck(this, TemplateHelper);
+    }
+
+    /**
+     * Gets all templates
+     *
+     * @param {String} type
+     *
+     * @returns {Array} Templates
+     */
+    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
+        if (!type) {
+            return resources.templates;
+        }
+
+        var templates = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var template = _ref;
+
+            if (template.type !== type) {
+                continue;
+            }
+
+            templates.push(template);
+        }
+
+        return templates;
+    };
+
+    return TemplateHelper;
+}();
+
+module.exports = TemplateHelper;
+
+/***/ }),
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25084,6 +25186,234 @@ var UIHelper = function () {
     }
 
     /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+    UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
+        array = array || [];
+
+        // Set indices on all elements
+        var items = field.querySelector('.editor__field__value').children;
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
+                continue;
+            }
+
+            items[i].dataset.index = i;
+        }
+
+        // Init the sortable context
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var oldIndex = element.dataset.index;
+            var newIndex = 0;
+
+            // Discover new index
+            var items = field.querySelector('.editor__field__value').children;
+
+            for (var _i = 0; _i < items.length; _i++) {
+                if (items[_i] === element) {
+                    newIndex = _i;
+                    break;
+                }
+            }
+
+            // Swap indices
+            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+
+            onChange(array);
+        });
+    };
+
+    /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
+        object = object || {};
+
+        this.fieldSortable(field, function (element) {
+            if (!element) {
+                return;
+            }
+
+            var itemKey = element.querySelector('.editor__field__sort-key').value;
+            var itemValue = object[itemKey];
+
+            // Try to get the next key
+            var nextKey = '';
+
+            if (element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
+                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            }
+
+            // Construct a new object based on the old one
+            var newObject = {};
+
+            for (var fieldKey in object) {
+                // Omit existing key
+                if (fieldKey === itemKey) {
+                    continue;
+                }
+
+                var fieldValue = object[fieldKey];
+
+                // If there is a next key, and it's the same as this field key,
+                // the sorted item should be inserted just before it
+                if (nextKey === fieldKey) {
+                    newObject[itemKey] = itemValue;
+                }
+
+                newObject[fieldKey] = fieldValue;
+            }
+
+            // If the item wasn't reinserted, insert it now
+            if (!newObject[itemKey]) {
+                newObject[itemKey] = itemValue;
+            }
+
+            // Assign the new object to the old one
+            object = newObject;
+
+            // Fire the change event
+            onChange(newObject);
+        });
+    };
+
+    /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+
+    UIHelper.fieldSortable = function fieldSortable(field, onChange) {
+        var btnSort = field.querySelector('.editor__field__key__action--sort');
+        var divValue = field.querySelector('.editor__field__value');
+        var isSorting = !divValue.classList.contains('sorting');
+
+        if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+            btnSort.classList.toggle('sorting', isSorting);
+            divValue.classList.toggle('sorting', isSorting);
+        }
+    };
+
+    /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
+     * @param {Boolean} isActive
+     * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
+     */
+
+
+    UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
+        var children = Array.prototype.slice.call(parentElement.children || []);
+        var canSort = true;
+
+        children = children.filter(function (child) {
+            return child instanceof HTMLElement && child.classList.contains(sortableClassName);
+        });
+
+        if (!children || children.length < 1) {
+            return false;
+        }
+
+        if (typeof isActive === 'undefined') {
+            isActive = !parentElement.classList.contains('sorting');
+        }
+
+        _.each(children, function (i, child) {
+            if (isActive) {
+                child.setAttribute('draggable', true);
+            } else {
+                child.removeAttribute('draggable');
+            }
+
+            if (isActive) {
+                child.ondrag = function (e) {
+                    if (!canSort) {
+                        return;
+                    }
+
+                    _.each(children, function (i, sibling) {
+                        if (sibling === child || !canSort || e.pageY < 1) {
+                            return;
+                        }
+
+                        var cursorY = e.pageY;
+                        var childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var hasMoved = false;
+
+                        // Dragging above a sibling
+                        if (cursorY < siblingY && childY > siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling);
+                            hasMoved = true;
+                        }
+
+                        // Dragging below a sibling
+                        if (cursorY > siblingY && childY < siblingY) {
+                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
+                            hasMoved = true;
+                        }
+
+                        // Init transition
+                        if (hasMoved) {
+                            canSort = false;
+
+                            var newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                            setTimeout(function () {
+                                child.removeAttribute('style');
+                                sibling.removeAttribute('style');
+                                canSort = true;
+                            }, 100);
+                        }
+                    });
+                };
+
+                child.ondragend = function (e) {
+                    onChange(child);
+                };
+
+                child.ondragcancel = function (e) {
+                    onChange(child);
+                };
+            } else {
+                child.ondragstart = null;
+                child.ondrag = null;
+                child.ondragstop = null;
+                child.ondragcancel = null;
+            }
+        });
+
+        parentElement.classList.toggle('sorting', isActive);
+
+        return true;
+    };
+
+    /**
      * Creates a switch
      *
      * @param {Boolean} initialValue
@@ -25091,6 +25421,8 @@ var UIHelper = function () {
      *
      * @returns {HTMLElement} Switch element
      */
+
+
     UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
         var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
         var $input = void 0;
@@ -25142,25 +25474,54 @@ var UIHelper = function () {
 
             // Render individual chips
             _.each(items, function (itemIndex, item) {
+                var label = item.label || item.name || item.title;
+
+                if (!label) {
+                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                        var _ref;
+
+                        if (_isArray) {
+                            if (_i2 >= _iterator.length) break;
+                            _ref = _iterator[_i2++];
+                        } else {
+                            _i2 = _iterator.next();
+                            if (_i2.done) break;
+                            _ref = _i2.value;
+                        }
+
+                        var dropdownItem = _ref;
+
+                        var value = dropdownItem.id || dropdownItem.value || dropdownItem;
+
+                        if (value === item) {
+                            label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                        }
+                    }
+                }
+
+                if (!label) {
+                    label = item;
+                }
+
                 var $chip = _.div({ class: 'chip' },
 
                 // Dropdown
-                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, label), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
                     // Look for unique dropdown items
                     if (isDropdownUnique) {
-                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                            var _ref;
+                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref2;
 
-                            if (_isArray) {
-                                if (_i >= _iterator.length) break;
-                                _ref = _iterator[_i++];
+                            if (_isArray2) {
+                                if (_i3 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i3++];
                             } else {
-                                _i = _iterator.next();
-                                if (_i.done) break;
-                                _ref = _i.value;
+                                _i3 = _iterator2.next();
+                                if (_i3.done) break;
+                                _ref2 = _i3.value;
                             }
 
-                            var _item = _ref;
+                            var _item = _ref2;
 
                             if (_item == dropdownItem) {
                                 return;
@@ -25171,7 +25532,7 @@ var UIHelper = function () {
                     return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
                         e.preventDefault();
 
-                        items[itemIndex] = dropdownItem;
+                        items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
 
                         render();
 
@@ -25204,35 +25565,35 @@ var UIHelper = function () {
             _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
                 if (Array.isArray(dropdownItems)) {
                     if (isDropdownUnique) {
-                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                            var _ref2;
+                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                            var _ref3;
 
-                            if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
+                            if (_isArray3) {
+                                if (_i4 >= _iterator3.length) break;
+                                _ref3 = _iterator3[_i4++];
                             } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
+                                _i4 = _iterator3.next();
+                                if (_i4.done) break;
+                                _ref3 = _i4.value;
                             }
 
-                            var dropdownItem = _ref2;
+                            var dropdownItem = _ref3;
 
                             var isSelected = false;
 
-                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-                                var _ref3;
+                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                                var _ref4;
 
-                                if (_isArray3) {
-                                    if (_i3 >= _iterator3.length) break;
-                                    _ref3 = _iterator3[_i3++];
+                                if (_isArray4) {
+                                    if (_i5 >= _iterator4.length) break;
+                                    _ref4 = _iterator4[_i5++];
                                 } else {
-                                    _i3 = _iterator3.next();
-                                    if (_i3.done) break;
-                                    _ref3 = _i3.value;
+                                    _i5 = _iterator4.next();
+                                    if (_i5.done) break;
+                                    _ref4 = _i5.value;
                                 }
 
-                                var item = _ref3;
+                                var item = _ref4;
 
                                 if (item == dropdownItem) {
                                     isSelected = true;
@@ -25241,12 +25602,12 @@ var UIHelper = function () {
                             }
 
                             if (!isSelected) {
-                                items.push(dropdownItem);
+                                items.push(dropdownItem.value || dropdownItem);
                                 break;
                             }
                         }
                     } else {
-                        items.push(dropdownItems[0]);
+                        items.push(dropdownItems[0].value || dropdownItems[0]);
                     }
                 } else if (typeof dropdownItems === 'string') {
                     items.push(dropdownItems);
@@ -25314,19 +25675,19 @@ var UIHelper = function () {
                 return;
             }
 
-            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
+            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+                var _ref5;
 
-                if (_isArray4) {
-                    if (_i4 >= _iterator4.length) break;
-                    _ref4 = _iterator4[_i4++];
+                if (_isArray5) {
+                    if (_i6 >= _iterator5.length) break;
+                    _ref5 = _iterator5[_i6++];
                 } else {
-                    _i4 = _iterator4.next();
-                    if (_i4.done) break;
-                    _ref4 = _i4.value;
+                    _i6 = _iterator5.next();
+                    if (_i6.done) break;
+                    _ref5 = _i6.value;
                 }
 
-                var option = _ref4;
+                var option = _ref5;
 
                 if (option.value == defaultValue) {
                     $toggle.html(option.label);
@@ -25388,8 +25749,8 @@ var UIHelper = function () {
         _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
 
         // Render all options
-        for (var _i5 in options || []) {
-            $element.trigger('addOption', options[_i5]);
+        for (var _i7 in options || []) {
+            $element.trigger('addOption', options[_i7]);
         }
 
         return $element;
@@ -25634,12 +25995,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 193 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(194);
-window.marked = __webpack_require__(195);
-window.toMarkdown = __webpack_require__(196);
+window.Promise = __webpack_require__(197);
+window.marked = __webpack_require__(198);
+window.toMarkdown = __webpack_require__(199);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -25738,13 +26099,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(204);
+window.app = __webpack_require__(207);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 194 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -31075,7 +31436,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 195 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -32264,7 +32625,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 196 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32280,10 +32641,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(197);
-var gfmConverters = __webpack_require__(198);
-var HtmlParser = __webpack_require__(199);
-var collapse = __webpack_require__(201);
+var mdConverters = __webpack_require__(200);
+var gfmConverters = __webpack_require__(201);
+var HtmlParser = __webpack_require__(202);
+var collapse = __webpack_require__(204);
 
 /*
  * Utilities
@@ -32491,7 +32852,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 197 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32624,7 +32985,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 198 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32724,7 +33085,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 199 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -32758,7 +33119,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(200);
+    var jsdom = __webpack_require__(203);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -32805,25 +33166,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 200 */
+/* 203 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 201 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(202);
+var voidElements = __webpack_require__(205);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(203).forEach(function (name) {
+__webpack_require__(206).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -32953,7 +33314,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 202 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -32981,7 +33342,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 203 */
+/* 206 */
 /***/ (function(module, exports) {
 
 /**
@@ -32992,7 +33353,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -33044,9 +33405,6 @@ module.exports = {
 };
 
 /***/ }),
-/* 205 */,
-/* 206 */,
-/* 207 */,
 /* 208 */,
 /* 209 */,
 /* 210 */,
@@ -33100,7 +33458,17 @@ module.exports = {
 /* 258 */,
 /* 259 */,
 /* 260 */,
-/* 261 */
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33112,10 +33480,10 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Helpers = __webpack_require__(189);
+HashBrown.Helpers = __webpack_require__(191);
 
 // Helper functions
-__webpack_require__(193);
+__webpack_require__(196);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -33151,7 +33519,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(262);
+            var ProjectEditor = __webpack_require__(272);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33417,7 +33785,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 262 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33432,11 +33800,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(263);
-var SyncEditor = __webpack_require__(264);
-var LanguageEditor = __webpack_require__(265);
-var BackupEditor = __webpack_require__(266);
-var MigrationEditor = __webpack_require__(267);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33678,7 +34046,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 263 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33796,7 +34164,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 264 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34002,7 +34370,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 265 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34085,7 +34453,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 266 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34351,7 +34719,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 267 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

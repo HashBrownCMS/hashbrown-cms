@@ -7,6 +7,24 @@
  */
 class FieldEditor extends Crisp.View {
     /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        return null;
+    }
+
+    /**
+     * Renders key actions
+     *
+     * @returns {HTMLElement} Actions
+     */
+    renderKeyActions() {}
+
+    /**
      * Renders a field preview template
      *
      * @returns {HTMLElement} Element

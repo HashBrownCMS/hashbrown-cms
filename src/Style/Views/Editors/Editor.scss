@@ -1,0 +1,384 @@
+/**
+ * Global editor styling
+ */
+.editor {
+    // Locked state
+    &.locked &__body > &__field {
+        pointer-events: none;
+        opacity: 0.75;
+        user-select: none;
+    }
+    
+    // Header
+    &__header {
+        background-color: $secondary;
+        padding: 1rem 0 0 1rem;
+        color: $secondary-text;
+        height: 4rem;
+        flex-shrink: 0;
+        flex-basis: 4rem;
+
+        @include background('secondary');
+
+        &__title {
+            margin: 0px;
+            display: inline-block;
+        }
+
+        &__icon {
+            margin-right: 10px;
+            font-size: 20px;
+            width: 20px;
+            display: inline-block;
+            position: relative;
+            top: 1px;
+        }
+
+        // Tab
+        &__tab {
+            padding: 0 2rem;
+            border-top-left-radius: 0.2rem;
+            border-top-right-radius: 0.2rem;
+            display: inline-block;
+            height: 3rem;
+            line-height: 3rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 0;
+            background-color: transparent;
+            color: $secondary-text;
+            background-color: $secondary-light;
+            margin-right: 0.5rem;
+
+            &:hover {
+                color: $primary-text;
+                background-color: $primary;
+            }
+
+            &.active {
+                pointer-events: none;
+                color: $standard-text;
+                background-color: $standard-dark;
+            }
+        }
+    }
+
+    // Body
+    &__body {
+        padding: 15px;
+        flex-grow: 1;
+        overflow: auto;
+        position: relative;
+
+        // Tab
+        &__tab {
+            &:not(.active) { 
+                display: none;
+            }
+        }
+    }
+
+    // Footer
+    &__footer {
+        position: relative;
+        z-index: 10;
+        box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0;
+        padding: 15px;
+        margin: 0px;
+        border-width: 0px;
+        border-top-width: 1px;
+        border-radius: 0px;
+        background-color: $standard-dark;
+        border-top: 1px solid $standard-darker;
+        color: $standard-text;
+
+        &__buttons {
+            margin: 0 0 0 auto;
+            float: right;
+            display: flex;
+        }
+    }
+
+    // Field container
+    &__field {
+        display: flex;
+        padding: 1rem 0;
+        position: relative;
+        transition: background-color 0.5s ease, transform 0.5s ease;
+        border-bottom: 1px solid $standard-darker;
+
+        &:last-of-type {
+            border-bottom: 0;
+        }
+
+        // Vertical mode
+        &.vertical {
+            flex-direction: column;
+        }
+
+        &.vertical > &__key {
+            flex-basis: 2rem;
+        }
+
+        &.vertical > &__value {
+            margin-left: 1rem;
+        }
+
+        // Key
+        &__key {
+            flex-basis: 10rem;
+            flex-shrink: 0;
+            margin-right: 1rem;
+            line-height: 2rem;
+
+            // Key actions
+            &__actions {
+                // Following state
+                &.following {
+                    position: fixed;
+                    top: 80px;
+                }
+            }
+
+            // Key action button
+            &__action {
+                border: 0px;
+                line-height: 2rem;
+                height: 2rem;
+                display: block;
+                padding: 0;
+                margin-top: 0.5rem;
+                float: left;
+                clear: both;
+                background-color: transparent;
+                color: $primary;
+                text-transform: uppercase;
+                font-weight: bold;
+                text-align: left;
+                transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+                cursor: pointer;
+                border-radius: 0.2rem;
+                padding: 0 0.5rem 0 0;
+
+                &:hover {
+                    color: $primary-text;
+                    background-color: $primary;
+                }
+                
+                // Icon
+                &:before {
+                    font-family: 'FontAwesome';
+                    display: inline-block;
+                    line-height: 2rem;
+                    height: 2rem;
+                    width: 2rem;
+                    text-align: center;
+                }
+
+                // Collapse/expand
+                &--collapse {
+                    &:after {
+                        content: 'Collapse all';
+                    }
+
+                    &:before {
+                        content: '\f066';
+                    }
+
+                    // Collapsed state
+                    &.collapsed {
+                        &:after {
+                            content: 'Expand all';
+                        }
+
+                        &:before {
+                            content: '\f065';
+                        }
+                    }
+                }
+
+                // Sort
+                &--sort {
+                    &:after {
+                        content: 'Sort items'
+                    }
+
+                    &:before {
+                        content: '\f0dc';
+                    }
+
+                    // Sorting state
+                    &.sorting {
+                        &:after {
+                            content: 'Done sorting'
+                        }
+
+                        &:before {
+                            content: '\f00c';
+                        }
+                    }
+                }
+            }
+        }
+
+        // Value
+        &__value {
+            flex-grow: 1;
+            border: 0 dashed transparent;
+            border-radius: 0.2rem;
+            transition: border 0.5s ease, padding 0.5s ease;
+
+            // Segmented
+            &.segmented > .editor__field {
+                border-bottom: 0;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                background-color: $standard;
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            // Nested segmentation
+            &.segmented .editor__field__value.segmented {
+                padding: 1rem;
+                background-color: $standard-dark;
+                border-radius: 0.2rem;
+                box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+            }
+
+            // Collapsed & sorting mode
+            &.collapsed, &.sorting {
+                // Style the items inside
+                .editor__field {
+                    height: 3rem;
+                    border-radius: 0.2rem;
+                    padding: 0;
+
+                    &:not(:first-of-type) {
+                        margin-top: 1rem !important;
+                    }
+
+                    &:last-of-type {
+                        margin-bottom: 0 !important;
+                    }
+
+                    &:before {
+                        display: none !important;
+                    }
+                
+                    &__sort-key {
+                        display: block;
+                    }
+
+                    &__key,
+                    &__value,
+                    &__remove {
+                        display: none;
+                    }
+                }
+            }
+
+            // Collapsed mode
+            &.collapsed {
+                // Style the items inside
+                .editor__field {
+                    background-color: $standard;
+                }
+            }
+
+            // Sorting mode
+            &.sorting {
+                padding: 1rem;
+                border: 0.15rem dashed $standard-darker;
+        
+                // Hide the add button
+                .editor__field__add {
+                    display: none;
+                }
+
+                // Style the sort key
+                .editor__field__sort-key {
+                    color: $primary-text;
+                }
+
+                // Style the items inside
+                .editor__field {
+                    background-color: $primary;
+                    cursor: move;
+
+                    &__remove {
+                        display: none;
+                    }
+                }
+            }
+
+            // Warning
+            &__warning {
+                background-color: $warning;
+                color: $warning-text;
+                font-weight: bold;
+                line-height: 2rem;
+                height: 2rem;
+                display: inline-block;
+                border-radius: 0.2rem;
+                padding: 0 0.5rem;
+
+                &:before {
+                    font-family: 'FontAwesome';
+                    content: '\f071';
+                    margin-right: 0.5rem;
+                }
+            }
+        }
+
+        // Sort key
+        &__sort-key {
+            background-color: transparent;
+            font-weight: bold;
+            padding: 0 1rem;
+            border: 0;
+            pointer-events: none;
+            line-height: 3rem;
+            height: 3rem;
+            display: none;
+        }
+            
+        // Add button
+        &__add {
+            margin-top: 1rem;
+            margin-left: auto;
+        }
+
+        // Remove button
+        &__remove {
+            background-color: transparent;
+            line-height: 2rem;
+            height: 2rem;
+            width: 2rem;
+            border: 0;
+            display: block;
+            cursor: pointer;
+            color: $primary;
+            z-index: 90;
+            padding: 0;
+
+            &:hover {
+                &::after {
+                   position: absolute;
+                   display: block;
+                   content: '';
+                   border: 1px solid $primary;
+                   top: 0;
+                   left: 0;
+                   width: 100%;
+                   height: 100%;
+                   pointer-events: none;
+                }
+            }
+        }
+    }
+}
