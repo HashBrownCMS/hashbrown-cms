@@ -252,18 +252,6 @@
 
             // Collapsed & sorting mode
             &.collapsed, &.sorting {
-                // Style the sort key
-                .editor__field__sort-key {
-                    background-color: transparent;
-                    font-weight: bold;
-                    padding: 0 1rem;
-                    border: 0;
-                    pointer-events: none;
-                    line-height: 3rem;
-                    height: 3rem;
-                    display: block;
-                }
-
                 // Style the items inside
                 .editor__field {
                     height: 3rem;
@@ -282,8 +270,13 @@
                         display: none !important;
                     }
                 
-                    &__value > *:not(.editor__field__sort-key),
-                    &__key > *:not(.editor__field__sort-key) {
+                    &__sort-key {
+                        display: block;
+                    }
+
+                    &__key,
+                    &__value,
+                    &__remove {
                         display: none;
                     }
                 }
@@ -342,6 +335,18 @@
             }
         }
 
+        // Sort key
+        &__sort-key {
+            background-color: transparent;
+            font-weight: bold;
+            padding: 0 1rem;
+            border: 0;
+            pointer-events: none;
+            line-height: 3rem;
+            height: 3rem;
+            display: none;
+        }
+            
         // Add button
         &__add {
             margin-top: 1rem;

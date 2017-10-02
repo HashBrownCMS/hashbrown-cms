@@ -240,7 +240,6 @@ class ArrayEditor extends FieldEditor {
                         _.div({class: 'editor__field'},
                             _.div({class: 'editor__field__key'}, 'Schema'),
                             _.div({class: 'editor__field__value'},
-
                                 new HashBrown.Views.Widgets.Dropdown({
                                     value: item.schemaId,
                                     valueKey: 'id',
@@ -255,12 +254,13 @@ class ArrayEditor extends FieldEditor {
 
                                         this.trigger('change', this.value);
                                     }
-                                }).$element
+                                })
                             )
                         )
                     );
                 
                     _.append($field.empty(),
+                        _.div({class: 'editor__field__sort-key'}, schema.name),
                         editorInstance.$element,
                         _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove item'})
                             .click(() => {

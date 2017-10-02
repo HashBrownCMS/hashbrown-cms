@@ -2593,15 +2593,6 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       background-color: #eeeeee;
       border-radius: 0.2rem;
       box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
-    .editor__field__value.collapsed .editor__field__sort-key, .editor__field__value.sorting .editor__field__sort-key {
-      background-color: transparent;
-      font-weight: bold;
-      padding: 0 1rem;
-      border: 0;
-      pointer-events: none;
-      line-height: 3rem;
-      height: 3rem;
-      display: block; }
     .editor__field__value.collapsed .editor__field, .editor__field__value.sorting .editor__field {
       height: 3rem;
       border-radius: 0.2rem;
@@ -2612,9 +2603,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
         margin-bottom: 0 !important; }
       .editor__field__value.collapsed .editor__field:before, .editor__field__value.sorting .editor__field:before {
         display: none !important; }
-      .editor__field__value.collapsed .editor__field__value > *:not(.editor__field__sort-key),
-      .editor__field__value.collapsed .editor__field__key > *:not(.editor__field__sort-key), .editor__field__value.sorting .editor__field__value > *:not(.editor__field__sort-key),
-      .editor__field__value.sorting .editor__field__key > *:not(.editor__field__sort-key) {
+      .editor__field__value.collapsed .editor__field__sort-key, .editor__field__value.sorting .editor__field__sort-key {
+        display: block; }
+      .editor__field__value.collapsed .editor__field__key, .editor__field__value.collapsed .editor__field__value, .editor__field__value.collapsed .editor__field__remove, .editor__field__value.sorting .editor__field__key, .editor__field__value.sorting .editor__field__value, .editor__field__value.sorting .editor__field__remove {
         display: none; }
     .editor__field__value.collapsed .editor__field {
       background-color: #ffffff; }
@@ -2643,6 +2634,15 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
         font-family: 'FontAwesome';
         content: '\F071';
         margin-right: 0.5rem; }
+  .editor__field__sort-key {
+    background-color: transparent;
+    font-weight: bold;
+    padding: 0 1rem;
+    border: 0;
+    pointer-events: none;
+    line-height: 3rem;
+    height: 3rem;
+    display: none; }
   .editor__field__add {
     margin-top: 1rem;
     margin-left: auto; }
@@ -2671,6 +2671,178 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 /**
  * The editor for Schemas
  */
+/**
+ * A rich text editor
+ */
+.editor__field--rich-text-editor {
+  margin: 0px;
+  width: 100px; }
+  .editor__field--rich-text-editor__header {
+    padding: 1rem 0 0 1rem;
+    background-color: #dddddd;
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
+    position: relative;
+    height: 4rem; }
+    .editor__field--rich-text-editor__header__tab {
+      text-transform: uppercase;
+      font-weight: bold;
+      border-top-left-radius: 0.2rem;
+      border-top-right-radius: 0.2rem;
+      border: 0;
+      background-color: #eeeeee;
+      color: #333333;
+      height: 3rem;
+      line-height: 3rem;
+      padding: 0 1rem;
+      margin-right: 0.5rem; }
+      .editor__field--rich-text-editor__header__tab:hover {
+        background-color: #e70d3b;
+        color: #ffffff; }
+      .editor__field--rich-text-editor__header__tab.active {
+        background-color: #ffffff;
+        color: #333333; }
+    .editor__field--rich-text-editor__header__add-media {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0 0.5rem;
+      border: 0;
+      color: #e70d3b;
+      background-color: transparent;
+      border-radius: 0.2rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      line-height: 2rem;
+      height: 2rem;
+      transition: background-color 0.3s ease, color 0.3s ease; }
+      .editor__field--rich-text-editor__header__add-media:hover {
+        background-color: #e70d3b;
+        color: #ffffff; }
+      .editor__field--rich-text-editor__header__add-media:before {
+        font-family: 'FontAwesome';
+        content: '\F1C5';
+        margin-right: 0.5rem; }
+  .editor__field--rich-text-editor .CodeMirror {
+    min-height: 462px; }
+    .editor__field--rich-text-editor .CodeMirror p, .editor__field--rich-text-editor .CodeMirror pre, .editor__field--rich-text-editor .CodeMirror span, .editor__field--rich-text-editor .CodeMirror .cke_editable {
+      font-size: 14px; }
+  .editor__field--rich-text-editor .cke {
+    padding: 0px;
+    background: none;
+    border: 0px;
+    border-radius: 0px;
+    box-shadow: none; }
+    .editor__field--rich-text-editor .cke .cke_inner {
+      border-radius: 0px; }
+      .editor__field--rich-text-editor .cke .cke_inner .cke_top, .editor__field--rich-text-editor .cke .cke_inner .cke_contents, .editor__field--rich-text-editor .cke .cke_inner .cke_bottom {
+        background-image: none;
+        border: 0px;
+        box-shadow: none; }
+      .editor__field--rich-text-editor .cke .cke_inner .cke_top {
+        background-image: linear-gradient(top, #f5f5f5, #eee);
+        background-image: -webkit-linear-gradient(top, #f5f5f5, #eee);
+        background-image: -moz-linear-gradient(top, #f5f5f5, #eee);
+        background-color: #f5f5f5;
+        border-bottom: 1px solid #d9d9d9;
+        padding: 0px; }
+        .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_toolgroup {
+          border: 0px;
+          box-shadow: none;
+          background-image: none;
+          background-color: transparent;
+          border-radius: 0px;
+          margin: 0px; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_toolgroup .cke_toolbar_separator {
+            display: none; }
+        .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_toolbar {
+          border-right: 1px solid #ccc;
+          padding: 0px 5px; }
+        .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_combo {
+          margin: 5px 0px; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_combo .cke_combo_button {
+            margin: 0px;
+            border: 1px solid transparent;
+            background-image: none;
+            background-color: transparent;
+            box-shadow: none; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_combo .cke_combo_button:hover {
+              border: 1px solid #ccc;
+              border-radius: 2px; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_combo .cke_combo_button .cke_combo_arrow {
+              margin-top: 9px; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_combo .cke_combo_button .cke_combo_text {
+              line-height: 23px;
+              font-weight: 700; }
+        .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button {
+          margin: 5px 0px;
+          background-image: none;
+          border: 0px;
+          box-shadow: none;
+          padding: 0px;
+          height: 23px;
+          width: 23px;
+          position: relative;
+          border: 1px solid transparent; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button:hover {
+            background-color: transparent;
+            border: 1px solid #ccc;
+            border-radius: 2px; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_label {
+            display: none; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon {
+            display: block;
+            font-family: 'FontAwesome';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0px; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon:not(.cke_button__markdown_icon) {
+              background-image: none !important;
+              margin-top: 2px; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__bold_icon:after {
+              content: '\F032'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__italic_icon:after {
+              content: '\F033'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__strike_icon:after {
+              content: '\F0CC'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__removeformat_icon:after {
+              content: '\F00D'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__numberedlist_icon:after {
+              content: '\F0CB'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__bulletedlist_icon:after {
+              content: '\F0CA'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__outdent_icon:after {
+              content: '\F03B'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__indent_icon:after {
+              content: '\F03C'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__blockquote_icon:after {
+              content: '\F10E'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__link_icon:after {
+              content: '\F0C1'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__unlink_icon:after {
+              content: '\F127'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__image_icon:after {
+              content: '\F1C5'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyleft_icon:after {
+              content: '\F036'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifycenter_icon:after {
+              content: '\F037'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyright_icon:after {
+              content: '\F038'; }
+            .editor__field--rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyblock_icon:after {
+              content: '\F039'; }
+      .editor__field--rich-text-editor .cke .cke_inner .cke_bottom {
+        background-color: #424242; }
+        .editor__field--rich-text-editor .cke .cke_inner .cke_bottom .cke_path a {
+          color: #e0e0e0;
+          text-shadow: none;
+          cursor: pointer; }
+          .editor__field--rich-text-editor .cke .cke_inner .cke_bottom .cke_path a:hover {
+            background: none;
+            box-shadow: none; }
+
 /**
  * A generic modal
  */

@@ -25331,7 +25331,7 @@ var UIHelper = function () {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });
 
-        if (!children || children.length < 2) {
+        if (!children || children.length < 1) {
             return false;
         }
 

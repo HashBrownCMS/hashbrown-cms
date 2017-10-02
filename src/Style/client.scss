@@ -65,6 +65,9 @@ $xs: 'max-width: 767px';
 @import 'Views/Editors/Editor';
 @import 'Views/Editors/SchemaEditor';
 
+// Field editors
+@import 'Views/Editors/FieldEditors/RichTextEditor';
+
 // Modals
 @import 'Views/Modals/Modal';
 @import 'Views/Modals/IconModal';

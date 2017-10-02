@@ -140,7 +140,7 @@ class UIHelper {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });
 
-        if(!children || children.length < 2) { return false; }
+        if(!children || children.length < 1) { return false; }
 
         if(typeof isActive === 'undefined') {
             isActive = !parentElement.classList.contains('sorting');

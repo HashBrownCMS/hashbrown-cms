@@ -41,7 +41,7 @@ class StringEditor extends FieldEditor {
 
                     this.trigger('change', this.value);
                 }
-            }).$element.toggleClass('editor__field__sort-key', true)
+            })
         );
     }
 }

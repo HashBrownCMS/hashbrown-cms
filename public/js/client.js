@@ -30254,7 +30254,7 @@ var UIHelper = function () {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
         });
 
-        if (!children || children.length < 2) {
+        if (!children || children.length < 1) {
             return false;
         }
 
@@ -45791,9 +45791,9 @@ var ArrayEditor = function (_FieldEditor) {
 
                         _this4.trigger('change', _this4.value);
                     }
-                }).$element)));
+                }))));
 
-                _.append($field.empty(), editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
                     _this4.value.splice(i, 1);
 
                     _this4.trigger('change', _this4.value);
@@ -47193,33 +47193,11 @@ var RichTextEditor = function (_FieldEditor) {
 
 
     RichTextEditor.prototype.onClickTab = function onClickTab(source) {
-        var _this2 = this;
-
         this.silentChange = true;
 
-        switch (source) {
-            case 'wysiwyg':
-                this.wysiwyg.setData(this.value);
-                break;
-
-            case 'html':
-                this.html.getDoc().setValue(this.value);
-
-                setTimeout(function () {
-                    _this2.html.refresh();
-                }, 1);
-                break;
-
-            case 'markdown':
-                this.markdown.getDoc().setValue(toMarkdown(this.value));
-
-                setTimeout(function () {
-                    _this2.markdown.refresh();
-                }, 1);
-                break;
-        }
-
         document.cookie = 'rteview = ' + source;
+
+        this.init();
     };
 
     /**
@@ -47228,7 +47206,7 @@ var RichTextEditor = function (_FieldEditor) {
 
 
     RichTextEditor.prototype.onClickInsertMedia = function onClickInsertMedia() {
-        var _this3 = this;
+        var _this2 = this;
 
         var mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
@@ -47246,42 +47224,43 @@ var RichTextEditor = function (_FieldEditor) {
 
                 switch (source) {
                     case 'wysiwyg':
-                        _this3.wysiwyg.insertHtml(html);
+                        _this2.wysiwyg.insertHtml(html);
                         break;
 
                     case 'html':
-                        _this3.html.replaceSelection(html, 'end');
+                        _this2.html.replaceSelection(html, 'end');
                         break;
 
                     case 'markdown':
-                        _this3.markdown.replaceSelection(toMarkdown(html), 'end');
+                        _this2.markdown.replaceSelection(toMarkdown(html), 'end');
                         break;
                 }
             }).catch(UI.errorModal);
         });
     };
 
-    RichTextEditor.prototype.render = function render() {
-        var _this4 = this;
+    /**
+     * Gets the tab content
+     *
+     * @returns {HTMLElement} Tab content
+     */
 
-        var $wysiwyg = void 0;
-        var $markdown = void 0;
-        var $html = void 0;
 
-        var activeView = getCookie('rteview') || 'wysiwyg';
+    RichTextEditor.prototype.getTabContent = function getTabContent() {
+        return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+    };
 
-        // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
-            return _.li({ class: activeView == alias ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + _this4.guid + '-' + alias }, label).click(function () {
-                _this4.onClickTab(alias);
-            }));
-        }), _.button({ class: 'btn btn-primary btn-insert-media' }, 'Add media').click(function () {
-            _this4.onClickInsertMedia();
-        })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '') }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '') }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '') }, $html = _.textarea({}))));
+    /**
+     * Initialises the HTML editor
+     */
 
-        // Init HTML editor
+
+    RichTextEditor.prototype.initHtmlEditor = function initHtmlEditor() {
+        var _this3 = this;
+
         setTimeout(function () {
-            _this4.html = CodeMirror.fromTextArea($html[0], {
+            // Kepp reference to editor
+            _this3.html = CodeMirror.fromTextArea(_this3.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'xml'
@@ -47291,23 +47270,31 @@ var RichTextEditor = function (_FieldEditor) {
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: 'default',
-                value: _this4.value
+                value: _this3.value
             });
 
-            _this4.html.on('change', function () {
-                _this4.onChange(_this4.html.getDoc().getValue());
+            // Change event
+            _this3.html.on('change', function () {
+                _this3.onChange(_this3.html.getDoc().getValue());
             });
 
-            // Set value
-            if (activeView == 'html') {
-                _this4.silentChange = true;
-                _this4.html.getDoc().setValue(_this4.value);
-            }
+            // Set value initially
+            _this3.silentChange = true;
+            _this3.html.getDoc().setValue(_this3.value);
         }, 1);
+    };
 
-        // Init markdown editor
+    /**
+     * Initialises the markdown editor
+     */
+
+
+    RichTextEditor.prototype.initMarkdownEditor = function initMarkdownEditor() {
+        var _this4 = this;
+
         setTimeout(function () {
-            _this4.markdown = CodeMirror.fromTextArea($markdown[0], {
+            // Keep reference to editor
+            _this4.markdown = CodeMirror.fromTextArea(_this4.getTabContent(), {
                 lineNumbers: false,
                 mode: {
                     name: 'markdown'
@@ -47320,99 +47307,159 @@ var RichTextEditor = function (_FieldEditor) {
                 value: toMarkdown(_this4.value)
             });
 
+            // Change event
             _this4.markdown.on('change', function () {
                 _this4.onChange(marked(_this4.markdown.getDoc().getValue()));
             });
 
-            // Set value
-            if (activeView == 'markdown') {
-                _this4.silentChange = true;
-                _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
-            }
+            // Set value initially
+            _this4.silentChange = true;
+            _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
         }, 1);
+    };
 
-        // Init WYSIWYG editor
-        this.wysiwyg = CKEDITOR.replace($wysiwyg[0], {
-            removePlugins: 'contextmenu,liststyle,tabletools',
-            allowedContent: true,
-            height: 400,
-            toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
+    /**
+     * Initialises the WYSIWYG editor
+     */
 
-            extraPlugins: 'justify,divarea',
 
-            removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+    RichTextEditor.prototype.initWYSIWYGEditor = function initWYSIWYGEditor() {
+        var _this5 = this;
 
-            removeDialogTabs: 'image:advanced;link:advanced'
-        });
+        setTimeout(function () {
+            _this5.wysiwyg = CKEDITOR.replace(_this5.getTabContent(), {
+                removePlugins: 'contextmenu,liststyle,tabletools',
+                allowedContent: true,
+                height: 400,
+                toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
-        this.wysiwyg.on('change', function () {
-            _this4.onChange(_this4.wysiwyg.getData());
-        });
+                extraPlugins: 'justify,divarea',
 
-        this.wysiwyg.on('instanceReady', function () {
-            // Strips the style information
-            var stripStyle = function stripStyle(element) {
-                delete element.attributes.style;
-            };
+                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-            // Filtering rules
-            _this4.wysiwyg.dataProcessor.dataFilter.addRules({
-                elements: {
-                    // Strip styling from these elements
-                    p: stripStyle,
-                    h1: stripStyle,
-                    h2: stripStyle,
-                    h3: stripStyle,
-                    h4: stripStyle,
-                    h5: stripStyle,
-                    h6: stripStyle,
-                    span: stripStyle,
-                    div: stripStyle,
-                    section: stripStyle,
-                    hr: stripStyle,
-                    header: stripStyle,
-                    aside: stripStyle,
-                    footer: stripStyle,
-                    ul: stripStyle,
-                    li: stripStyle,
-                    blockquote: stripStyle,
-
-                    // Refactor image src url to fit MediaController
-                    img: function img(element) {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if (element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-
-                            // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        }
-                    },
-
-                    // Refactor video src url to fit MediaController
-                    video: function video(element) {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if (element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-
-                            // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                        }
-                    }
-                }
+                removeDialogTabs: 'image:advanced;link:advanced'
             });
 
-            // Set value
-            if (activeView == 'wysiwyg') {
-                _this4.silentChange = true;
-                _this4.wysiwyg.setData(_this4.value);
-            }
-        });
+            _this5.wysiwyg.on('change', function () {
+                _this5.onChange(_this5.wysiwyg.getData());
+            });
+
+            _this5.wysiwyg.on('instanceReady', function () {
+                // Strips the style information
+                var stripStyle = function stripStyle(element) {
+                    delete element.attributes.style;
+                };
+
+                // Filtering rules
+                _this5.wysiwyg.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        // Strip styling from these elements
+                        p: stripStyle,
+                        h1: stripStyle,
+                        h2: stripStyle,
+                        h3: stripStyle,
+                        h4: stripStyle,
+                        h5: stripStyle,
+                        h6: stripStyle,
+                        span: stripStyle,
+                        div: stripStyle,
+                        section: stripStyle,
+                        hr: stripStyle,
+                        header: stripStyle,
+                        aside: stripStyle,
+                        footer: stripStyle,
+                        ul: stripStyle,
+                        li: stripStyle,
+                        blockquote: stripStyle,
+
+                        // Refactor image src url to fit MediaController
+                        img: function img(element) {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if (element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+
+                                // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            }
+                        },
+
+                        // Refactor video src url to fit MediaController
+                        video: function video(element) {
+                            stripStyle(element);
+
+                            // Fetch from data attribute
+                            if (element.attributes['data-id']) {
+                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+
+                                // Failing that, use regex
+                            } else {
+                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            }
+                        }
+                    }
+                });
+
+                // Set value initially
+                _this5.silentChange = true;
+                _this5.wysiwyg.setData(_this5.value);
+            });
+        }, 1);
+    };
+
+    /**
+     * Prerender
+     */
+
+
+    RichTextEditor.prototype.prerender = function prerender() {
+        this.markdown = null;
+        this.wysiwyg = null;
+        this.html = null;
+    };
+
+    /** 
+     * Renders this editor
+     */
+
+
+    RichTextEditor.prototype.template = function template() {
+        var _this6 = this;
+
+        var activeView = getCookie('rteview') || 'wysiwyg';
+
+        return _.div({ class: 'editor__field__value editor__field--rich-text-editor' }, _.div({ class: 'editor__field--rich-text-editor__header' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
+            return _.button({ class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab' }, label).click(function () {
+                _this6.onClickTab(alias);
+            });
+        }), _.button({ class: 'editor__field--rich-text-editor__header__add-media' }, 'Add media').click(function () {
+            _this6.onClickInsertMedia();
+        })), _.div({ class: 'editor__field--rich-text-editor__body' }, _.if(activeView === 'wysiwyg', _.div({ class: 'editor__field--rich-text-editor__tab wysiwyg' }, _.div({ class: 'editor__field--rich-text-editor__tab__content', 'contenteditable': true }))), _.if(activeView === 'markdown', _.div({ class: 'editor__field--rich-text-editor__tab markdown' }, _.textarea({ class: 'editor__field--rich-text-editor__tab__content' }))), _.if(activeView === 'html', _.div({ class: 'editor__field--rich-text-editor__tab html' }, _.textarea({ class: 'editor__field--rich-text-editor__tab__content' })))));
+    };
+
+    /**
+     * Post render
+     */
+
+
+    RichTextEditor.prototype.postrender = function postrender() {
+        var activeView = getCookie('rteview') || 'wysiwyg';
+
+        switch (activeView) {
+            case 'html':
+                this.initHtmlEditor();
+                break;
+
+            case 'markdown':
+                this.initMarkdownEditor();
+                break;
+
+            case 'wysiwyg':
+                this.initWYSIWYGEditor();
+                break;
+        }
     };
 
     return RichTextEditor;
@@ -47483,7 +47530,7 @@ var StringEditor = function (_FieldEditor) {
 
                 _this2.trigger('change', _this2.value);
             }
-        }).$element.toggleClass('editor__field__sort-key', true));
+        }));
     };
 
     return StringEditor;
@@ -47733,7 +47780,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             // Return the DOM element
-            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, keySchema.label, fieldEditorInstance.$keyContent), _.div({ class: 'editor__field__value' }, fieldEditorInstance.$element));
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, keySchema.label, fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
         }));
     };
 

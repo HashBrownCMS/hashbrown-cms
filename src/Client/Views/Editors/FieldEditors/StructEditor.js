@@ -244,11 +244,9 @@ class StructEditor extends FieldEditor {
                 return _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
                         keySchema.label,
-                        fieldEditorInstance.$keyContent
+                        fieldEditorInstance.renderKeyActions()
                     ),
-                    _.div({class: 'editor__field__value'},
-                        fieldEditorInstance.$element
-                    )
+                    fieldEditorInstance.$element
                 );
             })    
         );
