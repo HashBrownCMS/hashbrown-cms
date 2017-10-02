@@ -3,7 +3,7 @@
  */
 .editor {
     // Locked state
-    &.locked &__body > &__field {
+    &.locked &__body__tab > &__field {
         pointer-events: none;
         opacity: 0.75;
         user-select: none;
@@ -84,7 +84,8 @@
         z-index: 10;
         box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
         flex-shrink: 0;
-        padding: 15px;
+        padding: 1rem;
+        height: 5rem;
         margin: 0px;
         border-width: 0px;
         border-top-width: 1px;
@@ -93,10 +94,33 @@
         border-top: 1px solid $standard-darker;
         color: $standard-text;
 
+        // Buttons
         &__buttons {
             margin: 0 0 0 auto;
             float: right;
             display: flex;
+
+            > .widget--button:not(:last-child) {
+                margin-right: 1rem;
+            }
+        }
+
+        // Error
+        &__error {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            pointer-events: none;
+            background-color: $warning;
+            color: $warning-text;
+            padding: 1rem;
+            border-bottom-left-radius: 2px;
+            line-height: 1.5rem;
+
+            &__heading {
+                font-weight: 700;
+            }
         }
     }
 
@@ -111,6 +135,32 @@
         &:last-of-type {
             border-bottom: 0;
         }
+
+        // Collapsed & sorting mode
+        .editor__field__value.collapsed &,
+        .editor__field__value.sorting &,
+        &.collapsed {
+            height: 4rem;
+            border-radius: 0.2rem;
+
+            &:not(:first-of-type) {
+                margin-top: 1rem !important;
+            }
+
+            &:last-of-type {
+                margin-bottom: 0 !important;
+            }
+
+            .editor__field__sort-key {
+                display: block;
+            }
+
+            .editor__field__key,
+            .editor__field__value {
+                display: none;
+            }
+        }
+
 
         // Vertical mode
         &.vertical {
@@ -250,38 +300,6 @@
                 box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
             }
 
-            // Collapsed & sorting mode
-            &.collapsed, &.sorting {
-                // Style the items inside
-                .editor__field {
-                    height: 3rem;
-                    border-radius: 0.2rem;
-                    padding: 0;
-
-                    &:not(:first-of-type) {
-                        margin-top: 1rem !important;
-                    }
-
-                    &:last-of-type {
-                        margin-bottom: 0 !important;
-                    }
-
-                    &:before {
-                        display: none !important;
-                    }
-                
-                    &__sort-key {
-                        display: block;
-                    }
-
-                    &__key,
-                    &__value,
-                    &__remove {
-                        display: none;
-                    }
-                }
-            }
-
             // Collapsed mode
             &.collapsed {
                 // Style the items inside
@@ -310,6 +328,7 @@
                     background-color: $primary;
                     cursor: move;
 
+                    &__collapse,
                     &__remove {
                         display: none;
                     }
@@ -335,26 +354,15 @@
             }
         }
 
-        // Sort key
-        &__sort-key {
-            background-color: transparent;
-            font-weight: bold;
-            padding: 0 1rem;
-            border: 0;
-            pointer-events: none;
-            line-height: 3rem;
-            height: 3rem;
-            display: none;
-        }
-            
-        // Add button
-        &__add {
-            margin-top: 1rem;
-            margin-left: auto;
+        // Actions
+        &__actions {
+            display: flex;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
         }
 
-        // Remove button
-        &__remove {
+        &__action {
             background-color: transparent;
             line-height: 2rem;
             height: 2rem;
@@ -362,23 +370,53 @@
             border: 0;
             display: block;
             cursor: pointer;
-            color: $primary;
             z-index: 90;
             padding: 0;
 
-            &:hover {
-                &::after {
-                   position: absolute;
-                   display: block;
-                   content: '';
-                   border: 1px solid $primary;
-                   top: 0;
-                   left: 0;
-                   width: 100%;
-                   height: 100%;
-                   pointer-events: none;
+            // Icon
+            &:after {
+                font-family: 'FontAwesome';
+            }
+
+            // Collapse button
+            &--collapse {
+                &:after {
+                    content: '\f2d1';
                 }
             }
+
+            .editor__field.collapsed > .editor__field__actions > &--collapse {
+                &:after {
+                    content: '\f2d0';
+                }
+            }
+
+            // Remove button
+            &--remove {
+                color: $primary;
+                
+                &:after {
+                    content: '\f00d';
+                }
+            }
+        }
+
+        // Sort key
+        &__sort-key {
+            background-color: transparent;
+            font-weight: bold;
+            border: 0;
+            pointer-events: none;
+            line-height: 2rem;
+            height: 2rem;
+            display: none;
+            flex-grow: 1;
+        }
+            
+        // Add button
+        &__add {
+            margin-top: 1rem;
+            margin-left: auto;
         }
     }
 }

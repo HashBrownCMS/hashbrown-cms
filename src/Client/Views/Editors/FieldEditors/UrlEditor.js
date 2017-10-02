@@ -81,7 +81,7 @@ class UrlEditor extends FieldEditor {
             let title = '';
        
             if(node.id == Crisp.Router.params.id) {
-                title = $('.field-container[data-key="title"] .field-editor input').val();
+                title = $('.editor__field[data-key="title"] .editor__field__value input').val();
 
             } else {
                 // If title is set directly (unlikely), pass it
@@ -181,17 +181,18 @@ class UrlEditor extends FieldEditor {
         this.trigger('change', this.value);
     };
 
-    render() {
-        this.$element = _.div({class: 'field-editor url-editor input-group'},
-            // Render preview
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'editor__field__value'},
             this.renderPreview(),
 
-            this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
-                .on('change', () => { this.onChange(); }),
-            _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-default btn-small'},
-                    _.span({class: 'fa fa-refresh'})
-                ).click(() => { this.regenerate(); })
+            _.div({class: 'widget-group'},
+                this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
+                    .on('change', () => { this.onChange(); }),
+                _.button({class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL'})
+                    .click(() => { this.regenerate(); })
             )
         );
 

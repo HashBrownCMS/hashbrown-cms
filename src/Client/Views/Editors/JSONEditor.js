@@ -13,10 +13,10 @@ class JSONEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'json-editor editor flex-vertical'});
-        this.$error = _.div({class: 'error'},
-            _.div({class: 'error-heading'}),
-            _.div({class: 'error-body'})
+        this.$element = _.div({class: 'editor editor--json'});
+        this.$error = _.div({class: 'editor__footer__error'},
+            _.div({class: 'editor__footer__error__heading'}),
+            _.div({class: 'editor__footer__error__body'})
         ).hide();
 
         if(!this.model && !this.modelUrl) {
@@ -69,8 +69,8 @@ class JSONEditor extends Crisp.View {
             this.$element.find('textarea').val(this.value);
         
         } catch(e) {
-            this.$error.children('.error-heading').html('JSON error');
-            this.$error.children('.error-body').html(e);
+            this.$error.children('.editor__footer__error__heading').html('JSON error');
+            this.$error.children('.editor__footer__error__body').html(e);
             this.$error.show();
 
         }
@@ -231,8 +231,8 @@ class JSONEditor extends Crisp.View {
                     let failMessage = check(k, v);
                     
                     if(failMessage) {
-                        this.$error.children('.error-heading').html('Input error');
-                        this.$error.children('.error-body').html(failMessage);
+                        this.$error.children('.editor__footer__error__heading').html('Input error');
+                        this.$error.children('.editor__footer__error__body').html(failMessage);
                         this.$error.show();
                     
                         isValid = false;
@@ -256,8 +256,8 @@ class JSONEditor extends Crisp.View {
             recurse(this.model);
 
         } catch(e) {
-            this.$error.children('.error-heading').html('Syntax error');
-            this.$error.children('.error-body').html(e);
+            this.$error.children('.editor__footer__error__heading').html('Syntax error');
+            this.$error.children('.editor__footer__error__body').html(e);
             this.$error.show();
 
             isValid = false;
@@ -288,22 +288,24 @@ class JSONEditor extends Crisp.View {
         this.value = beautify(JSON.stringify(this.model));
 
         _.append(this.$element.empty(),
-            _.div({class: 'editor-body'},
-                this.$textarea = _.textarea(),
-                this.$error
+            _.div({class: 'editor__header'}, 
+                _.span({class: 'editor__header__icon fa fa-code'}),
+                _.h4({class: 'editor__header__title'}, Crisp.Router.params.id)
             ),
-            _.if(!this.embedded,
-                _.div({class: 'editor-footer'}, 
-                    _.div({class: 'btn-group'},
-                        _.button({class: 'btn btn-embedded'},
-                            'Basic'
-                        ).click(() => { this.onClickBasic(); }),
-                        _.if(!this.model.isLocked,
-                            this.$saveBtn = _.button({class: 'btn btn-raised btn-primary'},
-                                _.span({class: 'text-default'}, 'Save'),
-                                _.span({class: 'text-working'}, 'Saving')
-                            ).click(() => { this.onClickSave(); })
-                        )
+            _.div({class: 'editor__body'},
+                this.$textarea = _.textarea(),
+            ),
+            _.div({class: 'editor__footer'}, 
+                this.$error,
+                _.div({class: 'editor__footer__buttons'},
+                    _.button({class: 'widget widget--button embedded'},
+                        'Basic'
+                    ).click(() => { this.onClickBasic(); }),
+                    _.if(!this.model.isLocked,
+                        this.$saveBtn = _.button({class: 'widget widget--button'},
+                            _.span({class: 'widget--button__text-default'}, 'Save'),
+                            _.span({class: 'widget--button__text-working'}, 'Saving')
+                        ).click(() => { this.onClickSave(); })
                     )
                 )
             )
@@ -316,9 +318,9 @@ class JSONEditor extends Crisp.View {
                     name: 'javascript',
                     json: true
                 },
-                viewportMargin: this.embedded ? Infinity : 10,
+                viewportMargin: 10,
                 tabSize: 4,
-                lineWrapping: this.embedded,
+                lineWrapping: false,
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',

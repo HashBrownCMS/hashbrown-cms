@@ -262,14 +262,20 @@ class ArrayEditor extends FieldEditor {
                     _.append($field.empty(),
                         _.div({class: 'editor__field__sort-key'}, schema.name),
                         editorInstance.$element,
-                        _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove item'})
-                            .click(() => {
-                                this.value.splice(i, 1);
-                        
-                                this.trigger('change', this.value);
+                        _.div({class: 'editor__field__actions'},
+                            _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
+                                .click(() => {
+                                    $field.toggleClass('collapsed');
+                                }),
+                            _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove item'})
+                                .click(() => {
+                                    this.value.splice(i, 1);
+                            
+                                    this.trigger('change', this.value);
 
-                                this.init();
-                            })
+                                    this.init();
+                                })
+                        )
                     );
                 };
 

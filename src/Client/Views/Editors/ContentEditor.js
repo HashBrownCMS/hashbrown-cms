@@ -412,25 +412,25 @@ class ContentEditor extends Crisp.View {
         _.append($('.editor__footer').empty(), 
             _.div({class: 'editor__footer__buttons'},
                 // JSON editor
-                _.button({class: 'widget widget--button embedded'},
+                _.button({class: 'widget widget--button contracted embedded'},
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
                 _.if(this.model.isPublished && remoteUrl,
-                    _.a({target: '_blank', href: remoteUrl, class: 'widget widget--button embedded'}, 'View')
+                    _.a({target: '_blank', href: remoteUrl, class: 'widget widget--button contracted embedded'}, 'View')
                 ),
 
                 _.if(!this.model.isLocked,
                     // Save & publish
-                    _.div({class: 'widget widget--button-group'},
+                    _.div({class: 'widget widget-group'},
                         this.$saveBtn = _.button({class: 'widget widget--button'},
                             _.span({class: 'widget--button__text-default'}, 'Save'),
                             _.span({class: 'widget--button__text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
                         _.if(connection,
-                            _.span('&'),
-                            _.select({class: 'widget widget--button-group__appendix'},
+                            _.span({class: 'widget widget--button widget-group__separator'}, '&'),
+                            _.select({class: 'widget widget--button contracted'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
                                 _.if(this.model.isPublished, 

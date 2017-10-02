@@ -25135,8 +25135,8 @@ var JSONEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'json-editor editor flex-vertical' });
-        _this.$error = _.div({ class: 'error' }, _.div({ class: 'error-heading' }), _.div({ class: 'error-body' })).hide();
+        _this.$element = _.div({ class: 'editor editor--json' });
+        _this.$error = _.div({ class: 'editor__footer__error' }, _.div({ class: 'editor__footer__error__heading' }), _.div({ class: 'editor__footer__error__body' })).hide();
 
         if (!_this.model && !_this.modelUrl) {
             _this.modelUrl = RequestHelper.environmentUrl(_this.apiPath);
@@ -25192,8 +25192,8 @@ var JSONEditor = function (_Crisp$View) {
             this.value = beautify(this.value);
             this.$element.find('textarea').val(this.value);
         } catch (e) {
-            this.$error.children('.error-heading').html('JSON error');
-            this.$error.children('.error-body').html(e);
+            this.$error.children('.editor__footer__error__heading').html('JSON error');
+            this.$error.children('.editor__footer__error__body').html(e);
             this.$error.show();
         }
     };
@@ -25382,8 +25382,8 @@ var JSONEditor = function (_Crisp$View) {
                     var failMessage = check(k, v);
 
                     if (failMessage) {
-                        _this3.$error.children('.error-heading').html('Input error');
-                        _this3.$error.children('.error-body').html(failMessage);
+                        _this3.$error.children('.editor__footer__error__heading').html('Input error');
+                        _this3.$error.children('.editor__footer__error__body').html(failMessage);
                         _this3.$error.show();
 
                         isValid = false;
@@ -25406,8 +25406,8 @@ var JSONEditor = function (_Crisp$View) {
             // Sanity check
             recurse(this.model);
         } catch (e) {
-            this.$error.children('.error-heading').html('Syntax error');
-            this.$error.children('.error-body').html(e);
+            this.$error.children('.editor__footer__error__heading').html('Syntax error');
+            this.$error.children('.editor__footer__error__body').html(e);
             this.$error.show();
 
             isValid = false;
@@ -25441,11 +25441,11 @@ var JSONEditor = function (_Crisp$View) {
         // Convert the model to a string value
         this.value = beautify(JSON.stringify(this.model));
 
-        _.append(this.$element.empty(), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.embedded, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(function () {
+        _.append(this.$element.empty(), _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-code' }), _.h4({ class: 'editor__header__title' }, Crisp.Router.params.id)), _.div({ class: 'editor__body' }, this.$textarea = _.textarea()), _.div({ class: 'editor__footer' }, this.$error, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Basic').click(function () {
             _this4.onClickBasic();
-        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this4.onClickSave();
-        }))))));
+        })))));
 
         setTimeout(function () {
             _this4.editor = CodeMirror.fromTextArea(_this4.$textarea[0], {
@@ -25454,9 +25454,9 @@ var JSONEditor = function (_Crisp$View) {
                     name: 'javascript',
                     json: true
                 },
-                viewportMargin: _this4.embedded ? Infinity : 10,
+                viewportMargin: 10,
                 tabSize: 4,
-                lineWrapping: _this4.embedded,
+                lineWrapping: false,
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
@@ -29359,16 +29359,16 @@ var ContentEditor = function (_Crisp$View) {
 
         _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
-        _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+        _.button({ class: 'widget widget--button contracted embedded' }, 'Advanced').click(function () {
             _this6.onClickAdvanced();
         }),
 
         // View remote
-        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button embedded' }, 'View')), _.if(!this.model.isLocked,
+        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button contracted embedded' }, 'View')), _.if(!this.model.isLocked,
         // Save & publish
-        _.div({ class: 'widget widget--button-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
+        _.div({ class: 'widget widget-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connection, _.span('&'), _.select({ class: 'widget widget--button-group__appendix' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button contracted' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     /**
@@ -45805,13 +45805,15 @@ var ArrayEditor = function (_FieldEditor) {
                     }
                 }))));
 
-                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
+                    $field.toggleClass('collapsed');
+                }), _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove item' }).click(function () {
                     _this4.value.splice(i, 1);
 
                     _this4.trigger('change', _this4.value);
 
                     _this4.init();
-                }));
+                })));
             };
 
             renderField();
@@ -48300,7 +48302,7 @@ var UrlEditor = function (_FieldEditor) {
             var title = '';
 
             if (node.id == Crisp.Router.params.id) {
-                title = $('.field-container[data-key="title"] .field-editor input').val();
+                title = $('.editor__field[data-key="title"] .editor__field__value input').val();
             } else {
                 // If title is set directly (unlikely), pass it
                 if (typeof node.title === 'string') {
@@ -48415,14 +48417,15 @@ var UrlEditor = function (_FieldEditor) {
         this.trigger('change', this.value);
     };
 
-    UrlEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+    UrlEditor.prototype.template = function template() {
         var _this2 = this;
 
-        this.$element = _.div({ class: 'field-editor url-editor input-group' },
-        // Render preview
-        this.renderPreview(), this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }).on('change', function () {
+        return _.div({ class: 'editor__field__value' }, this.renderPreview(), _.div({ class: 'widget-group' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
             _this2.onChange();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-default btn-small' }, _.span({ class: 'fa fa-refresh' })).click(function () {
+        }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();
         })));
 

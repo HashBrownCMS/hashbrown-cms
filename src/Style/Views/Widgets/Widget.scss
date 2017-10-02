@@ -9,6 +9,32 @@
 .widget {
     position: relative;
 
+    // Group
+    &-group {
+        display: flex;
+
+        .widget {
+            border-radius: 0;
+
+            &:first-child {
+                border-top-left-radius: 0.2rem;
+                border-bottom-left-radius: 0.2rem;
+            }
+            
+            &:last-child {
+                border-top-right-radius: 0.2rem;
+                border-bottom-right-radius: 0.2rem;
+            }
+        }
+
+        &__separator {
+            min-width: 0 !important;
+            padding: 0 0.5rem;
+            user-select: none;
+            pointer-events: none;
+        }
+    }
+
     // Working state
     &.working {
         &:after {

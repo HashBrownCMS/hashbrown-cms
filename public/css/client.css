@@ -2436,7 +2436,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 /**
  * Global editor styling
  */
-.editor.locked .editor__body > .editor__field {
+.editor.locked .editor__body__tab > .editor__field {
   pointer-events: none;
   opacity: 0.75;
   user-select: none; }
@@ -2496,7 +2496,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   z-index: 10;
   box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
-  padding: 15px;
+  padding: 1rem;
+  height: 5rem;
   margin: 0px;
   border-width: 0px;
   border-top-width: 1px;
@@ -2508,6 +2509,21 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     margin: 0 0 0 auto;
     float: right;
     display: flex; }
+    .editor__footer__buttons > .widget--button:not(:last-child) {
+      margin-right: 1rem; }
+  .editor__footer__error {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+    pointer-events: none;
+    background-color: #FFB300;
+    color: #664800;
+    padding: 1rem;
+    border-bottom-left-radius: 2px;
+    line-height: 1.5rem; }
+    .editor__footer__error__heading {
+      font-weight: 700; }
 
 .editor__field {
   display: flex;
@@ -2517,6 +2533,25 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   border-bottom: 1px solid #dddddd; }
   .editor__field:last-of-type {
     border-bottom: 0; }
+  .editor__field__value.collapsed .editor__field,
+  .editor__field__value.sorting .editor__field, .editor__field.collapsed {
+    height: 4rem;
+    border-radius: 0.2rem; }
+    .editor__field__value.collapsed .editor__field:not(:first-of-type),
+    .editor__field__value.sorting .editor__field:not(:first-of-type), .editor__field.collapsed:not(:first-of-type) {
+      margin-top: 1rem !important; }
+    .editor__field__value.collapsed .editor__field:last-of-type,
+    .editor__field__value.sorting .editor__field:last-of-type, .editor__field.collapsed:last-of-type {
+      margin-bottom: 0 !important; }
+    .editor__field__value.collapsed .editor__field .editor__field__sort-key,
+    .editor__field__value.sorting .editor__field .editor__field__sort-key, .editor__field.collapsed .editor__field__sort-key {
+      display: block; }
+    .editor__field__value.collapsed .editor__field .editor__field__key,
+    .editor__field__value.collapsed .editor__field .editor__field__value,
+    .editor__field__value.sorting .editor__field .editor__field__key,
+    .editor__field__value.sorting .editor__field .editor__field__value, .editor__field.collapsed .editor__field__key,
+    .editor__field.collapsed .editor__field__value {
+      display: none; }
   .editor__field.vertical {
     flex-direction: column; }
   .editor__field.vertical > .editor__field__key {
@@ -2593,20 +2628,6 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       background-color: #eeeeee;
       border-radius: 0.2rem;
       box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
-    .editor__field__value.collapsed .editor__field, .editor__field__value.sorting .editor__field {
-      height: 3rem;
-      border-radius: 0.2rem;
-      padding: 0; }
-      .editor__field__value.collapsed .editor__field:not(:first-of-type), .editor__field__value.sorting .editor__field:not(:first-of-type) {
-        margin-top: 1rem !important; }
-      .editor__field__value.collapsed .editor__field:last-of-type, .editor__field__value.sorting .editor__field:last-of-type {
-        margin-bottom: 0 !important; }
-      .editor__field__value.collapsed .editor__field:before, .editor__field__value.sorting .editor__field:before {
-        display: none !important; }
-      .editor__field__value.collapsed .editor__field__sort-key, .editor__field__value.sorting .editor__field__sort-key {
-        display: block; }
-      .editor__field__value.collapsed .editor__field__key, .editor__field__value.collapsed .editor__field__value, .editor__field__value.collapsed .editor__field__remove, .editor__field__value.sorting .editor__field__key, .editor__field__value.sorting .editor__field__value, .editor__field__value.sorting .editor__field__remove {
-        display: none; }
     .editor__field__value.collapsed .editor__field {
       background-color: #ffffff; }
     .editor__field__value.sorting {
@@ -2619,7 +2640,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       .editor__field__value.sorting .editor__field {
         background-color: #e70d3b;
         cursor: move; }
-        .editor__field__value.sorting .editor__field__remove {
+        .editor__field__value.sorting .editor__field__collapse, .editor__field__value.sorting .editor__field__remove {
           display: none; }
     .editor__field__value__warning {
       background-color: #FFB300;
@@ -2634,19 +2655,12 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
         font-family: 'FontAwesome';
         content: '\F071';
         margin-right: 0.5rem; }
-  .editor__field__sort-key {
-    background-color: transparent;
-    font-weight: bold;
-    padding: 0 1rem;
-    border: 0;
-    pointer-events: none;
-    line-height: 3rem;
-    height: 3rem;
-    display: none; }
-  .editor__field__add {
-    margin-top: 1rem;
-    margin-left: auto; }
-  .editor__field__remove {
+  .editor__field__actions {
+    display: flex;
+    position: absolute;
+    top: 1rem;
+    right: 1rem; }
+  .editor__field__action {
     background-color: transparent;
     line-height: 2rem;
     height: 2rem;
@@ -2654,19 +2668,48 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     border: 0;
     display: block;
     cursor: pointer;
-    color: #e70d3b;
     z-index: 90;
     padding: 0; }
-    .editor__field__remove:hover::after {
-      position: absolute;
-      display: block;
-      content: '';
-      border: 1px solid #e70d3b;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none; }
+    .editor__field__action:after {
+      font-family: 'FontAwesome'; }
+    .editor__field__action--collapse:after {
+      content: '\F2D1'; }
+    .editor__field.collapsed > .editor__field__actions > .editor__field__action--collapse:after {
+      content: '\F2D0'; }
+    .editor__field__action--remove {
+      color: #e70d3b; }
+      .editor__field__action--remove:after {
+        content: '\F00D'; }
+  .editor__field__sort-key {
+    background-color: transparent;
+    font-weight: bold;
+    border: 0;
+    pointer-events: none;
+    line-height: 2rem;
+    height: 2rem;
+    display: none;
+    flex-grow: 1; }
+  .editor__field__add {
+    margin-top: 1rem;
+    margin-left: auto; }
+
+/**
+ * A JSON editor
+ */
+.editor--json .editor__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  position: relative; }
+  .editor--json .editor__body .CodeMirror {
+    height: 100%;
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px; }
 
 /**
  * The editor for Schemas
@@ -2929,6 +2972,21 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 
 .widget {
   position: relative; }
+  .widget-group {
+    display: flex; }
+    .widget-group .widget {
+      border-radius: 0; }
+      .widget-group .widget:first-child {
+        border-top-left-radius: 0.2rem;
+        border-bottom-left-radius: 0.2rem; }
+      .widget-group .widget:last-child {
+        border-top-right-radius: 0.2rem;
+        border-bottom-right-radius: 0.2rem; }
+    .widget-group__separator {
+      min-width: 0 !important;
+      padding: 0 0.5rem;
+      user-select: none;
+      pointer-events: none; }
   .widget.working:after {
     font-family: 'FontAwesome';
     content: '\F1CE';
@@ -2980,7 +3038,12 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   text-transform: uppercase;
   display: block;
   font-weight: bold;
-  min-width: 10rem; }
+  min-width: 10rem;
+  text-align: center;
+  cursor: pointer; }
+  .widget--button:hover {
+    background-color: #b70a2f;
+    text-decoration: none; }
   .widget--button.round {
     width: 3rem;
     min-width: 0;
@@ -2991,9 +3054,16 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     color: #e70d3b;
     background-color: transparent;
     box-shadow: none; }
+  .widget--button.small {
+    width: 2rem;
+    line-height: 2rem;
+    height: 2rem;
+    min-width: 0; }
   .widget--button.working .widget--button__text-default,
   .widget--button:not(.working) .widget--button__text-working {
     display: none; }
+  .widget--button.contracted {
+    min-width: 0; }
 
 /**
  * A group of chips
