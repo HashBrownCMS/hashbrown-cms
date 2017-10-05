@@ -11311,7 +11311,6 @@ var FieldSchema = function (_Schema) {
         _Schema.prototype.structure.call(this);
 
         this.def(String, 'editorId');
-        this.def(String, 'previewTemplate', '');
         this.def(Object, 'config', {});
 
         this.name = 'New field schema';

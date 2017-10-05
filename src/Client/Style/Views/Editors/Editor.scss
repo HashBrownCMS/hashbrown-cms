@@ -372,6 +372,14 @@
             cursor: pointer;
             z-index: 90;
             padding: 0;
+            color: $primary;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            border-radius: 0.2rem;
+
+            &:hover {
+                background-color: $primary;
+                color: $primary-text;
+            }
 
             // Icon
             &:after {
@@ -393,8 +401,6 @@
 
             // Remove button
             &--remove {
-                color: $primary;
-                
                 &:after {
                     content: '\f00d';
                 }

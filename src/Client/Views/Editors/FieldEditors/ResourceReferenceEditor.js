@@ -55,7 +55,7 @@ class ResourceReferenceEditor extends FieldEditor {
     /**
      * Renders this editor
      */
-    render() {
+    template() {
         let resource = resources[this.config.resource];
         let value;
 
@@ -91,8 +91,8 @@ class ResourceReferenceEditor extends FieldEditor {
             }
         }
         
-        this.$element = _.div({class: 'field-editor resource-reference-editor'},
-            _.p(value || '(none)')
+        return _.div({class: 'editor__field__value'},
+            value || '(none)'
         );
     }
 }

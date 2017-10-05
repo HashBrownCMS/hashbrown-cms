@@ -8,35 +8,6 @@ const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
  * @memberof HashBrown.Client.Views.Editors
  */
 class FieldSchemaEditor extends SchemaEditor {
-	/**
-	 * Render template editor
-	 *
-	 * @returns {HTMLElement} Element
-	 */
-	renderTemplateEditor() {
-        let $element = _.div({class: 'field-properties-editor'});
-
-		setTimeout(() => {
-			this.templateEditor = CodeMirror($element[0], {
-				value: this.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-			});
-
-			this.templateEditor.on('change', () => {
-				this.model.previewTemplate = this.templateEditor.getDoc().getValue();
-			});
-		}, 1);
-
-		return $element;
-	}
-    
     /**
      * Renders the field config editor
      *
@@ -114,10 +85,7 @@ class FieldSchemaEditor extends SchemaEditor {
             }
         }).$element));
         
-        if(!this.model.isLocked) {
-            $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-            $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
-        }
+        $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
 
         return $element;
     }

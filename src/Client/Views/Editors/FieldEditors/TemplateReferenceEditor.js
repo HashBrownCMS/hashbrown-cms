@@ -163,7 +163,6 @@ class TemplateReferenceEditor extends FieldEditor {
         }
 
         return _.div({class: 'editor__field__value'},
-            this.renderPreview(),
             new HashBrown.Views.Widgets.Dropdown({
                 useTypeAhead: true,
                 value: this.value,

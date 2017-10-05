@@ -41,8 +41,28 @@ class Modal extends Crisp.View {
      *
      * @returns {HTMLElement} Body
      */
-    renderBody() {
+    renderBody() { }
+    
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+    renderFooter() { }
+    
+    /**
+     * Renders the modal header
+     *
+     * @returns {HTMLElement} Header
+     */
+    renderHeader() {
+        if(!this.title) { return; }
 
+        return [
+            _.h4({class: 'modal__title'}, this.title),
+            _.button({class: 'modal__close fa fa-close'})
+                .click(() => { this.close(); })
+        ];
     }
 
     /**
@@ -51,18 +71,14 @@ class Modal extends Crisp.View {
     template() {
         return _.div({class: 'modal'},
             _.div({class: 'modal__dialog'},
-                _.if(this.title,
-                    _.div({class: 'modal__header'}, 
-                        _.h4({class: 'modal__title'}, this.title),
-                        _.button({class: 'modal__close fa fa-close'})
-                            .click(() => { this.close(); })
-                    )
+                _.div({class: 'modal__header'},
+                    this.renderHeader()
                 ),
                 _.div({class: 'modal__body'},
                     this.renderBody() 
                 ),
-                _.if(this.actions.length > 0,
-                    _.div({class: 'modal__footer'})
+                _.div({class: 'modal__footer'},
+                    this.renderFooter()
                 )
             )
         );

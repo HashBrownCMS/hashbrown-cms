@@ -38,6 +38,11 @@
         box-shadow: none;
     }
 
+    &.low {
+        height: 2rem;
+        line-height: 2rem;
+    }
+
     &.small {
         width: 2rem;
         line-height: 2rem;

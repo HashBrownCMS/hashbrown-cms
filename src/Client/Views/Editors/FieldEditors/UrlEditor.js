@@ -79,10 +79,12 @@ class UrlEditor extends FieldEditor {
 
         for(let node of nodes) {
             let title = '';
-       
+
+            // If the node equals the currently edited node, take the value directly from the "title" field
             if(node.id == Crisp.Router.params.id) {
                 title = $('.editor__field[data-key="title"] .editor__field__value input').val();
 
+            // If it's not, try to get the title from the model
             } else {
                 // If title is set directly (unlikely), pass it
                 if(typeof node.title === 'string') {
@@ -105,6 +107,7 @@ class UrlEditor extends FieldEditor {
             url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
         }
 
+        // Check for duplicate URLs
         let sameUrls = 0;
 
         for(let content of window.resources.content) {
@@ -119,19 +122,8 @@ class UrlEditor extends FieldEditor {
             }
         }
 
+        // Append a number, if duplidate URLs were found
         if(sameUrls > 0) {
-            let message = sameUrls;
-           
-            if(sameUrls == 1) {
-                message += ' content node has ';
-            } else {
-                message += ' content nodes have ';
-            }
-
-            message += 'the same URL "' + url + '". Appending "-' + sameUrls + '".';
-
-            UI.messageModal('Duplicate URLs', message);
-
             url = url.replace(/\/$/, '-' + sameUrls + '/');
         }
 
@@ -186,8 +178,6 @@ class UrlEditor extends FieldEditor {
      */
     template() {
         return _.div({class: 'editor__field__value'},
-            this.renderPreview(),
-
             _.div({class: 'widget-group'},
                 this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),

@@ -4,13 +4,13 @@
 .editor__field--rich-text-editor {
     margin: 0px;
     width: 100px; // A hack to prevent CodeMirror from exceeding boundaries
+    border-radius: 0.2rem;
+    border: 1px solid $standard-darker;
 
     // Header
     &__header {
         padding: 1rem 0 0 1rem;
         background-color: $standard-darker;
-        border-top-left-radius: 0.2rem;
-        border-top-right-radius: 0.2rem;
         position: relative;
         height: 4rem;
 

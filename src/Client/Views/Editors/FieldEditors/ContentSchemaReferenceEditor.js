@@ -28,8 +28,6 @@ class ContentSchemaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
        
-        this.$element = _.div({class: 'field-editor content-schema-reference-editor'});
-       
         // Adopt allowed Schemas from parent if applicable
         let parentSchema = this.getParentSchema();
 
@@ -82,23 +80,6 @@ class ContentSchemaReferenceEditor extends FieldEditor {
     }
 
     /**
-     * Event: Change input
-     *
-     * @param {String} newValue
-     */
-    onChange(newValue) {
-        this.value = newValue;
-        this.trigger('change', this.value);
-
-        // Only re-render if the ContentEditor is the parent
-        if(this.$element.parents('.content-editor').length > 0) {
-            let contentEditor = Crisp.View.get('ContentEditor');
-
-            contentEditor.render();
-        }
-    }
-
-    /**
      * Gets schema types
      *
      * @returns {Array} List of options
@@ -121,9 +102,8 @@ class ContentSchemaReferenceEditor extends FieldEditor {
                 )
             ) {
                 contentSchemas[contentSchemas.length] = {
-                    label: schema.name,
-                    value: schema.id,
-                    selected: schema.id == this.value
+                    name: schema.name,
+                    id: schema.id
                 };
             }
         }
@@ -161,14 +141,20 @@ class ContentSchemaReferenceEditor extends FieldEditor {
     /**
      * Renders this editor
      */
-    render() {
-        _.append(this.$element.empty(),
-            // Render preview
-            this.renderPreview(),
+    template() {
+        return _.div({class: 'editor__field__value'}, 
+            new HashBrown.Views.Widgets.Dropdown({
+                value: this.value,
+                options: this.getDropdownOptions(),
+                valueKey: 'id',
+                labelKey: 'name',
+                useClearButton: true,
+                onChange: (newValue) => {
+                    this.value = newValue;
 
-            UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
-                this.onChange(newValue);
-            }, false)
+                    this.trigger('change', this.value);
+                }
+            }).$element
         );
     }
 }

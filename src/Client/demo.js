@@ -462,7 +462,6 @@ class DemoApi {
                     "parentSchemaId": "struct",
                     "hiddenProperties": [],
                     "editorId": "struct",
-                    "previewTemplate": "",
                     "config": {
                         "template": {
                             "label": "Template",
@@ -488,7 +487,6 @@ class DemoApi {
                     "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
                     "hiddenProperties": [],
                     "editorId": "struct",
-                    "previewTemplate": "",
                     "config": {
                         "struct": {
                             "template": {
@@ -522,7 +520,6 @@ class DemoApi {
                     "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
                     "hiddenProperties": [],
                     "editorId": "struct",
-                    "previewTemplate": "",
                     "config": {
                         "struct": {
                             "template": {

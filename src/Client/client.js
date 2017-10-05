@@ -5,7 +5,7 @@
  */
 
 // Style
-require('Style/client');
+require('Client/Style/client');
 
 // Get routes
 require('Client/Routes');

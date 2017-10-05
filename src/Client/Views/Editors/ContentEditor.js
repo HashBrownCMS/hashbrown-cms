@@ -333,7 +333,6 @@ class ContentEditor extends Crisp.View {
      * @param {String} tab
      */
     onClickTab(tab) {
-        location.hash = '/content/' + Crisp.Router.params.id + '/' + tab;
     }
 
     /**
@@ -345,40 +344,42 @@ class ContentEditor extends Crisp.View {
      * @return {Object} element
      */
     renderEditor(content, schema) {
-        let view = this;
-
         let activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
         // Render editor
         return [
             _.div({class: 'editor__header'}, 
                 _.each(schema.tabs, (tabId, tabName) => {
-                    return _.button({'data-id': tabId, class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
+                    return _.button({class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
                         .click(() => {
-                            $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
-                                tab.classList.toggle('active', tab.dataset.id === tabId);
-                            });
+                            location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
+
+                            this.render();
                         });
                 }),
                 _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
                     .click(() => {
-                        $('.editor__body__tab, .editor__header__tab').each((i, tab) => {
-                            tab.classList.toggle('active', tab.dataset.id === 'meta');
-                        });
+                        location.hash = '/content/' + Crisp.Router.params.id + '/meta';
+
+                        this.render();
                     })
             ),
-            this.$body = _.div({class: 'editor__body'},
+            _.div({class: 'editor__body'},
                 // Render content properties
                 _.each(schema.tabs, (tabId, tabName) => {
-                    return _.div({class: 'editor__body__tab' + (tabId === activeTab ? ' active' : ''), 'data-id': tabId},
+                    if(tabId !== activeTab) { return; }
+
+                    return _.div({class: 'editor__body__tab active'},
                         this.renderFields(tabId, schema.fields.properties, content.properties)
                     );
                 }),
 
                 // Render meta properties
-                _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
-                    this.renderFields('meta', schema.fields, content),
-                    this.renderFields('meta', schema.fields.properties, content.properties)
+                _.if(activeTab === 'meta',
+                    _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
+                        this.renderFields('meta', schema.fields, content),
+                        this.renderFields('meta', schema.fields.properties, content.properties)
+                    )
                 )
             ).on('scroll', (e) => {
                 this.onScroll(e);

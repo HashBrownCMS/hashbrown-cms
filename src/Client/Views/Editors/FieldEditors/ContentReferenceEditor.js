@@ -56,9 +56,8 @@ class ContentReferenceEditor extends FieldEditor {
             }
 
             allowedContent[allowedContent.length] = {
-                label: content.prop('title', window.language),
-                value: content.id,
-                selected: content.id == this.value
+                title: content.prop('title', window.language) || content.id,
+                id: content.id
             };
         }
 
@@ -95,16 +94,21 @@ class ContentReferenceEditor extends FieldEditor {
     /**
      * Render this editor
      */
-    render() {
-        // Render main element
-        this.$element = _.div({class: 'field-editor content-reference-editor'}, [
-            // Render preview
-            this.renderPreview(),
+    template() {
+        return _.div({class: 'editor__field__value'}, [
+            new HashBrown.Views.Widgets.Dropdown({
+                value: this.value,
+                options: this.getDropdownOptions(),
+                useTypeAhead: true,
+                valueKey: 'id',
+                useClearButton: true,
+                labelKey: 'title',
+                onChange: (newValue) => {
+                    this.value = newValue;
 
-            // Render picker
-            this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
-                this.onChange(newValue);             
-            }, true)
+                    this.trigger('change', this.value);
+                }
+            }).$element
         ]);
     }
 }

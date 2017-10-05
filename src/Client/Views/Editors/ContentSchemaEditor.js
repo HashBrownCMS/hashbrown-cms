@@ -78,8 +78,15 @@ class ContentSchemaEditor extends SchemaEditor {
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                         let $field = _.div({class: 'editor__field'});
 
+                        // Sanity check
+                        fieldValue.config = fieldValue.config || {};
+                        fieldValue.schemaId = fieldValue.schemaId || 'array';
+
                         let renderField = () => {
                             _.append($field.empty(),
+                                _.div({class: 'editor__field__sort-key'},
+                                    HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name
+                                ),
                                 _.div({class: 'editor__field__key'},
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
@@ -93,7 +100,7 @@ class ContentSchemaEditor extends SchemaEditor {
 
                                             this.model.fields.properties[fieldKey] = fieldValue;
                                         }
-                                    }).$element.addClass('editor__field__sort-key'),
+                                    }),
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
                                         placeholder: 'A label, e.g. "My field"',
@@ -147,12 +154,14 @@ class ContentSchemaEditor extends SchemaEditor {
                                         return editor.renderConfigEditor(fieldValue.config);
                                     })
                                 ),
-                                _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
-                                    .click(() => {
-                                        delete this.model.fields.properties[fieldKey];
+                                _.div({class: 'editor__field__actions'},
+                                    _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
+                                        .click(() => {
+                                            delete this.model.fields.properties[fieldKey];
 
-                                        renderFieldProperties();
-                                    })
+                                            renderFieldProperties();
+                                        })
+                                )
                             );
                         };
 

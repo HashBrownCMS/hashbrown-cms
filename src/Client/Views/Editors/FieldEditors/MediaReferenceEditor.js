@@ -27,72 +27,51 @@ class MediaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'field-editor media-reference-editor'},
-            // Render preview
-            this.renderPreview(),
-
-            this.$body = _.button({class: 'thumbnail raised'})
-                .click(() => { this.onClickBrowse(); }),
-            _.button({class: 'btn btn-remove'},
-                _.span({class: 'fa fa-remove'})
-            ).click((e) => { e.stopPropagation(); e.preventDefault(); this.onClickRemove(); })
-        );
-
         this.init();
     }
 
     /**
-     * Event: Change value
+     * Renders this editor
      */
-    onChange() {
-        this.trigger('change', this.value);
-
-        this.render();
-    }
-
-    /**
-     * Event: Click remove
-     */
-    onClickRemove() {
-        this.value = null;
-
-        this.onChange();
-    }
-
-    /**
-     * Event: Click browse
-     */
-    onClickBrowse() {
-        let mediaBrowser = new MediaBrowser({
-            value: this.value
-        });
-
-        mediaBrowser.on('select', (id) => {
-            this.value = id;
-            this.onChange();
-        });
-    }
-
-    render() {
-        if(!this.value) {
-            this.$body.empty();
-            return;
-        }
-
+    template() {
         let media = MediaHelper.getMediaByIdSync(this.value);
-        
-        if(!media) {
-            return this.$body.empty();
-        }
 
-        _.append(this.$body.empty(),
-            _.if(media.isVideo(),
-                _.video({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-            ),
-            _.if(media.isImage(),
-                _.img({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-            ),
-            _.label(media.name)
+        return _.div({class: 'editor__field__value editor__field--media-reference'},
+            _.button({class: 'editor__field--media-reference__pick'},
+                _.do(()=> {
+                    if(!media) { return; }
+            
+                    return [
+                        _.if(media.isVideo(),
+                            _.video({class: 'editor__field--media-reference__preview', muted: true, autoplay: true, loop: true, src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+                        ),
+                        _.if(media.isImage(),
+                            _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+                        )
+                    ];
+                })
+            ).click(() => {
+                let mediaBrowser = new MediaBrowser({
+                    value: this.value
+                });
+
+                mediaBrowser.on('select', (id) => {
+                    this.value = id;
+
+                    this.trigger('change', this.value);
+
+                    this.render();
+                });
+            }),
+            _.div({class: 'editor__field--media-reference__footer'},
+                _.label({class: 'editor__field--media-reference__name'}, media ? media.name : ''),
+                _.button({class: 'editor__field--media-reference__remove', title: 'Clear the Media selection'})
+                    .click(() => {
+                        this.value = null;
+
+                        this.render();
+                    })
+            )
         );
     }
 }

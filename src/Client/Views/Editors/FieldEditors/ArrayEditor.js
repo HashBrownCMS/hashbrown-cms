@@ -236,28 +236,30 @@ class ArrayEditor extends FieldEditor {
                     });
 
                     // Render Schema picker
-                    editorInstance.$element.prepend(
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Schema'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Dropdown({
-                                    value: item.schemaId,
-                                    valueKey: 'id',
-                                    labelKey: 'name',
-                                    options: resources.schemas.filter((schema) => {
-                                        return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                    }),
-                                    onChange: (newSchemaId) => {
-                                        item.schemaId = newSchemaId;
+                    if(this.config.allowedSchemas.length > 1) {
+                        editorInstance.$element.prepend(
+                            _.div({class: 'editor__field'},
+                                _.div({class: 'editor__field__key'}, 'Schema'),
+                                _.div({class: 'editor__field__value'},
+                                    new HashBrown.Views.Widgets.Dropdown({
+                                        value: item.schemaId,
+                                        valueKey: 'id',
+                                        labelKey: 'name',
+                                        options: resources.schemas.filter((schema) => {
+                                            return this.config.allowedSchemas.indexOf(schema.id) > -1;
+                                        }),
+                                        onChange: (newSchemaId) => {
+                                            item.schemaId = newSchemaId;
 
-                                        renderField();
+                                            renderField();
 
-                                        this.trigger('change', this.value);
-                                    }
-                                })
+                                            this.trigger('change', this.value);
+                                        }
+                                    })
+                                )
                             )
-                        )
-                    );
+                        );
+                    }
                 
                     _.append($field.empty(),
                         _.div({class: 'editor__field__sort-key'}, schema.name),

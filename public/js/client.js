@@ -6081,81 +6081,35 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FieldEditor = function (_Crisp$View) {
-    _inherits(FieldEditor, _Crisp$View);
+  _inherits(FieldEditor, _Crisp$View);
 
-    function FieldEditor() {
-        _classCallCheck(this, FieldEditor);
+  function FieldEditor() {
+    _classCallCheck(this, FieldEditor);
 
-        return _possibleConstructorReturn(this, _Crisp$View.apply(this, arguments));
-    }
+    return _possibleConstructorReturn(this, _Crisp$View.apply(this, arguments));
+  }
 
-    /**
-     * Renders the config editor
-     *
-     * @param {Object} config
-     *
-     * @returns {HTMLElement} Element
-     */
-    FieldEditor.renderConfigEditor = function renderConfigEditor(config) {
-        return null;
-    };
+  /**
+   * Renders the config editor
+   *
+   * @param {Object} config
+   *
+   * @returns {HTMLElement} Element
+   */
+  FieldEditor.renderConfigEditor = function renderConfigEditor(config) {
+    return null;
+  };
 
-    /**
-     * Renders key actions
-     *
-     * @returns {HTMLElement} Actions
-     */
-
-
-    FieldEditor.prototype.renderKeyActions = function renderKeyActions() {};
-
-    /**
-     * Renders a field preview template
-     *
-     * @returns {HTMLElement} Element
-     */
+  /**
+   * Renders key actions
+   *
+   * @returns {HTMLElement} Actions
+   */
 
 
-    FieldEditor.prototype.renderPreview = function renderPreview() {
-        if (!this.schema || !this.schema.previewTemplate) {
-            return null;
-        }
+  FieldEditor.prototype.renderKeyActions = function renderKeyActions() {};
 
-        var $element = _.div({ class: 'field-preview' });
-        var template = this.schema.previewTemplate;
-        var regex = /\${([\s\S]+?)}/g;
-        var field = this.value;
-
-        var html = template.replace(regex, function (key) {
-            // Remove braces first
-            key = key.replace('${ ', '').replace('${', '');
-            key = key.replace(' }', '').replace('}', '');
-
-            // Find result
-            var result = '';
-
-            try {
-                result = eval("'use strict'; " + key);
-            } catch (e) {
-                // Ignore failed eval, the values are just not set yet
-                result = e.message;
-            }
-
-            if (result && result._multilingual) {
-                result = result[window.language];
-            }
-
-            return result || '';
-        });
-
-        $element.append(_.div({ class: 'field-preview-toolbar' }, _.button({ class: 'btn raised btn-primary' }, 'Edit').click(function () {
-            $element.toggleClass('editing');
-        })), html);
-
-        return $element;
-    };
-
-    return FieldEditor;
+  return FieldEditor;
 }(Crisp.View);
 
 module.exports = FieldEditor;
@@ -12127,7 +12081,6 @@ var FieldSchema = function (_Schema) {
         _Schema.prototype.structure.call(this);
 
         this.def(String, 'editorId');
-        this.def(String, 'previewTemplate', '');
         this.def(Object, 'config', {});
 
         this.name = 'New field schema';
@@ -29287,9 +29240,7 @@ var ContentEditor = function (_Crisp$View) {
      */
 
 
-    ContentEditor.prototype.onClickTab = function onClickTab(tab) {
-        location.hash = '/content/' + Crisp.Router.params.id + '/' + tab;
-    };
+    ContentEditor.prototype.onClickTab = function onClickTab(tab) {};
 
     /**
      * Renders the editor
@@ -29304,29 +29255,31 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.renderEditor = function renderEditor(content, schema) {
         var _this5 = this;
 
-        var view = this;
-
         var activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
         // Render editor
         return [_.div({ class: 'editor__header' }, _.each(schema.tabs, function (tabId, tabName) {
-            return _.button({ 'data-id': tabId, class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '') }, tabName).click(function () {
-                $('.editor__body__tab, .editor__header__tab').each(function (i, tab) {
-                    tab.classList.toggle('active', tab.dataset.id === tabId);
-                });
+            return _.button({ class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '') }, tabName).click(function () {
+                location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
+
+                _this5.render();
             });
         }), _.button({ 'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '') }, 'Meta').click(function () {
-            $('.editor__body__tab, .editor__header__tab').each(function (i, tab) {
-                tab.classList.toggle('active', tab.dataset.id === 'meta');
-            });
-        })), this.$body = _.div({ class: 'editor__body' },
+            location.hash = '/content/' + Crisp.Router.params.id + '/meta';
+
+            _this5.render();
+        })), _.div({ class: 'editor__body' },
         // Render content properties
         _.each(schema.tabs, function (tabId, tabName) {
-            return _.div({ class: 'editor__body__tab' + (tabId === activeTab ? ' active' : ''), 'data-id': tabId }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+            if (tabId !== activeTab) {
+                return;
+            }
+
+            return _.div({ class: 'editor__body__tab active' }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
         }),
 
         // Render meta properties
-        _.div({ class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta' }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
+        _.if(activeTab === 'meta', _.div({ class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta' }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties)))).on('scroll', function (e) {
             _this5.onScroll(e);
         }), _.div({ class: 'editor__footer' })];
     };
@@ -42026,11 +41979,11 @@ var Dropdown = function (_Widget) {
             var optionValue = this.valueKey ? value[this.valueKey] : value;
 
             if (typeof optionValue !== 'string') {
-                optionValue = optionValue.toString();
+                optionValue = optionValue ? optionValue.toString() : '';
             }
 
             if (typeof optionLabel !== 'string') {
-                optionLabel = optionLabel.toString();
+                optionLabel = optionLabel ? optionLabel.toString() : '';
             }
 
             // Check for disabled options
@@ -42538,7 +42491,8 @@ module.exports = {
     MediaUploader: __webpack_require__(213),
     MediaBrowser: __webpack_require__(214),
     MessageModal: __webpack_require__(17),
-    IconModal: __webpack_require__(236)
+    IconModal: __webpack_require__(236),
+    DateModal: __webpack_require__(298)
 };
 
 /***/ }),
@@ -42706,16 +42660,40 @@ var Modal = function (_Crisp$View) {
     Modal.prototype.renderBody = function renderBody() {};
 
     /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    Modal.prototype.renderFooter = function renderFooter() {};
+
+    /**
+     * Renders the modal header
+     *
+     * @returns {HTMLElement} Header
+     */
+
+
+    Modal.prototype.renderHeader = function renderHeader() {
+        var _this3 = this;
+
+        if (!this.title) {
+            return;
+        }
+
+        return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this3.close();
+        })];
+    };
+
+    /**
      * Renders this modal
      */
 
 
     Modal.prototype.template = function template() {
-        var _this3 = this;
-
-        return _.div({ class: 'modal' }, _.div({ class: 'modal__dialog' }, _.if(this.title, _.div({ class: 'modal__header' }, _.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
-            _this3.close();
-        }))), _.div({ class: 'modal__body' }, this.renderBody()), _.if(this.actions.length > 0, _.div({ class: 'modal__footer' }))));
+        return _.div({ class: 'modal' }, _.div({ class: 'modal__dialog' }, _.div({ class: 'modal__header' }, this.renderHeader()), _.div({ class: 'modal__body' }, this.renderBody()), _.div({ class: 'modal__footer' }, this.renderFooter())));
     };
 
     return Modal;
@@ -45144,8 +45122,12 @@ var ContentSchemaEditor = function (_SchemaEditor) {
             }))), _.div({ class: 'editor__field__value segmented' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
                 var $field = _.div({ class: 'editor__field' });
 
+                // Sanity check
+                fieldValue.config = fieldValue.config || {};
+                fieldValue.schemaId = fieldValue.schemaId || 'array';
+
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -45157,7 +45139,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 
                             _this2.model.fields.properties[fieldKey] = fieldValue;
                         }
-                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
+                    }), new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -45199,11 +45181,11 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                         fieldValue.config = fieldValue.config || {};
 
                         return editor.renderConfigEditor(fieldValue.config);
-                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                    })), _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove field' }).click(function () {
                         delete _this2.model.fields.properties[fieldKey];
 
                         renderFieldProperties();
-                    }));
+                    })));
                 };
 
                 renderField();
@@ -45264,43 +45246,10 @@ var FieldSchemaEditor = function (_SchemaEditor) {
     }
 
     /**
-     * Render template editor
-     *
-     * @returns {HTMLElement} Element
-     */
-    FieldSchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
-        var _this2 = this;
-
-        var $element = _.div({ class: 'field-properties-editor' });
-
-        setTimeout(function () {
-            _this2.templateEditor = CodeMirror($element[0], {
-                value: _this2.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-            });
-
-            _this2.templateEditor.on('change', function () {
-                _this2.model.previewTemplate = _this2.templateEditor.getDoc().getValue();
-            });
-        }, 1);
-
-        return $element;
-    };
-
-    /**
      * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
      */
-
-
     FieldSchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
         var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
 
@@ -45319,7 +45268,7 @@ var FieldSchemaEditor = function (_SchemaEditor) {
 
 
     FieldSchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
-        var _this3 = this;
+        var _this2 = this;
 
         if (this.model.isPropertyHidden('editorId')) {
             return;
@@ -45343,9 +45292,9 @@ var FieldSchemaEditor = function (_SchemaEditor) {
         editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
 
         var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
-            _this3.model.editorId = newValue;
+            _this2.model.editorId = newValue;
 
-            _this3.render();
+            _this2.render();
         })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
 
         return $element;
@@ -45357,7 +45306,7 @@ var FieldSchemaEditor = function (_SchemaEditor) {
 
 
     FieldSchemaEditor.prototype.renderFields = function renderFields() {
-        var _this4 = this;
+        var _this3 = this;
 
         var $element = _SchemaEditor.prototype.renderFields.call(this);
 
@@ -45368,16 +45317,13 @@ var FieldSchemaEditor = function (_SchemaEditor) {
             valueKey: 'name',
             labelKey: 'name',
             onChange: function onChange(newEditor) {
-                _this4.model.editorId = newEditor;
+                _this3.model.editorId = newEditor;
 
-                _this4.render();
+                _this3.render();
             }
         }).$element));
 
-        if (!this.model.isLocked) {
-            $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-            $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
-        }
+        $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
 
         return $element;
     };
@@ -45789,21 +45735,23 @@ var ArrayEditor = function (_FieldEditor) {
                 });
 
                 // Render Schema picker
-                editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
-                    value: item.schemaId,
-                    valueKey: 'id',
-                    labelKey: 'name',
-                    options: resources.schemas.filter(function (schema) {
-                        return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
-                    }),
-                    onChange: function onChange(newSchemaId) {
-                        item.schemaId = newSchemaId;
+                if (_this4.config.allowedSchemas.length > 1) {
+                    editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        value: item.schemaId,
+                        valueKey: 'id',
+                        labelKey: 'name',
+                        options: resources.schemas.filter(function (schema) {
+                            return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
+                        }),
+                        onChange: function onChange(newSchemaId) {
+                            item.schemaId = newSchemaId;
 
-                        renderField();
+                            renderField();
 
-                        _this4.trigger('change', _this4.value);
-                    }
-                }))));
+                            _this4.trigger('change', _this4.value);
+                        }
+                    }))));
+                }
 
                 _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
                     $field.toggleClass('collapsed');
@@ -46019,9 +45967,8 @@ var ContentReferenceEditor = function (_FieldEditor) {
             }
 
             allowedContent[allowedContent.length] = {
-                label: content.prop('title', window.language),
-                value: content.id,
-                selected: content.id == this.value
+                title: content.prop('title', window.language) || content.id,
+                id: content.id
             };
         }
 
@@ -46057,18 +46004,22 @@ var ContentReferenceEditor = function (_FieldEditor) {
      */
 
 
-    ContentReferenceEditor.prototype.render = function render() {
+    ContentReferenceEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // Render main element
-        this.$element = _.div({ class: 'field-editor content-reference-editor' }, [
-        // Render preview
-        this.renderPreview(),
+        return _.div({ class: 'editor__field__value' }, [new HashBrown.Views.Widgets.Dropdown({
+            value: this.value,
+            options: this.getDropdownOptions(),
+            useTypeAhead: true,
+            valueKey: 'id',
+            useClearButton: true,
+            labelKey: 'title',
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-        // Render picker
-        this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
-            _this2.onChange(newValue);
-        }, true)]);
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element]);
     };
 
     return ContentReferenceEditor;
@@ -46120,11 +46071,9 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
     function ContentSchemaReferenceEditor(params) {
         _classCallCheck(this, ContentSchemaReferenceEditor);
 
+        // Adopt allowed Schemas from parent if applicable
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'field-editor content-schema-reference-editor' });
-
-        // Adopt allowed Schemas from parent if applicable
         var parentSchema = _this.getParentSchema();
 
         if (parentSchema && _this.config && _this.config.allowedSchemas == 'fromParent') {
@@ -46187,25 +46136,6 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
     };
 
     /**
-     * Event: Change input
-     *
-     * @param {String} newValue
-     */
-
-
-    ContentSchemaReferenceEditor.prototype.onChange = function onChange(newValue) {
-        this.value = newValue;
-        this.trigger('change', this.value);
-
-        // Only re-render if the ContentEditor is the parent
-        if (this.$element.parents('.content-editor').length > 0) {
-            var contentEditor = Crisp.View.get('ContentEditor');
-
-            contentEditor.render();
-        }
-    };
-
-    /**
      * Gets schema types
      *
      * @returns {Array} List of options
@@ -46221,9 +46151,8 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 
             if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
                 contentSchemas[contentSchemas.length] = {
-                    label: schema.name,
-                    value: schema.id,
-                    selected: schema.id == this.value
+                    name: schema.name,
+                    id: schema.id
                 };
             }
         }
@@ -46260,14 +46189,21 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
      */
 
 
-    ContentSchemaReferenceEditor.prototype.render = function render() {
+    ContentSchemaReferenceEditor.prototype.template = function template() {
         var _this2 = this;
 
-        _.append(this.$element.empty(),
-        // Render preview
-        this.renderPreview(), UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
-            _this2.onChange(newValue);
-        }, false));
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            value: this.value,
+            options: this.getDropdownOptions(),
+            valueKey: 'id',
+            labelKey: 'name',
+            useClearButton: true,
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
+
+                _this2.trigger('change', _this2.value);
+            }
+        }).$element);
     };
 
     return ContentSchemaReferenceEditor;
@@ -46313,34 +46249,11 @@ var DateEditor = function (_FieldEditor) {
     function DateEditor(params) {
         _classCallCheck(this, DateEditor);
 
-        // Ensure correct type
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
-
-        if (typeof params.value === 'string' && !isNaN(params.value)) {
-            _this.value = new Date(parseInt(params.value));
-        } else if (params.value) {
-            _this.value = new Date(params.value);
-        }
-
-        // Sanity check
-        if (!_this.value || !params.value || _this.value.getFullYear() == 1970 || isNaN(_this.value.getTime())) {
-            _this.value = null;
-
-            _this.onChange();
-        }
 
         _this.init();
         return _this;
     }
-
-    /**
-     * Event: Change value
-     */
-
-
-    DateEditor.prototype.onChange = function onChange() {
-        this.trigger('change', this.value);
-    };
 
     /**
      * Event: On click remove
@@ -46350,9 +46263,9 @@ var DateEditor = function (_FieldEditor) {
     DateEditor.prototype.onClickRemove = function onClickRemove() {
         this.value = null;
 
-        this.$element.find('.btn-edit').html(this.formatDate(this.value));
+        this.trigger('change', this.value);
 
-        this.onChange();
+        this.render();
     };
 
     /**
@@ -46363,97 +46276,17 @@ var DateEditor = function (_FieldEditor) {
     DateEditor.prototype.onClickOpen = function onClickOpen() {
         var _this2 = this;
 
-        var date = this.value ? new Date(this.value) : new Date();
-
-        if (isNaN(date.getDate())) {
-            date = new Date();
-        }
-
-        var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        var hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
-        var minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
-
-        var messageModal = new HashBrown.Views.Modals.MessageModal({
-            model: {
-                class: 'date-picker'
-            },
-            renderTitle: function renderTitle() {
-                return [_.span(date.getFullYear().toString()), _.h2({ class: 'date-picker-title' }, days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate())];
-            },
-            renderBody: function renderBody() {
-                return [_.div({ class: 'date-picker-top-nav' }, _.button({ class: 'btn btn-embedded' }, _.span({ class: 'fa fa-angle-left' })).click(function () {
-                    date.setMonth(date.getMonth() - 1);
-
-                    messageModal.reload();
-                }), _.span(months[date.getMonth()] + ' ' + date.getFullYear()), _.button({ class: 'btn btn-embedded' }, _.span({ class: 'fa fa-angle-right' })).click(function () {
-                    date.setMonth(date.getMonth() + 1);
-
-                    messageModal.reload();
-                })), _.div({ class: 'date-picker-weekdays' }, _.span('M'), _.span('T'), _.span('W'), _.span('T'), _.span('F'), _.span('S'), _.span('S')), _.div({ class: 'date-picker-days' }, _.each(_this2.getDays(date.getFullYear(), date.getMonth() + 1), function (i, day) {
-                    var thisDate = new Date(date.getTime());
-                    var now = new Date();
-
-                    var isCurrent = now.getFullYear() == date.getFullYear() && now.getMonth() == date.getMonth() && now.getDate() == day;
-
-                    var isActive = date.getDate() == day;
-
-                    thisDate.setDate(day);
-
-                    var $button = _.button({ class: 'btn btn-embedded' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '') }, day).click(function () {
-                        date.setDate(day);
-
-                        $button.siblings().removeClass('active');
-                        $button.addClass('active');
-
-                        messageModal.$element.find('.date-picker-title').html(days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate());
-                    });
-
-                    return $button;
-                })), _.div({ class: 'date-picker-time' }, _.input({ type: 'number', min: 0, max: 23, value: date.getHours() }).on('change', function (e) {
-                    date.setHours(e.currentTarget.value);
-                }), _.div({ class: 'date-picker-time-separator' }, ':'), _.input({ type: 'number', min: 0, max: 59, value: date.getMinutes() }).on('change', function (e) {
-                    date.setMinutes(e.currentTarget.value);
-                }))];
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'OK',
-                class: 'btn-primary',
-                callback: function callback() {
-                    _this2.value = date;
-
-                    _this2.$element.find('.btn-edit').html(_this2.formatDate(date));
-
-                    _this2.onChange();
-                }
-            }]
+        var modal = new HashBrown.Views.Modals.DateModal({
+            value: this.value
         });
-    };
 
-    /**
-     * Renders day buttons
-     *
-     * @param {Number} year
-     * @param {Number} month
-     *
-     * @returns {Array} Days
-     */
+        modal.on('change', function (newValue) {
+            _this2.value = newValue.toISOString();
 
+            _this2.trigger('change', _this2.value);
 
-    DateEditor.prototype.getDays = function getDays(year, month) {
-        var max = new Date(year, month, 0).getDate();
-        var days = [];
-
-        while (days.length < max) {
-            days[days.length] = days.length + 1;
-        }
-
-        return days;
+            _this2.render();
+        });
     };
 
     /**
@@ -46497,16 +46330,25 @@ var DateEditor = function (_FieldEditor) {
         return output;
     };
 
-    DateEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+
+
+    DateEditor.prototype.template = function template() {
         var _this3 = this;
 
-        this.$element = _.div({ class: 'field-editor date-editor input-group' },
-        // Render preview
-        this.renderPreview(), _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(function () {
-            _this3.onClickOpen();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-remove' })).click(function () {
-            _this3.onClickRemove();
-        }))));
+        return _.div({ class: 'editor__field__value' }, _.do(function () {
+            if (_this3.disabled) {
+                return _this3.formatDate(_this3.value);
+            }
+
+            return _.div({ class: 'widget widget-group' }, _.button({ class: 'widget widget--button low' }, _this3.formatDate(_this3.value)).click(function () {
+                _this3.onClickOpen();
+            }), _.div({ class: 'widget widget--button small fa fa-remove' }).click(function () {
+                _this3.onClickRemove();
+            }));
+        }));
     };
 
     return DateEditor;
@@ -46645,9 +46487,7 @@ var DropdownEditor = function (_FieldEditor) {
                 };
             }
 
-            _.append(_this2.$element.empty(),
-            // Render preview
-            _this2.renderPreview(), _.if(_this2.config.options.length > 0, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
+            _.append(_this2.$element.empty(), _.if(_this2.config.options.length > 0, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
                 _this2.onChange(newValue);
             }, true)), _.if(_this2.config.options.length < 1, _.span({ class: 'field-warning' }, 'No options configured')));
         }, 1);
@@ -46719,9 +46559,7 @@ var LanguageEditor = function (_FieldEditor) {
     LanguageEditor.prototype.render = function render() {
         var _this2 = this;
 
-        this.$element = _.div({ class: 'field-editor dropdown-editor' },
-        // Render preview
-        this.renderPreview(), this.$select = _.select({ class: 'form-control' }).change(function () {
+        this.$element = _.div({ class: 'field-editor dropdown-editor' }, this.$select = _.select({ class: 'form-control' }).change(function () {
             _this2.onChange();
         }));
 
@@ -46798,71 +46636,43 @@ var MediaReferenceEditor = function (_FieldEditor) {
 
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'field-editor media-reference-editor' },
-        // Render preview
-        _this.renderPreview(), _this.$body = _.button({ class: 'thumbnail raised' }).click(function () {
-            _this.onClickBrowse();
-        }), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
-            e.stopPropagation();e.preventDefault();_this.onClickRemove();
-        }));
-
         _this.init();
         return _this;
     }
 
     /**
-     * Event: Change value
+     * Renders this editor
      */
 
 
-    MediaReferenceEditor.prototype.onChange = function onChange() {
-        this.trigger('change', this.value);
-
-        this.render();
-    };
-
-    /**
-     * Event: Click remove
-     */
-
-
-    MediaReferenceEditor.prototype.onClickRemove = function onClickRemove() {
-        this.value = null;
-
-        this.onChange();
-    };
-
-    /**
-     * Event: Click browse
-     */
-
-
-    MediaReferenceEditor.prototype.onClickBrowse = function onClickBrowse() {
+    MediaReferenceEditor.prototype.template = function template() {
         var _this2 = this;
-
-        var mediaBrowser = new MediaBrowser({
-            value: this.value
-        });
-
-        mediaBrowser.on('select', function (id) {
-            _this2.value = id;
-            _this2.onChange();
-        });
-    };
-
-    MediaReferenceEditor.prototype.render = function render() {
-        if (!this.value) {
-            this.$body.empty();
-            return;
-        }
 
         var media = MediaHelper.getMediaByIdSync(this.value);
 
-        if (!media) {
-            return this.$body.empty();
-        }
+        return _.div({ class: 'editor__field__value editor__field--media-reference' }, _.button({ class: 'editor__field--media-reference__pick' }, _.do(function () {
+            if (!media) {
+                return;
+            }
 
-        _.append(this.$body.empty(), _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name));
+            return [_.if(media.isVideo(), _.video({ class: 'editor__field--media-reference__preview', muted: true, autoplay: true, loop: true, src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id }))];
+        })).click(function () {
+            var mediaBrowser = new MediaBrowser({
+                value: _this2.value
+            });
+
+            mediaBrowser.on('select', function (id) {
+                _this2.value = id;
+
+                _this2.trigger('change', _this2.value);
+
+                _this2.render();
+            });
+        }), _.div({ class: 'editor__field--media-reference__footer' }, _.label({ class: 'editor__field--media-reference__name' }, media ? media.name : ''), _.button({ class: 'editor__field--media-reference__remove', title: 'Clear the Media selection' }).click(function () {
+            _this2.value = null;
+
+            _this2.render();
+        })));
     };
 
     return MediaReferenceEditor;
@@ -47070,7 +46880,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
      */
 
 
-    ResourceReferenceEditor.prototype.render = function render() {
+    ResourceReferenceEditor.prototype.template = function template() {
         var resource = resources[this.config.resource];
         var value = void 0;
 
@@ -47117,7 +46927,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
             }
         }
 
-        this.$element = _.div({ class: 'field-editor resource-reference-editor' }, _.p(value || '(none)'));
+        return _.div({ class: 'editor__field__value' }, value || '(none)');
     };
 
     return ResourceReferenceEditor;
@@ -47670,11 +47480,12 @@ var StructEditor = function (_FieldEditor) {
             }))), _.div({ class: 'editor__field__value segmented' }, _.each(config.struct, function (fieldKey, fieldValue) {
                 // Sanity check
                 fieldValue.config = fieldValue.config || {};
+                fieldValue.schemaId = fieldValue.schemaId || 'array';
 
                 var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -47686,7 +47497,7 @@ var StructEditor = function (_FieldEditor) {
 
                             config.struct[fieldKey] = fieldValue;
                         }
-                    }).$element.addClass('editor__field__sort-key'), new HashBrown.Views.Widgets.Input({
+                    }), new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -47719,11 +47530,11 @@ var StructEditor = function (_FieldEditor) {
                         }
 
                         return editor.renderConfigEditor(fieldValue.config);
-                    })), _.button({ class: 'editor__field__remove fa fa-remove', title: 'Remove field' }).click(function () {
+                    })), _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove field' }).click(function () {
                         delete config.struct[fieldKey];
 
                         renderEditor();
-                    }));
+                    })));
                 };
 
                 renderField();
@@ -47757,9 +47568,6 @@ var StructEditor = function (_FieldEditor) {
         var _this2 = this;
 
         return _.div({ class: 'editor__field__value' },
-        // Render preview
-        this.renderPreview(),
-
         // Loop through each key in the struct
         _.each(this.config.struct, function (k, keySchema) {
             var value = _this2.value[k];
@@ -47838,6 +47646,9 @@ var FieldEditor = __webpack_require__(11);
 var TagsEditor = function (_FieldEditor) {
     _inherits(TagsEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function TagsEditor(params) {
         _classCallCheck(this, TagsEditor);
 
@@ -47848,127 +47659,21 @@ var TagsEditor = function (_FieldEditor) {
     }
 
     /**
-     * Event: Change
+     * Renders this editor
      */
 
 
-    TagsEditor.prototype.onChange = function onChange() {
-        this.trigger('change', this.value);
-
-        this.cleanUpTags();
-
-        this.renderTags();
-    };
-
-    /**
-     * Event: Click add tag
-     */
-
-
-    TagsEditor.prototype.onClickAdd = function onClickAdd() {
-        var tags = (this.value || '').split(',');
-
-        tags.push('new tag');
-
-        this.value = tags.join(',');
-
-        this.onChange();
-    };
-
-    /**
-     * Event: Click remove tag
-     *
-     * @param {String} tag
-     */
-
-
-    TagsEditor.prototype.onClickRemove = function onClickRemove(tag) {
-        var tags = (this.value || '').split(',');
-
-        for (var i = tags.length - 1; i >= 0; i--) {
-            if (tags[i] == tag) {
-                tags.splice(i, 1);
-                break;
-            }
-        }
-
-        this.value = tags.join(',');
-
-        this.onChange();
-    };
-
-    /**
-     * Event: On change tag
-     *
-     * @param {String} oldTag
-     * @param {String} newTag
-     */
-
-
-    TagsEditor.prototype.onChangeTag = function onChangeTag(oldTag, newTag) {
-        var tags = (this.value || '').split(',');
-
-        for (var i in tags) {
-            if (tags[i] == oldTag) {
-                tags[i] = newTag;
-                break;
-            }
-        }
-
-        this.value = tags.join(',');
-
-        this.onChange();
-    };
-
-    /**
-     * Cleans up tags
-     */
-
-
-    TagsEditor.prototype.cleanUpTags = function cleanUpTags() {
-        var tags = (this.value || '').split(',');
-
-        for (var i = tags.length - 1; i >= 0; i--) {
-            if (!tags[i]) {
-                tags.splice(i, 1);
-            }
-        }
-
-        this.value = tags.join(',');
-    };
-
-    /**
-     * Renders all tags
-     */
-
-
-    TagsEditor.prototype.renderTags = function renderTags() {
+    TagsEditor.prototype.template = function template() {
         var _this2 = this;
 
-        _.append(this.$tags.empty(), _.each((this.value || '').split(','), function (i, tag) {
-            if (tag) {
-                var $input = void 0;
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            value: (this.value || '').split(','),
+            onChange: function onChange(newValue) {
+                _this2.value = newValue.join(',');
 
-                return _.div({ class: 'chip' }, $input = _.input({ type: 'text', class: 'chip-label', value: tag }).change(function () {
-                    _this2.onChangeTag(tag, $input.val());
-                }), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                    _this2.onClickRemove(tag);
-                }));
+                _this2.trigger('change', _this2.value);
             }
-        }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
-            _this2.onClickAdd();
-        }));
-    };
-
-    TagsEditor.prototype.render = function render() {
-        var editor = this;
-
-        // Main element
-        this.$element = _.div({ class: 'field-editor tags-editor' },
-        // Render preview
-        this.renderPreview(), _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$tags = _.div({ class: 'tags chip-group' })));
-
-        this.renderTags();
+        }).$element);
     };
 
     return TagsEditor;
@@ -48167,7 +47872,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
             return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning' }, 'No allowed templates configured'));
         }
 
-        return _.div({ class: 'editor__field__value' }, this.renderPreview(), new HashBrown.Views.Widgets.Dropdown({
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             useTypeAhead: true,
             value: this.value,
             options: this.getOptions(),
@@ -48301,8 +48006,11 @@ var UrlEditor = function (_FieldEditor) {
 
             var title = '';
 
+            // If the node equals the currently edited node, take the value directly from the "title" field
             if (node.id == Crisp.Router.params.id) {
                 title = $('.editor__field[data-key="title"] .editor__field__value input').val();
+
+                // If it's not, try to get the title from the model
             } else {
                 // If title is set directly (unlikely), pass it
                 if (typeof node.title === 'string') {
@@ -48324,6 +48032,7 @@ var UrlEditor = function (_FieldEditor) {
             url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
         }
 
+        // Check for duplicate URLs
         var sameUrls = 0;
 
         for (var _iterator2 = window.resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
@@ -48351,19 +48060,8 @@ var UrlEditor = function (_FieldEditor) {
             }
         }
 
+        // Append a number, if duplidate URLs were found
         if (sameUrls > 0) {
-            var message = sameUrls;
-
-            if (sameUrls == 1) {
-                message += ' content node has ';
-            } else {
-                message += ' content nodes have ';
-            }
-
-            message += 'the same URL "' + url + '". Appending "-' + sameUrls + '".';
-
-            UI.messageModal('Duplicate URLs', message);
-
             url = url.replace(/\/$/, '-' + sameUrls + '/');
         }
 
@@ -48423,7 +48121,7 @@ var UrlEditor = function (_FieldEditor) {
     UrlEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, this.renderPreview(), _.div({ class: 'widget-group' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
+        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
             _this2.onChange();
         }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();
@@ -48449,6 +48147,184 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(237);
+
+/**
+ * A modal for picking dates
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var DateModal = function (_Modal) {
+    _inherits(DateModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function DateModal(params) {
+        _classCallCheck(this, DateModal);
+
+        return _possibleConstructorReturn(this, _Modal.call(this, params));
+    }
+
+    /**
+     * Pre render
+     */
+
+
+    DateModal.prototype.prerender = function prerender() {
+        this.days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        this.hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+        this.minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+
+        // Sanity check
+        this.value = this.value ? new Date(this.value) : new Date();
+
+        if (isNaN(this.value.getDate())) {
+            this.value = new Date();
+        }
+    };
+
+    /**
+     * Gets days in current month and year
+     *
+     * @param {Number} year
+     * @param {Number} month
+     *
+     * @returns {Array} Days
+     */
+
+
+    DateModal.prototype.getDays = function getDays(year, month) {
+        var max = new Date(year, month, 0).getDate();
+        var days = [];
+
+        while (days.length < max) {
+            days[days.length] = days.length + 1;
+        }
+
+        return days;
+    };
+
+    /**
+     * Post render
+     */
+
+
+    DateModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--date', true);
+    };
+
+    /**
+     * Render header
+     */
+
+
+    DateModal.prototype.renderHeader = function renderHeader() {
+        return [_.div({ class: 'modal--date__header__year' }, this.value.getFullYear().toString()), _.div({ class: 'modal--date__header__day' }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({ class: 'modal__close fa fa-close' })];
+    };
+
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    DateModal.prototype.renderFooter = function renderFooter() {
+        var _this2 = this;
+
+        return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
+            _this2.trigger('change', _this2.value);
+
+            _this2.close();
+        });
+    };
+
+    /**
+     * Render body
+     */
+
+
+    DateModal.prototype.renderBody = function renderBody() {
+        var _this3 = this;
+
+        return [_.div({ class: 'modal--date__body__nav' }, _.button({ class: 'modal--date__body__nav__left fa fa-arrow-left' }).click(function () {
+            _this3.value.setMonth(_this3.value.getMonth() - 1);
+
+            _this3.render();
+        }), _.div({ class: 'modal--date__body__nav__month-year' }, this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()), _.button({ class: 'modal--date__body__nav__left fa fa-arrow-right' }).click(function () {
+            _this3.value.setMonth(_this3.value.getMonth() + 1);
+
+            _this3.render();
+        })), _.div({ class: 'modal--date__body__weekdays' }, _.span({ class: 'modal--date__body__weekday' }, 'M'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'W'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'F'), _.span({ class: 'modal--date__body__weekday' }, 'S'), _.span({ class: 'modal--date__body__weekday' }, 'S')), _.div({ class: 'modal--date__body__days' }, _.each(this.getDays(this.value.getFullYear(), this.value.getMonth() + 1), function (i, day) {
+            var thisDate = new Date(_this3.value.getTime());
+            var now = new Date();
+
+            var isCurrent = now.getFullYear() == _this3.value.getFullYear() && now.getMonth() == _this3.value.getMonth() && now.getDate() == day;
+
+            var isActive = _this3.value.getDate() == day;
+
+            thisDate.setDate(day);
+
+            return _.button({ class: 'modal--date__body__day' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '') }, day).click(function () {
+                _this3.value.setDate(day);
+
+                _this3.render();
+            });
+        })), _.div({ class: 'modal--date__body__time' }, _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 23, value: this.value.getHours() }).on('change', function (e) {
+            _this3.value.setHours(e.currentTarget.value);
+        }), _.div({ class: 'modal--date__body__time__separator' }, ':'), _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 59, value: this.value.getMinutes() }).on('change', function (e) {
+            _this3.value.setMinutes(e.currentTarget.value);
+        }))];
+    };
+
+    return DateModal;
+}(Modal);
+
+module.exports = DateModal;
 
 /***/ })
 /******/ ]);

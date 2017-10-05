@@ -11,9 +11,8 @@
         line-height: 2rem;
         height: 2rem;
         padding: 0 0.5rem;
-        background-color: $standard;
-        color: $standard-text;
-        border: 0.1rem solid $standard-darker;
+        background-color: $primary;
+        color: $primary-text;
 
         &:last-of-type {
             margin-bottom: 0;
@@ -44,7 +43,7 @@
             display: block;
             width: 2rem;
             height: 2rem;
-            color: $primary;
+            color: $primary-text;
             border: 0;
             margin: 0;
             padding: 0;

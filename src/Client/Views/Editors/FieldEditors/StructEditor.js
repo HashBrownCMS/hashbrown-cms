@@ -108,11 +108,15 @@ class StructEditor extends FieldEditor {
                         _.each(config.struct, (fieldKey, fieldValue) => {
                             // Sanity check
                             fieldValue.config = fieldValue.config || {};
+                            fieldValue.schemaId = fieldValue.schemaId || 'array';
 
                             let $field = _.div({class: 'editor__field'});
 
                             let renderField = () => {
                                 _.append($field.empty(),
+                                    _.div({class: 'editor__field__sort-key'},
+                                        HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name
+                                    ),
                                     _.div({class: 'editor__field__key'},
                                         new HashBrown.Views.Widgets.Input({
                                             type: 'text',
@@ -126,7 +130,7 @@ class StructEditor extends FieldEditor {
 
                                                 config.struct[fieldKey] = fieldValue;
                                             }
-                                        }).$element.addClass('editor__field__sort-key'),
+                                        }),
                                         new HashBrown.Views.Widgets.Input({
                                             type: 'text',
                                             placeholder: 'A label, e.g. "My field"',
@@ -165,12 +169,14 @@ class StructEditor extends FieldEditor {
                                             return editor.renderConfigEditor(fieldValue.config);
                                         })
                                     ),
-                                    _.button({class: 'editor__field__remove fa fa-remove', title: 'Remove field'})
-                                        .click(() => {
-                                            delete config.struct[fieldKey];
+                                    _.div({class: 'editor__field__actions'},
+                                        _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
+                                            .click(() => {
+                                                delete config.struct[fieldKey];
 
-                                            renderEditor();
-                                        })
+                                                renderEditor();
+                                            })
+                                    )
                                 )
                             };
 
@@ -204,9 +210,6 @@ class StructEditor extends FieldEditor {
      */
    template() {
         return _.div({class: 'editor__field__value'},
-            // Render preview
-            this.renderPreview(),
-
             // Loop through each key in the struct
             _.each(this.config.struct, (k, keySchema) => {
                 let value = this.value[k];

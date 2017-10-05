@@ -39,9 +39,6 @@ class LanguageEditor extends FieldEditor {
     
     render() {
         this.$element = _.div({class: 'field-editor dropdown-editor'},
-            // Render preview
-            this.renderPreview(),
-
             this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
         );
 

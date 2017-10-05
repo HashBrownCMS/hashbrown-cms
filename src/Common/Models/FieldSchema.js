@@ -12,7 +12,6 @@ class FieldSchema extends Schema {
         super.structure();
 
         this.def(String, 'editorId');
-        this.def(String, 'previewTemplate', '');
         this.def(Object, 'config', {});
 
         this.name = 'New field schema';        

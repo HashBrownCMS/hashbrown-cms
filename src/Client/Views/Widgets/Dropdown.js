@@ -25,11 +25,11 @@ class Dropdown extends Widget {
             let optionValue = this.valueKey ? value[this.valueKey] : value;
            
             if(typeof optionValue !== 'string') { 
-                optionValue = optionValue.toString();
+                optionValue = optionValue ? optionValue.toString() : '';
             }
             
             if(typeof optionLabel !== 'string') { 
-                optionLabel = optionLabel.toString();
+                optionLabel = optionLabel ? optionLabel.toString() : '';
             }
 
             // Check for disabled options

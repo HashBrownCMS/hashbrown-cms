@@ -97,9 +97,6 @@ class DropdownEditor extends FieldEditor {
             }
         
             _.append(this.$element.empty(),
-                // Render preview
-                this.renderPreview(),
-
                 _.if(this.config.options.length > 0,
                     UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
                         this.onChange(newValue);
