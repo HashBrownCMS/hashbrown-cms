@@ -39,7 +39,7 @@ class MediaReferenceEditor extends FieldEditor {
         return _.div({class: 'editor__field__value editor__field--media-reference'},
             _.button({class: 'editor__field--media-reference__pick'},
                 _.do(()=> {
-                    if(!media) { return; }
+                    if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }
             
                     return [
                         _.if(media.isVideo(),

@@ -66,6 +66,7 @@ class DateModal extends Modal {
             _.div({class: 'modal--date__header__year'}, this.value.getFullYear().toString()),
             _.div({class: 'modal--date__header__day'}, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()),
             _.button({class: 'modal__close fa fa-close'})
+                .click(() => { this.close(); })
         ];
     }
     

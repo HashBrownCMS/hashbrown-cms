@@ -21,18 +21,22 @@
             background-color: $primary;
         }
 
-        &:before {
-            font-family: 'FontAwesome';
-            content: '\f1c5';
-            position: absolute;
-            display: block;
-            font-size: 4rem;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
     }
 
+    &__empty {
+        position: absolute;
+        display: block;
+        font-size: 4rem;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        &:after {
+            font-family: 'FontAwesome';
+            content: '\f1c5';
+        }
+    }
+    
     &__remove {
         display: block;
         border-bottom-right-radius: 0.2rem;

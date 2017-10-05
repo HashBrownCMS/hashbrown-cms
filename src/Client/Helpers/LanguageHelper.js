@@ -1,7 +1,10 @@
 'use strict';
 
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
+
+let selectedLanguages = {};
 
 /**
  * The client side language helper
@@ -16,9 +19,9 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Array} List of language names
      */
-    static getLanguages(
-        project = requiredParam('project')
-    ) {
+    static getLanguages(project) {
+        project = project || ProjectHelper.currentProject;
+
         return SettingsHelper.getSettings(project, null, 'languages')
         .then((selected) => {
             if(!selected || !Array.isArray(selected)) {
@@ -27,12 +30,25 @@ class LanguageHelper extends LanguageHelperCommon {
 
             selected.sort();
 
-            this.selectedLanguages = selected;
+            selectedLanguages[project] = selected;
 
             return Promise.resolve(selected);
         });
     }
-    
+   
+    /**
+     * Gets all selected languages (sync)
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+    static getLanguagesSync(project) {
+        project = project || ProjectHelper.currentProject;
+
+        return selectedLanguages[project] || ['en'];
+    }
+
     /**
      * Sets all languages
      *

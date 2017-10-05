@@ -76,5 +76,11 @@
         background-color: $secondary;
         padding: 1rem;
         color: $secondary-text;
+        display: flex;
+        justify-content: flex-end;
+
+        .widget {
+            margin-left: 0.5rem;
+        }
     }
 }

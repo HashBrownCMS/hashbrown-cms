@@ -1,6 +1,5 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const LanguageHelper = require('Client/Helpers/LanguageHelper');
 
 const FieldEditor = require('./FieldEditor');
@@ -22,6 +21,9 @@ const FieldEditor = require('./FieldEditor');
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class LanguageEditor extends FieldEditor {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
 
@@ -29,45 +31,31 @@ class LanguageEditor extends FieldEditor {
     }
 
     /**
-     * Event: Change value
-     */ 
-    onChange() {
-        this.value = this.$select.val();
+     * Prerender
+     */
+    prerender() {
+        let options = LanguageHelper.getLanguagesSync();
 
-        this.trigger('change', this.value);
+        if(!this.value || options.indexOf(this.value) < 0) {
+            this.value = options[0];
+        }
     }
-    
-    render() {
-        this.$element = _.div({class: 'field-editor dropdown-editor'},
-            this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
-        );
 
-        LanguageHelper.getLanguages(ProjectHelper.currentProject)
-        .then((languages) => {
-            _.append(this.$select,
-                _.each(languages, (i, language) => {
-                    return _.option({value: language}, language);
-                })
-            );
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'editor__field__value'},
+            new HashBrown.Views.Widgets.Dropdown({
+                value: this.value,
+                options: LanguageHelper.getLanguagesSync(),
+                onChange: (newValue) => {
+                    this.value = newValue;
 
-            // Null check
-            if(!this.value) {
-                if(languages.length > 0) {
-                    this.value = languages[0];
-
-                    // Apply changes on next CPU cycle
-                    setTimeout(() => {
-                        this.trigger('change', this.value);
-                    }, 1);
-                
-                } else {
-                    debug.warning('No selected languages were found', this);
-
+                    this.trigger('change', this.value);
                 }
-            }
-
-            this.$select.val(this.value);
-        });
+            }).$element
+        );
     }
 }
 

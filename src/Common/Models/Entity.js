@@ -25,9 +25,7 @@ class Entity {
                 }
             
             } catch(e) {
-                debug.log(e.message, this);
-                console.log(properties);
-                console.log(e.stack);
+                debug.log(e.message, this, 4);
             }
         }
     }

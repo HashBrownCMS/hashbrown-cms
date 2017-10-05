@@ -7,7 +7,7 @@
     max-width: 20rem;
     background-color: $standard;
     border-radius: 0.2rem;
-    border: 0.1rem solid $standard-darker;
+    border: 1px solid $standard-darker;
 
     // Value
     &__value {
@@ -139,6 +139,14 @@
         right: 0;
         top: 0;
         color: $primary;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        border-top-right-radius: 0.2rem;
+        border-bottom-right-radius: 0.2rem;
+
+        &:hover {
+            color: $primary-text;
+            background-color: $primary;
+        }
     }
 
     // Obscure

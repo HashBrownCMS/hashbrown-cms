@@ -3,7 +3,7 @@
  */
 .modal--date {
     .modal__dialog {
-        max-width: 40rem;
+        max-width: 24rem;
     }
 
     &__header {
@@ -48,6 +48,77 @@
                     background-color: $primary;
                     color: $primary-text;
                 }
+            }
+        }
+
+        &__weekdays {
+            display: flex;
+            width: calc(7 * 3rem);
+            margin: 0 auto;
+        }
+
+        &__weekday {
+            display: block;
+            width: 3rem;
+            text-align: center;
+            color: $standard-text;
+            font-weight: bold;
+            line-height: 3rem;
+            height: 3rem;
+        }
+        
+        &__days {
+            display: flex;
+            flex-wrap: wrap;
+            width: calc(7 * 3rem);
+            margin: 0 auto;
+        }
+
+        &__day {
+            position: relative;
+            display: block;
+            width: 3rem;
+            height: 3rem;
+            border: 0;
+            background-color: transparent;
+            border-radius: 0.2rem;
+            color: $standard-text;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            
+            &.current {
+               background-color: $standard-dark;
+            }
+            
+            &:hover, &.active {
+                color: $primary-text;
+                background-color: $primary;
+            }
+        }
+        
+        &__time {
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+
+            &__separator {
+                color: $standard-text;
+                font-weight: bold;
+                font-size: 2rem;
+                padding: 0 0.5rem;
+                display: flex;
+                align-items: center;
+            }
+
+            &__number {
+                display: block;
+                padding: 0 0 0 1rem;
+                flex-grow: 0;
+                width: 5rem;
+                flex-basis: 5rem;
+                text-align: center;
+                font-size: 2rem;
+                border: 1px solid $standard-darker;
+                border-radius: 0.2rem;
             }
         }
     }

@@ -7537,9 +7537,7 @@ var Entity = function () {
                     this[k] = properties[k];
                 }
             } catch (e) {
-                debug.log(e.message, this);
-                console.log(properties);
-                console.log(e.stack);
+                debug.log(e.message, this, 4);
             }
         }
     }
@@ -15090,7 +15088,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
+var ProjectHelper = __webpack_require__(6);
 var LanguageHelperCommon = __webpack_require__(190);
+
+var selectedLanguages = {};
 
 /**
  * The client side language helper
@@ -15114,10 +15115,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
      *
      * @returns {Array} List of language names
      */
-    LanguageHelper.getLanguages = function getLanguages() {
-        var _this2 = this;
-
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    LanguageHelper.getLanguages = function getLanguages(project) {
+        project = project || ProjectHelper.currentProject;
 
         return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
             if (!selected || !Array.isArray(selected)) {
@@ -15126,10 +15125,25 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 
             selected.sort();
 
-            _this2.selectedLanguages = selected;
+            selectedLanguages[project] = selected;
 
             return Promise.resolve(selected);
         });
+    };
+
+    /**
+     * Gets all selected languages (sync)
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+
+
+    LanguageHelper.getLanguagesSync = function getLanguagesSync(project) {
+        project = project || ProjectHelper.currentProject;
+
+        return selectedLanguages[project] || ['en'];
     };
 
     /**

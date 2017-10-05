@@ -7589,9 +7589,7 @@ var Entity = function () {
                     this[k] = properties[k];
                 }
             } catch (e) {
-                debug.log(e.message, this);
-                console.log(properties);
-                console.log(e.stack);
+                debug.log(e.message, this, 4);
             }
         }
     }
@@ -15860,7 +15858,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
+var ProjectHelper = __webpack_require__(6);
 var LanguageHelperCommon = __webpack_require__(190);
+
+var selectedLanguages = {};
 
 /**
  * The client side language helper
@@ -15884,10 +15885,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
      *
      * @returns {Array} List of language names
      */
-    LanguageHelper.getLanguages = function getLanguages() {
-        var _this2 = this;
-
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    LanguageHelper.getLanguages = function getLanguages(project) {
+        project = project || ProjectHelper.currentProject;
 
         return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
             if (!selected || !Array.isArray(selected)) {
@@ -15896,10 +15895,25 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 
             selected.sort();
 
-            _this2.selectedLanguages = selected;
+            selectedLanguages[project] = selected;
 
             return Promise.resolve(selected);
         });
+    };
+
+    /**
+     * Gets all selected languages (sync)
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+
+
+    LanguageHelper.getLanguagesSync = function getLanguagesSync(project) {
+        project = project || ProjectHelper.currentProject;
+
+        return selectedLanguages[project] || ['en'];
     };
 
     /**
@@ -46408,22 +46422,13 @@ var DropdownEditor = function (_FieldEditor) {
 
         var _this = _possibleConstructorReturn(this, _FieldEditor.call(this, params));
 
-        _this.$element = _.div({ class: 'field-editor dropdown-editor' });
+        if (!_this.config.options) {
+            _this.config.options = [];
+        }
 
         _this.init();
         return _this;
     }
-
-    /**
-     * Event: Change value
-     */
-
-
-    DropdownEditor.prototype.onChange = function onChange(newValue) {
-        this.value = newValue;
-
-        this.trigger('change', this.value);
-    };
 
     /**
      * Renders the config editor
@@ -46453,44 +46458,21 @@ var DropdownEditor = function (_FieldEditor) {
      */
 
 
-    DropdownEditor.prototype.render = function render() {
+    DropdownEditor.prototype.template = function template() {
         var _this2 = this;
 
-        // Wait until next CPU cycle to trigger an eventual change if needed
-        setTimeout(function () {
-            // Value sanity check, should not be null
-            if (!_this2.config.options) {
-                _this2.config.options = [];
+        return _.div({ class: 'editor__field__value' }, _.if(this.config.options.length < 1, _.span({ class: 'editor__field__value__warning' }, 'No options configured')), _.if(this.config.options.length > 0, new HashBrown.Views.Widgets.Dropdown({
+            value: this.value,
+            useClearButton: true,
+            options: this.config.options,
+            valueKey: 'value',
+            labelKey: 'label',
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
+
+                _this2.trigger('change', _this2.value);
             }
-
-            // Generate dropdown options
-            var dropdownOptions = [];
-
-            for (var _iterator = _this2.config.options || [], _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var option = _ref;
-
-                dropdownOptions[dropdownOptions.length] = {
-                    label: option.label,
-                    value: option.value,
-                    selected: option.value == _this2.value
-                };
-            }
-
-            _.append(_this2.$element.empty(), _.if(_this2.config.options.length > 0, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
-                _this2.onChange(newValue);
-            }, true)), _.if(_this2.config.options.length < 1, _.span({ class: 'field-warning' }, 'No options configured')));
-        }, 1);
+        }).$element));
     };
 
     return DropdownEditor;
@@ -46511,7 +46493,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ProjectHelper = __webpack_require__(6);
 var LanguageHelper = __webpack_require__(94);
 
 var FieldEditor = __webpack_require__(11);
@@ -46536,6 +46517,9 @@ var FieldEditor = __webpack_require__(11);
 var LanguageEditor = function (_FieldEditor) {
     _inherits(LanguageEditor, _FieldEditor);
 
+    /**
+     * Constructor
+     */
     function LanguageEditor(params) {
         _classCallCheck(this, LanguageEditor);
 
@@ -46546,44 +46530,35 @@ var LanguageEditor = function (_FieldEditor) {
     }
 
     /**
-     * Event: Change value
+     * Prerender
      */
 
 
-    LanguageEditor.prototype.onChange = function onChange() {
-        this.value = this.$select.val();
+    LanguageEditor.prototype.prerender = function prerender() {
+        var options = LanguageHelper.getLanguagesSync();
 
-        this.trigger('change', this.value);
+        if (!this.value || options.indexOf(this.value) < 0) {
+            this.value = options[0];
+        }
     };
 
-    LanguageEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+
+
+    LanguageEditor.prototype.template = function template() {
         var _this2 = this;
 
-        this.$element = _.div({ class: 'field-editor dropdown-editor' }, this.$select = _.select({ class: 'form-control' }).change(function () {
-            _this2.onChange();
-        }));
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            value: this.value,
+            options: LanguageHelper.getLanguagesSync(),
+            onChange: function onChange(newValue) {
+                _this2.value = newValue;
 
-        LanguageHelper.getLanguages(ProjectHelper.currentProject).then(function (languages) {
-            _.append(_this2.$select, _.each(languages, function (i, language) {
-                return _.option({ value: language }, language);
-            }));
-
-            // Null check
-            if (!_this2.value) {
-                if (languages.length > 0) {
-                    _this2.value = languages[0];
-
-                    // Apply changes on next CPU cycle
-                    setTimeout(function () {
-                        _this2.trigger('change', _this2.value);
-                    }, 1);
-                } else {
-                    debug.warning('No selected languages were found', _this2);
-                }
+                _this2.trigger('change', _this2.value);
             }
-
-            _this2.$select.val(_this2.value);
-        });
+        }).$element);
     };
 
     return LanguageEditor;
@@ -46652,7 +46627,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 
         return _.div({ class: 'editor__field__value editor__field--media-reference' }, _.button({ class: 'editor__field--media-reference__pick' }, _.do(function () {
             if (!media) {
-                return;
+                return _.div({ class: 'editor__field--media-reference__empty' });
             }
 
             return [_.if(media.isVideo(), _.video({ class: 'editor__field--media-reference__preview', muted: true, autoplay: true, loop: true, src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id }))];
@@ -48263,7 +48238,11 @@ var DateModal = function (_Modal) {
 
 
     DateModal.prototype.renderHeader = function renderHeader() {
-        return [_.div({ class: 'modal--date__header__year' }, this.value.getFullYear().toString()), _.div({ class: 'modal--date__header__day' }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({ class: 'modal__close fa fa-close' })];
+        var _this2 = this;
+
+        return [_.div({ class: 'modal--date__header__year' }, this.value.getFullYear().toString()), _.div({ class: 'modal--date__header__day' }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this2.close();
+        })];
     };
 
     /**
@@ -48274,12 +48253,12 @@ var DateModal = function (_Modal) {
 
 
     DateModal.prototype.renderFooter = function renderFooter() {
-        var _this2 = this;
+        var _this3 = this;
 
         return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
-            _this2.trigger('change', _this2.value);
+            _this3.trigger('change', _this3.value);
 
-            _this2.close();
+            _this3.close();
         });
     };
 
@@ -48289,35 +48268,35 @@ var DateModal = function (_Modal) {
 
 
     DateModal.prototype.renderBody = function renderBody() {
-        var _this3 = this;
+        var _this4 = this;
 
         return [_.div({ class: 'modal--date__body__nav' }, _.button({ class: 'modal--date__body__nav__left fa fa-arrow-left' }).click(function () {
-            _this3.value.setMonth(_this3.value.getMonth() - 1);
+            _this4.value.setMonth(_this4.value.getMonth() - 1);
 
-            _this3.render();
+            _this4.render();
         }), _.div({ class: 'modal--date__body__nav__month-year' }, this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()), _.button({ class: 'modal--date__body__nav__left fa fa-arrow-right' }).click(function () {
-            _this3.value.setMonth(_this3.value.getMonth() + 1);
+            _this4.value.setMonth(_this4.value.getMonth() + 1);
 
-            _this3.render();
+            _this4.render();
         })), _.div({ class: 'modal--date__body__weekdays' }, _.span({ class: 'modal--date__body__weekday' }, 'M'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'W'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'F'), _.span({ class: 'modal--date__body__weekday' }, 'S'), _.span({ class: 'modal--date__body__weekday' }, 'S')), _.div({ class: 'modal--date__body__days' }, _.each(this.getDays(this.value.getFullYear(), this.value.getMonth() + 1), function (i, day) {
-            var thisDate = new Date(_this3.value.getTime());
+            var thisDate = new Date(_this4.value.getTime());
             var now = new Date();
 
-            var isCurrent = now.getFullYear() == _this3.value.getFullYear() && now.getMonth() == _this3.value.getMonth() && now.getDate() == day;
+            var isCurrent = now.getFullYear() == _this4.value.getFullYear() && now.getMonth() == _this4.value.getMonth() && now.getDate() == day;
 
-            var isActive = _this3.value.getDate() == day;
+            var isActive = _this4.value.getDate() == day;
 
             thisDate.setDate(day);
 
             return _.button({ class: 'modal--date__body__day' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '') }, day).click(function () {
-                _this3.value.setDate(day);
+                _this4.value.setDate(day);
 
-                _this3.render();
+                _this4.render();
             });
         })), _.div({ class: 'modal--date__body__time' }, _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 23, value: this.value.getHours() }).on('change', function (e) {
-            _this3.value.setHours(e.currentTarget.value);
+            _this4.value.setHours(e.currentTarget.value);
         }), _.div({ class: 'modal--date__body__time__separator' }, ':'), _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 59, value: this.value.getMinutes() }).on('change', function (e) {
-            _this3.value.setMinutes(e.currentTarget.value);
+            _this4.value.setMinutes(e.currentTarget.value);
         }))];
     };
 

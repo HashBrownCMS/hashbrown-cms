@@ -2909,15 +2909,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   .editor__field--media-reference__pick:hover {
     color: #ffffff;
     background-color: #e70d3b; }
-  .editor__field--media-reference__pick:before {
+
+.editor__field--media-reference__empty {
+  position: absolute;
+  display: block;
+  font-size: 4rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); }
+  .editor__field--media-reference__empty:after {
     font-family: 'FontAwesome';
-    content: '\F1C5';
-    position: absolute;
-    display: block;
-    font-size: 4rem;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); }
+    content: '\F1C5'; }
 
 .editor__field--media-reference__remove {
   display: block;
@@ -3025,7 +3027,11 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   .modal__footer {
     background-color: #21303b;
     padding: 1rem;
-    color: #ffffff; }
+    color: #ffffff;
+    display: flex;
+    justify-content: flex-end; }
+    .modal__footer .widget {
+      margin-left: 0.5rem; }
 
 /**
  * A modal for picking icons
@@ -3051,7 +3057,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
  * A date picker modal
  */
 .modal--date .modal__dialog {
-  max-width: 40rem; }
+  max-width: 24rem; }
 
 .modal--date__header__year {
   margin-bottom: 0.5rem;
@@ -3084,6 +3090,64 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     .modal--date__body__nav__left:hover, .modal--date__body__nav__right:hover {
       background-color: #e70d3b;
       color: #ffffff; }
+
+.modal--date__body__weekdays {
+  display: flex;
+  width: calc(7 * 3rem);
+  margin: 0 auto; }
+
+.modal--date__body__weekday {
+  display: block;
+  width: 3rem;
+  text-align: center;
+  color: #333333;
+  font-weight: bold;
+  line-height: 3rem;
+  height: 3rem; }
+
+.modal--date__body__days {
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(7 * 3rem);
+  margin: 0 auto; }
+
+.modal--date__body__day {
+  position: relative;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  border: 0;
+  background-color: transparent;
+  border-radius: 0.2rem;
+  color: #333333;
+  transition: color 0.3s ease, background-color 0.3s ease; }
+  .modal--date__body__day.current {
+    background-color: #eeeeee; }
+  .modal--date__body__day:hover, .modal--date__body__day.active {
+    color: #ffffff;
+    background-color: #e70d3b; }
+
+.modal--date__body__time {
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center; }
+  .modal--date__body__time__separator {
+    color: #333333;
+    font-weight: bold;
+    font-size: 2rem;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: center; }
+  .modal--date__body__time__number {
+    display: block;
+    padding: 0 0 0 1rem;
+    flex-grow: 0;
+    width: 5rem;
+    flex-basis: 5rem;
+    text-align: center;
+    font-size: 2rem;
+    border: 1px solid #dddddd;
+    border-radius: 0.2rem; }
 
 /**
  * A generic widget
@@ -3357,7 +3421,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   max-width: 20rem;
   background-color: #ffffff;
   border-radius: 0.2rem;
-  border: 0.1rem solid #dddddd; }
+  border: 1px solid #dddddd; }
   .widget--dropdown__value {
     height: 2rem;
     width: calc(100% - 2rem);
@@ -3460,7 +3524,13 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     background: transparent;
     right: 0;
     top: 0;
-    color: #e70d3b; }
+    color: #e70d3b;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border-top-right-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem; }
+    .widget--dropdown__clear:hover {
+      color: #ffffff;
+      background-color: #e70d3b; }
   .widget--dropdown__obscure {
     position: relative;
     display: none; }
