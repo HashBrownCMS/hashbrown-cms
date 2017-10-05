@@ -3050,6 +3050,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 /**
  * A date picker modal
  */
+.modal--date .modal__dialog {
+  max-width: 40rem; }
+
 .modal--date__header__year {
   margin-bottom: 0.5rem;
   font-size: 1.5rem; }

@@ -2,6 +2,10 @@
  * A date picker modal
  */
 .modal--date {
+    .modal__dialog {
+        max-width: 40rem;
+    }
+
     &__header {
         &__year {
             margin-bottom: 0.5rem;
