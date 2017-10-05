@@ -99,6 +99,16 @@
         height: 1.5rem;
         background-color: $primary;
         border-radius: 0.2rem;
+
+        &.working {
+            &:after {
+                color: $primary-text;
+                width: 1.5rem;
+                height: 1.5rem;
+                line-height: 1.5rem;
+                margin-top: -0.75rem;
+            }
+        }
     }
 
     &__checkbox {

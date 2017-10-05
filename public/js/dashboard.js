@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 271);
+/******/ 	return __webpack_require__(__webpack_require__.s = 272);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1837,259 +1837,6 @@ if (typeof Object.create === 'function') {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper class for making HTTP/S requests
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var RequestHelper = function () {
-    function RequestHelper() {
-        _classCallCheck(this, RequestHelper);
-    }
-
-    /**
-     * An environment specific request
-     *
-     * @param {String} method
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} Response
-     */
-    RequestHelper.request = function request(method, url, data) {
-        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
-    };
-
-    /**
-     * An environment-independent request
-     *
-     * @param {String} method
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} Response
-     */
-
-
-    RequestHelper.customRequest = function customRequest(method, url, data) {
-        return new Promise(function (resolve, reject) {
-            var xhr = new XMLHttpRequest();
-            xhr.open(method.toUpperCase(), url);
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-            if (data) {
-                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-                    data = JSON.stringify(data);
-                }
-
-                xhr.send(data);
-            } else {
-                xhr.send();
-            }
-
-            xhr.onreadystatechange = function () {
-                var DONE = 4;
-                var OK = 200;
-                var NOT_MODIFIED = 304;
-                var UNAUTHORIZED = 403;
-
-                if (xhr.readyState === DONE) {
-                    if (xhr.status === UNAUTHORIZED) {
-                        location = '/login/?path=' + location.pathname + location.hash;
-
-                        reject(new Error('User is not logged in'));
-                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
-                        var response = xhr.responseText;
-
-                        if (response && response != 'OK') {
-                            try {
-                                response = JSON.parse(response);
-                            } catch (e) {
-                                // If the response isn't JSON, then so be it
-
-                            }
-                        }
-
-                        resolve(response);
-                    } else {
-                        var error = new Error(xhr.responseText);
-
-                        error.statusCode = xhr.status;
-
-                        reject(error);
-                    }
-                }
-            };
-        });
-    };
-
-    /**
-     * Wraps a URL to include environment
-     *
-     * @param {String} url
-     */
-
-
-    RequestHelper.environmentUrl = function environmentUrl(url) {
-        var newUrl = '/api/';
-
-        if (HashBrown.Helpers.ProjectHelper.currentProject) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
-        }
-
-        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
-        }
-
-        newUrl += url;
-
-        return newUrl;
-    };
-
-    /**
-     * Listens for server restart
-     */
-
-
-    RequestHelper.listenForRestart = function listenForRestart() {
-        UI.messageModal('Restart', 'HashBrown is restarting...', false);
-
-        function poke() {
-            $.ajax({
-                type: 'get',
-                url: '/',
-                success: function success() {
-                    location.reload();
-                },
-                error: function error() {
-                    poke();
-                }
-            });
-        }
-
-        poke();
-    };
-
-    /**
-     * Reloads a resource
-     */
-    RequestHelper.reloadResource = function reloadResource(name) {
-        return RequestHelper.request('get', name).then(function (result) {
-            window.resources[name] = result;
-
-            // Apply correct model
-            for (var i in window.resources[name]) {
-                var object = window.resources[name][i];
-                var model = null;
-
-                switch (name) {
-                    case 'connections':
-                        model = new HashBrown.Models.Connection(object);
-                        break;
-
-                    case 'content':
-                        model = new HashBrown.Models.Content(object);
-                        break;
-
-                    case 'templates':
-                        model = new HashBrown.Models.Template(object);
-                        break;
-
-                    case 'forms':
-                        model = new HashBrown.Models.Form(object);
-                        break;
-
-                    case 'users':
-                        model = new HashBrown.Models.User(object);
-                        break;
-
-                    case 'media':
-                        model = new HashBrown.Models.Media(object);
-                        break;
-
-                    case 'schemas':
-                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
-                        break;
-
-                    default:
-                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
-                }
-
-                window.resources[name][i] = model;
-            }
-
-            return Promise.resolve(result);
-        }).catch(function (e) {
-            // If the error is a 404, it's an intended response from the controller
-            if (e.statusCode !== 404) {
-                UI.errorModal(e);
-            }
-
-            return Promise.resolve([]);
-        });
-    };
-
-    /**
-     * Reloads all resources
-     */
-    RequestHelper.reloadAllResources = function reloadAllResources() {
-        $('.loading-messages').empty();
-
-        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
-
-        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var item = _ref;
-
-            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
-
-            $('.loading-messages').append($msg);
-        }
-
-        var processQueue = function processQueue() {
-            var name = queue.shift();
-
-            return RequestHelper.reloadResource(name).then(function () {
-                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
-
-                if (queue.length < 1) {
-                    return Promise.resolve();
-                } else {
-                    return processQueue();
-                }
-            });
-        };
-
-        return processQueue();
-    };
-
-    return RequestHelper;
-}();
-
-module.exports = RequestHelper;
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5457,6 +5204,259 @@ module.exports = RequestHelper;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(133)(module)))
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for making HTTP/S requests
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var RequestHelper = function () {
+    function RequestHelper() {
+        _classCallCheck(this, RequestHelper);
+    }
+
+    /**
+     * An environment specific request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
+    RequestHelper.request = function request(method, url, data) {
+        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
+    };
+
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
+
+
+    RequestHelper.customRequest = function customRequest(method, url, data) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(method.toUpperCase(), url);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            if (data) {
+                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                    data = JSON.stringify(data);
+                }
+
+                xhr.send(data);
+            } else {
+                xhr.send();
+            }
+
+            xhr.onreadystatechange = function () {
+                var DONE = 4;
+                var OK = 200;
+                var NOT_MODIFIED = 304;
+                var UNAUTHORIZED = 403;
+
+                if (xhr.readyState === DONE) {
+                    if (xhr.status === UNAUTHORIZED) {
+                        location = '/login/?path=' + location.pathname + location.hash;
+
+                        reject(new Error('User is not logged in'));
+                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                        var response = xhr.responseText;
+
+                        if (response && response != 'OK') {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (e) {
+                                // If the response isn't JSON, then so be it
+
+                            }
+                        }
+
+                        resolve(response);
+                    } else {
+                        var error = new Error(xhr.responseText);
+
+                        error.statusCode = xhr.status;
+
+                        reject(error);
+                    }
+                }
+            };
+        });
+    };
+
+    /**
+     * Wraps a URL to include environment
+     *
+     * @param {String} url
+     */
+
+
+    RequestHelper.environmentUrl = function environmentUrl(url) {
+        var newUrl = '/api/';
+
+        if (HashBrown.Helpers.ProjectHelper.currentProject) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        }
+
+        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        }
+
+        newUrl += url;
+
+        return newUrl;
+    };
+
+    /**
+     * Listens for server restart
+     */
+
+
+    RequestHelper.listenForRestart = function listenForRestart() {
+        UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+        function poke() {
+            $.ajax({
+                type: 'get',
+                url: '/',
+                success: function success() {
+                    location.reload();
+                },
+                error: function error() {
+                    poke();
+                }
+            });
+        }
+
+        poke();
+    };
+
+    /**
+     * Reloads a resource
+     */
+    RequestHelper.reloadResource = function reloadResource(name) {
+        return RequestHelper.request('get', name).then(function (result) {
+            window.resources[name] = result;
+
+            // Apply correct model
+            for (var i in window.resources[name]) {
+                var object = window.resources[name][i];
+                var model = null;
+
+                switch (name) {
+                    case 'connections':
+                        model = new HashBrown.Models.Connection(object);
+                        break;
+
+                    case 'content':
+                        model = new HashBrown.Models.Content(object);
+                        break;
+
+                    case 'templates':
+                        model = new HashBrown.Models.Template(object);
+                        break;
+
+                    case 'forms':
+                        model = new HashBrown.Models.Form(object);
+                        break;
+
+                    case 'users':
+                        model = new HashBrown.Models.User(object);
+                        break;
+
+                    case 'media':
+                        model = new HashBrown.Models.Media(object);
+                        break;
+
+                    case 'schemas':
+                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
+                        break;
+
+                    default:
+                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
+                }
+
+                window.resources[name][i] = model;
+            }
+
+            return Promise.resolve(result);
+        }).catch(function (e) {
+            // If the error is a 404, it's an intended response from the controller
+            if (e.statusCode !== 404) {
+                UI.errorModal(e);
+            }
+
+            return Promise.resolve([]);
+        });
+    };
+
+    /**
+     * Reloads all resources
+     */
+    RequestHelper.reloadAllResources = function reloadAllResources() {
+        $('.loading-messages').empty();
+
+        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+
+        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var item = _ref;
+
+            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
+
+            $('.loading-messages').append($msg);
+        }
+
+        var processQueue = function processQueue() {
+            var name = queue.shift();
+
+            return RequestHelper.reloadResource(name).then(function () {
+                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+
+                if (queue.length < 1) {
+                    return Promise.resolve();
+                } else {
+                    return processQueue();
+                }
+            });
+        };
+
+        return processQueue();
+    };
+
+    return RequestHelper;
+}();
+
+module.exports = RequestHelper;
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6439,7 +6439,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ContentSchema = __webpack_require__(55);
 var FieldSchema = __webpack_require__(56);
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 var SchemaHelperCommon = __webpack_require__(179);
 
@@ -7034,7 +7034,7 @@ BlockHash.prototype._pad = function pad() {
 
 var asn1 = exports;
 
-asn1.bignum = __webpack_require__(3);
+asn1.bignum = __webpack_require__(2);
 
 asn1.define = __webpack_require__(161).define;
 asn1.base = __webpack_require__(25);
@@ -7066,7 +7066,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 var SettingsHelperCommon = __webpack_require__(185);
 
@@ -9126,7 +9126,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var MediaHelperCommon = __webpack_require__(184);
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 /**
  * The client side media helper
@@ -9285,7 +9285,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 var ContentHelperCommon = __webpack_require__(186);
 
@@ -11154,7 +11154,7 @@ exports.EDE = __webpack_require__(130);
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(3);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(2);
 var randomBytes = __webpack_require__(18);
 module.exports = crt;
 function blind(priv) {
@@ -11355,7 +11355,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ContentCommon = __webpack_require__(95);
+var ContentCommon = __webpack_require__(94);
 var ProjectHelper = __webpack_require__(6);
 
 /**
@@ -13491,7 +13491,7 @@ var randomBytes = __webpack_require__(18);
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
 findPrime.fermatTest = fermatTest;
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var TWENTYFOUR = new BN(24);
 var MillerRabin = __webpack_require__(79);
 var millerRabin = new MillerRabin();
@@ -13589,7 +13589,7 @@ function findPrime(bits, gen) {
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bn = __webpack_require__(3);
+var bn = __webpack_require__(2);
 var brorand = __webpack_require__(80);
 
 function MillerRabin(rand) {
@@ -14913,7 +14913,7 @@ module.exports = function xor(a, b) {
 /* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(3);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(2);
 function withPublic(paddedMsg, key) {
   return new Buffer(paddedMsg.toRed(bn.mont(key.modulus)).redPow(new bn(key.publicExponent)).fromRed().toArray());
 }
@@ -14923,157 +14923,6 @@ module.exports = withPublic;
 
 /***/ }),
 /* 93 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ConnectionHelperCommon = __webpack_require__(187);
-var Connection = __webpack_require__(37);
-var ProjectHelper = __webpack_require__(6);
-var RequestHelper = __webpack_require__(2);
-
-/**
- * The client side connection helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var ConnectionHelper = function (_ConnectionHelperComm) {
-    _inherits(ConnectionHelper, _ConnectionHelperComm);
-
-    function ConnectionHelper() {
-        _classCallCheck(this, ConnectionHelper);
-
-        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
-    }
-
-    /**
-     * Gets all connections
-     *
-     * @return {Promise} Array of Connections
-     */
-    ConnectionHelper.getAllConnections = function getAllConnections() {
-        return Promise.resolve(resources.connections);
-    };
-
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-
-
-    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return connection;
-            }
-        }
-    };
-
-    /**
-     * Gets a Connection by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {string} id
-     *
-     * @return {Promise(Connection)} promise
-     */
-
-
-    ConnectionHelper.getConnectionById = function getConnectionById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return Promise.resolve(connection);
-            }
-        }
-
-        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
-    };
-
-    /**
-     * Sets the Media provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-
-
-    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
-        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return RequestHelper.reloadResource('media');
-        }).then(function () {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
-    };
-
-    /**
-     * Gets the Media provider
-     *
-     * @returns {Promise} Connection
-     */
-
-
-    ConnectionHelper.getMediaProvider = function getMediaProvider() {
-        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-    };
-
-    /**
-     * Sets the Template provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-
-
-    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
-        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return RequestHelper.reloadResource('templates');
-        }).then(function () {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
-    };
-
-    /**
-     * Gets the Template provider
-     *
-     * @returns {Promise} Connection
-     */
-
-
-    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
-        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-    };
-
-    return ConnectionHelper;
-}(ConnectionHelperCommon);
-
-module.exports = ConnectionHelper;
-
-/***/ }),
-/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15173,7 +15022,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 95 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15561,7 +15410,7 @@ var Content = function (_Resource) {
 module.exports = Content;
 
 /***/ }),
-/* 96 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15694,7 +15543,7 @@ var Project = function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 97 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15706,7 +15555,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 /**
  * An editor for Users
@@ -15977,6 +15826,157 @@ var UserEditor = function (_Crisp$View) {
 }(Crisp.View);
 
 module.exports = UserEditor;
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConnectionHelperCommon = __webpack_require__(188);
+var Connection = __webpack_require__(37);
+var ProjectHelper = __webpack_require__(6);
+var RequestHelper = __webpack_require__(3);
+
+/**
+ * The client side connection helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var ConnectionHelper = function (_ConnectionHelperComm) {
+    _inherits(ConnectionHelper, _ConnectionHelperComm);
+
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+
+        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @return {Promise} Array of Connections
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        return Promise.resolve(resources.connections);
+    };
+
+    /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
+
+
+    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return connection;
+            }
+        }
+    };
+
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {string} id
+     *
+     * @return {Promise(Connection)} promise
+     */
+
+
+    ConnectionHelper.getConnectionById = function getConnectionById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return Promise.resolve(connection);
+            }
+        }
+
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
+        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('media');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
+        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('templates');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    return ConnectionHelper;
+}(ConnectionHelperCommon);
+
+module.exports = ConnectionHelper;
 
 /***/ }),
 /* 98 */
@@ -18816,7 +18816,7 @@ module.exports = {
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(3);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(2);
 var MillerRabin = __webpack_require__(79);
 var millerRabin = new MillerRabin();
 var TWENTYFOUR = new BN(24);
@@ -19084,7 +19084,7 @@ module.exports = {
 var createHmac = __webpack_require__(64);
 var crt = __webpack_require__(53);
 var EC = __webpack_require__(4).ec;
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var parseKeys = __webpack_require__(36);
 var curves = __webpack_require__(89);
 
@@ -19332,7 +19332,7 @@ module.exports = {
 
 
 var utils = exports;
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var minAssert = __webpack_require__(5);
 var minUtils = __webpack_require__(81);
 
@@ -19438,7 +19438,7 @@ utils.intFromLE = intFromLE;
 "use strict";
 
 
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var getNAF = utils.getNAF;
@@ -19776,7 +19776,7 @@ BasePoint.prototype.dblp = function dblp(k) {
 
 var curve = __webpack_require__(35);
 var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -20644,7 +20644,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
 
 
 var curve = __webpack_require__(35);
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -20826,7 +20826,7 @@ Point.prototype.getX = function getX() {
 
 var curve = __webpack_require__(35);
 var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -21674,7 +21674,7 @@ module.exports = {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var HmacDRBG = __webpack_require__(154);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
@@ -22001,7 +22001,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
 "use strict";
 
 
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var assert = utils.assert;
@@ -22112,7 +22112,7 @@ KeyPair.prototype.inspect = function inspect() {
 "use strict";
 
 
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
@@ -22465,7 +22465,7 @@ module.exports = KeyPair;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var assert = utils.assert;
@@ -23723,7 +23723,7 @@ module.exports = function (okey, password) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 var EC = __webpack_require__(4).ec;
 var parseKeys = __webpack_require__(36);
 var curves = __webpack_require__(89);
@@ -23808,7 +23808,7 @@ module.exports = verify;
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(3);
+var BN = __webpack_require__(2);
 
 module.exports = function createECDH(curve) {
 	return new ECDH(curve);
@@ -23955,7 +23955,7 @@ var randomBytes = __webpack_require__(18);
 var createHash = __webpack_require__(19);
 var mgf = __webpack_require__(90);
 var xor = __webpack_require__(91);
-var bn = __webpack_require__(3);
+var bn = __webpack_require__(2);
 var withPublic = __webpack_require__(92);
 var crt = __webpack_require__(53);
 
@@ -24054,7 +24054,7 @@ function nonZero(len, crypto) {
 /* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(36);
 var mgf = __webpack_require__(90);
 var xor = __webpack_require__(91);
-var bn = __webpack_require__(3);
+var bn = __webpack_require__(2);
 var crt = __webpack_require__(53);
 var createHash = __webpack_require__(19);
 var withPublic = __webpack_require__(92);
@@ -24573,7 +24573,8 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 187 */
+/* 187 */,
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24741,7 +24742,6 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 188 */,
 /* 189 */,
 /* 190 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -24862,13 +24862,13 @@ module.exports = LanguageHelper;
  */
 
 module.exports = {
-    ConnectionHelper: __webpack_require__(93),
+    ConnectionHelper: __webpack_require__(97),
     ContentHelper: __webpack_require__(41),
     DebugHelper: __webpack_require__(192),
-    LanguageHelper: __webpack_require__(94),
+    LanguageHelper: __webpack_require__(93),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
-    RequestHelper: __webpack_require__(2),
+    RequestHelper: __webpack_require__(3),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
     TemplateHelper: __webpack_require__(194),
@@ -33481,7 +33481,8 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */
+/* 271 */,
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33531,8 +33532,8 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
         }
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
-            var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(272);
+            var Project = __webpack_require__(95);
+            var ProjectEditor = __webpack_require__(273);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33561,7 +33562,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
     return HashBrown.Helpers.RequestHelper.request('get', 'users');
 }).then(function (users) {
-    var UserEditor = __webpack_require__(97);
+    var UserEditor = __webpack_require__(96);
     var User = __webpack_require__(43);
 
     var _loop = function _loop() {
@@ -33798,7 +33799,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33810,14 +33811,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(273);
-var SyncEditor = __webpack_require__(274);
-var LanguageEditor = __webpack_require__(275);
-var BackupEditor = __webpack_require__(276);
-var MigrationEditor = __webpack_require__(277);
+var InfoEditor = __webpack_require__(274);
+var SyncEditor = __webpack_require__(275);
+var LanguageEditor = __webpack_require__(276);
+var BackupEditor = __webpack_require__(277);
+var MigrationEditor = __webpack_require__(278);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -34059,7 +34060,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34177,7 +34178,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 274 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34190,7 +34191,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(17);
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 var SettingsHelper = __webpack_require__(26);
 var ProjectHelper = __webpack_require__(6);
 
@@ -34383,7 +34384,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 275 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34396,7 +34397,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(17);
-var LanguageHelper = __webpack_require__(94);
+var LanguageHelper = __webpack_require__(93);
 
 /**
  * The language settings editor
@@ -34466,7 +34467,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 276 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34478,7 +34479,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 
 var MessageModal = __webpack_require__(17);
 
@@ -34732,7 +34733,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 277 */
+/* 278 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34744,7 +34745,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(2);
+var RequestHelper = __webpack_require__(3);
 var MessageModal = __webpack_require__(17);
 
 /**

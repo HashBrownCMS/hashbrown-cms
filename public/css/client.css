@@ -2453,14 +2453,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   background-position: 0px 0px; }
   .editor__header__title {
     margin: 0px;
-    display: inline-block; }
+    display: inline-block;
+    line-height: 2rem;
+    height: 2rem; }
   .editor__header__icon {
     margin-right: 10px;
-    font-size: 20px;
-    width: 20px;
+    line-height: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
+    width: 2rem;
     display: inline-block;
-    position: relative;
-    top: 1px; }
+    position: relative; }
   .editor__header__tab {
     padding: 0 2rem;
     border-top-left-radius: 0.2rem;
@@ -2484,7 +2487,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       background-color: #eeeeee; }
 
 .editor__body {
-  padding: 15px;
+  padding: 1rem;
   flex-grow: 1;
   overflow: auto;
   position: relative; }
@@ -3175,19 +3178,22 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       padding: 0 0.5rem;
       user-select: none;
       pointer-events: none; }
-  .widget.working:after {
-    font-family: 'FontAwesome';
-    content: '\F1CE';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    margin-top: -1rem;
-    width: 2rem;
-    line-height: 2rem;
-    height: 2rem;
-    text-align: center;
-    z-index: 10;
-    animation: widget__spinner 1s linear infinite; }
+  .widget.working {
+    pointer-events: none;
+    cursor: not-allowed; }
+    .widget.working:after {
+      font-family: 'FontAwesome';
+      content: '\F1CE';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      margin-top: -1rem;
+      width: 2rem;
+      line-height: 2rem;
+      height: 2rem;
+      text-align: center;
+      z-index: 10;
+      animation: widget__spinner 1s linear infinite; }
 
 /**
  * Tabs
@@ -3393,6 +3399,12 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     height: 1.5rem;
     background-color: #e70d3b;
     border-radius: 0.2rem; }
+    .widget--input.checkbox.working:after {
+      color: #ffffff;
+      width: 1.5rem;
+      height: 1.5rem;
+      line-height: 1.5rem;
+      margin-top: -0.75rem; }
   .widget--input__checkbox-input, .widget--input__checkbox-extra {
     position: absolute;
     top: 0;

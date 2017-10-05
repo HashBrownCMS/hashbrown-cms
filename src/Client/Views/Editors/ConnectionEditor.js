@@ -28,13 +28,11 @@ class ConnectionEditor extends Crisp.View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        let view = this;
+        this.$saveBtn.toggleClass('saving', true);
 
-        view.$saveBtn.toggleClass('saving', true);
-
-        RequestHelper.request('post', 'connections/' + view.model.id, view.model)
+        RequestHelper.request('post', 'connections/' + this.model.id, this.model)
         .then(() => {
-            view.$saveBtn.toggleClass('saving', false);
+            this.$saveBtn.toggleClass('saving', false);
        
             location.reload(); 
         })
@@ -42,50 +40,61 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
-     * Reload this view
-     */
-    reload() {
-        this.model = null;
-        
-        this.fetch();
-    }
-
-    /**
      * Renders the Template provider editor
      */
     renderTemplateProviderEditor() {
-        let $inputSwitch = UI.inputSwitch(false, (isProvider) => {
-            ConnectionHelper.setTemplateProvider(isProvider ? this.model.id : null)
-            .catch(UI.errorModal);
+        let input = new HashBrown.Views.Widgets.Input({
+            value: false,
+            type: 'checkbox',
+            onChange: (isProvider) => {
+                ConnectionHelper.setTemplateProvider(isProvider ? this.model.id : null)
+                .catch(UI.errorModal);
+            }
         });
+
+        // Set the value
+        input.$element.toggleClass('working', true);
 
         ConnectionHelper.getTemplateProvider()
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
-                $inputSwitch.trigger('set', true);
+                input.value = true;
+                input.render();
             }
+        
+            input.$element.toggleClass('working', false);
         });
 
-        return $inputSwitch;
+        return input.$element;
     }
     
     /**
      * Renders the Media provider editor
      */
     renderMediaProviderEditor() {
-        let $inputSwitch = UI.inputSwitch(false, (isProvider) => {
-            ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
-            .catch(UI.errorModal);
+        let input = new HashBrown.Views.Widgets.Input({
+            value: false,
+            type: 'checkbox',
+            onChange: (isProvider) => {
+                ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
+                .catch(UI.errorModal);
+            }
         });
+
+        // Set the value
+        input.$element.toggleClass('working', true);
 
         ConnectionHelper.getMediaProvider()
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
-                $inputSwitch.trigger('set', true);
+                input.value = true;
+                input.render();
             }
+        
+            input.$element.toggleClass('working', false);
         });
 
-        return $inputSwitch;
+        return input.$element;
     }
 
     /**
@@ -112,20 +121,13 @@ class ConnectionEditor extends Crisp.View {
      * Renders the URL editor
      */
     renderUrlEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.url = $(this).val();
-        } 
-
-        let $editor = _.div({class: 'field-editor string-editor'},
-            _.input({class: 'form-control', value: this.model.url, type: 'text', placeholder: 'Input the remote URL here, e.g. http://awesomeproject.com'})
-                .change(onChange)
-        );
-
-        return $editor;
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.url,
+            onChange: (newValue) => {
+                this.model.url = newValue;
+            }
+        }).$element;
     }
-    
     
     /**
      * Renders the settings editor
@@ -153,91 +155,74 @@ class ConnectionEditor extends Crisp.View {
      * Renders the type editor
      */
     renderTypeEditor() {
-        // Generate dropdown options
-        let dropdownOptions = [];
-        
-        for(let label in HashBrown.Views.Editors.ConnectionEditors || []) {
-            let option = HashBrown.Views.Editors.ConnectionEditors[label];
-            
-            dropdownOptions[dropdownOptions.length] = {
-                label: label,
-                value: label,
-                selected: label == this.model.type
-            };
-        }
-
-        let $editor = _.div({class: 'field-editor dropdown-editor'},
-            UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
+        return new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.type,
+            options: Object.keys(HashBrown.Views.Editors.ConnectionEditors),
+            onChange: (newValue) => {
                 this.model.type = newValue;
 
-                this.$element.find('.connection-settings .field-value').html(
-                    this.renderSettingsEditor()
-                );
-            }, true)
-        );
-
-        return $editor;
+                this.render();
+            }
+        }).$element;
     }
 
-    render() {
-        let view = this;
-
-        this.$element.toggleClass('locked', this.model.isLocked);
-        this.$element.html(
-            _.div({class: 'object'},
-                _.div({class: 'editor-header'},
-                    _.span({class: 'fa fa-exchange'}),
-                    _.h4(this.model.title)
-                ),
-                _.div({class: 'tab-content editor-body'},
-                    _.div({class: 'field-container connection-template-provider'},
-                        _.div({class: 'field-key'}, 'Is Template provider'),
-                        _.div({class: 'field-value'},
-                            this.renderTemplateProviderEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container connection-media-provider'},
-                        _.div({class: 'field-key'}, 'Is Media provider'),
-                        _.div({class: 'field-value'},
-                            this.renderMediaProviderEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container connection-title'},
-                        _.div({class: 'field-key'}, 'Title'),
-                        _.div({class: 'field-value'},
-                            this.renderTitleEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container connection-url'},
-                        _.div({class: 'field-key'}, 'URL'),
-                        _.div({class: 'field-value'},
-                            this.renderUrlEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container connection-type'},
-                        _.div({class: 'field-key'}, 'Type'),
-                        _.div({class: 'field-value'},
-                            this.renderTypeEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container connection-settings'},
-                        _.div({class: 'field-key'}, 'Settings'),
-                        _.div({class: 'field-value'},
-                            this.renderSettingsEditor()
-                        )
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '')},
+            _.div({class: 'editor__header'},
+                _.span({class: 'editor__header__icon fa fa-exchange'}),
+                _.h4({class: 'editor__header__title'}, this.model.title)
+            ),
+            _.div({class: 'editor__body'},
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Is Template provider'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderTemplateProviderEditor()
                     )
                 ),
-                _.div({class: 'editor-footer'}, 
-                    _.div({class: 'btn-group'},
-                        _.button({class: 'btn btn-embedded'},
-                            'Advanced'
-                        ).click(function() { view.onClickAdvanced(); }),
-                        _.if(!this.model.isLocked, 
-                            view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                                _.span({class: 'text-default'}, 'Save '),
-                                _.span({class: 'text-working'}, 'Saving ')
-                            ).click(function() { view.onClickSave(); })
-                        )
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Is Media provider'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderMediaProviderEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Title'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderTitleEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'URL'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderUrlEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Type'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderTypeEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Settings'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderSettingsEditor()
+                    )
+                )
+            ),
+            _.div({class: 'editor__footer'}, 
+                _.div({class: 'editor__footer__buttons'},
+                    _.button({class: 'widget widget--button embedded'},
+                        'Advanced'
+                    ).click(() => { this.onClickAdvanced(); }),
+                    _.if(!this.model.isLocked, 
+                        this.$saveBtn = _.button({class: 'widget widget--button editor__footer__buttons__save'},
+                            _.span({class: 'widget--button__text-default'}, 'Save '),
+                            _.span({class: 'widget--button__text-working'}, 'Saving ')
+                        ).click(() => { this.onClickSave(); })
                     )
                 )
             )

@@ -18,7 +18,7 @@ class ContentEditor extends Crisp.View {
 
         this.dirty = false;
 
-        this.$element = _.div({class: 'editor content-editor'});
+        this.$element = _.div({class: 'editor editor--content'});
 
         this.fetch();
     }

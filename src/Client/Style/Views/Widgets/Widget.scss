@@ -37,6 +37,9 @@
 
     // Working state
     &.working {
+        pointer-events: none;
+        cursor: not-allowed;
+
         &:after {
             font-family: 'FontAwesome';
             content: '\f1ce';
