@@ -9,6 +9,24 @@
     border-radius: 0.2rem;
     border: 1px solid $standard-darker;
 
+    // Context menu mode
+    &.context-menu {
+        width: 16rem;
+        position: absolute;
+        z-index: 1200;
+
+        .widget--dropdown__value,
+        .widget--dropdown__toggle {
+            display: none;
+        }
+
+        .widget--dropdown__options {
+            top: 0;
+            max-height: none;
+            padding: 1rem;
+        }
+    }
+
     // Value
     &__value {
         height: 2rem;
@@ -71,6 +89,16 @@
             top: 0;
             text-align: center;
             display: none;
+        }
+    }
+
+    // Separator
+    &__separator {
+        opacity: 0.75;
+        margin-top: 1rem;
+        
+        &:first-child {
+            margin-top: 0;
         }
     }
 

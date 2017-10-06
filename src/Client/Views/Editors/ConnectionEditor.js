@@ -12,8 +12,6 @@ class ConnectionEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'editor connection-editor content-editor'});
-
         this.fetch();
     }
 

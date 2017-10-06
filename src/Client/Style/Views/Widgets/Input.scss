@@ -122,23 +122,48 @@
         }
 
         &-label {
-            line-height: 1.5rem;
+            line-height: 2rem;
             display: block;
-            height: 1.5rem;
+            height: 2rem;
             min-height: 0 !important;
-            padding-left: 0.25rem !important;
+            padding-left: 0.5rem !important;
             padding-right: 0.5rem;
             margin-bottom: 0 !important;
             cursor: pointer;
             font-weight: 400;
-            background-color: $primary;
-            color: $primary-text;
+            background-color: $standard-darker;
+            color: $standard-text;
             max-width: none !important;
             border-top-right-radius: 0.2rem;
             border-bottom-right-radius: 0.2rem;
             position: absolute;
-            top: 0;
-            left: 1.25rem;
+            white-space: nowrap;
+            top: -0.25rem;
+            left: 3rem;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            
+            &:hover {
+                background-color: $primary;
+                color: $primary-text;
+                
+                &:before {
+                    border-right-color: $primary;
+                }
+            }
+
+            &:before {
+                transition: border-color 0.3s ease;
+                width: 0; 
+                height: 0; 
+                border-top: 1rem solid transparent;
+                border-bottom: 1rem solid transparent; 
+                border-right: 1rem solid $standard-darker; 
+                display: block;
+                content: '';
+                position: absolute;
+                right: 100%;
+                top: 0;
+            }
         }
 
         &-input {

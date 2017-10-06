@@ -36,7 +36,7 @@ class ConnectionPane extends NavbarPane {
      * Event: On click remove connection
      */
     static onClickRemoveConnection() {
-        let $element = $('.cr-context-menu__target-element'); 
+        let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
         
@@ -80,7 +80,7 @@ class ConnectionPane extends NavbarPane {
      */
     static onClickPullConnection() {
         let connectionEditor = Crisp.View.get('ConnectionEditor');
-        let pullId = $('.cr-context-menu__target-element').data('id');
+        let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Connection by id
         RequestHelper.request('post', 'connections/pull/' + pullId, {})
@@ -110,7 +110,7 @@ class ConnectionPane extends NavbarPane {
      * Event: Click push connection
      */
     static onClickPushConnection() {
-		let $element = $('.cr-context-menu__target-element');
+		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');

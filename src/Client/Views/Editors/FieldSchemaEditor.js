@@ -24,49 +24,6 @@ class FieldSchemaEditor extends SchemaEditor {
     }
 
     /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-    renderEditorPicker() {
-        if(this.model.isPropertyHidden('editorId')) { return; }  
-
-        let editorOptions = [];
-
-        for(let i in HashBrown.Views.Editors.FieldEditors) {
-            let editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        let editorName = this.model.editorId || '(none)';
-        
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-        
-        let $element = _.div({class: 'editor-picker'},
-            _.if(!this.model.isLocked,
-                UI.inputDropdownTypeAhead(editorName, editorOptions, (newValue) => {
-                    this.model.editorId = newValue;
-
-                    this.fetch();
-                })
-            ),
-            _.if(this.model.isLocked,
-                _.p({class: 'read-only'},
-                    editorName
-                )
-            )
-        );
-
-        return $element;
-    }
-
-    /**
      * Renders the editor fields
      */
     renderFields() {

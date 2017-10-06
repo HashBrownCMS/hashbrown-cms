@@ -41,14 +41,23 @@ class Modal extends Crisp.View {
      *
      * @returns {HTMLElement} Body
      */
-    renderBody() { }
+    renderBody() {
+        return this.body;
+    }
     
     /**
      * Renders the modal footer
      *
      * @returns {HTMLElement} Footer
      */
-    renderFooter() { }
+    renderFooter() {
+        return _.button({class: 'widget widget--button'}, 'OK')
+            .click(() => {
+                this.close();
+
+                this.trigger('ok');
+            });
+    }
     
     /**
      * Renders the modal header

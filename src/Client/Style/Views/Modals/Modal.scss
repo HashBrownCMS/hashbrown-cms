@@ -27,6 +27,9 @@
         border-radius: 0.2rem;
         width: calc(100% - 2rem);
         max-width: 40rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
     }
 
     // Close button
@@ -69,6 +72,8 @@
     &__body {
         padding: 1rem;
         background-color: $standard;
+        position: relative;
+        flex-grow: 1;
     }
 
     // Footer

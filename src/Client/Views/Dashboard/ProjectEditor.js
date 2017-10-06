@@ -176,6 +176,15 @@ class ProjectEditor extends Crisp.View {
     }
 
     /**
+     * Post render
+     */
+    postrender() {
+		setTimeout(() => {
+			this.$element.toggleClass('in', false);
+		}, 50);
+    }
+
+    /**
      * Renders this editor
      */
     template() {
@@ -261,10 +270,6 @@ class ProjectEditor extends Crisp.View {
                 )
             )
         );
-
-		setTimeout(() => {
-			this.$element.toggleClass('in', false);
-		}, 50);
     }
 }
 

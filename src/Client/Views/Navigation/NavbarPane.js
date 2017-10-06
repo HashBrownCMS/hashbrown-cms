@@ -17,7 +17,7 @@ class Pane {
      * Event: Click copy item id
      */
     static onClickCopyItemId() {
-        let id = $('.cr-context-menu__target-element').data('id');
+        let id = $('.context-menu-target').data('id');
 
         copyToClipboard(id);
     }
@@ -59,7 +59,7 @@ class Pane {
      * Event: Click move item
      */
     static onClickMoveItem() {
-        let id = $('.cr-context-menu__target-element').data('id');
+        let id = $('.context-menu-target').data('id');
         let navbar = Crisp.View.get('NavbarMain');
         let $pane = navbar.$element.find('.pane-container.active');
 

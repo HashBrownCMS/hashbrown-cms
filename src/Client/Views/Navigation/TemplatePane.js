@@ -77,7 +77,7 @@ class TemplatePane extends NavbarPane {
      * Event: On click remove Template
      */
     static onClickRemoveTemplate() {
-        let $element = $('.cr-context-menu__target-element'); 
+        let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
         
@@ -117,8 +117,8 @@ class TemplatePane extends NavbarPane {
      * Event: On click rename Template
      */
     static onClickRenameTemplate() {
-        let id = $('.cr-context-menu__target-element').data('id');
-        let type = $('.cr-context-menu__target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+        let id = $('.context-menu-target').data('id');
+        let type = $('.context-menu-target').attr('href').replace('#/templates/', '').replace('/' + id, '');
         let templateEditor = Crisp.View.get('TemplateEditor');
         let model;
 

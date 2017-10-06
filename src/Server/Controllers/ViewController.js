@@ -96,6 +96,7 @@ class ViewController extends Controller {
             })
             .then((update) => {
                 res.render('dashboard', {
+                    tab: 'projects',
                     os: OS,
                     user: user,
                     app: require(appRoot + '/package.json')

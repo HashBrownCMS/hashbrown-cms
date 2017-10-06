@@ -17,7 +17,7 @@ class SchemaPane extends NavbarPane {
      * Event: Click remove schema
      */
     static onClickRemoveSchema() {
-        let $element = $('.cr-context-menu__target-element'); 
+        let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let schema = SchemaHelper.getSchemaByIdSync(id);
         
@@ -81,7 +81,7 @@ class SchemaPane extends NavbarPane {
      * Event: Click new schema
      */
     static onClickNewSchema() {
-        let parentId = $('.cr-context-menu__target-element').data('id');
+        let parentId = $('.context-menu-target').data('id');
         let parentSchema = SchemaHelper.getSchemaByIdSync(parentId);
 
         RequestHelper.request('post', 'schemas/new', parentSchema)
@@ -101,7 +101,7 @@ class SchemaPane extends NavbarPane {
      */
     static onClickPullSchema() {
         let schemaEditor = Crisp.View.get('SchemaEditor');
-        let pullId = $('.cr-context-menu__target-element').data('id');
+        let pullId = $('.context-menu-target').data('id');
 
         RequestHelper.request('post', 'schemas/pull/' + pullId, {})
         .then(() => {
@@ -126,7 +126,7 @@ class SchemaPane extends NavbarPane {
      * Event: Click push Schema
      */
     static onClickPushSchema() {
-		let $element = $('.cr-context-menu__target-element');
+		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');

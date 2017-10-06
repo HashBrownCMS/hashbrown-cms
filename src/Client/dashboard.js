@@ -6,6 +6,8 @@ window._ = Crisp.Elements;
 window.HashBrown = {};
 
 HashBrown.Helpers = require('Client/Helpers');
+HashBrown.Views = {};
+HashBrown.Views.Modals = require('Client/Views/Modals');
 
 // Helper functions
 require('Client/helpers');
@@ -52,7 +54,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
                 model: new Project(project)
             });
 
-            $('.dashboard-container .projects .project-list').append(projectEditor.$element);
+            $('.page--dashboard__projects__list').append(projectEditor.$element);
 
             return renderNext();
         })
@@ -149,7 +151,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 .then(() => {
     if(!currentUserIsAdmin()) { return; }
 
-    let $btnUpdate = _.find('.btn-update');
+    let $btnUpdate = _.find('.page--dashboard__update');
 
     return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check')
     .then((update) => {

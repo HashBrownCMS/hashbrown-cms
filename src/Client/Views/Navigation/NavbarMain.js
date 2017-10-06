@@ -36,7 +36,7 @@ class NavbarMain extends Crisp.View {
      * Event: Click copy item id
      */
     onClickCopyItemId() {
-        let id = $('.cr-context-menu__target-element').data('id');
+        let id = $('.context-menu-target').data('id');
 
         copyToClipboard(id);
     }
@@ -434,7 +434,7 @@ class NavbarMain extends Crisp.View {
                         
                         // Attach item context menu
                         if(pane.settings.dirContextMenu) {
-                            $dir.crcontext(pane.settings.dirContextMenu);
+                            UI.context($dir[0], pane.settings.dirContextMenu);
                         }
                     }
                    

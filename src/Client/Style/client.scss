@@ -60,6 +60,9 @@ $xs: 'max-width: 767px';
 /**
  * New BEM styles
  */
+// Pages
+@import 'Pages/Dashboard';
+
 // Navigation
 @import 'Views/Navigation/MainMenu';
 
@@ -77,6 +80,7 @@ $xs: 'max-width: 767px';
 // Modals
 @import 'Views/Modals/Modal';
 @import 'Views/Modals/IconModal';
+@import 'Views/Modals/IframeModal';
 @import 'Views/Modals/DateModal';
 
 // Widgets

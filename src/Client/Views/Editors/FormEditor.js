@@ -274,7 +274,7 @@ class FormEditor extends Crisp.View {
     renderEntries() {
         return _.div({class: 'editor__field__value'},
             _.div({class: 'widget-group'},
-                _.button({class: 'widget widget--button low danger'}, 'Clear').click(() => {
+                _.button({class: 'widget widget--button low warning'}, 'Clear').click(() => {
                     UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
                         RequestHelper.request('post', 'forms/clear/' + this.model.id)
                         .then(() => {

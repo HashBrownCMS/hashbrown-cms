@@ -413,188 +413,7 @@ class UIHelper {
 
         return $element;
     }
-
-    /**
-     * Renders a dropdown
-     *
-     * @param {String|Number} defaultValue
-     * @param {Array|Number} options
-     * @param {Function} onChange
-     * @param {Boolean} useClearButton
-     * @param {Boolean} useSearch
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-    static inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to an array
-        if(typeof options === 'number') {
-            let amount = options;
-
-            options = [];
-
-            for(let i = 0; i < amount; i++) {
-                options[options.length] = { label: i.toString(), value: i };
-            }
-        }
-
-        // Change event
-        let onClick = (e, element) => {
-            let $button = $(e.target);
-            let $li = $button.parents('li');
-
-            $li
-            .addClass('active')
-            .siblings()
-            .removeClass('active');
-
-            $toggle.html($button.html());
-            $toggle.click();
-            
-            onChange($li.attr('data-value'));
-        };
-
-        // Highlight selected value
-        let highlightSelectedValue = () => {
-            $element.find('ul li').removeClass('active');
-            $toggle.html('(none)');       
-            
-            if(!defaultValue) { return; }
-
-            for(let option of options) {
-                if(option.value == defaultValue) {
-                    $toggle.html(option.label);
-                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
-                    break;
-                }
-            }
-        };
-
-        // Clear event
-        let onClear = () => {
-            defaultValue = onChange(null);
-
-            highlightSelectedValue();
-        };
-
-        // Base elements
-        let $element = _.div({class: 'dropdown'});
-        let $toggle = _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'}, '(none)');
-        let $clear = _.button({class: 'btn btn-default btn-small dropdown-clear'}, _.span({class: 'fa fa-remove'})).on('click', onClear);
-        let $list = _.ul({class: 'dropdown-menu-items'});
-
-        // Add an option
-        $element.on('addOption', (e, option) => {
-            let optionValue = typeof option.value !== 'undefined' ? option.value : option.id || option;
-            let optionLabel = typeof option.label !== 'undefined' ? option.label : option.name || option.title || option.id || option.toString();
-            let isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
-
-            if(isSelected) {
-                $toggle.html(optionLabel);
-            }
     
-            let $li = _.li({'data-value': optionValue, class: isSelected ? 'active' : ''},
-                _.button(optionLabel).on('click', onClick)
-            );
-
-            $list.append($li);
-        });
-
-        // Remove an option
-        $element.on('removeOption', (e, optionValue) => {
-            $list.children('[data-value="' + optionValue + '"]').remove();
-        });
-        
-        // Change an option
-        $element.on('changeOption', (e, oldOptionValue, newOption) => {
-            $element.trigger('removeOption', oldOptionValue);
-            $element.trigger('addOption', newOption);
-        });
-
-        // Set current option
-        $element.on('setValue', (e, newValue) => {
-            let $option = $list.children('[data-value="' + newValue + '"]');
-            
-            if($option.length > 0) {
-                $toggle.html($option.children('button').html());   
-            }
-        });
-
-        // Render
-        _.append($element,
-            $toggle,
-            _.if(useClearButton,
-                $clear
-            ),
-            _.div({class: 'dropdown-menu'}, 
-                $list
-            )
-        );
-
-        // Render all options
-        for(let i in options || []) {
-            $element.trigger('addOption', options[i]);
-        }
-
-        return $element;
-    }
-    
-    /**
-     * Renders a dropdown with typeahead
-     *
-     * @param {String} label
-     * @param {Array|Number} options
-     * @param {Function} onClick
-     * @param {Boolean} useClearButton
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-    static inputDropdownTypeAhead(label, options, onClick, useClearButton) {
-        let $element = this.inputDropdown(label, options, onClick, useClearButton);
-        let inputTimeout;
-
-        // Change input event
-        let onChangeInput = () => {
-            if(inputTimeout) { clearTimeout(inputTimeout); }    
-
-            let query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
-            let isQueryEmpty = !query || query.length < 2;
-
-            inputTimeout = setTimeout(() => {
-                $element.find('ul li button').each((i, button) => {
-                    let $button = $(button);
-                    let label = ($button.html() || '').toLowerCase();
-                    let isMatch = label.indexOf(query) > -1;
-
-                    $button.toggle(isMatch || isQueryEmpty);
-                });
-            }, 250);
-        };
-
-        // Clear input event
-        let onClearInput = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $element.find('.dropdown-typeahead input').val('');
-
-            onChangeInput();
-        };
-
-        $element.addClass('typeahead');
-
-        $element.find('.dropdown-menu').prepend(
-            _.div({class: 'dropdown-typeahead'},
-                _.input({class: 'form-control', placeholder: 'Search...'})
-                    .on('keyup paste change propertychange', onChangeInput),
-                _.button({class: 'dropdown-typeahead-btn-clear'},
-                    _.span({class: 'fa fa-remove'})
-                ).on('click', onClearInput)
-            )
-        );
-
-        return $element;
-    }
-
     /**
      * Renders a carousel
      *
@@ -656,16 +475,9 @@ class UIHelper {
 
         }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Error',
-                body: error.message + '<br /><br />Please check the JavaScript console for details',
-                onSubmit: onClickOK,
-                class: 'error-modal'
-            }
-        });
-
         console.log(error.stack);
+        
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
     }
     
     /**
@@ -677,14 +489,7 @@ class UIHelper {
     static warningModal(warning, onClickOK) {
         if(!warning) { return; }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Warning',
-                body: warning,
-                onSubmit: onClickOK,
-                class: 'warning-modal'
-            }
-        });
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
     }
 
     /**
@@ -694,13 +499,14 @@ class UIHelper {
      * @param {String} body
      */
     static messageModal(title, body, onSubmit) {
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit
-            }
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: title,
+            body: body
         });
+
+        modal.on('ok', onSubmit);
+
+        return modal;
     }
 
     /**
@@ -708,46 +514,17 @@ class UIHelper {
      *
      * @param {String} title
      * @param {String} url
-     * @param {Function} onload
-     * @param {Function} onerror
      */
-    static iframeModal(title, url, onload, onerror) {
-        let $iframe = _.iframe({src: url});
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: [
-                    _.span({class: 'iframe-modal-error'}, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'),
-                    $iframe
-                ],
-                class: 'iframe-modal'
-            },
-            buttons: [
-                {
-                    label: 'Reload',
-                    class: 'btn-primary',
-                    callback: () => {
-                        $iframe[0].src += '';
-
-                        return false;
-                    }
-                },
-                {
-                    label: 'Open',
-                    class: 'btn-primary',
-                    callback: () => {
-                        window.open($iframe[0].src);
-
-                        return false;
-                    }
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-default'
-                }
-            ]
+    static iframeModal(title, url) {
+        let modal = new HashBrown.Views.Modals.IframeModal({
+            title: title,
+            url: url
         });
+
+        modal.on('cancel', onCancel);
+        modal.on('ok', onSubmit);
+       
+        return modal;
     }
 
     /**
@@ -767,6 +544,63 @@ class UIHelper {
 
         modal.on('cancel', onCancel);
         modal.on('ok', onSubmit);
+
+        return modal;
+    }
+
+    /**
+     * Creates a context menu
+     */
+    static context(element, items) {
+        element.addEventListener('contextmenu', (e) => {
+            // If this is not a right click, end
+            if(e.which !== 3) { return; }
+            
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Find any existing context menu targets and remove their classes
+            let existingTargets = document.querySelectorAll('.context-menu-target');
+        
+            if(existingTargets) {
+                for(let i = 0; i < existingTargets.length; i++) {
+                    existingTargets[i].classList.remove('context-menu-target');
+                }
+            }
+
+            // Set new target
+            element.classList.toggle('context-menu-target', true);
+            
+            // Remove existing dropdowns
+            let existingMenu = _.find('.widget--dropdown.context-menu');
+
+            if(existingMenu) { existingMenu.remove(); }
+
+            // Init new dropdown
+            let dropdown = new HashBrown.Views.Widgets.Dropdown({
+                options: items,
+                reverseKeys: true,
+                onChange: (pickedItem) => {
+                    if(typeof pickedItem !== 'function') { return; }
+
+                    pickedItem();
+                }
+            });
+
+            // Set cancel event
+            dropdown.on('cancel', () => { dropdown.remove(); });
+
+            // Set styles
+            dropdown.element.classList.toggle('context-menu', true);
+            dropdown.element.style.top = e.pageY;
+            dropdown.element.style.left = e.pageX;
+
+            // Open it
+            dropdown.toggle(true);
+
+            // Append to body
+            document.body.appendChild(dropdown.element);
+        });
     }
 }
 

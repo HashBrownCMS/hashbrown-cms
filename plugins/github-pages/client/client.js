@@ -53,7 +53,7 @@ class GitHubPagesConnectionEditor extends Crisp.View {
                 .on('change', (e) => {
                     this.model.token = e.currentTarget.value;
 
-                    this.render();
+                    this.fetch();
                 }),
             _.button({class: 'widget widget--button small fa fa-refresh'})
                 .on('click', () => {
@@ -97,7 +97,7 @@ class GitHubPagesConnectionEditor extends Crisp.View {
 
             dropdown.options = repos;
 
-            dropdown.render();
+            dropdown.fetch();
         })
         .catch(UI.errorModal);
 
@@ -129,7 +129,7 @@ class GitHubPagesConnectionEditor extends Crisp.View {
             
             dropdown.options = branches;
 
-            dropdown.render();
+            dropdown.fetch();
         })
         .catch(UI.errorModal);
 

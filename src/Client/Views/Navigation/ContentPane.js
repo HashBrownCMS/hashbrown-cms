@@ -80,7 +80,7 @@ class ContentPane extends NavbarPane {
      */
     static onClickPullContent() {
         let contentEditor = Crisp.View.get('ContentEditor');
-        let pullId = $('.cr-context-menu__target-element').data('id');
+        let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Content by id
         RequestHelper.request('post', 'content/pull/' + pullId, {})
@@ -110,7 +110,7 @@ class ContentPane extends NavbarPane {
      * Event: Click push content
      */
     static onClickPushContent() {
-		let $element = $('.cr-context-menu__target-element');
+		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
@@ -296,9 +296,15 @@ class ContentPane extends NavbarPane {
                         _.div({class: 'input-group'},      
                             _.span('Connection'),
                             _.div({class: 'input-group-addon'},
-                                UI.inputDropdown('(none)', resources.connections, (newValue) => {
-                                    publishing.connectionId = newValue;
-                                }, true).trigger('setValue', publishing.connectionId)
+                                new HashBrown.Views.Widgets.Dropdown({
+                                    options: resources.connections,
+                                    value: publishing.connectionId,
+                                    valueKey: 'id',
+                                    labelKey: 'name',
+                                    onChange: (newValue) => {
+                                        publishing.connectionId = newValue;
+                                    }
+                                }).$element
                             )
                         )
                     );
@@ -313,7 +319,7 @@ class ContentPane extends NavbarPane {
      * Event: Click Content settings
      */
     static onClickContentPublishing() {
-        let id = $('.cr-context-menu__target-element').data('id');
+        let id = $('.context-menu-target').data('id');
 
         // Get Content model
         let content = ContentHelper.getContentByIdSync(id);
@@ -327,7 +333,7 @@ class ContentPane extends NavbarPane {
      * @param {Boolean} shouldUnpublish
      */
     static onClickRemoveContent(shouldUnpublish) {
-        let $element = $('.cr-context-menu__target-element'); 
+        let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
     
@@ -369,20 +375,23 @@ class ContentPane extends NavbarPane {
                 });
             }
 
-            let $deleteChildrenSwitch;
+            let shouldDeleteChildren = false;
+            
             UI.confirmModal(
                 'Remove',
                 'Remove the content "' + name + '"?',
-                _.div({class: 'input-group'},      
-                    _.span('Remove child content too'),
-                    _.div({class: 'input-group-addon'},
-                        $deleteChildrenSwitch = UI.inputSwitch(true)
-                    )
-                ),
+                new HashBrown.Views.Widgets.Input({
+                    value: shouldDeleteChildren,
+                    type: 'checkbox',
+                    placeholder: 'Remove child content too',
+                    onChange: (newValue) => {
+                        shouldDeleteChildren = newValue;
+                    }
+                }).$element,
                 () => {
                     $element.parent().toggleClass('loading', true);
 
-                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
+                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
                     .then(() => {
                         if(shouldUnpublish && content.getSettings('publishing').connectionId) {
                             return unpublishConnection();
@@ -414,7 +423,7 @@ class ContentPane extends NavbarPane {
                 menu['This content'] = '---';
                 
                 menu['New child content'] = () => {
-                    this.onClickNewContent($('.cr-context-menu__target-element').data('id'));
+                    this.onClickNewContent($('.context-menu-target').data('id'));
                 };
                                 
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
@@ -430,7 +439,7 @@ class ContentPane extends NavbarPane {
                 menu['Folder'] = '---';
 
                 menu['New content'] = () => {
-                    let targetId = $('.cr-context-menu__target-element').data('id');
+                    let targetId = $('.context-menu-target').data('id');
                     let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
                     
                     this.onClickNewContent(parentId);

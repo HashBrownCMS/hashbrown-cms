@@ -1,0 +1,75 @@
+/**
+ * The dashboard page
+ */
+.page--dashboard {
+    // Header
+    &__header {
+        background-color: $secondary;
+        padding: 1rem 0 0 1rem;
+        color: $secondary-text;
+        height: 4rem;
+        display: flex;
+        justify-content: flex-end;
+
+        @include background('secondary');
+
+        // Logo
+        &__logo {
+            position: absolute;
+            left: 1rem;
+            top: 0.5rem;
+
+            &__image {
+                height: 3rem;
+                width: 3rem;
+            }
+        }
+
+        // Actions
+        &__actions {
+            display: flex;
+            padding: 0.5rem 0;
+
+            .widget {
+                margin-right: 0.5rem;
+            }
+        }
+            
+        // Tab
+        &__tab {
+            text-decoration: none;
+            padding: 0 2rem;
+            border-top-left-radius: 0.2rem;
+            border-top-right-radius: 0.2rem;
+            display: inline-block;
+            height: 3rem;
+            line-height: 3rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 0;
+            background-color: transparent;
+            color: $secondary-text;
+            background-color: $secondary-light;
+            margin-right: 0.5rem;
+
+            &:hover {
+                color: $primary-text;
+                background-color: $primary;
+                text-decoration: none;
+            }
+
+            &.active {
+                pointer-events: none;
+                color: $standard-text;
+                background-color: $standard-dark;
+            }
+        }
+    }
+
+    // Body
+    &__body {
+        width: calc(100% - 2rem;);
+        margin: 4rem auto 0 auto;
+        max-width: 60rem;
+    }
+}

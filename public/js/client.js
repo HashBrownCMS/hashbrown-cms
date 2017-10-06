@@ -9377,7 +9377,7 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.onClickCopyItemId = function onClickCopyItemId() {
-        var id = $('.cr-context-menu__target-element').data('id');
+        var id = $('.context-menu-target').data('id');
 
         copyToClipboard(id);
     };
@@ -9815,7 +9815,7 @@ var NavbarMain = function (_Crisp$View) {
 
                         // Attach item context menu
                         if (pane.settings.dirContextMenu) {
-                            $dir.crcontext(pane.settings.dirContextMenu);
+                            UI.context($dir[0], pane.settings.dirContextMenu);
                         }
                     }
 
@@ -9875,7 +9875,7 @@ var Pane = function () {
 
 
     Pane.onClickCopyItemId = function onClickCopyItemId() {
-        var id = $('.cr-context-menu__target-element').data('id');
+        var id = $('.context-menu-target').data('id');
 
         copyToClipboard(id);
     };
@@ -9922,7 +9922,7 @@ var Pane = function () {
     Pane.onClickMoveItem = function onClickMoveItem() {
         var _this = this;
 
-        var id = $('.cr-context-menu__target-element').data('id');
+        var id = $('.context-menu-target').data('id');
         var navbar = Crisp.View.get('NavbarMain');
         var $pane = navbar.$element.find('.pane-container.active');
 
@@ -28982,7 +28982,7 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        var saveAction = this.$element.find('.editor__footer__buttons widget--button-group__appendix').val();
+        var saveAction = this.$element.find('.editor__footer__buttons select').val();
         var postSaveUrl = void 0;
 
         var setContent = function setContent() {
@@ -29349,16 +29349,16 @@ var ContentEditor = function (_Crisp$View) {
 
         _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
-        _.button({ class: 'widget widget--button contracted embedded' }, 'Advanced').click(function () {
+        _.button({ class: 'widget widget--button condensed embedded' }, 'Advanced').click(function () {
             _this6.onClickAdvanced();
         }),
 
         // View remote
-        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button contracted embedded' }, 'View')), _.if(!this.model.isLocked,
+        _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button condensed embedded' }, 'View')), _.if(!this.model.isLocked,
         // Save & publish
         _.div({ class: 'widget widget-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button contracted' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button condensed' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     /**
@@ -29508,69 +29508,6 @@ var SchemaEditor = function (_Crisp$View) {
     };
 
     /**
-     * Renders the parent editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
-        var _this4 = this;
-
-        if (this.model.isPropertyHidden('parentSchemaId')) {
-            return;
-        }
-
-        var schemaOptions = [];
-
-        // Filter out irrelevant schemas, self and children of self
-        var excludedParents = {};
-        excludedParents[this.model.id] = true;
-
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            // Check if this Schema has a parent in the excluded list
-            // If so, add this id to the excluded list
-            // This is to prevent making a Schema a child of its own children
-            if (excludedParents[schema.parentSchemaId] == true) {
-                excludedParents[schema.id] = true;
-                continue;
-            }
-
-            // If this Schema is not of the same type as the model, or has the same id, exclude it
-            if (schema.type != this.model.type || schema.id == this.model.id) {
-                continue;
-            }
-
-            schemaOptions[schemaOptions.length] = {
-                label: schema.name,
-                value: schema.id
-            };
-        }
-
-        // Assign fallback schema name
-        var parentName = '(none)';
-
-        if (schemaOptions[this.model.parentSchemaId]) {
-            parentName = schemaOptions[this.model.parentSchemaId].name;
-        }
-
-        // Render element
-        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
-            if (!newValue) {
-                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
-            }
-
-            _this4.model.parentSchemaId = newValue;
-
-            return newValue;
-        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
-
-        return $element;
-    };
-
-    /**
      * Renders a single field
      *
      * @param {String} label
@@ -29597,7 +29534,7 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.renderFields = function renderFields() {
-        var _this5 = this;
+        var _this4 = this;
 
         var id = parseInt(this.model.id);
 
@@ -29608,7 +29545,7 @@ var SchemaEditor = function (_Crisp$View) {
         $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
             value: this.model.name,
             onChange: function onChange(newValue) {
-                _this5.model.name = newValue;
+                _this4.model.name = newValue;
             }
         }).$element));
 
@@ -29621,9 +29558,9 @@ var SchemaEditor = function (_Crisp$View) {
             labelKey: 'name',
             disabledOptions: [{ id: this.model.id, name: this.model.name }],
             onChange: function onChange(newParent) {
-                _this5.model.parentSchemaId = newParent;
+                _this4.model.parentSchemaId = newParent;
 
-                _this5.fetch();
+                _this4.fetch();
             }
         }).$element));
 
@@ -29642,12 +29579,12 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.template = function template() {
-        var _this6 = this;
+        var _this5 = this;
 
         return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
-            _this6.onClickAdvanced();
+            _this5.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
-            _this6.onClickSave();
+            _this5.onClickSave();
         })))));
     };
 
@@ -30556,187 +30493,6 @@ var UIHelper = function () {
     };
 
     /**
-     * Renders a dropdown
-     *
-     * @param {String|Number} defaultValue
-     * @param {Array|Number} options
-     * @param {Function} onChange
-     * @param {Boolean} useClearButton
-     * @param {Boolean} useSearch
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to an array
-        if (typeof options === 'number') {
-            var amount = options;
-
-            options = [];
-
-            for (var i = 0; i < amount; i++) {
-                options[options.length] = { label: i.toString(), value: i };
-            }
-        }
-
-        // Change event
-        var onClick = function onClick(e, element) {
-            var $button = $(e.target);
-            var $li = $button.parents('li');
-
-            $li.addClass('active').siblings().removeClass('active');
-
-            $toggle.html($button.html());
-            $toggle.click();
-
-            onChange($li.attr('data-value'));
-        };
-
-        // Highlight selected value
-        var highlightSelectedValue = function highlightSelectedValue() {
-            $element.find('ul li').removeClass('active');
-            $toggle.html('(none)');
-
-            if (!defaultValue) {
-                return;
-            }
-
-            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
-                var _ref5;
-
-                if (_isArray5) {
-                    if (_i6 >= _iterator5.length) break;
-                    _ref5 = _iterator5[_i6++];
-                } else {
-                    _i6 = _iterator5.next();
-                    if (_i6.done) break;
-                    _ref5 = _i6.value;
-                }
-
-                var option = _ref5;
-
-                if (option.value == defaultValue) {
-                    $toggle.html(option.label);
-                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
-                    break;
-                }
-            }
-        };
-
-        // Clear event
-        var onClear = function onClear() {
-            defaultValue = onChange(null);
-
-            highlightSelectedValue();
-        };
-
-        // Base elements
-        var $element = _.div({ class: 'dropdown' });
-        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
-        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
-        var $list = _.ul({ class: 'dropdown-menu-items' });
-
-        // Add an option
-        $element.on('addOption', function (e, option) {
-            var optionValue = typeof option.value !== 'undefined' ? option.value : option.id || option;
-            var optionLabel = typeof option.label !== 'undefined' ? option.label : option.name || option.title || option.id || option.toString();
-            var isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
-
-            if (isSelected) {
-                $toggle.html(optionLabel);
-            }
-
-            var $li = _.li({ 'data-value': optionValue, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
-
-            $list.append($li);
-        });
-
-        // Remove an option
-        $element.on('removeOption', function (e, optionValue) {
-            $list.children('[data-value="' + optionValue + '"]').remove();
-        });
-
-        // Change an option
-        $element.on('changeOption', function (e, oldOptionValue, newOption) {
-            $element.trigger('removeOption', oldOptionValue);
-            $element.trigger('addOption', newOption);
-        });
-
-        // Set current option
-        $element.on('setValue', function (e, newValue) {
-            var $option = $list.children('[data-value="' + newValue + '"]');
-
-            if ($option.length > 0) {
-                $toggle.html($option.children('button').html());
-            }
-        });
-
-        // Render
-        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
-
-        // Render all options
-        for (var _i7 in options || []) {
-            $element.trigger('addOption', options[_i7]);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown with typeahead
-     *
-     * @param {String} label
-     * @param {Array|Number} options
-     * @param {Function} onClick
-     * @param {Boolean} useClearButton
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
-        var $element = this.inputDropdown(label, options, onClick, useClearButton);
-        var inputTimeout = void 0;
-
-        // Change input event
-        var onChangeInput = function onChangeInput() {
-            if (inputTimeout) {
-                clearTimeout(inputTimeout);
-            }
-
-            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
-            var isQueryEmpty = !query || query.length < 2;
-
-            inputTimeout = setTimeout(function () {
-                $element.find('ul li button').each(function (i, button) {
-                    var $button = $(button);
-                    var label = ($button.html() || '').toLowerCase();
-                    var isMatch = label.indexOf(query) > -1;
-
-                    $button.toggle(isMatch || isQueryEmpty);
-                });
-            }, 250);
-        };
-
-        // Clear input event
-        var onClearInput = function onClearInput(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $element.find('.dropdown-typeahead input').val('');
-
-            onChangeInput();
-        };
-
-        $element.addClass('typeahead');
-
-        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
-
-        return $element;
-    };
-
-    /**
      * Renders a carousel
      *
      * @param {Array} items
@@ -30781,16 +30537,9 @@ var UIHelper = function () {
             error = new Error(error.toString());
         }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Error',
-                body: error.message + '<br /><br />Please check the JavaScript console for details',
-                onSubmit: onClickOK,
-                class: 'error-modal'
-            }
-        });
-
         console.log(error.stack);
+
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
     };
 
     /**
@@ -30806,14 +30555,7 @@ var UIHelper = function () {
             return;
         }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Warning',
-                body: warning,
-                onSubmit: onClickOK,
-                class: 'warning-modal'
-            }
-        });
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
     };
 
     /**
@@ -30825,13 +30567,14 @@ var UIHelper = function () {
 
 
     UIHelper.messageModal = function messageModal(title, body, onSubmit) {
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit
-            }
+        var modal = new HashBrown.Views.Modals.Modal({
+            title: title,
+            body: body
         });
+
+        modal.on('ok', onSubmit);
+
+        return modal;
     };
 
     /**
@@ -30839,41 +30582,19 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} url
-     * @param {Function} onload
-     * @param {Function} onerror
      */
 
 
-    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
-        var $iframe = _.iframe({ src: url });
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
-                class: 'iframe-modal'
-            },
-            buttons: [{
-                label: 'Reload',
-                class: 'btn-primary',
-                callback: function callback() {
-                    $iframe[0].src += '';
-
-                    return false;
-                }
-            }, {
-                label: 'Open',
-                class: 'btn-primary',
-                callback: function callback() {
-                    window.open($iframe[0].src);
-
-                    return false;
-                }
-            }, {
-                label: 'OK',
-                class: 'btn-default'
-            }]
+    UIHelper.iframeModal = function iframeModal(title, url) {
+        var modal = new HashBrown.Views.Modals.IframeModal({
+            title: title,
+            url: url
         });
+
+        modal.on('cancel', onCancel);
+        modal.on('ok', onSubmit);
+
+        return modal;
     };
 
     /**
@@ -30895,6 +30616,73 @@ var UIHelper = function () {
 
         modal.on('cancel', onCancel);
         modal.on('ok', onSubmit);
+
+        return modal;
+    };
+
+    /**
+     * Creates a context menu
+     */
+
+
+    UIHelper.context = function context(element, items) {
+        element.addEventListener('contextmenu', function (e) {
+            // If this is not a right click, end
+            if (e.which !== 3) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Find any existing context menu targets and remove their classes
+            var existingTargets = document.querySelectorAll('.context-menu-target');
+
+            if (existingTargets) {
+                for (var i = 0; i < existingTargets.length; i++) {
+                    existingTargets[i].classList.remove('context-menu-target');
+                }
+            }
+
+            // Set new target
+            element.classList.toggle('context-menu-target', true);
+
+            // Remove existing dropdowns
+            var existingMenu = _.find('.widget--dropdown.context-menu');
+
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+
+            // Init new dropdown
+            var dropdown = new HashBrown.Views.Widgets.Dropdown({
+                options: items,
+                reverseKeys: true,
+                onChange: function onChange(pickedItem) {
+                    if (typeof pickedItem !== 'function') {
+                        return;
+                    }
+
+                    pickedItem();
+                }
+            });
+
+            // Set cancel event
+            dropdown.on('cancel', function () {
+                dropdown.remove();
+            });
+
+            // Set styles
+            dropdown.element.classList.toggle('context-menu', true);
+            dropdown.element.style.top = e.pageY;
+            dropdown.element.style.left = e.pageX;
+
+            // Open it
+            dropdown.toggle(true);
+
+            // Append to body
+            document.body.appendChild(dropdown.element);
+        });
     };
 
     return UIHelper;
@@ -38774,7 +38562,7 @@ var FormEditor = function (_Crisp$View) {
     FormEditor.prototype.renderEntries = function renderEntries() {
         var _this7 = this;
 
-        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, _.button({ class: 'widget widget--button low danger' }, 'Clear').click(function () {
+        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, _.button({ class: 'widget widget--button low warning' }, 'Clear').click(function () {
             UI.confirmModal('Clear', 'Clear "' + _this7.model.title + '"', 'Are you sure you want to clear all entries?', function () {
                 RequestHelper.request('post', 'forms/clear/' + _this7.model.id).then(function () {
                     _this7.model.entries = [];
@@ -40071,7 +39859,9 @@ var Modal = function (_Crisp$View) {
      */
 
 
-    Modal.prototype.renderBody = function renderBody() {};
+    Modal.prototype.renderBody = function renderBody() {
+        return this.body;
+    };
 
     /**
      * Renders the modal footer
@@ -40080,7 +39870,15 @@ var Modal = function (_Crisp$View) {
      */
 
 
-    Modal.prototype.renderFooter = function renderFooter() {};
+    Modal.prototype.renderFooter = function renderFooter() {
+        var _this3 = this;
+
+        return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
+            _this3.close();
+
+            _this3.trigger('ok');
+        });
+    };
 
     /**
      * Renders the modal header
@@ -40090,14 +39888,14 @@ var Modal = function (_Crisp$View) {
 
 
     Modal.prototype.renderHeader = function renderHeader() {
-        var _this3 = this;
+        var _this4 = this;
 
         if (!this.title) {
             return;
         }
 
         return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
-            _this3.close();
+            _this4.close();
         })];
     };
 
@@ -42303,11 +42101,26 @@ var Dropdown = function (_Widget) {
 
 
     Dropdown.prototype.onCancel = function onCancel() {
+        this.toggle(false);
+
+        this.trigger('cancel');
+    };
+
+    /**
+     * Toggles open/closed
+     *
+     * @param {Boolean} isOpen
+     */
+
+
+    Dropdown.prototype.toggle = function toggle(isOpen) {
         var toggle = this.element.querySelector('.widget--dropdown__toggle');
 
-        if (toggle) {
-            toggle.checked = false;
+        if (typeof isOpen === 'undefined') {
+            isOpen = !toggle.checked;
         }
+
+        toggle.checked = isOpen;
     };
 
     /**
@@ -42341,6 +42154,19 @@ var Dropdown = function (_Widget) {
 
         // Dropdown options
         _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+            // Reverse keys option
+            if (_this2.reverseKeys) {
+                var key = optionLabel;
+                var value = optionValue;
+
+                optionValue = key;
+                optionLabel = value;
+            }
+
+            if (!optionValue || optionValue === '---') {
+                return _.div({ class: 'widget--dropdown__separator' }, optionLabel);
+            }
+
             return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
                 _this2.onChangeInternal(optionValue);
             });
@@ -42631,9 +42457,11 @@ module.exports = {
     MediaUploader: __webpack_require__(213),
     MediaBrowser: __webpack_require__(214),
     MessageModal: __webpack_require__(17),
+    Modal: __webpack_require__(216),
     IconModal: __webpack_require__(237),
     ConfirmModal: __webpack_require__(298),
-    DateModal: __webpack_require__(238)
+    DateModal: __webpack_require__(238),
+    IframeModal: __webpack_require__(299)
 };
 
 /***/ }),
@@ -43033,9 +42861,9 @@ module.exports = function () {
 
             // Attach item context menu
             if (pane.settings.getItemContextMenu) {
-                $item.find('a').crcontext(pane.settings.getItemContextMenu(item));
+                UI.context($item.find('a')[0], pane.settings.getItemContextMenu(item));
             } else if (pane.settings.itemContextMenu) {
-                $item.find('a').crcontext(pane.settings.itemContextMenu);
+                UI.context($item.find('a')[0], pane.settings.itemContextMenu);
             }
 
             // Add element to queue item
@@ -43057,7 +42885,7 @@ module.exports = function () {
 
         // Attach pane context menu
         if (pane.settings.paneContextMenu) {
-            $pane.crcontext(pane.settings.paneContextMenu);
+            UI.context($pane[0], pane.settings.paneContextMenu);
         }
 
         return $pane;
@@ -43123,7 +42951,7 @@ var ConnectionPane = function (_NavbarPane) {
     ConnectionPane.onClickRemoveConnection = function onClickRemoveConnection() {
         var _this2 = this;
 
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var name = $element.data('name');
 
@@ -43163,7 +42991,7 @@ var ConnectionPane = function (_NavbarPane) {
 
     ConnectionPane.onClickPullConnection = function onClickPullConnection() {
         var connectionEditor = Crisp.View.get('ConnectionEditor');
-        var pullId = $('.cr-context-menu__target-element').data('id');
+        var pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Connection by id
         RequestHelper.request('post', 'connections/pull/' + pullId, {})
@@ -43194,7 +43022,7 @@ var ConnectionPane = function (_NavbarPane) {
 
 
     ConnectionPane.onClickPushConnection = function onClickPushConnection() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var pushId = $element.data('id');
 
         $element.parent().addClass('loading');
@@ -43397,7 +43225,7 @@ var ContentPane = function (_NavbarPane) {
 
     ContentPane.onClickPullContent = function onClickPullContent() {
         var contentEditor = Crisp.View.get('ContentEditor');
-        var pullId = $('.cr-context-menu__target-element').data('id');
+        var pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Content by id
         RequestHelper.request('post', 'content/pull/' + pullId, {})
@@ -43428,7 +43256,7 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.onClickPushContent = function onClickPushContent() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var pushId = $element.data('id');
 
         $element.parent().addClass('loading');
@@ -43593,9 +43421,15 @@ var ContentPane = function (_NavbarPane) {
                     }))),
 
                     // Connection picker
-                    _.div({ class: 'input-group' }, _.span('Connection'), _.div({ class: 'input-group-addon' }, UI.inputDropdown('(none)', resources.connections, function (newValue) {
-                        publishing.connectionId = newValue;
-                    }, true).trigger('setValue', publishing.connectionId))));
+                    _.div({ class: 'input-group' }, _.span('Connection'), _.div({ class: 'input-group-addon' }, new HashBrown.Views.Widgets.Dropdown({
+                        options: resources.connections,
+                        value: publishing.connectionId,
+                        valueKey: 'id',
+                        labelKey: 'name',
+                        onChange: function onChange(newValue) {
+                            publishing.connectionId = newValue;
+                        }
+                    }).$element)));
                 }
             }
         });
@@ -43609,7 +43443,7 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.onClickContentPublishing = function onClickContentPublishing() {
-        var id = $('.cr-context-menu__target-element').data('id');
+        var id = $('.context-menu-target').data('id');
 
         // Get Content model
         var content = ContentHelper.getContentByIdSync(id);
@@ -43625,7 +43459,7 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.onClickRemoveContent = function onClickRemoveContent(shouldUnpublish) {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var name = $element.data('name');
 
@@ -43663,11 +43497,19 @@ var ContentPane = function (_NavbarPane) {
                 });
             }
 
-            var $deleteChildrenSwitch = void 0;
-            UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
+            var shouldDeleteChildren = false;
+
+            UI.confirmModal('Remove', 'Remove the content "' + name + '"?', new HashBrown.Views.Widgets.Input({
+                value: shouldDeleteChildren,
+                type: 'checkbox',
+                placeholder: 'Remove child content too',
+                onChange: function onChange(newValue) {
+                    shouldDeleteChildren = newValue;
+                }
+            }).$element, function () {
                 $element.parent().toggleClass('loading', true);
 
-                RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
+                RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren).then(function () {
                     if (shouldUnpublish && content.getSettings('publishing').connectionId) {
                         return unpublishConnection();
                     } else {
@@ -43702,7 +43544,7 @@ var ContentPane = function (_NavbarPane) {
                 menu['This content'] = '---';
 
                 menu['New child content'] = function () {
-                    _this2.onClickNewContent($('.cr-context-menu__target-element').data('id'));
+                    _this2.onClickNewContent($('.context-menu-target').data('id'));
                 };
 
                 menu['Copy id'] = function () {
@@ -43724,7 +43566,7 @@ var ContentPane = function (_NavbarPane) {
                 menu['Folder'] = '---';
 
                 menu['New content'] = function () {
-                    var targetId = $('.cr-context-menu__target-element').data('id');
+                    var targetId = $('.context-menu-target').data('id');
                     var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
 
                     _this2.onClickNewContent(parentId);
@@ -43845,7 +43687,7 @@ var FormsPane = function (_NavbarPane) {
 
     FormsPane.onClickRemoveForm = function onClickRemoveForm() {
         var view = this;
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var form = resources.forms.filter(function (form) {
             return form.id == id;
@@ -43896,7 +43738,7 @@ var FormsPane = function (_NavbarPane) {
 
 
     FormsPane.onClickPullForm = function onClickPullForm() {
-        var pullId = $('.cr-context-menu__target-element').data('id');
+        var pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Form by id
         RequestHelper.request('post', 'forms/pull/' + pullId, {})
@@ -43927,7 +43769,7 @@ var FormsPane = function (_NavbarPane) {
 
 
     FormsPane.onClickPushForm = function onClickPushForm() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var pushId = $element.data('id');
 
         $element.parent().addClass('loading');
@@ -44259,7 +44101,7 @@ var MediaPane = function (_NavbarPane) {
 
 
     MediaPane.onClickRemoveMedia = function onClickRemoveMedia() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var name = $element.data('name');
 
@@ -44299,7 +44141,7 @@ var MediaPane = function (_NavbarPane) {
 
 
     MediaPane.onClickReplaceMedia = function onClickReplaceMedia() {
-        var id = $('.cr-context-menu__target-element').data('id');
+        var id = $('.context-menu-target').data('id');
 
         this.onClickUploadMedia(id);
     };
@@ -44310,7 +44152,7 @@ var MediaPane = function (_NavbarPane) {
 
 
     MediaPane.onClickUploadMedia = function onClickUploadMedia(replaceId) {
-        var folder = $('.cr-context-menu__target-element').data('media-folder') || '/';
+        var folder = $('.context-menu-target').data('media-folder') || '/';
 
         new MediaUploader({
             onSuccess: function onSuccess(ids) {
@@ -44453,7 +44295,7 @@ var SchemaPane = function (_NavbarPane) {
      * Event: Click remove schema
      */
     SchemaPane.onClickRemoveSchema = function onClickRemoveSchema() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var schema = SchemaHelper.getSchemaByIdSync(id);
 
@@ -44509,7 +44351,7 @@ var SchemaPane = function (_NavbarPane) {
 
 
     SchemaPane.onClickNewSchema = function onClickNewSchema() {
-        var parentId = $('.cr-context-menu__target-element').data('id');
+        var parentId = $('.context-menu-target').data('id');
         var parentSchema = SchemaHelper.getSchemaByIdSync(parentId);
 
         RequestHelper.request('post', 'schemas/new', parentSchema).then(function (newSchema) {
@@ -44528,7 +44370,7 @@ var SchemaPane = function (_NavbarPane) {
 
     SchemaPane.onClickPullSchema = function onClickPullSchema() {
         var schemaEditor = Crisp.View.get('SchemaEditor');
-        var pullId = $('.cr-context-menu__target-element').data('id');
+        var pullId = $('.context-menu-target').data('id');
 
         RequestHelper.request('post', 'schemas/pull/' + pullId, {}).then(function () {
             return RequestHelper.reloadResource('schemas');
@@ -44552,7 +44394,7 @@ var SchemaPane = function (_NavbarPane) {
 
 
     SchemaPane.onClickPushSchema = function onClickPushSchema() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var pushId = $element.data('id');
 
         $element.parent().addClass('loading');
@@ -44794,7 +44636,7 @@ var TemplatePane = function (_NavbarPane) {
 
 
     TemplatePane.onClickRemoveTemplate = function onClickRemoveTemplate() {
-        var $element = $('.cr-context-menu__target-element');
+        var $element = $('.context-menu-target');
         var id = $element.data('id');
         var type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
 
@@ -44846,8 +44688,8 @@ var TemplatePane = function (_NavbarPane) {
 
 
     TemplatePane.onClickRenameTemplate = function onClickRenameTemplate() {
-        var id = $('.cr-context-menu__target-element').data('id');
-        var type = $('.cr-context-menu__target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+        var id = $('.context-menu-target').data('id');
+        var type = $('.context-menu-target').attr('href').replace('#/templates/', '').replace('/' + id, '');
         var templateEditor = Crisp.View.get('TemplateEditor');
         var model = void 0;
 
@@ -45025,8 +44867,6 @@ var ConnectionEditor = function (_Crisp$View) {
         _classCallCheck(this, ConnectionEditor);
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.$element = _.div({ class: 'editor connection-editor content-editor' });
 
         _this.fetch();
         return _this;
@@ -45454,52 +45294,12 @@ var FieldSchemaEditor = function (_SchemaEditor) {
     };
 
     /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-
-
-    FieldSchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
-        var _this2 = this;
-
-        if (this.model.isPropertyHidden('editorId')) {
-            return;
-        }
-
-        var editorOptions = [];
-
-        for (var i in HashBrown.Views.Editors.FieldEditors) {
-            var editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        var editorName = this.model.editorId || '(none)';
-
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
-            _this2.model.editorId = newValue;
-
-            _this2.fetch();
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
-
-        return $element;
-    };
-
-    /**
      * Renders the editor fields
      */
 
 
     FieldSchemaEditor.prototype.renderFields = function renderFields() {
-        var _this3 = this;
+        var _this2 = this;
 
         var $element = _SchemaEditor.prototype.renderFields.call(this);
 
@@ -45510,9 +45310,9 @@ var FieldSchemaEditor = function (_SchemaEditor) {
             valueKey: 'name',
             labelKey: 'name',
             onChange: function onChange(newEditor) {
-                _this3.model.editorId = newEditor;
+                _this2.model.editorId = newEditor;
 
-                _this3.fetch();
+                _this2.fetch();
             }
         }).$element));
 
@@ -48296,6 +48096,57 @@ var ConfirmModal = function (_Modal) {
 }(Modal);
 
 module.exports = ConfirmModal;
+
+/***/ }),
+/* 299 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(216);
+
+/**
+ * A modal for showng iframes
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var IframeModal = function (_Modal) {
+  _inherits(IframeModal, _Modal);
+
+  function IframeModal() {
+    _classCallCheck(this, IframeModal);
+
+    return _possibleConstructorReturn(this, _Modal.apply(this, arguments));
+  }
+
+  /**
+   * Post render
+   */
+  IframeModal.prototype.postrender = function postrender() {
+    this.element.classList.toggle('modal--iframe', true);
+  };
+
+  /**
+   * Render body
+   */
+
+
+  IframeModal.prototype.renderBody = function renderBody() {
+    return _.iframe({ class: 'modal--iframe__iframe', src: this.url });
+  };
+
+  return IframeModal;
+}(Modal);
+
+module.exports = IframeModal;
 
 /***/ })
 /******/ ]);

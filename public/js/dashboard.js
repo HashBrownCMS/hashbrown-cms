@@ -25641,187 +25641,6 @@ var UIHelper = function () {
     };
 
     /**
-     * Renders a dropdown
-     *
-     * @param {String|Number} defaultValue
-     * @param {Array|Number} options
-     * @param {Function} onChange
-     * @param {Boolean} useClearButton
-     * @param {Boolean} useSearch
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to an array
-        if (typeof options === 'number') {
-            var amount = options;
-
-            options = [];
-
-            for (var i = 0; i < amount; i++) {
-                options[options.length] = { label: i.toString(), value: i };
-            }
-        }
-
-        // Change event
-        var onClick = function onClick(e, element) {
-            var $button = $(e.target);
-            var $li = $button.parents('li');
-
-            $li.addClass('active').siblings().removeClass('active');
-
-            $toggle.html($button.html());
-            $toggle.click();
-
-            onChange($li.attr('data-value'));
-        };
-
-        // Highlight selected value
-        var highlightSelectedValue = function highlightSelectedValue() {
-            $element.find('ul li').removeClass('active');
-            $toggle.html('(none)');
-
-            if (!defaultValue) {
-                return;
-            }
-
-            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
-                var _ref5;
-
-                if (_isArray5) {
-                    if (_i6 >= _iterator5.length) break;
-                    _ref5 = _iterator5[_i6++];
-                } else {
-                    _i6 = _iterator5.next();
-                    if (_i6.done) break;
-                    _ref5 = _i6.value;
-                }
-
-                var option = _ref5;
-
-                if (option.value == defaultValue) {
-                    $toggle.html(option.label);
-                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
-                    break;
-                }
-            }
-        };
-
-        // Clear event
-        var onClear = function onClear() {
-            defaultValue = onChange(null);
-
-            highlightSelectedValue();
-        };
-
-        // Base elements
-        var $element = _.div({ class: 'dropdown' });
-        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
-        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
-        var $list = _.ul({ class: 'dropdown-menu-items' });
-
-        // Add an option
-        $element.on('addOption', function (e, option) {
-            var optionValue = typeof option.value !== 'undefined' ? option.value : option.id || option;
-            var optionLabel = typeof option.label !== 'undefined' ? option.label : option.name || option.title || option.id || option.toString();
-            var isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
-
-            if (isSelected) {
-                $toggle.html(optionLabel);
-            }
-
-            var $li = _.li({ 'data-value': optionValue, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
-
-            $list.append($li);
-        });
-
-        // Remove an option
-        $element.on('removeOption', function (e, optionValue) {
-            $list.children('[data-value="' + optionValue + '"]').remove();
-        });
-
-        // Change an option
-        $element.on('changeOption', function (e, oldOptionValue, newOption) {
-            $element.trigger('removeOption', oldOptionValue);
-            $element.trigger('addOption', newOption);
-        });
-
-        // Set current option
-        $element.on('setValue', function (e, newValue) {
-            var $option = $list.children('[data-value="' + newValue + '"]');
-
-            if ($option.length > 0) {
-                $toggle.html($option.children('button').html());
-            }
-        });
-
-        // Render
-        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
-
-        // Render all options
-        for (var _i7 in options || []) {
-            $element.trigger('addOption', options[_i7]);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown with typeahead
-     *
-     * @param {String} label
-     * @param {Array|Number} options
-     * @param {Function} onClick
-     * @param {Boolean} useClearButton
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
-        var $element = this.inputDropdown(label, options, onClick, useClearButton);
-        var inputTimeout = void 0;
-
-        // Change input event
-        var onChangeInput = function onChangeInput() {
-            if (inputTimeout) {
-                clearTimeout(inputTimeout);
-            }
-
-            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
-            var isQueryEmpty = !query || query.length < 2;
-
-            inputTimeout = setTimeout(function () {
-                $element.find('ul li button').each(function (i, button) {
-                    var $button = $(button);
-                    var label = ($button.html() || '').toLowerCase();
-                    var isMatch = label.indexOf(query) > -1;
-
-                    $button.toggle(isMatch || isQueryEmpty);
-                });
-            }, 250);
-        };
-
-        // Clear input event
-        var onClearInput = function onClearInput(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $element.find('.dropdown-typeahead input').val('');
-
-            onChangeInput();
-        };
-
-        $element.addClass('typeahead');
-
-        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
-
-        return $element;
-    };
-
-    /**
      * Renders a carousel
      *
      * @param {Array} items
@@ -25866,16 +25685,9 @@ var UIHelper = function () {
             error = new Error(error.toString());
         }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Error',
-                body: error.message + '<br /><br />Please check the JavaScript console for details',
-                onSubmit: onClickOK,
-                class: 'error-modal'
-            }
-        });
-
         console.log(error.stack);
+
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
     };
 
     /**
@@ -25891,14 +25703,7 @@ var UIHelper = function () {
             return;
         }
 
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Warning',
-                body: warning,
-                onSubmit: onClickOK,
-                class: 'warning-modal'
-            }
-        });
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
     };
 
     /**
@@ -25910,13 +25715,14 @@ var UIHelper = function () {
 
 
     UIHelper.messageModal = function messageModal(title, body, onSubmit) {
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit
-            }
+        var modal = new HashBrown.Views.Modals.Modal({
+            title: title,
+            body: body
         });
+
+        modal.on('ok', onSubmit);
+
+        return modal;
     };
 
     /**
@@ -25924,41 +25730,19 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} url
-     * @param {Function} onload
-     * @param {Function} onerror
      */
 
 
-    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
-        var $iframe = _.iframe({ src: url });
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
-                class: 'iframe-modal'
-            },
-            buttons: [{
-                label: 'Reload',
-                class: 'btn-primary',
-                callback: function callback() {
-                    $iframe[0].src += '';
-
-                    return false;
-                }
-            }, {
-                label: 'Open',
-                class: 'btn-primary',
-                callback: function callback() {
-                    window.open($iframe[0].src);
-
-                    return false;
-                }
-            }, {
-                label: 'OK',
-                class: 'btn-default'
-            }]
+    UIHelper.iframeModal = function iframeModal(title, url) {
+        var modal = new HashBrown.Views.Modals.IframeModal({
+            title: title,
+            url: url
         });
+
+        modal.on('cancel', onCancel);
+        modal.on('ok', onSubmit);
+
+        return modal;
     };
 
     /**
@@ -25980,6 +25764,73 @@ var UIHelper = function () {
 
         modal.on('cancel', onCancel);
         modal.on('ok', onSubmit);
+
+        return modal;
+    };
+
+    /**
+     * Creates a context menu
+     */
+
+
+    UIHelper.context = function context(element, items) {
+        element.addEventListener('contextmenu', function (e) {
+            // If this is not a right click, end
+            if (e.which !== 3) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Find any existing context menu targets and remove their classes
+            var existingTargets = document.querySelectorAll('.context-menu-target');
+
+            if (existingTargets) {
+                for (var i = 0; i < existingTargets.length; i++) {
+                    existingTargets[i].classList.remove('context-menu-target');
+                }
+            }
+
+            // Set new target
+            element.classList.toggle('context-menu-target', true);
+
+            // Remove existing dropdowns
+            var existingMenu = _.find('.widget--dropdown.context-menu');
+
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+
+            // Init new dropdown
+            var dropdown = new HashBrown.Views.Widgets.Dropdown({
+                options: items,
+                reverseKeys: true,
+                onChange: function onChange(pickedItem) {
+                    if (typeof pickedItem !== 'function') {
+                        return;
+                    }
+
+                    pickedItem();
+                }
+            });
+
+            // Set cancel event
+            dropdown.on('cancel', function () {
+                dropdown.remove();
+            });
+
+            // Set styles
+            dropdown.element.classList.toggle('context-menu', true);
+            dropdown.element.style.top = e.pageY;
+            dropdown.element.style.left = e.pageX;
+
+            // Open it
+            dropdown.toggle(true);
+
+            // Append to body
+            document.body.appendChild(dropdown.element);
+        });
     };
 
     return UIHelper;
@@ -33403,10 +33254,1191 @@ module.exports = {
 /* 210 */,
 /* 211 */,
 /* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Media = __webpack_require__(26);
+
+var MediaHelper = __webpack_require__(37);
+var RequestHelper = __webpack_require__(2);
+var ProjectHelper = __webpack_require__(6);
+var SettingsHelper = __webpack_require__(38);
+
+/**
+ * A modal for uploading Media objects
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var MediaUploader = function (_Crisp$View) {
+    _inherits(MediaUploader, _Crisp$View);
+
+    function MediaUploader(params) {
+        _classCallCheck(this, MediaUploader);
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        MediaUploader.checkMediaProvider().then(function () {
+            // Event: Change file
+            var onChangeFile = function onChangeFile() {
+                var input = $(_this);
+                var numFiles = _this.files ? _this.files.length : 1;
+
+                // In the case of a single file selected 
+                if (numFiles == 1) {
+                    var file = _this.files[0];
+
+                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+
+                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+
+                    if (isImage) {
+                        var reader = new FileReader();
+
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                        reader.onload = function (e) {
+                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
+
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+
+                    if (isVideo) {
+                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
+                    }
+
+                    debug.log('Previewing data of file type ' + file.type + '...', _this);
+
+                    // Multiple files selected
+                } else if (numFiles > 1) {
+                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
+
+                    // No files selected
+                } else if (numFiles == 0) {
+                    uploadModal.$element.find('.media-preview').html('(No files selected)');
+                }
+            };
+
+            // Event: Click upload
+            var onClickUpload = function onClickUpload() {
+                uploadModal.$element.find('form').submit();
+
+                return false;
+            };
+
+            // Event: Submit
+            var onSubmit = function onSubmit(e, content) {
+                e.preventDefault();
+
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                var apiPath = 'media/' + (_this.replaceId ? 'replace/' + _this.replaceId : 'new');
+                var uploadedIds = [];
+
+                // First upload the Media files
+                // TODO: Use the RequestHelper for this
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        url: RequestHelper.environmentUrl(apiPath),
+                        type: 'POST',
+                        data: new FormData(content),
+                        processData: false,
+                        contentType: false,
+                        success: function success(ids) {
+                            uploadedIds = ids || [];
+
+                            resolve();
+                        },
+                        error: function error(e) {
+                            reject(e);
+                        }
+                    });
+                })
+
+                // Then update the Media tree
+                .then(function () {
+                    if (!_this.folder || _this.folder === '/') {
+                        return Promise.resolve();
+                    }
+
+                    var queue = uploadedIds.slice(0);
+
+                    var putNextMediaIntoTree = function putNextMediaIntoTree() {
+                        var id = queue.pop();
+
+                        if (!id) {
+                            return Promise.resolve();
+                        }
+
+                        return RequestHelper.request('post', 'media/tree/' + id, {
+                            id: id,
+                            folder: _this.folder
+                        }).then(function () {
+                            return putNextMediaIntoTree();
+                        });
+                    };
+
+                    return putNextMediaIntoTree();
+                })
+
+                // Then reload the Media resource
+                .then(function () {
+                    return RequestHelper.reloadResource('media');
+                })
+
+                // Then update the UI and trigger the success callback
+                .then(function () {
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    if (typeof _this.onSuccess === 'function') {
+                        _this.onSuccess(uploadedIds);
+                    }
+
+                    uploadModal.hide();
+                });
+            };
+
+            // Render the upload modal
+            var uploadModal = new HashBrown.Views.Modals.MessageModal({
+                model: {
+                    class: 'modal-upload-media',
+                    title: 'Upload a file',
+                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
+                        if (typeof _this.onChangeFile === 'function') {
+                            _this.onChangeFile(e);
+                        }
+                    })).submit(function (e) {
+                        onSubmit(e, this);
+                    })]
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: _this.onCancel
+                }, {
+                    label: 'Upload',
+                    class: 'btn-primary',
+                    callback: onClickUpload
+                }]
+            });
+
+            // Event: Close modal
+            uploadModal.on('close', function () {
+                if (typeof _this.onCancel === 'function') {
+                    _this.onCancel();
+                }
+
+                _this.remove();
+            });
+        }).catch(UI.errorModal);
+        return _this;
+    }
+
+    /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+
+
+    MediaUploader.checkMediaProvider = function checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+            if (!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
+            }
+
+            return Promise.resolve();
+        });
+    };
+
+    return MediaUploader;
+}(Crisp.View);
+
+module.exports = MediaUploader;
+
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Media = __webpack_require__(26);
+
+var MediaHelper = __webpack_require__(37);
+var RequestHelper = __webpack_require__(2);
+var ProjectHelper = __webpack_require__(6);
+var SettingsHelper = __webpack_require__(38);
+
+/**
+ * A browser modal for Media objects
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var MediaBrowser = function (_Crisp$View) {
+    _inherits(MediaBrowser, _Crisp$View);
+
+    function MediaBrowser(params) {
+        _classCallCheck(this, MediaBrowser);
+
+        // First check if an active Connection is set up to be a Media provider
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+
+        // Make sure the modal is removed when it's cancelled
+        _this.$element.on('hidden.bs.modal', function () {
+            _this.$element.remove();
+        });
+
+        // Show the modal
+        _this.$element.modal('show');
+
+        // Init the media picker mode inside the iframe
+        var iframe = _this.$element.find('iframe')[0];
+
+        iframe.onload = function () {
+            iframe.contentWindow.HashBrown.Helpers.MediaHelper.initMediaPickerMode(function (id) {
+                _this.onPickMedia(id);
+            }, function () {
+                _this.onChangeResource();
+            }, function (e) {
+                UI.errorModal(e);
+            }, resources);
+        };
+        return _this;
+    }
+
+    /**
+     * Gets whether the media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+
+
+    MediaBrowser.checkMediaProvider = function checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+            if (!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
+            }
+
+            return Promise.resolve();
+        });
+    };
+
+    /**
+     * Event: Pick Media
+     *
+     * @param {string} id
+     */
+
+
+    MediaBrowser.prototype.onPickMedia = function onPickMedia(id) {
+        this.value = id;
+    };
+
+    /** 
+     * Event: Click OK
+     */
+
+
+    MediaBrowser.prototype.onClickOK = function onClickOK() {
+        if (this.value) {
+            this.trigger('select', this.value);
+        }
+
+        this.$element.modal('hide');
+    };
+
+    /** 
+     * Event: Click cancel
+     */
+
+
+    MediaBrowser.prototype.onClickCancel = function onClickCancel() {
+        this.$element.modal('hide');
+    };
+
+    /**
+     * Event: Change resource
+     */
+
+
+    MediaBrowser.prototype.onChangeResource = function onChangeResource() {
+        RequestHelper.reloadResource('media').then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Render the media browser
+     */
+
+
+    MediaBrowser.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ class: 'modal fade media-browser' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Browsing media')), _.div({ class: 'modal-body' }, _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') })), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
+            _this2.onClickCancel();
+        }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
+            _this2.onClickOK();
+        })))));
+    };
+
+    return MediaBrowser;
+}(Crisp.View);
+
+module.exports = MediaBrowser;
+
+/***/ }),
+/* 215 */
+/***/ (function(module, exports) {
+
+module.exports = {
+	"icons": [
+		"500px",
+		"adjust",
+		"adn",
+		"align-center",
+		"align-justify",
+		"align-left",
+		"align-right",
+		"amazon",
+		"ambulance",
+		"anchor",
+		"android",
+		"angellist",
+		"angle-double-down",
+		"angle-double-left",
+		"angle-double-right",
+		"angle-double-up",
+		"angle-down",
+		"angle-left",
+		"angle-right",
+		"angle-up",
+		"apple",
+		"archive",
+		"area-chart",
+		"arrow-circle-down",
+		"arrow-circle-left",
+		"arrow-circle-o-down",
+		"arrow-circle-o-left",
+		"arrow-circle-o-right",
+		"arrow-circle-o-up",
+		"arrow-circle-right",
+		"arrow-circle-up",
+		"arrow-down",
+		"arrow-left",
+		"arrow-right",
+		"arrow-up",
+		"arrows",
+		"arrows-alt",
+		"arrows-h",
+		"arrows-v",
+		"asterisk",
+		"at",
+		"automobile",
+		"backward",
+		"balance-scale",
+		"ban",
+		"bank",
+		"bar-chart",
+		"bar-chart-o",
+		"barcode",
+		"bars",
+		"battery-0",
+		"battery-1",
+		"battery-2",
+		"battery-3",
+		"battery-4",
+		"battery-empty",
+		"battery-full",
+		"battery-half",
+		"battery-quarter",
+		"battery-three-quarters",
+		"bed",
+		"beer",
+		"behance",
+		"behance-square",
+		"bell",
+		"bell-o",
+		"bell-slash",
+		"bell-slash-o",
+		"bicycle",
+		"binoculars",
+		"birthday-cake",
+		"bitbucket",
+		"bitbucket-square",
+		"bitcoin",
+		"black-tie",
+		"bluetooth",
+		"bluetooth-b",
+		"bold",
+		"bolt",
+		"bomb",
+		"book",
+		"bookmark",
+		"bookmark-o",
+		"briefcase",
+		"btc",
+		"bug",
+		"building",
+		"building-o",
+		"bullhorn",
+		"bullseye",
+		"bus",
+		"buysellads",
+		"cab",
+		"calculator",
+		"calendar",
+		"calendar-check-o",
+		"calendar-minus-o",
+		"calendar-o",
+		"calendar-plus-o",
+		"calendar-times-o",
+		"camera",
+		"camera-retro",
+		"car",
+		"caret-down",
+		"caret-left",
+		"caret-right",
+		"caret-square-o-down",
+		"caret-square-o-left",
+		"caret-square-o-right",
+		"caret-square-o-up",
+		"caret-up",
+		"cart-arrow-down",
+		"cart-plus",
+		"cc",
+		"cc-amex",
+		"cc-diners-club",
+		"cc-discover",
+		"cc-jcb",
+		"cc-mastercard",
+		"cc-paypal",
+		"cc-stripe",
+		"cc-visa",
+		"certificate",
+		"chain",
+		"chain-broken",
+		"check",
+		"check-circle",
+		"check-circle-o",
+		"check-square",
+		"check-square-o",
+		"chevron-circle-down",
+		"chevron-circle-left",
+		"chevron-circle-right",
+		"chevron-circle-up",
+		"chevron-down",
+		"chevron-left",
+		"chevron-right",
+		"chevron-up",
+		"child",
+		"chrome",
+		"circle",
+		"circle-o",
+		"circle-o-notch",
+		"circle-thin",
+		"clipboard",
+		"clock-o",
+		"clone",
+		"close",
+		"cloud",
+		"cloud-download",
+		"cloud-upload",
+		"cny",
+		"code",
+		"code-fork",
+		"codepen",
+		"codiepie",
+		"coffee",
+		"cog",
+		"cogs",
+		"columns",
+		"comment",
+		"comment-o",
+		"commenting",
+		"commenting-o",
+		"comments",
+		"comments-o",
+		"compass",
+		"compress",
+		"connectdevelop",
+		"contao",
+		"copy",
+		"copyright",
+		"creative-commons",
+		"credit-card",
+		"credit-card-alt",
+		"crop",
+		"crosshairs",
+		"css3",
+		"cube",
+		"cubes",
+		"cut",
+		"cutlery",
+		"dashboard",
+		"dashcube",
+		"database",
+		"dedent",
+		"delicious",
+		"desktop",
+		"deviantart",
+		"diamond",
+		"digg",
+		"dollar",
+		"dot-circle-o",
+		"download",
+		"dribbble",
+		"dropbox",
+		"drupal",
+		"edge",
+		"edit",
+		"eject",
+		"ellipsis-h",
+		"ellipsis-v",
+		"empire",
+		"envelope",
+		"envelope-o",
+		"envelope-square",
+		"eraser",
+		"eur",
+		"euro",
+		"exchange",
+		"exclamation",
+		"exclamation-circle",
+		"exclamation-triangle",
+		"expand",
+		"expeditedssl",
+		"external-link",
+		"external-link-square",
+		"eye",
+		"eye-slash",
+		"eyedropper",
+		"facebook",
+		"facebook-f",
+		"facebook-official",
+		"facebook-square",
+		"fast-backward",
+		"fast-forward",
+		"fax",
+		"feed",
+		"female",
+		"fighter-jet",
+		"file",
+		"file-archive-o",
+		"file-audio-o",
+		"file-code-o",
+		"file-excel-o",
+		"file-image-o",
+		"file-movie-o",
+		"file-o",
+		"file-pdf-o",
+		"file-photo-o",
+		"file-picture-o",
+		"file-powerpoint-o",
+		"file-sound-o",
+		"file-text",
+		"file-text-o",
+		"file-video-o",
+		"file-word-o",
+		"file-zip-o",
+		"files-o",
+		"film",
+		"filter",
+		"fire",
+		"fire-extinguisher",
+		"firefox",
+		"flag",
+		"flag-checkered",
+		"flag-o",
+		"flash",
+		"flask",
+		"flickr",
+		"floppy-o",
+		"folder",
+		"folder-o",
+		"folder-open",
+		"folder-open-o",
+		"font",
+		"fonticons",
+		"fort-awesome",
+		"forumbee",
+		"forward",
+		"foursquare",
+		"frown-o",
+		"futbol-o",
+		"gamepad",
+		"gavel",
+		"gbp",
+		"ge",
+		"gear",
+		"gears",
+		"genderless",
+		"get-pocket",
+		"gg",
+		"gg-circle",
+		"gift",
+		"git",
+		"git-square",
+		"github",
+		"github-alt",
+		"github-square",
+		"gittip",
+		"glass",
+		"globe",
+		"google",
+		"google-plus",
+		"google-plus-square",
+		"google-wallet",
+		"graduation-cap",
+		"gratipay",
+		"group",
+		"h-square",
+		"hacker-news",
+		"hand-grab-o",
+		"hand-lizard-o",
+		"hand-o-down",
+		"hand-o-left",
+		"hand-o-right",
+		"hand-o-up",
+		"hand-paper-o",
+		"hand-peace-o",
+		"hand-pointer-o",
+		"hand-rock-o",
+		"hand-scissors-o",
+		"hand-spock-o",
+		"hand-stop-o",
+		"hashtag",
+		"hdd-o",
+		"header",
+		"headphones",
+		"heart",
+		"heart-o",
+		"heartbeat",
+		"history",
+		"home",
+		"hospital-o",
+		"hotel",
+		"hourglass",
+		"hourglass-1",
+		"hourglass-2",
+		"hourglass-3",
+		"hourglass-end",
+		"hourglass-half",
+		"hourglass-o",
+		"hourglass-start",
+		"houzz",
+		"html5",
+		"i-cursor",
+		"ils",
+		"image",
+		"inbox",
+		"indent",
+		"industry",
+		"info",
+		"info-circle",
+		"inr",
+		"instagram",
+		"institution",
+		"internet-explorer",
+		"intersex",
+		"ioxhost",
+		"italic",
+		"joomla",
+		"jpy",
+		"jsfiddle",
+		"key",
+		"keyboard-o",
+		"krw",
+		"language",
+		"laptop",
+		"lastfm",
+		"lastfm-square",
+		"leaf",
+		"leanpub",
+		"legal",
+		"lemon-o",
+		"level-down",
+		"level-up",
+		"life-bouy",
+		"life-buoy",
+		"life-ring",
+		"life-saver",
+		"lightbulb-o",
+		"line-chart",
+		"link",
+		"linkedin",
+		"linkedin-square",
+		"linux",
+		"list",
+		"list-alt",
+		"list-ol",
+		"list-ul",
+		"location-arrow",
+		"lock",
+		"long-arrow-down",
+		"long-arrow-left",
+		"long-arrow-right",
+		"long-arrow-up",
+		"magic",
+		"magnet",
+		"mail-forward",
+		"mail-reply",
+		"mail-reply-all",
+		"male",
+		"map",
+		"map-marker",
+		"map-o",
+		"map-pin",
+		"map-signs",
+		"mars",
+		"mars-double",
+		"mars-stroke",
+		"mars-stroke-h",
+		"mars-stroke-v",
+		"maxcdn",
+		"meanpath",
+		"medium",
+		"medkit",
+		"meh-o",
+		"mercury",
+		"microphone",
+		"microphone-slash",
+		"minus",
+		"minus-circle",
+		"minus-square",
+		"minus-square-o",
+		"mixcloud",
+		"mobile",
+		"mobile-phone",
+		"modx",
+		"money",
+		"moon-o",
+		"mortar-board",
+		"motorcycle",
+		"mouse-pointer",
+		"music",
+		"navicon",
+		"neuter",
+		"newspaper-o",
+		"object-group",
+		"object-ungroup",
+		"odnoklassniki",
+		"odnoklassniki-square",
+		"opencart",
+		"openid",
+		"opera",
+		"optin-monster",
+		"outdent",
+		"pagelines",
+		"paint-brush",
+		"paper-plane",
+		"paper-plane-o",
+		"paperclip",
+		"paragraph",
+		"paste",
+		"pause",
+		"pause-circle",
+		"pause-circle-o",
+		"paw",
+		"paypal",
+		"pencil",
+		"pencil-square",
+		"pencil-square-o",
+		"percent",
+		"phone",
+		"phone-square",
+		"photo",
+		"picture-o",
+		"pie-chart",
+		"pied-piper",
+		"pied-piper-alt",
+		"pinterest",
+		"pinterest-p",
+		"pinterest-square",
+		"plane",
+		"play",
+		"play-circle",
+		"play-circle-o",
+		"plug",
+		"plus",
+		"plus-circle",
+		"plus-square",
+		"plus-square-o",
+		"power-off",
+		"print",
+		"product-hunt",
+		"puzzle-piece",
+		"qq",
+		"qrcode",
+		"question",
+		"question-circle",
+		"quote-left",
+		"quote-right",
+		"ra",
+		"random",
+		"rebel",
+		"recycle",
+		"reddit",
+		"reddit-alien",
+		"reddit-square",
+		"refresh",
+		"registered",
+		"remove",
+		"renren",
+		"reorder",
+		"repeat",
+		"reply",
+		"reply-all",
+		"retweet",
+		"rmb",
+		"road",
+		"rocket",
+		"rotate-left",
+		"rotate-right",
+		"rouble",
+		"rss",
+		"rss-square",
+		"rub",
+		"ruble",
+		"rupee",
+		"safari",
+		"save",
+		"scissors",
+		"scribd",
+		"search",
+		"search-minus",
+		"search-plus",
+		"sellsy",
+		"send",
+		"send-o",
+		"server",
+		"share",
+		"share-alt",
+		"share-alt-square",
+		"share-square",
+		"share-square-o",
+		"shekel",
+		"sheqel",
+		"shield",
+		"ship",
+		"shirtsinbulk",
+		"shopping-bag",
+		"shopping-basket",
+		"shopping-cart",
+		"sign-in",
+		"sign-out",
+		"signal",
+		"simplybuilt",
+		"sitemap",
+		"skyatlas",
+		"skype",
+		"slack",
+		"sliders",
+		"slideshare",
+		"smile-o",
+		"soccer-ball-o",
+		"sort",
+		"sort-alpha-asc",
+		"sort-alpha-desc",
+		"sort-amount-asc",
+		"sort-amount-desc",
+		"sort-asc",
+		"sort-desc",
+		"sort-down",
+		"sort-numeric-asc",
+		"sort-numeric-desc",
+		"sort-up",
+		"soundcloud",
+		"space-shuttle",
+		"spinner",
+		"spoon",
+		"spotify",
+		"square",
+		"square-o",
+		"stack-exchange",
+		"stack-overflow",
+		"star",
+		"star-half",
+		"star-half-empty",
+		"star-half-full",
+		"star-half-o",
+		"star-o",
+		"steam",
+		"steam-square",
+		"step-backward",
+		"step-forward",
+		"stethoscope",
+		"sticky-note",
+		"sticky-note-o",
+		"stop",
+		"stop-circle",
+		"stop-circle-o",
+		"street-view",
+		"strikethrough",
+		"stumbleupon",
+		"stumbleupon-circle",
+		"subscript",
+		"subway",
+		"suitcase",
+		"sun-o",
+		"superscript",
+		"support",
+		"table",
+		"tablet",
+		"tachometer",
+		"tag",
+		"tags",
+		"tasks",
+		"taxi",
+		"television",
+		"tencent-weibo",
+		"terminal",
+		"text-height",
+		"text-width",
+		"th",
+		"th-large",
+		"th-list",
+		"thumb-tack",
+		"thumbs-down",
+		"thumbs-o-down",
+		"thumbs-o-up",
+		"thumbs-up",
+		"ticket",
+		"times",
+		"times-circle",
+		"times-circle-o",
+		"tint",
+		"toggle-down",
+		"toggle-left",
+		"toggle-off",
+		"toggle-on",
+		"toggle-right",
+		"toggle-up",
+		"trademark",
+		"train",
+		"transgender",
+		"transgender-alt",
+		"trash",
+		"trash-o",
+		"tree",
+		"trello",
+		"tripadvisor",
+		"trophy",
+		"truck",
+		"try",
+		"tty",
+		"tumblr",
+		"tumblr-square",
+		"turkish-lira",
+		"tv",
+		"twitch",
+		"twitter",
+		"twitter-square",
+		"umbrella",
+		"underline",
+		"undo",
+		"university",
+		"unlink",
+		"unlock",
+		"unlock-alt",
+		"unsorted",
+		"upload",
+		"usb",
+		"usd",
+		"user",
+		"user-md",
+		"user-plus",
+		"user-secret",
+		"user-times",
+		"users",
+		"venus",
+		"venus-double",
+		"venus-mars",
+		"viacoin",
+		"video-camera",
+		"vimeo",
+		"vimeo-square",
+		"vine",
+		"vk",
+		"volume-down",
+		"volume-off",
+		"volume-up",
+		"warning",
+		"wechat",
+		"weibo",
+		"weixin",
+		"whatsapp",
+		"wheelchair",
+		"wifi",
+		"wikipedia-w",
+		"windows",
+		"won",
+		"wordpress",
+		"wrench",
+		"xing",
+		"xing-square",
+		"y-combinator",
+		"y-combinator-square",
+		"yahoo",
+		"yc",
+		"yc-square",
+		"yelp",
+		"yen",
+		"youtube",
+		"youtube-play",
+		"youtube-square"
+	]
+};
+
+/***/ }),
+/* 216 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A generic modal
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = function (_Crisp$View) {
+    _inherits(Modal, _Crisp$View);
+
+    /**
+     * Constructor
+     */
+    function Modal(params) {
+        _classCallCheck(this, Modal);
+
+        params = params || {};
+        params.actions = params.actions || [];
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.fetch();
+
+        document.body.appendChild(_this.element);
+
+        setTimeout(function () {
+            _this.element.classList.toggle('in', true);
+        }, 50);
+        return _this;
+    }
+
+    /**
+     * Close this modal
+     *
+     */
+
+
+    Modal.prototype.close = function close() {
+        var _this2 = this;
+
+        this.element.classList.toggle('in', false);
+
+        setTimeout(function () {
+            _this2.remove();
+        }, 500);
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    Modal.prototype.renderBody = function renderBody() {
+        return this.body;
+    };
+
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    Modal.prototype.renderFooter = function renderFooter() {
+        var _this3 = this;
+
+        return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
+            _this3.close();
+
+            _this3.trigger('ok');
+        });
+    };
+
+    /**
+     * Renders the modal header
+     *
+     * @returns {HTMLElement} Header
+     */
+
+
+    Modal.prototype.renderHeader = function renderHeader() {
+        var _this4 = this;
+
+        if (!this.title) {
+            return;
+        }
+
+        return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this4.close();
+        })];
+    };
+
+    /**
+     * Renders this modal
+     */
+
+
+    Modal.prototype.template = function template() {
+        var header = this.renderHeader();
+        var body = this.renderBody();
+        var footer = this.renderFooter();
+
+        return _.div({ class: 'modal' }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+    };
+
+    return Modal;
+}(Crisp.View);
+
+module.exports = Modal;
+
+/***/ }),
 /* 217 */,
 /* 218 */,
 /* 219 */,
@@ -33426,9 +34458,279 @@ module.exports = {
 /* 233 */,
 /* 234 */,
 /* 235 */,
-/* 236 */,
-/* 237 */,
-/* 238 */,
+/* 236 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @namespace HashBrown.Client.Views.Modals
+ */
+
+module.exports = {
+    MediaUploader: __webpack_require__(213),
+    MediaBrowser: __webpack_require__(214),
+    MessageModal: __webpack_require__(17),
+    Modal: __webpack_require__(216),
+    IconModal: __webpack_require__(237),
+    ConfirmModal: __webpack_require__(298),
+    DateModal: __webpack_require__(238),
+    IframeModal: __webpack_require__(299)
+};
+
+/***/ }),
+/* 237 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(215).icons;
+
+var Modal = __webpack_require__(216);
+
+/**
+ * A modal for picking icons
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var IconModal = function (_Modal) {
+    _inherits(IconModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function IconModal(params) {
+        _classCallCheck(this, IconModal);
+
+        params = params || {};
+        params.title = params.title || 'Pick an icon';
+
+        return _possibleConstructorReturn(this, _Modal.call(this, params));
+    }
+
+    /**
+     * Post render
+     */
+
+
+    IconModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--icon', true);
+    };
+
+    /**
+     * Event: Search
+     *
+     * @param {String} query
+     */
+
+
+    IconModal.prototype.onSearch = function onSearch(query) {
+        var icons = this.element.querySelectorAll('.modal--icon__icon');
+
+        if (!icons) {
+            return;
+        }
+
+        for (var i = 0; i < icons.length; i++) {
+            if (query.length < 3 || icons[i].title.indexOf(query) > -1) {
+                icons[i].style.display = 'block';
+            } else {
+                icons[i].style.display = 'none';
+            }
+        }
+    };
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    IconModal.prototype.renderBody = function renderBody() {
+        var _this2 = this;
+
+        return [_.input({ type: 'text', class: 'widget widget--input text modal--icon__search', placeholder: 'Search for icons' }).on('input', function (e) {
+            _this2.onSearch(e.currentTarget.value);
+        }), _.div({ class: 'modal--icon__icons' }, _.each(icons, function (i, icon) {
+            return _.button({ class: 'modal--icon__icon widget widget--button fa fa-' + icon, title: icon }).click(function () {
+                _this2.trigger('change', icon);
+
+                _this2.close();
+            });
+        }))];
+    };
+
+    return IconModal;
+}(Modal);
+
+module.exports = IconModal;
+
+/***/ }),
+/* 238 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(216);
+
+/**
+ * A modal for picking dates
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var DateModal = function (_Modal) {
+    _inherits(DateModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function DateModal(params) {
+        _classCallCheck(this, DateModal);
+
+        return _possibleConstructorReturn(this, _Modal.call(this, params));
+    }
+
+    /**
+     * Pre render
+     */
+
+
+    DateModal.prototype.prerender = function prerender() {
+        this.days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        this.hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+        this.minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+
+        // Sanity check
+        this.value = this.value ? new Date(this.value) : new Date();
+
+        if (isNaN(this.value.getDate())) {
+            this.value = new Date();
+        }
+    };
+
+    /**
+     * Gets days in current month and year
+     *
+     * @param {Number} year
+     * @param {Number} month
+     *
+     * @returns {Array} Days
+     */
+
+
+    DateModal.prototype.getDays = function getDays(year, month) {
+        var max = new Date(year, month, 0).getDate();
+        var days = [];
+
+        while (days.length < max) {
+            days[days.length] = days.length + 1;
+        }
+
+        return days;
+    };
+
+    /**
+     * Post render
+     */
+
+
+    DateModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--date', true);
+    };
+
+    /**
+     * Render header
+     */
+
+
+    DateModal.prototype.renderHeader = function renderHeader() {
+        var _this2 = this;
+
+        return [_.div({ class: 'modal--date__header__year' }, this.value.getFullYear().toString()), _.div({ class: 'modal--date__header__day' }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+            _this2.close();
+        })];
+    };
+
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    DateModal.prototype.renderFooter = function renderFooter() {
+        var _this3 = this;
+
+        return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
+            _this3.trigger('change', _this3.value);
+
+            _this3.close();
+        });
+    };
+
+    /**
+     * Render body
+     */
+
+
+    DateModal.prototype.renderBody = function renderBody() {
+        var _this4 = this;
+
+        return [_.div({ class: 'modal--date__body__nav' }, _.button({ class: 'modal--date__body__nav__left fa fa-arrow-left' }).click(function () {
+            _this4.value.setMonth(_this4.value.getMonth() - 1);
+
+            _this4.fetch();
+        }), _.div({ class: 'modal--date__body__nav__month-year' }, this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()), _.button({ class: 'modal--date__body__nav__left fa fa-arrow-right' }).click(function () {
+            _this4.value.setMonth(_this4.value.getMonth() + 1);
+
+            _this4.fetch();
+        })), _.div({ class: 'modal--date__body__weekdays' }, _.span({ class: 'modal--date__body__weekday' }, 'M'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'W'), _.span({ class: 'modal--date__body__weekday' }, 'T'), _.span({ class: 'modal--date__body__weekday' }, 'F'), _.span({ class: 'modal--date__body__weekday' }, 'S'), _.span({ class: 'modal--date__body__weekday' }, 'S')), _.div({ class: 'modal--date__body__days' }, _.each(this.getDays(this.value.getFullYear(), this.value.getMonth() + 1), function (i, day) {
+            var thisDate = new Date(_this4.value.getTime());
+            var now = new Date();
+
+            var isCurrent = now.getFullYear() == _this4.value.getFullYear() && now.getMonth() == _this4.value.getMonth() && now.getDate() == day;
+
+            var isActive = _this4.value.getDate() == day;
+
+            thisDate.setDate(day);
+
+            return _.button({ class: 'modal--date__body__day' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '') }, day).click(function () {
+                _this4.value.setDate(day);
+
+                _this4.fetch();
+            });
+        })), _.div({ class: 'modal--date__body__time' }, _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 23, value: this.value.getHours() }).on('change', function (e) {
+            _this4.value.setHours(e.currentTarget.value);
+        }), _.div({ class: 'modal--date__body__time__separator' }, ':'), _.input({ class: 'modal--date__body__time__number', type: 'number', min: 0, max: 59, value: this.value.getMinutes() }).on('change', function (e) {
+            _this4.value.setMinutes(e.currentTarget.value);
+        }))];
+    };
+
+    return DateModal;
+}(Modal);
+
+module.exports = DateModal;
+
+/***/ }),
 /* 239 */,
 /* 240 */,
 /* 241 */,
@@ -33474,6 +34776,8 @@ window._ = Crisp.Elements;
 window.HashBrown = {};
 
 HashBrown.Helpers = __webpack_require__(191);
+HashBrown.Views = {};
+HashBrown.Views.Modals = __webpack_require__(236);
 
 // Helper functions
 __webpack_require__(196);
@@ -33518,7 +34822,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
                 model: new Project(project)
             });
 
-            $('.dashboard-container .projects .project-list').append(projectEditor.$element);
+            $('.page--dashboard__projects__list').append(projectEditor.$element);
 
             return renderNext();
         }).catch(function (e) {
@@ -33614,7 +34918,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
         return;
     }
 
-    var $btnUpdate = _.find('.btn-update');
+    var $btnUpdate = _.find('.page--dashboard__update');
 
     return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check').then(function (update) {
         $btnUpdate.removeClass('working');
@@ -33999,39 +35303,48 @@ var ProjectEditor = function (_Crisp$View) {
     };
 
     /**
+     * Post render
+     */
+
+
+    ProjectEditor.prototype.postrender = function postrender() {
+        var _this8 = this;
+
+        setTimeout(function () {
+            _this8.$element.toggleClass('in', false);
+        }, 50);
+    };
+
+    /**
      * Renders this editor
      */
 
 
     ProjectEditor.prototype.template = function template() {
-        var _this8 = this;
+        var _this9 = this;
 
         var languageCount = this.model.settings.languages.length;
         var userCount = this.model.users.length;
 
         return _.div({ class: 'raised project-editor in' }, _.div({ class: 'body' }, _.if(currentUserIsAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
-            e.preventDefault();_this8.onClickInfo();
+            e.preventDefault();_this9.onClickInfo();
         })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
-            e.preventDefault();_this8.onClickLanguages();
+            e.preventDefault();_this9.onClickLanguages();
         })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
-            e.preventDefault();_this8.onClickBackups();
+            e.preventDefault();_this9.onClickBackups();
         })), _.if(this.model.environments.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
-            e.preventDefault();_this8.onClickMigrate();
+            e.preventDefault();_this9.onClickMigrate();
         }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Sync').click(function (e) {
-            e.preventDefault();_this8.onClickSync();
+            e.preventDefault();_this9.onClickSync();
         })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-            e.preventDefault();_this8.onClickRemove();
+            e.preventDefault();_this9.onClickRemove();
         }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.environments, function (i, environment) {
-            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this8.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(currentUserIsAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-                e.preventDefault();_this8.onClickRemoveEnvironment(environment);
+            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this9.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(currentUserIsAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+                e.preventDefault();_this9.onClickRemoveEnvironment(environment);
             })))))));
         }), _.if(currentUserIsAdmin(), _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-            _this8.onClickAddEnvironment();
+            _this9.onClickAddEnvironment();
         })))));
-
-        setTimeout(function () {
-            _this8.$element.toggleClass('in', false);
-        }, 50);
     };
 
     return ProjectEditor;
@@ -34822,6 +36135,166 @@ var MigrationEditor = function (_Crisp$View) {
 }(Crisp.View);
 
 module.exports = MigrationEditor;
+
+/***/ }),
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(216);
+
+/**
+ * A modal for confirming actions
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var ConfirmModal = function (_Modal) {
+    _inherits(ConfirmModal, _Modal);
+
+    function ConfirmModal() {
+        _classCallCheck(this, ConfirmModal);
+
+        return _possibleConstructorReturn(this, _Modal.apply(this, arguments));
+    }
+
+    /**
+     * Post render
+     */
+    ConfirmModal.prototype.postrender = function postrender() {
+        this.element.classList.toggle('modal--confirm', true);
+    };
+
+    /**
+     * Render header
+     */
+
+
+    ConfirmModal.prototype.renderHeader = function renderHeader() {
+        return _.h4({ class: 'modal--date__header__title' }, this.title);
+    };
+
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    ConfirmModal.prototype.renderFooter = function renderFooter() {
+        var _this2 = this;
+
+        var okClass = '';
+
+        switch (this.type) {
+            case 'delete':case 'remove':case 'discard':case 'clear':
+                okClass = 'warning';
+                break;
+        }
+
+        return [_.button({ class: 'widget widget--button standard' }, 'Cancel').click(function () {
+            _this2.trigger('cancel');
+
+            _this2.close();
+        }), _.button({ class: 'widget widget--button ' + okClass }, 'OK').click(function () {
+            _this2.trigger('ok');
+
+            _this2.close();
+        })];
+    };
+
+    /**
+     * Render body
+     */
+
+
+    ConfirmModal.prototype.renderBody = function renderBody() {
+        return this.body;
+    };
+
+    return ConfirmModal;
+}(Modal);
+
+module.exports = ConfirmModal;
+
+/***/ }),
+/* 299 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(216);
+
+/**
+ * A modal for showng iframes
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+var IframeModal = function (_Modal) {
+  _inherits(IframeModal, _Modal);
+
+  function IframeModal() {
+    _classCallCheck(this, IframeModal);
+
+    return _possibleConstructorReturn(this, _Modal.apply(this, arguments));
+  }
+
+  /**
+   * Post render
+   */
+  IframeModal.prototype.postrender = function postrender() {
+    this.element.classList.toggle('modal--iframe', true);
+  };
+
+  /**
+   * Render body
+   */
+
+
+  IframeModal.prototype.renderBody = function renderBody() {
+    return _.iframe({ class: 'modal--iframe__iframe', src: this.url });
+  };
+
+  return IframeModal;
+}(Modal);
+
+module.exports = IframeModal;
 
 /***/ })
 /******/ ]);

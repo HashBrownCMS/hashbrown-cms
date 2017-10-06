@@ -80,10 +80,10 @@ module.exports = function() {
 
                             // Attach item context menu
                             if(pane.settings.getItemContextMenu) {
-                                $item.find('a').crcontext(pane.settings.getItemContextMenu(item));
+                                UI.context($item.find('a')[0], pane.settings.getItemContextMenu(item));
 
                             } else if(pane.settings.itemContextMenu) {
-                                $item.find('a').crcontext(pane.settings.itemContextMenu);
+                                UI.context($item.find('a')[0], pane.settings.itemContextMenu);
 
                             }
                             
@@ -108,7 +108,7 @@ module.exports = function() {
 
                 // Attach pane context menu
                 if(pane.settings.paneContextMenu) {
-                    $pane.crcontext(pane.settings.paneContextMenu);
+                    UI.context($pane[0], pane.settings.paneContextMenu);
                 }
                 
                 return $pane;

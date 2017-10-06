@@ -2434,6 +2434,60 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
  * New BEM styles
  */
 /**
+ * The dashboard page
+ */
+.page--dashboard__header {
+  background-color: #21303b;
+  padding: 1rem 0 0 1rem;
+  color: #ffffff;
+  height: 4rem;
+  display: flex;
+  justify-content: flex-end;
+  background-image: url("/img/bg-secondary.jpg");
+  background-attachment: fixed;
+  background-position: 0px 0px; }
+  .page--dashboard__header__logo {
+    position: absolute;
+    left: 1rem;
+    top: 0.5rem; }
+    .page--dashboard__header__logo__image {
+      height: 3rem;
+      width: 3rem; }
+  .page--dashboard__header__actions {
+    display: flex;
+    padding: 0.5rem 0; }
+    .page--dashboard__header__actions .widget {
+      margin-right: 0.5rem; }
+  .page--dashboard__header__tab {
+    text-decoration: none;
+    padding: 0 2rem;
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
+    display: inline-block;
+    height: 3rem;
+    line-height: 3rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: 0;
+    background-color: transparent;
+    color: #ffffff;
+    background-color: #283b48;
+    margin-right: 0.5rem; }
+    .page--dashboard__header__tab:hover {
+      color: #ffffff;
+      background-color: #e70d3b;
+      text-decoration: none; }
+    .page--dashboard__header__tab.active {
+      pointer-events: none;
+      color: #333333;
+      background-color: #eeeeee; }
+
+.page--dashboard__body {
+  width: calc(100% - 2rem);
+  margin: 4rem auto 0 auto;
+  max-width: 60rem; }
+
+/**
  * The main menu
  */
 /**
@@ -3035,7 +3089,10 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
     border-radius: 0.2rem;
     width: calc(100% - 2rem);
-    max-width: 40rem; }
+    max-width: 40rem;
+    position: relative;
+    display: flex;
+    flex-direction: column; }
   .modal__close {
     border: 0;
     background-color: transparent;
@@ -3063,7 +3120,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     margin: 0; }
   .modal__body {
     padding: 1rem;
-    background-color: #ffffff; }
+    background-color: #ffffff;
+    position: relative;
+    flex-grow: 1; }
   .modal__footer {
     background-color: #21303b;
     padding: 1rem;
@@ -3092,6 +3151,23 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   width: 3rem;
   margin: 0.5rem;
   max-width: 3.1rem; }
+
+/**
+ * A modal for displaying iframes
+ */
+.modal--iframe .modal__dialog {
+  max-width: none;
+  height: calc(100% - 2rem);
+  width: calc(100% - 2rem);
+  margin: 1rem auto 1rem auto; }
+
+.modal--iframe__iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  width: 100%;
+  height: 100%; }
 
 /**
  * A date picker modal
@@ -3231,6 +3307,11 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       text-align: center;
       z-index: 10;
       animation: widget__spinner 1s linear infinite; }
+  .widget.disabled {
+    opacity: 0.5;
+    pointer-events: none; }
+  .widget.hidden {
+    display: none; }
 
 /**
  * Tabs
@@ -3296,7 +3377,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   .widget--button.working .widget--button__text-default,
   .widget--button:not(.working) .widget--button__text-working {
     display: none; }
-  .widget--button.contracted {
+  .widget--button.condensed {
     min-width: 0; }
   .widget--button.warning {
     background-color: #FFB300;
@@ -3456,23 +3537,42 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     height: 100%;
     margin: 0 !important; }
   .widget--input__checkbox-label {
-    line-height: 1.5rem;
+    line-height: 2rem;
     display: block;
-    height: 1.5rem;
+    height: 2rem;
     min-height: 0 !important;
-    padding-left: 0.25rem !important;
+    padding-left: 0.5rem !important;
     padding-right: 0.5rem;
     margin-bottom: 0 !important;
     cursor: pointer;
     font-weight: 400;
-    background-color: #e70d3b;
-    color: #ffffff;
+    background-color: #dddddd;
+    color: #333333;
     max-width: none !important;
     border-top-right-radius: 0.2rem;
     border-bottom-right-radius: 0.2rem;
     position: absolute;
-    top: 0;
-    left: 1.25rem; }
+    white-space: nowrap;
+    top: -0.25rem;
+    left: 3rem;
+    transition: color 0.3s ease, background-color 0.3s ease; }
+    .widget--input__checkbox-label:hover {
+      background-color: #e70d3b;
+      color: #ffffff; }
+      .widget--input__checkbox-label:hover:before {
+        border-right-color: #e70d3b; }
+    .widget--input__checkbox-label:before {
+      transition: border-color 0.3s ease;
+      width: 0;
+      height: 0;
+      border-top: 1rem solid transparent;
+      border-bottom: 1rem solid transparent;
+      border-right: 1rem solid #dddddd;
+      display: block;
+      content: '';
+      position: absolute;
+      right: 100%;
+      top: 0; }
   .widget--input__checkbox-input {
     cursor: pointer;
     opacity: 0; }
@@ -3495,6 +3595,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   background-color: #ffffff;
   border-radius: 0.2rem;
   border: 1px solid #dddddd; }
+  .widget--dropdown.context-menu {
+    width: 16rem;
+    position: absolute;
+    z-index: 1200; }
+    .widget--dropdown.context-menu .widget--dropdown__value,
+    .widget--dropdown.context-menu .widget--dropdown__toggle {
+      display: none; }
+    .widget--dropdown.context-menu .widget--dropdown__options {
+      top: 0;
+      max-height: none;
+      padding: 1rem; }
   .widget--dropdown__value {
     height: 2rem;
     width: calc(100% - 2rem);
@@ -3546,6 +3657,11 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       top: 0;
       text-align: center;
       display: none; }
+  .widget--dropdown__separator {
+    opacity: 0.75;
+    margin-top: 1rem; }
+    .widget--dropdown__separator:first-child {
+      margin-top: 0; }
   .widget--dropdown__options {
     border-bottom-right-radius: 0.2rem;
     border-bottom-left-radius: 0.2rem;

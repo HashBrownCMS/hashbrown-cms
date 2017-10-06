@@ -193,11 +193,24 @@ class Dropdown extends Widget {
      * Event: Cancel
      */
     onCancel() {
-        let toggle = this.element.querySelector('.widget--dropdown__toggle');
+        this.toggle(false);
 
-        if(toggle) {
-            toggle.checked = false;
+        this.trigger('cancel');
+    }
+
+    /**
+     * Toggles open/closed
+     *
+     * @param {Boolean} isOpen
+     */
+    toggle(isOpen) {
+        let toggle = this.element.querySelector('.widget--dropdown__toggle');
+        
+        if(typeof isOpen === 'undefined') {
+            isOpen = !toggle.checked;
         }
+
+        toggle.checked = isOpen;
     }
 
     /**
@@ -228,6 +241,19 @@ class Dropdown extends Widget {
             // Dropdown options
             _.div({class: 'widget--dropdown__options'},
                 _.each(this.getFlattenedOptions(), (optionValue, optionLabel) => {
+                    // Reverse keys option
+                    if(this.reverseKeys) {
+                        let key = optionLabel;
+                        let value = optionValue;
+
+                        optionValue = key;
+                        optionLabel = value;
+                    }
+
+                    if(!optionValue || optionValue === '---') {
+                        return _.div({class: 'widget--dropdown__separator'}, optionLabel);
+                    }
+
                     return _.button({class: 'widget--dropdown__option', 'data-value': optionValue}, 
                         optionLabel
                     ).click((e) => {

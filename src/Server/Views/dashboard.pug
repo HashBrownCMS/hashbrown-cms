@@ -13,37 +13,31 @@ html
 
         title HashBrown CMS
 
-    body.dashboard-container
-        ul.nav.nav-tabs.dashboard-header
-            a.dashboard-logo(target='_blank', href='http://hashbrown.rocks')
-                img.logo(src="/svg/logo_pink.svg")
-                span HashBrown
-
+    body.page.page--dashboard
+        .page--dashboard__header
+            a.page--dashboard__header__logo(target='_blank', href='http://hashbrown.rocks')
+                img.page--dashboard__header__logo__image(src="/svg/logo_pink.svg")
+            
             if(user.isAdmin)
-                li.active
-                    a(data-toggle="tab", href="#projects") Projects
-                li
-                    a(data-toggle="tab", href="#users") Users
-                li
-                    a(data-toggle="tab", href="#server") Server
+                a.page--dashboard__header__tab(href='/dashboard/projects', class=(tab === 'projects' ? 'active': '')) Projects
+                a.page--dashboard__header__tab(href='/dashboard/users', class=(tab === 'projects' ? 'users': '')) Users
+                a.page--dashboard__header__tab(href='/dashboard/server', class=(tab === 'projects' ? 'server': '')) Server
 
-            aside
+            .page--dashboard__header__actions
                 if(user.isAdmin)
-                    button(class="btn btn-primary btn-update working")
-                        span.text-default
-                            | Update
-                        span.text-working
-                            | Checking
+                    button.widget.widget--button.low.working.page--dashboard__update
+                        span.widget--button__text-default Update
+                        span.widget--button__text-working Checking
 
                 form(action='/api/user/logout', method='POST')
-                    input(type='submit', class='btn btn-primary', value='Log out')
+                    button.widget.widget--button.condensed.low.fa.fa-sign-out(type='submit', title='Log out')
 
-        .tab-content
-            .tab-pane.active#projects
-                .projects.container
+        .page--dashboard__body
+            if(tab === 'projects')
+                .page--dashboard__projects
                     h4 PROJECT OVERVIEW
 
-                    .welcome
+                    .page--dashboard__projects__welcome
                         p
                             | Welcome to the HashBrown dashboard. <br />
                             | Below you will find a list of active projects on this server.
@@ -58,23 +52,22 @@ html
                         p 
                             | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
 
-                    .project-list
+                    .page--dashboard__projects__list
 
                     if(user.isAdmin)
-                        .project-actions
-                            button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project')
-                                span.fa.fa-plus
+                        .page--dashboard__projects__actions
+                            button.widget.widget--button.round.fa.fa-plus(title='Create project')
 
-            if(user.isAdmin)
-                .tab-pane#users
-                    .users.container
-                        .user-list
+            if(user.isAdmin && tab ==='users')
+                .page--dashboard__users
+                    .page--dashboard__users__list
 
-                        .user-actions
-                            button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
+                    .page--dashboard__users__actions
+                        button.widget.widget--button.round.fa.fa-plus(title='Add user')
 
-                .tab-pane#server
-                    table.server
+            if(user.isAdmin && tab ==='server')
+                .page--dashboard__server
+                    table.page--dashboard__server__info
                         tr
                             td Software
                             td HashBrown v#{app.version} 
@@ -107,7 +100,7 @@ html
 
                         tr
                             td
-                                button.btn.btn-primary.btn-restart Restart
+                                button.widget.widget--button Restart
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')

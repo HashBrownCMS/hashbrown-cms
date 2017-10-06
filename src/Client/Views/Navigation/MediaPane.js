@@ -42,7 +42,7 @@ class MediaPane extends NavbarPane {
      * Event: Click remove media
      */
     static onClickRemoveMedia() {
-        let $element = $('.cr-context-menu__target-element'); 
+        let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
         
@@ -87,7 +87,7 @@ class MediaPane extends NavbarPane {
      * Event: Click replace media
      */
     static onClickReplaceMedia() {
-        let id = $('.cr-context-menu__target-element').data('id');
+        let id = $('.context-menu-target').data('id');
 
         this.onClickUploadMedia(id);
     }
@@ -96,7 +96,7 @@ class MediaPane extends NavbarPane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
-        let folder = $('.cr-context-menu__target-element').data('media-folder') || '/';
+        let folder = $('.context-menu-target').data('media-folder') || '/';
 
         new MediaUploader({
             onSuccess: (ids) => {

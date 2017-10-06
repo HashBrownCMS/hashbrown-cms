@@ -55,4 +55,15 @@
             animation: widget__spinner 1s linear infinite;
         }
     }
+
+    // Disabled state
+    &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    // Hidden
+    &.hidden {
+        display: none;
+    }
 }
