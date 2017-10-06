@@ -2434,6 +2434,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
  * New BEM styles
  */
 /**
+ * The main menu
+ */
+/**
  * Global editor styling
  */
 .editor.locked .editor__body__tab > .editor__field,

@@ -56,14 +56,14 @@ class SchemaEditor extends Crisp.View {
      * @return {Object} element
      */
     renderIconEditor() {
-        return _.button({class: 'widget widget--button fa fa-' + this.model.icon})
+        return _.button({class: 'widget small widget--button fa fa-' + this.model.icon})
             .click((e) => {
                 let modal = new HashBrown.Views.Modals.IconModal();
 
                 modal.on('change', (newIcon) => {
                     this.model.icon = newIcon;
 
-                    e.currentTarget.className = 'widget widget--button fa fa-' + this.model.icon;
+                    e.currentTarget.className = 'widget small widget--button fa fa-' + this.model.icon;
                 });
             });
     }

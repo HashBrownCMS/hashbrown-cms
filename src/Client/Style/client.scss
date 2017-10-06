@@ -60,6 +60,8 @@ $xs: 'max-width: 767px';
 /**
  * New BEM styles
  */
+// Navigation
+@import 'Views/Navigation/MainMenu';
 
 // Editors
 @import 'Views/Editors/Editor';

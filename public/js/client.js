@@ -29479,13 +29479,13 @@ var SchemaEditor = function (_Crisp$View) {
     SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
         var _this3 = this;
 
-        return _.button({ class: 'widget widget--button fa fa-' + this.model.icon }).click(function (e) {
+        return _.button({ class: 'widget small widget--button fa fa-' + this.model.icon }).click(function (e) {
             var modal = new HashBrown.Views.Modals.IconModal();
 
             modal.on('change', function (newIcon) {
                 _this3.model.icon = newIcon;
 
-                e.currentTarget.className = 'widget widget--button fa fa-' + _this3.model.icon;
+                e.currentTarget.className = 'widget small widget--button fa fa-' + _this3.model.icon;
             });
         });
     };
