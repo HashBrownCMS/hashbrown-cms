@@ -2436,7 +2436,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 /**
  * Global editor styling
  */
-.editor.locked .editor__body__tab > .editor__field {
+.editor.locked .editor__body__tab > .editor__field,
+.editor.locked .editor__body > .editor__field {
   pointer-events: none;
   opacity: 0.75;
   user-select: none; }
@@ -2456,6 +2457,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     display: inline-block;
     line-height: 2rem;
     height: 2rem; }
+    .editor__header__title__appendix {
+      margin-left: 1rem;
+      opacity: 0.5; }
   .editor__header__icon {
     margin-right: 10px;
     line-height: 2rem;
@@ -2739,6 +2743,18 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 /**
  * The editor for Schemas
  */
+/**
+ * The Media viewer
+ */
+.editor--media .editor__body {
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
+.editor--media__preview {
+  max-width: 90%;
+  max-height: 90%; }
+
 /**
  * A rich text editor
  */
@@ -3412,7 +3428,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     width: 2rem;
     overflow: hidden; }
   .widget--input.checkbox {
-    margin: 0.25rem 0.25rem 0.75rem 0;
+    margin: 0.25rem;
     width: 1.5rem;
     height: 1.5rem;
     background-color: #e70d3b;
@@ -3430,6 +3446,24 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     width: 100%;
     height: 100%;
     margin: 0 !important; }
+  .widget--input__checkbox-label {
+    line-height: 1.5rem;
+    display: block;
+    height: 1.5rem;
+    min-height: 0 !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.5rem;
+    margin-bottom: 0 !important;
+    cursor: pointer;
+    font-weight: 400;
+    background-color: #e70d3b;
+    color: #ffffff;
+    max-width: none !important;
+    border-top-right-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+    position: absolute;
+    top: 0;
+    left: 1.25rem; }
   .widget--input__checkbox-input {
     cursor: pointer;
     opacity: 0; }

@@ -3,7 +3,8 @@
  */
 .editor {
     // Locked state
-    &.locked &__body__tab > &__field {
+    &.locked &__body__tab > &__field,
+    &.locked &__body > &__field {
         pointer-events: none;
         opacity: 0.75;
         user-select: none;
@@ -25,6 +26,11 @@
             display: inline-block;
             line-height: 2rem;
             height: 2rem;
+
+            &__appendix {
+                margin-left: 1rem;
+                opacity: 0.5;
+            }
         }
 
         &__icon {

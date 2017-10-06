@@ -94,7 +94,7 @@
 
     // Checkbox
     &.checkbox {
-        margin: 0.25rem 0.25rem 0.75rem 0;
+        margin: 0.25rem;
         width: 1.5rem;
         height: 1.5rem;
         background-color: $primary;
@@ -119,6 +119,26 @@
             width: 100%;
             height: 100%;
             margin: 0 !important;
+        }
+
+        &-label {
+            line-height: 1.5rem;
+            display: block;
+            height: 1.5rem;
+            min-height: 0 !important;
+            padding-left: 0.25rem !important;
+            padding-right: 0.5rem;
+            margin-bottom: 0 !important;
+            cursor: pointer;
+            font-weight: 400;
+            background-color: $primary;
+            color: $primary-text;
+            max-width: none !important;
+            border-top-right-radius: 0.2rem;
+            border-bottom-right-radius: 0.2rem;
+            position: absolute;
+            top: 0;
+            left: 1.25rem;
         }
 
         &-input {

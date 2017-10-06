@@ -51,7 +51,10 @@ class Input extends Widget {
 
             case 'checkbox':
                 return _.div({class: config.class, title: config.title},
-                    _.input({class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value})
+                    _.if(config.placeholder,
+                        _.label({for: 'checkbox-' + this.guid, class: 'widget--input__checkbox-label'}, config.placeholder)
+                    ),
+                    _.input({id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value})
                         .on('change', (e) => {
                             this.onChangeInternal(e.currentTarget.checked);
                         }),

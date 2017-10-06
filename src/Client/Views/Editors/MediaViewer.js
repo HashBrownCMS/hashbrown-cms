@@ -10,37 +10,47 @@ const Media = require('Common/Models/Media');
  * @memberof HashBrown.Client.Views.Editors
  */
 class MediaViewer extends Crisp.View {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
-        
-        this.$element = _.div({class: 'editor media-viewer'});
 
         this.fetch();
     }
 
-    render() {
+    /**
+     * Pre render
+     */
+    prerender() {
         if(this.model instanceof Media === false) {
             this.model = new Media(this.model);        
         }
 
+    }
+
+    /**
+     * Renders this editor
+     */
+    template() {
         let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
-        this.$element.empty().append(
-            _.div({class: 'editor-header media-heading'},
-                _.span({class: 'fa fa-file-image-o'}),
-                _.h4({class: 'media-title'},
+        return _.div({class: 'editor editor--media'},
+            _.div({class: 'editor__header'},
+                _.span({class: 'editor__header__icon fa fa-file-image-o'}),
+                _.h4({class: 'editor__header__title'},
                     this.model.name,
-                    _.span({class: 'media-data'},
+                    _.span({class: 'editor__header__title__appendix'},
                         this.model.getContentTypeHeader()    
                     )
                 )
             ),
-            _.div({class: 'media-preview editor-body'},
+            _.div({class: 'editor__body'},
                 _.if(this.model.isImage(),
-                    _.img({src: mediaSrc})
+                    _.img({class: 'editor--media__preview', src: mediaSrc})
                 ),
                 _.if(this.model.isVideo(),
-                    _.video({controls: true, src: mediaSrc})
+                    _.video({class: 'editor--media__preview', controls: true, src: mediaSrc})
                 )
             )
         );

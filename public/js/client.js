@@ -38340,25 +38340,38 @@ var Media = __webpack_require__(27);
 var MediaViewer = function (_Crisp$View) {
     _inherits(MediaViewer, _Crisp$View);
 
+    /**
+     * Constructor
+     */
     function MediaViewer(params) {
         _classCallCheck(this, MediaViewer);
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'editor media-viewer' });
-
         _this.fetch();
         return _this;
     }
 
-    MediaViewer.prototype.render = function render() {
+    /**
+     * Pre render
+     */
+
+
+    MediaViewer.prototype.prerender = function prerender() {
         if (this.model instanceof Media === false) {
             this.model = new Media(this.model);
         }
+    };
 
+    /**
+     * Renders this editor
+     */
+
+
+    MediaViewer.prototype.template = function template() {
         var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
-        this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))));
+        return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true, src: mediaSrc }))));
     };
 
     return MediaViewer;
@@ -38535,8 +38548,6 @@ var FormEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'editor form-editor' });
-
         _this.fetch();
         return _this;
     }
@@ -38589,7 +38600,7 @@ var FormEditor = function (_Crisp$View) {
             this.model.inputs['newinput'] = { type: 'text' };
         }
 
-        this.render();
+        this.init();
     };
 
     /**
@@ -38602,7 +38613,7 @@ var FormEditor = function (_Crisp$View) {
     FormEditor.prototype.onClickRemoveInput = function onClickRemoveInput(key) {
         delete this.model.inputs[key];
 
-        this.render();
+        this.init();
     };
 
     /**
@@ -38613,15 +38624,15 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderAllowedOriginEditor = function renderAllowedOriginEditor() {
-        var view = this;
+        var _this3 = this;
 
-        function onInputChange() {
-            view.model.allowedOrigin = $(this).val();
-        }
-
-        var $element = _.div({ class: 'allowed-origin-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.allowedOrigin, placeholder: 'Type the allowed origin URL here' }).on('change', onInputChange));
-
-        return $element;
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            value: this.model.allowedOrigin,
+            tooltip: 'The allowed origin from which entries to this form can be posted',
+            onChange: function onChange(newOrigin) {
+                _this3.model.allowedOrigin = newOrigin;
+            }
+        }).$element);
     };
 
     /**
@@ -38632,15 +38643,15 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderTitleEditor = function renderTitleEditor() {
-        var view = this;
+        var _this4 = this;
 
-        function onInputChange() {
-            view.model.title = $(this).val();
-        }
-
-        var $element = _.div({ class: 'name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.title, placeholder: 'Type the form name here' }).on('change', onInputChange));
-
-        return $element;
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            value: this.model.title,
+            tooltip: 'The title of the form',
+            onChange: function onChange(newTitle) {
+                _this4.model.title = newTitle;
+            }
+        }).$element);
     };
 
     /**
@@ -38651,30 +38662,23 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderRedirectEditor = function renderRedirectEditor() {
-        var view = this;
+        var _this5 = this;
 
-        function onInputChange() {
-            view.model.redirect = $(this).val();
-        }
-
-        var $element = _.div({ class: 'redirect-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.redirect, placeholder: 'Type the redirect URL here' }).on('change', onInputChange));
-
-        return $element;
-    };
-
-    /**
-     * Renders the redirect append editor
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    FormEditor.prototype.renderAppendRedirectEditor = function renderAppendRedirectEditor() {
-        var _this3 = this;
-
-        return _.div({ class: 'append-redirect-editor' }, UI.inputSwitch(this.model.appendRedirect, function (isActive) {
-            _this3.model.appendRedirect = isActive;
-        }));
+        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, new HashBrown.Views.Widgets.Input({
+            value: this.model.redirect,
+            tooltip: 'The URL that the user will be redirected to after submitting the form entry',
+            onChange: function onChange(newUrl) {
+                _this5.model.redirect = newUrl;
+            }
+        }).$element, new HashBrown.Views.Widgets.Input({
+            value: this.model.appendRedirect,
+            placeholder: 'Append',
+            type: 'checkbox',
+            tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
+            onChange: function onChange(newValue) {
+                _this5.model.appendRedirect = newValue;
+            }
+        }).$element));
     };
 
     /**
@@ -38685,72 +38689,60 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderInputsEditor = function renderInputsEditor() {
-        var _this4 = this;
+        var _this6 = this;
 
-        var types = ['textarea', 'select', 'checkbox', 'color', 'date', 'datetime', 'datetime-local', 'email', 'hidden', 'month', 'number', 'password', 'radio', 'range', 'reset', 'search', 'submit', 'tel', 'text', 'time ', 'url', 'week'];
+        var types = ['checkbox', 'hidden', 'number', 'select', 'text'];
 
-        var $element = _.div({ class: 'inputs-editor' }, _.each(this.model.inputs, function (key, input) {
-            var view = _this4;
-            var $input = _.div({ class: 'input raised' });
+        return _.div({ class: 'editor__field__value segmented' }, _.each(this.model.inputs, function (key, input) {
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__actions--remove' }).click(function () {
+                view.onClickRemoveInput(key);
+            })), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Name'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: key,
+                onChange: function onChange(newValue) {
+                    delete _this6.model.inputs[key];
 
-            function onChange(inputKey, inputValue) {
-                var useDirectValue = !(this && this.dataset);
-                inputKey = useDirectValue ? inputKey : this.dataset.key;
+                    key = newValue;
 
-                if (inputKey == 'name') {
-                    input = view.model.inputs[key];
+                    _this6.model.inputs[key] = input;
 
-                    delete view.model.inputs[key];
-
-                    key = $(this).val();
-
-                    view.model.inputs[key] = input;
-
-                    render();
-
-                    var $newPreview = view.renderPreview();
-                    view.$preview.replaceWith($newPreview);
-                    view.$preview = $newPreview;
-                } else {
-                    if (inputKey == 'required') {
-                        input.required = useDirectValue ? inputValue : this.checked;
-                    } else if (inputKey == 'checkDuplicates') {
-                        input.checkDuplicates = useDirectValue ? inputValue : this.checked;
-                    } else if (inputKey == 'options') {
-                        input.options = (useDirectValue ? inputValue : $(this).val()).replace(/, /g, ',').split(',');
-                    } else {
-                        input[inputKey] = useDirectValue ? inputValue : $(this).val();
-                    }
-
-                    render();
-
-                    var _$newPreview = view.renderPreview();
-
-                    view.$preview.replaceWith(_$newPreview);
-                    view.$preview = _$newPreview;
+                    _this6.init();
                 }
-            };
+            }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                value: input.type,
+                options: types,
+                onChange: function onChange(newValue) {
+                    input.type = newValue;
 
-            function render() {
-                _.append($input.empty(), _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                    view.onClickRemoveInput(key);
-                }), view.renderField('Name', _.input({ class: 'form-control', 'data-key': 'name', type: 'text', value: key, placeholder: 'Type the input name here' }).on('change', onChange)), view.renderField('Type', _.select({ class: 'form-control', 'data-key': 'type' }, _.each(types, function (i, option) {
-                    return _.option({ value: option }, option);
-                })).val(input.type).on('change', onChange)), _.if(input.type == 'select', view.renderField('Select options (CSV)', _.input({ class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma' }).on('change', onChange))), view.renderField('Required', UI.inputSwitch(input.required == true, function (newValue) {
-                    onChange('required', newValue);
-                })), view.renderField('Check duplicates', UI.inputSwitch(input.checkDuplicates == true, function (newValue) {
-                    onChange('checkDuplicates', newValue);
-                })), view.renderField('Pattern', _.input({ class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern || '', placeholder: 'Type a RegEx pattern here' }).on('change', onChange)));
-            }
+                    _this6.init();
+                }
+            }).$element)), _.if(input.type == 'select', _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Select options'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+                value: input.options || [],
+                onChange: function onChange(newValue) {
+                    input.options = newValue;
 
-            render();
-
-            return $input;
-        }), _.button({ class: 'btn btn-primary btn-add-input btn-round' }, '+').on('click', function () {
-            _this4.onClickAddInput();
+                    _this6.renderPreview();
+                }
+            }).$element))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Required'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                type: 'checkbox',
+                value: input.required === true,
+                onChange: function onChange(newValue) {
+                    input.required = newValue;
+                }
+            }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Check duplicates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                type: 'checkbox',
+                value: input.checkDuplicates === true,
+                onChange: function onChange(newValue) {
+                    input.checkDuplicates = newValue;
+                }
+            }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Pattern'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: input.pattern,
+                onChange: function onChange(newValue) {
+                    input.pattern = newValue;
+                }
+            }).$element))));
+        }), _.button({ class: 'widget widget--button round editor__field__add fa fa-plus', title: 'Add an input' }).on('click', function () {
+            _this6.onClickAddInput();
         }));
-
-        return $element;
     };
 
     /**
@@ -38761,17 +38753,17 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderPreview = function renderPreview() {
-        return _.form({ class: 'preview raised', onsubmit: 'return false;' }, _.each(this.model.inputs, function (key, input) {
-            if (input.type == 'textarea') {
-                return _.textarea({ class: 'form-control', placeholder: key, name: key, pattern: input.pattern, required: input.required == true });
-            } else if (input.type == 'select') {
-                return _.select({ class: 'form-control', name: key, required: input.required == true }, _.each(input.options || [], function (i, option) {
-                    return _.option({ value: option }, option);
-                }));
+        var $preview = this.$element.find('.editor--form__preview');
+
+        _.append($preview.empty(), _.each(this.model.inputs, function (key, input) {
+            if (input.type === 'select') {
+                return new HashBrown.Views.Widgets.Dropdown({
+                    options: input.options || []
+                }).$element;
             } else {
-                return _.input({ class: 'form-control', placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required == true });
+                return _.input({ class: 'widget widget--input ' + (input.type || 'text'), placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required === true });
             }
-        }), _.input({ class: 'btn btn-primary', type: 'submit', value: 'Test' }));
+        }));
     };
 
     /**
@@ -38782,28 +38774,28 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderEntries = function renderEntries() {
-        var _this5 = this;
+        var _this7 = this;
 
-        return _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger' }, 'Clear').click(function () {
-            UI.confirmModal('Clear', 'Clear "' + _this5.model.title + '"', 'Are you sure you want to clear all entries?', function () {
-                RequestHelper.request('post', 'forms/clear/' + _this5.model.id).then(function () {
-                    _this5.model.entries = [];
+        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, _.button({ class: 'widget widget--button low danger' }, 'Clear').click(function () {
+            UI.confirmModal('Clear', 'Clear "' + _this7.model.title + '"', 'Are you sure you want to clear all entries?', function () {
+                RequestHelper.request('post', 'forms/clear/' + _this7.model.id).then(function () {
+                    _this7.model.entries = [];
                 }).catch(UI.errorModal);
             });
-        }), _.button({ class: 'btn btn-primary' }, 'Get .csv').click(function () {
-            location = RequestHelper.environmentUrl('forms/' + _this5.model.id + '/entries');
-        }));
+        }), _.button({ class: 'widget widget--button low' }, 'Get .csv').click(function () {
+            location = RequestHelper.environmentUrl('forms/' + _this7.model.id + '/entries');
+        })));
     };
 
     /**
      * Renders a single field
      *
-     * @return {Object} element
+     * @return {HTMLElement} Element
      */
 
 
-    FormEditor.prototype.renderField = function renderField(label, $content) {
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    FormEditor.prototype.renderField = function renderField(label, $content, className) {
+        return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, label), $content);
     };
 
     /**
@@ -38814,39 +38806,35 @@ var FormEditor = function (_Crisp$View) {
 
 
     FormEditor.prototype.renderFields = function renderFields() {
-        var id = parseInt(this.model.id);
-
-        var $element = _.div({ class: 'form editor-body' });
+        var $element = _.div({ class: 'editor__body' });
         var postUrl = location.protocol + '//' + location.hostname + '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
 
-        // Content type
-        $element.empty();
-
-        this.$preview = this.renderPreview();
-
-        $element.append(this.renderField('Entries (' + this.model.entries.length + ')', this.renderEntries()));
-        $element.append(this.renderField('POST URL', _.div({ class: 'input-group' }, _.input({ readonly: 'readonly', class: 'form-control post-url', type: 'text', value: postUrl }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Copy').click(function () {
-            copyToClipboard($('.post-url').val());
-        })))));
-        $element.append(this.renderField('Title', this.renderTitleEditor()));
-        $element.append(this.renderField('Allowed origin', this.renderAllowedOriginEditor()));
-        $element.append(this.renderField('Redirect URL', this.renderRedirectEditor()));
-        $element.append(this.renderField('Redirect URL is appended', this.renderAppendRedirectEditor()));
-        $element.append(this.renderField('Inputs', this.renderInputsEditor()));
-        $element.append(this.renderField('Test', this.$preview));
-
-        return $element;
+        return _.div({ class: 'editor__body' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Entries (' + this.model.entries.length + ')'), _.div({ class: 'editor__field__value' }, this.renderEntries())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'POST URL'), _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, _.input({ readonly: 'readonly', class: 'widget widget--input text', type: 'text', value: postUrl }), _.button({ class: 'widget widget--button small fa fa-copy', title: 'Copy POST URL' }).click(function (e) {
+            copyToClipboard(e.currentTarget.previousElementSibling.value);
+        })))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Title'), _.div({ class: 'editor__field__value' }, this.renderTitleEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed origin'), _.div({ class: 'editor__field__value' }, this.renderAllowedOriginEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Redirect URL'), _.div({ class: 'editor__field__value' }, this.renderRedirectEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Inputs'), _.div({ class: 'editor__field__value' }, this.renderInputsEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Preview'), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor--form__preview' }))));
     };
 
-    FormEditor.prototype.render = function render() {
-        var _this6 = this;
+    /**
+     * Post render
+     */
 
-        this.$element.toggleClass('locked', this.model.isLocked);
 
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-wpforms' }), _.h4(this.model.title)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-            _this6.onClickAdvanced();
-        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-            _this6.onClickSave();
+    FormEditor.prototype.postrender = function postrender() {
+        this.renderPreview();
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    FormEditor.prototype.template = function template() {
+        var _this8 = this;
+
+        return _.div({ class: 'editor editor--form' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-wpforms' }), _.h4({ class: 'editor__header__title' }, this.model.title)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+            _this8.onClickAdvanced();
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
+            _this8.onClickSave();
         })))));
     };
 
@@ -42617,7 +42605,7 @@ var Input = function (_Widget) {
                 }), _.div({ class: 'widget--input__range-extra' }, this.value));
 
             case 'checkbox':
-                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
+                return _.div({ class: config.class, title: config.title }, _.if(config.placeholder, _.label({ for: 'checkbox-' + this.guid, class: 'widget--input__checkbox-label' }, config.placeholder)), _.input({ id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
                     _this2.onChangeInternal(e.currentTarget.checked);
                 }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
 
