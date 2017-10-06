@@ -29,7 +29,7 @@ class TemplateReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.fetch();
     }
    
     /**
@@ -110,8 +110,7 @@ class TemplateReferenceEditor extends FieldEditor {
             
             // Apply changes on next CPU cycle
             setTimeout(() => {
-                this.trigger('change', this.value);
-                this.render();
+                this.trigger('silentchange', this.value);
             }, 1);
         }
     }

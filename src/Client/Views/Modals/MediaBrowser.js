@@ -17,7 +17,7 @@ class MediaBrowser extends Crisp.View {
         super(params);
 
         // First check if an active Connection is set up to be a Media provider
-        this.init();
+        this.fetch();
         
         // Make sure the modal is removed when it's cancelled
         this.$element.on('hidden.bs.modal', () => {

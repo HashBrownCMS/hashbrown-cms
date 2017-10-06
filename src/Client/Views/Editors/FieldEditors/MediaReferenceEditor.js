@@ -27,7 +27,7 @@ class MediaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.fetch();
     }
 
     /**
@@ -60,7 +60,7 @@ class MediaReferenceEditor extends FieldEditor {
 
                     this.trigger('change', this.value);
 
-                    this.render();
+                    this.fetch();
                 });
             }),
             _.div({class: 'editor__field--media-reference__footer'},
@@ -69,7 +69,7 @@ class MediaReferenceEditor extends FieldEditor {
                     .click(() => {
                         this.value = null;
 
-                        this.render();
+                        this.fetch();
                     })
             )
         );

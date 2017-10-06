@@ -11,8 +11,6 @@ class UserEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'user-editor'});
-
         this.modal = UI.confirmModal(
             'save',
             'Settings for "' + this.getLabel() + '"', this.$element,
@@ -28,7 +26,7 @@ class UserEditor extends Crisp.View {
         RequestHelper.customRequest('get', '/api/server/projects')
         .then((projects) => {
             this.projects = projects;
-            this.init();
+            this.fetch();
         });
     }
     
@@ -222,7 +220,7 @@ class UserEditor extends Crisp.View {
         return UI.inputSwitch(this.model.isAdmin == true, (newValue) => {
             this.model.isAdmin = newValue;
 
-            this.render();
+            this.fetch();
         }).addClass('admin-editor');
     }
 
@@ -253,9 +251,12 @@ class UserEditor extends Crisp.View {
 
         return $element;
     }
-    
-    render() {
-        _.append(this.$element.empty(),
+
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'user-editor'},
             this.renderField('Username', this.renderUserNameEditor()),
             this.renderField('Full name', this.renderFullNameEditor()),
             this.renderField('Email', this.renderEmailEditor()),

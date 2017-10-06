@@ -35,7 +35,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
             this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
         }
 
-        this.init();
+        this.fetch();
     }
 
     /**

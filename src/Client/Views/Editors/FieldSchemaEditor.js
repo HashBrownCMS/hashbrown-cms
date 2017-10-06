@@ -53,7 +53,7 @@ class FieldSchemaEditor extends SchemaEditor {
                 UI.inputDropdownTypeAhead(editorName, editorOptions, (newValue) => {
                     this.model.editorId = newValue;
 
-                    this.render();
+                    this.fetch();
                 })
             ),
             _.if(this.model.isLocked,
@@ -81,7 +81,7 @@ class FieldSchemaEditor extends SchemaEditor {
             onChange: (newEditor) => {
                 this.model.editorId = newEditor;
 
-                this.render();
+                this.fetch();
             }
         }).$element));
         

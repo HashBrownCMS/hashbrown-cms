@@ -34,7 +34,7 @@ class ArrayEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.fetch();
     }
    
     /**
@@ -162,7 +162,7 @@ class ArrayEditor extends FieldEditor {
             this.value = newItems;
     
             setTimeout(() => {
-                this.trigger('change', this.value);
+                this.trigger('silentchange', this.value);
             }, 500);
         }
 
@@ -275,7 +275,7 @@ class ArrayEditor extends FieldEditor {
                             
                                     this.trigger('change', this.value);
 
-                                    this.init();
+                                    this.fetch();
                                 })
                         )
                     );
@@ -298,7 +298,7 @@ class ArrayEditor extends FieldEditor {
 
                     this.trigger('change', this.value);
 
-                    this.init();
+                    this.fetch();
                 })
         );
     }    

@@ -5,7 +5,7 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
 // Dashboard
 Crisp.Router.route('/content/', function() {
     Crisp.View.get('NavbarMain').showTab('/content/');
-    
+   
     populateWorkspace(
         _.div({class: 'dashboard-container'},
             _.h1('Content'),
@@ -30,7 +30,7 @@ Crisp.Router.route('/content/json/:id', function() {
 // Edit (redirect to default tab)
 Crisp.Router.route('/content/:id', function() {
     let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.id);
-
+    
     if(content) {
         let contentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(content.schemaId);
 
@@ -50,16 +50,18 @@ Crisp.Router.route('/content/:id', function() {
 
 // Edit (with tab specified)
 Crisp.Router.route('/content/:id/:tab', function() {
+    Crisp.View.get('NavbarMain').highlightItem('/content/', this.id);
+
     let contentEditor = Crisp.View.get('ContentEditor');
-  
-    if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
-        Crisp.View.get('NavbarMain').highlightItem('/content/', this.id);
-   
+
+    if(!contentEditor || !contentEditor.model || contentEditor.model.id !== this.id) {
         contentEditor = new HashBrown.Views.Editors.ContentEditor({
             modelUrl: RequestHelper.environmentUrl('content/' + this.id)
         });
-        
+    
         populateWorkspace(contentEditor.$element);
+    } else {
+        contentEditor.fetch();
     }
 });
 

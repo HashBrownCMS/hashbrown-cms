@@ -10,35 +10,12 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
 /**
  * A modal for uploading Media objects
  *
- * @memberof HashBrown.Client.Views.Modal
+ * @memberof HashBrown.Client.Views.Modals
  */
 class MediaUploader extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.fetch();
-    }
-    
-    /**
-     * Gets whether the Media provider exists
-     *
-     * @returns {Promise} Promise
-     */
-    static checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-        .then((result) => {
-            if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
-            }  
-
-            return Promise.resolve();
-        }); 
-    }
-
-    /**
-     * Renders the Media uploader
-     */
-    render() {
         MediaUploader.checkMediaProvider()
         .then(() => {
             // Event: Change file
@@ -219,9 +196,27 @@ class MediaUploader extends Crisp.View {
                 if(typeof this.onCancel === 'function') {
                     this.onCancel();
                 } 
+
+                this.remove();
             });
         })
         .catch(UI.errorModal);
+    }
+    
+    /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+    static checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+        .then((result) => {
+            if(!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
+            }  
+
+            return Promise.resolve();
+        }); 
     }
 }
 

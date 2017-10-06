@@ -3035,7 +3035,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
     border-radius: 0.2rem;
     width: calc(100% - 2rem);
-    max-width: 50rem; }
+    max-width: 40rem; }
   .modal__close {
     border: 0;
     background-color: transparent;
@@ -3298,6 +3298,12 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     display: none; }
   .widget--button.contracted {
     min-width: 0; }
+  .widget--button.warning {
+    background-color: #FFB300;
+    color: #664800; }
+  .widget--button.standard {
+    background-color: #ffffff;
+    color: #333333; }
 
 /**
  * A group of chips

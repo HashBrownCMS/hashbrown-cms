@@ -40,6 +40,10 @@ class LanguageEditor extends Crisp.View {
         .then((selectedLanguages) => {
             this.model = selectedLanguages;
 
+            _.append(this.$element.find('.modal-body').empty(),
+                UI.inputChipGroup(this.model, LanguageHelper.getLanguageOptions(this.projectId), true)
+            );
+
             this.fetch();
         });
     }
@@ -56,12 +60,6 @@ class LanguageEditor extends Crisp.View {
         })
         .catch(UI.errorModal);
     }
-
-    render() {
-        _.append(this.$element.find('.modal-body').empty(),
-            UI.inputChipGroup(this.model, LanguageHelper.getLanguageOptions(this.projectId), true)
-        );
-    } 
 }
 
 module.exports = LanguageEditor;

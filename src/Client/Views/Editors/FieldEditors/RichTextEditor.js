@@ -31,7 +31,7 @@ class RichTextEditor extends FieldEditor {
         // Make sure convert is HTML
         this.value = marked(this.value);
 
-        this.init();
+        this.fetch();
     }
 
     /**
@@ -65,7 +65,7 @@ class RichTextEditor extends FieldEditor {
 
         document.cookie = 'rteview = ' + source;
         
-        this.init();
+        this.fetch();
     }
 
     /**

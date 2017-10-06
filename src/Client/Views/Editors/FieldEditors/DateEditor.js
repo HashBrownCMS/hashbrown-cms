@@ -22,7 +22,7 @@ class DateEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.fetch();
     }
 
     /**
@@ -33,7 +33,7 @@ class DateEditor extends FieldEditor {
 
         this.trigger('change', this.value);
 
-        this.render();
+        this.fetch();
     }
 
     /**
@@ -49,7 +49,7 @@ class DateEditor extends FieldEditor {
 
             this.trigger('change', this.value);
 
-            this.render();
+            this.fetch();
         });
     }
 

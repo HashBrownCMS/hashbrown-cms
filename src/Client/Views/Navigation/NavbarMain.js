@@ -20,7 +20,7 @@ class NavbarMain extends Crisp.View {
         HashBrown.Views.Navigation.ConnectionPane.init();
         HashBrown.Views.Navigation.SchemaPane.init();
 
-        this.init();
+        this.fetch();
         
         $('.navspace').html(this.$element);
     }

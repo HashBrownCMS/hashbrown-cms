@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 272);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1837,6 +1837,259 @@ if (typeof Object.create === 'function') {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for making HTTP/S requests
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var RequestHelper = function () {
+    function RequestHelper() {
+        _classCallCheck(this, RequestHelper);
+    }
+
+    /**
+     * An environment specific request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
+    RequestHelper.request = function request(method, url, data) {
+        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
+    };
+
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
+
+
+    RequestHelper.customRequest = function customRequest(method, url, data) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(method.toUpperCase(), url);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            if (data) {
+                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                    data = JSON.stringify(data);
+                }
+
+                xhr.send(data);
+            } else {
+                xhr.send();
+            }
+
+            xhr.onreadystatechange = function () {
+                var DONE = 4;
+                var OK = 200;
+                var NOT_MODIFIED = 304;
+                var UNAUTHORIZED = 403;
+
+                if (xhr.readyState === DONE) {
+                    if (xhr.status === UNAUTHORIZED) {
+                        location = '/login/?path=' + location.pathname + location.hash;
+
+                        reject(new Error('User is not logged in'));
+                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                        var response = xhr.responseText;
+
+                        if (response && response != 'OK') {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (e) {
+                                // If the response isn't JSON, then so be it
+
+                            }
+                        }
+
+                        resolve(response);
+                    } else {
+                        var error = new Error(xhr.responseText);
+
+                        error.statusCode = xhr.status;
+
+                        reject(error);
+                    }
+                }
+            };
+        });
+    };
+
+    /**
+     * Wraps a URL to include environment
+     *
+     * @param {String} url
+     */
+
+
+    RequestHelper.environmentUrl = function environmentUrl(url) {
+        var newUrl = '/api/';
+
+        if (HashBrown.Helpers.ProjectHelper.currentProject) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        }
+
+        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        }
+
+        newUrl += url;
+
+        return newUrl;
+    };
+
+    /**
+     * Listens for server restart
+     */
+
+
+    RequestHelper.listenForRestart = function listenForRestart() {
+        UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+        function poke() {
+            $.ajax({
+                type: 'get',
+                url: '/',
+                success: function success() {
+                    location.reload();
+                },
+                error: function error() {
+                    poke();
+                }
+            });
+        }
+
+        poke();
+    };
+
+    /**
+     * Reloads a resource
+     */
+    RequestHelper.reloadResource = function reloadResource(name) {
+        return RequestHelper.request('get', name).then(function (result) {
+            window.resources[name] = result;
+
+            // Apply correct model
+            for (var i in window.resources[name]) {
+                var object = window.resources[name][i];
+                var model = null;
+
+                switch (name) {
+                    case 'connections':
+                        model = new HashBrown.Models.Connection(object);
+                        break;
+
+                    case 'content':
+                        model = new HashBrown.Models.Content(object);
+                        break;
+
+                    case 'templates':
+                        model = new HashBrown.Models.Template(object);
+                        break;
+
+                    case 'forms':
+                        model = new HashBrown.Models.Form(object);
+                        break;
+
+                    case 'users':
+                        model = new HashBrown.Models.User(object);
+                        break;
+
+                    case 'media':
+                        model = new HashBrown.Models.Media(object);
+                        break;
+
+                    case 'schemas':
+                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
+                        break;
+
+                    default:
+                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
+                }
+
+                window.resources[name][i] = model;
+            }
+
+            return Promise.resolve(result);
+        }).catch(function (e) {
+            // If the error is a 404, it's an intended response from the controller
+            if (e.statusCode !== 404) {
+                UI.errorModal(e);
+            }
+
+            return Promise.resolve([]);
+        });
+    };
+
+    /**
+     * Reloads all resources
+     */
+    RequestHelper.reloadAllResources = function reloadAllResources() {
+        $('.loading-messages').empty();
+
+        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+
+        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var item = _ref;
+
+            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
+
+            $('.loading-messages').append($msg);
+        }
+
+        var processQueue = function processQueue() {
+            var name = queue.shift();
+
+            return RequestHelper.reloadResource(name).then(function () {
+                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+
+                if (queue.length < 1) {
+                    return Promise.resolve();
+                } else {
+                    return processQueue();
+                }
+            });
+        };
+
+        return processQueue();
+    };
+
+    return RequestHelper;
+}();
+
+module.exports = RequestHelper;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5204,259 +5457,6 @@ if (typeof Object.create === 'function') {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(133)(module)))
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper class for making HTTP/S requests
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var RequestHelper = function () {
-    function RequestHelper() {
-        _classCallCheck(this, RequestHelper);
-    }
-
-    /**
-     * An environment specific request
-     *
-     * @param {String} method
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} Response
-     */
-    RequestHelper.request = function request(method, url, data) {
-        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
-    };
-
-    /**
-     * An environment-independent request
-     *
-     * @param {String} method
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} Response
-     */
-
-
-    RequestHelper.customRequest = function customRequest(method, url, data) {
-        return new Promise(function (resolve, reject) {
-            var xhr = new XMLHttpRequest();
-            xhr.open(method.toUpperCase(), url);
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-            if (data) {
-                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-                    data = JSON.stringify(data);
-                }
-
-                xhr.send(data);
-            } else {
-                xhr.send();
-            }
-
-            xhr.onreadystatechange = function () {
-                var DONE = 4;
-                var OK = 200;
-                var NOT_MODIFIED = 304;
-                var UNAUTHORIZED = 403;
-
-                if (xhr.readyState === DONE) {
-                    if (xhr.status === UNAUTHORIZED) {
-                        location = '/login/?path=' + location.pathname + location.hash;
-
-                        reject(new Error('User is not logged in'));
-                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
-                        var response = xhr.responseText;
-
-                        if (response && response != 'OK') {
-                            try {
-                                response = JSON.parse(response);
-                            } catch (e) {
-                                // If the response isn't JSON, then so be it
-
-                            }
-                        }
-
-                        resolve(response);
-                    } else {
-                        var error = new Error(xhr.responseText);
-
-                        error.statusCode = xhr.status;
-
-                        reject(error);
-                    }
-                }
-            };
-        });
-    };
-
-    /**
-     * Wraps a URL to include environment
-     *
-     * @param {String} url
-     */
-
-
-    RequestHelper.environmentUrl = function environmentUrl(url) {
-        var newUrl = '/api/';
-
-        if (HashBrown.Helpers.ProjectHelper.currentProject) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
-        }
-
-        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
-        }
-
-        newUrl += url;
-
-        return newUrl;
-    };
-
-    /**
-     * Listens for server restart
-     */
-
-
-    RequestHelper.listenForRestart = function listenForRestart() {
-        UI.messageModal('Restart', 'HashBrown is restarting...', false);
-
-        function poke() {
-            $.ajax({
-                type: 'get',
-                url: '/',
-                success: function success() {
-                    location.reload();
-                },
-                error: function error() {
-                    poke();
-                }
-            });
-        }
-
-        poke();
-    };
-
-    /**
-     * Reloads a resource
-     */
-    RequestHelper.reloadResource = function reloadResource(name) {
-        return RequestHelper.request('get', name).then(function (result) {
-            window.resources[name] = result;
-
-            // Apply correct model
-            for (var i in window.resources[name]) {
-                var object = window.resources[name][i];
-                var model = null;
-
-                switch (name) {
-                    case 'connections':
-                        model = new HashBrown.Models.Connection(object);
-                        break;
-
-                    case 'content':
-                        model = new HashBrown.Models.Content(object);
-                        break;
-
-                    case 'templates':
-                        model = new HashBrown.Models.Template(object);
-                        break;
-
-                    case 'forms':
-                        model = new HashBrown.Models.Form(object);
-                        break;
-
-                    case 'users':
-                        model = new HashBrown.Models.User(object);
-                        break;
-
-                    case 'media':
-                        model = new HashBrown.Models.Media(object);
-                        break;
-
-                    case 'schemas':
-                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
-                        break;
-
-                    default:
-                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
-                }
-
-                window.resources[name][i] = model;
-            }
-
-            return Promise.resolve(result);
-        }).catch(function (e) {
-            // If the error is a 404, it's an intended response from the controller
-            if (e.statusCode !== 404) {
-                UI.errorModal(e);
-            }
-
-            return Promise.resolve([]);
-        });
-    };
-
-    /**
-     * Reloads all resources
-     */
-    RequestHelper.reloadAllResources = function reloadAllResources() {
-        $('.loading-messages').empty();
-
-        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
-
-        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var item = _ref;
-
-            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
-
-            $('.loading-messages').append($msg);
-        }
-
-        var processQueue = function processQueue() {
-            var name = queue.shift();
-
-            return RequestHelper.reloadResource(name).then(function () {
-                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
-
-                if (queue.length < 1) {
-                    return Promise.resolve();
-                } else {
-                    return processQueue();
-                }
-            });
-        };
-
-        return processQueue();
-    };
-
-    return RequestHelper;
-}();
-
-module.exports = RequestHelper;
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5468,7 +5468,7 @@ var elliptic = exports;
 elliptic.version = __webpack_require__(139).version;
 elliptic.utils = __webpack_require__(140);
 elliptic.rand = __webpack_require__(80);
-elliptic.curve = __webpack_require__(35);
+elliptic.curve = __webpack_require__(34);
 elliptic.curves = __webpack_require__(145);
 
 // Protocols
@@ -6170,7 +6170,7 @@ function forEach(xs, f) {
 
 module.exports = Stream;
 
-var EE = __webpack_require__(30).EventEmitter;
+var EE = __webpack_require__(29).EventEmitter;
 var inherits = __webpack_require__(1);
 
 inherits(Stream, EE);
@@ -6360,7 +6360,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(28);
+var Entity = __webpack_require__(27);
 
 /**
  * Basic resource class
@@ -6439,7 +6439,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ContentSchema = __webpack_require__(55);
 var FieldSchema = __webpack_require__(56);
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 var SchemaHelperCommon = __webpack_require__(179);
 
@@ -6608,8 +6608,6 @@ var MessageModal = function (_Crisp$View) {
             }
         }
 
-        _this.$element = _.div();
-
         _this.fetch();
         return _this;
     }
@@ -6645,12 +6643,10 @@ var MessageModal = function (_Crisp$View) {
         return this.model.body;
     };
 
-    MessageModal.prototype.render = function render() {
+    MessageModal.prototype.template = function template() {
         var _this2 = this;
 
-        var view = this;
-
-        this.$element = _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.renderTitle())), _.div({ class: 'modal-body' }, this.renderBody()), _.div({ class: 'modal-footer' }, _.if(this.buttons, _.each(this.buttons, function (i, button) {
+        return _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.renderTitle())), _.div({ class: 'modal-body' }, this.renderBody()), _.div({ class: 'modal-footer' }, _.if(this.buttons, _.each(this.buttons, function (i, button) {
             var $button = _.button({ class: 'btn ' + button.class }, button.label).click(function () {
                 if (button.callback) {
                     if (button.callback() != false) {
@@ -6679,7 +6675,7 @@ var MessageModal = function (_Crisp$View) {
         $('body').append(this.$element);
 
         this.$element.find('a').click(function () {
-            view.hide();
+            _this2.hide();
         });
 
         this.$element.modal('show');
@@ -6749,7 +6745,7 @@ function randomBytes(size, cb) {
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var inherits = __webpack_require__(1);
-var md5 = __webpack_require__(29);
+var md5 = __webpack_require__(28);
 var RIPEMD160 = __webpack_require__(44);
 var sha = __webpack_require__(50);
 
@@ -7034,7 +7030,7 @@ BlockHash.prototype._pad = function pad() {
 
 var asn1 = exports;
 
-asn1.bignum = __webpack_require__(2);
+asn1.bignum = __webpack_require__(3);
 
 asn1.define = __webpack_require__(161).define;
 asn1.base = __webpack_require__(25);
@@ -7055,241 +7051,6 @@ base.Node = __webpack_require__(165);
 
 /***/ }),
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var RequestHelper = __webpack_require__(3);
-
-var SettingsHelperCommon = __webpack_require__(185);
-
-/**
- * The client side settings helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var SettingsHelper = function (_SettingsHelperCommon) {
-    _inherits(SettingsHelper, _SettingsHelperCommon);
-
-    function SettingsHelper() {
-        _classCallCheck(this, SettingsHelper);
-
-        return _possibleConstructorReturn(this, _SettingsHelperCommon.apply(this, arguments));
-    }
-
-    /**
-     * Gets all settings
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     *
-     * @return {Promise(Object)}  settings
-     */
-    SettingsHelper.getSettings = function getSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-
-        var _this2 = this;
-
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-        if (environment === '*') {
-            environment = null;
-        }
-
-        var apiUrl = '/api/' + project + '/';
-
-        if (environment) {
-            apiUrl += environment + '/';
-        }
-
-        apiUrl += 'settings';
-
-        if (section) {
-            apiUrl += '/' + section;
-        }
-
-        return RequestHelper.customRequest('get', apiUrl)
-
-        // Cache settings client-side
-        .then(function (settings) {
-            _this2.updateCache(project, environment, section, settings);
-
-            return Promise.resolve(settings || {});
-        });
-    };
-
-    /**
-     * Cache update
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     */
-
-
-    SettingsHelper.cacheSanityCheck = function cacheSanityCheck() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-        if (environment === '*') {
-            environment = null;
-        }
-
-        this.cache = this.cache || {};
-        this.cache[project] = this.cache[project] || {};
-
-        if (environment) {
-            this.cache[project][environment] = this.cache[project][environment] || {};
-
-            if (section) {
-                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-            }
-        } else if (section) {
-            this.cache[project][section] = this.cache[project][section] || {};
-        }
-    };
-
-    /**
-     * Cache update
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     * @param {Object} settings
-     */
-
-
-    SettingsHelper.updateCache = function updateCache() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
-
-        if (environment === '*') {
-            environment = null;
-        }
-
-        this.cacheSanityCheck(project, environment, section);
-
-        if (environment && !section) {
-            return this.cache[project][environment] = settings;
-        }
-
-        if (!environment && section) {
-            return this.cache[project][section] = settings;
-        }
-
-        if (environment && section) {
-            return this.cache[project][environment][section] = settings;
-        }
-
-        return this.cache[project] = settings;
-    };
-
-    /**
-     * Gets cached settings
-     *
-     * @param {String} section
-     *
-     * @returns {Object} Settings
-     */
-
-
-    SettingsHelper.getCachedSettings = function getCachedSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-        if (environment === '*') {
-            environment = null;
-        }
-
-        this.cacheSanityCheck(project, environment, section);
-
-        if (environment) {
-            if (section) {
-                return this.cache[project][environment][section];
-            }
-
-            return this.cache[project][environment];
-        }
-
-        if (section) {
-            return this.cache[project][section];
-        }
-
-        return this.cache[project];
-    };
-
-    /**
-     * Sets all settings
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     * @param {Object} settings
-     *
-     * @return {Promise} promise
-     */
-
-
-    SettingsHelper.setSettings = function setSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-        var _this3 = this;
-
-        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
-
-        if (environment === '*') {
-            environment = null;
-        }
-
-        var apiUrl = '/api/' + project + '/';
-
-        settings.usedBy = 'project';
-
-        if (environment) {
-            apiUrl += environment + '/';
-
-            settings.usedBy = environment;
-        }
-
-        apiUrl += 'settings';
-
-        if (section) {
-            apiUrl += '/' + section;
-        }
-
-        return RequestHelper.customRequest('post', apiUrl, settings)
-
-        // Cache new settings
-        .then(function () {
-            _this3.updateCache(project, environment, section, settings);
-
-            return Promise.resolve();
-        });
-    };
-
-    return SettingsHelper;
-}(SettingsHelperCommon);
-
-module.exports = SettingsHelper;
-
-/***/ }),
-/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7500,7 +7261,7 @@ var Media = function (_Resource) {
 module.exports = Media;
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7681,7 +7442,7 @@ var Entity = function () {
 module.exports = Entity;
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7838,7 +7599,7 @@ module.exports = function md5(buf) {
 };
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8114,10 +7875,10 @@ function isUndefined(arg) {
 }
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var md5 = __webpack_require__(29);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var md5 = __webpack_require__(28);
 module.exports = EVP_BytesToKey;
 function EVP_BytesToKey(password, salt, keyLen, ivLen) {
   if (!Buffer.isBuffer(password)) {
@@ -8188,7 +7949,7 @@ function EVP_BytesToKey(password, salt, keyLen, ivLen) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// based on the aes implimentation in triple sec
@@ -8366,7 +8127,7 @@ exports.AES = AES;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports) {
 
 exports['aes-128-ecb'] = {
@@ -8542,7 +8303,7 @@ exports['aes-256-gcm'] = {
 };
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var xor = __webpack_require__(22);
@@ -8579,7 +8340,7 @@ exports.encrypt = function (self, chunk) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8593,7 +8354,7 @@ curve.mont = __webpack_require__(143);
 curve.edwards = __webpack_require__(144);
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8710,7 +8471,7 @@ function decrypt(data, password) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9112,7 +8873,7 @@ var Connection = function (_Resource) {
 module.exports = Connection;
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9126,7 +8887,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var MediaHelperCommon = __webpack_require__(184);
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 /**
  * The client side media helper
@@ -9269,6 +9030,241 @@ var MediaHelper = function (_MediaHelperCommon) {
 module.exports = MediaHelper;
 
 /***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(2);
+
+var SettingsHelperCommon = __webpack_require__(185);
+
+/**
+ * The client side settings helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var SettingsHelper = function (_SettingsHelperCommon) {
+    _inherits(SettingsHelper, _SettingsHelperCommon);
+
+    function SettingsHelper() {
+        _classCallCheck(this, SettingsHelper);
+
+        return _possibleConstructorReturn(this, _SettingsHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets all settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @return {Promise(Object)}  settings
+     */
+    SettingsHelper.getSettings = function getSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+        var _this2 = this;
+
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        if (environment === '*') {
+            environment = null;
+        }
+
+        var apiUrl = '/api/' + project + '/';
+
+        if (environment) {
+            apiUrl += environment + '/';
+        }
+
+        apiUrl += 'settings';
+
+        if (section) {
+            apiUrl += '/' + section;
+        }
+
+        return RequestHelper.customRequest('get', apiUrl)
+
+        // Cache settings client-side
+        .then(function (settings) {
+            _this2.updateCache(project, environment, section, settings);
+
+            return Promise.resolve(settings || {});
+        });
+    };
+
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     */
+
+
+    SettingsHelper.cacheSanityCheck = function cacheSanityCheck() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        if (environment === '*') {
+            environment = null;
+        }
+
+        this.cache = this.cache || {};
+        this.cache[project] = this.cache[project] || {};
+
+        if (environment) {
+            this.cache[project][environment] = this.cache[project][environment] || {};
+
+            if (section) {
+                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+            }
+        } else if (section) {
+            this.cache[project][section] = this.cache[project][section] || {};
+        }
+    };
+
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     */
+
+
+    SettingsHelper.updateCache = function updateCache() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+        if (environment === '*') {
+            environment = null;
+        }
+
+        this.cacheSanityCheck(project, environment, section);
+
+        if (environment && !section) {
+            return this.cache[project][environment] = settings;
+        }
+
+        if (!environment && section) {
+            return this.cache[project][section] = settings;
+        }
+
+        if (environment && section) {
+            return this.cache[project][environment][section] = settings;
+        }
+
+        return this.cache[project] = settings;
+    };
+
+    /**
+     * Gets cached settings
+     *
+     * @param {String} section
+     *
+     * @returns {Object} Settings
+     */
+
+
+    SettingsHelper.getCachedSettings = function getCachedSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        if (environment === '*') {
+            environment = null;
+        }
+
+        this.cacheSanityCheck(project, environment, section);
+
+        if (environment) {
+            if (section) {
+                return this.cache[project][environment][section];
+            }
+
+            return this.cache[project][environment];
+        }
+
+        if (section) {
+            return this.cache[project][section];
+        }
+
+        return this.cache[project];
+    };
+
+    /**
+     * Sets all settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     *
+     * @return {Promise} promise
+     */
+
+
+    SettingsHelper.setSettings = function setSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+        var _this3 = this;
+
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+        if (environment === '*') {
+            environment = null;
+        }
+
+        var apiUrl = '/api/' + project + '/';
+
+        settings.usedBy = 'project';
+
+        if (environment) {
+            apiUrl += environment + '/';
+
+            settings.usedBy = environment;
+        }
+
+        apiUrl += 'settings';
+
+        if (section) {
+            apiUrl += '/' + section;
+        }
+
+        return RequestHelper.customRequest('post', apiUrl, settings)
+
+        // Cache new settings
+        .then(function () {
+            _this3.updateCache(project, environment, section, settings);
+
+            return Promise.resolve();
+        });
+    };
+
+    return SettingsHelper;
+}(SettingsHelperCommon);
+
+module.exports = SettingsHelper;
+
+/***/ }),
 /* 39 */,
 /* 40 */,
 /* 41 */
@@ -9285,7 +9281,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 var ContentHelperCommon = __webpack_require__(186);
 
@@ -9552,7 +9548,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(28);
+var Entity = __webpack_require__(27);
 
 /**
  * A model for Users
@@ -10200,7 +10196,7 @@ var Stream;
   try {
     Stream = __webpack_require__(13);
   } catch (_) {} finally {
-    if (!Stream) Stream = __webpack_require__(30).EventEmitter;
+    if (!Stream) Stream = __webpack_require__(29).EventEmitter;
   }
 })();
 /*</replacement>*/
@@ -11131,7 +11127,7 @@ exports.createCipheriv = exports.Cipheriv = ciphers.createCipheriv;
 var deciphers = __webpack_require__(124);
 exports.createDecipher = exports.Decipher = deciphers.createDecipher;
 exports.createDecipheriv = exports.Decipheriv = deciphers.createDecipheriv;
-var modes = __webpack_require__(33);
+var modes = __webpack_require__(32);
 function getCiphers() {
   return Object.keys(modes);
 }
@@ -11154,7 +11150,7 @@ exports.EDE = __webpack_require__(130);
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(2);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(3);
 var randomBytes = __webpack_require__(18);
 module.exports = crt;
 function blind(priv) {
@@ -11355,7 +11351,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ContentCommon = __webpack_require__(94);
+var ContentCommon = __webpack_require__(95);
 var ProjectHelper = __webpack_require__(6);
 
 /**
@@ -11452,7 +11448,7 @@ var isArray = __webpack_require__(58);
 Readable.ReadableState = ReadableState;
 
 /*<replacement>*/
-var EE = __webpack_require__(30).EventEmitter;
+var EE = __webpack_require__(29).EventEmitter;
 
 var EElistenerCount = function EElistenerCount(emitter, type) {
   return emitter.listeners(type).length;
@@ -11465,7 +11461,7 @@ var Stream;
   try {
     Stream = __webpack_require__(13);
   } catch (_) {} finally {
-    if (!Stream) Stream = __webpack_require__(30).EventEmitter;
+    if (!Stream) Stream = __webpack_require__(29).EventEmitter;
   }
 })();
 /*</replacement>*/
@@ -12823,7 +12819,7 @@ var inherits = __webpack_require__(1);
 var Legacy = __webpack_require__(118);
 var Base = __webpack_require__(10);
 var Buffer = __webpack_require__(21).Buffer;
-var md5 = __webpack_require__(29);
+var md5 = __webpack_require__(28);
 var RIPEMD160 = __webpack_require__(44);
 
 var sha = __webpack_require__(50);
@@ -13091,7 +13087,7 @@ module.exports = defaultEncoding;
 /* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var md5 = __webpack_require__(29);
+var md5 = __webpack_require__(28);
 var rmd160 = __webpack_require__(44);
 var sha = __webpack_require__(50);
 
@@ -13200,7 +13196,7 @@ module.exports = function (password, salt, iterations, keylen, digest) {
 /* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(32);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(31);
 var Transform = __webpack_require__(10);
 var inherits = __webpack_require__(1);
 
@@ -13231,7 +13227,7 @@ StreamCipher.prototype._final = function () {
 /* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(32);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(31);
 var Transform = __webpack_require__(10);
 var inherits = __webpack_require__(1);
 var GHASH = __webpack_require__(123);
@@ -13491,7 +13487,7 @@ var randomBytes = __webpack_require__(18);
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
 findPrime.fermatTest = fermatTest;
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var TWENTYFOUR = new BN(24);
 var MillerRabin = __webpack_require__(79);
 var millerRabin = new MillerRabin();
@@ -13589,7 +13585,7 @@ function findPrime(bits, gen) {
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bn = __webpack_require__(2);
+var bn = __webpack_require__(3);
 var brorand = __webpack_require__(80);
 
 function MillerRabin(rand) {
@@ -14913,7 +14909,7 @@ module.exports = function xor(a, b) {
 /* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(2);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(3);
 function withPublic(paddedMsg, key) {
   return new Buffer(paddedMsg.toRed(bn.mont(key.modulus)).redPow(new bn(key.publicExponent)).fromRed().toArray());
 }
@@ -14928,6 +14924,157 @@ module.exports = withPublic;
 "use strict";
 
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConnectionHelperCommon = __webpack_require__(187);
+var Connection = __webpack_require__(36);
+var ProjectHelper = __webpack_require__(6);
+var RequestHelper = __webpack_require__(2);
+
+/**
+ * The client side connection helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var ConnectionHelper = function (_ConnectionHelperComm) {
+    _inherits(ConnectionHelper, _ConnectionHelperComm);
+
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+
+        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @return {Promise} Array of Connections
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        return Promise.resolve(resources.connections);
+    };
+
+    /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
+
+
+    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return connection;
+            }
+        }
+    };
+
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {string} id
+     *
+     * @return {Promise(Connection)} promise
+     */
+
+
+    ConnectionHelper.getConnectionById = function getConnectionById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return Promise.resolve(connection);
+            }
+        }
+
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
+        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('media');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
+        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('templates');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    return ConnectionHelper;
+}(ConnectionHelperCommon);
+
+module.exports = ConnectionHelper;
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14936,7 +15083,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelper = __webpack_require__(26);
+var SettingsHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
 var LanguageHelperCommon = __webpack_require__(190);
 
@@ -15022,7 +15169,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15410,7 +15557,7 @@ var Content = function (_Resource) {
 module.exports = Content;
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15422,8 +15569,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(28);
-var Connection = __webpack_require__(37);
+var Entity = __webpack_require__(27);
+var Connection = __webpack_require__(36);
 
 /**
  * The Project class
@@ -15543,7 +15690,7 @@ var Project = function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15555,7 +15702,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 /**
  * An editor for Users
@@ -15571,8 +15718,6 @@ var UserEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'user-editor' });
-
         _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
             _this.onClickSave();
 
@@ -15583,7 +15728,7 @@ var UserEditor = function (_Crisp$View) {
 
         RequestHelper.customRequest('get', '/api/server/projects').then(function (projects) {
             _this.projects = projects;
-            _this.init();
+            _this.fetch();
         });
         return _this;
     }
@@ -15778,7 +15923,7 @@ var UserEditor = function (_Crisp$View) {
         return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
             _this4.model.isAdmin = newValue;
 
-            _this4.render();
+            _this4.fetch();
         }).addClass('admin-editor');
     };
 
@@ -15806,10 +15951,15 @@ var UserEditor = function (_Crisp$View) {
         return $element;
     };
 
-    UserEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+
+
+    UserEditor.prototype.template = function template() {
         var _this5 = this;
 
-        _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+        return _.div({ class: 'user-editor' }, this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
             return _.div({ class: 'project', 'data-id': project }, _.div({ class: 'project-header' }, UI.inputSwitch(_this5.model.hasScope(project), function (newValue) {
                 if (newValue) {
                     _this5.model.giveScope(project);
@@ -15826,157 +15976,6 @@ var UserEditor = function (_Crisp$View) {
 }(Crisp.View);
 
 module.exports = UserEditor;
-
-/***/ }),
-/* 97 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ConnectionHelperCommon = __webpack_require__(188);
-var Connection = __webpack_require__(37);
-var ProjectHelper = __webpack_require__(6);
-var RequestHelper = __webpack_require__(3);
-
-/**
- * The client side connection helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var ConnectionHelper = function (_ConnectionHelperComm) {
-    _inherits(ConnectionHelper, _ConnectionHelperComm);
-
-    function ConnectionHelper() {
-        _classCallCheck(this, ConnectionHelper);
-
-        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
-    }
-
-    /**
-     * Gets all connections
-     *
-     * @return {Promise} Array of Connections
-     */
-    ConnectionHelper.getAllConnections = function getAllConnections() {
-        return Promise.resolve(resources.connections);
-    };
-
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-
-
-    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return connection;
-            }
-        }
-    };
-
-    /**
-     * Gets a Connection by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {string} id
-     *
-     * @return {Promise(Connection)} promise
-     */
-
-
-    ConnectionHelper.getConnectionById = function getConnectionById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return Promise.resolve(connection);
-            }
-        }
-
-        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
-    };
-
-    /**
-     * Sets the Media provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-
-
-    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
-        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return RequestHelper.reloadResource('media');
-        }).then(function () {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
-    };
-
-    /**
-     * Gets the Media provider
-     *
-     * @returns {Promise} Connection
-     */
-
-
-    ConnectionHelper.getMediaProvider = function getMediaProvider() {
-        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-    };
-
-    /**
-     * Sets the Template provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-
-
-    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
-        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return RequestHelper.reloadResource('templates');
-        }).then(function () {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
-    };
-
-    /**
-     * Gets the Template provider
-     *
-     * @returns {Promise} Connection
-     */
-
-
-    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
-        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-    };
-
-    return ConnectionHelper;
-}(ConnectionHelperCommon);
-
-module.exports = ConnectionHelper;
 
 /***/ }),
 /* 98 */
@@ -17571,11 +17570,11 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ebtk = __webpack_require__(31);
+var ebtk = __webpack_require__(30);
 var aes = __webpack_require__(51);
 var DES = __webpack_require__(125);
 var desModes = __webpack_require__(131);
-var aesModes = __webpack_require__(33);
+var aesModes = __webpack_require__(32);
 function createCipher(suite, password) {
   var keyLen, ivLen;
   suite = suite.toLowerCase();
@@ -17649,11 +17648,11 @@ exports.listCiphers = exports.getCiphers = getCiphers;
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(32);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(31);
 var Transform = __webpack_require__(10);
 var inherits = __webpack_require__(1);
-var modes = __webpack_require__(33);
-var ebtk = __webpack_require__(31);
+var modes = __webpack_require__(32);
+var ebtk = __webpack_require__(30);
 var StreamCipher = __webpack_require__(70);
 var AuthCipher = __webpack_require__(71);
 inherits(Cipher, Transform);
@@ -17732,8 +17731,8 @@ var modelist = {
   CFB8: __webpack_require__(75),
   CFB1: __webpack_require__(76),
   OFB: __webpack_require__(77),
-  CTR: __webpack_require__(34),
-  GCM: __webpack_require__(34)
+  CTR: __webpack_require__(33),
+  GCM: __webpack_require__(33)
 };
 
 function createCipheriv(suite, password, iv) {
@@ -17868,13 +17867,13 @@ function xor(a, b) {
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(32);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(31);
 var Transform = __webpack_require__(10);
 var inherits = __webpack_require__(1);
-var modes = __webpack_require__(33);
+var modes = __webpack_require__(32);
 var StreamCipher = __webpack_require__(70);
 var AuthCipher = __webpack_require__(71);
-var ebtk = __webpack_require__(31);
+var ebtk = __webpack_require__(30);
 
 inherits(Decipher, Transform);
 function Decipher(mode, key, iv) {
@@ -17966,8 +17965,8 @@ var modelist = {
   CFB8: __webpack_require__(75),
   CFB1: __webpack_require__(76),
   OFB: __webpack_require__(77),
-  CTR: __webpack_require__(34),
-  GCM: __webpack_require__(34)
+  CTR: __webpack_require__(33),
+  GCM: __webpack_require__(33)
 };
 
 function createDecipheriv(suite, password, iv) {
@@ -18816,7 +18815,7 @@ module.exports = {
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(2);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(3);
 var MillerRabin = __webpack_require__(79);
 var millerRabin = new MillerRabin();
 var TWENTYFOUR = new BN(24);
@@ -19084,8 +19083,8 @@ module.exports = {
 var createHmac = __webpack_require__(64);
 var crt = __webpack_require__(53);
 var EC = __webpack_require__(4).ec;
-var BN = __webpack_require__(2);
-var parseKeys = __webpack_require__(36);
+var BN = __webpack_require__(3);
+var parseKeys = __webpack_require__(35);
 var curves = __webpack_require__(89);
 
 function sign(hash, key, hashType, signType, tag) {
@@ -19332,7 +19331,7 @@ module.exports = {
 
 
 var utils = exports;
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var minAssert = __webpack_require__(5);
 var minUtils = __webpack_require__(81);
 
@@ -19438,7 +19437,7 @@ utils.intFromLE = intFromLE;
 "use strict";
 
 
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var getNAF = utils.getNAF;
@@ -19774,9 +19773,9 @@ BasePoint.prototype.dblp = function dblp(k) {
 "use strict";
 
 
-var curve = __webpack_require__(35);
+var curve = __webpack_require__(34);
 var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -20643,8 +20642,8 @@ JPoint.prototype.isInfinity = function isInfinity() {
 "use strict";
 
 
-var curve = __webpack_require__(35);
-var BN = __webpack_require__(2);
+var curve = __webpack_require__(34);
+var BN = __webpack_require__(3);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -20824,9 +20823,9 @@ Point.prototype.getX = function getX() {
 "use strict";
 
 
-var curve = __webpack_require__(35);
+var curve = __webpack_require__(34);
 var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
 
@@ -21674,7 +21673,7 @@ module.exports = {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var HmacDRBG = __webpack_require__(154);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
@@ -22001,7 +22000,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
 "use strict";
 
 
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var assert = utils.assert;
@@ -22112,7 +22111,7 @@ KeyPair.prototype.inspect = function inspect() {
 "use strict";
 
 
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
@@ -22465,7 +22464,7 @@ module.exports = KeyPair;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var elliptic = __webpack_require__(4);
 var utils = elliptic.utils;
 var assert = utils.assert;
@@ -23690,7 +23689,7 @@ module.exports = {
 var findProc = /Proc-Type: 4,ENCRYPTED\n\r?DEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)\n\r?\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?/m;
 var startRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n/m;
 var fullRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?-----END \1-----$/m;
-var evp = __webpack_require__(31);
+var evp = __webpack_require__(30);
 var ciphers = __webpack_require__(51);
 module.exports = function (okey, password) {
   var key = okey.toString();
@@ -23723,9 +23722,9 @@ module.exports = function (okey, password) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 var EC = __webpack_require__(4).ec;
-var parseKeys = __webpack_require__(36);
+var parseKeys = __webpack_require__(35);
 var curves = __webpack_require__(89);
 
 function verify(sig, hash, key, signType, tag) {
@@ -23808,7 +23807,7 @@ module.exports = verify;
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var elliptic = __webpack_require__(4);
-var BN = __webpack_require__(2);
+var BN = __webpack_require__(3);
 
 module.exports = function createECDH(curve) {
 	return new ECDH(curve);
@@ -23950,12 +23949,12 @@ exports.publicDecrypt = function publicDecrypt(key, buf) {
 /* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(36);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(35);
 var randomBytes = __webpack_require__(18);
 var createHash = __webpack_require__(19);
 var mgf = __webpack_require__(90);
 var xor = __webpack_require__(91);
-var bn = __webpack_require__(2);
+var bn = __webpack_require__(3);
 var withPublic = __webpack_require__(92);
 var crt = __webpack_require__(53);
 
@@ -24051,10 +24050,10 @@ function nonZero(len, crypto) {
 /* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(36);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(35);
 var mgf = __webpack_require__(90);
 var xor = __webpack_require__(91);
-var bn = __webpack_require__(2);
+var bn = __webpack_require__(3);
 var crt = __webpack_require__(53);
 var createHash = __webpack_require__(19);
 var withPublic = __webpack_require__(92);
@@ -24316,7 +24315,7 @@ module.exports = SchemaHelper;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Media = __webpack_require__(27);
+var Media = __webpack_require__(26);
 
 /**
  * A helper for Media objects
@@ -24573,8 +24572,7 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 187 */,
-/* 188 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24582,7 +24580,7 @@ module.exports = ContentHelper;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Connection = __webpack_require__(37);
+var Connection = __webpack_require__(36);
 
 /**
  * The helper class for Connections
@@ -24742,6 +24740,7 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
+/* 188 */,
 /* 189 */,
 /* 190 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -24862,15 +24861,15 @@ module.exports = LanguageHelper;
  */
 
 module.exports = {
-    ConnectionHelper: __webpack_require__(97),
+    ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
     DebugHelper: __webpack_require__(192),
-    LanguageHelper: __webpack_require__(93),
-    MediaHelper: __webpack_require__(38),
+    LanguageHelper: __webpack_require__(94),
+    MediaHelper: __webpack_require__(37),
     ProjectHelper: __webpack_require__(6),
-    RequestHelper: __webpack_require__(3),
+    RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
-    SettingsHelper: __webpack_require__(26),
+    SettingsHelper: __webpack_require__(38),
     TemplateHelper: __webpack_require__(194),
     UIHelper: __webpack_require__(195)
 };
@@ -25973,33 +25972,14 @@ var UIHelper = function () {
 
 
     UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
-        var submitClass = 'btn-primary';
-
-        type = (type || '').toLowerCase();
-
-        switch (type) {
-            case 'delete':case 'remove':case 'discard':case 'clear':
-                submitClass = 'btn-danger';
-                break;
-        }
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit,
-                class: 'confirm-modal'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default',
-                callback: onCancel
-            }, {
-                label: type,
-                class: submitClass,
-                callback: onSubmit
-            }]
+        var modal = new HashBrown.Views.Modals.ConfirmModal({
+            type: type ? type.toLowerCase() : null,
+            title: title,
+            body: body
         });
+
+        modal.on('cancel', onCancel);
+        modal.on('ok', onSubmit);
     };
 
     return UIHelper;
@@ -33481,8 +33461,7 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */,
-/* 272 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33532,8 +33511,8 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
         }
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
-            var Project = __webpack_require__(95);
-            var ProjectEditor = __webpack_require__(273);
+            var Project = __webpack_require__(96);
+            var ProjectEditor = __webpack_require__(272);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33562,7 +33541,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
     return HashBrown.Helpers.RequestHelper.request('get', 'users');
 }).then(function (users) {
-    var UserEditor = __webpack_require__(96);
+    var UserEditor = __webpack_require__(97);
     var User = __webpack_require__(43);
 
     var _loop = function _loop() {
@@ -33799,7 +33778,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 273 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33811,14 +33790,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(274);
-var SyncEditor = __webpack_require__(275);
-var LanguageEditor = __webpack_require__(276);
-var BackupEditor = __webpack_require__(277);
-var MigrationEditor = __webpack_require__(278);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33834,9 +33813,7 @@ var ProjectEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'raised project-editor in' });
-
-        _this.init();
+        _this.fetch();
         return _this;
     }
 
@@ -34021,15 +33998,18 @@ var ProjectEditor = function (_Crisp$View) {
         });
     };
 
-    ProjectEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+
+
+    ProjectEditor.prototype.template = function template() {
         var _this8 = this;
 
         var languageCount = this.model.settings.languages.length;
         var userCount = this.model.users.length;
 
-        this.$element.toggleClass('in', true);
-
-        _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(currentUserIsAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
+        return _.div({ class: 'raised project-editor in' }, _.div({ class: 'body' }, _.if(currentUserIsAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
             e.preventDefault();_this8.onClickInfo();
         })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
             e.preventDefault();_this8.onClickLanguages();
@@ -34060,7 +34040,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 274 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34073,7 +34053,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(17);
-var SettingsHelper = __webpack_require__(26);
+var SettingsHelper = __webpack_require__(38);
 
 /**
  * The info settings editor
@@ -34108,9 +34088,15 @@ var InfoEditor = function (_Crisp$View) {
             }]
         });
 
-        _this.$element = _this.modal.$element;
+        _this.$element = _this.model.$element;
 
-        _this.fetch();
+        SettingsHelper.getSettings(_this.projectId, null, 'info').then(function (infoSettings) {
+            _this.model = infoSettings || {};
+
+            _.append(_this.$element.find('.modal-body').empty(), _this.renderField('Project name', _this.renderProjectNameEditor()));
+
+            _this.fetch();
+        });
         return _this;
     }
 
@@ -34162,23 +34148,13 @@ var InfoEditor = function (_Crisp$View) {
         return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, $content));
     };
 
-    InfoEditor.prototype.render = function render() {
-        var _this3 = this;
-
-        SettingsHelper.getSettings(this.projectId, null, 'info').then(function (infoSettings) {
-            _this3.model = infoSettings || {};
-
-            _.append(_this3.$element.find('.modal-body').empty(), _this3.renderField('Project name', _this3.renderProjectNameEditor()));
-        });
-    };
-
     return InfoEditor;
 }(Crisp.View);
 
 module.exports = InfoEditor;
 
 /***/ }),
-/* 275 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34191,8 +34167,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(17);
-var RequestHelper = __webpack_require__(3);
-var SettingsHelper = __webpack_require__(26);
+var RequestHelper = __webpack_require__(2);
+var SettingsHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
 
 /**
@@ -34240,6 +34216,8 @@ var SyncEditor = function (_Crisp$View) {
 
         SettingsHelper.getSettings(_this.projectId, '', 'sync').then(function (syncSettings) {
             _this.model = syncSettings || {};
+
+            _.append(_this.$element.find('.modal-body').empty(), _this.renderField('Enabled', _this.renderEnabledSwitch()), _this.renderField('API URL', _this.renderUrlEditor()), _this.renderField('API Token', _this.renderTokenEditor()), _this.renderField('Project', _this.renderProjectNameEditor()));
 
             _this.fetch();
         });
@@ -34374,17 +34352,13 @@ var SyncEditor = function (_Crisp$View) {
         return _.div({ class: 'field' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
     };
 
-    SyncEditor.prototype.render = function render() {
-        _.append(this.$element.find('.modal-body').empty(), this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project', this.renderProjectNameEditor()));
-    };
-
     return SyncEditor;
 }(Crisp.View);
 
 module.exports = SyncEditor;
 
 /***/ }),
-/* 276 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34397,7 +34371,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(17);
-var LanguageHelper = __webpack_require__(93);
+var LanguageHelper = __webpack_require__(94);
 
 /**
  * The language settings editor
@@ -34437,6 +34411,8 @@ var LanguageEditor = function (_Crisp$View) {
         LanguageHelper.getLanguages(_this.projectId).then(function (selectedLanguages) {
             _this.model = selectedLanguages;
 
+            _.append(_this.$element.find('.modal-body').empty(), UI.inputChipGroup(_this.model, LanguageHelper.getLanguageOptions(_this.projectId), true));
+
             _this.fetch();
         });
         return _this;
@@ -34457,17 +34433,13 @@ var LanguageEditor = function (_Crisp$View) {
         }).catch(UI.errorModal);
     };
 
-    LanguageEditor.prototype.render = function render() {
-        _.append(this.$element.find('.modal-body').empty(), UI.inputChipGroup(this.model, LanguageHelper.getLanguageOptions(this.projectId), true));
-    };
-
     return LanguageEditor;
 }(Crisp.View);
 
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 277 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34479,7 +34451,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
 
@@ -34733,7 +34705,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 278 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34745,7 +34717,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var RequestHelper = __webpack_require__(3);
+var RequestHelper = __webpack_require__(2);
 var MessageModal = __webpack_require__(17);
 
 /**

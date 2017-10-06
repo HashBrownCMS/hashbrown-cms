@@ -18,9 +18,7 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'raised project-editor in'});
-
-        this.init();
+        this.fetch();
     }
    
     /**
@@ -177,13 +175,14 @@ class ProjectEditor extends Crisp.View {
         });
     }
 
-    render() {
+    /**
+     * Renders this editor
+     */
+    template() {
         let languageCount = this.model.settings.languages.length;
         let userCount = this.model.users.length;
 
-		this.$element.toggleClass('in', true);
-
-        _.append(this.$element.empty(),
+        return _.div({class: 'raised project-editor in'},
             _.div({class: 'body'},
                 _.if(currentUserIsAdmin(),
                     _.div({class: 'admin dropdown'}, 

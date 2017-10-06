@@ -34,9 +34,18 @@ class InfoEditor extends Crisp.View {
             ]
         });
 
-        this.$element = this.modal.$element;
+        this.$element = this.model.$element;
 
-        this.fetch();
+        SettingsHelper.getSettings(this.projectId, null, 'info')
+        .then((infoSettings) => {
+            this.model = infoSettings || {};
+
+            _.append(this.$element.find('.modal-body').empty(),
+                this.renderField('Project name', this.renderProjectNameEditor())
+            );
+        
+            this.fetch();
+        });
     }
     
     /**
@@ -88,17 +97,6 @@ class InfoEditor extends Crisp.View {
             )
         );
     }
-
-    render() {
-        SettingsHelper.getSettings(this.projectId, null, 'info')
-        .then((infoSettings) => {
-            this.model = infoSettings || {};
-
-            _.append(this.$element.find('.modal-body').empty(),
-                this.renderField('Project name', this.renderProjectNameEditor())
-            );
-        });
-    } 
 }
 
 module.exports = InfoEditor;

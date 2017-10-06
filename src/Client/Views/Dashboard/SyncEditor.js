@@ -51,6 +51,13 @@ class SyncEditor extends Crisp.View {
         .then((syncSettings) => {
             this.model = syncSettings || {};
 
+            _.append(this.$element.find('.modal-body').empty(),
+                this.renderField('Enabled', this.renderEnabledSwitch()),
+                this.renderField('API URL', this.renderUrlEditor()),
+                this.renderField('API Token', this.renderTokenEditor()),
+                this.renderField('Project', this.renderProjectNameEditor())
+            );
+
             this.fetch();
         });
     }
@@ -192,15 +199,6 @@ class SyncEditor extends Crisp.View {
             )
         );
     }
-
-    render() {
-        _.append(this.$element.find('.modal-body').empty(),
-            this.renderField('Enabled', this.renderEnabledSwitch()),
-            this.renderField('API URL', this.renderUrlEditor()),
-            this.renderField('API Token', this.renderTokenEditor()),
-            this.renderField('Project', this.renderProjectNameEditor())
-        );
-    } 
 }
 
 module.exports = SyncEditor;

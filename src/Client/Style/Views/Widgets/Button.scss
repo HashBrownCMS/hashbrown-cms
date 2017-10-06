@@ -58,4 +58,14 @@
     &.contracted {
         min-width: 0;
     }
+
+    &.warning {
+        background-color: $warning;
+        color: $warning-text;
+    }
+    
+    &.standard {
+        background-color: $standard;
+        color: $standard-text;
+    }
 }

@@ -94,7 +94,7 @@ class DateModal extends Modal {
                     .click(() => {
                         this.value.setMonth(this.value.getMonth() - 1);
                         
-                        this.render();
+                        this.fetch();
                     }),
                 _.div({class: 'modal--date__body__nav__month-year'},
                     this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()
@@ -103,7 +103,7 @@ class DateModal extends Modal {
                     .click(() => {
                         this.value.setMonth(this.value.getMonth() + 1);
                         
-                        this.render();
+                        this.fetch();
                     })
             ),
             _.div({class: 'modal--date__body__weekdays'},
@@ -133,7 +133,7 @@ class DateModal extends Modal {
                         .click(() => {
                             this.value.setDate(day);
 
-                            this.render();
+                            this.fetch();
                         });
                 })
             ),

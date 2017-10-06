@@ -245,7 +245,7 @@ class ContentPane extends NavbarPane {
                     let contentEditor = Crisp.View.get('ContentEditor');
 
                     contentEditor.model = content;
-                    return contentEditor.render();
+                    return contentEditor.fetch();
                 
                 } else {
                     return Promise.resolve();

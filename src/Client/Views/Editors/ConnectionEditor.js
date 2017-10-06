@@ -59,7 +59,7 @@ class ConnectionEditor extends Crisp.View {
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
                 input.value = true;
-                input.render();
+                input.fetch();
             }
         
             input.$element.toggleClass('working', false);
@@ -88,7 +88,7 @@ class ConnectionEditor extends Crisp.View {
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
                 input.value = true;
-                input.render();
+                input.fetch();
             }
         
             input.$element.toggleClass('working', false);
@@ -153,7 +153,7 @@ class ConnectionEditor extends Crisp.View {
             onChange: (newValue) => {
                 this.model.type = newValue;
 
-                this.render();
+                this.fetch();
             }
         }).$element;
     }

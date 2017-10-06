@@ -69,16 +69,26 @@ class Modal extends Crisp.View {
      * Renders this modal
      */
     template() {
+        let header = this.renderHeader();
+        let body = this.renderBody();
+        let footer = this.renderFooter();
+
         return _.div({class: 'modal'},
             _.div({class: 'modal__dialog'},
-                _.div({class: 'modal__header'},
-                    this.renderHeader()
+                _.if(header,
+                    _.div({class: 'modal__header'},
+                        header
+                    )
                 ),
-                _.div({class: 'modal__body'},
-                    this.renderBody() 
+                _.if(body,
+                    _.div({class: 'modal__body'},
+                        body 
+                    )
                 ),
-                _.div({class: 'modal__footer'},
-                    this.renderFooter()
+                _.if(footer,
+                    _.div({class: 'modal__footer'},
+                        footer
+                    )
                 )
             )
         );

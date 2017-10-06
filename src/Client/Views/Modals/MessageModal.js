@@ -17,8 +17,6 @@ class MessageModal extends Crisp.View {
             }
         }
 
-        this.$element = _.div();
-        
         this.fetch();
     }
 
@@ -53,10 +51,8 @@ class MessageModal extends Crisp.View {
         return this.model.body;
     }
 
-    render() {
-        let view = this;
-
-        this.$element = _.div({class: 'modal fade ' + (this.model.class ? this.model.class : '')}, 
+    template() {
+        return _.div({class: 'modal fade ' + (this.model.class ? this.model.class : '')}, 
             _.div({class: 'modal-dialog'},
                 _.div({class: 'modal-content'},
                     _.div({class: 'modal-header'},
@@ -106,8 +102,8 @@ class MessageModal extends Crisp.View {
 
         $('body').append(this.$element);
 
-        this.$element.find('a').click(function() {
-            view.hide();
+        this.$element.find('a').click(() => {
+            this.hide();
         });
 
         this.$element.modal('show');

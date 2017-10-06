@@ -18,8 +18,6 @@ class ContentEditor extends Crisp.View {
 
         this.dirty = false;
 
-        this.$element = _.div({class: 'editor editor--content'});
-
         this.fetch();
     }
 
@@ -215,14 +213,16 @@ class ContentEditor extends Crisp.View {
                 });
 
                 fieldEditorInstance.on('change', (newValue) => {
-                    if(!this.model.isLocked) {
-                        this.dirty = true;
-                    }
+                    if(this.model.isLocked) { return; }
+                    
+                    this.dirty = true;
 
                     onChange(newValue);
                 });
 
                 fieldEditorInstance.on('silentchange', (newValue) => {
+                    if(this.model.isLocked) { return; }
+                    
                     onChange(newValue);
                 });
 
@@ -354,14 +354,14 @@ class ContentEditor extends Crisp.View {
                         .click(() => {
                             location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
 
-                            this.render();
+                            this.fetch();
                         });
                 }),
                 _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
                     .click(() => {
                         location.hash = '/content/' + Crisp.Router.params.id + '/meta';
 
-                        this.render();
+                        this.fetch();
                     })
             ),
             _.div({class: 'editor__body'},
@@ -447,16 +447,26 @@ class ContentEditor extends Crisp.View {
     }
 
     /**
-     * Render this editor
+     * Pre render
      */
-    render() {
+    prerender() {
         // Make sure the model data is using the Content model
         if(this.model instanceof HashBrown.Models.Content === false) {
             this.model = new HashBrown.Models.Content(this.model);
         }
-      
-        this.$element.toggleClass('locked', this.model.isLocked);
+    }
 
+    /**
+     * Render this editor
+     */
+    template() {
+        return _.div({class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')});
+    }
+
+    /**
+     * Post render
+     */
+    postrender() {
         // Fetch information
         let contentSchema;
 

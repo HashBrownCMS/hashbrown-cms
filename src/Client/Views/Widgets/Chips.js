@@ -115,7 +115,7 @@ class Chips extends Widget {
 
                             this.onChangeInternal();
 
-                            this.init();
+                            this.fetch();
                         })
                 );
             }),
@@ -144,7 +144,7 @@ class Chips extends Widget {
 
                 this.onChangeInternal();
 
-                this.init();
+                this.fetch();
             })
         );
     }

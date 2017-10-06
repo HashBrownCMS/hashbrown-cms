@@ -58,7 +58,7 @@ class FormEditor extends Crisp.View {
             this.model.inputs['newinput'] = { type: 'text' };
         }
 
-        this.init();
+        this.fetch();
     }
 
     /**
@@ -69,7 +69,7 @@ class FormEditor extends Crisp.View {
     onClickRemoveInput(key) {
         delete this.model.inputs[key];
 
-        this.init();
+        this.fetch();
     }
     
     /**
@@ -168,7 +168,7 @@ class FormEditor extends Crisp.View {
 
                                         this.model.inputs[key] = input;
 
-                                        this.init();
+                                        this.fetch();
                                     }
                                 }).$element
                             )
@@ -182,7 +182,7 @@ class FormEditor extends Crisp.View {
                                     onChange: (newValue) => {
                                         input.type = newValue;
 
-                                        this.init();
+                                        this.fetch();
                                     }
                                 }).$element
                             )

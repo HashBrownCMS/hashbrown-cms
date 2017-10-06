@@ -38,7 +38,7 @@ class DropdownEditor extends FieldEditor {
             this.config.options = [];
         }
         
-        this.init();
+        this.fetch();
     }
    
     /**

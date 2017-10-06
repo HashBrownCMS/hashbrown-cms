@@ -13,10 +13,6 @@ class MainMenu extends Crisp.View {
     constructor(params) {
         super(params);
         
-        this.$element = _.div({class: 'main-menu'})
-
-        $('.menuspace').html(this.$element);
-
         this.fetch();
     }
     
@@ -128,11 +124,21 @@ class MainMenu extends Crisp.View {
         }
     }
 
-    render() {
+    /**
+     * Post render
+     */
+    postrender() {
+        $('.menuspace').html(this.$element);
+    }
+
+    /**
+     * Renders this menu
+     */
+    template() {
         // Render menu
         this.languages = HashBrown.Helpers.LanguageHelper.selectedLanguages || [];
 
-        _.append(this.$element.empty(),
+        return _.div({class: 'main-menu'},
             // Language picker
             _.if(Array.isArray(this.languages) && this.languages.length > 1,
                 _.div({class: 'main-menu-item dropdown main-menu-language'},

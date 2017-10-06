@@ -759,36 +759,14 @@ class UIHelper {
      * @param {Function} onSubmit
      */
     static confirmModal(type, title, body, onSubmit, onCancel) {
-        let submitClass = 'btn-primary';
-
-        type = (type || '').toLowerCase();
-
-        switch(type) {
-            case 'delete': case 'remove': case 'discard': case 'clear':
-                submitClass = 'btn-danger';
-                break;
-        }
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit,
-                class: 'confirm-modal'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: onCancel
-                },
-                {
-                    label: type,
-                    class: submitClass,
-                    callback: onSubmit
-                }
-            ]
+        let modal = new HashBrown.Views.Modals.ConfirmModal({
+            type: type ? type.toLowerCase() : null,
+            title: title,
+            body: body
         });
+
+        modal.on('cancel', onCancel);
+        modal.on('ok', onSubmit);
     }
 }
 

@@ -187,7 +187,7 @@ class SchemaEditor extends Crisp.View {
             onChange: (newParent) => {
                 this.model.parentSchemaId = newParent;
 
-                this.render();
+                this.fetch();
             }
         }).$element));
         

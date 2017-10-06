@@ -42,7 +42,7 @@ class BooleanEditor extends FieldEditor {
             this.trigger('silentchange', this.value);
         }, 20);
         
-        this.init();
+        this.fetch();
     }
 
     /**

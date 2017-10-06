@@ -27,7 +27,7 @@ class ContentReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.fetch();
     }
 
     /**
