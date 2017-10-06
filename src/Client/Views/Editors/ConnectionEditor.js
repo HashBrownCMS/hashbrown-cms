@@ -101,20 +101,12 @@ class ConnectionEditor extends Crisp.View {
      * Renders the title editor
      */
     renderTitleEditor() {
-        let view = this;
-
-        function onChange() {
-            let title = $(this).val();
-
-            view.model.title = title;
-        } 
-
-        let $editor = _.div({class: 'field-editor string-editor'},
-            _.input({class: 'form-control', value: this.model.title, type: 'text'})
-                .change(onChange)
-        );
-
-        return $editor;
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.title,
+            onChange: (newValue) => {
+                this.model.title = newValue;
+            }
+        }).$element;
     }
     
     /**

@@ -2719,6 +2719,24 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     left: 0px; }
 
 /**
+ * A Template editor
+ */
+.editor--template .editor__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  position: relative; }
+  .editor--template .editor__body .CodeMirror {
+    height: 100%;
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px; }
+
+/**
  * The editor for Schemas
  */
 /**

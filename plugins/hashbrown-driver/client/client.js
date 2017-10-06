@@ -1,44 +1,30 @@
-(function() {
-    function ConnectionEditor(params) {
-        View.call(this, params);
-        
-        this.$element = _.div({class: 'hashbrown-driver-editor'});
+'use strict';
+
+class HashBrownDriverConnectionEditor extends Crisp.View {
+    /**
+     * Constructor
+     */
+    constructor(params) {
+        super(params);
 
         this.fetch();
     }
 
-    ConnectionEditor.prototype = Object.create(Crisp.View.prototype);
-    ConnectionEditor.prototype.constructor = Crisp.View;
-
     /**
-     * Render token editor
+     * Renders this editor
      */
-    ConnectionEditor.prototype.renderTokenEditor = function renderTokenEditor() {
-        var view = this;
-
-        function onChange() {
-            view.model.token = $(this).val();
-        }
-
-        return _.div({class: 'field-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token'})
-                .change(onChange)
-        );
-    };
-
-    ConnectionEditor.prototype.render = function render() {
-        this.$element.empty();
-
-        _.append(this.$element,
-            // Token
-            _.div({class: 'field-container hashbrown-token'},
-                _.div({class: 'field-key'}, 'Token'),
-                _.div({class: 'field-value'},
-                    this.renderTokenEditor()
-                )
+    template() {
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'}, 'Token'),
+            _.div({class: 'editor__field__value'},
+                _.input({class: 'widget widget--input text', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token'})
+                    .change((e) => {
+                        this.model.token = e.currentTarget.value;
+                    })
             )
         );
     };
 
-    HashBrown.Views.Editors.ConnectionEditors['HashBrown Driver'] = ConnectionEditor;
-})();
+}
+    
+HashBrown.Views.Editors.ConnectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;

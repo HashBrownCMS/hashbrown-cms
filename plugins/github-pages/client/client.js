@@ -1,280 +1,189 @@
-(function() {
-    function ConnectionEditor(params) {
-        View.call(this, params);
-        
+'use strict';
+
+class GitHubPagesConnectionEditor extends Crisp.View {
+    /**
+     * Constructor
+     */
+    constructor(params) {
+        super(params);
+
         this.fetch();
     }
-    
-    ConnectionEditor.prototype = Object.create(Crisp.View.prototype);
-    ConnectionEditor.prototype.constructor = Crisp.View;
     
     /**
      * Get organisations
      */
-    ConnectionEditor.prototype.getOrgs = function getOrgs() {
-        return new Promise((callback) => {
-            $.ajax({
-                type: 'get',
-                url: '/plugins/github/orgs/?connectionId=' + Router.params.id,
-                success: (orgs) => {
-                    callback(orgs);
-                }
-            });
-        });
+    getOrgs() {
+        return HashBrown.Helpers.RequestHelper.customRequest('get', '/plugins/github/orgs/?connectionId=' + Router.params.id);
     };
    
     /**
      * Render local switch
      */
-    ConnectionEditor.prototype.renderLocalSwitch = function renderLocalSwitch() {
-        return _.div({class: 'field-editor'},
-            UI.inputSwitch(this.model.isLocal == true, (newValue) => {
-                this.model.isLocal = newValue;
+    renderLocalSwitch() {
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.isLocal,
+            type: 'checkbox',
+            onChange: (isLocal) => {
+                this.model.isLocal = isLocal;
 
                 this.fetch();
-            })
-        );
+            }
+        }).$element;
     }
 
     /**
      * Render local path editor
      */
-    ConnectionEditor.prototype.renderLocalPathEditor = function renderLocalPathEditor() {
-        var view = this;
-        
-        function onChange() {
-            view.model.localPath = $(this).val();
-
-            view.render();
-        }
-
-        return _.div({class: 'field-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.localPath, placeholder: 'Input local path'})
-                .change(onChange)
-        );
+    renderLocalPathEditor() {
+        return _.input({class: 'widget widget--input text', type: 'text', value: this.model.localPath, placeholder: 'Input local path'})
+            .on('input', (e) => {
+                this.model.localPath = e.currentTarget.value;
+            });
     }
     
     /**
      * Render token editor
      */
-    ConnectionEditor.prototype.renderTokenEditor = function renderTokenEditor() {
-        var view = this;
-        
-        function onChange() {
-            view.model.token = $(this).val();
-
-            view.render();
-        }
-
-        function onRefresh() {
-            var w = window.open('/plugins/github/oauth/start');
-
-            w.addEventListener('load', function() {
-                view.model.token = w.document.body.innerHTML;
-
-                view.render();
-
-                w.close();
-            });
-        }
-
+    renderTokenEditor() {
         this.model.token = Router.query('token') || this.model.token; 
 
-        return _.div({class: 'field-editor input-group'},
-            _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
-                .change(onChange),
-            _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-default btn-small'},
-                    _.span({class: 'fa fa-refresh'})
-                ).on('click', onRefresh)
-            )
+        return _.div({class: 'widget-group'},
+            _.input({class: 'widget widget--input text', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
+                .on('change', (e) => {
+                    this.model.token = e.currentTarget.value;
+
+                    this.render();
+                }),
+            _.button({class: 'widget widget--button small fa fa-refresh'})
+                .on('click', () => {
+                    let w = window.open('/plugins/github/oauth/start');
+
+                    w.addEventListener('load', () => {
+                        this.model.token = w.document.body.innerHTML;
+
+                        this.fetch();
+                        
+                        w.close();
+                    });
+                })
         );
     }
     
     /**
-     * Render organisation picker
-     */
-    ConnectionEditor.prototype.renderOrgPicker = function renderOrgPicker() {
-        var view = this;
-        
-        var $editor = _.div({class: 'field-editor dropdown-editor'},
-            _.select({class: 'form-control'},
-                _.option({value: this.model.org}, this.model.org)
-            ).change(onChange)
-        );
-        
-        function onChange() {
-            var org = $(this).val();
-
-            view.model.org = org;
-
-            view.render();
-        }
-        
-        $editor.children('select').val(view.model.org);
-
-        if(this.model.token) {
-            $.ajax({
-                type: 'get',
-                url: '/plugins/github/orgs?token=' + this.model.token,
-                success: (orgs) => {
-                    _.append($editor.children('select').empty(),
-                        _.option({value: ''}, '(none)'),
-                        _.if(typeof orgs === 'object',
-                            _.each(orgs, function(i, org) {
-                                return _.option({value: org.login}, org.login);
-                            })
-                        )
-                    );
-                    
-                    $editor.children('select').val(view.model.org);
-                }
-            });
-        }
-
-        return $editor;
-    }
-
-
-    /**
      * Render repository picker
      */
-    ConnectionEditor.prototype.renderRepoPicker = function renderRepoPicker() {
-        var view = this;
-        
-        var $editor = _.div({class: 'field-editor dropdown-editor'},
-            _.select({class: 'form-control'},
-                _.option({value: this.model.repo}, this.model.repo)
-            ).change(onChange)
-        );
-        
-        function onChange() {
-            var repo = $(this).val();
+    renderRepoPicker() {
+        if(!this.model.token) { return; }
 
-            view.model.repo = repo;
+        let dropdown = new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.repo,
+            valueKey: 'full_name',
+            labelKey: 'full_name',
+            useTypeAhead: true,
+            options: [],
+            onChange: (newRepo) => {
+                this.model.repo = newRepo;
 
-            view.render();
-        }
-        
-        $editor.children('select').val(view.model.repo);
+                this.fetch();
+            }
+        });
+            
+        dropdown.element.classList.toggle('working', true);
 
-        if(this.model.token) {
-            $.ajax({
-                type: 'get',
-                url: '/plugins/github/repos?token=' + this.model.token + '&org=' + this.model.org,
-                success: (repos) => {
-                    if(typeof repos === 'object') {
-                        $editor.children('select').html(
-                            _.each(repos, function(i, repo) {
-                                return _.option({value: repo.full_name}, repo.full_name);
-                            })
-                        );
-                        
-                        $editor.children('select').val(view.model.repo);
-                    }
-                }
-            });
-        }
+        HashBrown.Helpers.RequestHelper.customRequest('get', '/plugins/github/repos?token=' + this.model.token)
+        .then((repos) => {
+            dropdown.element.classList.toggle('working', false);
 
-        return $editor;
+            dropdown.options = repos;
+
+            dropdown.render();
+        })
+        .catch(UI.errorModal);
+
+        return dropdown.$element;
     }
 
     /**
      * Render branch picker
      */
-    ConnectionEditor.prototype.renderBranchPicker = function renderBranchPicker() {
-        var view = this;
+    renderBranchPicker() {
+        if(!this.model.repo || !this.model.token) { return; }
+
+        let dropdown = new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.branch,
+            useClearButton: true,
+            valueKey: 'name',
+            labelKey: 'name',
+            options: [],
+            onChange: (newBranch) => {
+                this.model.branch = newBranch;
+            }
+        });
         
-        var $editor = _.div({class: 'field-editor dropdown-editor'},
-            _.select({class: 'form-control'},
-                _.option({value: this.model.branch}, this.model.branch)
-            ).change(onChange)
-        );
-        
-        function onChange() {
-            var branch = $(this).val();
+        dropdown.element.classList.toggle('working', true);
 
-            view.model.branch = branch;
+        HashBrown.Helpers.RequestHelper.customRequest('get', '/plugins/github/' + this.model.repo + '/branches?token=' + this.model.token)
+        .then((branches) => {
+            dropdown.element.classList.toggle('working', false);
+            
+            dropdown.options = branches;
 
-            view.render();
-        }
-        
-        $editor.children('select').val(view.model.branch);
+            dropdown.render();
+        })
+        .catch(UI.errorModal);
 
-        if(this.model.token && this.model.repo) {
-            $.ajax({
-                type: 'get',
-                url: '/plugins/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
-                success: (branches) => {
-                    if(typeof branches === 'object') {
-                        $editor.children('select').html(
-                            _.each(branches, function(i, branch) {
-                                return _.option({value: branch.name}, branch.name);
-                            })
-                        );
-                        
-                        $editor.children('select').val(view.model.branch);
-                    }
-                }
-            });
-        }
-
-        return $editor;
+        return dropdown.$element;
     }
 
-    ConnectionEditor.prototype.template = function template() {
+    /**
+     * Renders this editor
+     */
+    template() {
         return _.div({class: 'github-editor'},
             // Local switch
-            _.div({class: 'field-container is-local'},
-                _.div({class: 'field-key'}, 'Local'),
-                _.div({class: 'field-value'},
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Local'),
+                _.div({class: 'editor__field__value'},
                     this.renderLocalSwitch()
                 )
             ),
             _.if(this.model.isLocal,
                 // Path
-                _.div({class: 'field-container local-path'},
-                    _.div({class: 'field-key'}, 'Local path'),
-                    _.div({class: 'field-value'},
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Local path'),
+                    _.div({class: 'editor__field__value'},
                         this.renderLocalPathEditor()
                     )
                 )
             ),
             _.if(!this.model.isLocal,
                 // Token
-                _.div({class: 'field-container github-token'},
-                    _.div({class: 'field-key'}, 'Token'),
-                    _.div({class: 'field-value'},
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Token'),
+                    _.div({class: 'editor__field__value'},
                         this.renderTokenEditor()
                     )
                 ),
                 
-                // Org picker
-                _.div({class: 'field-container github-org'},
-                    _.div({class: 'field-key'}, 'Organisation'),
-                    _.div({class: 'field-value'},
-                        this.renderOrgPicker()
-                    )
-                ),
-                
                 // Repo picker
-                _.div({class: 'field-container github-repo'},
-                    _.div({class: 'field-key'}, 'Repository'),
-                    _.div({class: 'field-value'},
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Repository'),
+                    _.div({class: 'editor__field__value'},
                         this.renderRepoPicker()
                     )
                 ),
                 
                 // Branch picker
-                _.div({class: 'field-container github-branch'},
-                    _.div({class: 'field-key'}, 'Branch'),
-                    _.div({class: 'field-value'},
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Branch'),
+                    _.div({class: 'editor__field__value'},
                         this.renderBranchPicker()
                     )
                 )
             )
         );
     }
+}
 
-    HashBrown.Views.Editors.ConnectionEditors['GitHub Pages'] = ConnectionEditor;
-})();
+HashBrown.Views.Editors.ConnectionEditors['GitHub Pages'] = GitHubPagesConnectionEditor;

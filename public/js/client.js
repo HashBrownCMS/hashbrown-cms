@@ -25102,7 +25102,6 @@ var JSONEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.$element = _.div({ class: 'editor editor--json' });
         _this.$error = _.div({ class: 'editor__footer__error' }, _.div({ class: 'editor__footer__error__heading' }), _.div({ class: 'editor__footer__error__body' })).hide();
 
         if (!_this.model && !_this.modelUrl) {
@@ -25398,24 +25397,45 @@ var JSONEditor = function (_Crisp$View) {
         }
     };
 
-    JSONEditor.prototype.render = function render() {
-        var _this4 = this;
+    /**
+     * Pre render
+     */
 
+
+    JSONEditor.prototype.prerender = function prerender() {
         // Debug once before entering into the code editor
         // This allows for backward compatibility adjustments to happen first
         this.debug(true);
 
         // Convert the model to a string value
         this.value = beautify(JSON.stringify(this.model));
+    };
 
-        _.append(this.$element.empty(), _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-code' }), _.h4({ class: 'editor__header__title' }, Crisp.Router.params.id)), _.div({ class: 'editor__body' }, this.$textarea = _.textarea()), _.div({ class: 'editor__footer' }, this.$error, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Basic').click(function () {
+    /**
+     * Renders this editor
+     */
+
+
+    JSONEditor.prototype.template = function template() {
+        var _this4 = this;
+
+        return _.div({ class: 'editor editor--json' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-code' }), _.h4({ class: 'editor__header__title' }, Crisp.Router.params.id)), _.div({ class: 'editor__body' }, _.textarea()), _.div({ class: 'editor__footer' }, this.$error, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Basic').click(function () {
             _this4.onClickBasic();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this4.onClickSave();
         })))));
+    };
+
+    /**
+     * Post render
+     */
+
+
+    JSONEditor.prototype.postrender = function postrender() {
+        var _this5 = this;
 
         setTimeout(function () {
-            _this4.editor = CodeMirror.fromTextArea(_this4.$textarea[0], {
+            _this5.editor = CodeMirror.fromTextArea(_this5.element.querySelector('textarea'), {
                 lineNumbers: true,
                 mode: {
                     name: 'javascript',
@@ -25427,16 +25447,16 @@ var JSONEditor = function (_Crisp$View) {
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
-                value: _this4.value
+                value: _this5.value
             });
 
-            _this4.editor.getDoc().setValue(_this4.value);
+            _this5.editor.getDoc().setValue(_this5.value);
 
-            _this4.editor.on('change', function () {
-                _this4.onChangeText();
+            _this5.editor.on('change', function () {
+                _this5.onChangeText();
             });
 
-            _this4.onChangeText();
+            _this5.onChangeText();
         }, 1);
     };
 
@@ -38370,12 +38390,13 @@ var RequestHelper = __webpack_require__(3);
 var TemplateEditor = function (_Crisp$View) {
     _inherits(TemplateEditor, _Crisp$View);
 
+    /**
+     * Constructor
+     */
     function TemplateEditor(params) {
         _classCallCheck(this, TemplateEditor);
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.$element = _.div({ class: 'template-editor editor flex-vertical' });
 
         _this.fetch();
         return _this;
@@ -38388,8 +38409,6 @@ var TemplateEditor = function (_Crisp$View) {
 
     TemplateEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
-
-        var view = this;
 
         this.$saveBtn.toggleClass('working', true);
 
@@ -38434,36 +38453,50 @@ var TemplateEditor = function (_Crisp$View) {
         }
     };
 
-    TemplateEditor.prototype.render = function render() {
+    /**
+     * Renders this editor
+     */
+
+
+    TemplateEditor.prototype.template = function template() {
         var _this3 = this;
 
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.model.isLocked, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' },
+        return _.div({ class: 'editor editor--template' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-code' }), _.h4({ class: 'editor__header__title' }, this.model.name)), _.div({ class: 'editor__body' }, _.textarea()), _.if(!this.model.isLocked, _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' },
         // Save
-        this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+        this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this3.onClickSave();
         })))));
+    };
+
+    /**
+     * Post render
+     */
+
+
+    TemplateEditor.prototype.postrender = function postrender() {
+        var _this4 = this;
 
         setTimeout(function () {
-            _this3.editor = CodeMirror.fromTextArea(_this3.$textarea[0], {
+            _this4.editor = CodeMirror.fromTextArea(_this4.element.querySelector('textarea'), {
                 lineNumbers: true,
                 mode: {
-                    name: _this3.getMode()
+                    name: _this4.getMode()
                 },
-                viewportMargin: _this3.embedded ? Infinity : 10,
+                viewportMargin: _this4.embedded ? Infinity : 10,
                 tabSize: 4,
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
-                value: _this3.model.markup
+                value: _this4.model.markup
             });
 
-            _this3.editor.getDoc().setValue(_this3.model.markup);
+            _this4.editor.getDoc().setValue(_this4.model.markup);
 
-            _this3.editor.on('change', function () {
-                _this3.onChangeText();
+            _this4.editor.on('change', function () {
+                _this4.onChangeText();
             });
 
-            _this3.onChangeText();
+            _this4.onChangeText();
         }, 1);
     };
 
@@ -45100,17 +45133,14 @@ var ConnectionEditor = function (_Crisp$View) {
 
 
     ConnectionEditor.prototype.renderTitleEditor = function renderTitleEditor() {
-        var view = this;
+        var _this5 = this;
 
-        function onChange() {
-            var title = $(this).val();
-
-            view.model.title = title;
-        }
-
-        var $editor = _.div({ class: 'field-editor string-editor' }, _.input({ class: 'form-control', value: this.model.title, type: 'text' }).change(onChange));
-
-        return $editor;
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.title,
+            onChange: function onChange(newValue) {
+                _this5.model.title = newValue;
+            }
+        }).$element;
     };
 
     /**
@@ -45119,12 +45149,12 @@ var ConnectionEditor = function (_Crisp$View) {
 
 
     ConnectionEditor.prototype.renderUrlEditor = function renderUrlEditor() {
-        var _this5 = this;
+        var _this6 = this;
 
         return new HashBrown.Views.Widgets.Input({
             value: this.model.url,
             onChange: function onChange(newValue) {
-                _this5.model.url = newValue;
+                _this6.model.url = newValue;
             }
         }).$element;
     };
@@ -45157,15 +45187,15 @@ var ConnectionEditor = function (_Crisp$View) {
 
 
     ConnectionEditor.prototype.renderTypeEditor = function renderTypeEditor() {
-        var _this6 = this;
+        var _this7 = this;
 
         return new HashBrown.Views.Widgets.Dropdown({
             value: this.model.type,
             options: Object.keys(HashBrown.Views.Editors.ConnectionEditors),
             onChange: function onChange(newValue) {
-                _this6.model.type = newValue;
+                _this7.model.type = newValue;
 
-                _this6.render();
+                _this7.render();
             }
         }).$element;
     };
@@ -45176,12 +45206,12 @@ var ConnectionEditor = function (_Crisp$View) {
 
 
     ConnectionEditor.prototype.template = function template() {
-        var _this7 = this;
+        var _this8 = this;
 
         return _.div({ class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-exchange' }), _.h4({ class: 'editor__header__title' }, this.model.title)), _.div({ class: 'editor__body' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Template provider'), _.div({ class: 'editor__field__value' }, this.renderTemplateProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Media provider'), _.div({ class: 'editor__field__value' }, this.renderMediaProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Title'), _.div({ class: 'editor__field__value' }, this.renderTitleEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'URL'), _.div({ class: 'editor__field__value' }, this.renderUrlEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, this.renderTypeEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Settings'), _.div({ class: 'editor__field__value' }, this.renderSettingsEditor()))), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
-            _this7.onClickAdvanced();
+            _this8.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
-            _this7.onClickSave();
+            _this8.onClickSave();
         })))));
     };
 

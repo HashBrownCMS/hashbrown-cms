@@ -13,7 +13,6 @@ class JSONEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'editor editor--json'});
         this.$error = _.div({class: 'editor__footer__error'},
             _.div({class: 'editor__footer__error__heading'}),
             _.div({class: 'editor__footer__error__body'})
@@ -279,21 +278,29 @@ class JSONEditor extends Crisp.View {
         }
     }
 
-    render() {
+    /**
+     * Pre render
+     */
+    prerender() {
         // Debug once before entering into the code editor
         // This allows for backward compatibility adjustments to happen first
         this.debug(true);
 
         // Convert the model to a string value
         this.value = beautify(JSON.stringify(this.model));
+    }
 
-        _.append(this.$element.empty(),
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'editor editor--json'},
             _.div({class: 'editor__header'}, 
                 _.span({class: 'editor__header__icon fa fa-code'}),
                 _.h4({class: 'editor__header__title'}, Crisp.Router.params.id)
             ),
             _.div({class: 'editor__body'},
-                this.$textarea = _.textarea(),
+                _.textarea(),
             ),
             _.div({class: 'editor__footer'}, 
                 this.$error,
@@ -310,9 +317,14 @@ class JSONEditor extends Crisp.View {
                 )
             )
         );
+    }
 
+    /**
+     * Post render
+     */
+    postrender() {
         setTimeout(() => {
-            this.editor = CodeMirror.fromTextArea(this.$textarea[0], {
+            this.editor = CodeMirror.fromTextArea(this.element.querySelector('textarea'), {
                 lineNumbers: true,
                 mode: {
                     name: 'javascript',

@@ -8,21 +8,19 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  * @memberof HashBrown.Client.Views.Editors
  */
 class TemplateEditor extends Crisp.View {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'template-editor editor flex-vertical'});
-
         this.fetch();
     }
-
 
     /**
      * Event: Click save. Posts the model to the apiPath
      */
     onClickSave() {
-        let view = this;
-
         this.$saveBtn.toggleClass('working', true);
 
         RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.id, this.model)
@@ -65,31 +63,38 @@ class TemplateEditor extends Crisp.View {
         }
     }
 
-    render() {
-        _.append(this.$element.empty(),
-            _.div({class: 'editor-header'},
-                _.span({class: 'fa fa-code'}),
-                _.h4(this.model.name)
+    /**
+     * Renders this editor
+     */
+    template() {
+        return _.div({class: 'editor editor--template'},
+            _.div({class: 'editor__header'},
+                _.span({class: 'editor__header__icon fa fa-code'}),
+                _.h4({class: 'editor__header__title'}, this.model.name)
             ),
-            _.div({class: 'editor-body'},
-                this.$textarea = _.textarea(),
-                this.$error
+            _.div({class: 'editor__body'},
+                _.textarea()
             ),
 			_.if(!this.model.isLocked,
-				_.div({class: 'editor-footer'}, 
-					_.div({class: 'btn-group'},
+				_.div({class: 'editor__footer'}, 
+					_.div({class: 'editor__footer__buttons'},
                         // Save
-                        this.$saveBtn = _.button({class: 'btn btn-raised btn-primary'},
-                            _.span({class: 'text-default'}, 'Save'),
-                            _.span({class: 'text-working'}, 'Saving')
+                        this.$saveBtn = _.button({class: 'widget widget--button'},
+                            _.span({class: 'widget--button__text-default'}, 'Save'),
+                            _.span({class: 'widget--button__text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); })
                     )
                 )
             )
         );
+    }
 
+    /**
+     * Post render
+     */
+    postrender() {
         setTimeout(() => {
-            this.editor = CodeMirror.fromTextArea(this.$textarea[0], {
+            this.editor = CodeMirror.fromTextArea(this.element.querySelector('textarea'), {
                 lineNumbers: true,
                 mode: {
                     name: this.getMode(),

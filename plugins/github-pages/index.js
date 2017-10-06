@@ -44,20 +44,9 @@ class GitHubPages {
                 res.send(resData.access_token);
             })
             .catch((e) => {
-                res.status(502).send(ApiController.printError(e));
-            });
-        });
-
-        /**
-         * Lists all user orgs
-         */
-        app.get('/plugins/github/orgs', (req, res) => {
-            RequestHelper.request('get', 'https://api.github.com/user/orgs', { access_token: req.query.token })
-            .then((resData) => {
-                res.send(resData);
-            })
-            .catch((e) => {
-                res.status(502).send(ApiController.printError(e));
+                res.status(502).send('');
+                
+                debug.error(e);
             });
         });
 
@@ -65,20 +54,16 @@ class GitHubPages {
          * Lists all user repos
          */
         app.get('/plugins/github/repos', (req, res) => {
-            let apiUrl = '';
+            let apiUrl = 'https://api.github.com/user/repos';
             
-            if(req.query.org && req.query.org !== 'undefined' && req.query.org !== '(none)') {
-                apiUrl = 'https://api.github.com/users/' + req.query.org + '/repos';
-            } else {
-                apiUrl = 'https://api.github.com/user/repos';
-            }
-            
-            RequestHelper.request('get', apiUrl, { access_token: req.query.token })
+            RequestHelper.getPaginated(apiUrl, { access_token: req.query.token })
             .then((resData) => {
                 res.send(resData);
             })
             .catch((e) => {
-                res.status(502).send(ApiController.printError(e));
+                res.status(404).send([]);
+                
+                debug.error(e);
             });
         });
 
@@ -91,7 +76,9 @@ class GitHubPages {
                 res.send(resData);
             })
             .catch((e) => {
-                res.status(502).send(ApiController.printError(e));
+                res.status(404).send([]);
+                
+                debug.error(e);
             });
         });
 
@@ -99,7 +86,7 @@ class GitHubPages {
          * Lists all root directories
          */
         app.get('/plugins/github/:owner/:repo/dirs', (req, res) => {
-            RequestHelper.request('get', 'https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents', { access_token: req.query.token })
+            RequestHelper.getPaginated('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents', { access_token: req.query.token })
             .then((resData) => {
                 let dirs = [];
 
@@ -116,7 +103,9 @@ class GitHubPages {
                 res.send(dirs);
             })
             .catch((e) => {
-                res.status(502).send(ApiController.printError(e));
+                res.send([]);
+                
+                debug.error(e);
             });
         });
     }
