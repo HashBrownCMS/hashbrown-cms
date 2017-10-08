@@ -7,7 +7,6 @@ $xs: 'max-width: 767px';
 @import '_helpers';
 
 @import '_colors';
-@import '_typography';
 @import '_util';
 @import '_main';
 @import '_main-menu';
@@ -60,8 +59,15 @@ $xs: 'max-width: 767px';
 /**
  * New BEM styles
  */
+// Tools
+@import 'Tools/Base';
+@import 'Tools/Typography';
+
 // Pages
 @import 'Pages/Dashboard';
+
+// Dashboard
+@import 'Views/Dashboard/ProjectEditor';
 
 // Navigation
 @import 'Views/Navigation/MainMenu';

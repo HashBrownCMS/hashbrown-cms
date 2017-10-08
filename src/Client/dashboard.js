@@ -8,6 +8,7 @@ window.HashBrown = {};
 HashBrown.Helpers = require('Client/Helpers');
 HashBrown.Views = {};
 HashBrown.Views.Modals = require('Client/Views/Modals');
+HashBrown.Views.Widgets = require('Client/Views/Widgets');
 
 // Helper functions
 require('Client/helpers');

@@ -72,4 +72,12 @@
         margin: 4rem auto 0 auto;
         max-width: 60rem;
     }
+
+	// Projects
+	&__projects {
+        &__list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+	}
 }

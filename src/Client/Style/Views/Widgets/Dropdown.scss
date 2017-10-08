@@ -9,6 +9,54 @@
     border-radius: 0.2rem;
     border: 1px solid $standard-darker;
 
+    // Icon mode
+    &.has-icon {
+        width: 2rem;
+        border: 0;
+
+        &:hover {
+            .widget--dropdown__value {
+                background-color: $primary;
+                color: $primary-text;
+            }
+        }
+        
+        .widget-group &:last-child .widget--dropdown__value {
+            border-radius: 0;
+            border-top-right-radius: 0.2rem;
+            border-bottom-right-radius: 0.2rem;
+        }
+
+        .widget--dropdown__value {
+            border-radius: 50%;
+            padding: 0;
+            width: 100%;
+        }
+        
+        .widget--dropdown__options {
+            top: 3.5rem;
+            left: -0.5rem;
+            max-height: none;
+            overflow: visible;
+            width: 10rem;
+            border-top-left-radius: 0.2rem;
+            border-top-right-radius: 0.2rem;
+
+            &:before {
+                position: absolute;
+                content: '';
+                display: block;
+                left: 0.5rem;
+                bottom: 100%;
+                width: 0; 
+                height: 0; 
+                border-left: 1rem solid transparent;
+                border-right: 1rem solid transparent;
+                border-bottom: 1rem solid $primary;
+            }
+        }
+    }
+
     // Context menu mode
     &.context-menu {
         width: 16rem;
@@ -37,6 +85,15 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+
+        // Icon
+        .fa {
+            text-align: center;
+            height: 2rem;
+            line-height: 2rem;
+            width: 2rem;
+            display: block;
+        }
     }
 
     // Toggle
@@ -51,6 +108,10 @@
         height: 100%;
         cursor: pointer;
         z-index: 20;
+
+        .has-icon & {
+            width: 2rem;
+        }
     }
 
     // Toggle active
@@ -112,6 +173,7 @@
         position: absolute;
         top: 2rem;
         left: 0;
+        border: 1px solid $primary;
         background-color: $standard;
         width: 100%;
         max-height: 10rem;
@@ -131,6 +193,7 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+        cursor: pointer;
 
         &:hover {
             background-color: $primary;

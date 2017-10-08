@@ -2,7 +2,6 @@
 
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
-const MessageModal = require('Client/Views/Modals/MessageModal');
 const InfoEditor = require('Client/Views/Dashboard/InfoEditor');
 const SyncEditor = require('Client/Views/Dashboard/SyncEditor');
 const LanguageEditor = require('Client/Views/Dashboard/LanguageEditor');
@@ -27,31 +26,27 @@ class ProjectEditor extends Crisp.View {
     onClickRemove() {
         if(!currentUserIsAdmin()) { return; }
 
-        let modal = new MessageModal({
-            model: {
-                title: 'Delete project',
-                body: _.div(
-                    _.p('Please type in the project name to confirm'),
-                    _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
-                        .on('change propertychange input keyup paste', (e) => {
-                            let $btn = modal.$element.find('.btn-danger');
-                            let isMatch = $(e.target).val() == this.model.settings.info.name;
-                            
-                            $btn.attr('disabled', !isMatch);
-                            $btn.toggleClass('disabled', !isMatch);
-                        })
-                )
-            },
-            buttons: [
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: 'Delete project',
+            body: _.div(
+                _.p('Please type in the project name to confirm'),
+                _.input({class: 'widget widget--input text', type: 'text', placeholder: 'Project name'})
+                    .on('input', (e) => {
+                        let $btn = modal.$element.find('.widget.warning');
+                        let isMatch = $(e.target).val() == this.model.settings.info.name;
+                        
+                        $btn.toggleClass('disabled', !isMatch);
+                    })
+            ),
+            actions: [
                 {
                     label: 'Cancel',
-                    class: 'btn-default'
+                    class: 'default'
                 },
                 {
                     label: 'Delete',
-                    class: 'btn-danger disabled',
-                    disabled: true,
-                    callback: () => {
+                    class: 'warning disabled',
+                    onClick: () => {
                         RequestHelper.request('delete', 'server/projects/' + this.model.id)
                         .then(() => {
                             location.reload();
@@ -148,16 +143,13 @@ class ProjectEditor extends Crisp.View {
      * Event: Click add environment button
      */
     onClickAddEnvironment() {
-        let modal = new MessageModal({
-            model: {
-                title: 'New environment for "' + this.model.id + '"',
-                body: _.input({class: 'form-control', type: 'text', placeholder: 'Type environment name here'})
-            },
-            buttons: [
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: 'New environment for "' + this.model.id + '"',
+            body: _.input({class: 'form-control', type: 'text', placeholder: 'Type environment name here'}),
+            actions: [
                 {
                     label: 'Create',
-                    class: 'btn-primary',
-                    callback: () => {
+                    onClick: () => {
                         let environmentName = modal.$element.find('input').val();
 
                         this.model.environments.push(environmentName);
@@ -191,80 +183,46 @@ class ProjectEditor extends Crisp.View {
         let languageCount = this.model.settings.languages.length;
         let userCount = this.model.users.length;
 
-        return _.div({class: 'raised project-editor in'},
-            _.div({class: 'body'},
+        return _.div({class: 'page--dashboard__project in'},
+            _.div({class: 'page--dashboard__project__body'},
                 _.if(currentUserIsAdmin(),
-                    _.div({class: 'admin dropdown'}, 
-                        _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                            _.span({class: 'fa fa-ellipsis-v'})
-                        ),
-                        _.ul({class: 'dropdown-menu'},
-                            _.li(
-                                _.a({href: '#', class: 'dropdown-item'}, 
-                                    'Info'
-                                ).click((e) => { e.preventDefault(); this.onClickInfo(); })
-                            ),
-                            _.li(
-                                _.a({href: '#', class: 'dropdown-item'}, 
-                                    'Languages'
-                                ).click((e) => { e.preventDefault(); this.onClickLanguages(); })
-                            ),
-                            _.li(
-                                _.a({href: '#', class: 'dropdown-item'}, 
-                                    'Backups'
-                                ).click((e) => { e.preventDefault(); this.onClickBackups(); })
-                            ),
-                            _.if(this.model.environments.length > 1,
-                                _.li(
-                                    _.a({href: '#', class: 'dropdown-item'}, 
-                                        'Migrate'
-                                    ).click((e) => { e.preventDefault(); this.onClickMigrate(); })
-                                )
-                            ),
-                            _.li(
-                                _.a({href: '#', class: 'dropdown-item'}, 
-                                    'Sync'
-                                ).click((e) => { e.preventDefault(); this.onClickSync(); })
-                            ),
-                            _.li(
-                                _.a({href: '#', class: 'dropdown-item'},
-                                    'Delete'
-                                ).click((e) => { e.preventDefault(); this.onClickRemove(); })
-                            )
-                        )
-                    )
+                    new HashBrown.Views.Widgets.Dropdown({
+                        icon: 'ellipsis-v',
+                        reverseKeys: true,
+                        options: {
+                            'Info': () => { this.onClickInfo(); },
+                            'Languages': () => { this.onClickLanguages(); },
+                            'Backups': () => { this.onClickBackups(); },
+                            'Sync': () => { this.onClickSync(); },
+                            'Delete': () => { this.onClickRemove(); },
+                            'Migrate': () => { this.onClickMigrate(); }
+                        }
+                    }).$element.addClass('page--dashboard__project__menu')
                 ),
-                _.div({class: 'info'},
+                _.div({class: 'page--dashboard__project__info'},
                     _.h4(this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')
                 ),
-                _.div({class: 'environments'},
+                _.div({class: 'page--dashboard__project__environments'},
                     _.each(this.model.environments, (i, environment) => {
-                        return _.div({class: 'environment'},
-                            _.div({class: 'btn-group'},
-                                _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'environment-title btn btn-default'}, 
-                                    environment
-                                ),
-                                _.if(currentUserIsAdmin(),
-                                    _.div({class: 'dropdown'},
-                                        _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                            _.span({class: 'fa fa-ellipsis-v'})
-                                        ),
-                                        _.ul({class: 'dropdown-menu'},
-                                            _.li(
-                                                _.a({href: '#', class: 'dropdown-item'},
-                                                    'Delete'
-                                                ).click((e) => { e.preventDefault(); this.onClickRemoveEnvironment(environment); })
-                                            )
-                                        )
-                                    )
-                                )
+                        return _.div({class: 'page--dashboard__project__environment'},
+                            _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'widget widget--button expanded low'}, 
+                                environment
+                            ),
+                            _.if(currentUserIsAdmin(),
+                                new HashBrown.Views.Widgets.Dropdown({
+                                    icon: 'ellipsis-v',
+                                    reverseKeys: true,
+                                    options: {
+                                        'Delete': () => { this.onClickRemoveEnvironment(environment); }
+                                    }
+                                }).$element.addClass('page--dashboard__project__environment__menu')
                             )
                         );
                     }),
                     _.if(currentUserIsAdmin(),
-                        _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, _.span({class: 'fa fa-plus'}))
+                        _.button({title: 'Add environment', class: 'widget widget--button round right fa fa-plus'})
                             .click(() => { this.onClickAddEnvironment(); })
                     )
                 )

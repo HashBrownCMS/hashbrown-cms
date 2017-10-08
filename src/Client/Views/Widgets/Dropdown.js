@@ -66,7 +66,11 @@ class Dropdown extends Widget {
      */
     getValueLabel() {
         this.sanityCheck();
-        
+       
+        if(this.icon) {
+            return '<span class="fa fa-' + this.icon + '"></span>';
+        }
+
         let label = this.placeholder || '(none)';
         let options = this.getFlattenedOptions();
 
@@ -166,6 +170,12 @@ class Dropdown extends Widget {
         // Cancel
         this.onCancel();
 
+        // The value is a function, execute it and return
+        if(typeof this.value === 'function') {
+            this.value();
+            return;
+        }
+
         // Change event
         if(typeof this.onChange === 'function') {
             this.onChange(this.value);
@@ -224,7 +234,7 @@ class Dropdown extends Widget {
      * Template
      */
     template() {
-        return _.div({title: this.tooltip, class: 'widget widget--dropdown dropdown'},
+        return _.div({title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '')},
             // Value
             _.div({class: 'widget--dropdown__value'}, this.getValueLabel()),
             

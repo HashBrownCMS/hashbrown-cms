@@ -1,0 +1,52 @@
+/**
+ * Project editor
+ */
+.page--dashboard__project {
+    padding: 1rem;
+    margin: 0.5rem;
+    position: relative;
+    flex-grow: 0;
+    flex-basis: calc(33.33% - 1rem);
+    width: calc(33.33% - 1rem);
+    color: $standard-text;
+    background-color: $standard;
+    transform-origin: center;
+    transition: transform 0.25s ease;
+
+    &.in {
+        transform: scale(0);
+    }           
+    
+    &__remove {
+        padding: 0rem;
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        display: block;
+        color: material-color('red', '500');
+    }
+
+    &__environment {
+        position: relative;
+        margin-bottom: 1rem;
+        
+        &__menu {
+            position: absolute !important;
+            right: 0;
+            top: 0;
+
+            .widget--dropdown__value {
+                color: $primary-text;
+                background-color: $primary;
+                border-top-right-radius: 0.2rem;
+                border-bottom-right-radius: 0.2rem;
+            }
+        }
+    }
+
+    &__menu {
+        position: absolute !important;
+        right: 0.5rem;
+        top: 0.5rem;
+    }
+}

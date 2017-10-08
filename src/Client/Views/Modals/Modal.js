@@ -51,6 +51,21 @@ class Modal extends Crisp.View {
      * @returns {HTMLElement} Footer
      */
     renderFooter() {
+        if(this.actions && this.actions.length > 0) {
+            return _.each(this.actions, (i, action) => {
+                return _.button({class: 'widget widget--button ' + (action.class || '')}, action.label)
+                    .click(() => {
+                        if(typeof action.onClick !== 'function') {
+                            return this.close();
+                        }
+
+                        if(action.onClick() !== false) {
+                            this.close();
+                        }
+                    });
+            });
+        }
+
         return _.button({class: 'widget widget--button'}, 'OK')
             .click(() => {
                 this.close();

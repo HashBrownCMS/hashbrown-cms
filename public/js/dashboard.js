@@ -24304,7 +24304,45 @@ module.exports = SchemaHelper;
 /* 180 */,
 /* 181 */,
 /* 182 */,
-/* 183 */,
+/* 183 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A standard widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = function (_Crisp$View) {
+  _inherits(Widget, _Crisp$View);
+
+  /**
+   * Constructor
+   */
+  function Widget(params) {
+    _classCallCheck(this, Widget);
+
+    var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+    _this.fetch();
+    return _this;
+  }
+
+  return Widget;
+}(Crisp.View);
+
+module.exports = Widget;
+
+/***/ }),
 /* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -34394,6 +34432,20 @@ var Modal = function (_Crisp$View) {
     Modal.prototype.renderFooter = function renderFooter() {
         var _this3 = this;
 
+        if (this.actions && this.actions.length > 0) {
+            return _.each(this.actions, function (i, action) {
+                return _.button({ class: 'widget widget--button ' + (action.class || '') }, action.label).click(function () {
+                    if (typeof action.onClick !== 'function') {
+                        return _this3.close();
+                    }
+
+                    if (action.onClick() !== false) {
+                        _this3.close();
+                    }
+                });
+            });
+        }
+
         return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
             _this3.close();
 
@@ -34454,10 +34506,607 @@ module.exports = Modal;
 /* 229 */,
 /* 230 */,
 /* 231 */,
-/* 232 */,
-/* 233 */,
-/* 234 */,
-/* 235 */,
+/* 232 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @namespace HashBrown.Client.Views.Widgets
+ */
+
+module.exports = {
+    Dropdown: __webpack_require__(233),
+    Chips: __webpack_require__(234),
+    Input: __webpack_require__(235)
+};
+
+/***/ }),
+/* 233 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A generic dropdown
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+var Dropdown = function (_Widget) {
+    _inherits(Dropdown, _Widget);
+
+    function Dropdown() {
+        _classCallCheck(this, Dropdown);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Converts options into a flattened structure
+     *
+     * @returns {Object} Options
+     */
+    Dropdown.prototype.getFlattenedOptions = function getFlattenedOptions() {
+        if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
+            return this.options;
+        }
+
+        var options = {};
+
+        for (var key in this.options) {
+            var value = this.options[key];
+
+            var optionLabel = this.labelKey ? value[this.labelKey] : value;
+            var optionValue = this.valueKey ? value[this.valueKey] : value;
+
+            if (typeof optionValue !== 'string') {
+                optionValue = optionValue ? optionValue.toString() : '';
+            }
+
+            if (typeof optionLabel !== 'string') {
+                optionLabel = optionLabel ? optionLabel.toString() : '';
+            }
+
+            // Check for disabled options
+            var isDisabled = false;
+
+            if (this.disabledOptions && Array.isArray(this.disabledOptions)) {
+                for (var disabledKey in this.disabledOptions) {
+                    var disabledValue = this.disabledOptions[disabledKey];
+                    var disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
+
+                    if (typeof disabledOptionValue !== 'string') {
+                        disabledOptionValue = disabledOptionValue.toString();
+                    }
+
+                    if (optionValue === disabledOptionValue) {
+                        isDisabled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isDisabled) {
+                continue;
+            }
+
+            options[optionValue] = optionLabel;
+        }
+
+        return options;
+    };
+
+    /**
+     * Gets the current value label
+     *
+     * @returns {String} Value label
+     */
+
+
+    Dropdown.prototype.getValueLabel = function getValueLabel() {
+        this.sanityCheck();
+
+        if (this.icon) {
+            return '<span class="fa fa-' + this.icon + '"></span>';
+        }
+
+        var label = this.placeholder || '(none)';
+        var options = this.getFlattenedOptions();
+
+        if (this.useMultiple) {
+            var multipleLabel = '';
+
+            for (var key in options) {
+                var value = options[key];
+
+                if (this.value.indexOf(key) > -1) {
+                    multipleLabel += value + ', ';
+                }
+            }
+
+            label = multipleLabel || label;
+        } else {
+            label = options[this.value] === 0 ? '0' : options[this.value] || label;
+        }
+
+        return label;
+    };
+
+    /**
+     * Performs a sanity check of the value
+     */
+
+
+    Dropdown.prototype.sanityCheck = function sanityCheck() {
+        if (this.useMultiple && !Array.isArray(this.value)) {
+            this.value = [];
+        } else if (!this.useMultiple && Array.isArray(this.value)) {
+            this.value = null;
+        }
+    };
+
+    /**
+     * Updates all selected classes
+     */
+
+
+    Dropdown.prototype.updateSelectedClasses = function updateSelectedClasses() {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var value = btnOptions[i].dataset.value;
+            var hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
+
+            btnOptions[i].classList.toggle('selected', hasValue);
+        }
+    };
+
+    /**
+     * Event: Change value
+     *
+     * @param {Object} newValue
+     */
+
+
+    Dropdown.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.sanityCheck();
+
+        // Change multiple value
+        if (this.useMultiple) {
+            // First check if value was already selected, remove if found
+            var foundValue = false;
+
+            for (var i in this.value) {
+                if (this.value[i] === newValue) {
+                    this.value.splice(i, 1);
+                    foundValue = true;
+                    break;
+                }
+            }
+
+            // If value was not selected, add it
+            if (!foundValue) {
+                if (!newValue) {
+                    this.value = [];
+                } else {
+                    this.value.push(newValue);
+                }
+            }
+
+            // Change single value
+        } else {
+            this.value = newValue;
+        }
+
+        // Update classes
+        this.updateSelectedClasses();
+
+        // Update value label
+        var divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if (divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+
+        // Cancel
+        this.onCancel();
+
+        // The value is a function, execute it and return
+        if (typeof this.value === 'function') {
+            this.value();
+            return;
+        }
+
+        // Change event
+        if (typeof this.onChange === 'function') {
+            this.onChange(this.value);
+        }
+    };
+
+    /**
+     * Event: Typeahead
+     *
+     * @param {String} query
+     */
+
+
+    Dropdown.prototype.onTypeahead = function onTypeahead(query) {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+
+            btnOptions[i].classList.toggle('hidden', !isMatch);
+        }
+    };
+
+    /**
+     * Event: Cancel
+     */
+
+
+    Dropdown.prototype.onCancel = function onCancel() {
+        this.toggle(false);
+
+        this.trigger('cancel');
+    };
+
+    /**
+     * Toggles open/closed
+     *
+     * @param {Boolean} isOpen
+     */
+
+
+    Dropdown.prototype.toggle = function toggle(isOpen) {
+        var toggle = this.element.querySelector('.widget--dropdown__toggle');
+
+        if (typeof isOpen === 'undefined') {
+            isOpen = !toggle.checked;
+        }
+
+        toggle.checked = isOpen;
+    };
+
+    /**
+     * Post render
+     */
+
+
+    Dropdown.prototype.postrender = function postrender() {
+        this.updateSelectedClasses();
+    };
+
+    /**
+     * Template
+     */
+
+
+    Dropdown.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '') },
+        // Value
+        _.div({ class: 'widget--dropdown__value' }, this.getValueLabel()),
+
+        // Toggle
+        _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }),
+
+        // Typeahead input
+        _.if(this.useTypeAhead, _.span({ class: 'widget--dropdown__typeahead__icon fa fa-search' }), _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
+            _this2.onTypeahead(e.currentTarget.value);
+        })),
+
+        // Dropdown options
+        _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+            // Reverse keys option
+            if (_this2.reverseKeys) {
+                var key = optionLabel;
+                var value = optionValue;
+
+                optionValue = key;
+                optionLabel = value;
+            }
+
+            if (!optionValue || optionValue === '---') {
+                return _.div({ class: 'widget--dropdown__separator' }, optionLabel);
+            }
+
+            return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
+                _this2.onChangeInternal(optionValue);
+            });
+        })),
+
+        // Clear button
+        _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection' }).click(function (e) {
+            _this2.onChangeInternal(null);
+        })),
+
+        // Obscure
+        _.div({ class: 'widget--dropdown__obscure' }, _.div({ class: 'widget--dropdown__obscure__inner' }).click(function (e) {
+            _this2.onCancel();
+        })));
+    };
+
+    return Dropdown;
+}(Widget);
+
+module.exports = Dropdown;
+
+/***/ }),
+/* 234 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A group of chips
+ */
+
+var Chips = function (_Widget) {
+    _inherits(Chips, _Widget);
+
+    function Chips() {
+        _classCallCheck(this, Chips);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Event: Change
+     */
+    Chips.prototype.onChangeInternal = function onChangeInternal() {
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
+     * Pre render
+     */
+
+
+    Chips.prototype.prerender = function prerender() {
+        // Array check
+        // NOTE: Array is the default mode for this widget
+        if (this.useArray === true || typeof this.useArray === 'undefined') {
+            // Check format
+            if (!this.value || !Array.isArray(this.value)) {
+                this.value = [];
+            }
+
+            if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
+                this.disabledValue = [];
+            }
+
+            // Check empty values
+            for (var i = this.value.length - 1; i >= 0; i--) {
+                if (!this.value[i]) {
+                    this.value.splice(i, 1);
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
+                if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
+                    this.disabledValue.splice(_i, 1);
+                }
+            }
+
+            // Object check
+        } else if (this.useArray === false || this.useObject === true) {
+            // Check format
+            if (!this.value || Array.isArray(this.value) || _typeof(this.value) !== 'object') {
+                this.value = {};
+            }
+
+            if (!this.disabledValue || Array.isArray(this.disabledValue) || _typeof(this.disabledValue) !== 'object') {
+                this.disabledValue = {};
+            }
+
+            // Check empty values
+            for (var k in this.value) {
+                if (!k || !this.value[k]) {
+                    delete this.value[k];
+                }
+            }
+
+            // Check for empty values or duplicates in disabled value
+            for (var _k in this.disabledValue) {
+                if (!_k || !this.disabledValue[_k] || this.value[_k]) {
+                    delete this.value[_k];
+                }
+            }
+        }
+    };
+
+    /**
+     * Template
+     */
+
+
+    Chips.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
+        }), _.each(this.value, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.valueKey) {
+                    item[_this2.valueKey] = e.currentTarget.value || '';
+                } else {
+                    i = e.currentTarget.value || '';
+
+                    _this2.value[i] = item;
+                }
+
+                _this2.onChangeInternal();
+            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('input', function (e) {
+                if (_this2.labelKey) {
+                    item[_this2.labelKey] = e.currentTarget.value || '';
+                } else {
+                    _this2.value[i] = e.currentTarget.value || '';
+                }
+
+                _this2.onChangeInternal();
+            }), _.button({ class: 'widget--chips__chip__remove fa fa-remove', title: 'Remove item' }).click(function () {
+                _this2.value.splice(i, 1);
+
+                _this2.onChangeInternal();
+
+                _this2.fetch();
+            }));
+        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            var newValue = _this2.placeholder || 'New item';
+            var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+
+            if (_this2.useObject === true || _this2.useArray === false) {
+                _this2.value[newKey] = newValue;
+            } else if (_this2.valueKey && _this2.labelKey) {
+                var newObject = {};
+
+                newObject[_this2.valueKey] = newKey;
+                newObject[_this2.labelKey] = newValue;
+
+                _this2.value.push(newObject);
+            } else {
+                _this2.value.push(newValue);
+            }
+
+            _this2.onChangeInternal();
+
+            _this2.fetch();
+        }));
+    };
+
+    return Chips;
+}(Widget);
+
+module.exports = Chips;
+
+/***/ }),
+/* 235 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(183);
+
+/**
+ * A versatile input widget
+ */
+
+var Input = function (_Widget) {
+    _inherits(Input, _Widget);
+
+    function Input() {
+        _classCallCheck(this, Input);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Event: Change value
+     *
+     * @param {Anything} newValue
+     */
+    Input.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.value = newValue;
+
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
+     * Template
+     */
+
+
+    Input.prototype.template = function template() {
+        var _this2 = this;
+
+        var config = {
+            placeholder: this.placeholder,
+            title: this.tooltip,
+            type: this.type || 'text',
+            class: 'widget widget--input ' + (this.type || 'text'),
+            value: this.value
+        };
+
+        if (this.type === 'number' || this.type === 'range') {
+            config.step = this.step || 'any';
+            config.min = this.min;
+            config.max = this.max;
+        }
+
+        switch (this.type) {
+            case 'range':
+                return _.div({ class: config.class, title: config.title }, _.input({ class: 'widget--input__range-input', type: 'range', value: this.value, min: config.min, max: config.max, step: config.step }).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
+
+                    e.currentTarget.nextElementSibling.innerHTML = e.currentTarget.value;
+                }), _.div({ class: 'widget--input__range-extra' }, this.value));
+
+            case 'checkbox':
+                return _.div({ class: config.class, title: config.title }, _.if(config.placeholder, _.label({ for: 'checkbox-' + this.guid, class: 'widget--input__checkbox-label' }, config.placeholder)), _.input({ id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.checked);
+                }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
+
+            default:
+                return _.input(config).on('input', function (e) {
+                    _this2.onChangeInternal(e.currentTarget.value);
+                });
+        }
+    };
+
+    return Input;
+}(Widget);
+
+module.exports = Input;
+
+/***/ }),
 /* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -34471,7 +35120,6 @@ module.exports = Modal;
 module.exports = {
     MediaUploader: __webpack_require__(213),
     MediaBrowser: __webpack_require__(214),
-    MessageModal: __webpack_require__(17),
     Modal: __webpack_require__(216),
     IconModal: __webpack_require__(237),
     ConfirmModal: __webpack_require__(298),
@@ -34778,6 +35426,7 @@ window.HashBrown = {};
 HashBrown.Helpers = __webpack_require__(191);
 HashBrown.Views = {};
 HashBrown.Views.Modals = __webpack_require__(236);
+HashBrown.Views.Widgets = __webpack_require__(232);
 
 // Helper functions
 __webpack_require__(196);
@@ -35096,7 +35745,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var MessageModal = __webpack_require__(17);
 var InfoEditor = __webpack_require__(273);
 var SyncEditor = __webpack_require__(274);
 var LanguageEditor = __webpack_require__(275);
@@ -35133,25 +35781,21 @@ var ProjectEditor = function (_Crisp$View) {
             return;
         }
 
-        var modal = new MessageModal({
-            model: {
-                title: 'Delete project',
-                body: _.div(_.p('Please type in the project name to confirm'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange input keyup paste', function (e) {
-                    var $btn = modal.$element.find('.btn-danger');
-                    var isMatch = $(e.target).val() == _this2.model.settings.info.name;
+        var modal = new HashBrown.Views.Modals.Modal({
+            title: 'Delete project',
+            body: _.div(_.p('Please type in the project name to confirm'), _.input({ class: 'widget widget--input text', type: 'text', placeholder: 'Project name' }).on('input', function (e) {
+                var $btn = modal.$element.find('.widget.warning');
+                var isMatch = $(e.target).val() == _this2.model.settings.info.name;
 
-                    $btn.attr('disabled', !isMatch);
-                    $btn.toggleClass('disabled', !isMatch);
-                }))
-            },
-            buttons: [{
+                $btn.toggleClass('disabled', !isMatch);
+            })),
+            actions: [{
                 label: 'Cancel',
-                class: 'btn-default'
+                class: 'default'
             }, {
                 label: 'Delete',
-                class: 'btn-danger disabled',
-                disabled: true,
-                callback: function callback() {
+                class: 'warning disabled',
+                onClick: function onClick() {
                     RequestHelper.request('delete', 'server/projects/' + _this2.model.id).then(function () {
                         location.reload();
                     }).catch(UI.errorModal);
@@ -35277,15 +35921,12 @@ var ProjectEditor = function (_Crisp$View) {
     ProjectEditor.prototype.onClickAddEnvironment = function onClickAddEnvironment() {
         var _this7 = this;
 
-        var modal = new MessageModal({
-            model: {
-                title: 'New environment for "' + this.model.id + '"',
-                body: _.input({ class: 'form-control', type: 'text', placeholder: 'Type environment name here' })
-            },
-            buttons: [{
+        var modal = new HashBrown.Views.Modals.Modal({
+            title: 'New environment for "' + this.model.id + '"',
+            body: _.input({ class: 'form-control', type: 'text', placeholder: 'Type environment name here' }),
+            actions: [{
                 label: 'Create',
-                class: 'btn-primary',
-                callback: function callback() {
+                onClick: function onClick() {
                     var environmentName = modal.$element.find('input').val();
 
                     _this7.model.environments.push(environmentName);
@@ -35326,23 +35967,40 @@ var ProjectEditor = function (_Crisp$View) {
         var languageCount = this.model.settings.languages.length;
         var userCount = this.model.users.length;
 
-        return _.div({ class: 'raised project-editor in' }, _.div({ class: 'body' }, _.if(currentUserIsAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
-            e.preventDefault();_this9.onClickInfo();
-        })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
-            e.preventDefault();_this9.onClickLanguages();
-        })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
-            e.preventDefault();_this9.onClickBackups();
-        })), _.if(this.model.environments.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
-            e.preventDefault();_this9.onClickMigrate();
-        }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Sync').click(function (e) {
-            e.preventDefault();_this9.onClickSync();
-        })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-            e.preventDefault();_this9.onClickRemove();
-        }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.environments, function (i, environment) {
-            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this9.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(currentUserIsAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-                e.preventDefault();_this9.onClickRemoveEnvironment(environment);
-            })))))));
-        }), _.if(currentUserIsAdmin(), _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
+        return _.div({ class: 'page--dashboard__project in' }, _.div({ class: 'page--dashboard__project__body' }, _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+            icon: 'ellipsis-v',
+            reverseKeys: true,
+            options: {
+                'Info': function Info() {
+                    _this9.onClickInfo();
+                },
+                'Languages': function Languages() {
+                    _this9.onClickLanguages();
+                },
+                'Backups': function Backups() {
+                    _this9.onClickBackups();
+                },
+                'Sync': function Sync() {
+                    _this9.onClickSync();
+                },
+                'Delete': function Delete() {
+                    _this9.onClickRemove();
+                },
+                'Migrate': function Migrate() {
+                    _this9.onClickMigrate();
+                }
+            }
+        }).$element.addClass('page--dashboard__project__menu')), _.div({ class: 'page--dashboard__project__info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'page--dashboard__project__environments' }, _.each(this.model.environments, function (i, environment) {
+            return _.div({ class: 'page--dashboard__project__environment' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this9.model.id + '/' + environment, class: 'widget widget--button expanded low' }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+                icon: 'ellipsis-v',
+                reverseKeys: true,
+                options: {
+                    'Delete': function Delete() {
+                        _this9.onClickRemoveEnvironment(environment);
+                    }
+                }
+            }).$element.addClass('page--dashboard__project__environment__menu')));
+        }), _.if(currentUserIsAdmin(), _.button({ title: 'Add environment', class: 'widget widget--button round right fa fa-plus' }).click(function () {
             _this9.onClickAddEnvironment();
         })))));
     };

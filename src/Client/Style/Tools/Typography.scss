@@ -1,0 +1,69 @@
+/**
+ * All basic rules regarding typography
+ */
+// Fonts
+@font-face {
+    font-family: 'Roboto';
+    font-weight: normal;
+    src: url('/fonts/Roboto/Roboto-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Roboto';
+    font-weight: bold;
+    src: url('/fonts/Roboto/Roboto-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 100;
+    src: url('/fonts/Roboto/Roboto-Light.ttf');
+}
+
+@font-face {
+    font-family: 'RobotoMono';
+    font-weight: normal;
+    src: url('/fonts/Roboto_Mono/RobotoMono-Regular.ttf');
+}
+
+// Base sizing
+html {
+    font-size: 15px;
+
+    @media($sm) {
+        font-size: 12px;
+    }
+}
+
+// Links
+a {
+    text-decoration: none;
+}
+
+// Fonts applied
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+button, input, optgroup, select, textarea {
+    font-family: inherit;
+}
+
+// Code
+pre {
+    font-family: 'RobotoMono', monospace;
+}
+
+// Headings
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.5rem; }
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 100;
+}

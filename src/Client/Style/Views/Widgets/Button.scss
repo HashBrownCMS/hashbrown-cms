@@ -59,6 +59,11 @@
         min-width: 0;
     }
 
+    &.expanded {
+        max-width: none;
+        width: 100%;
+    }
+
     &.warning {
         background-color: $warning;
         color: $warning-text;

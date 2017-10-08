@@ -39873,6 +39873,20 @@ var Modal = function (_Crisp$View) {
     Modal.prototype.renderFooter = function renderFooter() {
         var _this3 = this;
 
+        if (this.actions && this.actions.length > 0) {
+            return _.each(this.actions, function (i, action) {
+                return _.button({ class: 'widget widget--button ' + (action.class || '') }, action.label).click(function () {
+                    if (typeof action.onClick !== 'function') {
+                        return _this3.close();
+                    }
+
+                    if (action.onClick() !== false) {
+                        _this3.close();
+                    }
+                });
+            });
+        }
+
         return _.button({ class: 'widget widget--button' }, 'OK').click(function () {
             _this3.close();
 
@@ -41963,6 +41977,10 @@ var Dropdown = function (_Widget) {
     Dropdown.prototype.getValueLabel = function getValueLabel() {
         this.sanityCheck();
 
+        if (this.icon) {
+            return '<span class="fa fa-' + this.icon + '"></span>';
+        }
+
         var label = this.placeholder || '(none)';
         var options = this.getFlattenedOptions();
 
@@ -42068,6 +42086,12 @@ var Dropdown = function (_Widget) {
         // Cancel
         this.onCancel();
 
+        // The value is a function, execute it and return
+        if (typeof this.value === 'function') {
+            this.value();
+            return;
+        }
+
         // Change event
         if (typeof this.onChange === 'function') {
             this.onChange(this.value);
@@ -42140,7 +42164,7 @@ var Dropdown = function (_Widget) {
     Dropdown.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' },
+        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '') },
         // Value
         _.div({ class: 'widget--dropdown__value' }, this.getValueLabel()),
 
@@ -42456,7 +42480,6 @@ module.exports = Input;
 module.exports = {
     MediaUploader: __webpack_require__(213),
     MediaBrowser: __webpack_require__(214),
-    MessageModal: __webpack_require__(17),
     Modal: __webpack_require__(216),
     IconModal: __webpack_require__(237),
     ConfirmModal: __webpack_require__(298),
