@@ -38,8 +38,9 @@
             .widget--dropdown__value {
                 color: $primary-text;
                 background-color: $primary;
-                border-top-right-radius: 0.2rem;
-                border-bottom-right-radius: 0.2rem;
+                border-radius: 0 !important;
+                border-top-right-radius: 0.2rem !important;
+                border-bottom-right-radius: 0.2rem !important;
             }
         }
     }

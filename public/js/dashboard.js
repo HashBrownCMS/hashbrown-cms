@@ -34752,8 +34752,11 @@ var Dropdown = function (_Widget) {
             return;
         }
 
+        query = (query || '').toLowerCase();
+
         for (var i = 0; i < btnOptions.length; i++) {
-            var isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+            var value = btnOptions[i].innerHTML.toLowerCase();
+            var isMatch = query.length < 2 || value.indexOf(query) > -1;
 
             btnOptions[i].classList.toggle('hidden', !isMatch);
         }
@@ -36023,7 +36026,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MessageModal = __webpack_require__(17);
 var SettingsHelper = __webpack_require__(38);
 
 /**
@@ -36032,39 +36034,29 @@ var SettingsHelper = __webpack_require__(38);
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-var InfoEditor = function (_Crisp$View) {
-    _inherits(InfoEditor, _Crisp$View);
+var InfoEditor = function (_HashBrown$Views$Moda) {
+    _inherits(InfoEditor, _HashBrown$Views$Moda);
 
     function InfoEditor(params) {
         _classCallCheck(this, InfoEditor);
 
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        params.title = 'Project info';
+        params.actions = [{
+            label: 'Cancel',
+            class: 'default'
+        }, {
+            label: 'Save',
+            onClick: function onClick() {
+                _this.onClickSave();
 
-        _this.modal = new MessageModal({
-            model: {
-                class: 'info-settings settings-modal',
-                title: 'Project info'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'Save',
-                class: 'btn-primary',
-                callback: function callback() {
-                    _this.onClickSave();
+                return false;
+            }
+        }];
 
-                    return false;
-                }
-            }]
-        });
-
-        _this.$element = _this.model.$element;
+        var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
         SettingsHelper.getSettings(_this.projectId, null, 'info').then(function (infoSettings) {
             _this.model = infoSettings || {};
-
-            _.append(_this.$element.find('.modal-body').empty(), _this.renderField('Project name', _this.renderProjectNameEditor()));
 
             _this.fetch();
         });
@@ -36080,47 +36072,36 @@ var InfoEditor = function (_Crisp$View) {
         var _this2 = this;
 
         SettingsHelper.setSettings(this.projectId, null, 'info', this.model).then(function () {
-            _this2.modal.hide();
+            _this2.close();
 
             _this2.trigger('change', _this2.model);
         }).catch(UI.errorModal);
     };
 
     /**
-     * Renders the project name editor
+     * Renders the modal body
      *
-     * @returns {HTMLElement} Element
+     * @returns {HTMLElement} Body
      */
 
 
-    InfoEditor.prototype.renderProjectNameEditor = function renderProjectNameEditor() {
-        var view = this;
+    InfoEditor.prototype.renderBody = function renderBody() {
+        var _this3 = this;
 
-        function onInputChange() {
-            view.model.name = $(this).val();
+        if (!this.model) {
+            return;
         }
 
-        var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the project name here' }).on('change', onInputChange));
-
-        return $element;
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     *
-     * @return {HTMLElement} Editor element
-     */
-
-
-    InfoEditor.prototype.renderField = function renderField(label, $content) {
-        return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, $content));
+        return _.div({ class: 'widget-group' }, _.span({ class: 'widget widget--label' }, 'Name'), new HashBrown.Views.Widgets.Input({
+            value: this.model.name,
+            onChange: function onChange(newName) {
+                _this3.model.name = newName;
+            }
+        }));
     };
 
     return InfoEditor;
-}(Crisp.View);
+}(HashBrown.Views.Modals.Modal);
 
 module.exports = InfoEditor;
 
@@ -36341,7 +36322,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MessageModal = __webpack_require__(17);
 var LanguageHelper = __webpack_require__(94);
 
 /**
@@ -36350,39 +36330,29 @@ var LanguageHelper = __webpack_require__(94);
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-var LanguageEditor = function (_Crisp$View) {
-    _inherits(LanguageEditor, _Crisp$View);
+var LanguageEditor = function (_HashBrown$Views$Moda) {
+    _inherits(LanguageEditor, _HashBrown$Views$Moda);
 
     function LanguageEditor(params) {
         _classCallCheck(this, LanguageEditor);
 
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        params.title = 'Languages';
+        params.actions = [{
+            label: 'Cancel',
+            class: 'default'
+        }, {
+            label: 'Save',
+            onClick: function onClick() {
+                _this.onClickSave();
 
-        _this.modal = new MessageModal({
-            model: {
-                class: 'language-settings settings-modal',
-                title: 'Languages'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'Save',
-                class: 'btn-primary',
-                callback: function callback() {
-                    _this.onClickSave();
+                return false;
+            }
+        }];
 
-                    return false;
-                }
-            }]
-        });
-
-        _this.$element = _this.modal.$element;
+        var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
         LanguageHelper.getLanguages(_this.projectId).then(function (selectedLanguages) {
-            _this.model = selectedLanguages;
-
-            _.append(_this.$element.find('.modal-body').empty(), UI.inputChipGroup(_this.model, LanguageHelper.getLanguageOptions(_this.projectId), true));
+            _this.model = selectedLanguages || [];
 
             _this.fetch();
         });
@@ -36398,14 +36368,30 @@ var LanguageEditor = function (_Crisp$View) {
         var _this2 = this;
 
         LanguageHelper.setLanguages(this.projectId, this.model).then(function () {
-            _this2.modal.hide();
+            _this2.close();
 
             _this2.trigger('change', _this2.model);
         }).catch(UI.errorModal);
     };
 
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    LanguageEditor.prototype.renderBody = function renderBody() {
+        return new HashBrown.Views.Widgets.Dropdown({
+            value: this.model,
+            useTypeAhead: true,
+            useMultiple: true,
+            options: LanguageHelper.getLanguageOptions(this.projectId)
+        }).$element;
+    };
+
     return LanguageEditor;
-}(Crisp.View);
+}(HashBrown.Views.Modals.Modal);
 
 module.exports = LanguageEditor;
 
@@ -36424,59 +36410,52 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var MessageModal = __webpack_require__(17);
-
 /**
  * The project backup editor
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-var BackupEditor = function (_Crisp$View) {
-    _inherits(BackupEditor, _Crisp$View);
+var BackupEditor = function (_HashBrown$Views$Moda) {
+    _inherits(BackupEditor, _HashBrown$Views$Moda);
 
     function BackupEditor(params) {
         _classCallCheck(this, BackupEditor);
 
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        params.model = params.model || {};
+        params.model.settings = params.model.settings || {};
+        params.model.settings.info = params.model.settings.info || {};
+        params.model.settings.info.name = params.model.settings.info.name || params.model.id;
 
-        _this.modal = new MessageModal({
-            model: {
-                class: 'modal-project-admin',
-                title: _this.model.id + ' backups',
-                body: _.div(
-                // List existing backups
-                _.h4('Backups'), _.each(_this.model.backups, function (i, backup) {
-                    var label = backup;
-                    var date = new Date(parseInt(backup));
+        params.title = params.model.settings.info.name + ' backups';
+        params.body = _.div(
+        // List existing backups
+        _.each(params.model.backups, function (i, backup) {
+            var label = backup;
+            var date = new Date(parseInt(backup));
 
-                    if (!isNaN(date.getTime())) {
-                        label = date.toString();
-                    }
-
-                    return _.div({ class: 'project-backup' }, _.p({ class: 'project-backup-name' }, label), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(
-                    // Restore backup
-                    _.a({ href: '#', class: 'dropdown-item' }, 'Restore').click(function (e) {
-                        e.preventDefault();_this.onClickRestoreBackup(backup);
-                    })), _.li(
-                    // Download backup
-                    _.a({ class: 'dropdown-item', href: RequestHelper.environmentUrl('server/backups/' + _this.model.id + '/' + backup + '.hba') }, 'Download')), _.li(
-                    // Delete backup
-                    _.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-                        e.preventDefault();_this.onClickDeleteBackup(backup);
-                    })))));
-                }),
-
-                // Create backup
-                _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
-                    _this.onClickUploadBackup();
-                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, _.span({ class: 'fa fa-plus' })), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
-                    _this.onClickCreateBackup();
-                })))
+            if (!isNaN(date.getTime())) {
+                label = date.toString();
             }
-        });
 
-        _this.$element = _this.modal.$element;
+            return _.div({ class: 'page--dashboard__backup-editor__backup widget-group' }, _.p({ class: 'widget widget--label page--dashboard__backup-editor__back__label' }, label), new HashBrown.Views.Widgets.Dropdown({
+                icon: 'ellipsis-v',
+                reverseKeys: true,
+                options: {
+                    'Restore': function Restore() {
+                        _this.onClickRestoreBackup(backup);
+                    },
+                    'Download': function Download() {
+                        location = RequestHelper.environmentUrl('server/backups/' + _this.model.id + '/' + backup + '.hba');
+                    },
+                    'Delete': function Delete() {
+                        _this.onClickDeleteBackup(backup);
+                    }
+                }
+            }).$element);
+        }));
+
+        var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
         _this.fetch();
         return _this;
@@ -36520,12 +36499,16 @@ var BackupEditor = function (_Crisp$View) {
                 processData: false,
                 contentType: false,
                 success: function success(id) {
+                    var _this2 = this;
+
                     new MessageModal({
                         model: {
                             title: 'Success',
                             body: 'Backup uploaded successfully',
                             onSubmit: function onSubmit() {
-                                location.reload();
+                                _this2.fetch();
+
+                                uploadModal.close();
                             }
                         }
                     });
@@ -36533,17 +36516,14 @@ var BackupEditor = function (_Crisp$View) {
             });
         }
 
-        var uploadModal = new MessageModal({
-            model: {
-                title: 'Upload a backup file',
-                body: _.form(_.input({ class: 'form-control', type: 'file', name: 'backup' }).change(onChangeFile)).submit(onSubmit)
-            },
-            buttons: [{
+        var uploadModal = new HashBrown.Views.Modals.Modal({
+            title: 'Upload a backup file',
+            body: _.form(_.input({ class: 'widget widget--input', type: 'file', name: 'backup' }).change(onChangeFile)).submit(onSubmit),
+            actions: [{
                 label: 'Cancel',
-                class: 'btn-default'
+                class: 'default'
             }, {
                 label: 'OK',
-                class: 'btn-primary',
                 callback: onClickUpload
             }]
         });
@@ -36555,26 +36535,16 @@ var BackupEditor = function (_Crisp$View) {
 
 
     BackupEditor.prototype.onClickCreateBackup = function onClickCreateBackup() {
-        var _this2 = this;
+        var _this3 = this;
 
         if (!currentUserIsAdmin()) {
             return;
         }
 
         RequestHelper.request('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
-            new MessageModal({
-                model: {
-                    title: 'Success',
-                    body: 'Project "' + _this2.model.id + '" was backed up successfully'
-                },
-                buttons: [{
-                    callback: function callback() {
-                        location.reload();
-                    },
-                    label: 'OK',
-                    class: 'btn-primary'
-                }]
-            });
+            UI.messageModal('Success', 'Project "' + _this3.model.id + '" was backed up successfully');
+
+            _this3.fetch();
         }).catch(UI.errorModal);
     };
 
@@ -36586,7 +36556,7 @@ var BackupEditor = function (_Crisp$View) {
 
 
     BackupEditor.prototype.onClickRestoreBackup = function onClickRestoreBackup(timestamp) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (!currentUserIsAdmin()) {
             return;
@@ -36599,35 +36569,14 @@ var BackupEditor = function (_Crisp$View) {
             label = date.toString();
         }
 
-        var modal = new MessageModal({
-            model: {
-                title: 'Restore backup',
-                body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'Restore',
-                class: 'btn-danger',
-                callback: function callback() {
-                    RequestHelper.request('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
-                        new MessageModal({
-                            model: {
-                                title: 'Success',
-                                body: 'Project "' + _this3.model.id + '" was restored successfully to ' + label
-                            },
-                            buttons: [{
-                                callback: function callback() {
-                                    location.reload();
-                                },
-                                label: 'OK',
-                                class: 'btn-primary'
-                            }]
-                        });
-                    }).catch(UI.errorModal);
-                }
-            }]
+        var modal = UI.confirmModal('restore', 'Restore backup', 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.', function () {
+            RequestHelper.request('post', 'server/backups/' + _this4.model.id + '/' + timestamp + '/restore').then(function () {
+                UI.messageModal('Success', 'Project "' + _this4.model.id + '" was restored successfully to ' + label, function () {
+                    modal.close();
+
+                    _this4.fetch();
+                });
+            }).catch(UI.errorModal);
         });
     };
 
@@ -36637,7 +36586,7 @@ var BackupEditor = function (_Crisp$View) {
 
 
     BackupEditor.prototype.onClickDeleteBackup = function onClickDeleteBackup(timestamp) {
-        var _this4 = this;
+        var _this5 = this;
 
         if (!currentUserIsAdmin()) {
             return;
@@ -36650,28 +36599,32 @@ var BackupEditor = function (_Crisp$View) {
             label = date.toString();
         }
 
-        var modal = new MessageModal({
-            model: {
-                title: 'Delete backup',
-                body: 'Are you sure you want to delete the backup "' + label + '"?'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'Delete',
-                class: 'btn-danger',
-                callback: function callback() {
-                    RequestHelper.request('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
-                        location.reload();
-                    }).catch(UI.errorModal);
-                }
-            }]
+        var modal = UI.confirmModal('delete', 'Delete backup', 'Are you sure you want to delete the backup "' + label + '"?', function () {
+            RequestHelper.request('delete', 'server/backups/' + _this5.model.id + '/' + timestamp).then(function () {
+                _this5.fetch();
+            }).catch(UI.errorModal);
         });
     };
 
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+
+    BackupEditor.prototype.renderFooter = function renderFooter() {
+        var _this6 = this;
+
+        return [_.button({ class: 'widget widget--button', title: 'Upload backup' }, 'Upload').click(function () {
+            _this6.onClickUploadBackup();
+        }), _.button({ class: 'widget widget--button', title: 'Create a new backup' }, 'Create').click(function () {
+            _this6.onClickCreateBackup();
+        })];
+    };
+
     return BackupEditor;
-}(Crisp.View);
+}(HashBrown.Views.Modals.Modal);
 
 module.exports = BackupEditor;
 

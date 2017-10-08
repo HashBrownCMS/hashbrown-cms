@@ -2544,7 +2544,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .page--dashboard__projects__list {
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  margin: 0 -0.5rem; }
 
 /**
  * Project editor
@@ -2579,12 +2580,19 @@ h1, h2, h3, h4, h5, h6 {
       .page--dashboard__project__environment__menu .widget--dropdown__value {
         color: #ffffff;
         background-color: #e70d3b;
-        border-top-right-radius: 0.2rem;
-        border-bottom-right-radius: 0.2rem; }
+        border-radius: 0 !important;
+        border-top-right-radius: 0.2rem !important;
+        border-bottom-right-radius: 0.2rem !important; }
   .page--dashboard__project__menu {
     position: absolute !important;
     right: 0.5rem;
     top: 0.5rem; }
+
+/**
+ * The project backup editor
+ */
+.page--dashboard__backup-editor__backup {
+  margin-bottom: 0.5rem; }
 
 /**
  * The main menu
@@ -3417,6 +3425,20 @@ h1, h2, h3, h4, h5, h6 {
     display: none; }
 
 /**
+ * A generic label
+ */
+.widget--label {
+  line-height: 2rem;
+  height: 2rem;
+  display: block;
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
+  background-color: #eeeeee;
+  padding: 0 0.5rem;
+  border-radius: 0.2rem; }
+
+/**
  * Tabs
  */
 .widget--tab__content {
@@ -3839,6 +3861,8 @@ h1, h2, h3, h4, h5, h6 {
     .widget--dropdown__option:hover {
       background-color: #e70d3b;
       color: #ffffff; }
+    .widget--dropdown__option.hidden {
+      display: none; }
     .widget--dropdown__option.selected {
       padding-right: 2rem; }
       .widget--dropdown__option.selected::after {

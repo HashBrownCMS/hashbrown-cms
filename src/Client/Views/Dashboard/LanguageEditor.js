@@ -1,6 +1,5 @@
 'use strict';
 
-const MessageModal = require('Client/Views/Modals/MessageModal');
 const LanguageHelper = require('Client/Helpers/LanguageHelper');
 
 /**
@@ -8,42 +7,30 @@ const LanguageHelper = require('Client/Helpers/LanguageHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class LanguageEditor extends Crisp.View {
+class LanguageEditor extends HashBrown.Views.Modals.Modal {
     constructor(params) {
-        super(params);
-
-        this.modal = new MessageModal({
-            model: {
-                class: 'language-settings settings-modal',
-                title: 'Languages'
+        params.title = 'Languages';
+        params.actions = [
+            {
+                label: 'Cancel',
+                class: 'default'
             },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'Save',
-                    class: 'btn-primary',
-                    callback: () => {
-                        this.onClickSave();
+            {
+                label: 'Save',
+                onClick: () => {
+                    this.onClickSave();
 
-                        return false;
-                    }
+                    return false;
                 }
-            ]
-        });
+            }
+        ];
 
-        this.$element = this.modal.$element;
-
+        super(params);
+        
         LanguageHelper.getLanguages(this.projectId)
         .then((selectedLanguages) => {
-            this.model = selectedLanguages;
-
-            _.append(this.$element.find('.modal-body').empty(),
-                UI.inputChipGroup(this.model, LanguageHelper.getLanguageOptions(this.projectId), true)
-            );
-
+            this.model = selectedLanguages || [];
+            
             this.fetch();
         });
     }
@@ -54,11 +41,25 @@ class LanguageEditor extends Crisp.View {
     onClickSave() {
         LanguageHelper.setLanguages(this.projectId, this.model)
         .then(() => {
-            this.modal.hide();
+            this.close();
 
             this.trigger('change', this.model);
         })
         .catch(UI.errorModal);
+    }
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+    renderBody() {
+        return new HashBrown.Views.Widgets.Dropdown({
+            value: this.model,
+            useTypeAhead: true,
+            useMultiple: true,
+            options: LanguageHelper.getLanguageOptions(this.projectId)
+        }).$element;
     }
 }
 

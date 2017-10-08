@@ -68,6 +68,7 @@ $xs: 'max-width: 767px';
 
 // Dashboard
 @import 'Views/Dashboard/ProjectEditor';
+@import 'Views/Dashboard/BackupEditor';
 
 // Navigation
 @import 'Views/Navigation/MainMenu';
@@ -91,6 +92,7 @@ $xs: 'max-width: 767px';
 
 // Widgets
 @import 'Views/Widgets/Widget';
+@import 'Views/Widgets/Label';
 @import 'Views/Widgets/Tabs';
 @import 'Views/Widgets/Button';
 @import 'Views/Widgets/Chips';

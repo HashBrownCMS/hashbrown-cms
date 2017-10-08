@@ -192,8 +192,11 @@ class Dropdown extends Widget {
 
         if(!btnOptions) { return; }
         
+        query = (query || '').toLowerCase();
+
         for(let i = 0; i < btnOptions.length; i++) {
-            let isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+            let value = btnOptions[i].innerHTML.toLowerCase();
+            let isMatch = query.length < 2 || value.indexOf(query) > -1;
 
             btnOptions[i].classList.toggle('hidden', !isMatch);
         }

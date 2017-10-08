@@ -1,0 +1,14 @@
+/**
+ * A generic label
+ */
+.widget--label {
+    line-height: 2rem;
+    height: 2rem;
+    display: block;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    background-color: $standard-dark;
+    padding: 0 0.5rem;
+    border-radius: 0.2rem;
+}

@@ -42112,8 +42112,11 @@ var Dropdown = function (_Widget) {
             return;
         }
 
+        query = (query || '').toLowerCase();
+
         for (var i = 0; i < btnOptions.length; i++) {
-            var isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+            var value = btnOptions[i].innerHTML.toLowerCase();
+            var isMatch = query.length < 2 || value.indexOf(query) > -1;
 
             btnOptions[i].classList.toggle('hidden', !isMatch);
         }

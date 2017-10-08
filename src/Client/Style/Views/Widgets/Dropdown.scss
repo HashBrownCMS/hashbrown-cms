@@ -200,6 +200,10 @@
             color: $primary-text;
         }
 
+        &.hidden {
+            display: none;
+        }
+
         &.selected {
             padding-right: 2rem;    
 

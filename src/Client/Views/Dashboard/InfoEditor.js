@@ -1,6 +1,5 @@
 'use strict';
 
-const MessageModal = require('Client/Views/Modals/MessageModal');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
 
 /**
@@ -8,42 +7,30 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class InfoEditor extends Crisp.View {
+class InfoEditor extends HashBrown.Views.Modals.Modal {
     constructor(params) {
-        super(params);
-
-        this.modal = new MessageModal({
-            model: {
-                class: 'info-settings settings-modal',
-                title: 'Project info'
+        params.title = 'Project info';
+        params.actions = [
+            {
+                label: 'Cancel',
+                class: 'default'
             },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'Save',
-                    class: 'btn-primary',
-                    callback: () => {
-                        this.onClickSave();
+            {
+                label: 'Save',
+                onClick: () => {
+                    this.onClickSave();
 
-                        return false;
-                    }
+                    return false;
                 }
-            ]
-        });
+            }
+        ];
 
-        this.$element = this.model.$element;
+        super(params);
 
         SettingsHelper.getSettings(this.projectId, null, 'info')
         .then((infoSettings) => {
             this.model = infoSettings || {};
 
-            _.append(this.$element.find('.modal-body').empty(),
-                this.renderField('Project name', this.renderProjectNameEditor())
-            );
-        
             this.fetch();
         });
     }
@@ -54,7 +41,7 @@ class InfoEditor extends Crisp.View {
     onClickSave() {
         SettingsHelper.setSettings(this.projectId, null, 'info', this.model)
         .then(() => {
-            this.modal.hide();
+            this.close();
 
             this.trigger('change', this.model);
         })
@@ -62,39 +49,21 @@ class InfoEditor extends Crisp.View {
     }
     
     /**
-     * Renders the project name editor
+     * Renders the modal body
      *
-     * @returns {HTMLElement} Element
+     * @returns {HTMLElement} Body
      */
-    renderProjectNameEditor() {
-        let view = this;
-        
-        function onInputChange() {
-            view.model.name = $(this).val();
-        }
+    renderBody() {
+        if(!this.model) { return; }
 
-        let $element = _.div({class: 'project-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the project name here'})
-                .on('change', onInputChange)
-        );
-
-        return $element;
-    }
-    
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     *
-     * @return {HTMLElement} Editor element
-     */
-    renderField(label, $content) {
-        return _.div({class: 'input-group'},
-            _.span(label),
-            _.div({class: 'input-group-addon'},
-                $content
-            )
+        return _.div({class: 'widget-group'},
+            _.span({class: 'widget widget--label'}, 'Name'),
+            new HashBrown.Views.Widgets.Input({
+                value: this.model.name,
+                onChange: (newName) => {
+                    this.model.name = newName
+                }
+            })
         );
     }
 }
