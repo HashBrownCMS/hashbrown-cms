@@ -11,27 +11,58 @@
 
     // Group
     &-group {
-        display: flex;
+        display: flex !important;
 
-        .widget {
-            border-radius: 0;
+        &.vertical {
+            flex-direction: column;
+        }
 
+        &:not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
+
+        > .widget {
+            border-radius: 0 !important;
+        }
+
+        &:not(.vertical) > .widget {
             &:first-child {
-                border-top-left-radius: 0.2rem;
-                border-bottom-left-radius: 0.2rem;
+                border-top-left-radius: 0.2rem !important;
+                border-bottom-left-radius: 0.2rem !important;
             }
             
             &:last-child {
-                border-top-right-radius: 0.2rem;
-                border-bottom-right-radius: 0.2rem;
+                border-top-right-radius: 0.2rem !important;
+                border-bottom-right-radius: 0.2rem !important;
+            }
+        }
+        
+        &.vertical > .widget {
+            &:first-child {
+                border-top-left-radius: 0.2rem !important;
+                border-top-right-radius: 0.2rem !important;
+            }
+            
+            &:last-child {
+                border-bottom-left-radius: 0.2rem !important;
+                border-bottom-right-radius: 0.2rem !important;
             }
         }
 
         &__separator {
-            min-width: 0 !important;
+            min-width: 2rem !important;
             padding: 0 0.5rem;
             user-select: none;
             pointer-events: none;
+            position: relative;
+
+            &:before {
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
         }
     }
 

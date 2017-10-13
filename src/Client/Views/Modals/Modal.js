@@ -15,13 +15,11 @@ class Modal extends Crisp.View {
 
         super(params);
 
-        this.fetch();
-
+        if(this.autoFetch !== false) {
+            this.fetch();
+        }
+        
         document.body.appendChild(this.element);
-
-        setTimeout(() => {
-            this.element.classList.toggle('in', true);
-        }, 50);
     }
     
     /**
@@ -97,7 +95,15 @@ class Modal extends Crisp.View {
         let body = this.renderBody();
         let footer = this.renderFooter();
 
-        return _.div({class: 'modal'},
+        if(!this.hasTransitionedIn) {
+
+            setTimeout(() => {
+                this.hasTransitionedIn = true;
+                this.element.classList.toggle('in', true);
+            }, 50);
+        }
+        
+        return _.div({class: 'modal' + (this.hasTransitionedIn ? ' in' : '')},
             _.div({class: 'modal__dialog'},
                 _.if(header,
                     _.div({class: 'modal__header'},

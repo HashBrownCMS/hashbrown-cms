@@ -15,13 +15,13 @@ html
 
     body.page.page--dashboard
         .page--dashboard__header
-            a.page--dashboard__header__logo(target='_blank', href='http://hashbrown.rocks')
+            a.page--dashboard__header__logo(target='_blank', href='http://hashbrown.rocks', title='Go to HashBrown website')
                 img.page--dashboard__header__logo__image(src="/svg/logo_pink.svg")
             
             if(user.isAdmin)
                 a.page--dashboard__header__tab(href='/dashboard/projects', class=(tab === 'projects' ? 'active': '')) Projects
-                a.page--dashboard__header__tab(href='/dashboard/users', class=(tab === 'projects' ? 'users': '')) Users
-                a.page--dashboard__header__tab(href='/dashboard/server', class=(tab === 'projects' ? 'server': '')) Server
+                a.page--dashboard__header__tab(href='/dashboard/users', class=(tab === 'users' ? 'active': '')) Users
+                a.page--dashboard__header__tab(href='/dashboard/server', class=(tab === 'server' ? 'active': '')) Server
 
             .page--dashboard__header__actions
                 if(user.isAdmin)
@@ -55,17 +55,15 @@ html
                     .page--dashboard__projects__list
 
                     if(user.isAdmin)
-                        .page--dashboard__projects__actions
-                            button.widget.widget--button.round.right.fa.fa-plus(title='Create project')
+                        button.page--dashboard__projects__add.widget.widget--button.round.right.fa.fa-plus(title='Create project')
 
-            if(user.isAdmin && tab ==='users')
+            if(user.isAdmin && tab === 'users')
                 .page--dashboard__users
                     .page--dashboard__users__list
 
-                    .page--dashboard__users__actions
-                        button.widget.widget--button.round.fa.fa-plus(title='Add user')
+                    button.page--dashboard__users__add.widget.widget--button.round.fa.fa-plus.right(title='Add user')
 
-            if(user.isAdmin && tab ==='server')
+            if(user.isAdmin && tab === 'server')
                 .page--dashboard__server
                     table.page--dashboard__server__info
                         tr
@@ -100,7 +98,7 @@ html
 
                         tr
                             td
-                                button.widget.widget--button Restart
+                                button.widget.widget--button.page--dashboard__server__restart Restart
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.min.js')

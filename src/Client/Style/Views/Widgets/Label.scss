@@ -11,4 +11,26 @@
     background-color: $standard-dark;
     padding: 0 0.5rem;
     border-radius: 0.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .fa {
+        margin-right: 0.5rem;
+    }
+
+    &.warning {
+        background-color: $warning;
+        color: $warning-text;
+    }
+    
+    &.primary {
+        background-color: $primary;
+        color: $primary-text;
+    }
+    
+    &.secondary {
+        background-color: $secondary;
+        color: $secondary-text;
+    }
 }

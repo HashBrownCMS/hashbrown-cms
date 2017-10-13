@@ -7,6 +7,7 @@ window.HashBrown = {};
 
 HashBrown.Helpers = require('Client/Helpers');
 HashBrown.Views = {};
+HashBrown.Models = require('Client/Models');
 HashBrown.Views.Modals = require('Client/Views/Modals');
 HashBrown.Views.Widgets = require('Client/Views/Widgets');
 
@@ -37,36 +38,16 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 // --------------------
 .then((projects) => {
     projects = projects || [];
-
-    // Get next project
-    function renderNext(i) {
-        let project = projects.pop();
-
-        if(!project) {
-            return Promise.resolve();
-        }
-
-        return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project)
-        .then((project) => {
-            const Project = require('Common/Models/Project');
-            const ProjectEditor = require('Client/Views/Dashboard/ProjectEditor');
-
-            let projectEditor = new ProjectEditor({
-                model: new Project(project)
-            });
-
-            $('.page--dashboard__projects__list').append(projectEditor.$element);
-
-            return renderNext();
-        })
-        .catch((e) => {
-            UI.errorModal(e);
-
-            return renderNext();
-        });
-    }
     
-    return renderNext();
+    const ProjectEditor = require('Client/Views/Dashboard/ProjectEditor');
+
+    for(let projectId of projects) {
+        let projectEditor = new ProjectEditor({
+            modelUrl: '/api/server/projects/' + projectId
+        });
+
+        $('.page--dashboard__projects__list').append(projectEditor.$element);
+    }
 })
 
 // --------------------
@@ -89,43 +70,38 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 
         let renderUser = () => {
             _.append($user.empty(),
-                _.div({class: 'user-info'}, 
-                    _.span({class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
-                    _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')),
-                    _.p(user.isAdmin ? 'Admin' : 'Editor')
-                ),
-                _.div({class: 'user-actions'},
-                    _.button({class: 'btn btn-primary', title: 'Edit user'},
-                        'Edit'
-                    ).on('click', () => {
-                        let userEditor = new UserEditor({ model: user }); 
-                        
-                        userEditor.on('save', () => {
-                            renderUser(); 
-                        });
-                    }),
-                    _.button({class: 'btn btn-primary', title: 'Remove user'},
-                        'Remove'
-                    ).on('click', () => {
-                        UI.confirmModal(
-                            'remove',
-                            'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
-                            'Are you sure you want to remove this user?',
-                            () => {
-                                HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
-                                .then(() => {
-                                    $user.remove(); 
-                                })
-                                .catch(UI.errorModal);
-                            }
-                        );
-                    })
+                _.button({class: 'widget widget--button expanded low list-item', title: 'Edit user'},
+                    _.span({class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
+                    (user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')
+                ).on('click', () => {
+                    let userEditor = new UserEditor({ model: user }); 
+                    
+                    userEditor.on('save', () => {
+                        renderUser(); 
+                    });
+                }),
+                _.if(user.id !== User.current.id,
+                    _.button({class: 'widget widget--button small fa fa-remove', title: 'Remove user'})
+                        .on('click', () => {
+                            UI.confirmModal(
+                                'remove',
+                                'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
+                                'Are you sure you want to remove this user?',
+                                () => {
+                                    HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
+                                    .then(() => {
+                                        $user.remove(); 
+                                    })
+                                    .catch(UI.errorModal);
+                                }
+                            );
+                        })
                 )
             );
         };
 
-        $('.dashboard-container .users .user-list').append(
-            $user = _.div({class: 'user raised'})
+        $('.page--dashboard__users__list').append(
+            $user = _.div({class: 'widget-group page--dashboard__users__list__user'})
         );
 
         renderUser();
@@ -166,23 +142,9 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 
                 HashBrown.Helpers.RequestHelper.request('post', 'server/update/start')
                 .then(() => {
-                    const MessageModal = require('Client/Views/Modals/MessageModal');
-
-                    new MessageModal({
-                        model: {
-                            title: 'Success',
-                            body: 'HashBrown was updated successfully'
-                        },
-                        buttons: [
-                            {
-                                label: 'Cool!',
-                                class: 'btn-primary',
-                                callback: () => {
-                                    HashBrown.Helpers.RequestHelper.listenForRestart();
-                                }
-                            }
-                        ]
-                    });
+                    UI.messageModal('Success', 'HashBrown is restarting...', false);
+                    
+                    HashBrown.Helpers.RequestHelper.listenForRestart();
                 })
                 .catch(UI.errorModal);
             })
@@ -197,17 +159,9 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 .catch(UI.errorModal);
 
 // --------------------
-// Navbar
-// --------------------
-$('.navbar-main a').click(function() {
-    $('.navbar-main a').removeClass('active');
-    $(this).addClass('active');
-});
-
-// --------------------
 // Invite a user
 // --------------------
-$('.btn-invite-user').click(() => {
+$('.page--dashboard__users__add').click(() => {
     HashBrown.Helpers.RequestHelper.customRequest('get', '/api/users')
     .then((users) => {
         /**
@@ -227,7 +181,7 @@ $('.btn-invite-user').click(() => {
          * Event: On submit user changes
          */
         function onSubmit() {
-            let username = addUserModal.$element.find('input.username').val();
+            let username = addUserModal.$element.find('input').val();
 
             // Check if username was email
             let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -271,16 +225,17 @@ $('.btn-invite-user').click(() => {
             // User doesn't exist, create it
             let $passwd;
 
-            let modal = UI.confirmModal(
-                'create',
+            let modal = UI.messageModal(
                 'Add user',
-                [
-                    _.p('Set password for new user "' + username + '"'),
-                    $passwd = _.input({required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
-                ],
+                _.div({class: 'widget-group'},
+                    _.label({class: 'widget widget--label'}, 'Password for new user "' + username + '"'),
+                    $passwd = _.input({required: true, pattern: '.{6,}', class: 'widget widget--input text', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
+                ),
                 () => {
                     let password = $passwd.val() || '';
                     let scopes = {};
+
+                    UI.messageModal('Creating user', 'Creating user "' + username + '"...');
 
                     HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
                         username: username,
@@ -291,20 +246,19 @@ $('.btn-invite-user').click(() => {
                         UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
                     })
                     .catch(UI.errorModal);
-
-                    let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
-
-                    return false;
                 }
             );
         }
 
         // Renders the modal
-        let addUserModal = UI.confirmModal(
-            'OK',
+        let addUserModal = UI.messageModal(
             'Add user',
-            _.input({class: 'form-control username', placeholder: 'Username or email', type: 'text'})
-            .on('change keyup paste propertychange input'),
+            _.div({class: 'widget-group'},
+                _.div({class: 'widget widget--label'}, 'Username or email'),
+                new HashBrown.Views.Widgets.Input({
+                    placeholder: 'Input username or email'
+                }).$element
+            ),
             onSubmit
         );
     })
@@ -314,41 +268,31 @@ $('.btn-invite-user').click(() => {
 // --------------------
 // Create project
 // --------------------
-$('.btn-create-project').click(() => {
-    function onClickCreate() {
-        let name = modal.$element.find('input').val();
-
-        if(name) {
-            HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name })
-            .then(() => {
-                location.reload();
-            })
-            .catch(UI.errorModal);
-        
-        } else {
-            return false;
-
-        }
-    }
-                    
-    const MessageModal = require('Client/Views/Modals/MessageModal');
-
-    let modal = new MessageModal({
-        model: {
-            title: 'Create new project',
-            body: [
-                _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
-            ]
-        },
-        buttons: [
-            {
-                label: 'Cancel',
-                class: 'btn-default'
-            },
+$('.page--dashboard__projects__add').click(() => {
+    let modal = new HashBrown.Views.Modals.Modal({
+        title: 'Create new project',
+        body: _.div({class: 'widget-group'},
+            _.label({class: 'widget widget--label'}, 'Project name'),
+            new HashBrown.Views.Widgets.Input({
+                placeholder: 'example.com'
+            }).$element
+        ),
+        actions: [
             {
                 label: 'Create',
-                class: 'btn-primary',
-                callback: onClickCreate
+                onClick: (e) => {
+                    let name = modal.$element.find('input').val();
+
+                    if(name) {
+                        HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name })
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch(UI.errorModal);
+                    }
+
+                    return false;
+                }
             }
         ]
     });

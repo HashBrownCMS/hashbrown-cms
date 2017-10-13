@@ -12,10 +12,6 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
         params.title = 'Languages';
         params.actions = [
             {
-                label: 'Cancel',
-                class: 'default'
-            },
-            {
                 label: 'Save',
                 onClick: () => {
                     this.onClickSave();
@@ -24,6 +20,8 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
                 }
             }
         ];
+
+        params.autoFetch = false;
 
         super(params);
         
@@ -43,7 +41,7 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
         .then(() => {
             this.close();
 
-            this.trigger('change', this.model);
+            this.trigger('change');
         })
         .catch(UI.errorModal);
     }
@@ -54,12 +52,15 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        return new HashBrown.Views.Widgets.Dropdown({
-            value: this.model,
-            useTypeAhead: true,
-            useMultiple: true,
-            options: LanguageHelper.getLanguageOptions(this.projectId)
-        }).$element;
+        return _.div({class: 'widget-group'},
+            _.label({class: 'widget widget--label'}, 'Selected languages'),
+                new HashBrown.Views.Widgets.Dropdown({
+                value: this.model,
+                useTypeAhead: true,
+                useMultiple: true,
+                options: LanguageHelper.getLanguageOptions(this.projectId)
+            }).$element
+        );
     }
 }
 

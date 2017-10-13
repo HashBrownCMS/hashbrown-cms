@@ -28,14 +28,6 @@ class ConfirmModal extends Modal {
      * @returns {HTMLElement} Footer
      */
     renderFooter() {
-        let okClass = '';
-
-        switch(this.type) {
-            case 'delete': case 'remove': case 'discard': case 'clear':
-                okClass = 'warning';
-                break;
-        }
-
         return [
             _.button({class: 'widget widget--button standard'}, 'Cancel')
                 .click(() => {
@@ -43,7 +35,7 @@ class ConfirmModal extends Modal {
 
                     this.close();
                 }),
-            _.button({class: 'widget widget--button ' + okClass}, 'OK')
+            _.button({class: 'widget widget--button warning'}, this.type || 'OK')
                 .click(() => {
                     this.trigger('ok');
 

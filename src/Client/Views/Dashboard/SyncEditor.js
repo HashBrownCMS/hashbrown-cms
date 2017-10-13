@@ -1,6 +1,5 @@
 'use strict';
 
-const MessageModal = require('Client/Views/Modals/MessageModal');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
@@ -10,53 +9,37 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class SyncEditor extends Crisp.View {
+class SyncEditor extends HashBrown.Views.Modals.Modal {
     constructor(params) {
-        super(params);
+        params.title = 'Sync';
+        params.actions = [
+            {
+                label: 'Apply',
+                class: 'btn-primary',
+                callback: () => {
+                    this.onClickApply();
 
-        this.modal = new MessageModal({
-            model: {
-                class: 'modal-sync-settings settings-modal',
-                title: 'Sync'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'Apply',
-                    class: 'btn-primary',
-                    callback: () => {
-                        this.onClickApply();
-
-                        return false;
-                    }
-                },
-                {
-                    label: 'Save',
-                    class: 'btn-primary',
-                    callback: () => {
-                        this.onClickSave();
-
-                        return false;
-                    }
+                    return false;
                 }
-            ]
-        });
-        
-        this.$element = this.modal.$element;
+            },
+            {
+                label: 'Save',
+                class: 'btn-primary',
+                callback: () => {
+                    this.onClickSave();
 
+                    return false;
+                }
+            }
+        ];
+
+        params.autoFetch = false;
+
+        super(params);
+        
         SettingsHelper.getSettings(this.projectId, '', 'sync')
         .then((syncSettings) => {
             this.model = syncSettings || {};
-
-            _.append(this.$element.find('.modal-body').empty(),
-                this.renderField('Enabled', this.renderEnabledSwitch()),
-                this.renderField('API URL', this.renderUrlEditor()),
-                this.renderField('API Token', this.renderTokenEditor()),
-                this.renderField('Project', this.renderProjectNameEditor())
-            );
 
             this.fetch();
         });
@@ -66,7 +49,7 @@ class SyncEditor extends Crisp.View {
      * Event: Click save. Posts the model to the modelUrl and closes
      */
     onClickSave() {
-        this.model.url = this.$element.find('.url-editor input').val();
+        this.model.url = this.$element.find('input[name="url"]').val();
 
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
@@ -81,7 +64,7 @@ class SyncEditor extends Crisp.View {
      * Event: Click apply. Posts the model to the modelUrl
      */
     onClickApply() {
-        this.model.url = this.$element.find('.url-editor input').val();
+        this.model.url = this.$element.find('input[name="url"]').val();
 
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
@@ -94,11 +77,14 @@ class SyncEditor extends Crisp.View {
      * Render enabled switch
      */
     renderEnabledSwitch() {
-        return _.div({class: 'field-editor'},
-            UI.inputSwitch(this.model.enabled == true, (newValue) => {
+        return new HashBrown.Views.Widgets.Input({
+            type: 'checkbox',
+            name: 'enabled',
+            value: this.model.enabled === true,
+            onChange: (newValue) => {
                 this.model.enabled = newValue;
-            })
-        );
+            }
+        }).$element;
     }
 
     /**
@@ -107,9 +93,12 @@ class SyncEditor extends Crisp.View {
      * @returns {HTMLElement} Element
      */
     renderUrlEditor() {
-        return _.div({class: 'url-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.url || '', placeholder: 'e.g. "https://myserver.com/api/"'})
-        );
+        return new HashBrown.Views.Widgets.Input({
+            name: 'url',
+            type: 'text',
+            value: this.model.url || '',
+            placeholder: 'e.g. "https://myserver.com/api/"'
+        }).$element;
     }
     
     /**
@@ -122,12 +111,14 @@ class SyncEditor extends Crisp.View {
             this.model.project = this.projectId;
         }
 
-        return _.div({class: 'project-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + ProjectHelper.currentProject + '"'})
-                .on('change', (e) => {
-                    this.model.project = $(e.target).val();
-                })
-        );
+        return new HashBrown.Views.Widgets.Input({
+            name: 'name',
+            value: this.model.project || '',
+            placeholder: 'e.g. "' + ProjectHelper.currentProject + '"',
+            onChange: (newValue) => {
+                this.model.project = newValue;
+            }
+        }).$element;
     }
     
     /**
@@ -136,68 +127,89 @@ class SyncEditor extends Crisp.View {
      * @returns {HTMLElement} Element
      */
     renderTokenEditor() {
-        let view = this;
-
-        function onInputChange() {
-            view.model.token = $(this).val();
-        }
-
-        function onClickRenew() {
-            if(!view.model.url) {
-                alert('You need to specify a URL. Please do so and apply the settings first.');
-                return;
-            }
-            
-            let username = prompt('Remote instance username');
-            let password = prompt('Remote instance password');
-
-            RequestHelper.request(
-                'post',
-                view.projectId + '/sync/login',
-                {
-                    username: username,
-                    password: password
-                }
-            ).then((token) => {
-                view.model.token = token;
-                $element.children('input').val(token);
-            })
-            .catch(UI.errorModal);
-        }
-
-
-        let $element;
-       
-        $element = _.div({class: 'token-editor input-group'},
-            _.input({class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here'})
-                .on('change', onInputChange),
-            _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-small btn-default'},
-                    _.span({class: 'fa fa-refresh'})
-                ).on('click', onClickRenew)
-            )
-        );
-
-        return $element;
+        return [
+            new HashBrown.Views.Widgets.Input({
+                value: this.model.token,
+                name: 'token',
+                placeholder: 'API token',
+                onChange: (newToken) => { this.model.token = newToken; }
+            }).$element,
+            _.button({class: 'widget widget--button small fa fa-refresh'})
+                .on('click', () => {
+                    if(!this.model.url) {
+                        alert('You need to specify a URL. Please do so and apply the settings first.');
+                        return;
+                    }
+                    
+                    let tokenModal = new HashBrown.Views.Modals.Modal({
+                        title: 'Refresh token',
+                        body: [
+                            _.div({class: 'widget-group'},
+                                _.label({class: 'widget widget--label'}, 'Username'),
+                                _.input({class: 'widget widget--input text', type: 'text'})
+                            ),
+                            _.div({class: 'widget-group'},
+                                _.label({class: 'widget widget--label'}, 'Password'),
+                                _.input({class: 'widget widget--input text', type: 'password'})
+                            )
+                        ],
+                        actions: [
+                            {
+                                label: 'Get token',
+                                onClick: () => {
+                                    let username = tokenModal.element.querySelector('input[type="text"]').value;
+                                    let password = tokenModal.element.querySelector('input[type="password"]').value;
+                                    
+                                    RequestHelper.request(
+                                        'post',
+                                        this.projectId + '/sync/login',
+                                        {
+                                            username: username,
+                                            password: password
+                                        }
+                                    ).then((token) => {
+                                        this.model.token = token;
+                                        
+                                        this.element.querySelector('input[name="token"]').value = token;
+                                    })
+                                    .catch(UI.errorModal);
+                                }
+                            }
+                        ]
+                    });
+                })
+        ];
     }
     
     /**
      * Renders a single field
      *
      * @param {String} label
-     * @param {HTMLElement} content
+     * @param {HTMLElement} $content
      *
      * @return {HTMLElement} Editor element
      */
     renderField(label, $content) {
-        return _.div({class: 'field'},
-            _.div({class: 'field-key'},
+        return _.div({class: 'widget-group'},
+            _.div({class: 'widget widget--label'},
                 label
             ),
-            _.div({class: 'field-value'},
-                $content
-            )
+            $content
         );
+    }
+
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+    renderBody() {
+        return [
+            this.renderField('Enabled', this.renderEnabledSwitch()),
+            this.renderField('API URL', this.renderUrlEditor()),
+            this.renderField('API Token', this.renderTokenEditor()),
+            this.renderField('Project id', this.renderProjectNameEditor())
+        ];
     }
 }
 

@@ -5,11 +5,10 @@
     // Header
     &__header {
         background-color: $secondary;
-        padding: 1rem 0 0 1rem;
+        padding: 1rem 0 0 5rem;
         color: $secondary-text;
         height: 4rem;
         display: flex;
-        justify-content: flex-end;
 
         @include background('secondary');
 
@@ -29,6 +28,7 @@
         &__actions {
             display: flex;
             padding: 0.5rem 0;
+            margin-left: auto;
 
             .widget {
                 margin-right: 0.5rem;
@@ -73,12 +73,25 @@
         max-width: 60rem;
     }
 
+    // Users
+    &__users {
+        &__list {
+            &__user {
+                margin-bottom: 1rem;
+            }
+        }
+    }
+
 	// Projects
 	&__projects {
         &__list {
             display: flex;
             flex-wrap: wrap;
             margin: 0 -0.5rem;
+        }
+
+        &__add {
+            margin-top: 1rem;
         }
 	}
 }

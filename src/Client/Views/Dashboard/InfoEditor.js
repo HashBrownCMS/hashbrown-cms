@@ -25,6 +25,8 @@ class InfoEditor extends HashBrown.Views.Modals.Modal {
             }
         ];
 
+        params.autoFetch = false;
+
         super(params);
 
         SettingsHelper.getSettings(this.projectId, null, 'info')

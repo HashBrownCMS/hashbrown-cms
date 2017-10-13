@@ -28,7 +28,8 @@ class Input extends Widget {
             title: this.tooltip,
             type: this.type || 'text',
             class: 'widget widget--input ' + (this.type || 'text'),
-            value: this.value
+            value: this.value,
+            name: this.name
         };
 
         if(this.type === 'number' || this.type === 'range') {
@@ -60,7 +61,52 @@ class Input extends Widget {
                         }),
                     _.div({class: 'widget--input__checkbox-extra fa fa-check'})
                 );
-       
+      
+            case 'file':
+                return _.form({class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title},
+                    _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded'}, this.placeholder || 'Browse...'), 
+                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple})
+                        .on('change', (e) => {
+                            let names = [];
+                            let files = e.currentTarget.files;
+
+                            let btnBrowse = e.currentTarget.parentElement.querySelector('.widget--input__file-browse');
+                            let btnSubmit = e.currentTarget.parentElement.querySelector('.widget--input__file-submit');
+
+                            if(btnSubmit) {
+                                btnSubmit.classList.toggle('disabled', !files || files.length < 1);
+                            }
+
+                            this.onChangeInternal(files);
+
+                            if(files && files.length > 0) {
+                                for(let i = 0; i < files.length; i++) {
+                                    names.push(files[i].name + ' (' + Math.round(files[i].size / 1000) + 'kb)');
+                                }
+                            }
+
+                            if(names.length > 0) {
+                                btnBrowse.innerHTML = names.join(', ');
+
+                            } else {
+                                btnBrowse.innerHTML = this.placeholder || 'Browse...';
+                            }
+                        }),
+                    _.if(typeof this.onSubmit === 'function',
+                        _.button({class: 'widget widget--button widget--input__file-submit disabled small fa fa-upload', type: 'submit', title: 'Upload file'})
+                    )
+                ).on('submit', (e) => {
+                    e.preventDefault();
+
+                    let input = e.currentTarget.querySelector('.widget--input__file-input');
+
+                    if(!input || !input.files || input.files.length < 1) { return; }
+
+                    if(typeof this.onSubmit !== 'function') { return; }
+
+                    this.onSubmit(new FormData(e.currentTarget));
+                });
+
             default:
                 return _.input(config)
                     .on('input', (e) => {

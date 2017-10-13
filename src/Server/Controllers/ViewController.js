@@ -25,6 +25,15 @@ class ViewController extends Controller {
             res.sendStatus(404);
         });
 
+        // Root
+        app.get('/', (req, res) => {
+            res.redirect('/dashboard/projects');
+        });
+        
+        app.get('/dashboard', (req, res) => {
+            res.redirect('/dashboard/projects');
+        });
+
         // Text
         app.get('/text/:name', (req, res) => {
             let filename = '';
@@ -87,16 +96,12 @@ class ViewController extends Controller {
         });
 
         // Dashboard
-        app.get('/', (req, res) => {
-            let user;
+        app.get('/dashboard/:tab', (req, res) => {
 
             ApiController.authenticate(req.cookies.token)
-            .then((result) => {
-                user = result;
-            })
-            .then((update) => {
+            .then((user) => {
                 res.render('dashboard', {
-                    tab: 'projects',
+                    tab: req.params.tab,
                     os: OS,
                     user: user,
                     app: require(appRoot + '/package.json')

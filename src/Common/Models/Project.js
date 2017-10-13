@@ -51,6 +51,9 @@ class Project extends Entity {
         return params;
     }
 
+    /**
+     * Defines the structure of this project
+     */
     structure() {
         this.def(String, 'id');
         this.def(Array, 'users', []);

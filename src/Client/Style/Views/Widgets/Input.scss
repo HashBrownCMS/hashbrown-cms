@@ -14,11 +14,41 @@
     &.text,
     &.number {
         border-radius: 0.2rem;
-        border: 0.1rem solid $standard-darker;
+        border: 1px solid $standard-dark;
         padding: 0 0.5rem;
         height: 2rem;
         width: 100%;
         max-width: 20rem;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    // File
+    &.file {
+    }
+
+    &__file {
+        &-input {
+            opacity: 0;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        &-browse {
+            text-align: left;
+        }
+
+        &-input:hover + &-browse {
+            background-color: $primary-dark;
+        }
     }
 
     // Range
@@ -94,19 +124,23 @@
 
     // Checkbox
     &.checkbox {
-        margin: 0.25rem;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 2rem;
+        height: 2rem;
         background-color: $primary;
         border-radius: 0.2rem;
+        margin: 0;
+
+        &:hover {
+            background-color: $primary-dark;
+        }
 
         &.working {
             &:after {
                 color: $primary-text;
-                width: 1.5rem;
-                height: 1.5rem;
-                line-height: 1.5rem;
-                margin-top: -0.75rem;
+                width: 2rem;
+                height: 2rem;
+                line-height: 2rem;
+                margin-top: -1rem;
             }
         }
     }
@@ -138,7 +172,6 @@
             border-bottom-right-radius: 0.2rem;
             position: absolute;
             white-space: nowrap;
-            top: -0.25rem;
             left: 3rem;
             transition: color 0.3s ease, background-color 0.3s ease;
             
@@ -174,7 +207,7 @@
         &-extra {
             pointer-events: none;
             display: none;
-            line-height: 1.5rem;
+            line-height: 2rem;
             text-align: center;
             color: $primary-text;
         }

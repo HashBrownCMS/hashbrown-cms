@@ -7,38 +7,22 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class UserEditor extends Crisp.View {
+class UserEditor extends HashBrown.Views.Modals.Modal {
     constructor(params) {
+        params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
+
+        params.autoFetch = false;
+
         super(params);
-
-        this.modal = UI.confirmModal(
-            'save',
-            'Settings for "' + this.getLabel() + '"', this.$element,
-            () => {
-                this.onClickSave();
-
-                return false;
-            }
-        );
-
-        this.modal.$element.addClass('modal-user-editor');
 
         RequestHelper.customRequest('get', '/api/server/projects')
         .then((projects) => {
             this.projects = projects;
+
             this.fetch();
         });
     }
     
-    /**
-     * Gets the user label
-     *
-     * @returns {String} Label
-     */
-    getLabel() {
-        return this.model.fullName || this.model.username || this.model.email || this.model.id;
-    }
-
     /**
      * Event: Click save.
      */
@@ -78,22 +62,13 @@ class UserEditor extends Crisp.View {
      * @returns {HTMLElement} Element
      */
     renderUserNameEditor() {
-        let view = this;
-
-        function onInputChange() {
-            view.model.username = $(this).val();
-        }
-
-        let $element = _.div({class: 'username-editor'},
-            _.input({
-                    class: 'form-control',
-                    type: 'text',
-                    value: view.model.username,
-                    placeholder: 'Input the username here'
-            }).on('change', onInputChange)
-        );
-
-        return $element;
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.username,
+            placeholder: 'Input the username here',
+            onChange: (newValue) => {
+                this.model.username = newValue;
+            }
+        }).$element;
     }
 
     /**
@@ -104,13 +79,15 @@ class UserEditor extends Crisp.View {
      * @returns {HTMLElement} Element
      */
     renderScopesEditor(project) {
-        return _.div({class: 'scopes-editor'},
-            UI.inputChipGroup(this.model.getScopes(project), this.getScopes(), (newValue) => {
+        return new HashBrown.Views.Widgets.Dropdown({
+            value: this.model.getScopes(project),
+            options: this.getScopes(),
+            onChange: (newValue) => {
                 this.model.scopes[project] = newValue;
 
-                this.$element.find('.project[data-id="' + project + '"] .switch input')[0].checked = true;
-            }, true)
-        );
+                this.fetch();
+            }
+        }).$element;
     }
 
     /**
@@ -119,18 +96,12 @@ class UserEditor extends Crisp.View {
      * @return {HTMLElement} Element
      */
     renderFullNameEditor() {
-        let view = this;
-
-        function onChange() {
-            let fullName = $(this).val();
-
-            view.model.fullName = fullName;
-        } 
-
-        return _.div({class: 'full-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.fullName}).
-                change(onChange)
-        );
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.fullName,
+            onChange: (newValue) => {
+                this.model.fullName = newValue;
+            }
+        }).$element;
     }
     
     /**
@@ -139,18 +110,12 @@ class UserEditor extends Crisp.View {
      * @return {HTMLElement} Element
      */
     renderEmailEditor() {
-        let view = this;
-
-        function onChange() {
-            let email = $(this).val();
-
-            view.model.email = email;
-        } 
-
-        return _.div({class: 'full-name-editor'},
-            _.input({class: 'form-control', type: 'email', value: this.model.email}).
-                change(onChange)
-        );
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.email,
+            onChange: (newValue) => {
+                this.model.email = newValue;
+            }
+        }).$element;
     }
     
     /**
@@ -159,56 +124,52 @@ class UserEditor extends Crisp.View {
      * @return {HTMLElement} Element
      */
     renderPasswordEditor() {
-        let view = this;
-
-        let $invalidMessage;
         let password1;
         let password2;
 
-        function onChange() {
+        let onChange = () => {
             let isMatch = password1 == password2;
             let isLongEnough = password1 && password1.length > 3;
             let isValid = isMatch && isLongEnough;
 
             $element.toggleClass('invalid', !isValid);
 
-            view.$element.find('.model-footer .btn-primary').toggleClass('disabled', !isValid);
+            this.$element.find('.modal__footer .widget--button').toggleClass('disabled', !isValid);
 
             if(isValid) {
-                view.newPassword = password1;
+                this.newPassword = password1;
             
             } else {
-                view.newPassword = null;
+                this.newPassword = null;
 
                 if(!isMatch) {
-                    $invalidMessage.html('Passwords do not match');
+                    UI.errorModal(new Error('Passwords do not match'));
                 } else if(!isLongEnough) {
-                    $invalidMessage.html('Passwords are too short');
+                    UI.errorModal(new Error('Passwords are too short'));
                 }
             }
         }
 
-        function onChange1() {
-            password1 = $(this).val();
-   
-            onChange(); 
-        } 
-        
-        function onChange2() {
-            password2 = $(this).val();
-            
-            onChange(); 
-        } 
+        return _.div({class: 'widget-group'},
+            new HashBrown.Views.Widgets.Input({
+                placeholder: 'Type new password',
+                type: 'password',
+                onChange: (newValue) => {
+                    password1 = newValue;
 
-        let $element = _.div({class: 'password-editor'},
-            $invalidMessage = _.span({class: 'invalid-message'}, 'Passwords do not match'),
-            _.input({class: 'form-control', type: 'password', placeholder: 'Type new password'})
-                .on('change propertychange keyup paste input', onChange1),
-            _.input({class: 'form-control', type: 'password', placeholder: 'Confirm new password'})
-                .on('change propertychange keyup paste input', onChange2)
+                    onChange();
+                }
+            }).$element,
+            new HashBrown.Views.Widgets.Input({
+                placeholder: 'Confirm new password',
+                type: 'password',
+                onChange: (newValue) => {
+                    password2 = newValue;
+
+                    onChange();
+                }
+            }).$element
         );
-
-        return $element;
     }
     
     /**
@@ -255,8 +216,8 @@ class UserEditor extends Crisp.View {
     /**
      * Renders this editor
      */
-    template() {
-        return _.div({class: 'user-editor'},
+    renderBody() {
+        return _.div(
             this.renderField('Username', this.renderUserNameEditor()),
             this.renderField('Full name', this.renderFullNameEditor()),
             this.renderField('Email', this.renderEmailEditor()),

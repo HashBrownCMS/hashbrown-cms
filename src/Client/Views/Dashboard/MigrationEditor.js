@@ -1,115 +1,116 @@
 'use strict';
 
 const RequestHelper = require('Client/Helpers/RequestHelper');
-const MessageModal = require('Client/Views/Modals/MessageModal');
 
 /**
  * The editor for migrating content between environments
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class MigrationEditor extends Crisp.View {
+class MigrationEditor extends HashBrown.Views.Modals.Modal {
     constructor(params) {
-        super(params);
+        params.title = 'Migrate content';
 
-        this.data = {
-            from: '',
+        params.actions = [
+            {
+                label: 'Migrate',
+                onClick: () => {
+                    this.onSubmit(); 
+
+                    return false;
+                }
+            }
+        ];
+
+        params.data = {
+            from: params.model.environments[0],
             to: '',
             settings: {
                 schemas: true,
                 replace: true
             }
-        }
+        };
 
-        this.modal =  new MessageModal({
-            model: {
-                class: 'modal-migrate-content settings-modal',
-                title: 'Migrate content',
-                body: [
-                    _.div({class: 'migration-message'},
-                        _.span({class: 'fa fa-warning'}),
-                        _.span('It might be a good idea to make a project backup before you proceed')
-                    ),
-                    _.div({class: 'migration-operation'},
-                        _.select({class: 'form-control environment-from'},
-                            _.each(this.model.environments, (i, environment) => {
-                                return _.option({value: environment}, environment);  
-                            })
-                        ).change(() => {
-                            this.updateOptions();
-                        }),
-                        _.span({class: 'fa fa-arrow-right'}),
-                        _.select({class: 'form-control environment-to'})
-                    ),
-                    _.div({class: 'migration-settings'},
-                        _.each({
-                            replace: 'Overwrite on target',
-                            schemas: 'Schemas',
-                            content: 'Content',
-                            forms: 'Forms',
-                            media: 'Media',
-                            connections: 'Connections'
-                        }, (key, label) => {
-                            return _.div({class: 'input-group'},      
-                                _.span(label),
-                                _.div({class: 'input-group-addon'},
-                                    UI.inputSwitch(this.data.settings[key], (newValue) => {
-                                        this.data.settings[key] = newValue;
-                                    })
-                                )
-                            );
-                        })
-                    )
-                ]
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'Migrate',
-                    class: 'btn-primary',
-                    callback: () => {
-                        this.onSubmit(); 
-
-                        return false;
-                    }
-                }
-            ]
-        });
-
-        this.$element = this.modal.$element;
-
-        this.fetch();
-
-        this.updateOptions();
+        super(params);
     }
 
     /**
-     * Updates the displayed options
+     * Pre render
      */
-    updateOptions() {
-        _.append(this.modal.$element.find('.environment-to').empty(),
-            _.each(this.model.environments, (i, environment) => {
-                // Filter out "from" environment
-                if(environment != this.modal.$element.find('.environment-from').val()) {
-                    return _.option({value: environment}, environment);  
-                }
+    prerender() {
+        if(!this.data.to || this.getToOptions().indexOf(this.data.to) < 0) {
+            this.data.to = this.getToOptions()[0];
+        }
+    }
+
+    /**
+     * Renders this modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+    renderBody() {
+        return [
+            _.div({class: 'widget-group'},
+                new HashBrown.Views.Widgets.Dropdown({
+                    value: this.data.from,
+                    options: this.model.environments,
+                    onChange: (newValue) => {
+                        this.data.from = newValue;
+
+                        this.fetch();
+                    }
+                }).$element,
+                _.div({class: 'widget widget--icon widget-group__separator fa fa-arrow-right'}),
+                new HashBrown.Views.Widgets.Dropdown({
+                    value: this.data.to,
+                    options: this.getToOptions(),
+                    onChange: (newValue) => {
+                        this.data.to = newValue;
+                    }
+                }).$element
+            ),
+            _.each({
+                replace: 'Overwrite on target',
+                schemas: 'Schemas',
+                content: 'Content',
+                forms: 'Forms',
+                media: 'Media',
+                connections: 'Connections'
+            }, (key, label) => {
+                return _.div({class: 'widget-group'},      
+                    _.label({class: 'widget widget--label'}, label),
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'checkbox',
+                        value: this.data.settings[key] === true,
+                        onChange: (newValue) => {
+                            this.data.settings[key] = newValue;
+                        }
+                    }).$element
+                );
             })
-        );
+        ];
+    }
+
+    /**
+     * Gets the displayed "to" options
+     */
+    getToOptions() {
+        return this.model.environments.filter((environment) => {
+            return environment !== this.data.from;   
+        });
     }
 
     /**
      * Event: Clicked submit
      */
     onSubmit() {
-        this.data.from = this.modal.$element.find('.environment-from').val();
-        this.data.to = this.modal.$element.find('.environment-to').val();
-
         RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data)
         .then(() => {
-            UI.messageModal('Success', 'Successfully migrated content from "' + this.data.from + '" to "' + this.data.to + '"');
+            UI.messageModal('Success', 'Successfully migrated content from "' + this.data.from + '" to "' + this.data.to + '"', () => {
+                this.trigger('change');
+
+                this.close();
+            });
         })
         .catch(UI.errorModal);
     }
