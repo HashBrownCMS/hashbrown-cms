@@ -3401,7 +3401,9 @@ h1, h2, h3, h4, h5, h6 {
     .widget-group:not(:last-child) {
       margin-bottom: 0.5rem; }
     .widget-group > .widget {
-      border-radius: 0 !important; }
+      border-radius: 0 !important;
+      flex-basis: 0;
+      flex-grow: 1; }
     .widget-group:not(.vertical) > .widget:first-child {
       border-top-left-radius: 0.2rem !important;
       border-bottom-left-radius: 0.2rem !important; }
@@ -3536,12 +3538,17 @@ h1, h2, h3, h4, h5, h6 {
     width: 2rem;
     line-height: 2rem;
     height: 2rem;
-    min-width: 0; }
+    min-width: 0;
+    flex-basis: 2rem;
+    flex-grow: 0;
+    flex-shrink: 0; }
   .widget--button.working .widget--button__text-default,
   .widget--button:not(.working) .widget--button__text-working {
     display: none; }
   .widget--button.condensed {
-    min-width: 0; }
+    min-width: 0;
+    flex-grow: 0;
+    flex-shrink: 0; }
   .widget--button.expanded {
     max-width: none;
     width: 100%; }
@@ -3614,14 +3621,14 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem; }
   .widget--input:last-of-type {
     margin-bottom: 0; }
-  .widget--input.text, .widget--input.number {
+  .widget--input.text, .widget--input.password, .widget--input.number {
     border-radius: 0.2rem;
     border: 1px solid #eeeeee;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
     max-width: 20rem; }
-    .widget--input.text:focus, .widget--input.number:focus {
+    .widget--input.text:focus, .widget--input.password:focus, .widget--input.number:focus {
       outline: none;
       border-color: #e70d3b; }
   .widget--input__file-input {
@@ -3707,6 +3714,9 @@ h1, h2, h3, h4, h5, h6 {
   .widget--input.checkbox {
     width: 2rem;
     height: 2rem;
+    flex-basis: 2rem;
+    flex-grow: 0;
+    flex-shrink: 0;
     background-color: #e70d3b;
     border-radius: 0.2rem;
     margin: 0; }

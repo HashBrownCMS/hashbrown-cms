@@ -23,6 +23,8 @@
 
         > .widget {
             border-radius: 0 !important;
+            flex-basis: 0;
+            flex-grow: 1;
         }
 
         &:not(.vertical) > .widget {

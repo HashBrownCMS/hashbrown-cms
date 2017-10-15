@@ -10,8 +10,9 @@
         margin-bottom: 0;
     }
 
-    // Text and number
+    // Text-like inputs
     &.text,
+    &.password,
     &.number {
         border-radius: 0.2rem;
         border: 1px solid $standard-dark;
@@ -126,6 +127,9 @@
     &.checkbox {
         width: 2rem;
         height: 2rem;
+        flex-basis: 2rem;
+        flex-grow: 0;
+        flex-shrink: 0;
         background-color: $primary;
         border-radius: 0.2rem;
         margin: 0;

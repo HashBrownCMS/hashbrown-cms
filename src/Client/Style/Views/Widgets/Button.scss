@@ -48,6 +48,9 @@
         line-height: 2rem;
         height: 2rem;
         min-width: 0;
+        flex-basis: 2rem;
+        flex-grow: 0;
+        flex-shrink: 0;
     }
 
     &.working &__text-default,
@@ -57,6 +60,8 @@
 
     &.condensed {
         min-width: 0;
+        flex-grow: 0;
+        flex-shrink: 0;
     }
 
     &.expanded {

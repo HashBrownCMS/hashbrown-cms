@@ -8,6 +8,9 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  * @memberof HashBrown.Client.Views.Editors
  */
 class UserEditor extends HashBrown.Views.Modals.Modal {
+    /**
+     * Constructor
+     */
     constructor(params) {
         params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
 
@@ -81,6 +84,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
     renderScopesEditor(project) {
         return new HashBrown.Views.Widgets.Dropdown({
             value: this.model.getScopes(project),
+            placeholder: '(no scopes)',
             options: this.getScopes(),
             onChange: (newValue) => {
                 this.model.scopes[project] = newValue;
@@ -132,20 +136,24 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             let isLongEnough = password1 && password1.length > 3;
             let isValid = isMatch && isLongEnough;
 
-            $element.toggleClass('invalid', !isValid);
-
             this.$element.find('.modal__footer .widget--button').toggleClass('disabled', !isValid);
+
+            let $passwordWarning = this.$element.find('.editor--user__password-warning');
 
             if(isValid) {
                 this.newPassword = password1;
+
+                $passwordWarning.hide();
             
             } else {
+                $passwordWarning.show();
+                
                 this.newPassword = null;
 
                 if(!isMatch) {
-                    UI.errorModal(new Error('Passwords do not match'));
+                    $passwordWarning.html('Passwords do not match');
                 } else if(!isLongEnough) {
-                    UI.errorModal(new Error('Passwords are too short'));
+                    $passwordWarning.html('Passwords are too short');
                 }
             }
         }
@@ -178,11 +186,15 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
      * @return {HTMLElement} Element
      */
     renderAdminEditor() {
-        return UI.inputSwitch(this.model.isAdmin == true, (newValue) => {
-            this.model.isAdmin = newValue;
+        return new HashBrown.Views.Widgets.Input({
+            type: 'checkbox',
+            value: this.model.isAdmin == true,
+            onChange: (newValue) => {
+                this.model.isAdmin = newValue;
 
-            this.fetch();
-        }).addClass('admin-editor');
+                this.fetch();
+            }
+        }).$element;
     }
 
     /**
@@ -191,65 +203,52 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
      * @return {HTMLElement} Element
      */
     renderField(label, $content) {
-        return _.div({class: 'field-container'},
-            _.div({class: 'field-key'},
+        return _.div({class: 'widget-group'},
+            _.div({class: 'widget widget--label'},
                 label
             ),
-            _.div({class: 'field-value'},
-                $content
-            )
+            $content
         );
     }
     
     /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-    renderFields() {
-        let id = parseInt(this.model.id);
-
-
-        return $element;
-    }
-
-    /**
      * Renders this editor
      */
     renderBody() {
-        return _.div(
+        return [
             this.renderField('Username', this.renderUserNameEditor()),
             this.renderField('Full name', this.renderFullNameEditor()),
             this.renderField('Email', this.renderEmailEditor()),
             this.renderField('Password', this.renderPasswordEditor()),
+            _.div({class: 'widget widget--label warning hidden editor--user__password-warning'}),
 
             _.if(currentUserIsAdmin() && !this.hidePermissions,
                 this.renderField('Is admin', this.renderAdminEditor()),
 
                 _.if(!this.model.isAdmin,
+                    _.h4('Projects'),
                     _.each(this.projects, (i, project) => {
-                        return _.div({class: 'project', 'data-id': project},
-                            _.div({class: 'project-header'},
-                                UI.inputSwitch(this.model.hasScope(project), (newValue) => {
+                        return _.div({class: 'widget-group'},
+                            _.div({class: 'widget widget--label'}, project),
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'checkbox',
+                                value: this.model.hasScope(project),
+                                onChange: (newValue) => {
                                     if(newValue) {
                                         this.model.giveScope(project);
                                     } else {
                                         this.model.removeScope(project);
-                
-                                        this.$element.find('.project[data-id="' + project + '"] .chip-group .chip').remove();
-                                    }   
-                                }),
-                                _.h4({class: 'project-title'}, project)
-                            ),
-                            _.div({class: 'project-scopes'},
-                                _.p('Scopes:'),
-                                this.renderScopesEditor(project)
-                            )
+               
+                                        this.fetch();
+                                    }
+                                }
+                            }).$element,
+                            this.renderScopesEditor(project)
                         );
                     })
                 )
             )
-        );
+        ];
     }
 }
 
