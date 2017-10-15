@@ -116,10 +116,13 @@ class SyncHelper {
                 })
                 .catch((e) => {
                     if(e.message) {
-                        debug.error(e.message, this);
+                        debug.error('Unable to get resource item "' + remoteResourceName + '/' + remoteItemName + '" from project "' + project + '". Reason: ' + e.message + '. Disabling sync for this reason.', this);
                     }
 
-                    return Promise.resolve(null);
+                    return HashBrown.Helpers.ProjectHelper.toggleProjectSync(project, false)
+                    .then(() => {
+                        return Promise.resolve(null);
+                    });
                 });
 
             } else {
@@ -220,10 +223,13 @@ class SyncHelper {
                 })
                 .catch((e) => {
                     if(e.message) {
-                        debug.error(e.message, this);
+                        debug.error('Unable to get resource "' + remoteResourceName + '" from project "' + project + '". Reason: ' + e.message + '. Disabling sync for this reason.', this);
                     }
 
-                    return Promise.resolve(null);
+                    return HashBrown.Helpers.ProjectHelper.toggleProjectSync(project, false)
+                    .then(() => {
+                        return Promise.resolve(null);
+                    });
                 });
 
             } else {

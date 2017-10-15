@@ -16991,17 +16991,6 @@ var UserEditor = function (_HashBrown$Views$Moda) {
     };
 
     /**
-     * Gets a list of available scopes
-     *
-     * @returns {Array} Array of scope strings
-     */
-
-
-    UserEditor.prototype.getScopes = function getScopes() {
-        return ['connections', 'schemas', 'templates'];
-    };
-
-    /**
      * Renders the username editor
      *
      * @returns {HTMLElement} Element
@@ -17034,8 +17023,9 @@ var UserEditor = function (_HashBrown$Views$Moda) {
 
         return new HashBrown.Views.Widgets.Dropdown({
             value: this.model.getScopes(project),
+            useMultiple: true,
             placeholder: '(no scopes)',
-            options: this.getScopes(),
+            options: ['connections', 'schemas', 'templates'],
             onChange: function onChange(newValue) {
                 _this4.model.scopes[project] = newValue;
 

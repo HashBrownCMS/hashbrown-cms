@@ -3517,7 +3517,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   min-width: 10rem;
   text-align: center;
-  cursor: pointer; }
+  cursor: pointer;
+  max-width: 20rem; }
   .widget--button:hover {
     background-color: #b70a2f;
     text-decoration: none; }
@@ -3617,10 +3618,7 @@ h1, h2, h3, h4, h5, h6 {
  */
 .widget--input {
   display: block;
-  line-height: 2rem;
-  margin-bottom: 0.5rem; }
-  .widget--input:last-of-type {
-    margin-bottom: 0; }
+  line-height: 2rem; }
   .widget--input.text, .widget--input.password, .widget--input.number {
     border-radius: 0.2rem;
     border: 1px solid #eeeeee;

@@ -512,9 +512,11 @@ class UserHelper {
                 userModels.push(new User(user));
             }  
 
-            return new Promise((resolve) => {
-                resolve(userModels);
+            userModels.sort((a, b) => {
+                return a.username > b.username;
             });
+
+            return Promise.resolve(userModels);
         });
     }
     

@@ -17761,17 +17761,6 @@ var UserEditor = function (_HashBrown$Views$Moda) {
     };
 
     /**
-     * Gets a list of available scopes
-     *
-     * @returns {Array} Array of scope strings
-     */
-
-
-    UserEditor.prototype.getScopes = function getScopes() {
-        return ['connections', 'schemas', 'templates'];
-    };
-
-    /**
      * Renders the username editor
      *
      * @returns {HTMLElement} Element
@@ -17804,8 +17793,9 @@ var UserEditor = function (_HashBrown$Views$Moda) {
 
         return new HashBrown.Views.Widgets.Dropdown({
             value: this.model.getScopes(project),
+            useMultiple: true,
             placeholder: '(no scopes)',
-            options: this.getScopes(),
+            options: ['connections', 'schemas', 'templates'],
             onChange: function onChange(newValue) {
                 _this4.model.scopes[project] = newValue;
 
@@ -45807,9 +45797,16 @@ var ArrayEditor = function (_FieldEditor) {
                     item.value = newValue;
                 });
 
+                // Editor element (wrap if not an editor field value)
+                var $editorElement = editorInstance.$element;
+
+                if (!$editorElement.hasClass('editor__field__value')) {
+                    $editorElement = _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, schema.name), _.div({ class: 'editor__field__value' }, $editorElement)));
+                }
+
                 // Render Schema picker
                 if (_this4.config.allowedSchemas.length > 1) {
-                    editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    $editorElement.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                         value: item.schemaId,
                         valueKey: 'id',
                         labelKey: 'name',
@@ -45826,7 +45823,7 @@ var ArrayEditor = function (_FieldEditor) {
                     }))));
                 }
 
-                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
+                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), $editorElement, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
                     $field.toggleClass('collapsed');
                 }), _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove item' }).click(function () {
                     _this4.value.splice(i, 1);

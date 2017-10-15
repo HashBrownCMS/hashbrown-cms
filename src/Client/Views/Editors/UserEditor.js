@@ -44,21 +44,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
         })
         .catch(UI.errorModal);
     }
-    
-    
-    /**
-     * Gets a list of available scopes
-     *
-     * @returns {Array} Array of scope strings
-     */
-    getScopes() {
-        return [
-            'connections',
-            'schemas',
-            'templates'
-        ];
-    }
-
+     
     /**
      * Renders the username editor
      *
@@ -84,8 +70,13 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
     renderScopesEditor(project) {
         return new HashBrown.Views.Widgets.Dropdown({
             value: this.model.getScopes(project),
+            useMultiple: true,
             placeholder: '(no scopes)',
-            options: this.getScopes(),
+            options: [
+                'connections',
+                'schemas',
+                'templates'
+            ],
             onChange: (newValue) => {
                 this.model.scopes[project] = newValue;
 

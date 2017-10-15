@@ -235,9 +235,23 @@ class ArrayEditor extends FieldEditor {
                         item.value = newValue;
                     });
 
+                    // Editor element (wrap if not an editor field value)
+                    let $editorElement = editorInstance.$element;
+
+                    if(!$editorElement.hasClass('editor__field__value')) {
+                        $editorElement = _.div({class: 'editor__field__value'},
+                            _.div({class: 'editor__field'},
+                                _.div({class: 'editor__field__key'}, schema.name),
+                                _.div({class: 'editor__field__value'},
+                                    $editorElement
+                                )
+                            )
+                        );
+                    }
+
                     // Render Schema picker
                     if(this.config.allowedSchemas.length > 1) {
-                        editorInstance.$element.prepend(
+                        $editorElement.prepend(
                             _.div({class: 'editor__field'},
                                 _.div({class: 'editor__field__key'}, 'Schema'),
                                 _.div({class: 'editor__field__value'},
@@ -263,7 +277,7 @@ class ArrayEditor extends FieldEditor {
                 
                     _.append($field.empty(),
                         _.div({class: 'editor__field__sort-key'}, schema.name),
-                        editorInstance.$element,
+                        $editorElement,
                         _.div({class: 'editor__field__actions'},
                             _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
                                 .click(() => {

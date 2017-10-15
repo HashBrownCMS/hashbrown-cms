@@ -43,6 +43,10 @@ class ProjectHelper {
      * returns {Promise} Promise
      */
     static environmentExists(project, environment) {
+        if(!environment) {
+            return Promise.resolve(false);
+        }
+        
         return this.getAllEnvironments(project)
         .then((environments) => {
             return Promise.resolve(environments.indexOf(environment) > -1);
@@ -70,6 +74,30 @@ class ProjectHelper {
     }
 
     /**
+     * Toggles a Project settings "sync" section on/off
+     *
+     * @param {String} id
+     * @param {Boolean} isEnabled
+     *
+     * @returns {Promise} Result
+     */
+    static toggleProjectSync(
+        id = requiredParam('id'),
+        isEnabled
+    ) {
+        return HashBrown.Helpers.SettingsHelper.getSettings(id, null, 'sync')
+        .then((syncSettings) => {
+            if(typeof isEnabled !== 'boolean') {
+                isEnabled = !syncSettings.enabled;
+            }
+
+            syncSettings.enabled = isEnabled;
+            
+            return HashBrown.Helpers.SettingsHelper.setSettings(id, null, 'sync', syncSettings);
+        });
+    }
+
+    /**
      * Gets a Project object
      *
      * @param {String} id
@@ -93,7 +121,7 @@ class ProjectHelper {
         .then((foundUsers) => {
             users = foundUsers;
 
-            return BackupHelper.getBackupsForProject(id);
+            return HashBrown.Helpers.BackupHelper.getBackupsForProject(id);
         })
         .then((foundBackups) => {
             backups = foundBackups;

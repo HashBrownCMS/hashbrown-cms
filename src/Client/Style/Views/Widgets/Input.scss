@@ -4,11 +4,6 @@
 .widget--input {
     display: block;
     line-height: 2rem;
-    margin-bottom: 0.5rem;
-
-    &:last-of-type {
-        margin-bottom: 0;
-    }
 
     // Text-like inputs
     &.text,
