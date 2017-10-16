@@ -43,23 +43,11 @@ class MainMenu extends Crisp.View {
     
     /**
      * Event: Click question
+     *
+     * @param {String} topic
      */
-    onClickQuestion() {
-        let path = location.hash.replace('#', '').split('/') ;
-
-        if(!path || path.length < 1) { return; }
-
-        let level1 = path[1];
-        let level2 = path[2];
-
-        switch(level1) {
-            default:
-                UI.messageModal('The help modal', [
-                    _.p('To get help for any particular screen, click the <span class="fa fa-question-circle"></span> button to bring up this modal.'),
-                    _.p('There\'s nothing worth explaining on this screen, though.')
-                ]);
-                break;
-
+    onClickQuestion(topic) {
+        switch(topic) {
             case 'content':
                 UI.messageModal('Content', [ 
                     _.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')
@@ -98,29 +86,6 @@ class MainMenu extends Crisp.View {
             case 'schemas':
                 UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
                 break;
-
-            case 'users':
-                UI.messageModal('Users', 'Here you can add and remove users, edit personal information and scopes and change passwords');
-                break;
-
-            case 'settings':
-                switch(level2) {
-                    case 'sync':
-                        UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
-                        break;
-                    case 'providers':
-                        UI.messageModal('Providers settings', [
-                            _.p('Providers are <a href="#/connections/">Connections</a> set up to serve static <a href="#/media/">Media</a> and <a href="#/template/">Templates</a>.'),
-                            _.p('For example, when a <a href="#/connections/">Connection</a> is assigned as the <a href="#/media/">Media</a> provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'),
-                            _.p('Similarly, if a <a href="#/connections/">Connection</a> is assigned as the <a href="#/templates/">Template</a> provider, the available <a href="#/templates/">Templates</a> will be pulled from that <a href="#/connections/">Connection</a>.')
-                        ]);
-                        break;
-                    default:
-                        UI.messageModal('Settings', 'Here you can edit environment-specific settings');
-                        break;
-                }
-
-                break;
         }
     }
 
@@ -135,7 +100,7 @@ class MainMenu extends Crisp.View {
      * Post render
      */
     postrender() {
-        $('.menuspace').html(this.$element);
+        $('.page--environment__space--menu').html(this.$element);
     }
 
     /**
@@ -147,6 +112,7 @@ class MainMenu extends Crisp.View {
             _.if(Array.isArray(this.languages) && this.languages.length > 1,
                 new HashBrown.Views.Widgets.Dropdown({
                     tooltip: 'Language',
+                    icon: 'flag',
                     value: window.language,
                     options: this.languages,
                     onChange: (newValue) => {
@@ -155,11 +121,9 @@ class MainMenu extends Crisp.View {
                 }).$element
             ),
 
-            // Dashboard link
-            _.a({title: 'Go to dashboard', href: '/', class: 'widget widget--button standard small fa fa-home'}),
-
             // User dropdown
             new HashBrown.Views.Widgets.Dropdown({
+                tooltip: 'Logged in as "' + (User.current.fullName || User.current.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
                 options: {
@@ -174,8 +138,19 @@ class MainMenu extends Crisp.View {
             }).$element,
 
             // Help
-            _.button({title: 'Help', class: 'widget widget--button small standard fa fa-question-circle'})
-                .click(() => { this.onClickQuestion(); })
+            new HashBrown.Views.Widgets.Dropdown({
+                tooltip: 'Get help',
+                icon: 'question-circle',
+                reverseKeys: true,
+                options: {
+                    'connections': () => { this.onClickQuestion('connections'); },
+                    'content': () => { this.onClickQuestion('content'); },
+                    'forms': () => { this.onClickQuestion('forms'); },
+                    'media': () => { this.onClickQuestion('media'); },
+                    'schemas': () => { this.onClickQuestion('schemas'); },
+                    'templates': () => { this.onClickQuestion('templates'); }
+                }
+            }).$element
         );
     }
 }

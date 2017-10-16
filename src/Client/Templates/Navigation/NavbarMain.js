@@ -10,6 +10,12 @@ module.exports = function() {
     return _.nav({class: 'navbar-main'},
         // Buttons
         _.div({class: 'tab-buttons'},
+            _.a({href: '/', class: 'navbar-main__buttons__tab'},
+                _.div({class: 'pane-icon'},
+                    _.img({src: '/svg/logo_white.svg', class: 'logo navbar-main__logo'})
+                ),
+                _.div({class: 'pane-text'}, 'Dashboard')
+            ),            
             _.each(this.tabPanes, (i, pane) => {
                 let $icon = pane.icon;
 

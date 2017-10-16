@@ -12,7 +12,6 @@ class NavbarMain extends Crisp.View {
         this.template = require('Client/Templates/Navigation/NavbarMain');
         this.tabPanes = [];
 
-        HashBrown.Views.Navigation.CMSPane.init();
         HashBrown.Views.Navigation.ContentPane.init();
         HashBrown.Views.Navigation.MediaPane.init();
         HashBrown.Views.Navigation.FormsPane.init();

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 273);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9712,9 +9712,7 @@ var FieldSchema = function (_Schema) {
 module.exports = FieldSchema;
 
 /***/ }),
-/* 43 */,
-/* 44 */,
-/* 45 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9888,6 +9886,8 @@ var ContentHelper = function (_ContentHelperCommon) {
 module.exports = ContentHelper;
 
 /***/ }),
+/* 44 */,
+/* 45 */,
 /* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25931,6 +25931,22 @@ var Dropdown = function (_Widget) {
     };
 
     /**
+     * Updates all position classes
+     */
+
+
+    Dropdown.prototype.updatePositionClasses = function updatePositionClasses() {
+        var _this2 = this;
+
+        setTimeout(function () {
+            var bounds = _this2.element.getBoundingClientRect();
+
+            _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
+            _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
+        }, 50);
+    };
+
+    /**
      * Event: Change value
      *
      * @param {Object} newValue
@@ -26051,6 +26067,7 @@ var Dropdown = function (_Widget) {
 
     Dropdown.prototype.postrender = function postrender() {
         this.updateSelectedClasses();
+        this.updatePositionClasses();
     };
 
     /**
@@ -26059,7 +26076,7 @@ var Dropdown = function (_Widget) {
 
 
     Dropdown.prototype.template = function template() {
-        var _this2 = this;
+        var _this3 = this;
 
         return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '') },
         // Value
@@ -26070,13 +26087,13 @@ var Dropdown = function (_Widget) {
 
         // Typeahead input
         _.if(this.useTypeAhead, _.span({ class: 'widget--dropdown__typeahead__icon fa fa-search' }), _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
-            _this2.onTypeahead(e.currentTarget.value);
+            _this3.onTypeahead(e.currentTarget.value);
         })),
 
         // Dropdown options
         _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
             // Reverse keys option
-            if (_this2.reverseKeys) {
+            if (_this3.reverseKeys) {
                 var key = optionLabel;
                 var value = optionValue;
 
@@ -26089,18 +26106,18 @@ var Dropdown = function (_Widget) {
             }
 
             return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
-                _this2.onChangeInternal(optionValue);
+                _this3.onChangeInternal(optionValue);
             });
         })),
 
         // Clear button
         _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection' }).click(function (e) {
-            _this2.onChangeInternal(null);
+            _this3.onChangeInternal(null);
         })),
 
         // Obscure
         _.div({ class: 'widget--dropdown__obscure' }, _.div({ class: 'widget--dropdown__obscure__inner' }).click(function (e) {
-            _this2.onCancel();
+            _this3.onCancel();
         })));
     };
 
@@ -27367,7 +27384,7 @@ module.exports = LanguageHelper;
 
 module.exports = {
     ConnectionHelper: __webpack_require__(98),
-    ContentHelper: __webpack_require__(45),
+    ContentHelper: __webpack_require__(43),
     DebugHelper: __webpack_require__(208),
     LanguageHelper: __webpack_require__(99),
     MediaHelper: __webpack_require__(28),
@@ -35921,9 +35938,7 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35968,7 +35983,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
     projects = projects || [];
 
-    var ProjectEditor = __webpack_require__(274);
+    var ProjectEditor = __webpack_require__(272);
 
     for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
@@ -36211,7 +36226,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 274 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36225,11 +36240,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Project = __webpack_require__(59);
 var RequestHelper = __webpack_require__(2);
-var InfoEditor = __webpack_require__(275);
-var SyncEditor = __webpack_require__(276);
-var LanguageEditor = __webpack_require__(277);
-var BackupEditor = __webpack_require__(278);
-var MigrationEditor = __webpack_require__(279);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -36524,7 +36539,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 275 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36615,7 +36630,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 276 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36841,7 +36856,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 277 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36926,7 +36941,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 278 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37142,7 +37157,7 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 279 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

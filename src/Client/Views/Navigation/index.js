@@ -4,7 +4,6 @@
  * @namespace HashBrown.Client.Views.Navigation
  */
 module.exports = {
-    CMSPane: require('./CMSPane'),
     ConnectionPane: require('./ConnectionPane'),
     ContentPane: require('./ContentPane'),
     FormsPane: require('./FormsPane'),

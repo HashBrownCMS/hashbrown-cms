@@ -123,6 +123,18 @@ class Dropdown extends Widget {
     }
 
     /**
+     * Updates all position classes
+     */
+    updatePositionClasses() {
+        setTimeout(() => {
+            let bounds = this.element.getBoundingClientRect();
+
+            this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
+            this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
+        }, 50);
+    }
+
+    /**
      * Event: Change value
      *
      * @param {Object} newValue
@@ -231,6 +243,7 @@ class Dropdown extends Widget {
      */
     postrender() {
         this.updateSelectedClasses();
+        this.updatePositionClasses();
     }
 
     /**

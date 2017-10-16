@@ -11,6 +11,31 @@
     border-radius: 0.2rem;
     border: 1px solid $standard-dark;
 
+    // Small
+    &.small {
+        max-width: 2rem;
+        width: 2rem;
+    }
+   
+    // Right + bottom modes
+    &.right {
+        .widget--dropdown__options {
+            transform: translateX(calc(-100% + 3rem));
+        }
+    }
+
+    &.bottom {
+        .widget--dropdown__options {
+            transform: translateY(-100%);
+        }
+    }
+    
+    &.bottom.right {
+        .widget--dropdown__options {
+            transform: translate(-100%, -100%);
+        }
+    }
+
     // Icon mode
     &.has-icon {
         min-width: 0;
@@ -25,9 +50,24 @@
                 color: $primary-text;
             }
         }
-        
-        .widget-group &:last-child .widget--dropdown__value {
+      
+        // Right mode
+        &.right .widget--dropdown__options:before {
+            left: auto;
+            right: 0.5rem;
+        }
+
+        // Inside group
+        .widget-group & .widget--dropdown__value {
             border-radius: 0;
+        }
+        
+        .widget-group &:first-child .widget--dropdown__value {
+            border-top-left-radius: 0.2rem;
+            border-bottom-left-radius: 0.2rem;
+        }
+
+        .widget-group &:last-child .widget--dropdown__value {
             border-top-right-radius: 0.2rem;
             border-bottom-right-radius: 0.2rem;
         }
@@ -49,6 +89,7 @@
             border-top-left-radius: 0.2rem;
             border-top-right-radius: 0.2rem;
 
+            // Arrow
             &:before {
                 position: absolute;
                 content: '';
