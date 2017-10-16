@@ -9,7 +9,6 @@ $xs: 'max-width: 767px';
 @import '_colors';
 @import '_util';
 @import '_main';
-@import '_main-menu';
 @import '_welcome';
 @import '_dashboard';
 @import '_navbar-main';
@@ -64,7 +63,9 @@ $xs: 'max-width: 767px';
 @import 'Tools/Typography';
 
 // Pages
+@import 'Pages/Page';
 @import 'Pages/Dashboard';
+@import 'Pages/Environment';
 
 // Dashboard
 @import 'Views/Dashboard/ProjectEditor';

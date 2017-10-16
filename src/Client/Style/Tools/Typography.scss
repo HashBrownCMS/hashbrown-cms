@@ -52,6 +52,11 @@ button, input, optgroup, select, textarea {
 // Code
 pre {
     font-family: 'RobotoMono', monospace;
+    overflow-x: auto;
+    padding: 0.5rem;
+    border-radius: 0.2rem;
+    background-color: $secondary;
+    color: $secondary-text;
 }
 
 // Headings

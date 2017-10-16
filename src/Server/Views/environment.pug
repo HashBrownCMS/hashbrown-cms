@@ -7,18 +7,18 @@ html
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
         
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
-        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
         link(href='/css/plugins.css', rel='stylesheet')
         link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
 
         title #{currentProject} - HashBrown
-    body
-        .cms-container
-            .menuspace
-            .navspace
-            .workspace
+
+    body.page.page--environment
+        .page--environment__spaces.cms-container
+            .page--environment__space.page--environment__space--menu.menuspace
+            .page--environment__space.page--environment__space--nav.navspace
+            .page--environment__space.page--environment__space--editor.workspace
         
         .spinner-obscure
             .spinner-container.inline
@@ -26,7 +26,6 @@ html
                 .loading-messages
 
         script(src='/lib/jquery/jquery.min.js')
-        script(src='/lib/bootstrap/js/bootstrap.min.js')
         script(src='/lib/ckeditor/ckeditor.js')
         script(src='/lib/codemirror/lib/codemirror.js')
         script(src='/lib/codemirror/mode/javascript/javascript.js')

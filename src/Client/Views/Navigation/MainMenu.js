@@ -125,6 +125,13 @@ class MainMenu extends Crisp.View {
     }
 
     /**
+     * Pre render
+     */
+    prerender() {
+        this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
+    }
+
+    /**
      * Post render
      */
     postrender() {
@@ -135,59 +142,40 @@ class MainMenu extends Crisp.View {
      * Renders this menu
      */
     template() {
-        // Render menu
-        this.languages = HashBrown.Helpers.LanguageHelper.selectedLanguages || [];
-
-        return _.div({class: 'main-menu'},
+        return _.div({class: 'main-menu widget-group'},
             // Language picker
             _.if(Array.isArray(this.languages) && this.languages.length > 1,
-                _.div({class: 'main-menu-item dropdown main-menu-language'},
-                    _.button({title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                        _.span({class: 'fa fa-flag'})    
-                    ),
-                    _.ul({class: 'dropdown-menu'},
-                        _.each(this.languages, (i, language) => {
-                            return _.li({value: language, class: language == window.language ? 'active': ''},
-                                _.button(
-                                    language
-                                ).click(() => { this.onChangeLanguage(language); })
-                            );
-                        })
-                    )
-                )
+                new HashBrown.Views.Widgets.Dropdown({
+                    tooltip: 'Language',
+                    value: window.language,
+                    options: this.languages,
+                    onChange: (newValue) => {
+                        this.onChangeLanguage(newValue);
+                    }
+                }).$element
             ),
 
             // Dashboard link
-            _.div({class: 'main-menu-item'},
-                _.a({title: 'Dashboard', href: '/', class: 'main-menu-dashboard'},
-                    _.span({class: 'fa fa-home'})
-                )
-            ),
+            _.a({title: 'Go to dashboard', href: '/', class: 'widget widget--button standard small fa fa-home'}),
 
             // User dropdown
-            _.div({class: 'main-menu-item main-menu-user dropdown'},
-                _.button({title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                    _.span({class: 'fa fa-user'})
-                ),
-                _.ul({class: 'dropdown-menu'},
-                    _.li(
-                        _.a({class: 'dropdown-item', href: '#/users/' + User.current.id}, 'User settings')
-                            .click((e) => { e.preventDefault(); new UserEditor({ hidePermissions: true, model: User.current }); })
-                    ),
-                    _.li(
-                        _.form({class: 'dropdown-item', action: '/api/user/logout', method: 'POST'},
-                            _.input({type: 'submit', value: 'Log out'})
-                        )
-                    )
-                )
-            ),
+            new HashBrown.Views.Widgets.Dropdown({
+                icon: 'user',
+                reverseKeys: true,
+                options: {
+                    'User settings': () => { new UserEditor({ hidePermissions: true, model: User.current }); },
+                    'Log out': () => {
+                        HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout')
+                        .then(() => {
+                            location = '/';
+                        });
+                    }
+                }
+            }).$element,
 
             // Help
-            _.div({class: 'main-menu-item'},
-                _.button({title: 'Help', class: 'main-menu-help'},
-                    _.span({class: 'fa fa-question-circle'})
-                ).click(() => { this.onClickQuestion(); })
-            )
+            _.button({title: 'Help', class: 'widget widget--button small standard fa fa-question-circle'})
+                .click(() => { this.onClickQuestion(); })
         );
     }
 }

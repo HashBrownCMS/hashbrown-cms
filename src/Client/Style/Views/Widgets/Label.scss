@@ -19,6 +19,13 @@
         margin-right: 0.5rem;
     }
 
+    &.small {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 10rem;
+        max-width: 10rem;
+    }
+
     &.warning {
         background-color: $warning;
         color: $warning-text;
@@ -32,5 +39,10 @@
     &.secondary {
         background-color: $secondary;
         color: $secondary-text;
+    }
+
+    &.standard {
+        background-color: $standard;
+        color: $standard-text;
     }
 }

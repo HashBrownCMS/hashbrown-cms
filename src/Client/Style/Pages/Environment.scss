@@ -1,0 +1,25 @@
+/**
+ * Environment page style
+ */
+.page--environment {
+    &__spaces {
+
+    }
+
+    &__space {
+        position: relative;
+
+        &--editor {
+            &__text {
+                max-width: calc(100% - 7rem);
+                max-height: calc(100% - 4rem);
+                overflow: auto;
+                margin: 2rem;
+                padding: 1rem;
+                background-color: $standard;
+                color: $standard-text;
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}

@@ -13,6 +13,12 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
      */
     constructor(params) {
         params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
+        params.actions = [
+            {
+                label: 'Save',
+                onClick: () => { this.onClickSave(); }
+            }
+        ];
 
         params.autoFetch = false;
 
@@ -38,7 +44,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
 
         RequestHelper.request('post', 'user/' + this.model.id, newUserObject)
         .then(() => {
-            this.modal.hide();
+            this.close();
 
             this.trigger('save', this.model);
         })

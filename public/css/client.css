@@ -186,37 +186,6 @@ img.logo {
       height: 100%;
       overflow-y: auto; }
 
-.main-menu {
-  display: flex; }
-  .main-menu .main-menu-spacer {
-    flex-grow: 1; }
-  .main-menu .main-menu-item {
-    position: relative;
-    margin: 0px;
-    width: 30px; }
-    .main-menu .main-menu-item > a, .main-menu .main-menu-item > button {
-      border: 0px;
-      padding: 0px;
-      background-color: transparent;
-      text-decoration: none;
-      position: relative;
-      display: block;
-      text-align: center;
-      width: 100%;
-      line-height: 20px; }
-      .main-menu .main-menu-item > a, .main-menu .main-menu-item > a:hover, .main-menu .main-menu-item > button, .main-menu .main-menu-item > button:hover {
-        color: #ffffff !important; }
-      .main-menu .main-menu-item > a > .fa, .main-menu .main-menu-item > button > .fa {
-        position: relative;
-        z-index: 10;
-        line-height: 20px;
-        height: 20px;
-        display: block;
-        font-size: 20px; }
-    .main-menu .main-menu-item .dropdown-menu {
-      left: auto;
-      right: 0px; }
-
 .dashboard-container.welcome .carousel {
   padding: 0px;
   margin: 30px auto; }
@@ -2463,7 +2432,12 @@ button, input, optgroup, select, textarea {
   font-family: inherit; }
 
 pre {
-  font-family: 'RobotoMono', monospace; }
+  font-family: 'RobotoMono', monospace;
+  overflow-x: auto;
+  padding: 0.5rem;
+  border-radius: 0.2rem;
+  background-color: #21303b;
+  color: #ffffff; }
 
 h1 {
   font-size: 3rem; }
@@ -2487,6 +2461,13 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   line-height: 1.5;
   font-weight: 100; }
+
+/**
+ * General page style
+ */
+.page {
+  margin: 0;
+  padding: 0; }
 
 /**
  * The dashboard page
@@ -2552,6 +2533,28 @@ h1, h2, h3, h4, h5, h6 {
 
 .page--dashboard__projects__add {
   margin-top: 1rem; }
+
+.page--dashboard__server__info {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
+
+/**
+ * Environment page style
+ */
+.page--environment__space {
+  position: relative; }
+  .page--environment__space--editor__text {
+    max-width: calc(100% - 7rem);
+    max-height: calc(100% - 4rem);
+    overflow: auto;
+    margin: 2rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    color: #333333;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
 
 /**
  * Project editor
@@ -3478,6 +3481,11 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap; }
   .widget--label .fa {
     margin-right: 0.5rem; }
+  .widget--label.small {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 10rem;
+    max-width: 10rem; }
   .widget--label.warning {
     background-color: #FFB300;
     color: #664800; }
@@ -3487,6 +3495,9 @@ h1, h2, h3, h4, h5, h6 {
   .widget--label.secondary {
     background-color: #21303b;
     color: #ffffff; }
+  .widget--label.standard {
+    background-color: #ffffff;
+    color: #333333; }
 
 /**
  * Tabs

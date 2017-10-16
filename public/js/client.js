@@ -17764,6 +17764,12 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         _classCallCheck(this, UserEditor);
 
         params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
+        params.actions = [{
+            label: 'Save',
+            onClick: function onClick() {
+                _this.onClickSave();
+            }
+        }];
 
         params.autoFetch = false;
 
@@ -17792,7 +17798,7 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         }
 
         RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
-            _this2.modal.hide();
+            _this2.close();
 
             _this2.trigger('save', _this2.model);
         }).catch(UI.errorModal);
@@ -41358,46 +41364,28 @@ Crisp.Router.route('/', function () {
     Crisp.View.get('NavbarMain').showTab('/');
     Crisp.View.get('NavbarMain').highlightItem('/', 'null');
 
-    var carouselItems = [[_.div(_.img({ src: '/img/welcome/intro-content.jpg' })), _.div(_.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'))], [_.div(_.img({ src: '/img/welcome/intro-media.jpg' })), _.div(_.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.'))], [_.div(_.img({ src: '/img/welcome/intro-forms.jpg' })), _.div(_.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.'))]];
-
-    if (currentUserHasScope('connections')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-connections.jpg' })), _.div(_.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to remote servers, provide statically hosted media and serve rendering templates.'))]);
-    }
-
-    if (currentUserHasScope('schemas')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-schemas.jpg' })), _.div(_.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'))]);
-    }
-
-    if (currentUserHasScope('users')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-users.jpg' })), _.div(_.h2('Users'), _.p('All of the users connected to this project. Here you can edit permissions and personal information and remove/add new users.'))]);
-    }
-
-    if (currentUserHasScope('settings')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
-    }
-
-    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'btn btn-default' }, 'example').click(function () {
+    _.append($('.page--environment__space--editor').empty(), _.div({ class: 'page--environment__space--editor__text' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'widget widget--button' }, 'example').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
-    }), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
+    }), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'widget widget--button', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')));
 });
 
 // Readme
-Crisp.Router.route('/readme/', function () {
+Crisp.Router.route('/readme', function () {
     Crisp.View.get('NavbarMain').highlightItem('/', 'readme');
 
     RequestHelper.customRequest('GET', '/text/readme').then(function (html) {
-        populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
+        _.append($('.page--environment__space--editor').empty(), _.div({ class: 'page--environment__space--editor__text' }, html));
     });
 });
 
 // License
-Crisp.Router.route('/license/', function () {
+Crisp.Router.route('/license', function () {
     Crisp.View.get('NavbarMain').highlightItem('/', 'license');
 
     RequestHelper.customRequest('GET', '/text/license').then(function (html) {
-        populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
+        _.append($('.page--environment__space--editor').empty(), _.div({ class: 'page--environment__space--editor__text' }, html));
     });
 });
 
@@ -44227,6 +44215,15 @@ var MainMenu = function (_Crisp$View) {
     };
 
     /**
+     * Pre render
+     */
+
+
+    MainMenu.prototype.prerender = function prerender() {
+        this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
+    };
+
+    /**
      * Post render
      */
 
@@ -44243,29 +44240,40 @@ var MainMenu = function (_Crisp$View) {
     MainMenu.prototype.template = function template() {
         var _this3 = this;
 
-        // Render menu
-        this.languages = HashBrown.Helpers.LanguageHelper.selectedLanguages || [];
-
-        return _.div({ class: 'main-menu' },
+        return _.div({ class: 'main-menu widget-group' },
         // Language picker
-        _.if(Array.isArray(this.languages) && this.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(this.languages, function (i, language) {
-            return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.button(language).click(function () {
-                _this3.onChangeLanguage(language);
-            }));
-        })))),
+        _.if(Array.isArray(this.languages) && this.languages.length > 1, new HashBrown.Views.Widgets.Dropdown({
+            tooltip: 'Language',
+            value: window.language,
+            options: this.languages,
+            onChange: function onChange(newValue) {
+                _this3.onChangeLanguage(newValue);
+            }
+        }).$element),
 
         // Dashboard link
-        _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
+        _.a({ title: 'Go to dashboard', href: '/', class: 'widget widget--button standard small fa fa-home' }),
 
         // User dropdown
-        _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + User.current.id }, 'User settings').click(function (e) {
-            e.preventDefault();new UserEditor({ hidePermissions: true, model: User.current });
-        })), _.li(_.form({ class: 'dropdown-item', action: '/api/user/logout', method: 'POST' }, _.input({ type: 'submit', value: 'Log out' }))))),
+        new HashBrown.Views.Widgets.Dropdown({
+            icon: 'user',
+            reverseKeys: true,
+            options: {
+                'User settings': function UserSettings() {
+                    new UserEditor({ hidePermissions: true, model: User.current });
+                },
+                'Log out': function LogOut() {
+                    HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout').then(function () {
+                        location = '/';
+                    });
+                }
+            }
+        }).$element,
 
         // Help
-        _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
+        _.button({ title: 'Help', class: 'widget widget--button small standard fa fa-question-circle' }).click(function () {
             _this3.onClickQuestion();
-        })));
+        }));
     };
 
     return MainMenu;

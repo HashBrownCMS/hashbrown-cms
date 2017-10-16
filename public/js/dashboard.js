@@ -16994,6 +16994,12 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         _classCallCheck(this, UserEditor);
 
         params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
+        params.actions = [{
+            label: 'Save',
+            onClick: function onClick() {
+                _this.onClickSave();
+            }
+        }];
 
         params.autoFetch = false;
 
@@ -17022,7 +17028,7 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         }
 
         RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
-            _this2.modal.hide();
+            _this2.close();
 
             _this2.trigger('save', _this2.model);
         }).catch(UI.errorModal);
@@ -36054,7 +36060,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
         return Promise.resolve();
     }
 
-    $('.btn-restart').click(function () {
+    $('.page--dashboard__restart').click(function () {
         HashBrown.Helpers.RequestHelper.request('post', 'server/restart').then(function () {
             HashBrown.Helpers.RequestHelper.listenForRestart();
         });

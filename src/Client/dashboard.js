@@ -114,7 +114,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 .then(() => {
     if(!currentUserIsAdmin()) { return Promise.resolve(); }
 
-    $('.btn-restart').click(() => {
+    $('.page--dashboard__restart').click(() => {
         HashBrown.Helpers.RequestHelper.request('post', 'server/restart')
         .then(() => {
             HashBrown.Helpers.RequestHelper.listenForRestart();
