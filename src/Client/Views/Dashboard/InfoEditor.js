@@ -12,10 +12,6 @@ class InfoEditor extends HashBrown.Views.Modals.Modal {
         params.title = 'Project info';
         params.actions = [
             {
-                label: 'Cancel',
-                class: 'default'
-            },
-            {
                 label: 'Save',
                 onClick: () => {
                     this.onClickSave();

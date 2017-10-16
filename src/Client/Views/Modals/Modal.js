@@ -15,6 +15,18 @@ class Modal extends Crisp.View {
 
         super(params);
 
+        // If this belongs to a group, find existing modals and append instead
+        if(this.group) {
+            for(let modal of Crisp.View.getAll('Modal')) {
+                if(modal.group !== this.group || modal === this) { continue; }
+
+                modal.append(this);
+
+                this.remove();
+                break;
+            }
+        }
+
         if(this.autoFetch !== false) {
             this.fetch();
         }
@@ -103,7 +115,7 @@ class Modal extends Crisp.View {
             }, 50);
         }
         
-        return _.div({class: 'modal' + (this.hasTransitionedIn ? ' in' : '')},
+        return _.div({class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '')},
             _.div({class: 'modal__dialog'},
                 _.if(header,
                     _.div({class: 'modal__header'},
@@ -122,6 +134,15 @@ class Modal extends Crisp.View {
                 )
             )
         );
+    }
+
+    /**
+     * Appends another modal to this modal
+     *
+     * @param {Modal} modal
+     */
+    append(modal) {
+        this.$element.find('.modal__footer').before(_.div({class: 'modal__body'}, modal.renderBody()));
     }
 }
 

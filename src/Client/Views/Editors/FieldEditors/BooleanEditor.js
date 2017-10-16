@@ -49,15 +49,17 @@ class BooleanEditor extends FieldEditor {
      * Render this editor
      */
     template() {
-        return new HashBrown.Views.Widgets.Input({
-            type: 'checkbox',
-            value: this.value,
-            onChange: (newValue) => {
-                this.value = newValue;
-                
-                this.trigger('change', this.value);
-            }
-        }).$element;
+        return _.div({class: 'editor__field__value'},
+            new HashBrown.Views.Widgets.Input({
+                type: 'checkbox',
+                value: this.value,
+                onChange: (newValue) => {
+                    this.value = newValue;
+                    
+                    this.trigger('change', this.value);
+                }
+            }).$element
+        );
     }
 }
 

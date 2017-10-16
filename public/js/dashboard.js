@@ -8148,7 +8148,34 @@ var Modal = function (_Crisp$View) {
         params = params || {};
         params.actions = params.actions || [];
 
+        // If this belongs to a group, find existing modals and append instead
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        if (_this.group) {
+            for (var _iterator = Crisp.View.getAll('Modal'), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var modal = _ref;
+
+                if (modal.group !== _this.group || modal === _this) {
+                    continue;
+                }
+
+                modal.append(_this);
+
+                _this.remove();
+                break;
+            }
+        }
 
         if (_this.autoFetch !== false) {
             _this.fetch();
@@ -8255,7 +8282,18 @@ var Modal = function (_Crisp$View) {
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+    };
+
+    /**
+     * Appends another modal to this modal
+     *
+     * @param {Modal} modal
+     */
+
+
+    Modal.prototype.append = function append(modal) {
+        this.$element.find('.modal__footer').before(_.div({ class: 'modal__body' }, modal.renderBody()));
     };
 
     return Modal;
@@ -17168,7 +17206,7 @@ var UserEditor = function (_HashBrown$Views$Moda) {
     UserEditor.prototype.renderBody = function renderBody() {
         var _this9 = this;
 
-        return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.h4('Projects'), _.each(this.projects, function (i, project) {
+        return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({ class: 'widget widget--separator' }, 'Projects'), _.each(this.projects, function (i, project) {
             return _.div({ class: 'widget-group' }, _.div({ class: 'widget widget--label' }, project), new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: _this9.model.hasScope(project),
@@ -28148,7 +28186,7 @@ var UIHelper = function () {
 
         console.log(error.stack);
 
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     };
 
     /**
@@ -28164,7 +28202,7 @@ var UIHelper = function () {
             return;
         }
 
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
     };
 
     /**
@@ -28172,16 +28210,19 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} body
+     * @param {Function} onClickOK
+     * @param {String} group
      */
 
 
-    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
+    UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
         var modal = new HashBrown.Views.Modals.Modal({
             title: title,
+            group: group,
             body: body
         });
 
-        modal.on('ok', onSubmit);
+        modal.on('ok', onClickOK);
 
         return modal;
     };
@@ -36505,9 +36546,6 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 
         params.title = 'Project info';
         params.actions = [{
-            label: 'Cancel',
-            class: 'default'
-        }, {
             label: 'Save',
             onClick: function onClick() {
                 _this.onClickSave();
@@ -37178,7 +37216,7 @@ var MigrationEditor = function (_HashBrown$Views$Moda) {
 
                 _this2.fetch();
             }
-        }).$element, _.div({ class: 'widget widget--icon widget-group__separator fa fa-arrow-right' }), new HashBrown.Views.Widgets.Dropdown({
+        }).$element, _.div({ class: 'widget-group__separator fa fa-arrow-right' }), new HashBrown.Views.Widgets.Dropdown({
             value: this.data.to,
             options: this.getToOptions(),
             onChange: function onChange(newValue) {

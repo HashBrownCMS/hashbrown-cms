@@ -3451,6 +3451,16 @@ h1, h2, h3, h4, h5, h6 {
     display: none; }
 
 /**
+ * A graphical separator
+ */
+.widget--separator {
+  margin: 2rem 0;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  color: #21303b; }
+
+/**
  * A generic label
  */
 .widget--label {

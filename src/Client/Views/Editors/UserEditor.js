@@ -217,7 +217,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
                 this.renderField('Is admin', this.renderAdminEditor()),
 
                 _.if(!this.model.isAdmin,
-                    _.h4('Projects'),
+                    _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(this.projects, (i, project) => {
                         return _.div({class: 'widget-group'},
                             _.div({class: 'widget widget--label'}, project),

@@ -477,7 +477,7 @@ class UIHelper {
 
         console.log(error.stack);
         
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
     
     /**
@@ -489,7 +489,7 @@ class UIHelper {
     static warningModal(warning, onClickOK) {
         if(!warning) { return; }
 
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
     }
 
     /**
@@ -497,14 +497,17 @@ class UIHelper {
      *
      * @param {String} title
      * @param {String} body
+     * @param {Function} onClickOK
+     * @param {String} group
      */
-    static messageModal(title, body, onSubmit) {
+    static messageModal(title, body, onClickOK, group) {
         let modal = new HashBrown.Views.Modals.Modal({
             title: title,
+            group: group,
             body: body
         });
 
-        modal.on('ok', onSubmit);
+        modal.on('ok', onClickOK);
 
         return modal;
     }

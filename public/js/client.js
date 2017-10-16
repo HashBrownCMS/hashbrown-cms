@@ -8200,7 +8200,34 @@ var Modal = function (_Crisp$View) {
         params = params || {};
         params.actions = params.actions || [];
 
+        // If this belongs to a group, find existing modals and append instead
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        if (_this.group) {
+            for (var _iterator = Crisp.View.getAll('Modal'), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var modal = _ref;
+
+                if (modal.group !== _this.group || modal === _this) {
+                    continue;
+                }
+
+                modal.append(_this);
+
+                _this.remove();
+                break;
+            }
+        }
 
         if (_this.autoFetch !== false) {
             _this.fetch();
@@ -8307,7 +8334,18 @@ var Modal = function (_Crisp$View) {
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+    };
+
+    /**
+     * Appends another modal to this modal
+     *
+     * @param {Modal} modal
+     */
+
+
+    Modal.prototype.append = function append(modal) {
+        this.$element.find('.modal__footer').before(_.div({ class: 'modal__body' }, modal.renderBody()));
     };
 
     return Modal;
@@ -17938,7 +17976,7 @@ var UserEditor = function (_HashBrown$Views$Moda) {
     UserEditor.prototype.renderBody = function renderBody() {
         var _this9 = this;
 
-        return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.h4('Projects'), _.each(this.projects, function (i, project) {
+        return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({ class: 'widget widget--separator' }, 'Projects'), _.each(this.projects, function (i, project) {
             return _.div({ class: 'widget-group' }, _.div({ class: 'widget widget--label' }, project), new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: _this9.model.hasScope(project),
@@ -32962,7 +33000,7 @@ var UIHelper = function () {
 
         console.log(error.stack);
 
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     };
 
     /**
@@ -32978,7 +33016,7 @@ var UIHelper = function () {
             return;
         }
 
-        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK);
+        return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
     };
 
     /**
@@ -32986,16 +33024,19 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} body
+     * @param {Function} onClickOK
+     * @param {String} group
      */
 
 
-    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
+    UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
         var modal = new HashBrown.Views.Modals.Modal({
             title: title,
+            group: group,
             body: body
         });
 
-        modal.on('ok', onSubmit);
+        modal.on('ok', onClickOK);
 
         return modal;
     };
@@ -45797,17 +45838,13 @@ var ArrayEditor = function (_FieldEditor) {
                     item.value = newValue;
                 });
 
-                // Editor element (wrap if not an editor field value)
-                var $editorElement = editorInstance.$element;
-
-                if (!$editorElement.hasClass('editor__field__value')) {
-                    $editorElement = _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, schema.name), _.div({ class: 'editor__field__value' }, $editorElement)));
-                }
-
                 // Render Schema picker
                 if (_this4.config.allowedSchemas.length > 1) {
-                    $editorElement.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    editorInstance.$element.prepend(_.div({ class: 'widget widget--separator' }));
+
+                    editorInstance.$element.prepend(new HashBrown.Views.Widgets.Dropdown({
                         value: item.schemaId,
+                        placeholder: 'Schema',
                         valueKey: 'id',
                         labelKey: 'name',
                         options: resources.schemas.filter(function (schema) {
@@ -45820,10 +45857,10 @@ var ArrayEditor = function (_FieldEditor) {
 
                             _this4.trigger('change', _this4.value);
                         }
-                    }))));
+                    }).$element);
                 }
 
-                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), $editorElement, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
+                _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
                     $field.toggleClass('collapsed');
                 }), _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove item' }).click(function () {
                     _this4.value.splice(i, 1);
@@ -45927,7 +45964,7 @@ var BooleanEditor = function (_FieldEditor) {
     BooleanEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return new HashBrown.Views.Widgets.Input({
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
             type: 'checkbox',
             value: this.value,
             onChange: function onChange(newValue) {
@@ -45935,7 +45972,7 @@ var BooleanEditor = function (_FieldEditor) {
 
                 _this2.trigger('change', _this2.value);
             }
-        }).$element;
+        }).$element);
     };
 
     return BooleanEditor;
@@ -46827,7 +46864,7 @@ var NumberEditor = function (_FieldEditor) {
     NumberEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return new HashBrown.Views.Widgets.Input({
+        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
             value: this.value,
             type: this.config.isSlider ? 'range' : 'number',
             step: this.config.step || 'any',
@@ -46838,7 +46875,7 @@ var NumberEditor = function (_FieldEditor) {
 
                 _this2.trigger('change', _this2.value);
             }
-        }).$element;
+        }).$element);
     };
 
     return NumberEditor;

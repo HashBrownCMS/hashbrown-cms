@@ -315,7 +315,7 @@ class SettingsHelper extends SettingsHelperCommon {
         upsertEnvironment = false
     ) {
         debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
-      
+    
         // Check if the environment exists
         return HashBrown.Helpers.ProjectHelper.environmentExists(project, environment)
         .then((environmentExists) => {
@@ -330,7 +330,7 @@ class SettingsHelper extends SettingsHelperCommon {
             if(!oldSettings) {
                 oldSettings = {};
             }
-
+            
             // If the section is "sync", always set the local setting
             if(section === 'sync') {
                 oldSettings.sync = settings;

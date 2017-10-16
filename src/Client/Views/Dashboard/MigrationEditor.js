@@ -60,7 +60,7 @@ class MigrationEditor extends HashBrown.Views.Modals.Modal {
                         this.fetch();
                     }
                 }).$element,
-                _.div({class: 'widget widget--icon widget-group__separator fa fa-arrow-right'}),
+                _.div({class: 'widget-group__separator fa fa-arrow-right'}),
                 new HashBrown.Views.Widgets.Dropdown({
                     value: this.data.to,
                     options: this.getToOptions(),

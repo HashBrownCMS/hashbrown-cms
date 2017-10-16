@@ -85,15 +85,26 @@ class ProjectHelper {
         id = requiredParam('id'),
         isEnabled
     ) {
-        return HashBrown.Helpers.SettingsHelper.getSettings(id, null, 'sync')
-        .then((syncSettings) => {
+        return HashBrown.Helpers.DatabaseHelper.findOne(id, 'settings', { usedBy: 'project' })
+        .then((projectSettings) => {
+            return Promise.resolve(projectSettings || { usedBy: 'project' });
+        })
+        .then((settings) => {
+            settings.sync = settings.sync || {};
+
             if(typeof isEnabled !== 'boolean') {
-                isEnabled = !syncSettings.enabled;
+                isEnabled = !settings.sync.enabled;
             }
 
-            syncSettings.enabled = isEnabled;
+            settings.sync.enabled = isEnabled;
             
-            return HashBrown.Helpers.SettingsHelper.setSettings(id, null, 'sync', syncSettings);
+            return DatabaseHelper.updateOne(
+                id,
+                'settings',
+                { usedBy: 'project' },
+                settings,
+                { upsert: true }
+            );
         });
     }
 

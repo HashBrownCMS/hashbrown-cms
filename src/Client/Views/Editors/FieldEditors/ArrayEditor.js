@@ -235,49 +235,33 @@ class ArrayEditor extends FieldEditor {
                         item.value = newValue;
                     });
 
-                    // Editor element (wrap if not an editor field value)
-                    let $editorElement = editorInstance.$element;
-
-                    if(!$editorElement.hasClass('editor__field__value')) {
-                        $editorElement = _.div({class: 'editor__field__value'},
-                            _.div({class: 'editor__field'},
-                                _.div({class: 'editor__field__key'}, schema.name),
-                                _.div({class: 'editor__field__value'},
-                                    $editorElement
-                                )
-                            )
-                        );
-                    }
-
                     // Render Schema picker
                     if(this.config.allowedSchemas.length > 1) {
-                        $editorElement.prepend(
-                            _.div({class: 'editor__field'},
-                                _.div({class: 'editor__field__key'}, 'Schema'),
-                                _.div({class: 'editor__field__value'},
-                                    new HashBrown.Views.Widgets.Dropdown({
-                                        value: item.schemaId,
-                                        valueKey: 'id',
-                                        labelKey: 'name',
-                                        options: resources.schemas.filter((schema) => {
-                                            return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                        }),
-                                        onChange: (newSchemaId) => {
-                                            item.schemaId = newSchemaId;
+                        editorInstance.$element.prepend(_.div({class: 'widget widget--separator'}));
+                        
+                        editorInstance.$element.prepend(
+                            new HashBrown.Views.Widgets.Dropdown({
+                                value: item.schemaId,
+                                placeholder: 'Schema',
+                                valueKey: 'id',
+                                labelKey: 'name',
+                                options: resources.schemas.filter((schema) => {
+                                    return this.config.allowedSchemas.indexOf(schema.id) > -1;
+                                }),
+                                onChange: (newSchemaId) => {
+                                    item.schemaId = newSchemaId;
 
-                                            renderField();
+                                    renderField();
 
-                                            this.trigger('change', this.value);
-                                        }
-                                    })
-                                )
-                            )
+                                    this.trigger('change', this.value);
+                                }
+                            }).$element
                         );
                     }
                 
                     _.append($field.empty(),
                         _.div({class: 'editor__field__sort-key'}, schema.name),
-                        $editorElement,
+                        editorInstance.$element,
                         _.div({class: 'editor__field__actions'},
                             _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
                                 .click(() => {

@@ -50,7 +50,7 @@ class SyncHelper {
      * @param {Object} settings
      * @param {Boolean} justUrl
      *
-     * @returns {Boolean} Whether the settigns are valid
+     * @returns {Boolean} Whether the settings are valid
      */
     static validateSettings(settings, justUrl) {
         if(!justUrl) {
@@ -213,8 +213,6 @@ class SyncHelper {
                 
                 params.token = settings.token;
               
-                let now = Date.now();
-
                 return RequestHelper.request('get', settings.url + path + '/' + remoteResourceName, params)
                 .then((data) => {
                     debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);

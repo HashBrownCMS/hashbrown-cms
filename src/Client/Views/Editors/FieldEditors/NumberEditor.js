@@ -113,18 +113,20 @@ class NumberEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return new HashBrown.Views.Widgets.Input({
-            value: this.value,
-            type: this.config.isSlider ? 'range' : 'number',
-            step: this.config.step || 'any',
-            min: this.config.min || '0',
-            max: this.config.max || '0',
-            onChange: (newValue) => {
-                this.value = parseFloat(newValue);
+        return _.div({class: 'editor__field__value'},
+            new HashBrown.Views.Widgets.Input({
+                value: this.value,
+                type: this.config.isSlider ? 'range' : 'number',
+                step: this.config.step || 'any',
+                min: this.config.min || '0',
+                max: this.config.max || '0',
+                onChange: (newValue) => {
+                    this.value = parseFloat(newValue);
 
-                this.trigger('change', this.value);
-            }
-        }).$element;
+                    this.trigger('change', this.value);
+                }
+            }).$element
+        );
     }
 }
 
