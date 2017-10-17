@@ -25943,7 +25943,7 @@ var Dropdown = function (_Widget) {
 
             _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
             _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
-        }, 50);
+        }, 1);
     };
 
     /**

@@ -3208,7 +3208,8 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   width: 100%;
   height: 100%;
-  display: block; }
+  display: block;
+  z-index: 999; }
   .modal.in {
     opacity: 1; }
   .modal.in .modal__dialog {
@@ -3951,7 +3952,10 @@ h1, h2, h3, h4, h5, h6 {
       display: none; }
   .widget--dropdown__separator {
     opacity: 0.75;
-    margin-top: 1rem; }
+    margin: 1rem 0 0.5rem 0;
+    text-transform: uppercase;
+    color: #21303b;
+    font-weight: bold; }
     .widget--dropdown__separator:first-child {
       margin-top: 0; }
   .widget--dropdown__options {

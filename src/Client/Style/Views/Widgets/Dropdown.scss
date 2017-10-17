@@ -205,7 +205,10 @@
     // Separator
     &__separator {
         opacity: 0.75;
-        margin-top: 1rem;
+        margin: 1rem 0 0.5rem 0;
+        text-transform: uppercase;
+        color: $secondary;
+        font-weight: bold;
         
         &:first-child {
             margin-top: 0;

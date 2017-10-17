@@ -131,7 +131,7 @@ class Dropdown extends Widget {
 
             this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
             this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
-        }, 50);
+        }, 1);
     }
 
     /**

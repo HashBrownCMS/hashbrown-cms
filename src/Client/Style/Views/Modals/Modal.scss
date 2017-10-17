@@ -12,6 +12,7 @@
     width: 100%;
     height: 100%;
     display: block;
+    z-index: 999;
 
     // In state
     &.in {

@@ -30061,7 +30061,7 @@ var Dropdown = function (_Widget) {
 
             _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
             _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
-        }, 50);
+        }, 1);
     };
 
     /**
@@ -43538,25 +43538,19 @@ var ContentPane = function (_NavbarPane) {
             }).catch(UI.errorModal);
         }
 
-        var modal = new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Publishing settings for "' + content.prop('title', window.language) + '"'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
+        var modal = new HashBrown.Views.Modals.Modal({
+            title: 'Publishing settings for "' + content.prop('title', window.language) + '"',
+            actions: [{
                 label: 'OK',
-                class: 'btn-primary',
-                callback: function callback() {
+                onClick: function onClick() {
                     onSubmit();
                 }
             }],
-            renderBody: function renderBody() {
+            body: _.do(function () {
                 if (publishing.governedBy) {
                     var governor = ContentHelper.getContentByIdSync(publishing.governedBy);
 
-                    return _.div({ class: 'settings-publishing' }, _.p('(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)'));
+                    return _.div({ class: 'widget widget--label' }, '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)');
                 } else {
                     return _.div({ class: 'settings-publishing' },
                     // Apply to children switch
@@ -43575,7 +43569,7 @@ var ContentPane = function (_NavbarPane) {
                         }
                     }).$element)));
                 }
-            }
+            })
         });
 
         modal.$element.toggleClass('settings-modal content-settings-modal');
@@ -44088,7 +44082,7 @@ var MainMenu = function (_Crisp$View) {
                 break;
 
             case 'media':
-                UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.if(User.current.hasScope('settings'), _.p('The contents of this gallery depends on which Connection has been set up as the Media provider in the <a href="#/settings/providers/">providers settings</a>'))]);
+                UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')]);
                 break;
 
             case 'forms':
@@ -44096,7 +44090,7 @@ var MainMenu = function (_Crisp$View) {
                 break;
 
             case 'templates':
-                UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
+                UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.p('Templates are served through the Connection assigned as the Template provider.')]);
                 break;
 
             case 'connections':
@@ -44170,22 +44164,22 @@ var MainMenu = function (_Crisp$View) {
             icon: 'question-circle',
             reverseKeys: true,
             options: {
-                'connections': function connections() {
+                'Connections': function Connections() {
                     _this3.onClickQuestion('connections');
                 },
-                'content': function content() {
+                'Content': function Content() {
                     _this3.onClickQuestion('content');
                 },
-                'forms': function forms() {
+                'Forms': function Forms() {
                     _this3.onClickQuestion('forms');
                 },
-                'media': function media() {
+                'Media': function Media() {
                     _this3.onClickQuestion('media');
                 },
-                'schemas': function schemas() {
+                'Schemas': function Schemas() {
                     _this3.onClickQuestion('schemas');
                 },
-                'templates': function templates() {
+                'Templates': function Templates() {
                     _this3.onClickQuestion('templates');
                 }
             }

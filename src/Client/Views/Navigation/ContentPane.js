@@ -255,29 +255,22 @@ class ContentPane extends NavbarPane {
             .catch(UI.errorModal);
         }
         
-        let modal = new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Publishing settings for "' + content.prop('title', window.language) + '"'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: 'Publishing settings for "' + content.prop('title', window.language) + '"',
+            actions: [
                 {
                     label: 'OK',
-                    class: 'btn-primary',
-                    callback: () => {
+                    onClick: () => {
                         onSubmit();
                     }
                 }
             ],
-            renderBody: () => {
+            body: _.do(() => {
                 if(publishing.governedBy) {
                     let governor = ContentHelper.getContentByIdSync(publishing.governedBy);
 
-                    return _.div({class: 'settings-publishing'},
-                        _.p('(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)')
+                    return _.div({class: 'widget widget--label'},
+                        '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)'
                     );
                 
                 } else {
@@ -309,7 +302,7 @@ class ContentPane extends NavbarPane {
                         )
                     );
                 }
-            }
+            })
         });
 
         modal.$element.toggleClass('settings-modal content-settings-modal');

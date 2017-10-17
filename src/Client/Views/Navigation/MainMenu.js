@@ -57,9 +57,7 @@ class MainMenu extends Crisp.View {
             case 'media':
                 UI.messageModal('Media', [
                     _.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'),
-                    _.if(User.current.hasScope('settings'),
-                        _.p('The contents of this gallery depends on which Connection has been set up as the Media provider in the <a href="#/settings/providers/">providers settings</a>')
-                    )
+                    _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')
                 ]);
                 break;
 
@@ -70,9 +68,7 @@ class MainMenu extends Crisp.View {
             case 'templates':
                 UI.messageModal('Templates', [
                     _.p('This section contains rendering Templates for your authored Content.'),
-                    _.if(User.current.hasScope('settings'),
-                        _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.')
-                    )
+                    _.p('Templates are served through the Connection assigned as the Template provider.')
                 ]);
                 break;
 
@@ -143,12 +139,12 @@ class MainMenu extends Crisp.View {
                 icon: 'question-circle',
                 reverseKeys: true,
                 options: {
-                    'connections': () => { this.onClickQuestion('connections'); },
-                    'content': () => { this.onClickQuestion('content'); },
-                    'forms': () => { this.onClickQuestion('forms'); },
-                    'media': () => { this.onClickQuestion('media'); },
-                    'schemas': () => { this.onClickQuestion('schemas'); },
-                    'templates': () => { this.onClickQuestion('templates'); }
+                    'Connections': () => { this.onClickQuestion('connections'); },
+                    'Content': () => { this.onClickQuestion('content'); },
+                    'Forms': () => { this.onClickQuestion('forms'); },
+                    'Media': () => { this.onClickQuestion('media'); },
+                    'Schemas': () => { this.onClickQuestion('schemas'); },
+                    'Templates': () => { this.onClickQuestion('templates'); }
                 }
             }).$element
         );
