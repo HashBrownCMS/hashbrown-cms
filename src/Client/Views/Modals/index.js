@@ -10,5 +10,6 @@ module.exports = {
     IconModal: require('./IconModal'),
     ConfirmModal: require('./ConfirmModal'),
     DateModal: require('./DateModal'),
+    PublishingSettingsModal: require('./PublishingSettingsModal'),
     IframeModal: require('./IframeModal')
 };

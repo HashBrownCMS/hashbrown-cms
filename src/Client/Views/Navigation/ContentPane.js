@@ -224,15 +224,15 @@ class ContentPane extends NavbarPane {
      * @param {Content} content
      */
     static renderPublishingModal(content) {
-        let publishing = content.getSettings('publishing');
-        publishing = JSON.parse(JSON.stringify(publishing));
+        let modal = new HashBrown.Views.Modals.PublishingSettingsModal({
+            model: content
+        });
 
-        // Event on clicking OK
-        function onSubmit() {
-            if(publishing.governedBy) { return; }
+        modal.on('change', (newValue) => {
+            if(newValue.governedBy) { return; }
            
             // Commit publishing settings to Content model
-            content.settings.publishing = publishing;
+            content.settings.publishing = newValue;
     
             // API call to save the Content model
             RequestHelper.request('post', 'content/' + content.id, content)
@@ -253,59 +253,7 @@ class ContentPane extends NavbarPane {
                 }
             })
             .catch(UI.errorModal);
-        }
-        
-        let modal = new HashBrown.Views.Modals.Modal({
-            title: 'Publishing settings for "' + content.prop('title', window.language) + '"',
-            actions: [
-                {
-                    label: 'OK',
-                    onClick: () => {
-                        onSubmit();
-                    }
-                }
-            ],
-            body: _.do(() => {
-                if(publishing.governedBy) {
-                    let governor = ContentHelper.getContentByIdSync(publishing.governedBy);
-
-                    return _.div({class: 'widget widget--label'},
-                        '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)'
-                    );
-                
-                } else {
-                    return _.div({class: 'settings-publishing'},
-                        // Apply to children switch
-                        _.div({class: 'input-group'},      
-                            _.span('Apply to children'),
-                            _.div({class: 'input-group-addon'},
-                                UI.inputSwitch(publishing.applyToChildren === true, (newValue) => {
-                                    publishing.applyToChildren = newValue;   
-                                })
-                            )
-                        ),
-
-                        // Connection picker
-                        _.div({class: 'input-group'},      
-                            _.span('Connection'),
-                            _.div({class: 'input-group-addon'},
-                                new HashBrown.Views.Widgets.Dropdown({
-                                    options: resources.connections,
-                                    value: publishing.connectionId,
-                                    valueKey: 'id',
-                                    labelKey: 'name',
-                                    onChange: (newValue) => {
-                                        publishing.connectionId = newValue;
-                                    }
-                                }).$element
-                            )
-                        )
-                    );
-                }
-            })
         });
-
-        modal.$element.toggleClass('settings-modal content-settings-modal');
     }
 
     /**

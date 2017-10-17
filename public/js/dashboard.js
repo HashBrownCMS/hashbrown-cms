@@ -26440,6 +26440,7 @@ module.exports = {
     IconModal: __webpack_require__(198),
     ConfirmModal: __webpack_require__(199),
     DateModal: __webpack_require__(200),
+    PublishingSettingsModal: __webpack_require__(298),
     IframeModal: __webpack_require__(201)
 };
 
@@ -37295,6 +37296,111 @@ var MigrationEditor = function (_HashBrown$Views$Moda) {
 }(HashBrown.Views.Modals.Modal);
 
 module.exports = MigrationEditor;
+
+/***/ }),
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Modal = __webpack_require__(30);
+
+/**
+ * A dialog for editing publishing settings for Content nodes
+ */
+
+var PublishingSettingsModal = function (_Modal) {
+    _inherits(PublishingSettingsModal, _Modal);
+
+    /**
+     * Constructor
+     */
+    function PublishingSettingsModal(params) {
+        _classCallCheck(this, PublishingSettingsModal);
+
+        var _this = _possibleConstructorReturn(this, _Modal.call(this, params));
+
+        _this.title = 'Publishing settings for "' + _this.model.prop('title', window.language) + '"';
+        _this.actions = [{
+            label: 'OK',
+            onClick: function onClick() {
+                _this.trigger('change', _this.value);
+            }
+        }];
+
+        _this.value = JSON.parse(JSON.stringify(_this.model.getSettings('publishing')));
+        return _this;
+    }
+
+    /**
+     * Renders the body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    PublishingSettingsModal.prototype.renderBody = function renderBody() {
+        var _this2 = this;
+
+        if (this.value.governedBy) {
+            var governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
+
+            return _.div({ class: 'widget widget--label' }, '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)');
+        } else {
+            return _.div({ class: 'settings-publishing' },
+            // Apply to children switch
+            _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Apply to children'), new HashBrown.Views.Widgets.Input({
+                type: 'checkbox',
+                value: this.value.applyToChildren === true,
+                onChange: function onChange(newValue) {
+                    _this2.value.applyToChildren = newValue;
+                }
+            }).$element),
+
+            // Connection picker
+            _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Connection'), new HashBrown.Views.Widgets.Dropdown({
+                options: resources.connections,
+                value: publishing.connectionId,
+                valueKey: 'id',
+                labelKey: 'name',
+                onChange: function onChange(newValue) {
+                    publishing.connectionId = newValue;
+                }
+            }).$element));
+        }
+    };
+
+    return PublishingSettingsModal;
+}(Modal);
+
+module.exports = PublishingSettingsModal;
 
 /***/ })
 /******/ ]);
