@@ -122,12 +122,6 @@ class SchemaEditor extends Crisp.View {
             }
         }).$element));
         
-        switch(this.model.type) {
-            case 'field':
-       
-                break;
-        }
-
 
         return $element;
     }

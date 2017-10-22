@@ -18,6 +18,11 @@
                 "schemaId": "string",
                 "tabId": "content"
             },
+            "url": {
+                "label": "URL",
+                "schemaId": "url",
+                "tabId": "content"
+            },
             "template": {
                 "label": "Template",
                 "schemaId": "templateReference",
@@ -25,11 +30,6 @@
                 "config": {
                     "allowedTemplates": []
                 }
-            },
-            "url": {
-                "label": "URL",
-                "schemaId": "url",
-                "tabId": "content"
             }
         }
     }

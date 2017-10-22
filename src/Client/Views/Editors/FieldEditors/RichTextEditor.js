@@ -26,11 +26,17 @@ class RichTextEditor extends FieldEditor {
         super(params);
 
         // Sanity check of value
-        this.value = this.value || '';
+        if(typeof this.value !== 'string') {
+            this.value = this.value || '';
+        }
 
-        // Make sure convert is HTML
-        this.value = marked(this.value);
-
+        // Make sure the string is HTML
+        try {
+            this.value = marked(this.value);
+        } catch(e) {
+            // Catch this silly exception that marked does sometimes
+        }
+        
         this.fetch();
     }
 

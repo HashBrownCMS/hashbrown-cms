@@ -191,6 +191,11 @@
             margin-right: 1rem;
             line-height: 2rem;
 
+            // Widgets inside key
+            .widget:not(:last-child) {
+                margin-bottom: 0.5rem;
+            }
+
             // Key actions
             &__actions {
                 // Following state

@@ -107,6 +107,13 @@ class ContentSchemaEditor extends SchemaEditor {
                                         tooltip: 'The field label',
                                         value: fieldValue.label,
                                         onChange: (newValue) => { fieldValue.label = newValue; }
+                                    }).$element,
+                                    new HashBrown.Views.Widgets.Input({
+                                        type: 'checkbox',
+                                        placeholder: 'Multilingual',
+                                        tooltip: 'Whether or not this field should support multiple languages',
+                                        value: fieldValue.multilingual || false,
+                                        onChange: (newValue) => { fieldValue.multilingual = newValue; }
                                     }).$element
                                 ),
                                 _.div({class: 'editor__field__value'},

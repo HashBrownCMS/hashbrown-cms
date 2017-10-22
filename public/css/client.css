@@ -2393,6 +2393,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 * {
   box-sizing: border-box; }
 
+button, a {
+  cursor: pointer; }
+
 /**
  * All basic rules regarding typography
  */
@@ -2423,7 +2426,8 @@ html {
       font-size: 12px; } }
 
 a {
-  text-decoration: none; }
+  text-decoration: none;
+  color: #e70d3b; }
 
 body {
   font-family: 'Roboto', sans-serif; }
@@ -2754,6 +2758,8 @@ h1, h2, h3, h4, h5, h6 {
     flex-shrink: 0;
     margin-right: 1rem;
     line-height: 2rem; }
+    .editor__field__key .widget:not(:last-child) {
+      margin-bottom: 0.5rem; }
     .editor__field__key__actions.following {
       position: fixed;
       top: 80px; }
@@ -3618,6 +3624,8 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
     background-color: transparent;
     display: inline-block;
+    line-height: 2rem;
+    color: inherit;
     padding: 0;
     margin: 0;
     width: 9.5rem; }
@@ -3775,32 +3783,17 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0 !important;
     cursor: pointer;
     font-weight: 400;
-    background-color: #dddddd;
-    color: #333333;
+    background-color: #e70d3b;
+    color: #ffffff;
     max-width: none !important;
     border-top-right-radius: 0.2rem;
     border-bottom-right-radius: 0.2rem;
     position: absolute;
     white-space: nowrap;
-    left: 3rem;
-    transition: color 0.3s ease, background-color 0.3s ease; }
+    left: 2rem;
+    border-left: 1px solid #ffffff; }
     .widget--input__checkbox-label:hover {
-      background-color: #e70d3b;
-      color: #ffffff; }
-      .widget--input__checkbox-label:hover:before {
-        border-right-color: #e70d3b; }
-    .widget--input__checkbox-label:before {
-      transition: border-color 0.3s ease;
-      width: 0;
-      height: 0;
-      border-top: 1rem solid transparent;
-      border-bottom: 1rem solid transparent;
-      border-right: 1rem solid #dddddd;
-      display: block;
-      content: '';
-      position: absolute;
-      right: 100%;
-      top: 0; }
+      background-color: #b70a2f; }
   .widget--input__checkbox-input {
     cursor: pointer;
     opacity: 0; }

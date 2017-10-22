@@ -75,7 +75,7 @@ class MainMenu extends Crisp.View {
             case 'connections':
                 UI.messageModal('Connections', [
                     _.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'),
-                    _.p('Through the <a href="#/settings/providers/">providers settings</a>, they can also be set up to provide statically hosted media and serve rendering templates.')
+                    _.p('They can also be set up to provide statically hosted media and serve rendering templates.')
                 ]);
                 break;
 
