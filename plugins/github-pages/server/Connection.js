@@ -22,7 +22,22 @@ class GitHubConnection extends Connection {
     }
 
     /**
-     * Gets the remote URL based on exisintg information
+     * Gets the local URL
+     *
+     * @returns {String} URL
+     */
+    getLocalUrl() {
+        let path = this.settings.localPath || '';
+
+        if(path[path.length - 1] !== '/') {
+            path += '/';
+        }
+
+        return path;
+    }
+
+    /**
+     * Gets the remote URL based on exising information
      *
      * @returns {String} URL
      */
@@ -94,7 +109,7 @@ class GitHubConnection extends Connection {
             return new Promise((resolve, reject) => {
                 switch(type) {
                     default: case 'dir':
-                        FileSystem.readdir(this.settings.localPath + path, (err, data) => {
+                        FileSystem.readdir(this.getLocalUrl() + path, (err, data) => {
                             if(err) {
                                 debug.error(err, this);
                                 resolve([]);
@@ -107,7 +122,7 @@ class GitHubConnection extends Connection {
                         break;
 
                     case 'file':
-                        FileSystem.readFile(this.settings.localPath + path, (err, data) => {
+                        FileSystem.readFile(this.getLocalUrl() + path, (err, data) => {
                             if(err) {
                                 debug.error(err, this);
                                 resolve([]);
@@ -149,11 +164,11 @@ class GitHubConnection extends Connection {
             return new Promise((resolve, reject) => {
                 let dirPath = path.slice(0, path.lastIndexOf('/'));
 
-                MediaHelper.mkdirRecursively(this.settings.localPath + dirPath);
+                MediaHelper.mkdirRecursively(this.getLocalUrl() + dirPath);
 
-                debug.log('Writing file "' + this.settings.localPath + path + '"...', this);
+                debug.log('Writing file "' + this.getLocalUrl() + path + '"...', this);
 
-                FileSystem.writeFile(this.settings.localPath + path, content, (err) => {
+                FileSystem.writeFile(this.getLocalUrl() + path, content, (err) => {
                     if(err) {
                         reject(err);
                     } else {
@@ -210,7 +225,7 @@ class GitHubConnection extends Connection {
         // Delete content locally
         if(this.settings.isLocal) {
             return new Promise((resolve, reject) => {
-                RimRaf(this.settings.localPath + path, (err) => {
+                RimRaf(this.getLocalUrl() + path, (err) => {
                     if(err) {
                         reject(err);
                     } else {
@@ -281,7 +296,7 @@ class GitHubConnection extends Connection {
                 Glob(
                     path,
                     {
-                        cwd: this.settings.localPath,
+                        cwd: this.getLocalUrl(),
                         nodir: mode != 'dir'
                     }, 
                     (err, files) => {
@@ -522,7 +537,7 @@ class GitHubConnection extends Connection {
                 if(isInMediaDir && isFile) {
                     media[media.length] = new Media({
                         name: Path.basename(nodePath),
-                        id: Path.dirname(nodePath).replace('media/', '').replace(this.settings.localPath, ''),
+                        id: Path.dirname(nodePath).replace('media/', '').replace(this.getLocalUrl(), ''),
                         url: nodePath,
                         remote: this.settings.isLocal != true
                     });
@@ -552,7 +567,7 @@ class GitHubConnection extends Connection {
                     media = new Media({
                         name: file.name || Path.basename(file),
                         id: id,
-                        url: file.download_url || this.settings.localPath + 'media/' + id + '/' + file,
+                        url: file.download_url || this.getLocalUrl() + 'media/' + id + '/' + file,
                         remote: this.settings.isLocal != true
                     });
 
@@ -604,7 +619,7 @@ class GitHubConnection extends Connection {
             // Local behaviour        
             if(this.settings.isLocal) {
                 return new Promise((resolve, reject) => {
-                    let newDirPath = this.settings.localPath + path; 
+                    let newDirPath = this.getLocalUrl() + path; 
                     let newFilePath = newDirPath + '/' + file.filename; 
 
                     MediaHelper.mkdirRecursively(newDirPath);
@@ -683,7 +698,7 @@ class GitHubConnection extends Connection {
         // Remove file locally
         if(this.settings.isLocal) {
             return new Promise((resolve, reject) => {
-                RimRaf(this.settings.localPath + path, (err) => {
+                RimRaf(this.getLocalUrl() + path, (err) => {
                     if(err) {
                         reject(err);
                     } else {

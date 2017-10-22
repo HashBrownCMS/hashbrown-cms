@@ -112,8 +112,7 @@
         position: absolute;
         z-index: 1200;
 
-        .widget--dropdown__value,
-        .widget--dropdown__toggle {
+        .widget--dropdown__value {
             display: none;
         }
 
@@ -164,10 +163,19 @@
     }
 
     // Toggle active
+    &__toggle:checked {
+        position: fixed;
+        z-index: 900;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        cursor: auto;
+    }
+
     &__toggle:checked ~ &__options,
     &__toggle:checked ~ &__typeahead,
-    &__toggle:checked ~ &__typeahead__icon,
-    &__toggle:checked ~ &__obscure {
+    &__toggle:checked ~ &__typeahead__icon {
         display: block;
     }
     
@@ -293,22 +301,6 @@
         &:hover {
             color: $primary-text;
             background-color: $primary;
-        }
-    }
-
-    // Obscure
-    &__obscure {
-        position: relative;
-        display: none;
-
-        &__inner {
-            position: fixed;
-            z-index: 900;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
         }
     }
 }

@@ -36,10 +36,14 @@ class GitHubPagesConnectionEditor extends Crisp.View {
      * Render local path editor
      */
     renderLocalPathEditor() {
-        return _.input({class: 'widget widget--input text', type: 'text', value: this.model.localPath, placeholder: 'Input local path'})
-            .on('input', (e) => {
-                this.model.localPath = e.currentTarget.value;
-            });
+        return new HashBrown.Views.Widgets.Input({
+            type: 'text',
+            value: this.model.localPath,
+            placeholder: 'Input local path',
+            onChange: (newValue) => {
+                this.model.localPath = newValue;
+            }
+        }).$element;
     }
     
     /**

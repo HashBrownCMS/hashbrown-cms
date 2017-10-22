@@ -68,6 +68,25 @@
         }
     }
 
+    // Notifier
+    &__notifier {
+        position: absolute;
+        line-height: 1.5rem;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        display: block;
+        top: -0.75rem;
+        right: calc(100% - 0.75rem);
+        background-color: $primary;
+        color: $primary-text;
+        border-radius: 1rem;
+        text-align: center;
+        font-size: 0.7rem;
+        font-weight: bold;
+        white-space: nowrap;
+        padding: 0 0.3rem;
+    }
+
     // Working state
     &.working {
         pointer-events: none;

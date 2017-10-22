@@ -65,7 +65,7 @@ class Input extends Widget {
             case 'file':
                 return _.form({class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title},
                     _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded'}, this.placeholder || 'Browse...'), 
-                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple})
+                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
                         .on('change', (e) => {
                             let names = [];
                             let files = e.currentTarget.files;

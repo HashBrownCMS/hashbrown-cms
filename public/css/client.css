@@ -3448,6 +3448,22 @@ h1, h2, h3, h4, h5, h6 {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%); }
+  .widget__notifier {
+    position: absolute;
+    line-height: 1.5rem;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    top: -0.75rem;
+    right: calc(100% - 0.75rem);
+    background-color: #e70d3b;
+    color: #ffffff;
+    border-radius: 1rem;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    white-space: nowrap;
+    padding: 0 0.3rem; }
   .widget.working {
     pointer-events: none;
     cursor: not-allowed; }
@@ -3877,8 +3893,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 16rem;
     position: absolute;
     z-index: 1200; }
-    .widget--dropdown.context-menu .widget--dropdown__value,
-    .widget--dropdown.context-menu .widget--dropdown__toggle {
+    .widget--dropdown.context-menu .widget--dropdown__value {
       display: none; }
     .widget--dropdown.context-menu .widget--dropdown__options {
       top: 0;
@@ -3912,10 +3927,17 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 20; }
     .has-icon .widget--dropdown__toggle {
       width: 2rem; }
+  .widget--dropdown__toggle:checked {
+    position: fixed;
+    z-index: 900;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    cursor: auto; }
   .widget--dropdown__toggle:checked ~ .widget--dropdown__options,
   .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead,
-  .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead__icon,
-  .widget--dropdown__toggle:checked ~ .widget--dropdown__obscure {
+  .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead__icon {
     display: block; }
   .widget--dropdown__typeahead {
     display: none;
@@ -4013,14 +4035,3 @@ h1, h2, h3, h4, h5, h6 {
     .widget--dropdown__clear:hover {
       color: #ffffff;
       background-color: #e70d3b; }
-  .widget--dropdown__obscure {
-    position: relative;
-    display: none; }
-    .widget--dropdown__obscure__inner {
-      position: fixed;
-      z-index: 900;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background-color: rgba(255, 255, 255, 0.1); }

@@ -11504,21 +11504,48 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Widget = function (_Crisp$View) {
-  _inherits(Widget, _Crisp$View);
+    _inherits(Widget, _Crisp$View);
 
-  /**
-   * Constructor
-   */
-  function Widget(params) {
-    _classCallCheck(this, Widget);
+    /**
+     * Constructor
+     */
+    function Widget(params) {
+        _classCallCheck(this, Widget);
 
-    var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-    _this.fetch();
-    return _this;
-  }
+        _this.fetch();
+        return _this;
+    }
 
-  return Widget;
+    /**
+     * Adds a notifying message
+     *
+     * @param {String} message
+     */
+
+
+    Widget.prototype.notify = function notify(message) {
+        var notifier = this.element.querySelector('.widget__notifier');
+
+        if (!message) {
+            if (notifier) {
+                notifier.parentElement.removeChild(notifier);
+            }
+
+            return;
+        }
+
+        if (!notifier) {
+            notifier = _.div({ class: 'widget__notifier' }, message);
+
+            _.append(this.element, notifier);
+        }
+
+        notifier.innerHTML = message;
+    };
+
+    return Widget;
 }(Crisp.View);
 
 module.exports = Widget;
@@ -26113,11 +26140,6 @@ var Dropdown = function (_Widget) {
         // Clear button
         _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear fa fa-remove', title: 'Clear selection' }).click(function (e) {
             _this3.onChangeInternal(null);
-        })),
-
-        // Obscure
-        _.div({ class: 'widget--dropdown__obscure' }, _.div({ class: 'widget--dropdown__obscure__inner' }).click(function (e) {
-            _this3.onCancel();
         })));
     };
 
@@ -26370,7 +26392,7 @@ var Input = function (_Widget) {
                 }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
 
             case 'file':
-                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple }).on('change', function (e) {
+                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
                     var names = [];
                     var files = e.currentTarget.files;
 

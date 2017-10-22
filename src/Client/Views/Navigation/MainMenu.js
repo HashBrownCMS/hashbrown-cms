@@ -97,6 +97,8 @@ class MainMenu extends Crisp.View {
      */
     postrender() {
         $('.page--environment__space--menu').html(this.$element);
+    
+        this.languageDropdown.notify(window.language);
     }
 
     /**
@@ -106,7 +108,7 @@ class MainMenu extends Crisp.View {
         return _.div({class: 'main-menu widget-group'},
             // Language picker
             _.if(Array.isArray(this.languages) && this.languages.length > 1,
-                new HashBrown.Views.Widgets.Dropdown({
+                this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
                     tooltip: 'Language',
                     icon: 'flag',
                     value: window.language,
@@ -114,11 +116,11 @@ class MainMenu extends Crisp.View {
                     onChange: (newValue) => {
                         this.onChangeLanguage(newValue);
                     }
-                }).$element
+                })
             ),
 
             // User dropdown
-            new HashBrown.Views.Widgets.Dropdown({
+            this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
                 tooltip: 'Logged in as "' + (User.current.fullName || User.current.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
@@ -131,10 +133,10 @@ class MainMenu extends Crisp.View {
                         });
                     }
                 }
-            }).$element,
+            }),
 
             // Help
-            new HashBrown.Views.Widgets.Dropdown({
+            this.helpDropdown = new HashBrown.Views.Widgets.Dropdown({
                 tooltip: 'Get help',
                 icon: 'question-circle',
                 reverseKeys: true,
@@ -146,7 +148,7 @@ class MainMenu extends Crisp.View {
                     'Schemas': () => { this.onClickQuestion('schemas'); },
                     'Templates': () => { this.onClickQuestion('templates'); }
                 }
-            }).$element
+            })
         );
     }
 }

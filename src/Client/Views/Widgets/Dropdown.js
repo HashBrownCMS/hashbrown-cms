@@ -294,12 +294,6 @@ class Dropdown extends Widget {
                     .click((e) => {
                     this.onChangeInternal(null);
                 })
-            ),
-
-            // Obscure
-            _.div({class: 'widget--dropdown__obscure'},
-                _.div({class: 'widget--dropdown__obscure__inner'})
-                    .click((e) => { this.onCancel(); })
             )
         );
     }
