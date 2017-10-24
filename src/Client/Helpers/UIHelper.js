@@ -1,7 +1,5 @@
 'use strict';
 
-const MessageModal = require('Client/Views/Modals/MessageModal');
-
 /**
  * A UI helper for creating and handling common interface behaviours
  *

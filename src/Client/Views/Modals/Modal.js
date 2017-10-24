@@ -146,4 +146,29 @@ class Modal extends Crisp.View {
     }
 }
 
+// Modal key events
+document.addEventListener('keyup', (e) => {
+    let modal = Crisp.View.getAll(Modal).pop();
+    
+    if(!modal) { return; }
+
+    switch(e.which) {
+        case 27: // Escape
+            if(modal.element.querySelector('.modal__close')) {
+                modal.close();
+            }
+            break;
+
+        case 13: // Enter
+            if((!modal.actions || modal.actions.length === 0) && modal.renderFooter === Modal.renderFooter) {
+                modal.close();
+                modal.trigger('ok');
+            } else if(modal.actions.length === 1) {
+                modal.close();
+                modal.actions[0].onClick();
+            }
+            break;
+    }
+});
+
 module.exports = Modal;

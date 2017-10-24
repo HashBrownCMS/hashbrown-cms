@@ -3,7 +3,7 @@
 const Widget = require('./Widget');
 
 /**
- * A generic dropdown
+ * A multi purpose dropdown
  *
  * @memberof HashBrown.Client.Views.Widgets
  */

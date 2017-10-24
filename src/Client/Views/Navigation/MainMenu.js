@@ -14,6 +14,8 @@ class MainMenu extends Crisp.View {
         super(params);
         
         this.fetch();
+        
+        $('.page--environment__space--menu').html(this.$element);
     }
     
     /**
@@ -96,8 +98,6 @@ class MainMenu extends Crisp.View {
      * Post render
      */
     postrender() {
-        $('.page--environment__space--menu').html(this.$element);
-    
         this.languageDropdown.notify(window.language);
     }
 

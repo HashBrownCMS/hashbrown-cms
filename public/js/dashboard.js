@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 272);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -6815,6 +6815,37 @@ var Modal = function (_Crisp$View) {
 
     return Modal;
 }(Crisp.View);
+
+// Modal key events
+
+
+document.addEventListener('keyup', function (e) {
+    var modal = Crisp.View.getAll(Modal).pop();
+
+    if (!modal) {
+        return;
+    }
+
+    switch (e.which) {
+        case 27:
+            // Escape
+            if (modal.element.querySelector('.modal__close')) {
+                modal.close();
+            }
+            break;
+
+        case 13:
+            // Enter
+            if ((!modal.actions || modal.actions.length === 0) && modal.renderFooter === Modal.renderFooter) {
+                modal.close();
+                modal.trigger('ok');
+            } else if (modal.actions.length === 1) {
+                modal.close();
+                modal.actions[0].onClick();
+            }
+            break;
+    }
+});
 
 module.exports = Modal;
 
@@ -25819,7 +25850,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Widget = __webpack_require__(58);
 
 /**
- * A generic dropdown
+ * A multi purpose dropdown
  *
  * @memberof HashBrown.Client.Views.Widgets
  */
@@ -27812,15 +27843,13 @@ module.exports = TemplateHelper;
 "use strict";
 
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MessageModal = __webpack_require__(213);
-
 /**
  * A UI helper for creating and handling common interface behaviours
  *
  * @memberof HashBrown.Client.Helpers
  */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var UIHelper = function () {
     function UIHelper() {
@@ -28475,127 +28504,9 @@ module.exports = UIHelper;
 /* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-/**
- * A basic modal for displaying messages to the user
- *
- * @memberof HashBrown.Client.Views.Modals
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var MessageModal = function (_Crisp$View) {
-    _inherits(MessageModal, _Crisp$View);
-
-    function MessageModal(params) {
-        _classCallCheck(this, MessageModal);
-
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        var otherModals = Crisp.View.getAll('MessageModal');
-
-        for (var i in otherModals) {
-            if (otherModals[i] !== _this) {
-                otherModals[i].hide();
-            }
-        }
-
-        _this.fetch();
-        return _this;
-    }
-
-    MessageModal.prototype.hide = function hide() {
-        this.$element.modal('hide');
-    };
-
-    MessageModal.prototype.show = function show() {
-        this.$element.modal('show');
-    };
-
-    MessageModal.prototype.onClickOK = function onClickOK() {
-        if (typeof this.model.onSubmit === 'function') {
-            if (this.model.onSubmit() == false) {
-                return;
-            }
-        }
-
-        this.hide();
-    };
-
-    MessageModal.prototype.reload = function reload() {
-        _.append(this.$element.find('.modal-title').empty(), this.renderTitle());
-        _.append(this.$element.find('.modal-body').empty(), this.renderBody());
-    };
-
-    MessageModal.prototype.renderTitle = function renderTitle() {
-        return this.model.title;
-    };
-
-    MessageModal.prototype.renderBody = function renderBody() {
-        return this.model.body;
-    };
-
-    MessageModal.prototype.template = function template() {
-        var _this2 = this;
-
-        return _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.renderTitle())), _.div({ class: 'modal-body' }, this.renderBody()), _.div({ class: 'modal-footer' }, _.if(this.buttons, _.each(this.buttons, function (i, button) {
-            var $button = _.button({ class: 'btn ' + button.class }, button.label).click(function () {
-                if (button.callback) {
-                    if (button.callback() != false) {
-                        _this2.hide();
-                    }
-                } else {
-                    _this2.hide();
-                }
-            });
-
-            if (button.disabled) {
-                $button.attr('disabled', true);
-            }
-
-            return $button;
-        })), _.if(!this.buttons && this.model.onSubmit != false, _.button({ class: 'btn btn-default' }, 'OK').click(function () {
-            _this2.onClickOK();
-        }))))));
-
-        // Callback was set to false, disable dismissing
-        if (this.model.onSubmit == false) {
-            this.$element.attr('data-backdrop', 'static');
-            this.$element.attr('data-keyboard', 'false');
-        }
-
-        $('body').append(this.$element);
-
-        this.$element.find('a').click(function () {
-            _this2.hide();
-        });
-
-        this.$element.modal('show');
-
-        this.$element.on('hidden.bs.modal', function () {
-            _this2.trigger('close');
-            _this2.remove();
-        });
-    };
-
-    return MessageModal;
-}(Crisp.View);
-
-module.exports = MessageModal;
-
-/***/ }),
-/* 214 */
-/***/ (function(module, exports, __webpack_require__) {
-
-window.Promise = __webpack_require__(215);
-window.marked = __webpack_require__(216);
-window.toMarkdown = __webpack_require__(217);
+window.Promise = __webpack_require__(214);
+window.marked = __webpack_require__(215);
+window.toMarkdown = __webpack_require__(216);
 
 var ProjectHelper = __webpack_require__(5);
 var User = __webpack_require__(32);
@@ -28694,13 +28605,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(225);
+window.app = __webpack_require__(224);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 215 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -34031,7 +33942,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(62).setImmediate))
 
 /***/ }),
-/* 216 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -35220,7 +35131,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 217 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35236,10 +35147,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(218);
-var gfmConverters = __webpack_require__(219);
-var HtmlParser = __webpack_require__(220);
-var collapse = __webpack_require__(222);
+var mdConverters = __webpack_require__(217);
+var gfmConverters = __webpack_require__(218);
+var HtmlParser = __webpack_require__(219);
+var collapse = __webpack_require__(221);
 
 /*
  * Utilities
@@ -35447,7 +35358,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 218 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35580,7 +35491,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 219 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35680,7 +35591,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 220 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -35714,7 +35625,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(221);
+    var jsdom = __webpack_require__(220);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -35761,25 +35672,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 221 */
+/* 220 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 222 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(223);
+var voidElements = __webpack_require__(222);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(224).forEach(function (name) {
+__webpack_require__(223).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -35909,7 +35820,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 223 */
+/* 222 */
 /***/ (function(module, exports) {
 
 /**
@@ -35937,7 +35848,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 224 */
+/* 223 */
 /***/ (function(module, exports) {
 
 /**
@@ -35948,7 +35859,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 225 */
+/* 224 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -36000,6 +35911,7 @@ module.exports = {
 };
 
 /***/ }),
+/* 225 */,
 /* 226 */,
 /* 227 */,
 /* 228 */,
@@ -36045,8 +35957,7 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */,
-/* 272 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36065,7 +35976,7 @@ HashBrown.Views.Modals = __webpack_require__(195);
 HashBrown.Views.Widgets = __webpack_require__(191);
 
 // Helper functions
-__webpack_require__(214);
+__webpack_require__(213);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -36091,7 +36002,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
     projects = projects || [];
 
-    var ProjectEditor = __webpack_require__(273);
+    var ProjectEditor = __webpack_require__(272);
 
     for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
@@ -36334,7 +36245,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 273 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36348,11 +36259,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Project = __webpack_require__(59);
 var RequestHelper = __webpack_require__(2);
-var InfoEditor = __webpack_require__(274);
-var SyncEditor = __webpack_require__(275);
-var LanguageEditor = __webpack_require__(276);
-var BackupEditor = __webpack_require__(277);
-var MigrationEditor = __webpack_require__(278);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -36647,7 +36558,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 274 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36738,7 +36649,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 275 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36964,7 +36875,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 276 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37049,7 +36960,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 277 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37265,7 +37176,7 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 278 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
