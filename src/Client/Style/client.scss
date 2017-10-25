@@ -3,15 +3,17 @@ $md: 'max-width: 1399px';
 $sm: 'max-width: 991px';
 $xs: 'max-width: 767px';
 
+// TODO: Move
+@import 'Tools/Colors';
+
+
 // Helpers
 @import '_helpers';
 
-@import '_colors';
-@import '_util';
-@import '_main';
-@import '_welcome';
-@import '_dashboard';
-@import '_navbar-main';
+//@import '_main';
+//@import '_welcome';
+//@import '_dashboard';
+//@import '_navbar-main';
 @import '_settings';
 @import '_login';
 
@@ -73,6 +75,7 @@ $xs: 'max-width: 767px';
 
 // Navigation
 @import 'Views/Navigation/MainMenu';
+@import 'Views/Navigation/NavbarMain';
 
 // Editors
 @import 'Views/Editors/Editor';

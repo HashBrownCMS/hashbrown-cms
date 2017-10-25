@@ -21,7 +21,7 @@ class NavbarMain extends Crisp.View {
 
         this.fetch();
         
-        $('.navspace').html(this.$element);
+        $('.page--environment__space--nav').html(this.$element);
     }
     
     /**

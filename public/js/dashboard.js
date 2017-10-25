@@ -28592,10 +28592,10 @@ window.clearWorkspace = function clearWorkspace() {
  * Sets workspace content
  */
 window.populateWorkspace = function populateWorkspace($html, classes) {
-    var $workspace = $('.workspace');
+    var $workspace = $('.page--environment__space--editor');
 
     $workspace.empty();
-    $workspace.attr('class', 'workspace');
+    $workspace.attr('class', 'page--environment__space--editor');
 
     _.append($workspace, $html);
 

@@ -2,8 +2,32 @@
  * Environment page style
  */
 .page--environment {
-    &__spaces {
+    // Media picker mode
+    &.media-picker {
+        .page--environment__space--nav .navbar-main .tab-buttons,
+        .page--environment__space--menu,
+        .page--environment__space--editor .editor__header { 
+            display: none;
+        }
+    }
+    
+    // Faded mode
+    &.faded {
+        pointer-events: none;
+        opacity: 0;
 
+        & + .spinner-obscure {
+            opacity: 1;
+        }
+    }
+
+    &__spaces {
+        display: flex;
+        height: 100%;
+        transition: opacity 0.5s ease;
+        opacity: 1;
+        position: relative;
+        z-index: 2;
     }
 
     &__space {
@@ -21,7 +45,22 @@
             z-index: 50;
         }
 
+        &--nav {
+            width: 30rem;
+            flex-basis: 30rem;
+            flex-shrink: 0;
+            height: 100%;
+            transition: width 0.5s, flex-basis 0.5s;
+            
+            @media($sm) {
+                overflow-x: hidden;
+            }
+        }
+
         &--editor {
+            flex-grow: 1;
+            height: 100%;
+
             &__text {
                 max-width: calc(100% - 7rem);
                 max-height: calc(100% - 4rem);

@@ -109,7 +109,6 @@
     }
 
     .dropdown-menu {
-        @extend .raised;
         padding: 10px 0px !important;
         border: 1px solid $standard-darker;
         border-radius: 2px;
