@@ -17,10 +17,32 @@ class ProjectHelper {
     /**
      * Gets a list of all available projects
      *
-     * @returns {Promise} Array of Project objects
+     * @returns {Promise} Array of Project names
      */
-    static getAllProjects() {
-        return DatabaseHelper.listDatabases();
+    static getAllProjectNames() {
+        return DatabaseHelper.listDatabases()
+        .then((allDatabases) => {
+            allDatabases = allDatabases || [];
+
+            let allProjects = [];
+
+            let checkNextProject = () => {
+                let db = allDatabases.pop();
+
+                if(!db) { return Promise.resolve(allProjects); }
+
+                return this.projectExists(db)
+                .then((projectExists) => {
+                    if(projectExists) {
+                        allProjects.push(db);
+                    }
+
+                    return checkNextProject();
+                });
+            };
+
+            return checkNextProject();
+        });
     }
 
     /**
@@ -31,7 +53,7 @@ class ProjectHelper {
      * returns {Promise} Promise
      */
     static projectExists(project) {
-        return DatabaseHelper.databaseExists(project);
+        return DatabaseHelper.collectionExists(project, 'settings');
     }
     
     /**
@@ -58,7 +80,7 @@ class ProjectHelper {
      *
      * @param {String} project
      *
-     * @returns {Promise}
+     * @returns {Promise} Result
      */
     static checkProject(
         project = requiredParam('project')

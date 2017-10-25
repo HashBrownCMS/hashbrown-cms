@@ -251,7 +251,14 @@ class DatabaseHelper {
     static collectionExists(databaseName, collectionName) {
         return this.listCollections(databaseName)
         .then((collections) => {
-            return Promise.resolve(collections.indexOf(collectionName) > -1);
+
+            for(let collection of collections || []) {
+                if(collection.name === collectionName) {
+                    return Promise.resolve(true);
+                }
+            }
+            
+            return Promise.resolve(false);
         });
     }
 

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 271);
+/******/ 	return __webpack_require__(__webpack_require__.s = 270);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -16011,12 +16011,12 @@ var MediaUploader = function (_Crisp$View) {
                     if (isImage) {
                         var reader = new FileReader();
 
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                        uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                         reader.onload = function (e) {
                             uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
 
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                            uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
                         };
 
                         reader.readAsDataURL(file);
@@ -16049,7 +16049,7 @@ var MediaUploader = function (_Crisp$View) {
             var onSubmit = function onSubmit(e, content) {
                 e.preventDefault();
 
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                 var apiPath = 'media/' + (_this.replaceId ? 'replace/' + _this.replaceId : 'new');
                 var uploadedIds = [];
@@ -16107,7 +16107,7 @@ var MediaUploader = function (_Crisp$View) {
 
                 // Then update the UI and trigger the success callback
                 .then(function () {
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
 
                     HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -16124,7 +16124,7 @@ var MediaUploader = function (_Crisp$View) {
                 model: {
                     class: 'modal-upload-media',
                     title: 'Upload a file',
-                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
+                    body: [_.div({ class: 'widget widget--spinner embedded hidden' }, _.span({ class: 'widget--spinner__image fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
                         if (typeof _this.onChangeFile === 'function') {
                             _this.onChangeFile(e);
                         }
@@ -27857,12 +27857,30 @@ var UIHelper = function () {
     }
 
     /**
+     * Sets the content of the editor space
+     *
+     * @param {Array|HTMLElement} content
+     * @param {String} className
+     */
+    UIHelper.setEditorSpaceContent = function setEditorSpaceContent(content, className) {
+        var $space = $('.page--environment__space--editor');
+
+        if (className) {
+            content = _.div({ class: 'page--environment__space--editor__' + className }, content);
+        }
+
+        _.append($space.empty(), content);
+    };
+
+    /**
      * Creates a sortable context specific to arrays using editor fields
      *
      * @param {Array} array
      * @param {HTMLElement} field
      * @param {Function} onChange
      */
+
+
     UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
         array = array || [];
 
@@ -35956,8 +35974,7 @@ module.exports = {
 /* 267 */,
 /* 268 */,
 /* 269 */,
-/* 270 */,
-/* 271 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36002,7 +36019,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
     projects = projects || [];
 
-    var ProjectEditor = __webpack_require__(272);
+    var ProjectEditor = __webpack_require__(271);
 
     for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
@@ -36245,7 +36262,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 272 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36259,11 +36276,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Project = __webpack_require__(59);
 var RequestHelper = __webpack_require__(2);
-var InfoEditor = __webpack_require__(273);
-var SyncEditor = __webpack_require__(274);
-var LanguageEditor = __webpack_require__(275);
-var BackupEditor = __webpack_require__(276);
-var MigrationEditor = __webpack_require__(277);
+var InfoEditor = __webpack_require__(272);
+var SyncEditor = __webpack_require__(273);
+var LanguageEditor = __webpack_require__(274);
+var BackupEditor = __webpack_require__(275);
+var MigrationEditor = __webpack_require__(276);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -36558,7 +36575,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 273 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36649,7 +36666,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 274 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36875,7 +36892,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 275 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36960,7 +36977,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 276 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37176,7 +37193,7 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 277 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -15,34 +15,35 @@ class TemplatePane extends NavbarPane {
      * Event: Click add Template
      */
     static onClickAddTemplate() {
-        let newTemplate = new Template({type: 'page'});
+        let newTemplate = new HashBrown.Models.Template({
+            type: 'page',
+            name: 'myTemplate.html'
+        });
 
         UI.confirmModal(
             'add',
             'Add new template',
             [
-                _.div({class: 'input-group'}, 
-                    _.span('Type'),
-                    _.div({class: 'input-group-addon'}, 
-                        _.select({class: 'form-control'},
-                            _.each(['page', 'partial'], (i, type) => {
-                                return _.option({value: type}, type);
-                            })
-                        )
-                        .val(newTemplate.type)
-                        .on('change', (e) => {
-                            newTemplate.type = e.target.value;
-                        })
-                    )
+                _.div({class: 'widget-group'}, 
+                    _.label({class: 'widget widget--label'}, 'Type'),
+                    new HashBrown.Views.Widgets.Dropdown({
+                        options: [ 'page', 'partial' ],
+                        value: newTemplate.type,
+                        onChange: (newValue) => {
+                            newTemplate.type = newValue;
+                        }
+                    }).$element
                 ),
-                _.div({class: 'input-group'}, 
-                    _.span('Name'),
-                    _.div({class: 'input-group-addon'}, 
-                        _.input({class: 'form-control', type: 'text', placeholder: 'Template name'})
-                        .on('change keyup paste propertychange', (e) => {
-                            newTemplate.name = e.target.value;
-                        })
-                    )
+                _.div({class: 'widget-group'}, 
+                    _.label({class: 'widget widget--label'}, 'Name'),
+                    new HashBrown.Views.Widgets.Input({
+                        placeholder: 'Template name',
+                        value: newTemplate.name,
+                        type: 'text',
+                        onChange: (newValue) => {
+                            newTemplate.name = newValue;
+                        }
+                    }).$element
                 )
             ],
             () => {
@@ -136,12 +137,16 @@ class TemplatePane extends NavbarPane {
         UI.confirmModal(
             'rename',
             'Rename "' + model.name + '"',
-            _.input({class: 'form-control', type: 'text', value: model.name, placeholder: 'Enter Template name'})
-            .on('keyup paste change propertychange', (e) => {
-                let oldName = model.name;
-
-                model.name = e.target.value;
-            }),
+            _.div({class: 'widget-group'},
+                _.label({class: 'widget widget--label'}, 'New name'),
+                new HashBrown.Views.Widgets.Input({
+                    value: model.name,
+                    placeholder: 'Enter Template name',
+                    onChange: (newValue) => {
+                        model.name = newValue;
+                    }
+                }).$element
+            ),
             () => {
                 RequestHelper.request('post', 'templates/' + type + '/' + id, model)
                 .then((newTemplate) => {

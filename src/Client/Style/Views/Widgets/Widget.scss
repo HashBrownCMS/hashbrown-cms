@@ -8,6 +8,8 @@
 
 .widget {
     position: relative;
+    text-align: inherit;
+    font-size: inherit;
 
     // Group
     &-group {
@@ -23,7 +25,6 @@
 
         > .widget {
             border-radius: 0 !important;
-            flex-basis: 0;
             flex-grow: 1;
         }
 

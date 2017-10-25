@@ -7,12 +7,13 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
 Crisp.Router.route('/media/', function() {
     Crisp.View.get('NavbarMain').showTab('/media/');
     
-    populateWorkspace(
-        _.div({class: 'dashboard-container'},
+    UI.setEditorSpaceContent(
+        [
             _.h1('Media'),
-            _.p('Please click on a media object to proceed')
-        ),
-        'presentation presentation-center'
+            _.p('Right click in the Media pane to create a new Media.'),
+            _.p('Click on a Media node to edit it.')
+        ],
+        'text'
     );
 });
 
@@ -24,5 +25,5 @@ Crisp.Router.route('/media/:id', function() {
     
     Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);
     
-    populateWorkspace(mediaViewer.$element);
+    UI.setEditorSpaceContent(mediaViewer.$element);
 });

@@ -8,12 +8,13 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
 Crisp.Router.route('/forms/', function() {
     Crisp.View.get('NavbarMain').showTab('/forms/');
     
-    populateWorkspace(
-        _.div({class: 'dashboard-container'},
+    UI.setEditorSpaceContent(
+        [
             _.h1('Forms'),
-            _.p('Please click on a form to proceed')
-        ),
-        'presentation presentation-center'
+            _.p('Right click in the Forms pane to create a new Form.'),
+            _.p('Click on a Form to edit it.')
+        ],
+        'text'
     );
 });
 
@@ -25,7 +26,7 @@ Crisp.Router.route('/forms/:id', function() {
         modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
     });
    
-    populateWorkspace(formEditor.$element);
+    UI.setEditorSpaceContent(formEditor.$element);
 });
 
 // Edit (JSON editor)
@@ -37,5 +38,5 @@ Crisp.Router.route('/forms/json/:id', function() {
      
     Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
-    populateWorkspace(formEditor.$element);
+    UI.setEditorSpaceContent(formEditor.$element);
 });

@@ -41,7 +41,7 @@ class MediaUploader extends Crisp.View {
                     if(isImage) {
                         let reader = new FileReader();
                         
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                        uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                         reader.onload = function(e) {
                             uploadModal.$element.find('.media-preview').html(
@@ -49,7 +49,7 @@ class MediaUploader extends Crisp.View {
                             );
 
 
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                            uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
                         }
                         
                         reader.readAsDataURL(file);
@@ -88,7 +88,7 @@ class MediaUploader extends Crisp.View {
             let onSubmit = (e, content) => {
                 e.preventDefault();
 
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                 let apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
                 let uploadedIds = [];
@@ -145,7 +145,7 @@ class MediaUploader extends Crisp.View {
 
                 // Then update the UI and trigger the success callback
                 .then(() => {
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
 
                     HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -163,8 +163,8 @@ class MediaUploader extends Crisp.View {
                     class: 'modal-upload-media',
                     title: 'Upload a file',
                     body: [
-                        _.div({class: 'spinner-container hidden'},
-                            _.span({class: 'spinner fa fa-refresh'})
+                        _.div({class: 'widget widget--spinner embedded hidden'},
+                            _.span({class: 'widget--spinner__image fa fa-refresh'})
                         ),
                         _.div({class: 'media-preview'}),
                         _.form({class: 'form-control'},

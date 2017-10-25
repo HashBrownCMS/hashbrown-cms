@@ -61,7 +61,7 @@ function getParam(name) {
     return decodeURIComponent(results[2].replace(/\+/g, " ")) || '';
 }
 
-$('.login').each(function() {
+$('.page--login__login').each(function() {
     var $login = $(this);
     
     $(document).keyup(function(e) {
@@ -120,8 +120,8 @@ $('.login').each(function() {
             location = newLocation || '/';
         })
         .catch(function(e) {
-            $('.login-container .message').remove();
-            $('.login-container').prepend('<div class="message raised">' + e + '</div>');
+            $('.widget--message').remove();
+            $('.page--login').prepend('<div class="widget widget--message">' + e + '</div>');
         });
     }); 
 }); 

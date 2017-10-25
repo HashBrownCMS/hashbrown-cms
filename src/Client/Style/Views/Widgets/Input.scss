@@ -5,6 +5,11 @@
     display: block;
     line-height: 2rem;
 
+    // Tall mode
+    &.tall {
+        line-height: 3rem;
+    }
+
     // Text-like inputs
     &.text,
     &.password,
@@ -15,6 +20,11 @@
         height: 2rem;
         width: 100%;
         max-width: 20rem;
+        
+        // Tall mode
+        &.tall {
+            height: 3rem;
+        }
 
         &:focus {
             outline: none;

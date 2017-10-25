@@ -10,13 +10,14 @@ Crisp.Router.route('/', () => {
 // Dashboard
 Crisp.Router.route('/content/', () => {
     Crisp.View.get('NavbarMain').showTab('/content/');
-   
-    populateWorkspace(
-        _.div({class: 'dashboard-container'},
+  
+    UI.setEditorSpaceContent(
+        [
             _.h1('Content'),
-            _.p('Please click on a content node to proceed')
-        ),
-        'presentation presentation-center'
+            _.p('Right click in the Content pane to create a new Content.'),
+            _.p('Click on a Content node to edit it.')
+        ],
+        'text'
     );
 });
 
@@ -29,7 +30,7 @@ Crisp.Router.route('/content/json/:id', () => {
         apiPath: 'content/' + Crisp.Router.params.id
     });
 
-    populateWorkspace(contentEditor.$element);
+    UI.setEditorSpaceContent(contentEditor.$element);
 });
 
 // Edit (redirect to default tab)
@@ -64,7 +65,7 @@ Crisp.Router.route('/content/:id/:tab', () => {
             modelUrl: RequestHelper.environmentUrl('content/' + Crisp.Router.params.id)
         });
     
-        populateWorkspace(contentEditor.$element);
+        UI.setEditorSpaceContent(contentEditor.$element);
     } else {
         contentEditor.fetch();
     }

@@ -19,7 +19,7 @@ class ServerController extends ApiController {
      */
     static init(app) {
         app.get('/api/server/update/check', this.middleware({ setProject: false }), this.getUpdateCheck);
-        app.get('/api/server/projects', this.middleware({ setProject: false }), this.getAllProjects);
+        app.get('/api/server/projects', this.middleware({ setProject: false }), this.getAllProjectNames);
         app.get('/api/server/projects/:project', this.middleware({ setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ setProject: false }), this.getAllEnvironments);
         app.get('/api/server/backups/:project/:timestamp.hba', this.middleware({ setProject: false }), this.getBackup);
@@ -340,8 +340,8 @@ class ServerController extends ApiController {
     /**
      * Gets a list of all projects
      */
-    static getAllProjects(req, res) {
-        ProjectHelper.getAllProjects()
+    static getAllProjectNames(req, res) {
+        ProjectHelper.getAllProjectNames()
         .then((projects) => {
             let scopedProjects = [];
 

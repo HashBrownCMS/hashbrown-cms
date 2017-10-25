@@ -16,7 +16,7 @@
         pointer-events: none;
         opacity: 0;
 
-        & + .spinner-obscure {
+        & + .widget--spinner {
             opacity: 1;
         }
     }
@@ -60,8 +60,11 @@
         &--editor {
             flex-grow: 1;
             height: 100%;
+            display: flex;
+            align-items: center;
 
             &__text {
+                width: 100%;
                 max-width: calc(100% - 7rem);
                 max-height: calc(100% - 4rem);
                 overflow: auto;

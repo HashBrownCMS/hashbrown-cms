@@ -7,6 +7,22 @@
  */
 class UIHelper {
     /**
+     * Sets the content of the editor space
+     *
+     * @param {Array|HTMLElement} content
+     * @param {String} className
+     */
+    static setEditorSpaceContent(content, className) {
+        let $space = $('.page--environment__space--editor');
+
+        if(className) {
+            content = _.div({class: 'page--environment__space--editor__' + className}, content);
+        }
+
+        _.append($space.empty(), content);
+    }
+
+    /**
      * Creates a sortable context specific to arrays using editor fields
      *
      * @param {Array} array

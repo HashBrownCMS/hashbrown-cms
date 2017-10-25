@@ -10191,7 +10191,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(242);
+        _this.template = __webpack_require__(241);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.ContentPane.init();
@@ -16780,12 +16780,12 @@ var MediaUploader = function (_Crisp$View) {
                     if (isImage) {
                         var reader = new FileReader();
 
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                        uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                         reader.onload = function (e) {
                             uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
 
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                            uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
                         };
 
                         reader.readAsDataURL(file);
@@ -16818,7 +16818,7 @@ var MediaUploader = function (_Crisp$View) {
             var onSubmit = function onSubmit(e, content) {
                 e.preventDefault();
 
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
 
                 var apiPath = 'media/' + (_this.replaceId ? 'replace/' + _this.replaceId : 'new');
                 var uploadedIds = [];
@@ -16876,7 +16876,7 @@ var MediaUploader = function (_Crisp$View) {
 
                 // Then update the UI and trigger the success callback
                 .then(function () {
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
 
                     HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -16893,7 +16893,7 @@ var MediaUploader = function (_Crisp$View) {
                 model: {
                     class: 'modal-upload-media',
                     title: 'Upload a file',
-                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
+                    body: [_.div({ class: 'widget widget--spinner embedded hidden' }, _.span({ class: 'widget--spinner__image fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
                         if (typeof _this.onChangeFile === 'function') {
                             _this.onChangeFile(e);
                         }
@@ -26397,7 +26397,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(238).js_beautify;
+var beautify = __webpack_require__(237).js_beautify;
 var SchemaHelper = __webpack_require__(18);
 var RequestHelper = __webpack_require__(2);
 
@@ -32664,12 +32664,30 @@ var UIHelper = function () {
     }
 
     /**
+     * Sets the content of the editor space
+     *
+     * @param {Array|HTMLElement} content
+     * @param {String} className
+     */
+    UIHelper.setEditorSpaceContent = function setEditorSpaceContent(content, className) {
+        var $space = $('.page--environment__space--editor');
+
+        if (className) {
+            content = _.div({ class: 'page--environment__space--editor__' + className }, content);
+        }
+
+        _.append($space.empty(), content);
+    };
+
+    /**
      * Creates a sortable context specific to arrays using editor fields
      *
      * @param {Array} array
      * @param {HTMLElement} field
      * @param {Function} onChange
      */
+
+
     UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
         array = array || [];
 
@@ -41284,10 +41302,10 @@ HashBrown.Models = __webpack_require__(189);
 HashBrown.Views = {};
 HashBrown.Views.Widgets = __webpack_require__(191);
 HashBrown.Views.Modals = __webpack_require__(195);
-HashBrown.Views.Navigation = __webpack_require__(240);
-HashBrown.Views.Editors = __webpack_require__(250);
+HashBrown.Views.Navigation = __webpack_require__(239);
+HashBrown.Views.Editors = __webpack_require__(249);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(254);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(253);
 HashBrown.Helpers = __webpack_require__(208);
 
 // Helper shortcuts
@@ -41376,7 +41394,6 @@ __webpack_require__(233);
 __webpack_require__(234);
 __webpack_require__(235);
 __webpack_require__(236);
-__webpack_require__(237);
 
 /***/ }),
 /* 231 */
@@ -41396,7 +41413,7 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Content'), _.p('Please click on a content node to proceed')), 'presentation presentation-center');
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.')], 'text');
 });
 
 // Edit (JSON editor)
@@ -41408,7 +41425,7 @@ Crisp.Router.route('/content/json/:id', function () {
         apiPath: 'content/' + Crisp.Router.params.id
     });
 
-    populateWorkspace(contentEditor.$element);
+    UI.setEditorSpaceContent(contentEditor.$element);
 });
 
 // Edit (redirect to default tab)
@@ -41441,7 +41458,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
             modelUrl: RequestHelper.environmentUrl('content/' + Crisp.Router.params.id)
         });
 
-        populateWorkspace(contentEditor.$element);
+        UI.setEditorSpaceContent(contentEditor.$element);
     } else {
         contentEditor.fetch();
     }
@@ -41461,7 +41478,7 @@ Crisp.Router.route('/connections/', function () {
     if (currentUserHasScope('connections')) {
         Crisp.View.get('NavbarMain').showTab('/connections/');
 
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Connections'), _.p('Please click on a connection to proceed')), 'presentation presentation-center');
+        UI.setEditorSpaceContent([_.h1('Connections'), _.p('Right click in the Connections pane to create a new Connection.'), _.p('Click on a Connection to edit it.')], 'text');
     } else {
         location.hash = '/';
     }
@@ -41476,7 +41493,7 @@ Crisp.Router.route('/connections/:id', function () {
 
         Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
 
-        populateWorkspace(connectionEditor.$element);
+        UI.setEditorSpaceContent(connectionEditor.$element);
     } else {
         location.hash = '/';
     }
@@ -41491,7 +41508,7 @@ Crisp.Router.route('/connections/json/:id', function () {
 
         Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
 
-        populateWorkspace(connectionEditor.$element);
+        UI.setEditorSpaceContent(connectionEditor.$element);
     } else {
         location.hash = '/';
     }
@@ -41511,7 +41528,7 @@ var RequestHelper = __webpack_require__(2);
 Crisp.Router.route('/media/', function () {
     Crisp.View.get('NavbarMain').showTab('/media/');
 
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Media'), _.p('Please click on a media object to proceed')), 'presentation presentation-center');
+    UI.setEditorSpaceContent([_.h1('Media'), _.p('Right click in the Media pane to create a new Media.'), _.p('Click on a Media node to edit it.')], 'text');
 });
 
 // Preview
@@ -41522,7 +41539,7 @@ Crisp.Router.route('/media/:id', function () {
 
     Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);
 
-    populateWorkspace(mediaViewer.$element);
+    UI.setEditorSpaceContent(mediaViewer.$element);
 });
 
 /***/ }),
@@ -41540,7 +41557,7 @@ Crisp.Router.route('/schemas/', function () {
     if (currentUserHasScope('schemas')) {
         Crisp.View.get('NavbarMain').showTab('/schemas/');
 
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Schemas'), _.p('Please click on a schema to proceed')), 'presentation presentation-center');
+        UI.setEditorSpaceContent([_.h1('Schemas'), _.p('Right click in the Schemas pane to create a new Schema.'), _.p('Click on a Schema to edit it.')], 'text');
     } else {
         location.hash = '/';
     }
@@ -41579,7 +41596,7 @@ Crisp.Router.route('/schemas/:id', function () {
                 });
             }
 
-            populateWorkspace(schemaEditor.$element);
+            UI.setEditorSpaceContent(schemaEditor.$element);
         });
     } else {
         location.hash = '/';
@@ -41603,7 +41620,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 
         Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
 
-        populateWorkspace(jsonEditor.$element);
+        UI.setEditorSpaceContent(jsonEditor.$element);
     } else {
         location.hash = '/';
     }
@@ -41611,36 +41628,6 @@ Crisp.Router.route('/schemas/json/:id', function () {
 
 /***/ }),
 /* 235 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Crisp.Router.route('/settings/', function () {
-    if (currentUserHasScope('settings')) {
-        Crisp.View.get('NavbarMain').showTab('/settings/');
-
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Settings'), _.p('Please click on a section to proceed')), 'presentation presentation-center');
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Providers
-Crisp.Router.route('/settings/providers/', function () {
-    if (currentUserHasScope('settings')) {
-        Crisp.View.get('NavbarMain').highlightItem('/settings/', 'providers');
-
-        populateWorkspace(new HashBrown.Views.Editors.ProvidersSettings().$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-/***/ }),
-/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41654,7 +41641,7 @@ Crisp.Router.route('/templates/', function () {
     if (currentUserHasScope('templates')) {
         Crisp.View.get('NavbarMain').showTab('/templates/');
 
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Templates'), _.p('Please click on a template to continue')), 'presentation presentation-center');
+        UI.setEditorSpaceContent([_.h1('Templates'), _.p('Right click in the Templates pane to create a new Template.'), _.p('Click on a Template to edit it.')], 'text');
     } else {
         location.hash = '/';
     }
@@ -41669,14 +41656,14 @@ Crisp.Router.route('/templates/:type/:id', function () {
             modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
         });
 
-        populateWorkspace(templateEditor.$element);
+        UI.setEditorSpaceContent(templateEditor.$element);
     } else {
         location.hash = '/';
     }
 });
 
 /***/ }),
-/* 237 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41690,7 +41677,7 @@ var RequestHelper = __webpack_require__(2);
 Crisp.Router.route('/forms/', function () {
     Crisp.View.get('NavbarMain').showTab('/forms/');
 
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Forms'), _.p('Please click on a form to proceed')), 'presentation presentation-center');
+    UI.setEditorSpaceContent([_.h1('Forms'), _.p('Right click in the Forms pane to create a new Form.'), _.p('Click on a Form to edit it.')], 'text');
 });
 
 // Edit
@@ -41701,7 +41688,7 @@ Crisp.Router.route('/forms/:id', function () {
         modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
     });
 
-    populateWorkspace(formEditor.$element);
+    UI.setEditorSpaceContent(formEditor.$element);
 });
 
 // Edit (JSON editor)
@@ -41713,11 +41700,11 @@ Crisp.Router.route('/forms/json/:id', function () {
 
     Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
 
-    populateWorkspace(formEditor.$element);
+    UI.setEditorSpaceContent(formEditor.$element);
 });
 
 /***/ }),
-/* 238 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -41784,7 +41771,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(187), __webpack_require__(188), __webpack_require__(239)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(187), __webpack_require__(188), __webpack_require__(238)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -41799,7 +41786,7 @@ if (true) {
 }
 
 /***/ }),
-/* 239 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -42927,7 +42914,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 240 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42938,20 +42925,20 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
  */
 
 module.exports = {
-    ConnectionPane: __webpack_require__(241),
-    ContentPane: __webpack_require__(243),
-    FormsPane: __webpack_require__(244),
-    MainMenu: __webpack_require__(245),
-    MediaPane: __webpack_require__(246),
+    ConnectionPane: __webpack_require__(240),
+    ContentPane: __webpack_require__(242),
+    FormsPane: __webpack_require__(243),
+    MainMenu: __webpack_require__(244),
+    MediaPane: __webpack_require__(245),
     NavbarMain: __webpack_require__(45),
     NavbarPane: __webpack_require__(44),
-    SchemaPane: __webpack_require__(247),
-    SettingsPane: __webpack_require__(248),
-    TemplatePane: __webpack_require__(249)
+    SchemaPane: __webpack_require__(246),
+    SettingsPane: __webpack_require__(247),
+    TemplatePane: __webpack_require__(248)
 };
 
 /***/ }),
-/* 241 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43180,7 +43167,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 242 */
+/* 241 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -43279,7 +43266,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 243 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43749,7 +43736,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 244 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43983,7 +43970,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 245 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44171,7 +44158,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 246 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44385,7 +44372,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 247 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44626,7 +44613,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 248 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44675,7 +44662,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 249 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44711,15 +44698,25 @@ var TemplatePane = function (_NavbarPane) {
      * Event: Click add Template
      */
     TemplatePane.onClickAddTemplate = function onClickAddTemplate() {
-        var newTemplate = new Template({ type: 'page' });
+        var newTemplate = new HashBrown.Models.Template({
+            type: 'page',
+            name: 'myTemplate.html'
+        });
 
-        UI.confirmModal('add', 'Add new template', [_.div({ class: 'input-group' }, _.span('Type'), _.div({ class: 'input-group-addon' }, _.select({ class: 'form-control' }, _.each(['page', 'partial'], function (i, type) {
-            return _.option({ value: type }, type);
-        })).val(newTemplate.type).on('change', function (e) {
-            newTemplate.type = e.target.value;
-        }))), _.div({ class: 'input-group' }, _.span('Name'), _.div({ class: 'input-group-addon' }, _.input({ class: 'form-control', type: 'text', placeholder: 'Template name' }).on('change keyup paste propertychange', function (e) {
-            newTemplate.name = e.target.value;
-        })))], function () {
+        UI.confirmModal('add', 'Add new template', [_.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Type'), new HashBrown.Views.Widgets.Dropdown({
+            options: ['page', 'partial'],
+            value: newTemplate.type,
+            onChange: function onChange(newValue) {
+                newTemplate.type = newValue;
+            }
+        }).$element), _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Name'), new HashBrown.Views.Widgets.Input({
+            placeholder: 'Template name',
+            value: newTemplate.name,
+            type: 'text',
+            onChange: function onChange(newValue) {
+                newTemplate.name = newValue;
+            }
+        }).$element)], function () {
             newTemplate.updateId();
 
             // Sanity check
@@ -44845,11 +44842,13 @@ var TemplatePane = function (_NavbarPane) {
             return;
         }
 
-        UI.confirmModal('rename', 'Rename "' + model.name + '"', _.input({ class: 'form-control', type: 'text', value: model.name, placeholder: 'Enter Template name' }).on('keyup paste change propertychange', function (e) {
-            var oldName = model.name;
-
-            model.name = e.target.value;
-        }), function () {
+        UI.confirmModal('rename', 'Rename "' + model.name + '"', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'New name'), new HashBrown.Views.Widgets.Input({
+            value: model.name,
+            placeholder: 'Enter Template name',
+            onChange: function onChange(newValue) {
+                model.name = newValue;
+            }
+        }).$element), function () {
             RequestHelper.request('post', 'templates/' + type + '/' + id, model).then(function (newTemplate) {
                 return RequestHelper.reloadResource('templates');
             }).then(function () {
@@ -44943,7 +44942,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 250 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44954,10 +44953,10 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(251),
+    ConnectionEditor: __webpack_require__(250),
     ContentEditor: __webpack_require__(205),
-    ContentSchemaEditor: __webpack_require__(252),
-    FieldSchemaEditor: __webpack_require__(253),
+    ContentSchemaEditor: __webpack_require__(251),
+    FieldSchemaEditor: __webpack_require__(252),
     FormEditor: __webpack_require__(227),
     JSONEditor: __webpack_require__(186),
     MediaViewer: __webpack_require__(225),
@@ -44967,7 +44966,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 251 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45182,7 +45181,7 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 252 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45385,7 +45384,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 253 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45463,7 +45462,7 @@ var FieldSchemaEditor = function (_SchemaEditor) {
 module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 254 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45474,27 +45473,27 @@ module.exports = FieldSchemaEditor;
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(255),
-    BooleanEditor: __webpack_require__(256),
-    ContentReferenceEditor: __webpack_require__(257),
-    ContentSchemaReferenceEditor: __webpack_require__(258),
-    DateEditor: __webpack_require__(259),
-    DropdownEditor: __webpack_require__(260),
+    ArrayEditor: __webpack_require__(254),
+    BooleanEditor: __webpack_require__(255),
+    ContentReferenceEditor: __webpack_require__(256),
+    ContentSchemaReferenceEditor: __webpack_require__(257),
+    DateEditor: __webpack_require__(258),
+    DropdownEditor: __webpack_require__(259),
     FieldEditor: __webpack_require__(11),
-    LanguageEditor: __webpack_require__(261),
-    MediaReferenceEditor: __webpack_require__(262),
-    NumberEditor: __webpack_require__(263),
-    ResourceReferenceEditor: __webpack_require__(264),
-    RichTextEditor: __webpack_require__(265),
-    StringEditor: __webpack_require__(266),
-    StructEditor: __webpack_require__(267),
-    TagsEditor: __webpack_require__(268),
-    TemplateReferenceEditor: __webpack_require__(269),
-    UrlEditor: __webpack_require__(270)
+    LanguageEditor: __webpack_require__(260),
+    MediaReferenceEditor: __webpack_require__(261),
+    NumberEditor: __webpack_require__(262),
+    ResourceReferenceEditor: __webpack_require__(263),
+    RichTextEditor: __webpack_require__(264),
+    StringEditor: __webpack_require__(265),
+    StructEditor: __webpack_require__(266),
+    TagsEditor: __webpack_require__(267),
+    TemplateReferenceEditor: __webpack_require__(268),
+    UrlEditor: __webpack_require__(269)
 };
 
 /***/ }),
-/* 255 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45801,7 +45800,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 256 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45886,7 +45885,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 257 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46040,7 +46039,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 258 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46224,7 +46223,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 259 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46369,7 +46368,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 260 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46479,7 +46478,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 261 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46565,7 +46564,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 262 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46654,7 +46653,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 263 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46789,7 +46788,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 264 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46909,7 +46908,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 265 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47271,7 +47270,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 266 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47342,7 +47341,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 267 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47599,7 +47598,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 268 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47669,7 +47668,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 269 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47878,7 +47877,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 270 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -353,7 +353,7 @@ class GitHubConnection extends Connection {
                 }
             }
            
-            debug.error(new Error('Template by id "' + id + '" not found'), this);
+            debug.log(new Error('Template by id "' + id + '" not found'), this, 3);
             return Promise.resolve();
         });
     }
@@ -419,6 +419,13 @@ class GitHubConnection extends Connection {
         // Get original first
         this.getTemplateById(type, id)
         .then((template) => {
+            // If template was not found, continue and set appropriate remote paths
+            if(!template) {
+                newTemplate.remotePath = this.getTemplateRemotePath(type) + '/' + newTemplate.name;
+
+                return Promise.resolve();
+            }
+
             oldTemplate = template;
 
             // Make sure markup is kept if it's not included in the request
@@ -426,12 +433,6 @@ class GitHubConnection extends Connection {
             if(!newTemplate.markup) {
                 newTemplate.markup = oldTemplate.markup;
             }
-        })
-        // If template was not found, continue and set appropriate remote paths
-        .catch(() => {
-            newTemplate.remotePath = this.getTemplateRemotePath(type) + '/' + newTemplate.name;
-
-            return Promise.resolve();
         })
         .then(() => {
             // Old file was not found, create new

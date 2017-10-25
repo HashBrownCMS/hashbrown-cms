@@ -7,33 +7,31 @@ html
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
         
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
-        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
         
         title HashBrown CMS
-    body
-        .login-container
-            if(message)
-                .message.raised
-                    | #{message}
+    body.page.page--login
+        if(message)
+            .widget.widget--message
+                | #{message}
 
 
-            form.login(data-first-time=(firstTime ? 'true': '' ), data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
-                .login-heading
-                    img.lg.logo(src='/svg/logo_pink.svg')
-                    h2 HashBrown
-                .login-body
-                        if(invitedUser)
-                            p
-                                | Activate the account for #{invitedUser.email}
-                            input(type='text', id='full-name', class='form-control', placeholder='Full name (optional)')
-                        if(firstTime)
-                            p
-                                | Please create your first admin account
-                        input(type='text', id='username', class='form-control', placeholder='Username')
-                        input(type='password', id='password', class='form-control', placeholder='Password')
-                        input.btn.btn-primary(type='submit', value=(invitedUser || firstTime ? 'Create' : 'Login'))
+        form.page--login__login(data-first-time=(firstTime ? 'true': '' ), data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
+            .page--login__login__heading
+                img.lg.logo(src='/svg/logo_pink.svg')
+                h2 HashBrown
+            .page--login__login__body
+                    if(invitedUser)
+                        p
+                            | Activate the account for #{invitedUser.email}
+                        input(type='text', id='full-name', class='widget widget--input text', placeholder='Full name (optional)')
+                    if(firstTime)
+                        p
+                            | Please create your first admin account
+                    input.widget.widget--input.tall.text(type='text', id='username', placeholder='Username')
+                    input.widget.widget--input.tall.text(type='password', id='password', placeholder='Password')
+                    input.widget.widget--button.expanded(type='submit', value=(invitedUser || firstTime ? 'Create' : 'Login'))
     
         script(src='/lib/jquery/jquery.min.js')
         script(src='/js/login.js')

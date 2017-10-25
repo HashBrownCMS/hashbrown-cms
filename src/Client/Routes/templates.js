@@ -8,12 +8,13 @@ Crisp.Router.route('/templates/', function() {
     if(currentUserHasScope('templates')) {
         Crisp.View.get('NavbarMain').showTab('/templates/');
 
-        populateWorkspace(
-            _.div({class: 'dashboard-container'},
+        UI.setEditorSpaceContent(
+            [
                 _.h1('Templates'),
-                _.p('Please click on a template to continue')
-            ),
-            'presentation presentation-center'
+                _.p('Right click in the Templates pane to create a new Template.'),
+                _.p('Click on a Template to edit it.')
+            ],
+            'text'
         );
     
     } else {
@@ -31,7 +32,7 @@ Crisp.Router.route('/templates/:type/:id', function() {
             modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
         });
 
-        populateWorkspace(templateEditor.$element);
+        UI.setEditorSpaceContent(templateEditor.$element);
     
     } else {
         location.hash = '/';

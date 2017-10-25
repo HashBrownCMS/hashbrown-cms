@@ -8,12 +8,13 @@ Crisp.Router.route('/schemas/', function() {
     if(currentUserHasScope('schemas')) {
         Crisp.View.get('NavbarMain').showTab('/schemas/');
         
-        populateWorkspace(
-            _.div({class: 'dashboard-container'},
+        UI.setEditorSpaceContent(
+            [
                 _.h1('Schemas'),
-                _.p('Please click on a schema to proceed')
-            ),
-            'presentation presentation-center'
+                _.p('Right click in the Schemas pane to create a new Schema.'),
+                _.p('Click on a Schema to edit it.')
+            ],
+            'text'
         );
     
     } else {
@@ -56,7 +57,7 @@ Crisp.Router.route('/schemas/:id', () => {
                 });
             }
             
-            populateWorkspace(schemaEditor.$element);
+            UI.setEditorSpaceContent(schemaEditor.$element);
         });
             
     } else {
@@ -83,7 +84,7 @@ Crisp.Router.route('/schemas/json/:id', function() {
 
         Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
         
-        populateWorkspace(jsonEditor.$element);
+        UI.setEditorSpaceContent(jsonEditor.$element);
     
     } else {
         location.hash = '/';

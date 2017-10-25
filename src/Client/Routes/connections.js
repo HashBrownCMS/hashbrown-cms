@@ -7,12 +7,13 @@ Crisp.Router.route('/connections/', function() {
     if(currentUserHasScope('connections')) {
         Crisp.View.get('NavbarMain').showTab('/connections/');
         
-        populateWorkspace(
-            _.div({class: 'dashboard-container'},
+        UI.setEditorSpaceContent(
+            [
                 _.h1('Connections'),
-                _.p('Please click on a connection to proceed')
-            ),
-            'presentation presentation-center'
+                _.p('Right click in the Connections pane to create a new Connection.'),
+                _.p('Click on a Connection to edit it.')
+            ],
+            'text'
         );
     
     } else {
@@ -30,7 +31,7 @@ Crisp.Router.route('/connections/:id', function() {
        
         Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
         
-        populateWorkspace(connectionEditor.$element);
+        UI.setEditorSpaceContent(connectionEditor.$element);
     
     } else {
         location.hash = '/';
@@ -47,7 +48,7 @@ Crisp.Router.route('/connections/json/:id', function() {
          
         Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
         
-        populateWorkspace(connectionEditor.$element);
+        UI.setEditorSpaceContent(connectionEditor.$element);
     
     } else {
         location.hash = '/';
