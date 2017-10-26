@@ -127,10 +127,10 @@ class Dropdown extends Widget {
      */
     updatePositionClasses() {
         setTimeout(() => {
-            let bounds = this.element.getBoundingClientRect();
+            let bounds = this.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
 
-            this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
-            this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
+            this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
+            this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
         }, 1);
     }
 

@@ -46,41 +46,28 @@ class MediaPane extends NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Delete media',
-                body: 'Are you sure you want to delete the media object "' + name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: () => {
-                        $element.parent().toggleClass('loading', true);
+        UI.confirmModal(
+            'delete',
+            'Delete media',
+            'Are you sure you want to delete the media object "' + name + '"?',
+            () => {
+                $element.parent().toggleClass('loading', true);
 
-                        RequestHelper.request('delete', 'media/' + id)
-                        .then(() => {
-                            return RequestHelper.reloadResource('media');
-                        })
-                        .then(() => {
-                            NavbarMain.reload();
+                RequestHelper.request('delete', 'media/' + id)
+                .then(() => {
+                    return RequestHelper.reloadResource('media');
+                })
+                .then(() => {
+                    NavbarMain.reload();
 
-                            // Cancel the MediaViever view if it was displaying the deleted object
-                            if(location.hash == '#/media/' + id) {
-                                location.hash = '/media/';
-                            }
-                        })
-                        .catch(UI.errorModal);
+                    // Cancel the MediaViever view if it was displaying the deleted object
+                    if(location.hash == '#/media/' + id) {
+                        location.hash = '/media/';
                     }
-                }
-            ]
-        });
+                })
+                .catch(UI.errorModal);
+            }
+        );
     }
 
     /**

@@ -20,25 +20,61 @@ class RequestHelper {
     }
 
     /**
+     * Uploads a file
+     *
+     * @param {String} url
+     * @param {String} type
+     * @param {FormData} data
+     *
+     * @returns {Promise} Response
+     */
+    static uploadFile(url, type, data) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: RequestHelper.environmentUrl(url),
+                type: 'POST',
+                data: data,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    resolve(response);
+                },
+                error: (e) => {
+                    reject(e);            
+                }
+            })
+        });
+        //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
+    }
+
+    /**
      * An environment-independent request
      *
      * @param {String} method
      * @param {String} url
      * @param {Object} data
+     * @param {Object} headers
      *
      * @returns {Promise} Response
      */
-    static customRequest(method, url, data) {
+    static customRequest(method, url, data, headers) {
+        headers = headers || {
+            'Content-Type': 'application/json; charset=utf-8'
+        };
+
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open(method.toUpperCase(), url);
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            for(let k in headers) {
+                xhr.setRequestHeader(k, headers[k]);
+            }
 
             if(data) {
-                if(typeof data === 'object') {
+                if(typeof data === 'object' && data instanceof FormData === false) {
                     data = JSON.stringify(data);
                 }
-                
+               
                 xhr.send(data);
 
             } else {
@@ -194,7 +230,7 @@ class RequestHelper {
      * Reloads all resources
      */
     static reloadAllResources() {
-        $('.loading-messages').empty();
+        $('.page--environment__spinner__messages').empty();
         
         let queue = [
             'content',
@@ -207,9 +243,9 @@ class RequestHelper {
         ];
 
         for(let item of queue) {
-            let $msg = _.div({class: 'loading-message', 'data-name': item}, item);
+            let $msg = _.div({class: 'widget--spinner__message', 'data-name': item}, item);
             
-            $('.loading-messages').append($msg);
+            $('.page--environment__spinner__messages').append($msg);
         }
 
         let processQueue = () => {
@@ -217,7 +253,7 @@ class RequestHelper {
 
             return RequestHelper.reloadResource(name)
             .then(() => {
-                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+                $('.page--environment__spinner__messages [data-name="' + name + '"]').toggleClass('loaded', true);
                 
                 if(queue.length < 1) {
                     return Promise.resolve();

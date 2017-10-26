@@ -1,3 +1,12 @@
+@keyframes navbar-main__pane__item__spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    
+    100% {
+        transform: rotate(359deg);
+    }
+}
 /**
  * The navigation bar
  */
@@ -281,7 +290,7 @@
                             content: '';
                             display: block;
                             height: 60px;
-                            width: 5px;
+                            width: 100%;
                             background-color: $primary;
                             position: absolute;
                             left: 0px;
@@ -289,6 +298,15 @@
 
                         >.pane-item {
                             font-weight: 700;
+                            color: $primary-text;
+
+                            >.btn-children-toggle {
+                                color: $primary-text;
+                            }
+
+                            &:after {
+                                color: $primary-text !important;
+                            }
                         }
                     }
 
@@ -344,7 +362,7 @@
                             &:after {
                                 content: '\f1ce';
                                 color: $primary;
-                                animation: spinner-no-offset 1s linear infinite;
+                                animation: navbar-main__pane__item__spinner 1s linear infinite;
                                 opacity: 1;
                             }
                         }

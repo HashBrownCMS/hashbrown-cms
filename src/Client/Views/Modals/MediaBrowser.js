@@ -2,6 +2,8 @@
 
 const Media = require('Common/Models/Media');
 
+const Modal = require('./Modal');
+
 const MediaHelper = require('Client/Helpers/MediaHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
@@ -12,20 +14,21 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MediaBrowser extends Crisp.View {
+class MediaBrowser extends Modal {
     constructor(params) {
-        super(params);
+        params.className = 'media-browser';
+        params.title = 'Pick media'; 
 
-        // First check if an active Connection is set up to be a Media provider
-        this.fetch();
+        params.actions = [
+            {
+                label: 'OK',
+                onClick: () => {
+                    this.onClickOK();
+                }
+            }
+        ];
         
-        // Make sure the modal is removed when it's cancelled
-        this.$element.on('hidden.bs.modal', () => {
-           this.$element.remove(); 
-        });
-
-        // Show the modal
-        this.$element.modal('show');
+        super(params);
 
         // Init the media picker mode inside the iframe
         let iframe = this.$element.find('iframe')[0];
@@ -38,22 +41,6 @@ class MediaBrowser extends Crisp.View {
                 resources
             );
         };
-    }
-
-    /**
-     * Gets whether the media provider exists
-     *
-     * @returns {Promise} Promise
-     */
-    static checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-        .then((result) => {
-            if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
-            }  
-
-            return Promise.resolve();
-        }); 
     }
 
     /**
@@ -73,14 +60,14 @@ class MediaBrowser extends Crisp.View {
             this.trigger('select', this.value);
         }
 
-        this.$element.modal('hide');
+        this.close();
     }
     
     /** 
      * Event: Click cancel
      */
     onClickCancel() {
-        this.$element.modal('hide');
+        this.close();
     }
 
     /**
@@ -94,33 +81,12 @@ class MediaBrowser extends Crisp.View {
     }
 
     /**
-     * Render the media browser
+     * Render body
+     *
+     * @returns {HTMLElement} Body
      */
-    template() {
-        return _.div({class: 'modal fade media-browser'}, 
-            _.div({class: 'modal-dialog'},
-                _.div({class: 'modal-content'},
-                    _.div({class: 'modal-header'},
-                        _.h4({class: 'modal-title'}, 'Browsing media')
-                    ),
-                    _.div({class: 'modal-body'},
-                        _.iframe({src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')})
-                    ),
-                    _.div({class: 'modal-footer'},
-                        _.button({class: 'btn btn-default'},
-                            'Cancel'
-                        ).click(() => {
-                            this.onClickCancel();
-                        }),
-                        _.button({class: 'btn btn-primary'},
-                            'OK'
-                        ).click(() => {
-                            this.onClickOK();
-                        })
-                    )
-                )
-            )
-        );
+    renderBody() {
+        return _.iframe({src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')});
     }
 }
 

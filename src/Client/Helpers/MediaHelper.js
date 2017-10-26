@@ -20,6 +20,22 @@ class MediaHelper extends MediaHelperCommon {
     }
 
     /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+    static checkMediaProvider() {
+        return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers')
+        .then((result) => {
+            if(!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
+            }  
+
+            return Promise.resolve();
+        }); 
+    }
+    
+    /**
      * Gets Media object by id synchronously
      *
      * @param {String} id
@@ -108,16 +124,13 @@ class MediaHelper extends MediaHelperCommon {
        
         // Listen for resource change
         HashBrown.Views.Navigation.NavbarMain.reload = () => {
-            ViewHelper.get('NavbarMain').reload();
+            Crisp.View.get('NavbarMain').reload();
 
             onChangeResource();
         };
 
         // Set visual fixes for media picker mode
-        $('.cms-container').addClass('media-picker-mode');
-
-        // Skip the loading screen
-        $('.cms-container').removeClass('faded');
+        $('.page--environment').addClass('media-picker');
     }
 }
 

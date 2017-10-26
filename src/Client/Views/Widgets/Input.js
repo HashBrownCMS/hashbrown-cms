@@ -104,7 +104,7 @@ class Input extends Widget {
 
                     if(typeof this.onSubmit !== 'function') { return; }
 
-                    this.onSubmit(new FormData(e.currentTarget));
+                    this.onSubmit(new FormData(e.currentTarget), input.files);
                 });
 
             default:

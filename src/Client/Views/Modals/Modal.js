@@ -11,7 +11,10 @@ class Modal extends Crisp.View {
      */
     constructor(params) {
         params = params || {};
-        params.actions = params.actions || [];
+
+        if(typeof params.actions === 'undefined') {
+            params.actions = [];
+        }
 
         super(params);
 
@@ -33,7 +36,18 @@ class Modal extends Crisp.View {
         
         document.body.appendChild(this.element);
     }
-    
+   
+    /**
+     * Toggles the loading state
+     *
+     * @param {Boolean} isActive
+     */
+    setLoading(isActive) {
+        let spinner = this.element.querySelector('.widget--spinner');
+
+        spinner.classList.toggle('hidden', !isActive);
+    }
+
     /**
      * Close this modal
      *
@@ -61,6 +75,8 @@ class Modal extends Crisp.View {
      * @returns {HTMLElement} Footer
      */
     renderFooter() {
+        if(this.actions === false) { return; }
+
         if(this.actions && this.actions.length > 0) {
             return _.each(this.actions, (i, action) => {
                 return _.button({class: 'widget widget--button ' + (action.class || '')}, action.label)
@@ -108,15 +124,17 @@ class Modal extends Crisp.View {
         let footer = this.renderFooter();
 
         if(!this.hasTransitionedIn) {
-
             setTimeout(() => {
                 this.hasTransitionedIn = true;
                 this.element.classList.toggle('in', true);
             }, 50);
         }
         
-        return _.div({class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '')},
+        return _.div({class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '')},
             _.div({class: 'modal__dialog'},
+                _.div({class: 'widget--spinner embedded hidden'},
+                    _.div({class: 'widget--spinner__image fa fa-refresh'})
+                ),
                 _.if(header,
                     _.div({class: 'modal__header'},
                         header

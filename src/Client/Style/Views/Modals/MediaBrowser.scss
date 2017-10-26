@@ -1,0 +1,40 @@
+/**
+ * The Media browser
+ */
+.modal--media-browser {
+    &.disabled {
+        pointer-events: none;
+
+        .modal-dialog {
+            background-color: #fff;
+                
+            >div {
+                opacity: 0.5;
+            }
+        }
+    }
+
+    .modal__dialog {
+        margin: 2rem auto 2rem auto;
+        width: calc(100% - 4rem);
+        max-width: 1040px;
+        height: calc(100% - 4rem);
+
+        .modal__footer {
+            .form-control {
+                float: left;
+            }
+        }
+
+        .modal__body {
+            padding: 0;
+
+            iframe {
+                border: 0;
+                width: 100%;
+                height: calc(100% - 9rem);
+                display: block;
+            }
+        }
+    }
+}

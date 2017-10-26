@@ -1871,24 +1871,62 @@ var RequestHelper = function () {
     };
 
     /**
-     * An environment-independent request
+     * Uploads a file
      *
-     * @param {String} method
      * @param {String} url
-     * @param {Object} data
+     * @param {String} type
+     * @param {FormData} data
      *
      * @returns {Promise} Response
      */
 
 
-    RequestHelper.customRequest = function customRequest(method, url, data) {
+    RequestHelper.uploadFile = function uploadFile(url, type, data) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: RequestHelper.environmentUrl(url),
+                type: 'POST',
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function success(response) {
+                    resolve(response);
+                },
+                error: function error(e) {
+                    reject(e);
+                }
+            });
+        });
+        //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
+    };
+
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     * @param {Object} headers
+     *
+     * @returns {Promise} Response
+     */
+
+
+    RequestHelper.customRequest = function customRequest(method, url, data, headers) {
+        headers = headers || {
+            'Content-Type': 'application/json; charset=utf-8'
+        };
+
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open(method.toUpperCase(), url);
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            for (var k in headers) {
+                xhr.setRequestHeader(k, headers[k]);
+            }
 
             if (data) {
-                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object' && data instanceof FormData === false) {
                     data = JSON.stringify(data);
                 }
 
@@ -2043,7 +2081,7 @@ var RequestHelper = function () {
      * Reloads all resources
      */
     RequestHelper.reloadAllResources = function reloadAllResources() {
-        $('.loading-messages').empty();
+        $('.page--environment__spinner__messages').empty();
 
         var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
 
@@ -2061,16 +2099,16 @@ var RequestHelper = function () {
 
             var item = _ref;
 
-            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
+            var $msg = _.div({ class: 'widget--spinner__message', 'data-name': item }, item);
 
-            $('.loading-messages').append($msg);
+            $('.page--environment__spinner__messages').append($msg);
         }
 
         var processQueue = function processQueue() {
             var name = queue.shift();
 
             return RequestHelper.reloadResource(name).then(function () {
-                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+                $('.page--environment__spinner__messages [data-name="' + name + '"]').toggleClass('loaded', true);
 
                 if (queue.length < 1) {
                     return Promise.resolve();
@@ -6663,7 +6701,10 @@ var Modal = function (_Crisp$View) {
         _classCallCheck(this, Modal);
 
         params = params || {};
-        params.actions = params.actions || [];
+
+        if (typeof params.actions === 'undefined') {
+            params.actions = [];
+        }
 
         // If this belongs to a group, find existing modals and append instead
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
@@ -6703,6 +6744,19 @@ var Modal = function (_Crisp$View) {
     }
 
     /**
+     * Toggles the loading state
+     *
+     * @param {Boolean} isActive
+     */
+
+
+    Modal.prototype.setLoading = function setLoading(isActive) {
+        var spinner = this.element.querySelector('.widget--spinner');
+
+        spinner.classList.toggle('hidden', !isActive);
+    };
+
+    /**
      * Close this modal
      *
      */
@@ -6738,6 +6792,10 @@ var Modal = function (_Crisp$View) {
 
     Modal.prototype.renderFooter = function renderFooter() {
         var _this3 = this;
+
+        if (this.actions === false) {
+            return;
+        }
 
         if (this.actions && this.actions.length > 0) {
             return _.each(this.actions, function (i, action) {
@@ -6792,14 +6850,13 @@ var Modal = function (_Crisp$View) {
         var footer = this.renderFooter();
 
         if (!this.hasTransitionedIn) {
-
             setTimeout(function () {
                 _this5.hasTransitionedIn = true;
                 _this5.element.classList.toggle('in', true);
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') }, _.div({ class: 'modal__dialog' }, _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
     };
 
     /**
@@ -7982,6 +8039,23 @@ var MediaHelper = function (_MediaHelperCommon) {
     };
 
     /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+
+
+    MediaHelper.checkMediaProvider = function checkMediaProvider() {
+        return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+            if (!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
+            }
+
+            return Promise.resolve();
+        });
+    };
+
+    /**
      * Gets Media object by id synchronously
      *
      * @param {String} id
@@ -8080,16 +8154,13 @@ var MediaHelper = function (_MediaHelperCommon) {
 
         // Listen for resource change
         HashBrown.Views.Navigation.NavbarMain.reload = function () {
-            ViewHelper.get('NavbarMain').reload();
+            Crisp.View.get('NavbarMain').reload();
 
             onChangeResource();
         };
 
         // Set visual fixes for media picker mode
-        $('.cms-container').addClass('media-picker-mode');
-
-        // Skip the loading screen
-        $('.cms-container').removeClass('faded');
+        $('.page--environment').addClass('media-picker');
     };
 
     return MediaHelper;
@@ -15974,6 +16045,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Media = __webpack_require__(14);
+var Modal = __webpack_require__(17);
 
 var MediaHelper = __webpack_require__(29);
 var RequestHelper = __webpack_require__(2);
@@ -15986,194 +16058,181 @@ var SettingsHelper = __webpack_require__(30);
  * @memberof HashBrown.Client.Views.Modals
  */
 
-var MediaUploader = function (_Crisp$View) {
-    _inherits(MediaUploader, _Crisp$View);
+var MediaUploader = function (_Modal) {
+    _inherits(MediaUploader, _Modal);
 
+    /**
+     * Constructor
+     */
     function MediaUploader(params) {
         _classCallCheck(this, MediaUploader);
 
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        params.className = 'media-uploader';
+        params.title = 'Upload a file';
+        params.actions = false;
 
-        MediaUploader.checkMediaProvider().then(function () {
-            // Event: Change file
-            var onChangeFile = function onChangeFile() {
-                var input = $(_this);
-                var numFiles = _this.files ? _this.files.length : 1;
+        var _this = _possibleConstructorReturn(this, _Modal.call(this, params));
 
-                // In the case of a single file selected 
-                if (numFiles == 1) {
-                    var file = _this.files[0];
+        MediaHelper.checkMediaProvider().catch(function (e) {
+            UI.errorModal(e);
 
-                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
-
-                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
-
-                    if (isImage) {
-                        var reader = new FileReader();
-
-                        uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
-
-                        reader.onload = function (e) {
-                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
-
-                            uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
-                        };
-
-                        reader.readAsDataURL(file);
-                    }
-
-                    if (isVideo) {
-                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
-                    }
-
-                    debug.log('Previewing data of file type ' + file.type + '...', _this);
-
-                    // Multiple files selected
-                } else if (numFiles > 1) {
-                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
-
-                    // No files selected
-                } else if (numFiles == 0) {
-                    uploadModal.$element.find('.media-preview').html('(No files selected)');
-                }
-            };
-
-            // Event: Click upload
-            var onClickUpload = function onClickUpload() {
-                uploadModal.$element.find('form').submit();
-
-                return false;
-            };
-
-            // Event: Submit
-            var onSubmit = function onSubmit(e, content) {
-                e.preventDefault();
-
-                uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
-
-                var apiPath = 'media/' + (_this.replaceId ? 'replace/' + _this.replaceId : 'new');
-                var uploadedIds = [];
-
-                // First upload the Media files
-                // TODO: Use the RequestHelper for this
-                return new Promise(function (resolve, reject) {
-                    $.ajax({
-                        url: RequestHelper.environmentUrl(apiPath),
-                        type: 'POST',
-                        data: new FormData(content),
-                        processData: false,
-                        contentType: false,
-                        success: function success(ids) {
-                            uploadedIds = ids || [];
-
-                            resolve();
-                        },
-                        error: function error(e) {
-                            reject(e);
-                        }
-                    });
-                })
-
-                // Then update the Media tree
-                .then(function () {
-                    if (!_this.folder || _this.folder === '/') {
-                        return Promise.resolve();
-                    }
-
-                    var queue = uploadedIds.slice(0);
-
-                    var putNextMediaIntoTree = function putNextMediaIntoTree() {
-                        var id = queue.pop();
-
-                        if (!id) {
-                            return Promise.resolve();
-                        }
-
-                        return RequestHelper.request('post', 'media/tree/' + id, {
-                            id: id,
-                            folder: _this.folder
-                        }).then(function () {
-                            return putNextMediaIntoTree();
-                        });
-                    };
-
-                    return putNextMediaIntoTree();
-                })
-
-                // Then reload the Media resource
-                .then(function () {
-                    return RequestHelper.reloadResource('media');
-                })
-
-                // Then update the UI and trigger the success callback
-                .then(function () {
-                    uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
-
-                    HashBrown.Views.Navigation.NavbarMain.reload();
-
-                    if (typeof _this.onSuccess === 'function') {
-                        _this.onSuccess(uploadedIds);
-                    }
-
-                    uploadModal.hide();
-                });
-            };
-
-            // Render the upload modal
-            var uploadModal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-upload-media',
-                    title: 'Upload a file',
-                    body: [_.div({ class: 'widget widget--spinner embedded hidden' }, _.span({ class: 'widget--spinner__image fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this.replaceId ? false : true }).change(function (e) {
-                        if (typeof _this.onChangeFile === 'function') {
-                            _this.onChangeFile(e);
-                        }
-                    })).submit(function (e) {
-                        onSubmit(e, this);
-                    })]
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: _this.onCancel
-                }, {
-                    label: 'Upload',
-                    class: 'btn-primary',
-                    callback: onClickUpload
-                }]
-            });
-
-            // Event: Close modal
-            uploadModal.on('close', function () {
-                if (typeof _this.onCancel === 'function') {
-                    _this.onCancel();
-                }
-
-                _this.remove();
-            });
-        }).catch(UI.errorModal);
+            _this.close();
+        });
         return _this;
     }
 
     /**
-     * Gets whether the Media provider exists
-     *
-     * @returns {Promise} Promise
+     * Event: Change file
      */
 
 
-    MediaUploader.checkMediaProvider = function checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
-            if (!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
+    MediaUploader.prototype.onChangeFile = function onChangeFile(files) {
+        var _this2 = this;
+
+        var numFiles = files ? files.length : 1;
+
+        // In the case of a single file selected 
+        if (numFiles == 1) {
+            var file = files[0];
+
+            var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+
+            var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+
+            if (isImage) {
+                var reader = new FileReader();
+
+                this.setLoading(true);
+
+                reader.onload = function (e) {
+                    _this2.$element.find('.modal--media-uploader__preview').html(_.img({ src: e.target.result }));
+
+                    _this2.setLoading(false);
+                };
+
+                reader.readAsDataURL(file);
             }
 
-            return Promise.resolve();
+            if (isVideo) {
+                this.$element.find('.modal--media-uploader__preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
+            }
+
+            debug.log('Previewing data of file type ' + file.type + '...', this);
+
+            // Multiple files selected
+        } else if (numFiles > 1) {
+            this.$element.find('.media-preview').html('(Multiple files selected)');
+
+            // No files selected
+        } else if (numFiles == 0) {
+            this.$element.find('.media-preview').html('(No files selected)');
+        }
+    };
+
+    /**
+     * Event: Submit
+     *
+     * @param {FormData} content
+     * @param {Array} files
+     */
+
+
+    MediaUploader.prototype.onSubmit = function onSubmit(content, files) {
+        var _this3 = this;
+
+        if (!content || !files || files.length < 1) {
+            return;
+        }
+
+        this.setLoading(true);
+
+        var type = files[0].type;
+        var apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+        var uploadedIds = [];
+
+        // First upload the Media files
+        return RequestHelper.uploadFile(apiPath, type, content)
+
+        // Then update the Media tree
+        .then(function (ids) {
+            uploadedIds = ids;
+
+            if (!uploadedIds || uploadedIds.length < 1) {
+                return Promise.reject(new Error('File upload failed'));
+            }
+
+            if (!_this3.folder || _this3.folder === '/') {
+                return Promise.resolve();
+            }
+
+            var queue = uploadedIds.slice(0);
+
+            var putNextMediaIntoTree = function putNextMediaIntoTree() {
+                var id = queue.pop();
+
+                if (!id) {
+                    return Promise.resolve();
+                }
+
+                return RequestHelper.request('post', 'media/tree/' + id, {
+                    id: id,
+                    folder: _this3.folder
+                }).then(function () {
+                    return putNextMediaIntoTree();
+                });
+            };
+
+            return putNextMediaIntoTree();
+        })
+
+        // Then reload the Media resource
+        .then(function () {
+            return RequestHelper.reloadResource('media');
+        })
+
+        // Then update the UI and trigger the success callback
+        .then(function () {
+            _this3.setLoading(false);
+
+            HashBrown.Views.Navigation.NavbarMain.reload();
+
+            if (typeof _this3.onSuccess === 'function') {
+                _this3.onSuccess(uploadedIds);
+            }
+
+            _this3.close();
+        }).catch(function (e) {
+            UI.errorModal(e);
+
+            _this3.setLoading(false);
         });
     };
 
+    /**
+     * Render body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+
+    MediaUploader.prototype.renderBody = function renderBody() {
+        var _this4 = this;
+
+        return [_.div({ class: 'modal--media-uploader__preview' }), new HashBrown.Views.Widgets.Input({
+            type: 'file',
+            name: 'media',
+            useMultiple: !this.replaceId,
+            onChange: function onChange(newValue) {
+                _this4.onChangeFile(newValue);
+            },
+            onSubmit: function onSubmit(newValue, newFiles) {
+                _this4.onSubmit(newValue, newFiles);
+            }
+        }).$element];
+    };
+
     return MediaUploader;
-}(Crisp.View);
+}(Modal);
 
 module.exports = MediaUploader;
 
@@ -16192,6 +16251,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Media = __webpack_require__(14);
 
+var Modal = __webpack_require__(17);
+
 var MediaHelper = __webpack_require__(29);
 var RequestHelper = __webpack_require__(2);
 var ProjectHelper = __webpack_require__(5);
@@ -16203,26 +16264,25 @@ var SettingsHelper = __webpack_require__(30);
  * @memberof HashBrown.Client.Views.Modals
  */
 
-var MediaBrowser = function (_Crisp$View) {
-    _inherits(MediaBrowser, _Crisp$View);
+var MediaBrowser = function (_Modal) {
+    _inherits(MediaBrowser, _Modal);
 
     function MediaBrowser(params) {
         _classCallCheck(this, MediaBrowser);
 
-        // First check if an active Connection is set up to be a Media provider
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+        params.className = 'media-browser';
+        params.title = 'Pick media';
 
-        _this.fetch();
-
-        // Make sure the modal is removed when it's cancelled
-        _this.$element.on('hidden.bs.modal', function () {
-            _this.$element.remove();
-        });
-
-        // Show the modal
-        _this.$element.modal('show');
+        params.actions = [{
+            label: 'OK',
+            onClick: function onClick() {
+                _this.onClickOK();
+            }
+        }];
 
         // Init the media picker mode inside the iframe
+        var _this = _possibleConstructorReturn(this, _Modal.call(this, params));
+
         var iframe = _this.$element.find('iframe')[0];
 
         iframe.onload = function () {
@@ -16236,23 +16296,6 @@ var MediaBrowser = function (_Crisp$View) {
         };
         return _this;
     }
-
-    /**
-     * Gets whether the media provider exists
-     *
-     * @returns {Promise} Promise
-     */
-
-
-    MediaBrowser.checkMediaProvider = function checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
-            if (!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
-            }
-
-            return Promise.resolve();
-        });
-    };
 
     /**
      * Event: Pick Media
@@ -16275,7 +16318,7 @@ var MediaBrowser = function (_Crisp$View) {
             this.trigger('select', this.value);
         }
 
-        this.$element.modal('hide');
+        this.close();
     };
 
     /** 
@@ -16284,7 +16327,7 @@ var MediaBrowser = function (_Crisp$View) {
 
 
     MediaBrowser.prototype.onClickCancel = function onClickCancel() {
-        this.$element.modal('hide');
+        this.close();
     };
 
     /**
@@ -16299,22 +16342,18 @@ var MediaBrowser = function (_Crisp$View) {
     };
 
     /**
-     * Render the media browser
+     * Render body
+     *
+     * @returns {HTMLElement} Body
      */
 
 
-    MediaBrowser.prototype.template = function template() {
-        var _this2 = this;
-
-        return _.div({ class: 'modal fade media-browser' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Browsing media')), _.div({ class: 'modal-body' }, _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') })), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
-            _this2.onClickCancel();
-        }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
-            _this2.onClickOK();
-        })))));
+    MediaBrowser.prototype.renderBody = function renderBody() {
+        return _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') });
     };
 
     return MediaBrowser;
-}(Crisp.View);
+}(Modal);
 
 module.exports = MediaBrowser;
 
@@ -25997,10 +26036,10 @@ var Dropdown = function (_Widget) {
         var _this2 = this;
 
         setTimeout(function () {
-            var bounds = _this2.element.getBoundingClientRect();
+            var bounds = _this2.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
 
-            _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < 200);
-            _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < 200);
+            _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
+            _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
         }, 1);
     };
 
@@ -26460,7 +26499,7 @@ var Input = function (_Widget) {
                         return;
                     }
 
-                    _this2.onSubmit(new FormData(e.currentTarget));
+                    _this2.onSubmit(new FormData(e.currentTarget), input.files);
                 });
 
             default:
@@ -26487,9 +26526,9 @@ module.exports = Input;
  */
 
 module.exports = {
+    Modal: __webpack_require__(17),
     MediaUploader: __webpack_require__(100),
     MediaBrowser: __webpack_require__(101),
-    Modal: __webpack_require__(17),
     IconModal: __webpack_require__(198),
     ConfirmModal: __webpack_require__(199),
     DateModal: __webpack_require__(200),
@@ -26809,6 +26848,8 @@ var DateModal = function (_Modal) {
     function DateModal(params) {
         _classCallCheck(this, DateModal);
 
+        params.className = 'date';
+
         return _possibleConstructorReturn(this, _Modal.call(this, params));
     }
 
@@ -26850,15 +26891,6 @@ var DateModal = function (_Modal) {
         }
 
         return days;
-    };
-
-    /**
-     * Post render
-     */
-
-
-    DateModal.prototype.postrender = function postrender() {
-        this.element.classList.toggle('modal--date', true);
     };
 
     /**

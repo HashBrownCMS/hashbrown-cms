@@ -12,6 +12,8 @@ class DateModal extends Modal {
      * Constructor
      */
     constructor(params) {
+        params.className = 'date';
+
         super(params);
     }
     
@@ -49,13 +51,6 @@ class DateModal extends Modal {
         }
 
         return days;
-    }
-
-    /**
-     * Post render
-     */
-    postrender() {
-        this.element.classList.toggle('modal--date', true);
     }
 
     /**

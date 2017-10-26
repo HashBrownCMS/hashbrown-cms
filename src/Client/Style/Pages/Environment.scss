@@ -11,16 +11,6 @@
         }
     }
     
-    // Faded mode
-    &.faded {
-        pointer-events: none;
-        opacity: 0;
-
-        & + .widget--spinner {
-            opacity: 1;
-        }
-    }
-
     &__spaces {
         display: flex;
         height: 100%;

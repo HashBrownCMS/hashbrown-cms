@@ -46,7 +46,7 @@ class MediaHelper extends MediaHelperCommon {
                     let split = file.originalname.split('.');
                     let name = split[0];
                     let extension = split[1];
-
+                    
                     name = name.replace(/\W+/g, '-').toLowerCase();
                    
                     if(extension) {

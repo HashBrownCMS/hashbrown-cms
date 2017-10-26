@@ -10,8 +10,7 @@ Crisp.Router.route('/media/', function() {
     UI.setEditorSpaceContent(
         [
             _.h1('Media'),
-            _.p('Right click in the Media pane to create a new Media.'),
-            _.p('Click on a Media node to edit it.')
+            _.p('Right click in the Media pane to upload, edit and sort Media items.')
         ],
         'text'
     );

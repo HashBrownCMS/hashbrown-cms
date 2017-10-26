@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const LanguageHelper = HashBrown.Helpers.LanguageHelper;
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
-    $('.cms-container').addClass('faded');
+    $('.page--environment__spinner').toggleClass('hidden', false);
 
     // Start debug socket
     debug.startSocket();
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         };
 
-        $('.cms-container').removeClass('faded');
+        $('.page--environment__spinner').toggleClass('hidden', true);
 
         Crisp.Router.init();
     })

@@ -178,7 +178,6 @@ class MediaController extends ApiController {
         }
 
         if(file) {
-
             ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(id, file);
@@ -205,9 +204,9 @@ class MediaController extends ApiController {
      * Creates a Media object
      */
     static createMedia(req, res) {
-        let files = req.files;
+        let files = req.files || [ req.file ];
 
-        if(files) {
+        if(files && files.length > 0) {
             let ids = [];
 
             let next = () => {
@@ -239,7 +238,6 @@ class MediaController extends ApiController {
             });
 
         } else {
-            debug.warning('File was not provided', MediaController);
             res.status(400).send('File was not provided');    
         }
     }

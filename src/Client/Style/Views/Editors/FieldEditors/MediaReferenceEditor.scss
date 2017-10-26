@@ -89,7 +89,7 @@
     }
 
     &__preview {
-        width: 100%;
+        max-width: 100%;
         position: absolute;
         max-height: 100%;
         top: 50%;

@@ -1,0 +1,21 @@
+/**
+ * The Media uploader modal
+ */
+.modal--media-uploader {
+    &__preview {
+        margin: 0 auto 1rem auto;
+        padding: 0 1rem;
+        text-align: center;
+
+        &:empty {
+            display: none;
+        }
+
+        img, video {
+            max-width: 100%;
+            display: block;
+            max-height: 20vh;
+            margin: 0 auto;
+        }
+    }
+}

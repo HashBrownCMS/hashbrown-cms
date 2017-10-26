@@ -178,8 +178,8 @@ class ContentPane extends NavbarPane {
                 UI.confirmModal(
                     'OK',
                     'Create new content',
-                    _.div({},
-                        _.p('Please pick a schema'),
+                    _.div({class: 'widget-group'},
+                        _.label({class: 'widget widget--label'},'Schema'),
                         schemaReference.$element
                     ),
 

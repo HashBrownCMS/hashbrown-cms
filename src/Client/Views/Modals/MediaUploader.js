@@ -1,6 +1,7 @@
 'use strict';
 
 const Media = require('Common/Models/Media');
+const Modal = require('./Modal');
 
 const MediaHelper = require('Client/Helpers/MediaHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
@@ -12,211 +13,178 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MediaUploader extends Crisp.View {
+class MediaUploader extends Modal {
+    /**
+     * Constructor
+     */
     constructor(params) {
+        params.className = 'media-uploader';
+        params.title = 'Upload a file';
+        params.actions = false;
+
         super(params);
 
-        MediaUploader.checkMediaProvider()
-        .then(() => {
-            // Event: Change file
-            let onChangeFile = () => {
-                let input = $(this);
-                let numFiles = this.files ? this.files.length : 1;
+        MediaHelper.checkMediaProvider()
+        .catch((e) => {
+            UI.errorModal(e);
+
+            this.close();
+        });
+    }
+
+    /**
+     * Event: Change file
+     */
+    onChangeFile(files) {
+        let numFiles = files ? files.length : 1;
+       
+        // In the case of a single file selected 
+        if(numFiles == 1) {
+            let file = files[0];
+
+            let isImage =
+                file.type == 'image/png' ||
+                file.type == 'image/jpeg' ||
+                file.type == 'image/gif';
+
+            let isVideo =
+                file.type == 'video/mpeg' ||
+                file.type == 'video/mp4' ||
+                file.type == 'video/quicktime' ||
+                file.type == 'video/x-matroska';
+
+            if(isImage) {
+                let reader = new FileReader();
                
-                // In the case of a single file selected 
-                if(numFiles == 1) {
-                    let file = this.files[0];
+                this.setLoading(true);
 
-                    let isImage =
-                        file.type == 'image/png' ||
-                        file.type == 'image/jpeg' ||
-                        file.type == 'image/gif';
-
-                    let isVideo =
-                        file.type == 'video/mpeg' ||
-                        file.type == 'video/mp4' ||
-                        file.type == 'video/quicktime' ||
-                        file.type == 'video/x-matroska';
-
-                    if(isImage) {
-                        let reader = new FileReader();
-                        
-                        uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
-
-                        reader.onload = function(e) {
-                            uploadModal.$element.find('.media-preview').html(
-                                _.img({src: e.target.result})
-                            );
-
-
-                            uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
-                        }
-                        
-                        reader.readAsDataURL(file);
-                    }
-                            
-                    if(isVideo) {
-                        uploadModal.$element.find('.media-preview').html(
-                            _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
-                        );
-                    }
-
-                    debug.log('Previewing data of file type ' + file.type + '...', this);
-                
-                // Multiple files selected
-                } else if(numFiles > 1) {
-                    uploadModal.$element.find('.media-preview').html(
-                        '(Multiple files selected)'
+                reader.onload = (e) => {
+                    this.$element.find('.modal--media-uploader__preview').html(
+                        _.img({src: e.target.result})
                     );
-                
-                // No files selected
-                } else if(numFiles == 0) {
-                    uploadModal.$element.find('.media-preview').html(
-                        '(No files selected)'
-                    );
+
+
+                    this.setLoading(false);
                 }
+                
+                reader.readAsDataURL(file);
             }
-           
-            // Event: Click upload
-            let onClickUpload = () => {
-                uploadModal.$element.find('form').submit();
-
-                return false;
-            }
-
-            // Event: Submit
-            let onSubmit = (e, content) => {
-                e.preventDefault();
-
-                uploadModal.$element.find('.widget--spinner').toggleClass('hidden', false);
-
-                let apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
-                let uploadedIds = [];
-
-                // First upload the Media files
-                // TODO: Use the RequestHelper for this
-                return new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: RequestHelper.environmentUrl(apiPath),
-                        type: 'POST',
-                        data: new FormData(content),
-                        processData: false,
-                        contentType: false,
-                        success: (ids) => {
-                            uploadedIds = ids || [];
-
-                            resolve();
-                        },
-                        error: (e) => {
-                            reject(e);            
-                        }
-                    })
-                })
-
-                // Then update the Media tree
-                .then(() => {
-                    if(!this.folder || this.folder === '/') {
-                        return Promise.resolve();
-                    }
-
-                    let queue = uploadedIds.slice(0);
-
-                    let putNextMediaIntoTree = () => {
-                        let id = queue.pop();
-
-                        if(!id) { return Promise.resolve(); }
-
-                        return RequestHelper.request('post', 'media/tree/' + id, {
-                            id: id,
-                            folder: this.folder
-                        })
-                        .then(() => {
-                            return putNextMediaIntoTree();
-                        });
-                    };
-
-                    return putNextMediaIntoTree();
-                })
-
-                // Then reload the Media resource
-                .then(() => {
-                    return RequestHelper.reloadResource('media');
-                })
-
-                // Then update the UI and trigger the success callback
-                .then(() => {
-                    uploadModal.$element.find('.widget--spinner').toggleClass('hidden', true);
-
-                    HashBrown.Views.Navigation.NavbarMain.reload();
-
-                    if(typeof this.onSuccess === 'function') {
-                        this.onSuccess(uploadedIds);
-                    }
                     
-                    uploadModal.hide();
-                });
+            if(isVideo) {
+                this.$element.find('.modal--media-uploader__preview').html(
+                    _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
+                );
             }
 
-            // Render the upload modal
-            let uploadModal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-upload-media',
-                    title: 'Upload a file',
-                    body: [
-                        _.div({class: 'widget widget--spinner embedded hidden'},
-                            _.span({class: 'widget--spinner__image fa fa-refresh'})
-                        ),
-                        _.div({class: 'media-preview'}),
-                        _.form({class: 'form-control'},
-                            _.input({type: 'file', name: 'media', multiple: this.replaceId ? false : true})
-                                .change((e) => {
-                                    if(typeof this.onChangeFile === 'function') {
-                                        this.onChangeFile(e);
-                                    }
-                                })
-                        ).submit(function(e) { onSubmit(e, this); })
-                    ]
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default',
-                        callback: this.onCancel
-                    },
-                    {
-                        label: 'Upload',
-                        class: 'btn-primary',
-                        callback: onClickUpload
-                    }
-                ]
-            });
-
-            // Event: Close modal
-            uploadModal.on('close', () => {
-                if(typeof this.onCancel === 'function') {
-                    this.onCancel();
-                } 
-
-                this.remove();
-            });
-        })
-        .catch(UI.errorModal);
+            debug.log('Previewing data of file type ' + file.type + '...', this);
+        
+        // Multiple files selected
+        } else if(numFiles > 1) {
+            this.$element.find('.media-preview').html(
+                '(Multiple files selected)'
+            );
+        
+        // No files selected
+        } else if(numFiles == 0) {
+            this.$element.find('.media-preview').html(
+                '(No files selected)'
+            );
+        }
     }
     
     /**
-     * Gets whether the Media provider exists
+     * Event: Submit
      *
-     * @returns {Promise} Promise
+     * @param {FormData} content
+     * @param {Array} files
      */
-    static checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-        .then((result) => {
-            if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
-            }  
+    onSubmit(content, files) {
+        if(!content || !files || files.length < 1) { return; }
 
-            return Promise.resolve();
-        }); 
+        this.setLoading(true);
+
+        let type = files[0].type;
+        let apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+        let uploadedIds = [];
+
+        // First upload the Media files
+        return RequestHelper.uploadFile(apiPath, type, content)
+
+        // Then update the Media tree
+        .then((ids) => {
+            uploadedIds = ids;
+
+            if(!uploadedIds || uploadedIds.length < 1) {
+                return Promise.reject(new Error('File upload failed'));
+            }
+
+            if(!this.folder || this.folder === '/') {
+                return Promise.resolve();
+            }
+
+            let queue = uploadedIds.slice(0);
+
+            let putNextMediaIntoTree = () => {
+                let id = queue.pop();
+
+                if(!id) { return Promise.resolve(); }
+
+                return RequestHelper.request('post', 'media/tree/' + id, {
+                    id: id,
+                    folder: this.folder
+                })
+                .then(() => {
+                    return putNextMediaIntoTree();
+                });
+            };
+
+            return putNextMediaIntoTree();
+        })
+
+        // Then reload the Media resource
+        .then(() => {
+            return RequestHelper.reloadResource('media');
+        })
+
+        // Then update the UI and trigger the success callback
+        .then(() => {
+            this.setLoading(false);
+
+            HashBrown.Views.Navigation.NavbarMain.reload();
+
+            if(typeof this.onSuccess === 'function') {
+                this.onSuccess(uploadedIds);
+            }
+            
+            this.close();
+        })
+        .catch((e) => {
+            UI.errorModal(e);
+
+            this.setLoading(false);  
+        });
+    }
+
+    /**
+     * Render body
+     *
+     * @returns {HTMLElement} Body
+     */
+    renderBody() {
+        return [
+            _.div({class: 'modal--media-uploader__preview'}),
+            new HashBrown.Views.Widgets.Input({
+                type: 'file',
+                name: 'media',
+                useMultiple: !this.replaceId,
+                onChange: (newValue) => {
+                    this.onChangeFile(newValue);
+                },
+                onSubmit: (newValue, newFiles) => {
+                    this.onSubmit(newValue, newFiles);
+                }
+            }).$element
+        ];
     }
 }
 
