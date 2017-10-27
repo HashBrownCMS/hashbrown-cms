@@ -1,10 +1,5 @@
 'use strict';
 
-const UserHelper = require('Server/Helpers/UserHelper');
-const ContentHelper = require('Server/Helpers/ContentHelper');
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-
 const Task = require('Server/Models/Task');
 
 let watchInterval;
@@ -87,23 +82,23 @@ class ScheduleHelper {
 
         let user;
 
-        return UserHelper.getUserById(task.user)
+        return HashBrown.Helpers.UserHelper.getUserById(task.user)
         .then((taskUser) => {
             user = taskUser;
 
-            return ContentHelper.getContentById(task.project, task.environment, task.content);
+            return HashBrown.Helpers.ContentHelper.getContentById(task.project, task.environment, task.content);
         })
         .then((content) => {
             switch(task.type) {
                 case 'publish':
-                    return ConnectionHelper.publishContent(task.project, task.environment, content, user)
+                    return HashBrown.Helpers.ConnectionHelper.publishContent(task.project, task.environment, content, user)
                     .then(() => {
                         return this.removeTask(task.project, task.environment, task.type, task.content);
                     });
                     break;
 
                 case 'unpublish':
-                    return ConnectionHelper.unpublishContent(task.project, task.environment, content, user)
+                    return HashBrown.Helpers.ConnectionHelper.unpublishContent(task.project, task.environment, content, user)
                     .then(() => {
                         return this.removeTask(task.project, task.environment, task.type, task.content);
                     });
@@ -138,7 +133,7 @@ class ScheduleHelper {
             query.date = date;
         }
 
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             'schedule',
             'tasks',
             query
@@ -194,7 +189,7 @@ class ScheduleHelper {
 
         debug.log('Updating ' + type + ' task for "' + contentId + '" to ' + date + '...', this, 2);
 
-        return DatabaseHelper.updateOne(
+        return HashBrown.Helpers.DatabaseHelper.updateOne(
             'schedule',
             'tasks',
             query,
@@ -228,7 +223,7 @@ class ScheduleHelper {
             environment: environment
         };
         
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'schedule',
             'tasks',
             query
@@ -238,7 +233,7 @@ class ScheduleHelper {
            
             debug.log('Removing ' + type + ' task for "' + contentId + '"...', this, 2);
 
-            return DatabaseHelper.remove(
+            return HashBrown.Helpers.DatabaseHelper.remove(
                 'schedule',
                 'tasks',
                 query
