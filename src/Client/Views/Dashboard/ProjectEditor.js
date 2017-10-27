@@ -17,6 +17,12 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
+        _.append(this.element,
+            _.div({class: 'widget--spinner embedded'},
+                _.div({class: 'widget--spinner__image fa fa-refresh'})
+            )
+        );
+
         this.fetch();
     }
    
@@ -195,15 +201,6 @@ class ProjectEditor extends Crisp.View {
         if(this.model instanceof HashBrown.Models.Project === false) {
             this.model = new HashBrown.Models.Project(this.model);
         }
-    }
-
-    /**
-     * Post render
-     */
-    postrender() {
-		setTimeout(() => {
-			this.$element.toggleClass('in', false);
-		}, 50);
     }
 
     /**

@@ -14,10 +14,6 @@
     transition: transform 0.25s ease;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
 
-    &.in {
-        transform: scale(0);
-    }           
-    
     &__remove {
         padding: 0rem;
         position: absolute;

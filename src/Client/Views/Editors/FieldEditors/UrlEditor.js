@@ -145,7 +145,7 @@ class UrlEditor extends FieldEditor {
      * Fetch the URL from the Content title
      */
     fetchFromTitle() {
-        this.value = this.$titleField.val();
+        this.value = this.$titleInput.val();
 
         this.regenerate();
     }
@@ -185,13 +185,18 @@ class UrlEditor extends FieldEditor {
                     .click(() => { this.regenerate(); })
             )
         );
+    }
 
-        //  Wait for next CPU cycle to check for title field
+    /**
+     * Post render
+     */
+    postrender() {
+        //  Wait a bit before checking for title field
         setTimeout(() => {
-            this.$titleField = this.$element.parents('.tab-pane').find('.field-container[data-key="title"]').eq(0);
+            this.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');
 
-            if(this.$titleField.length == 1) {
-                this.$titleField.change(() => {
+            if(this.$titleInput.length === 1) {
+                this.$titleInput.on('input', () => {
                     this.fetchFromTitle();   
                 });
             }
@@ -199,7 +204,7 @@ class UrlEditor extends FieldEditor {
             if(!this.value) {
                 this.fetchFromTitle();
             }
-        }, 2);
+        }, 100);
     }
 }
 

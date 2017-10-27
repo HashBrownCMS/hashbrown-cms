@@ -95,6 +95,21 @@
             display: flex;
             flex-wrap: wrap;
             margin: 0 -0.5rem;
+
+            .cr-placeholder {
+                padding: 1rem;
+                margin: 0.5rem;
+                position: relative;
+                flex-grow: 0;
+                flex-basis: calc(33.33% - 1rem);
+                width: calc(33.33% - 1rem);
+                color: $standard-text;
+                background-color: $standard;
+                transform-origin: center;
+                transition: transform 0.25s ease;
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                min-height: 12rem;
+            }
         }
 
         &__add {

@@ -36337,6 +36337,8 @@ var ProjectEditor = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
+        _.append(_this.element, _.div({ class: 'widget--spinner embedded' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })));
+
         _this.fetch();
         return _this;
     }
@@ -36549,25 +36551,12 @@ var ProjectEditor = function (_Crisp$View) {
     };
 
     /**
-     * Post render
-     */
-
-
-    ProjectEditor.prototype.postrender = function postrender() {
-        var _this10 = this;
-
-        setTimeout(function () {
-            _this10.$element.toggleClass('in', false);
-        }, 50);
-    };
-
-    /**
      * Renders this editor
      */
 
 
     ProjectEditor.prototype.template = function template() {
-        var _this11 = this;
+        var _this10 = this;
 
         var languageCount = this.model.settings.languages.length;
         var userCount = this.model.users.length;
@@ -36577,36 +36566,36 @@ var ProjectEditor = function (_Crisp$View) {
             reverseKeys: true,
             options: {
                 'Info': function Info() {
-                    _this11.onClickInfo();
+                    _this10.onClickInfo();
                 },
                 'Languages': function Languages() {
-                    _this11.onClickLanguages();
+                    _this10.onClickLanguages();
                 },
                 'Backups': function Backups() {
-                    _this11.onClickBackups();
+                    _this10.onClickBackups();
                 },
                 'Sync': function Sync() {
-                    _this11.onClickSync();
+                    _this10.onClickSync();
                 },
                 'Delete': function Delete() {
-                    _this11.onClickRemove();
+                    _this10.onClickRemove();
                 },
                 'Migrate content': function MigrateContent() {
-                    _this11.onClickMigrate();
+                    _this10.onClickMigrate();
                 }
             }
         }).$element.addClass('page--dashboard__project__menu')), _.div({ class: 'page--dashboard__project__info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'page--dashboard__project__environments' }, _.each(this.model.environments, function (i, environment) {
-            return _.div({ class: 'page--dashboard__project__environment' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this11.model.id + '/' + environment, class: 'widget widget--button expanded low' }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+            return _.div({ class: 'page--dashboard__project__environment' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this10.model.id + '/' + environment, class: 'widget widget--button expanded low' }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
                 icon: 'ellipsis-v',
                 reverseKeys: true,
                 options: {
                     'Delete': function Delete() {
-                        _this11.onClickRemoveEnvironment(environment);
+                        _this10.onClickRemoveEnvironment(environment);
                     }
                 }
             }).$element.addClass('page--dashboard__project__environment__menu')));
         }), _.if(currentUserIsAdmin(), _.button({ title: 'Add environment', class: 'widget widget--button round right fa fa-plus' }).click(function () {
-            _this11.onClickAddEnvironment();
+            _this10.onClickAddEnvironment();
         })))));
     };
 

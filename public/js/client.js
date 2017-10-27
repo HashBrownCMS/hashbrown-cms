@@ -48092,7 +48092,7 @@ var UrlEditor = function (_FieldEditor) {
      * Fetch the URL from the Content title
      */
     UrlEditor.prototype.fetchFromTitle = function fetchFromTitle() {
-        this.value = this.$titleField.val();
+        this.value = this.$titleInput.val();
 
         this.regenerate();
     };
@@ -48133,21 +48133,30 @@ var UrlEditor = function (_FieldEditor) {
         }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();
         })));
+    };
 
-        //  Wait for next CPU cycle to check for title field
+    /**
+     * Post render
+     */
+
+
+    UrlEditor.prototype.postrender = function postrender() {
+        var _this3 = this;
+
+        //  Wait a bit before checking for title field
         setTimeout(function () {
-            _this2.$titleField = _this2.$element.parents('.tab-pane').find('.field-container[data-key="title"]').eq(0);
+            _this3.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');
 
-            if (_this2.$titleField.length == 1) {
-                _this2.$titleField.change(function () {
-                    _this2.fetchFromTitle();
+            if (_this3.$titleInput.length === 1) {
+                _this3.$titleInput.on('input', function () {
+                    _this3.fetchFromTitle();
                 });
             }
 
-            if (!_this2.value) {
-                _this2.fetchFromTitle();
+            if (!_this3.value) {
+                _this3.fetchFromTitle();
             }
-        }, 2);
+        }, 100);
     };
 
     return UrlEditor;
