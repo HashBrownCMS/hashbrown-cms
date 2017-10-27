@@ -43211,14 +43211,8 @@ module.exports = function () {
 
     return _.nav({ class: 'navbar-main' },
     // Buttons
-    _.div({ class: 'navbar-main__tabs' }, _.a({ href: '/', class: 'navbar-main__tabs__button' }, _.div({ class: 'navbar-main__tabs__button__icon' }, _.img({ src: '/svg/logo_white.svg', class: 'logo navbar-main__logo' })), _.div({ class: 'navbar-main__tabs__button__text' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
-        var $icon = pane.icon;
-
-        if (typeof pane.icon === 'string') {
-            $icon = _.span({ class: 'fa fa-' + pane.icon });
-        }
-
-        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'navbar-main__tabs__button__icon' }, $icon), _.div({ class: 'navbar-main__tabs__button__text' }, _.span({ class: 'navbar-main__tabs__button__text__label' }, pane.label))).click(function (e) {
+    _.div({ class: 'navbar-main__tabs' }, _.a({ href: '/', class: 'navbar-main__tabs__button' }, _.img({ src: '/svg/logo_white.svg', class: 'navbar-main__tabs__button__icon' }), _.div({ class: 'navbar-main__tabs__button__label' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
+        return _.button({ class: 'navbar-main__tabs__button', 'data-route': pane.route, title: pane.label }, _.div({ class: 'navbar-main__tabs__button__icon fa fa-' + pane.icon }), _.div({ class: 'navbar-main__tabs__button__label' }, pane.label)).click(function (e) {
             _this.onClickTab(e);
         });
     })),
