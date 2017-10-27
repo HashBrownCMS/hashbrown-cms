@@ -29,7 +29,7 @@ class JSONEditor extends Crisp.View {
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
-        let url = $('.navbar-main .pane-container.active .pane-item-container.active .pane-item').attr('href');
+        let url = $('.navbar-main__pane__item.active > a').attr('href');
     
         if(url) {
             location = url;

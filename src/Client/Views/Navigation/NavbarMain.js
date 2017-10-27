@@ -45,7 +45,7 @@ class NavbarMain extends Crisp.View {
      */
     onClickTab(e) {
         let route = e.currentTarget.dataset.route;
-        let $currentTab = this.$element.find('.pane-container.active');
+        let $currentTab = this.$element.find('.navbar-main__pane.active');
 
         if(route == $currentTab.attr('data-route')) {
             location.hash = route;
@@ -81,100 +81,103 @@ class NavbarMain extends Crisp.View {
      * @param {String} tabName
      */
     showTab(tabRoute) {
-        this.$element.find('.tab-panes .pane-container').each(function(i) {
+        this.$element.find('.navbar-main__pane').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
         
-        this.$element.find('.navbar-main__tabs__button').each(function(i) {
+        this.$element.find('.navbar-main__tab').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     }
 
-	/**
-	 * Saves the navbar state
-	 */
-	save() {
-		this.state = {
-			buttons: {},
-			panes: {},
-			items: {},
-            scroll: $('.pane-container.active .pane').scrollTop() || 0
-		};
-		
-		this.$element.find('.navbar-main__tabs__button').each((i, element) => {
-			let $button = $(element);
-			let key = $button.data('route');
+    /**
+     * Saves the navbar state
+     */
+    save() {
+        this.state = {
+            buttons: {},
+            panes: {},
+            items: {},
+            scroll: $('.navbar-main__pane.active .navbar-main__pane').scrollTop() || 0
+        };
+        
+        this.$element.find('.navbar-main__tab').each((i, element) => {
+            let $button = $(element);
+            let key = $button.data('route');
 
-			this.state.buttons[key] = $button[0].className;
-		});
-		
-		this.$element.find('.pane-container').each((i, element) => {
-			let $pane = $(element);
-			let key = $pane.data('route');
+            this.state.buttons[key] = $button[0].className;
+        });
+        
+        this.$element.find('.navbar-main__pane').each((i, element) => {
+            let $pane = $(element);
+            let key = $pane.data('route');
 
-			this.state.panes[key] = $pane[0].className;
-		});
+            this.state.panes[key] = $pane[0].className;
+        });
 
-		this.$element.find('.pane-item-container').each((i, element) => {
-			let $item = $(element);
-			let key = $item.data('routing-path');
+        this.$element.find('.navbar-main__pane__item').each((i, element) => {
+            let $item = $(element);
+            let key = $item.data('routing-path');
 
-			this.state.items[key] = $item[0].className.replace('loading', '');
-		});
-	}
+            this.state.items[key] = $item[0].className.replace('loading', '');
+        });
+    }
 
-	/**
-	 * Restores the navbar state
-	 */
-	restore() {
-		if(!this.state) { return; }
+    /**
+     * Restores the navbar state
+     */
+    restore() {
+        if(!this.state) { return; }
 
         // Restore tab buttons
-		this.$element.find('.navbar-main__tabs__button').each((i, element) => {
-			let $button = $(element);
-			let key = $button.data('route');
+        this.$element.find('.navbar-main__tab').each((i, element) => {
+            let $button = $(element);
+            let key = $button.data('route');
 
-			if(this.state.buttons[key]) {
-				$button[0].className = this.state.buttons[key];
-			}
-		});
-		
+            if(this.state.buttons[key]) {
+                $button[0].className = this.state.buttons[key];
+            }
+        });
+        
         // Restore pane containers
-		this.$element.find('.pane-container').each((i, element) => {
-			let $pane = $(element);
-			let key = $pane.data('route');
+        this.$element.find('.navbar-main__pane').each((i, element) => {
+            let $pane = $(element);
+            let key = $pane.data('route');
 
-			if(this.state.panes[key]) {
-				$pane[0].className = this.state.panes[key];
-			}
-		});
+            if(this.state.panes[key]) {
+                $pane[0].className = this.state.panes[key];
+            }
+        });
 
         // Restore pane items
-		this.$element.find('.pane-item-container').each((i, element) => {
-			let $item = $(element);
-			let key = $item.data('routing-path');
+        this.$element.find('.navbar-main__pane__item').each((i, element) => {
+            let $item = $(element);
+            let key = $item.data('routing-path');
 
-			if(this.state.items[key]) {
-				$item[0].className = this.state.items[key];
-			}
-		});
+            if(this.state.items[key]) {
+                $item[0].className = this.state.items[key];
+            }
+        });
 
-        $('.pane-container.active .pane').scrollTop(this.state.scroll || 0);
+        $('.navbar-main__pane.active .navbar-main__pane__content').scrollTop(this.state.scroll || 0);
 
-		this.state = null;
-	}
+        this.state = null;
+    }
 
     /**
      * Reloads this view
      */
     reload() {
-		this.save();
+        this.save();
         
-		this.fetch();
+        this.fetch();
 
-		this.restore();
+        this.restore();
     }
     
+    /**
+     * Static version of the reload method
+     */
     static reload() {
         Crisp.View.get('NavbarMain').reload();
     }
@@ -306,7 +309,7 @@ class NavbarMain extends Crisp.View {
     highlightItem(tab, route) {
         this.showTab(tab);
 
-        this.$element.find('.pane-container.active .pane-item-container').each((i, element) => {
+        this.$element.find('.navbar-main__pane.active .navbar-main__pane__item').each((i, element) => {
             let $item = $(element);
             let id = ($item.children('a').attr('data-id') || '').toLowerCase();
             let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
@@ -318,7 +321,7 @@ class NavbarMain extends Crisp.View {
                 routingPath == route.toLowerCase()
             ) {
                 $item.toggleClass('active', true);
-                $item.parents('.pane-item-container').toggleClass('open', true);
+                $item.parents('.navbar-main__pane__item').toggleClass('open', true);
             }
         });
     }
@@ -328,7 +331,7 @@ class NavbarMain extends Crisp.View {
      */
     clear() {
         this.$element.find('.navbar-main__tabs').empty();
-        this.$element.find('.tab-panes').empty();
+        this.$element.find('.navbar-main__panes').empty();
     }
 
     /**
@@ -338,18 +341,18 @@ class NavbarMain extends Crisp.View {
      * @param {Object} pane
      */
     applySorting($pane, pane) {
-        $pane = $pane.children('.pane');
+        $pane = $pane.children('.navbar-main__pane');
 
         // Sort direct children
-        $pane.find('>.pane-item-container').sort((a, b) => {
+        $pane.find('>.navbar-main__pane__item').sort((a, b) => {
             return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
         }).appendTo($pane);
         
         // Sort nested children
-        $pane.find('.pane-item-container .children').each((i, children) => {
+        $pane.find('.navbar-main__pane__item .navbar-main__pane__item__children').each((i, children) => {
             let $children = $(children);
 
-            $children.find('>.pane-item-container').sort((a, b) => {
+            $children.find('>.navbar-main__pane__item').sort((a, b) => {
                 return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
             }).appendTo($children);
         });
@@ -369,12 +372,12 @@ class NavbarMain extends Crisp.View {
             // Find parent item
             let parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
             let parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-            let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+            let parentDirSelector = '.navbar-main__pane__item[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
             let $parentDir = $pane.find(parentDirSelector);
 
             // If parent element already exists, just append the queue item element
             if(parentDirAttrKey && parentDirAttrValue && $parentDir.length > 0) {
-                $parentDir.children('.children').append(queueItem.$element);
+                $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
             
             // If not, create parent elements if specified
             } else if(queueItem.createDir) {
@@ -393,20 +396,18 @@ class NavbarMain extends Crisp.View {
 
                     // Create it if not found
                     if($dir.length < 1) {
-                        $dir = _.div({class: 'pane-item-container', 'data-is-directory': true},
+                        $dir = _.div({class: 'navbar-main__pane__item', 'data-is-directory': true},
                             _.a({
-                                class: 'pane-item'
+                                class: 'navbar-main__pane__item__content'
                             },
-                                _.span({class: 'fa fa-folder'}),
-                                _.span({class: 'pane-item-label'}, dirName),
+                                _.span({class: 'navbar-main__pane__item__icon fa fa-folder'}),
+                                _.span({class: 'navbar-main__pane__item__label'}, dirName),
                                 
                                 // Toggle button
-                                _.button({class: 'btn-children-toggle'},
-                                    _.span({class:'fa fa-caret-down'}),
-                                    _.span({class:'fa fa-caret-right'})
-                                ).click((e) => { this.onClickToggleChildren(e); })
+                                _.button({class: 'navbar-main__pane__item__toggle-children'})
+                                    .click((e) => { this.onClickToggleChildren(e); })
                             ),
-                            _.div({class: 'children'})
+                            _.div({class: 'navbar-main__pane__item__children'})
                         );
                         
                         $dir.attr(parentDirAttrKey, finalDirName);
@@ -424,11 +425,11 @@ class NavbarMain extends Crisp.View {
                         let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
                         
                         if($prevDir.length > 0) {
-                            $prevDir.children('.children').prepend($dir);
+                            $prevDir.children('.navbar-main__pane__item__children').prepend($dir);
 
                         // If no previous dir was found, append directly to pane
                         } else {
-                            $pane.children('.pane').prepend($dir); 
+                            $pane.children('.navbar-main__pane__items').prepend($dir); 
                         }
                         
                         // Attach item context menu
@@ -443,16 +444,14 @@ class NavbarMain extends Crisp.View {
                     } 
                 }
 
-                $parentDir.children('.children').append(queueItem.$element);
+                $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
             }
 
             // Add expand/collapse buttons
-            if($parentDir.children('.pane-item').children('.btn-children-toggle').length < 1) {
-                $parentDir.children('.pane-item').append(
-                    _.button({class: 'btn-children-toggle'},
-                        _.span({class:'fa fa-caret-down'}),
-                        _.span({class:'fa fa-caret-right'})
-                    ).click((e) => { this.onClickToggleChildren(e); })
+            if($parentDir.children('.navbar-main__pane__item__content').children('.navbar-main__pane__item__toggle-children').length < 1) {
+                $parentDir.children('.navbar-main__pane__item__content').append(
+                    _.button({class: 'navbar-main__pane__item__toggle-children'})
+                        .click((e) => { this.onClickToggleChildren(e); })
                 );
             }
         }

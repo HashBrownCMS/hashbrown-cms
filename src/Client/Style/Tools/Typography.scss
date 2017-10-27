@@ -28,10 +28,18 @@
 
 // Base sizing
 html {
-    font-size: 15px;
+    font-size: 14px;
+    
+    @media($md) {
+        font-size: 13px;
+    }
 
     @media($sm) {
         font-size: 12px;
+    }
+    
+    @media($xs) {
+        font-size: 11px;
     }
 }
 

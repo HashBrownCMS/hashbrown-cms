@@ -10,37 +10,37 @@ module.exports = function() {
     return _.nav({class: 'navbar-main'},
         // Buttons
         _.div({class: 'navbar-main__tabs'},
-            _.a({href: '/', class: 'navbar-main__tabs__button'},
-                _.img({src: '/svg/logo_white.svg', class: 'navbar-main__tabs__button__icon'}),
-                _.div({class: 'navbar-main__tabs__button__label'}, 'Dashboard')
+            _.a({href: '/', class: 'navbar-main__tab'},
+                _.img({src: '/svg/logo_white.svg', class: 'navbar-main__tab__icon'}),
+                _.div({class: 'navbar-main__tab__label'}, 'Dashboard')
             ),            
             _.each(this.tabPanes, (i, pane) => {
-                return _.button({class: 'navbar-main__tabs__button', 'data-route': pane.route, title: pane.label},
-                    _.div({class: 'navbar-main__tabs__button__icon fa fa-' + pane.icon}),
-                    _.div({class: 'navbar-main__tabs__button__label'}, pane.label)
+                return _.button({class: 'navbar-main__tab', 'data-route': pane.route, title: pane.label},
+                    _.div({class: 'navbar-main__tab__icon fa fa-' + pane.icon}),
+                    _.div({class: 'navbar-main__tab__label'}, pane.label)
                 ).click((e) => { this.onClickTab(e); });
             })
         ),
 
         // Panes
-        _.div({class: 'tab-panes'},
+        _.div({class: 'navbar-main__panes'},
             _.each(this.tabPanes, (i, pane) => {
                 let queue = [];
 
-                let $pane = _.div({class: 'pane-container', 'data-route': pane.route},
+                let $pane = _.div({class: 'navbar-main__pane', 'data-route': pane.route},
                     // Toolbar
                     _.if(pane.settings.toolbar,
                         pane.settings.toolbar
                     ),
 
                     // Move buttons
-                    _.div({class: 'pane-move-buttons'},
-                        _.button({class: 'btn btn-move-to-root'}, 'Move to root'),
-                        _.button({class: 'btn btn-new-folder'}, 'New folder')
+                    _.div({class: 'navbar-main__pane__move-buttons widget-group'},
+                        _.button({class: 'widget widget--button low expanded navbar-main__pane__move-button navbar-main__pane__move-button--root-dir'}, 'Move to root'),
+                        _.button({class: 'widget widget--button low expanded navbar-main__pane__move-button navbar-main__pane__move-button--new-dir'}, 'New folder')
                     ),
 
                     // Items
-                    _.div({class: 'pane'},
+                    _.div({class: 'navbar-main__pane__items'},
                         _.each(pane.settings.items || pane.settings.getItems(), (i, item) => {
                             let id = item.id || i;
                             let name = this.getItemName(item);
@@ -53,7 +53,7 @@ module.exports = function() {
 
                             let $item = _.div(
                                 {
-                                    class: 'pane-item-container',
+                                    class: 'navbar-main__pane__item',
                                     'data-routing-path': routingPath,
                                     'data-locked': item.isLocked,
                                     'data-remote': isRemote,
@@ -65,13 +65,13 @@ module.exports = function() {
                                     'data-id': id,
                                     'data-name': name,
                                     href: '#' + (routingPath ? pane.route + routingPath : pane.route),
-                                    class: 'pane-item'
+                                    class: 'navbar-main__pane__item__content'
                                 },
-                                    _.span({class: 'fa fa-' + icon}),
-                                    _.span({class: 'pane-item-label'}, name)
+                                    _.div({class: 'navbar-main__pane__item__icon fa fa-' + icon}),
+                                    _.div({class: 'navbar-main__pane__item__label'}, name)
                                 ),
-                                _.div({class: 'children'}),
-                                _.div({class: 'pane-item-insert-below'})
+                                _.div({class: 'navbar-main__pane__item__children'}),
+                                _.div({class: 'navbar-main__pane__item__insert-below'})
                             );
 
                             // Attach item context menu

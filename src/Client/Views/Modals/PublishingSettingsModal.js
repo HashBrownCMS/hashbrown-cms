@@ -10,10 +10,8 @@ class PublishingSettingsModal extends Modal {
      * Constructor
      */
     constructor(params) {
-        super(params);
-
-        this.title = 'Publishing settings for "' + this.model.prop('title', window.language) + '"';
-        this.actions = [
+        params.title = 'Publishing settings for "' + params.model.prop('title', window.language) + '"';
+        params.actions = [
             {
                 label: 'OK',
                 onClick: () => {
@@ -22,7 +20,9 @@ class PublishingSettingsModal extends Modal {
             }
         ];
 
-        this.value = JSON.parse(JSON.stringify(this.model.getSettings('publishing')));
+        params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
+        
+        super(params);
     }
 
     /**
@@ -57,11 +57,11 @@ class PublishingSettingsModal extends Modal {
                     _.label({class: 'widget widget--label'}, 'Connection'),
                     new HashBrown.Views.Widgets.Dropdown({
                         options: resources.connections,
-                        value: publishing.connectionId,
+                        value: this.value.connectionId,
                         valueKey: 'id',
                         labelKey: 'name',
                         onChange: (newValue) => {
-                            publishing.connectionId = newValue;
+                            this.value.connectionId = newValue;
                         }
                     }).$element
                 )

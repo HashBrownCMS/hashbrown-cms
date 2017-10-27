@@ -197,6 +197,8 @@ class MediaHelper extends MediaHelperCommon {
 
             // Path sanity check
             for(let item of tree) {
+                item.folder = item.folder || '/'; 
+
                 // Append initial slash
                 if(item.folder.indexOf('/') !== 0) {
                     item.folder = '/' + item.folder;

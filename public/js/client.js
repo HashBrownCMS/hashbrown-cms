@@ -10121,31 +10121,21 @@ var Pane = function () {
 
         var id = $('.context-menu-target').data('id');
         var navbar = Crisp.View.get('NavbarMain');
-        var $pane = navbar.$element.find('.pane-container.active');
+        var $pane = navbar.$element.find('.navbar-main__pane.active');
 
-        $pane.find('.pane-item-container a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
+        $pane.find('.navbar-main__pane__item a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
         $pane.toggleClass('select-dir', true);
 
         // Reset
         function reset(newPath) {
-            var mediaViewer = Crisp.View.get('MediaViewer');
-
-            $pane.find('.pane-item-container[data-id="' + id + '"]').toggleClass('moving-item', false);
+            $pane.find('.navbar-main__pane__item[data-id="' + id + '"]').toggleClass('moving-item', false);
             $pane.toggleClass('select-dir', false);
-            $pane.find('.pane-move-buttons .btn').off('click');
-            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.navbar-main__pane__move-button').off('click');
+            $pane.find('.navbar-main__pane__item__content').off('click');
             $pane.find('.moving-item').toggleClass('moving-item', false);
-
-            if (!newPath) {
-                return;
-            }
-
-            if (id == Crisp.Router.params.id && mediaViewer) {
-                mediaViewer.$element.find('.editor-footer input').val(newPath);
-            }
         }
 
-        // Cancel
+        // Cancel by escape key
         $(document).on('keyup', function (e) {
             if (e.which == 27) {
                 reset();
@@ -10153,8 +10143,8 @@ var Pane = function () {
         });
 
         // Click existing directory
-        $pane.find('.pane-item-container[data-is-directory="true"]:not(.moving-item)').each(function (i, element) {
-            $(element).children('.pane-item').on('click', function (e) {
+        $pane.find('.navbar-main__pane__item[data-is-directory="true"]:not(.moving-item)').each(function (i, element) {
+            $(element).children('.navbar-main__pane__item__content').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -10167,7 +10157,7 @@ var Pane = function () {
         });
 
         // Click below item
-        $pane.find('.pane-item-container .pane-item-insert-below').click(function (e) {
+        $pane.find('.navbar-main__pane__item__insert-below').click(function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -10181,7 +10171,7 @@ var Pane = function () {
             reset();
 
             // Fetch the parent id as well, in case that changed
-            var $parentItem = $container.parents('.pane-item-container');
+            var $parentItem = $container.parents('.navbar-main__pane__item');
             var newPath = $parentItem.length > 0 ? $parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id') : null;
 
             // Trigger sort change event
@@ -10189,7 +10179,7 @@ var Pane = function () {
         });
 
         // Click "move to root" button
-        $pane.find('.pane-move-buttons .btn-move-to-root').on('click', function (e) {
+        $pane.find('.navbar-main__pane__move-button--root-dir').on('click', function (e) {
             var newPath = '/';
 
             reset(newPath);
@@ -10197,25 +10187,18 @@ var Pane = function () {
             _this.onChangeDirectory(id, newPath);
         });
 
-        $pane.find('.pane-move-buttons').toggle(this.canCreateDirectory == true);
+        $pane.find('.navbar-main__pane__move-button--new-dir').toggle(this.canCreateDirectory == true);
 
         if (this.canCreateDirectory) {
-            $pane.find('.pane-move-buttons .btn-new-folder').on('click', function () {
+            $pane.find('.navbar-main__pane__move-button--new-dir').on('click', function () {
                 HashBrown.Helpers.MediaHelper.getMediaById(id).then(function (item) {
-                    var messageModal = new HashBrown.Views.Modals.MessageModal({
-                        model: {
-                            title: 'Move item',
-                            body: _.div({}, 'Move the media object "' + (item.name || item.title || item.id) + '"', _.input({ class: 'form-control', value: item.folder || item.parentId || '', placeholder: 'Type folder path here' }))
-                        },
-                        buttons: [{
-                            label: 'Cancel',
-                            class: 'btn-default',
-                            callback: function callback() {}
-                        }, {
+                    var messageModal = new HashBrown.Views.Modals.Modal({
+                        title: 'Move item',
+                        body: _.div({ class: 'widget-group' }, _.input({ class: 'widget widget--input text', value: item.folder || item.parentId || '', placeholder: '/path/to/media/' }), _.div({ class: 'widget widget--label' }, item.name || item.title || item.id)),
+                        actions: [{
                             label: 'OK',
-                            class: 'btn-primary',
-                            callback: function callback() {
-                                var newPath = messageModal.$element.find('input.form-control').val();
+                            onClick: function onClick() {
+                                var newPath = messageModal.$element.find('.widget--input').val();
 
                                 reset(newPath);
 
@@ -10305,7 +10288,7 @@ var NavbarMain = function (_Crisp$View) {
 
     NavbarMain.prototype.onClickTab = function onClickTab(e) {
         var route = e.currentTarget.dataset.route;
-        var $currentTab = this.$element.find('.pane-container.active');
+        var $currentTab = this.$element.find('.navbar-main__pane.active');
 
         if (route == $currentTab.attr('data-route')) {
             location.hash = route;
@@ -10345,11 +10328,11 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.showTab = function showTab(tabRoute) {
-        this.$element.find('.tab-panes .pane-container').each(function (i) {
+        this.$element.find('.navbar-main__pane').each(function (i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
 
-        this.$element.find('.navbar-main__tabs__button').each(function (i) {
+        this.$element.find('.navbar-main__tab').each(function (i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     };
@@ -10366,24 +10349,24 @@ var NavbarMain = function (_Crisp$View) {
             buttons: {},
             panes: {},
             items: {},
-            scroll: $('.pane-container.active .pane').scrollTop() || 0
+            scroll: $('.navbar-main__pane.active .navbar-main__pane').scrollTop() || 0
         };
 
-        this.$element.find('.navbar-main__tabs__button').each(function (i, element) {
+        this.$element.find('.navbar-main__tab').each(function (i, element) {
             var $button = $(element);
             var key = $button.data('route');
 
             _this2.state.buttons[key] = $button[0].className;
         });
 
-        this.$element.find('.pane-container').each(function (i, element) {
+        this.$element.find('.navbar-main__pane').each(function (i, element) {
             var $pane = $(element);
             var key = $pane.data('route');
 
             _this2.state.panes[key] = $pane[0].className;
         });
 
-        this.$element.find('.pane-item-container').each(function (i, element) {
+        this.$element.find('.navbar-main__pane__item').each(function (i, element) {
             var $item = $(element);
             var key = $item.data('routing-path');
 
@@ -10404,7 +10387,7 @@ var NavbarMain = function (_Crisp$View) {
         }
 
         // Restore tab buttons
-        this.$element.find('.navbar-main__tabs__button').each(function (i, element) {
+        this.$element.find('.navbar-main__tab').each(function (i, element) {
             var $button = $(element);
             var key = $button.data('route');
 
@@ -10414,7 +10397,7 @@ var NavbarMain = function (_Crisp$View) {
         });
 
         // Restore pane containers
-        this.$element.find('.pane-container').each(function (i, element) {
+        this.$element.find('.navbar-main__pane').each(function (i, element) {
             var $pane = $(element);
             var key = $pane.data('route');
 
@@ -10424,7 +10407,7 @@ var NavbarMain = function (_Crisp$View) {
         });
 
         // Restore pane items
-        this.$element.find('.pane-item-container').each(function (i, element) {
+        this.$element.find('.navbar-main__pane__item').each(function (i, element) {
             var $item = $(element);
             var key = $item.data('routing-path');
 
@@ -10433,7 +10416,7 @@ var NavbarMain = function (_Crisp$View) {
             }
         });
 
-        $('.pane-container.active .pane').scrollTop(this.state.scroll || 0);
+        $('.navbar-main__pane.active .navbar-main__pane__content').scrollTop(this.state.scroll || 0);
 
         this.state = null;
     };
@@ -10450,6 +10433,11 @@ var NavbarMain = function (_Crisp$View) {
 
         this.restore();
     };
+
+    /**
+     * Static version of the reload method
+     */
+
 
     NavbarMain.reload = function reload() {
         Crisp.View.get('NavbarMain').reload();
@@ -10589,7 +10577,7 @@ var NavbarMain = function (_Crisp$View) {
     NavbarMain.prototype.highlightItem = function highlightItem(tab, route) {
         this.showTab(tab);
 
-        this.$element.find('.pane-container.active .pane-item-container').each(function (i, element) {
+        this.$element.find('.navbar-main__pane.active .navbar-main__pane__item').each(function (i, element) {
             var $item = $(element);
             var id = ($item.children('a').attr('data-id') || '').toLowerCase();
             var routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
@@ -10598,7 +10586,7 @@ var NavbarMain = function (_Crisp$View) {
 
             if (id == route.toLowerCase() || routingPath == route.toLowerCase()) {
                 $item.toggleClass('active', true);
-                $item.parents('.pane-item-container').toggleClass('open', true);
+                $item.parents('.navbar-main__pane__item').toggleClass('open', true);
             }
         });
     };
@@ -10610,7 +10598,7 @@ var NavbarMain = function (_Crisp$View) {
 
     NavbarMain.prototype.clear = function clear() {
         this.$element.find('.navbar-main__tabs').empty();
-        this.$element.find('.tab-panes').empty();
+        this.$element.find('.navbar-main__panes').empty();
     };
 
     /**
@@ -10622,18 +10610,18 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.applySorting = function applySorting($pane, pane) {
-        $pane = $pane.children('.pane');
+        $pane = $pane.children('.navbar-main__pane');
 
         // Sort direct children
-        $pane.find('>.pane-item-container').sort(function (a, b) {
+        $pane.find('>.navbar-main__pane__item').sort(function (a, b) {
             return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
         }).appendTo($pane);
 
         // Sort nested children
-        $pane.find('.pane-item-container .children').each(function (i, children) {
+        $pane.find('.navbar-main__pane__item .navbar-main__pane__item__children').each(function (i, children) {
             var $children = $(children);
 
-            $children.find('>.pane-item-container').sort(function (a, b) {
+            $children.find('>.navbar-main__pane__item').sort(function (a, b) {
                 return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
             }).appendTo($children);
         });
@@ -10672,12 +10660,12 @@ var NavbarMain = function (_Crisp$View) {
             // Find parent item
             var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
             var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-            var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+            var parentDirSelector = '.navbar-main__pane__item[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
             var $parentDir = $pane.find(parentDirSelector);
 
             // If parent element already exists, just append the queue item element
             if (parentDirAttrKey && parentDirAttrValue && $parentDir.length > 0) {
-                $parentDir.children('.children').append(queueItem.$element);
+                $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
 
                 // If not, create parent elements if specified
             } else if (queueItem.createDir) {
@@ -10698,14 +10686,14 @@ var NavbarMain = function (_Crisp$View) {
 
                     // Create it if not found
                     if ($dir.length < 1) {
-                        $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
-                            class: 'pane-item'
-                        }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName),
+                        $dir = _.div({ class: 'navbar-main__pane__item', 'data-is-directory': true }, _.a({
+                            class: 'navbar-main__pane__item__content'
+                        }, _.span({ class: 'navbar-main__pane__item__icon fa fa-folder' }), _.span({ class: 'navbar-main__pane__item__label' }, dirName),
 
                         // Toggle button
-                        _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' })).click(function (e) {
+                        _.button({ class: 'navbar-main__pane__item__toggle-children' }).click(function (e) {
                             _this4.onClickToggleChildren(e);
-                        })), _.div({ class: 'children' }));
+                        })), _.div({ class: 'navbar-main__pane__item__children' }));
 
                         $dir.attr(parentDirAttrKey, finalDirName);
 
@@ -10722,11 +10710,11 @@ var NavbarMain = function (_Crisp$View) {
                         var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
 
                         if ($prevDir.length > 0) {
-                            $prevDir.children('.children').prepend($dir);
+                            $prevDir.children('.navbar-main__pane__item__children').prepend($dir);
 
                             // If no previous dir was found, append directly to pane
                         } else {
-                            $pane.children('.pane').prepend($dir);
+                            $pane.children('.navbar-main__pane__items').prepend($dir);
                         }
 
                         // Attach item context menu
@@ -10741,12 +10729,12 @@ var NavbarMain = function (_Crisp$View) {
                     }
                 }
 
-                $parentDir.children('.children').append(queueItem.$element);
+                $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
             }
 
             // Add expand/collapse buttons
-            if ($parentDir.children('.pane-item').children('.btn-children-toggle').length < 1) {
-                $parentDir.children('.pane-item').append(_.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' })).click(function (e) {
+            if ($parentDir.children('.navbar-main__pane__item__content').children('.navbar-main__pane__item__toggle-children').length < 1) {
+                $parentDir.children('.navbar-main__pane__item__content').append(_.button({ class: 'navbar-main__pane__item__toggle-children' }).click(function (e) {
                     _this4.onClickToggleChildren(e);
                 }));
             }
@@ -26470,7 +26458,7 @@ var JSONEditor = function (_Crisp$View) {
 
 
     JSONEditor.prototype.onClickBasic = function onClickBasic() {
-        var url = $('.navbar-main .pane-container.active .pane-item-container.active .pane-item').attr('href');
+        var url = $('.navbar-main__pane__item.active > a').attr('href');
 
         if (url) {
             location = url;
@@ -31117,20 +31105,21 @@ var PublishingSettingsModal = function (_Modal) {
      * Constructor
      */
     function PublishingSettingsModal(params) {
+        var _this;
+
         _classCallCheck(this, PublishingSettingsModal);
 
-        var _this = _possibleConstructorReturn(this, _Modal.call(this, params));
-
-        _this.title = 'Publishing settings for "' + _this.model.prop('title', window.language) + '"';
-        _this.actions = [{
+        params.title = 'Publishing settings for "' + params.model.prop('title', window.language) + '"';
+        params.actions = [{
             label: 'OK',
             onClick: function onClick() {
                 _this.trigger('change', _this.value);
             }
         }];
 
-        _this.value = JSON.parse(JSON.stringify(_this.model.getSettings('publishing')));
-        return _this;
+        params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
+
+        return _this = _possibleConstructorReturn(this, _Modal.call(this, params));
     }
 
     /**
@@ -31161,11 +31150,11 @@ var PublishingSettingsModal = function (_Modal) {
             // Connection picker
             _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Connection'), new HashBrown.Views.Widgets.Dropdown({
                 options: resources.connections,
-                value: publishing.connectionId,
+                value: this.value.connectionId,
                 valueKey: 'id',
                 labelKey: 'name',
                 onChange: function onChange(newValue) {
-                    publishing.connectionId = newValue;
+                    _this2.value.connectionId = newValue;
                 }
             }).$element));
         }
@@ -43211,25 +43200,25 @@ module.exports = function () {
 
     return _.nav({ class: 'navbar-main' },
     // Buttons
-    _.div({ class: 'navbar-main__tabs' }, _.a({ href: '/', class: 'navbar-main__tabs__button' }, _.img({ src: '/svg/logo_white.svg', class: 'navbar-main__tabs__button__icon' }), _.div({ class: 'navbar-main__tabs__button__label' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
-        return _.button({ class: 'navbar-main__tabs__button', 'data-route': pane.route, title: pane.label }, _.div({ class: 'navbar-main__tabs__button__icon fa fa-' + pane.icon }), _.div({ class: 'navbar-main__tabs__button__label' }, pane.label)).click(function (e) {
+    _.div({ class: 'navbar-main__tabs' }, _.a({ href: '/', class: 'navbar-main__tab' }, _.img({ src: '/svg/logo_white.svg', class: 'navbar-main__tab__icon' }), _.div({ class: 'navbar-main__tab__label' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
+        return _.button({ class: 'navbar-main__tab', 'data-route': pane.route, title: pane.label }, _.div({ class: 'navbar-main__tab__icon fa fa-' + pane.icon }), _.div({ class: 'navbar-main__tab__label' }, pane.label)).click(function (e) {
             _this.onClickTab(e);
         });
     })),
 
     // Panes
-    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
+    _.div({ class: 'navbar-main__panes' }, _.each(this.tabPanes, function (i, pane) {
         var queue = [];
 
-        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
+        var $pane = _.div({ class: 'navbar-main__pane', 'data-route': pane.route },
         // Toolbar
         _.if(pane.settings.toolbar, pane.settings.toolbar),
 
         // Move buttons
-        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
+        _.div({ class: 'navbar-main__pane__move-buttons widget-group' }, _.button({ class: 'widget widget--button low expanded navbar-main__pane__move-button navbar-main__pane__move-button--root-dir' }, 'Move to root'), _.button({ class: 'widget widget--button low expanded navbar-main__pane__move-button navbar-main__pane__move-button--new-dir' }, 'New folder')),
 
         // Items
-        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
+        _.div({ class: 'navbar-main__pane__items' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
             var id = item.id || i;
             var name = _this.getItemName(item);
             var icon = _this.getItemIcon(item, pane.settings);
@@ -43240,7 +43229,7 @@ module.exports = function () {
             var isRemote = item.sync ? item.sync.isRemote : false;
 
             var $item = _.div({
-                class: 'pane-item-container',
+                class: 'navbar-main__pane__item',
                 'data-routing-path': routingPath,
                 'data-locked': item.isLocked,
                 'data-remote': isRemote,
@@ -43251,8 +43240,8 @@ module.exports = function () {
                 'data-id': id,
                 'data-name': name,
                 href: '#' + (routingPath ? pane.route + routingPath : pane.route),
-                class: 'pane-item'
-            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+                class: 'navbar-main__pane__item__content'
+            }, _.div({ class: 'navbar-main__pane__item__icon fa fa-' + icon }), _.div({ class: 'navbar-main__pane__item__label' }, name)), _.div({ class: 'navbar-main__pane__item__children' }), _.div({ class: 'navbar-main__pane__item__insert-below' }));
 
             // Attach item context menu
             if (pane.settings.getItemContextMenu) {
@@ -43623,14 +43612,13 @@ var ContentPane = function (_NavbarPane) {
 
             var shouldDeleteChildren = false;
 
-            UI.confirmModal('Remove', 'Remove the content "' + name + '"?', new HashBrown.Views.Widgets.Input({
+            UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Remove child Content too'), new HashBrown.Views.Widgets.Input({
                 value: shouldDeleteChildren,
                 type: 'checkbox',
-                placeholder: 'Remove child content too',
                 onChange: function onChange(newValue) {
                     shouldDeleteChildren = newValue;
                 }
-            }).$element, function () {
+            }).$element), function () {
                 $element.parent().toggleClass('loading', true);
 
                 RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren).then(function () {

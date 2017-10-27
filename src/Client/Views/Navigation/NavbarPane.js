@@ -61,38 +61,30 @@ class Pane {
     static onClickMoveItem() {
         let id = $('.context-menu-target').data('id');
         let navbar = Crisp.View.get('NavbarMain');
-        let $pane = navbar.$element.find('.pane-container.active');
+        let $pane = navbar.$element.find('.navbar-main__pane.active');
 
-        $pane.find('.pane-item-container a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
+        $pane.find('.navbar-main__pane__item a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
         $pane.toggleClass('select-dir', true);
         
         // Reset
         function reset(newPath) {
-            let mediaViewer = Crisp.View.get('MediaViewer');
-
-            $pane.find('.pane-item-container[data-id="' + id + '"]').toggleClass('moving-item', false);
+            $pane.find('.navbar-main__pane__item[data-id="' + id + '"]').toggleClass('moving-item', false);
             $pane.toggleClass('select-dir', false);
-            $pane.find('.pane-move-buttons .btn').off('click');
-            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.navbar-main__pane__move-button').off('click');
+            $pane.find('.navbar-main__pane__item__content').off('click');
             $pane.find('.moving-item').toggleClass('moving-item', false);
-            
-            if(!newPath) { return; }
-
-            if(id == Crisp.Router.params.id && mediaViewer) {
-                mediaViewer.$element.find('.editor-footer input').val(newPath);
-            }
         }
         
-        // Cancel
+        // Cancel by escape key
         $(document).on('keyup', (e) => {
             if(e.which == 27) {
                 reset();
             }
         });
-        
+
         // Click existing directory
-        $pane.find('.pane-item-container[data-is-directory="true"]:not(.moving-item)').each((i, element) => {
-            $(element).children('.pane-item').on('click', (e) => {
+        $pane.find('.navbar-main__pane__item[data-is-directory="true"]:not(.moving-item)').each((i, element) => {
+            $(element).children('.navbar-main__pane__item__content').on('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -105,7 +97,7 @@ class Pane {
         }); 
 
         // Click below item
-        $pane.find('.pane-item-container .pane-item-insert-below').click((e) => {
+        $pane.find('.navbar-main__pane__item__insert-below').click((e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -119,7 +111,7 @@ class Pane {
             reset();
 
             // Fetch the parent id as well, in case that changed
-            let $parentItem = $container.parents('.pane-item-container');
+            let $parentItem = $container.parents('.navbar-main__pane__item');
             let newPath = $parentItem.length > 0 ? ($parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id')) : null;
 
             // Trigger sort change event
@@ -127,7 +119,7 @@ class Pane {
         });
 
         // Click "move to root" button
-        $pane.find('.pane-move-buttons .btn-move-to-root').on('click', (e) => {
+        $pane.find('.navbar-main__pane__move-button--root-dir').on('click', (e) => {
             let newPath = '/';
 
             reset(newPath);
@@ -135,32 +127,23 @@ class Pane {
             this.onChangeDirectory(id, newPath);
         });
         
-        $pane.find('.pane-move-buttons').toggle(this.canCreateDirectory == true);
+        $pane.find('.navbar-main__pane__move-button--new-dir').toggle(this.canCreateDirectory == true);
 
         if(this.canCreateDirectory) {
-            $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
+            $pane.find('.navbar-main__pane__move-button--new-dir').on('click', () => {
                 HashBrown.Helpers.MediaHelper.getMediaById(id)
                 .then((item) => {
-                    let messageModal = new HashBrown.Views.Modals.MessageModal({
-                        model: {
-                            title: 'Move item',
-                            body: _.div({},
-                                'Move the media object "' + (item.name || item.title || item.id) + '"',
-                                _.input({class: 'form-control', value: (item.folder || item.parentId || ''), placeholder: 'Type folder path here'})
-                            )
-                        },
-                        buttons: [
-                            {
-                                label: 'Cancel',
-                                class: 'btn-default',
-                                callback: () => {
-                                }
-                            },
+                    let messageModal = new HashBrown.Views.Modals.Modal({
+                        title: 'Move item',
+                        body: _.div({class: 'widget-group'},
+                            _.input({class: 'widget widget--input text', value: (item.folder || item.parentId || ''), placeholder: '/path/to/media/'}),
+                            _.div({class: 'widget widget--label'}, (item.name || item.title || item.id))
+                        ),
+                        actions: [
                             {
                                 label: 'OK',
-                                class: 'btn-primary',
-                                callback: () => {
-                                    let newPath = messageModal.$element.find('input.form-control').val();
+                                onClick: () => {
+                                    let newPath = messageModal.$element.find('.widget--input').val();
                                     
                                     reset(newPath);
 

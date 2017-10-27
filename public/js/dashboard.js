@@ -26999,20 +26999,21 @@ var PublishingSettingsModal = function (_Modal) {
      * Constructor
      */
     function PublishingSettingsModal(params) {
+        var _this;
+
         _classCallCheck(this, PublishingSettingsModal);
 
-        var _this = _possibleConstructorReturn(this, _Modal.call(this, params));
-
-        _this.title = 'Publishing settings for "' + _this.model.prop('title', window.language) + '"';
-        _this.actions = [{
+        params.title = 'Publishing settings for "' + params.model.prop('title', window.language) + '"';
+        params.actions = [{
             label: 'OK',
             onClick: function onClick() {
                 _this.trigger('change', _this.value);
             }
         }];
 
-        _this.value = JSON.parse(JSON.stringify(_this.model.getSettings('publishing')));
-        return _this;
+        params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
+
+        return _this = _possibleConstructorReturn(this, _Modal.call(this, params));
     }
 
     /**
@@ -27043,11 +27044,11 @@ var PublishingSettingsModal = function (_Modal) {
             // Connection picker
             _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Connection'), new HashBrown.Views.Widgets.Dropdown({
                 options: resources.connections,
-                value: publishing.connectionId,
+                value: this.value.connectionId,
                 valueKey: 'id',
                 labelKey: 'name',
                 onChange: function onChange(newValue) {
-                    publishing.connectionId = newValue;
+                    _this2.value.connectionId = newValue;
                 }
             }).$element));
         }

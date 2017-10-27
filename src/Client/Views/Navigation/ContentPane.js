@@ -321,14 +321,16 @@ class ContentPane extends NavbarPane {
             UI.confirmModal(
                 'Remove',
                 'Remove the content "' + name + '"?',
-                new HashBrown.Views.Widgets.Input({
-                    value: shouldDeleteChildren,
-                    type: 'checkbox',
-                    placeholder: 'Remove child content too',
-                    onChange: (newValue) => {
-                        shouldDeleteChildren = newValue;
-                    }
-                }).$element,
+                _.div({class: 'widget-group'},
+                    _.label({class: 'widget widget--label'}, 'Remove child Content too'),
+                    new HashBrown.Views.Widgets.Input({
+                        value: shouldDeleteChildren,
+                        type: 'checkbox',
+                        onChange: (newValue) => {
+                            shouldDeleteChildren = newValue;
+                        }
+                    }).$element
+                ),
                 () => {
                     $element.parent().toggleClass('loading', true);
 
