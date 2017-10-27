@@ -72,7 +72,7 @@ class NavbarMain extends Crisp.View {
      * @param {Boolean} isActive
      */
     toggleTabButtons(isActive) {
-        this.$element.toggleClass('hide-tab-buttons', !isActive);
+        this.$element.toggleClass('hide-tabs', !isActive);
     }
 
     /**
@@ -85,7 +85,7 @@ class NavbarMain extends Crisp.View {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
         
-        this.$element.find('.tab-buttons button').each(function(i) {
+        this.$element.find('.navbar-main__tabs__button').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     }
@@ -101,7 +101,7 @@ class NavbarMain extends Crisp.View {
             scroll: $('.pane-container.active .pane').scrollTop() || 0
 		};
 		
-		this.$element.find('.tab-buttons button').each((i, element) => {
+		this.$element.find('.navbar-main__tabs__button').each((i, element) => {
 			let $button = $(element);
 			let key = $button.data('route');
 
@@ -130,7 +130,7 @@ class NavbarMain extends Crisp.View {
 		if(!this.state) { return; }
 
         // Restore tab buttons
-		this.$element.find('.tab-buttons button').each((i, element) => {
+		this.$element.find('.navbar-main__tabs__button').each((i, element) => {
 			let $button = $(element);
 			let key = $button.data('route');
 
@@ -327,7 +327,7 @@ class NavbarMain extends Crisp.View {
      * Clears all content within the navbar
      */
     clear() {
-        this.$element.find('.tab-buttons').empty();
+        this.$element.find('.navbar-main__tabs').empty();
         this.$element.find('.tab-panes').empty();
     }
 

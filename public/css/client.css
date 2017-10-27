@@ -250,7 +250,7 @@ h1, h2, h3, h4, h5, h6 {
 /**
  * Environment page style
  */
-.page--environment.media-picker .page--environment__space--nav .navbar-main .tab-buttons,
+.page--environment.media-picker .navbar-main__tabs,
 .page--environment.media-picker .page--environment__space--menu,
 .page--environment.media-picker .page--environment__space--editor .editor__header {
   display: none; }
@@ -363,12 +363,12 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   width: 100%;
   position: relative; }
-  .navbar-main.hide-tab-buttons .tab-buttons {
+  .navbar-main.hide-tabs .navbar-main__tabs {
     display: none; }
-  .navbar-main .tab-panes, .navbar-main .tab-buttons {
+  .navbar-main .tab-panes, .navbar-main__tabs {
     transition: opacity 0.5s, width 0.5s;
     overflow-x: hidden; }
-  .navbar-main .tab-buttons {
+  .navbar-main__tabs {
     width: 160px;
     flex-shrink: 0;
     height: 100%;
@@ -378,7 +378,7 @@ h1, h2, h3, h4, h5, h6 {
     background-image: url("/img/bg-secondary.jpg");
     background-attachment: fixed;
     background-position: 0px 0px; }
-    .navbar-main .tab-buttons:after {
+    .navbar-main__tabs:after {
       content: '';
       display: block;
       position: absolute;
@@ -388,9 +388,9 @@ h1, h2, h3, h4, h5, h6 {
       right: 0px;
       top: 0px; }
     @media (max-width: 1399px) {
-      .navbar-main .tab-buttons {
+      .navbar-main__tabs {
         width: 60px; } }
-    .navbar-main .tab-buttons button, .navbar-main .tab-buttons a {
+    .navbar-main__tabs__button {
       background-color: transparent;
       width: 100%;
       height: 60px;
@@ -403,23 +403,23 @@ h1, h2, h3, h4, h5, h6 {
       position: relative;
       display: block;
       z-index: 2; }
-      .navbar-main .tab-buttons button[data-route="about"], .navbar-main .tab-buttons a[data-route="about"] {
+      .navbar-main__tabs__button[data-route="about"] {
         font-weight: bold; }
-      .navbar-main .tab-buttons button.active, .navbar-main .tab-buttons a.active {
+      .navbar-main__tabs__button.active {
         background-color: #e70d3b;
         color: #ffffff; }
-        .navbar-main .tab-buttons button.active .pane-text .pane-label, .navbar-main .tab-buttons a.active .pane-text .pane-label {
-          font-weight: 700; }
-      .navbar-main .tab-buttons button:hover .pane-text .pane-label, .navbar-main .tab-buttons a:hover .pane-text .pane-label {
+      .navbar-main__tabs__button.active .navbar-main__tabs__button__text__label {
         font-weight: 700; }
-      .navbar-main .tab-buttons button .pane-icon, .navbar-main .tab-buttons a .pane-icon {
+      .navbar-main__tabs__button:hover .navbar-main__tabs__button__text__label {
+        font-weight: 700; }
+      .navbar-main__tabs__button .pane-icon {
         width: 60px;
         height: 60px;
         float: left;
         text-align: center; }
-        .navbar-main .tab-buttons button .pane-icon .logo, .navbar-main .tab-buttons a .pane-icon .logo {
+        .navbar-main__tabs__button .pane-icon .logo {
           margin-top: 15px; }
-        .navbar-main .tab-buttons button .pane-icon .fa, .navbar-main .tab-buttons a .pane-icon .fa {
+        .navbar-main__tabs__button .pane-icon .fa {
           margin: 0px;
           height: 60px;
           line-height: 60px;
@@ -427,7 +427,7 @@ h1, h2, h3, h4, h5, h6 {
           font-size: 20px;
           width: 60px;
           display: block; }
-      .navbar-main .tab-buttons button .pane-text, .navbar-main .tab-buttons a .pane-text {
+      .navbar-main__tabs__button .pane-text {
         height: 60px;
         display: flex;
         float: left;
@@ -436,12 +436,12 @@ h1, h2, h3, h4, h5, h6 {
         justify-content: center;
         text-align: left; }
         @media (max-width: 1399px) {
-          .navbar-main .tab-buttons button .pane-text, .navbar-main .tab-buttons a .pane-text {
+          .navbar-main__tabs__button .pane-text {
             display: none; } }
-        .navbar-main .tab-buttons button .pane-text .pane-label, .navbar-main .tab-buttons button .pane-text .pane-sublabel, .navbar-main .tab-buttons a .pane-text .pane-label, .navbar-main .tab-buttons a .pane-text .pane-sublabel {
+        .navbar-main__tabs__button .pane-text .pane-label, .navbar-main__tabs__button .pane-text .pane-sublabel {
           display: block;
           width: 100%; }
-        .navbar-main .tab-buttons button .pane-text .pane-sublabel, .navbar-main .tab-buttons a .pane-text .pane-sublabel {
+        .navbar-main__tabs__button .pane-text .pane-sublabel {
           line-height: 10px;
           height: 10px;
           opacity: 0.5;

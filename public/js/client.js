@@ -10334,7 +10334,7 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.toggleTabButtons = function toggleTabButtons(isActive) {
-        this.$element.toggleClass('hide-tab-buttons', !isActive);
+        this.$element.toggleClass('hide-tabs', !isActive);
     };
 
     /**
@@ -10349,7 +10349,7 @@ var NavbarMain = function (_Crisp$View) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
 
-        this.$element.find('.tab-buttons button').each(function (i) {
+        this.$element.find('.navbar-main__tabs__button').each(function (i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     };
@@ -10369,7 +10369,7 @@ var NavbarMain = function (_Crisp$View) {
             scroll: $('.pane-container.active .pane').scrollTop() || 0
         };
 
-        this.$element.find('.tab-buttons button').each(function (i, element) {
+        this.$element.find('.navbar-main__tabs__button').each(function (i, element) {
             var $button = $(element);
             var key = $button.data('route');
 
@@ -10404,7 +10404,7 @@ var NavbarMain = function (_Crisp$View) {
         }
 
         // Restore tab buttons
-        this.$element.find('.tab-buttons button').each(function (i, element) {
+        this.$element.find('.navbar-main__tabs__button').each(function (i, element) {
             var $button = $(element);
             var key = $button.data('route');
 
@@ -10609,7 +10609,7 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.clear = function clear() {
-        this.$element.find('.tab-buttons').empty();
+        this.$element.find('.navbar-main__tabs').empty();
         this.$element.find('.tab-panes').empty();
     };
 
@@ -43211,14 +43211,14 @@ module.exports = function () {
 
     return _.nav({ class: 'navbar-main' },
     // Buttons
-    _.div({ class: 'tab-buttons' }, _.a({ href: '/', class: 'navbar-main__buttons__tab' }, _.div({ class: 'pane-icon' }, _.img({ src: '/svg/logo_white.svg', class: 'logo navbar-main__logo' })), _.div({ class: 'pane-text' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
+    _.div({ class: 'navbar-main__tabs' }, _.a({ href: '/', class: 'navbar-main__tabs__button' }, _.div({ class: 'navbar-main__tabs__button__icon' }, _.img({ src: '/svg/logo_white.svg', class: 'logo navbar-main__logo' })), _.div({ class: 'navbar-main__tabs__button__text' }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
         var $icon = pane.icon;
 
         if (typeof pane.icon === 'string') {
             $icon = _.span({ class: 'fa fa-' + pane.icon });
         }
 
-        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
+        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'navbar-main__tabs__button__icon' }, $icon), _.div({ class: 'navbar-main__tabs__button__text' }, _.span({ class: 'navbar-main__tabs__button__text__label' }, pane.label))).click(function (e) {
             _this.onClickTab(e);
         });
     })),

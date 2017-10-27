@@ -4,7 +4,7 @@
 .page--environment {
     // Media picker mode
     &.media-picker {
-        .page--environment__space--nav .navbar-main .tab-buttons,
+        .navbar-main__tabs,
         .page--environment__space--menu,
         .page--environment__space--editor .editor__header { 
             display: none;
