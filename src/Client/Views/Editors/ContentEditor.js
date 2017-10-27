@@ -44,6 +44,8 @@ class ContentEditor extends Crisp.View {
         if(followingField) {
             followingField.classList.add('following');
         }
+        
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
     }
 
     /**
@@ -151,18 +153,27 @@ class ContentEditor extends Crisp.View {
 
     /**
      * Restores the scroll position
+     *
+     * @param {Number} delay
      */
-    restoreScrollPos() {
-        if(this.lastScrollPos) {
-            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
-        }
+    restoreScrollPos(delay) {
+        let newScrollPos = this.lastScrollPos || 0;
+
+        setTimeout(() => {
+            this.$element.find('.editor__body')[0].scrollTop = newScrollPos;
+        }, delay || 0);
     }
 
-    static restoreScrollPos() {
+    /**
+     * Static version of the restore scroll position method
+     *
+     * @param {Number} delay
+     */
+    static restoreScrollPos(delay) {
         let editor = Crisp.View.get('ContentEditor');
 
         if(editor) {
-            editor.restoreScrollPos();
+            editor.restoreScrollPos(delay);
         }
     }
 

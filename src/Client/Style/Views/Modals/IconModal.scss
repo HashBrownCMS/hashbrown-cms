@@ -2,6 +2,10 @@
  * A modal for picking icons
  */
 .modal--icon {
+    .modal__dialog {
+        max-width: 70rem;
+    }
+
     &__search {
         margin-bottom: 1rem !important;
         max-width: 100% !important; 
@@ -19,6 +23,6 @@
         min-width: 0 !important;
         width: 3rem;
         margin: 0.5rem;
-        max-width: 3.1rem;
+        max-width: 3.06rem !important;
     }
 }

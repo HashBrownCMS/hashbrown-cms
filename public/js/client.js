@@ -30788,6 +30788,7 @@ var IconModal = function (_Modal) {
 
         params = params || {};
         params.title = params.title || 'Pick an icon';
+        params.actions = false;
 
         return _possibleConstructorReturn(this, _Modal.call(this, params));
     }
@@ -31152,7 +31153,7 @@ var PublishingSettingsModal = function (_Modal) {
                 options: resources.connections,
                 value: this.value.connectionId,
                 valueKey: 'id',
-                labelKey: 'name',
+                labelKey: 'title',
                 onChange: function onChange(newValue) {
                     _this2.value.connectionId = newValue;
                 }
@@ -31613,6 +31614,8 @@ var ContentEditor = function (_Crisp$View) {
         if (followingField) {
             followingField.classList.add('following');
         }
+
+        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
     };
 
     /**
@@ -31735,20 +31738,33 @@ var ContentEditor = function (_Crisp$View) {
 
     /**
      * Restores the scroll position
+     *
+     * @param {Number} delay
      */
 
 
-    ContentEditor.prototype.restoreScrollPos = function restoreScrollPos() {
-        if (this.lastScrollPos) {
-            this.$element.find('.editor__body')[0].scrollTop = this.lastScrollPos;
-        }
+    ContentEditor.prototype.restoreScrollPos = function restoreScrollPos(delay) {
+        var _this3 = this;
+
+        var newScrollPos = this.lastScrollPos || 0;
+
+        setTimeout(function () {
+            _this3.$element.find('.editor__body')[0].scrollTop = newScrollPos;
+        }, delay || 0);
     };
 
-    ContentEditor.restoreScrollPos = function restoreScrollPos() {
+    /**
+     * Static version of the restore scroll position method
+     *
+     * @param {Number} delay
+     */
+
+
+    ContentEditor.restoreScrollPos = function restoreScrollPos(delay) {
         var editor = Crisp.View.get('ContentEditor');
 
         if (editor) {
-            editor.restoreScrollPos();
+            editor.restoreScrollPos(delay);
         }
     };
 
@@ -31790,7 +31806,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
-        var _this3 = this;
+        var _this4 = this;
 
         var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
@@ -31807,17 +31823,17 @@ var ContentEditor = function (_Crisp$View) {
                 });
 
                 fieldEditorInstance.on('change', function (newValue) {
-                    if (_this3.model.isLocked) {
+                    if (_this4.model.isLocked) {
                         return;
                     }
 
-                    _this3.dirty = true;
+                    _this4.dirty = true;
 
                     onChange(newValue);
                 });
 
                 fieldEditorInstance.on('silentchange', function (newValue) {
-                    if (_this3.model.isLocked) {
+                    if (_this4.model.isLocked) {
                         return;
                     }
 
@@ -31847,7 +31863,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.renderFields = function renderFields(tabId, fieldDefinitions, fieldValues) {
-        var _this4 = this;
+        var _this5 = this;
 
         var view = this;
         var tabFieldDefinitions = {};
@@ -31877,7 +31893,7 @@ var ContentEditor = function (_Crisp$View) {
             var fieldSchema = SchemaHelper.getSchemaByIdSync(fieldDefinition.schemaId);
 
             if (!fieldSchema) {
-                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this4);
+                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this5);
                 return null;
             }
 
@@ -31940,7 +31956,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.renderEditor = function renderEditor(content, schema) {
-        var _this5 = this;
+        var _this6 = this;
 
         var activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
@@ -31949,12 +31965,12 @@ var ContentEditor = function (_Crisp$View) {
             return _.button({ class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '') }, tabName).click(function () {
                 location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
 
-                _this5.fetch();
+                _this6.fetch();
             });
         }), _.button({ 'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '') }, 'Meta').click(function () {
             location.hash = '/content/' + Crisp.Router.params.id + '/meta';
 
-            _this5.fetch();
+            _this6.fetch();
         })), _.div({ class: 'editor__body' },
         // Render content properties
         _.each(schema.tabs, function (tabId, tabName) {
@@ -31962,12 +31978,12 @@ var ContentEditor = function (_Crisp$View) {
                 return;
             }
 
-            return _.div({ class: 'editor__body__tab active' }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+            return _.div({ class: 'editor__body__tab active' }, _this6.renderFields(tabId, schema.fields.properties, content.properties));
         }),
 
         // Render meta properties
         _.if(activeTab === 'meta', _.div({ class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta' }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties)))).on('scroll', function (e) {
-            _this5.onScroll(e);
+            _this6.onScroll(e);
         }), _.div({ class: 'editor__footer' })];
     };
 
@@ -31977,7 +31993,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.renderButtons = function renderButtons() {
-        var _this6 = this;
+        var _this7 = this;
 
         var url = this.model.properties.url;
 
@@ -32000,14 +32016,14 @@ var ContentEditor = function (_Crisp$View) {
         _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
         _.button({ class: 'widget widget--button condensed embedded' }, 'Advanced').click(function () {
-            _this6.onClickAdvanced();
+            _this7.onClickAdvanced();
         }),
 
         // View remote
         _.if(this.model.isPublished && remoteUrl, _.a({ target: '_blank', href: remoteUrl, class: 'widget widget--button condensed embedded' }, 'View')), _.if(!this.model.isLocked,
         // Save & publish
         _.div({ class: 'widget widget-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
-            _this6.onClickSave();
+            _this7.onClickSave();
         }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button condensed' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
@@ -32038,7 +32054,7 @@ var ContentEditor = function (_Crisp$View) {
 
 
     ContentEditor.prototype.postrender = function postrender() {
-        var _this7 = this;
+        var _this8 = this;
 
         // Fetch information
         var contentSchema = void 0;
@@ -32046,14 +32062,14 @@ var ContentEditor = function (_Crisp$View) {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
             contentSchema = schema;
 
-            _this7.$element.html(_this7.renderEditor(_this7.model, contentSchema));
+            _this8.$element.html(_this8.renderEditor(_this8.model, contentSchema));
 
-            _this7.renderButtons();
+            _this8.renderButtons();
 
-            _this7.onFieldEditorsReady();
+            _this8.onFieldEditorsReady();
         }).catch(function (e) {
             UI.errorModal(e, function () {
-                location.hash = '/content/json/' + _this7.model.id;
+                location.hash = '/content/json/' + _this8.model.id;
             });
         });
     };
@@ -45718,6 +45734,12 @@ var ArrayEditor = function (_FieldEditor) {
                     schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
                 }
 
+                if (!schema) {
+                    UI.errorModal(new Error('Item #' + i + ' has no available Schemas'));
+                    $field = null;
+                    return;
+                }
+
                 // Obtain the field editor
                 if (schema.editorId.indexOf('Editor') < 0) {
                     schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
@@ -45727,6 +45749,7 @@ var ArrayEditor = function (_FieldEditor) {
 
                 if (!editorClass) {
                     UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
+                    $field = null;
                     return;
                 }
 
@@ -45746,9 +45769,7 @@ var ArrayEditor = function (_FieldEditor) {
 
                 // Render Schema picker
                 if (_this4.config.allowedSchemas.length > 1) {
-                    editorInstance.$element.prepend(_.div({ class: 'widget widget--separator' }));
-
-                    editorInstance.$element.prepend(new HashBrown.Views.Widgets.Dropdown({
+                    editorInstance.$element.prepend(_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                         value: item.schemaId,
                         placeholder: 'Schema',
                         valueKey: 'id',
@@ -45763,7 +45784,7 @@ var ArrayEditor = function (_FieldEditor) {
 
                             _this4.trigger('change', _this4.value);
                         }
-                    }).$element);
+                    }).$element)));
                 }
 
                 _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, schema.name), editorInstance.$element, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item' }).click(function () {
@@ -45791,6 +45812,8 @@ var ArrayEditor = function (_FieldEditor) {
             _this4.value[index] = { value: null, schemaId: null };
 
             _this4.trigger('change', _this4.value);
+
+            HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
 
             _this4.fetch();
         }));

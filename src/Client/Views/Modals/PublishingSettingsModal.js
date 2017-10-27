@@ -59,7 +59,7 @@ class PublishingSettingsModal extends Modal {
                         options: resources.connections,
                         value: this.value.connectionId,
                         valueKey: 'id',
-                        labelKey: 'name',
+                        labelKey: 'title',
                         onChange: (newValue) => {
                             this.value.connectionId = newValue;
                         }

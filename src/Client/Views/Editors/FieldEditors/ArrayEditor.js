@@ -209,6 +209,12 @@ class ArrayEditor extends FieldEditor {
                         schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
                     }
 
+                    if(!schema) {
+                        UI.errorModal(new Error('Item #' + i + ' has no available Schemas'));
+                        $field = null;
+                        return;
+                    }
+
                     // Obtain the field editor
                     if(schema.editorId.indexOf('Editor') < 0) {
                         schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
@@ -218,6 +224,7 @@ class ArrayEditor extends FieldEditor {
 
                     if(!editorClass) {
                         UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));    
+                        $field = null;
                         return;
                     }
                     
@@ -237,25 +244,28 @@ class ArrayEditor extends FieldEditor {
 
                     // Render Schema picker
                     if(this.config.allowedSchemas.length > 1) {
-                        editorInstance.$element.prepend(_.div({class: 'widget widget--separator'}));
-                        
                         editorInstance.$element.prepend(
-                            new HashBrown.Views.Widgets.Dropdown({
-                                value: item.schemaId,
-                                placeholder: 'Schema',
-                                valueKey: 'id',
-                                labelKey: 'name',
-                                options: resources.schemas.filter((schema) => {
-                                    return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                }),
-                                onChange: (newSchemaId) => {
-                                    item.schemaId = newSchemaId;
+                            _.div({class: 'editor__field'},
+                                _.div({class: 'editor__field__key'}, 'Schema'),
+                                _.div({class: 'editor__field__value'},
+                                    new HashBrown.Views.Widgets.Dropdown({
+                                        value: item.schemaId,
+                                        placeholder: 'Schema',
+                                        valueKey: 'id',
+                                        labelKey: 'name',
+                                        options: resources.schemas.filter((schema) => {
+                                            return this.config.allowedSchemas.indexOf(schema.id) > -1;
+                                        }),
+                                        onChange: (newSchemaId) => {
+                                            item.schemaId = newSchemaId;
 
-                                    renderField();
+                                            renderField();
 
-                                    this.trigger('change', this.value);
-                                }
-                            }).$element
+                                            this.trigger('change', this.value);
+                                        }
+                                    }).$element
+                                )
+                            )
                         );
                     }
                 
@@ -296,6 +306,8 @@ class ArrayEditor extends FieldEditor {
 
                     this.trigger('change', this.value);
 
+                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
+                    
                     this.fetch();
                 })
         );

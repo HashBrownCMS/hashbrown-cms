@@ -26682,6 +26682,7 @@ var IconModal = function (_Modal) {
 
         params = params || {};
         params.title = params.title || 'Pick an icon';
+        params.actions = false;
 
         return _possibleConstructorReturn(this, _Modal.call(this, params));
     }
@@ -27046,7 +27047,7 @@ var PublishingSettingsModal = function (_Modal) {
                 options: resources.connections,
                 value: this.value.connectionId,
                 valueKey: 'id',
-                labelKey: 'name',
+                labelKey: 'title',
                 onChange: function onChange(newValue) {
                     _this2.value.connectionId = newValue;
                 }

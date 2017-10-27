@@ -20,6 +20,11 @@
         height: 2rem;
         width: 100%;
         max-width: 20rem;
+
+        // Expanded mode
+        &.expanded {
+            max-width: 100%;
+        }
         
         // Tall mode
         &.tall {

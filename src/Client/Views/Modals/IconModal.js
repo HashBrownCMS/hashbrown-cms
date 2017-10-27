@@ -16,6 +16,7 @@ class IconModal extends Modal {
     constructor(params) {
         params = params || {};
         params.title = params.title || 'Pick an icon';
+        params.actions = false;
 
         super(params);
     }
