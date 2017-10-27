@@ -13,27 +13,34 @@ html
         
         title HashBrown CMS
 
-    body.dashboard-container
-        ul.nav.nav-tabs.dashboard-header
-            a.dashboard-logo(target='_blank', href='http://hashbrown.rocks')
-                img.logo(src="/svg/logo_pink.svg")
-                span HashBrown
+    body.page.page--dashboard
+        .page--dashboard__header
+            a.page--dashboard__header__logo(target='_blank', href='http://hashbrown.rocks', title='Go to the HashBrown website')
+                img.page--dashboard__header__logo__image(src="/svg/logo_pink.svg")
+        
+            a.page--dashboard__header__tab(href='frontend', class=(tab === 'frontend' ? 'active': '')) Frontend
 
-            li.active
-                a(data-toggle="tab", href="#service") Service
-            li
-                a(data-toggle="tab", href="#ui") UI
+            if(user.isAdmin)
+                a.page--dashboard__header__tab(href='backend', class=(tab === 'backend' ? 'active': '')) Backend
+                        
+            .page--dashboard__header__actions
+                if(user.isAdmin && tab === 'backend')
+                    button.page--dashboard__backend-test__run.widget.widget--button.low='Run tests'
 
-        .tab-content.test-content
-            .tab-pane.active#service
-                .container.service
-                    button.btn.btn-primary='Run tests'
-                    ul.service-test__messages
-            .tab-pane#ui
-                .container.ui
-                    button.btn.btn-primary='Reset tests'
-                    | !{ uiChecklistHtml }
+                if(tab === 'frontend')
+                    button.page--dashboard__frontend-test__reset.widget.widget--button.low='Reset tests'
+
+        .page--dashboard__body
+            .page--dashboard__body__container
+                if(tab === 'frontend')
+                    .page--dashboard__frontend-test
+                        | !{ uiChecklistHtml }
+                
+                if(user.isAdmin && tab === 'backend')
+                    .page--dashboard__backend-test
+                        button.page--dashboard__backend-test__run.widget.widget--button='Run tests'
+                        ul.page--dashboard__backend-test__messages
+
 
         script(src='/lib/jquery/jquery.min.js')
-        script(src='/lib/bootstrap/js/bootstrap.min.js')
         script(src='/js/test.js')

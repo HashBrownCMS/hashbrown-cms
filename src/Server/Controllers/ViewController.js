@@ -150,11 +150,13 @@ class ViewController extends Controller {
         });
 
         // Test
-        app.get('/:project/:environment/test/', (req, res) => {
+        app.get('/:project/:environment/test', (req, res) => {
+            res.redirect('/' + req.params.project + '/' + req.params.environment + '/test/frontend');
+        });
+
+        app.get('/:project/:environment/test/:tab', (req, res) => {
             ApiController.authenticate(req.cookies.token)
             .then((user) => {
-                if(!user.isAdmin) { return res.redirect('/' + req.params.project + '/' + req.params.environment + '/'); }
-
                 FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
                     if(err) {
                         return res.status(502).send(e.message);
@@ -162,6 +164,8 @@ class ViewController extends Controller {
                     }
                 
                     res.render('test', {
+                        user: user,
+                        tab: req.params.tab,
                         uiChecklistHtml: Marked(file.toString())
                     });
                 });

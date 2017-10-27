@@ -68,9 +68,16 @@
 
     // Body
     &__body {
-        width: calc(100% - 2rem;);
-        margin: 4rem auto 0 auto;
-        max-width: 60rem;
+        width: 100%;
+        padding-top: 4rem;
+        height: calc(100% - 4rem);
+        overflow-y: auto;
+        margin: 0;
+
+        &__container {
+            max-width: 60rem;
+            margin: 0 auto;
+        }
     }
 
     // Users
@@ -82,8 +89,8 @@
         }
     }
 
-	// Projects
-	&__projects {
+    // Projects
+    &__projects {
         &__list {
             display: flex;
             flex-wrap: wrap;
@@ -93,7 +100,7 @@
         &__add {
             margin-top: 1rem;
         }
-	}
+    }
 
     // Server
     &__server {
@@ -103,6 +110,33 @@
             padding: 1rem;
             background-color: $standard;
             box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+        }
+    }
+
+    // Frontend test
+    &__frontend-test {
+        &__check {
+            position: relative;
+            line-height: 2rem;
+            padding-bottom: 0.5rem;
+
+            &:not(:last-child) {
+                margin-bottom: 0.5rem;
+                border-bottom: 1px solid $standard-darker;
+
+            }
+
+            ul {
+                border-top: 1px solid $standard-darker;
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            &__checkbox {
+                position: absolute !important;
+                top: 0;
+                right: 0;
+            }
         }
     }
 }

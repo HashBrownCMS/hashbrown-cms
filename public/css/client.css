@@ -191,9 +191,14 @@ h1, h2, h3, h4, h5, h6 {
       background-color: #eeeeee; }
 
 .page--dashboard__body {
-  width: calc(100% - 2rem);
-  margin: 4rem auto 0 auto;
-  max-width: 60rem; }
+  width: 100%;
+  padding-top: 4rem;
+  height: calc(100% - 4rem);
+  overflow-y: auto;
+  margin: 0; }
+  .page--dashboard__body__container {
+    max-width: 60rem;
+    margin: 0 auto; }
 
 .page--dashboard__users__list__user {
   margin-bottom: 1rem; }
@@ -212,6 +217,22 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1rem;
   background-color: #ffffff;
   box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
+
+.page--dashboard__frontend-test__check {
+  position: relative;
+  line-height: 2rem;
+  padding-bottom: 0.5rem; }
+  .page--dashboard__frontend-test__check:not(:last-child) {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #dddddd; }
+  .page--dashboard__frontend-test__check ul {
+    border-top: 1px solid #dddddd;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem; }
+  .page--dashboard__frontend-test__check__checkbox {
+    position: absolute !important;
+    top: 0;
+    right: 0; }
 
 /**
  * Environment page style
@@ -507,7 +528,15 @@ h1, h2, h3, h4, h5, h6 {
         transition: padding-top 0.5s ease; }
         .navbar-main .tab-panes .pane-container .pane .pane-item-container {
           position: relative; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before, .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item:before {
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item {
+            border: 2px dashed #e70d3b;
+            font-weight: 700;
+            color: #e70d3b !important; }
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item > .btn-children-toggle {
+              color: #e70d3b !important; }
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item:after {
+              color: #e70d3b !important; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before {
             content: '';
             display: block;
             height: 60px;
@@ -515,12 +544,12 @@ h1, h2, h3, h4, h5, h6 {
             background-color: #e70d3b;
             position: absolute;
             left: 0px; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item, .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item {
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item {
             font-weight: 700;
             color: #ffffff; }
-            .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item > .btn-children-toggle, .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item > .btn-children-toggle {
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item > .btn-children-toggle {
               color: #ffffff; }
-            .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:after, .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item:after {
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:after {
               color: #ffffff !important; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
             display: none; }

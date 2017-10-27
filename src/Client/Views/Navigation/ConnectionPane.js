@@ -40,38 +40,22 @@ class ConnectionPane extends NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Delete content',
-                body: 'Are you sure you want to remove the connection "' + name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: () => {
-                        RequestHelper.request('delete', 'connections/' + id)
-                        .then(() => {
-                            debug.log('Removed connection with alias "' + id + '"', this); 
+        new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', () => {
+            RequestHelper.request('delete', 'connections/' + id)
+            .then(() => {
+                debug.log('Removed connection with alias "' + id + '"', this); 
 
-                            return RequestHelper.reloadResource('connections');
-                        })
-                        .then(() => {
-                            NavbarMain.reload();
+                return RequestHelper.reloadResource('connections');
+            })
+            .then(() => {
+                NavbarMain.reload();
 
-                            // Cancel the ConnectionEditor view if it was displaying the deleted connection
-                            if(location.hash == '#/connections/' + id) {
-                                location.hash = '/connections/';
-                            }
-                        })
-                        .catch(UI.errorModal);
-                    }
+                // Cancel the ConnectionEditor view if it was displaying the deleted connection
+                if(location.hash == '#/connections/' + id) {
+                    location.hash = '/connections/';
                 }
-            ]
+            })
+            .catch(UI.errorModal);
         });
     }
     

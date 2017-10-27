@@ -26036,7 +26036,14 @@ var Dropdown = function (_Widget) {
         var _this2 = this;
 
         setTimeout(function () {
+            var toggle = _this2.element.querySelector('.widget--dropdown__toggle');
+            var isChecked = toggle.checked;
+
+            toggle.checked = true;
+
             var bounds = _this2.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
+
+            toggle.checked = isChecked;
 
             _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
             _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
@@ -36732,7 +36739,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
         params.actions = [{
             label: 'Apply',
             class: 'btn-primary',
-            callback: function callback() {
+            onClick: function onClick() {
                 _this.onClickApply();
 
                 return false;
@@ -36740,7 +36747,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
         }, {
             label: 'Save',
             class: 'btn-primary',
-            callback: function callback() {
+            onClick: function onClick() {
                 _this.onClickSave();
 
                 return false;
@@ -36770,7 +36777,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
         this.model.url = this.$element.find('input[name="url"]').val();
 
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
-            _this2.modal.hide();
+            _this2.close();
 
             _this2.trigger('change', _this2.model);
         }).catch(UI.errorModal);

@@ -2,8 +2,8 @@
  * Initialises the service test
  */
 function initServiceTest() {
-    var divMessages = document.querySelector('#service .service-test__messages');
-    var btnStart = document.querySelector('#service .btn');
+    var divMessages = document.querySelector('.page--dashboard__backend-test__messages');
+    var btnStart = document.querySelector('.page--dashboard__backend-test__run');
     var ulSection = null;    
 
     var url = 'ws://' + location.host + '/api' + location.pathname;
@@ -64,8 +64,8 @@ function initServiceTest() {
  * Initialises the UI tests
  */
 function initUITests() {
-    var btnReset = document.querySelector('#ui .btn');
-    var liChecks = document.querySelectorAll('#ui .container li');
+    var btnReset = document.querySelector('.page--dashboard__frontend-test__reset');
+    var liChecks = document.querySelectorAll('.page--dashboard__frontend-test li');
 
     function getCache() {
         var cache = {};
@@ -87,7 +87,7 @@ function initUITests() {
 
     btnReset.addEventListener('click', function(e) {
         var cache = getCache();
-        var checkboxes = document.querySelectorAll('#ui input');
+        var checkboxes = document.querySelectorAll('.page--dashboard__frontend-test input');
 
         delete cache.ui;
 
@@ -99,20 +99,32 @@ function initUITests() {
     });
 
     liChecks.forEach(function(liCheck) {
-        var checkKey = liCheck.innerHTML;
+        liCheck.className = 'page--dashboard__frontend-test__check';
+
+        var checkKey = liCheck.innerHTML.toLowerCase().replace(/ /g, '-');
         var cache = getCache();
 
-        var inputCheck = document.createElement('input');
-        inputCheck.className = 'form-control';
-        inputCheck.type = 'checkbox';
+        var div = document.createElement('div');
+        div.className = 'widget widget--input checkbox page--dashboard__frontend-test__check__checkbox';
 
-        liCheck.insertBefore(inputCheck, liCheck.firstChild);
+        var extra = document.createElement('div');
+        extra.className = 'widget--input__checkbox-extra fa fa-check';
+
+        var input = document.createElement('input');
+        input.className = 'widget--input__checkbox-input';
+        input.type = 'checkbox';
+        input.id = 'checkbox-' + checkKey;
+
+        div.appendChild(input);
+        div.appendChild(extra);
+
+        liCheck.insertBefore(div, liCheck.firstChild);
 
         if(cache.ui[checkKey] === true) {
-            inputCheck.checked = true;
+            input.checked = true;
         }
 
-        inputCheck.addEventListener('change', function(e) {
+        input.addEventListener('change', function(e) {
             var isChecked = e.currentTarget.checked;
             var cache = getCache();
 
@@ -128,5 +140,8 @@ function initUITests() {
 }
 
 // Init tests
-initUITests();
-initServiceTest();
+if(location.href.indexOf('/frontend') > -1) {
+    initUITests();
+} else {
+    initServiceTest();
+}

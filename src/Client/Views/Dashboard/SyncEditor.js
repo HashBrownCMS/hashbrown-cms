@@ -16,7 +16,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
             {
                 label: 'Apply',
                 class: 'btn-primary',
-                callback: () => {
+                onClick: () => {
                     this.onClickApply();
 
                     return false;
@@ -25,7 +25,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
             {
                 label: 'Save',
                 class: 'btn-primary',
-                callback: () => {
+                onClick: () => {
                     this.onClickSave();
 
                     return false;
@@ -53,7 +53,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
 
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
-            this.modal.hide();
+            this.close();
 
             this.trigger('change', this.model);
         })

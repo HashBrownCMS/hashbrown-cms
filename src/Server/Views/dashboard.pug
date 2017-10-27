@@ -34,69 +34,70 @@ html
                     button.widget.widget--button.condensed.low.fa.fa-sign-out(type='submit', title='Log out')
 
         .page--dashboard__body
-            if(tab === 'projects')
-                .page--dashboard__projects
-                    h4 PROJECT OVERVIEW
+            .page--dashboard__body__container
+                if(tab === 'projects')
+                    .page--dashboard__projects
+                        h4 PROJECT OVERVIEW
 
-                    .page--dashboard__projects__welcome
-                        p
-                            | Welcome to the HashBrown dashboard. <br />
-                            | Below you will find a list of active projects on this server.
+                        .page--dashboard__projects__welcome
+                            p
+                                | Welcome to the HashBrown dashboard. <br />
+                                | Below you will find a list of active projects on this server.
 
-                        p
-                            | To author content, you can click the environment buttons to get started.
+                            p
+                                | To author content, you can click the environment buttons to get started.
+
+                            if(user.isAdmin)
+                                p
+                                    | You're an admin, so you can use the various project menus ( <span class="fa fa-ellipsis-v"></span> and <span class="fa fa-plus"></span> ) to manage backups and create/delete environments and projects. 
+
+                            p 
+                                | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
+
+                        .page--dashboard__projects__list
 
                         if(user.isAdmin)
-                            p
-                                | You're an admin, so you can use the various project menus ( <span class="fa fa-ellipsis-v"></span> and <span class="fa fa-plus"></span> ) to manage backups and create/delete environments and projects. 
+                            button.page--dashboard__projects__add.widget.widget--button.round.right.fa.fa-plus(title='Create project')
 
-                        p 
-                            | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
+                if(user.isAdmin && tab === 'users')
+                    .page--dashboard__users
+                        .page--dashboard__users__list
 
-                    .page--dashboard__projects__list
+                        button.page--dashboard__users__add.widget.widget--button.round.fa.fa-plus.right(title='Add user')
 
-                    if(user.isAdmin)
-                        button.page--dashboard__projects__add.widget.widget--button.round.right.fa.fa-plus(title='Create project')
-
-            if(user.isAdmin && tab === 'users')
-                .page--dashboard__users
-                    .page--dashboard__users__list
-
-                    button.page--dashboard__users__add.widget.widget--button.round.fa.fa-plus.right(title='Add user')
-
-            if(user.isAdmin && tab === 'server')
-                .page--dashboard__server
-                    .page--dashboard__server__info
-                        .widget-group
-                            .widget.widget--label.small.secondary Software
-                            .widget.widget--label HashBrown v#{app.version} 
-
-                        .widget-group
-                            .widget.widget--label.small.secondary Platform
-                            .widget.widget--label #{os.type()} 
-
-                        each cpu, i in os.cpus()
+                if(user.isAdmin && tab === 'server')
+                    .page--dashboard__server
+                        .page--dashboard__server__info
                             .widget-group
-                                .widget.widget--label.small.secondary CPU #{i + 1}
-                                .widget.widget--label #{cpu.model}
-                        
-                        .widget-group
-                            .widget.widget--label.small.secondary Memory
-                            .widget.widget--label #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
+                                .widget.widget--label.small.secondary Software
+                                .widget.widget--label HashBrown v#{app.version} 
 
-                        .widget-group
-                            .widget.widget--label.small.secondary Load average
-                            .widget.widget--label #{Math.round(os.loadavg()[0] * 10000) / 10000}
+                            .widget-group
+                                .widget.widget--label.small.secondary Platform
+                                .widget.widget--label #{os.type()} 
 
-                        .widget-group
-                            .widget.widget--label.small.secondary Uptime
+                            each cpu, i in os.cpus()
+                                .widget-group
+                                    .widget.widget--label.small.secondary CPU #{i + 1}
+                                    .widget.widget--label #{cpu.model}
+                            
+                            .widget-group
+                                .widget.widget--label.small.secondary Memory
+                                .widget.widget--label #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
 
-                            - var seconds = os.uptime();
-                            - var days = Math.floor(seconds / (60*60*24));
-                            - var hours = Math.floor(seconds / (60*60)) - days * 24;
-                            - var minutes = Math.floor(seconds % (60*60) / 60);
+                            .widget-group
+                                .widget.widget--label.small.secondary Load average
+                                .widget.widget--label #{Math.round(os.loadavg()[0] * 10000) / 10000}
 
-                            .widget.widget--label #{days}d #{hours}h #{minutes}m
+                            .widget-group
+                                .widget.widget--label.small.secondary Uptime
+
+                                - var seconds = os.uptime();
+                                - var days = Math.floor(seconds / (60*60*24));
+                                - var hours = Math.floor(seconds / (60*60)) - days * 24;
+                                - var minutes = Math.floor(seconds % (60*60) / 60);
+
+                                .widget.widget--label #{days}d #{hours}h #{minutes}m
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.min.js')

@@ -127,7 +127,14 @@ class Dropdown extends Widget {
      */
     updatePositionClasses() {
         setTimeout(() => {
+            let toggle = this.element.querySelector('.widget--dropdown__toggle');
+            let isChecked = toggle.checked;
+            
+            toggle.checked = true;
+
             let bounds = this.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
+            
+            toggle.checked = isChecked;
 
             this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
             this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);

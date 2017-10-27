@@ -285,7 +285,23 @@
                 .pane-item-container {
                     position: relative;
 
-                    &.active, &.moving-item {
+                    &.moving-item {
+                        >.pane-item {
+                            border: 2px dashed $primary;
+                            font-weight: 700;
+                            color: $primary !important;
+
+                            >.btn-children-toggle {
+                                color: $primary !important;
+                            }
+
+                            &:after {
+                                color: $primary !important;
+                            }
+                        }
+                    }
+
+                    &.active {
                         &:before {
                             content: '';
                             display: block;

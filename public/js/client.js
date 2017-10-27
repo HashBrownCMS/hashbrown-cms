@@ -30154,7 +30154,14 @@ var Dropdown = function (_Widget) {
         var _this2 = this;
 
         setTimeout(function () {
+            var toggle = _this2.element.querySelector('.widget--dropdown__toggle');
+            var isChecked = toggle.checked;
+
+            toggle.checked = true;
+
             var bounds = _this2.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
+
+            toggle.checked = isChecked;
 
             _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
             _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
@@ -43034,32 +43041,19 @@ var ConnectionPane = function (_NavbarPane) {
         var id = $element.data('id');
         var name = $element.data('name');
 
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Delete content',
-                body: 'Are you sure you want to remove the connection "' + name + '"?'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'OK',
-                class: 'btn-danger',
-                callback: function callback() {
-                    RequestHelper.request('delete', 'connections/' + id).then(function () {
-                        debug.log('Removed connection with alias "' + id + '"', _this2);
+        new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', function () {
+            RequestHelper.request('delete', 'connections/' + id).then(function () {
+                debug.log('Removed connection with alias "' + id + '"', _this2);
 
-                        return RequestHelper.reloadResource('connections');
-                    }).then(function () {
-                        NavbarMain.reload();
+                return RequestHelper.reloadResource('connections');
+            }).then(function () {
+                NavbarMain.reload();
 
-                        // Cancel the ConnectionEditor view if it was displaying the deleted connection
-                        if (location.hash == '#/connections/' + id) {
-                            location.hash = '/connections/';
-                        }
-                    }).catch(UI.errorModal);
+                // Cancel the ConnectionEditor view if it was displaying the deleted connection
+                if (location.hash == '#/connections/' + id) {
+                    location.hash = '/connections/';
                 }
-            }]
+            }).catch(UI.errorModal);
         });
     };
 

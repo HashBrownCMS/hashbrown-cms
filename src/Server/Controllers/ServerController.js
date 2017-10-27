@@ -55,11 +55,19 @@ class ServerController extends ApiController {
 
         // Gets resource if specified in settings
         let getResource = (source, name, query) => {
-            if(!data.settings[name]) { return Promise.resolve(); }
+            if(!data.settings[name] && name !== 'settings') { return Promise.resolve(); }
 
             debug.log('Getting "' + data[source] + '" ' + name + '...', ServerController);
-        
-            return DatabaseHelper.find(project, data[source] + '.' + name, query)
+
+            let getFromDb = () => {
+                if(name === 'settings') {
+                    return DatabaseHelper.find(project, 'settings', { usedBy: data[source] });
+                }
+
+                return DatabaseHelper.find(project, data[source] + '.' + name, query || {});
+            }
+
+            return getFromDb()
             .then((result) => {
                 if(source === 'from') { 
                     from[name] = result;
@@ -83,7 +91,7 @@ class ServerController extends ApiController {
                 let item = from[resource][num];
 
                 let mongoPromise;
-                
+               
                 // Overwrite
                 if(data.settings.replace) {
                     debug.log('Updating "' + (item.id || item) + '" into ' + resource + '...', ServerController);
@@ -136,11 +144,29 @@ class ServerController extends ApiController {
                 });
             }; 
 
+            // Merge settings
+            if(resource === 'settings') {
+                if(!from.settings || !to.settings) { return Promise.resolve(); }
+
+                let fromSettings = from.settings[0];
+                let toSettings = to.settings[0];
+
+                fromSettings.usedBy = toSettings.usedBy;
+
+                debug.log('Merging settings from "' + data.from + '" into "' + data.to + '"...', ServerController);
+
+                return DatabaseHelper.updateOne(project, 'settings', { usedBy: data.to }, fromSettings, { upsert: true }); 
+            }
+
+            // Merge non-settings
             return next(0);
         };
 
         // From
-        return getResource('from', 'connections', {})
+        return getResource('from', 'settings')
+        .then(() => {
+            return getResource('from', 'connections')
+        })
         .then(() => {
             return getResource('from', 'content');
         })
@@ -155,6 +181,9 @@ class ServerController extends ApiController {
         })
 
         // To
+        .then(() => {
+            return getResource('to', 'settings');
+        })
         .then(() => {
             return getResource('to', 'connections');
         })
@@ -172,6 +201,9 @@ class ServerController extends ApiController {
         })
 
         // Merge "from" and "to"
+        .then(() => {
+            return mergeResource('settings');
+        })
         .then(() => {
             return mergeResource('connections');
         })
