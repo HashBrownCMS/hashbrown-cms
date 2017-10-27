@@ -115,7 +115,7 @@ class StructEditor extends FieldEditor {
                             let renderField = () => {
                                 _.append($field.empty(),
                                     _.div({class: 'editor__field__sort-key'},
-                                        HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name
+                                        fieldKey
                                     ),
                                     _.div({class: 'editor__field__key'},
                                         new HashBrown.Views.Widgets.Input({
@@ -129,6 +129,8 @@ class StructEditor extends FieldEditor {
                                                 fieldKey = newKey;
 
                                                 config.struct[fieldKey] = fieldValue;
+                                            
+                                                $field.find('.editor__field__sort-key').html(fieldKey);
                                             }
                                         }),
                                         new HashBrown.Views.Widgets.Input({

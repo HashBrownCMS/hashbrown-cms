@@ -6000,7 +6000,7 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Buffer = __webpack_require__(23).Buffer;
-var Transform = __webpack_require__(15).Transform;
+var Transform = __webpack_require__(16).Transform;
 var StringDecoder = __webpack_require__(50).StringDecoder;
 var inherits = __webpack_require__(1);
 
@@ -6100,580 +6100,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 module.exports = CipherBase;
 
 /***/ }),
-/* 11 */,
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Entity = __webpack_require__(19);
-
-/**
- * Basic resource class
- *
- * @memberof HashBrown.Common.Models
- */
-
-var Resource = function (_Entity) {
-    _inherits(Resource, _Entity);
-
-    function Resource() {
-        _classCallCheck(this, Resource);
-
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
-    }
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    Resource.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            if (typeof params.sync.isRemote === 'undefined') {
-                params.sync.hasRemote = params.local;
-            }
-
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            if (typeof params.sync.isRemote === 'undefined') {
-                params.sync.isRemote = params.remote;
-            }
-
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            if (typeof params.isLocked === 'undefined') {
-                params.isLocked = params.locked;
-            }
-
-            delete params.locked;
-        }
-
-        return params;
-    };
-
-    return Resource;
-}(Entity);
-
-module.exports = Resource;
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// a duplex stream is just a stream that is both readable and writable.
-// Since JS doesn't have multiple prototypal inheritance, this class
-// prototypally inherits from Readable, and then parasitically from
-// Writable.
-
-
-
-/*<replacement>*/
-
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
-/*</replacement>*/
-
-module.exports = Duplex;
-
-/*<replacement>*/
-var processNextTick = __webpack_require__(47);
-/*</replacement>*/
-
-/*<replacement>*/
-var util = __webpack_require__(22);
-util.inherits = __webpack_require__(1);
-/*</replacement>*/
-
-var Readable = __webpack_require__(61);
-var Writable = __webpack_require__(49);
-
-util.inherits(Duplex, Readable);
-
-var keys = objectKeys(Writable.prototype);
-for (var v = 0; v < keys.length; v++) {
-  var method = keys[v];
-  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
-}
-
-function Duplex(options) {
-  if (!(this instanceof Duplex)) return new Duplex(options);
-
-  Readable.call(this, options);
-  Writable.call(this, options);
-
-  if (options && options.readable === false) this.readable = false;
-
-  if (options && options.writable === false) this.writable = false;
-
-  this.allowHalfOpen = true;
-  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
-
-  this.once('end', onend);
-}
-
-// the no-half-open enforcer
-function onend() {
-  // if we allow half-open state, or if the writable side ended,
-  // then we're ok.
-  if (this.allowHalfOpen || this._writableState.ended) return;
-
-  // no more data can be written.
-  // But allow more writes to happen in this tick.
-  processNextTick(onEndNT, this);
-}
-
-function onEndNT(self) {
-  self.end();
-}
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Path = __webpack_require__(104);
-
-var Resource = __webpack_require__(12);
-
-/**
- * The base class for all Media objects
- *
- * @memberof HashBrown.Common.Models
- */
-
-var Media = function (_Resource) {
-    _inherits(Media, _Resource);
-
-    function Media(params) {
-        _classCallCheck(this, Media);
-
-        return _possibleConstructorReturn(this, _Resource.call(this, Media.paramsCheck(params)));
-    }
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-
-
-    Media.paramsCheck = function paramsCheck(params) {
-        params = _Resource.paramsCheck.call(this, params);
-
-        delete params.remote;
-        delete params.sync;
-        delete params.isRemote;
-
-        if (!params.folder) {
-            params.folder = '/';
-        }
-
-        return params;
-    };
-
-    Media.prototype.structure = function structure() {
-        this.def(String, 'id');
-        this.def(String, 'icon', 'file-image-o');
-        this.def(String, 'name');
-        this.def(String, 'url');
-        this.def(String, 'folder', '/');
-    };
-
-    /**
-     * Read from file path
-     *
-     * @param {String} filePath
-     */
-
-
-    Media.prototype.readFromFilePath = function readFromFilePath(filePath) {
-        var name = Path.basename(filePath);
-        var id = filePath;
-
-        // Trim file path for id 
-        id = id.replace('/' + name, '');
-        id = id.substring(id.lastIndexOf('/') + 1);
-
-        // Remove file extension
-        name = name.replace(/\.[^/.]+$/, '');
-
-        this.id = id;
-        this.name = name;
-        this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
-    };
-
-    /**
-     * Gets the content type header
-     *
-     * @returns {String} Content-Type header
-     */
-
-
-    Media.prototype.getContentTypeHeader = function getContentTypeHeader() {
-        var name = (this.name || '').toLowerCase();
-
-        // Image types
-        if (name.match(/\.jpg/)) {
-            return 'image/jpeg';
-        } else if (name.match(/\.png/)) {
-            return 'image/png';
-        } else if (name.match(/\.gif/)) {
-            return 'image/gif';
-        } else if (name.match(/\.bmp/)) {
-            return 'image/bmp';
-
-            // Video types
-        } else if (name.match(/\.mp4/)) {
-            return 'video/mp4';
-        } else if (name.match(/\.avi/)) {
-            return 'video/avi';
-        } else if (name.match(/\.mov/)) {
-            return 'video/quicktime';
-        } else if (name.match(/\.bmp/)) {
-            return 'video/bmp';
-        } else if (name.match(/\.wmv/)) {
-            return 'video/x-ms-wmv';
-        } else if (name.match(/\.3gp/)) {
-            return 'video/3gpp';
-        } else if (name.match(/\.mkv/)) {
-            return 'video/x-matroska';
-
-            // SVG
-        } else if (name.match(/\.svg/)) {
-            return 'image/svg+xml';
-
-            // PDF
-        } else if (name.match(/\.pdf/)) {
-            return 'application/pdf';
-
-            // Everything else
-        } else {
-            return 'application/octet-stream';
-        }
-    };
-
-    /**
-     * Gets whether this is a video
-     *
-     * @returns {Boolean} Is video
-     */
-
-
-    Media.prototype.isVideo = function isVideo() {
-        return this.getContentTypeHeader().indexOf('video') > -1;
-    };
-
-    /**
-     * Gets whether this is an image
-     *
-     * @returns {Boolean} Is image
-     */
-
-
-    Media.prototype.isImage = function isImage() {
-        return this.getContentTypeHeader().indexOf('image') > -1;
-    };
-
-    /**
-     * Gets whether this is a PDF
-     *
-     * @returns {Boolean} Is PDF
-     */
-
-
-    Media.prototype.isPdf = function isPdf() {
-        return this.getContentTypeHeader().indexOf('pdf') > -1;
-    };
-
-    /**
-     * Applies folder string from tree
-     *
-     * @param {Object} tree
-     */
-
-
-    Media.prototype.applyFolderFromTree = function applyFolderFromTree(tree) {
-        if (tree) {
-            for (var i in tree) {
-                var item = tree[i];
-
-                if (item.id == this.id) {
-                    this.folder = item.folder;
-                    break;
-                }
-            }
-        }
-    };
-
-    /**
-     * Creates a new Media object
-     *
-     * @param {Object} file
-     *
-     * @return {Media} media
-     */
-
-
-    Media.create = function create(file) {
-        var media = new Media({
-            id: Media.createId()
-        });
-
-        return media;
-    };
-
-    return Media;
-}(Resource);
-
-module.exports = Media;
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-module.exports = Stream;
-
-var EE = __webpack_require__(34).EventEmitter;
-var inherits = __webpack_require__(1);
-
-inherits(Stream, EE);
-Stream.Readable = __webpack_require__(111);
-Stream.Writable = __webpack_require__(116);
-Stream.Duplex = __webpack_require__(117);
-Stream.Transform = __webpack_require__(118);
-Stream.PassThrough = __webpack_require__(119);
-
-// Backwards-compat with node 0.4.x
-Stream.Stream = Stream;
-
-// old-style streams.  Note that the pipe method (the only relevant
-// part of this class) is overridden in the Readable class.
-
-function Stream() {
-  EE.call(this);
-}
-
-Stream.prototype.pipe = function (dest, options) {
-  var source = this;
-
-  function ondata(chunk) {
-    if (dest.writable) {
-      if (false === dest.write(chunk) && source.pause) {
-        source.pause();
-      }
-    }
-  }
-
-  source.on('data', ondata);
-
-  function ondrain() {
-    if (source.readable && source.resume) {
-      source.resume();
-    }
-  }
-
-  dest.on('drain', ondrain);
-
-  // If the 'end' option is not supplied, dest.end() will be called when
-  // source gets the 'end' or 'close' events.  Only dest.end() once.
-  if (!dest._isStdio && (!options || options.end !== false)) {
-    source.on('end', onend);
-    source.on('close', onclose);
-  }
-
-  var didOnEnd = false;
-  function onend() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    dest.end();
-  }
-
-  function onclose() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    if (typeof dest.destroy === 'function') dest.destroy();
-  }
-
-  // don't leave dangling pipes when there are errors.
-  function onerror(er) {
-    cleanup();
-    if (EE.listenerCount(this, 'error') === 0) {
-      throw er; // Unhandled stream error in pipe.
-    }
-  }
-
-  source.on('error', onerror);
-  dest.on('error', onerror);
-
-  // remove all the event listeners that were added.
-  function cleanup() {
-    source.removeListener('data', ondata);
-    dest.removeListener('drain', ondrain);
-
-    source.removeListener('end', onend);
-    source.removeListener('close', onclose);
-
-    source.removeListener('error', onerror);
-    dest.removeListener('error', onerror);
-
-    source.removeListener('end', cleanup);
-    source.removeListener('close', cleanup);
-
-    dest.removeListener('close', cleanup);
-  }
-
-  source.on('end', cleanup);
-  source.on('close', cleanup);
-
-  dest.on('close', cleanup);
-
-  dest.emit('pipe', source);
-
-  // Allow for unix-like usage: A.pipe(B).pipe(C)
-  return dest;
-};
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {// prototype class for hash functions
-function Hash(blockSize, finalSize) {
-  this._block = new Buffer(blockSize);
-  this._finalSize = finalSize;
-  this._blockSize = blockSize;
-  this._len = 0;
-  this._s = 0;
-}
-
-Hash.prototype.update = function (data, enc) {
-  if (typeof data === 'string') {
-    enc = enc || 'utf8';
-    data = new Buffer(data, enc);
-  }
-
-  var l = this._len += data.length;
-  var s = this._s || 0;
-  var f = 0;
-  var buffer = this._block;
-
-  while (s < l) {
-    var t = Math.min(data.length, f + this._blockSize - s % this._blockSize);
-    var ch = t - f;
-
-    for (var i = 0; i < ch; i++) {
-      buffer[s % this._blockSize + i] = data[i + f];
-    }
-
-    s += ch;
-    f += ch;
-
-    if (s % this._blockSize === 0) {
-      this._update(buffer);
-    }
-  }
-  this._s = s;
-
-  return this;
-};
-
-Hash.prototype.digest = function (enc) {
-  // Suppose the length of the message M, in bits, is l
-  var l = this._len * 8;
-
-  // Append the bit 1 to the end of the message
-  this._block[this._len % this._blockSize] = 0x80;
-
-  // and then k zero bits, where k is the smallest non-negative solution to the equation (l + 1 + k) === finalSize mod blockSize
-  this._block.fill(0, this._len % this._blockSize + 1);
-
-  if (l % (this._blockSize * 8) >= this._finalSize * 8) {
-    this._update(this._block);
-    this._block.fill(0);
-  }
-
-  // to this append the block which is equal to the number l written in binary
-  // TODO: handle case where l is > Math.pow(2, 29)
-  this._block.writeInt32BE(l, this._blockSize - 4);
-
-  var hash = this._update(this._block) || this._hash();
-
-  return enc ? hash.toString(enc) : hash;
-};
-
-Hash.prototype._update = function () {
-  throw new Error('_update must be implemented by subclass');
-};
-
-module.exports = Hash;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 17 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6905,6 +6332,579 @@ document.addEventListener('keyup', function (e) {
 });
 
 module.exports = Modal;
+
+/***/ }),
+/* 12 */,
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(19);
+
+/**
+ * Basic resource class
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Resource = function (_Entity) {
+    _inherits(Resource, _Entity);
+
+    function Resource() {
+        _classCallCheck(this, Resource);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    Resource.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.hasRemote = params.local;
+            }
+
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.isRemote = params.remote;
+            }
+
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            if (typeof params.isLocked === 'undefined') {
+                params.isLocked = params.locked;
+            }
+
+            delete params.locked;
+        }
+
+        return params;
+    };
+
+    return Resource;
+}(Entity);
+
+module.exports = Resource;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// a duplex stream is just a stream that is both readable and writable.
+// Since JS doesn't have multiple prototypal inheritance, this class
+// prototypally inherits from Readable, and then parasitically from
+// Writable.
+
+
+
+/*<replacement>*/
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
+
+module.exports = Duplex;
+
+/*<replacement>*/
+var processNextTick = __webpack_require__(47);
+/*</replacement>*/
+
+/*<replacement>*/
+var util = __webpack_require__(22);
+util.inherits = __webpack_require__(1);
+/*</replacement>*/
+
+var Readable = __webpack_require__(61);
+var Writable = __webpack_require__(49);
+
+util.inherits(Duplex, Readable);
+
+var keys = objectKeys(Writable.prototype);
+for (var v = 0; v < keys.length; v++) {
+  var method = keys[v];
+  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
+}
+
+function Duplex(options) {
+  if (!(this instanceof Duplex)) return new Duplex(options);
+
+  Readable.call(this, options);
+  Writable.call(this, options);
+
+  if (options && options.readable === false) this.readable = false;
+
+  if (options && options.writable === false) this.writable = false;
+
+  this.allowHalfOpen = true;
+  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
+
+  this.once('end', onend);
+}
+
+// the no-half-open enforcer
+function onend() {
+  // if we allow half-open state, or if the writable side ended,
+  // then we're ok.
+  if (this.allowHalfOpen || this._writableState.ended) return;
+
+  // no more data can be written.
+  // But allow more writes to happen in this tick.
+  processNextTick(onEndNT, this);
+}
+
+function onEndNT(self) {
+  self.end();
+}
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Path = __webpack_require__(104);
+
+var Resource = __webpack_require__(13);
+
+/**
+ * The base class for all Media objects
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Media = function (_Resource) {
+    _inherits(Media, _Resource);
+
+    function Media(params) {
+        _classCallCheck(this, Media);
+
+        return _possibleConstructorReturn(this, _Resource.call(this, Media.paramsCheck(params)));
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Media.paramsCheck = function paramsCheck(params) {
+        params = _Resource.paramsCheck.call(this, params);
+
+        delete params.remote;
+        delete params.sync;
+        delete params.isRemote;
+
+        if (!params.folder) {
+            params.folder = '/';
+        }
+
+        return params;
+    };
+
+    Media.prototype.structure = function structure() {
+        this.def(String, 'id');
+        this.def(String, 'icon', 'file-image-o');
+        this.def(String, 'name');
+        this.def(String, 'url');
+        this.def(String, 'folder', '/');
+    };
+
+    /**
+     * Read from file path
+     *
+     * @param {String} filePath
+     */
+
+
+    Media.prototype.readFromFilePath = function readFromFilePath(filePath) {
+        var name = Path.basename(filePath);
+        var id = filePath;
+
+        // Trim file path for id 
+        id = id.replace('/' + name, '');
+        id = id.substring(id.lastIndexOf('/') + 1);
+
+        // Remove file extension
+        name = name.replace(/\.[^/.]+$/, '');
+
+        this.id = id;
+        this.name = name;
+        this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
+    };
+
+    /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
+
+
+    Media.prototype.getContentTypeHeader = function getContentTypeHeader() {
+        var name = (this.name || '').toLowerCase();
+
+        // Image types
+        if (name.match(/\.jpg/)) {
+            return 'image/jpeg';
+        } else if (name.match(/\.png/)) {
+            return 'image/png';
+        } else if (name.match(/\.gif/)) {
+            return 'image/gif';
+        } else if (name.match(/\.bmp/)) {
+            return 'image/bmp';
+
+            // Video types
+        } else if (name.match(/\.mp4/)) {
+            return 'video/mp4';
+        } else if (name.match(/\.avi/)) {
+            return 'video/avi';
+        } else if (name.match(/\.mov/)) {
+            return 'video/quicktime';
+        } else if (name.match(/\.bmp/)) {
+            return 'video/bmp';
+        } else if (name.match(/\.wmv/)) {
+            return 'video/x-ms-wmv';
+        } else if (name.match(/\.3gp/)) {
+            return 'video/3gpp';
+        } else if (name.match(/\.mkv/)) {
+            return 'video/x-matroska';
+
+            // SVG
+        } else if (name.match(/\.svg/)) {
+            return 'image/svg+xml';
+
+            // PDF
+        } else if (name.match(/\.pdf/)) {
+            return 'application/pdf';
+
+            // Everything else
+        } else {
+            return 'application/octet-stream';
+        }
+    };
+
+    /**
+     * Gets whether this is a video
+     *
+     * @returns {Boolean} Is video
+     */
+
+
+    Media.prototype.isVideo = function isVideo() {
+        return this.getContentTypeHeader().indexOf('video') > -1;
+    };
+
+    /**
+     * Gets whether this is an image
+     *
+     * @returns {Boolean} Is image
+     */
+
+
+    Media.prototype.isImage = function isImage() {
+        return this.getContentTypeHeader().indexOf('image') > -1;
+    };
+
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
+
+
+    Media.prototype.isPdf = function isPdf() {
+        return this.getContentTypeHeader().indexOf('pdf') > -1;
+    };
+
+    /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */
+
+
+    Media.prototype.applyFolderFromTree = function applyFolderFromTree(tree) {
+        if (tree) {
+            for (var i in tree) {
+                var item = tree[i];
+
+                if (item.id == this.id) {
+                    this.folder = item.folder;
+                    break;
+                }
+            }
+        }
+    };
+
+    /**
+     * Creates a new Media object
+     *
+     * @param {Object} file
+     *
+     * @return {Media} media
+     */
+
+
+    Media.create = function create(file) {
+        var media = new Media({
+            id: Media.createId()
+        });
+
+        return media;
+    };
+
+    return Media;
+}(Resource);
+
+module.exports = Media;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Stream;
+
+var EE = __webpack_require__(34).EventEmitter;
+var inherits = __webpack_require__(1);
+
+inherits(Stream, EE);
+Stream.Readable = __webpack_require__(111);
+Stream.Writable = __webpack_require__(116);
+Stream.Duplex = __webpack_require__(117);
+Stream.Transform = __webpack_require__(118);
+Stream.PassThrough = __webpack_require__(119);
+
+// Backwards-compat with node 0.4.x
+Stream.Stream = Stream;
+
+// old-style streams.  Note that the pipe method (the only relevant
+// part of this class) is overridden in the Readable class.
+
+function Stream() {
+  EE.call(this);
+}
+
+Stream.prototype.pipe = function (dest, options) {
+  var source = this;
+
+  function ondata(chunk) {
+    if (dest.writable) {
+      if (false === dest.write(chunk) && source.pause) {
+        source.pause();
+      }
+    }
+  }
+
+  source.on('data', ondata);
+
+  function ondrain() {
+    if (source.readable && source.resume) {
+      source.resume();
+    }
+  }
+
+  dest.on('drain', ondrain);
+
+  // If the 'end' option is not supplied, dest.end() will be called when
+  // source gets the 'end' or 'close' events.  Only dest.end() once.
+  if (!dest._isStdio && (!options || options.end !== false)) {
+    source.on('end', onend);
+    source.on('close', onclose);
+  }
+
+  var didOnEnd = false;
+  function onend() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.end();
+  }
+
+  function onclose() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    if (typeof dest.destroy === 'function') dest.destroy();
+  }
+
+  // don't leave dangling pipes when there are errors.
+  function onerror(er) {
+    cleanup();
+    if (EE.listenerCount(this, 'error') === 0) {
+      throw er; // Unhandled stream error in pipe.
+    }
+  }
+
+  source.on('error', onerror);
+  dest.on('error', onerror);
+
+  // remove all the event listeners that were added.
+  function cleanup() {
+    source.removeListener('data', ondata);
+    dest.removeListener('drain', ondrain);
+
+    source.removeListener('end', onend);
+    source.removeListener('close', onclose);
+
+    source.removeListener('error', onerror);
+    dest.removeListener('error', onerror);
+
+    source.removeListener('end', cleanup);
+    source.removeListener('close', cleanup);
+
+    dest.removeListener('close', cleanup);
+  }
+
+  source.on('end', cleanup);
+  source.on('close', cleanup);
+
+  dest.on('close', cleanup);
+
+  dest.emit('pipe', source);
+
+  // Allow for unix-like usage: A.pipe(B).pipe(C)
+  return dest;
+};
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {// prototype class for hash functions
+function Hash(blockSize, finalSize) {
+  this._block = new Buffer(blockSize);
+  this._finalSize = finalSize;
+  this._blockSize = blockSize;
+  this._len = 0;
+  this._s = 0;
+}
+
+Hash.prototype.update = function (data, enc) {
+  if (typeof data === 'string') {
+    enc = enc || 'utf8';
+    data = new Buffer(data, enc);
+  }
+
+  var l = this._len += data.length;
+  var s = this._s || 0;
+  var f = 0;
+  var buffer = this._block;
+
+  while (s < l) {
+    var t = Math.min(data.length, f + this._blockSize - s % this._blockSize);
+    var ch = t - f;
+
+    for (var i = 0; i < ch; i++) {
+      buffer[s % this._blockSize + i] = data[i + f];
+    }
+
+    s += ch;
+    f += ch;
+
+    if (s % this._blockSize === 0) {
+      this._update(buffer);
+    }
+  }
+  this._s = s;
+
+  return this;
+};
+
+Hash.prototype.digest = function (enc) {
+  // Suppose the length of the message M, in bits, is l
+  var l = this._len * 8;
+
+  // Append the bit 1 to the end of the message
+  this._block[this._len % this._blockSize] = 0x80;
+
+  // and then k zero bits, where k is the smallest non-negative solution to the equation (l + 1 + k) === finalSize mod blockSize
+  this._block.fill(0, this._len % this._blockSize + 1);
+
+  if (l % (this._blockSize * 8) >= this._finalSize * 8) {
+    this._update(this._block);
+    this._block.fill(0);
+  }
+
+  // to this append the block which is equal to the number l written in binary
+  // TODO: handle case where l is > Math.pow(2, 29)
+  this._block.writeInt32BE(l, this._blockSize - 4);
+
+  var hash = this._update(this._block) || this._hash();
+
+  return enc ? hash.toString(enc) : hash;
+};
+
+Hash.prototype._update = function () {
+  throw new Error('_update must be implemented by subclass');
+};
+
+module.exports = Hash;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
 /* 18 */
@@ -7608,7 +7608,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(12);
+var Resource = __webpack_require__(13);
 
 /**
  * The base class for all Connection types
@@ -8416,7 +8416,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(12);
+var Resource = __webpack_require__(13);
 
 /**
  * The base class for all Schema types
@@ -10489,7 +10489,7 @@ var internalUtil = {
 var Stream;
 (function () {
   try {
-    Stream = __webpack_require__(15);
+    Stream = __webpack_require__(16);
   } catch (_) {} finally {
     if (!Stream) Stream = __webpack_require__(34).EventEmitter;
   }
@@ -10514,7 +10514,7 @@ function WriteReq(chunk, encoding, cb) {
 
 var Duplex;
 function WritableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(13);
+  Duplex = Duplex || __webpack_require__(14);
 
   options = options || {};
 
@@ -10630,7 +10630,7 @@ WritableState.prototype.getBuffer = function writableStateGetBuffer() {
 
 var Duplex;
 function Writable(options) {
-  Duplex = Duplex || __webpack_require__(13);
+  Duplex = Duplex || __webpack_require__(14);
 
   // Writable ctor is applied to Duplexes, though they're not
   // instanceof Writable, they're instanceof Readable.
@@ -11257,7 +11257,7 @@ function base64DetectIncompleteChar(buffer) {
 
 module.exports = Transform;
 
-var Duplex = __webpack_require__(13);
+var Duplex = __webpack_require__(14);
 
 /*<replacement>*/
 var util = __webpack_require__(22);
@@ -11831,7 +11831,7 @@ var EElistenerCount = function EElistenerCount(emitter, type) {
 var Stream;
 (function () {
   try {
-    Stream = __webpack_require__(15);
+    Stream = __webpack_require__(16);
   } catch (_) {} finally {
     if (!Stream) Stream = __webpack_require__(34).EventEmitter;
   }
@@ -11877,7 +11877,7 @@ function prependListener(emitter, event, fn) {
 
 var Duplex;
 function ReadableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(13);
+  Duplex = Duplex || __webpack_require__(14);
 
   options = options || {};
 
@@ -11947,7 +11947,7 @@ function ReadableState(options, stream) {
 
 var Duplex;
 function Readable(options) {
-  Duplex = Duplex || __webpack_require__(13);
+  Duplex = Duplex || __webpack_require__(14);
 
   if (!(this instanceof Readable)) return new Readable(options);
 
@@ -12845,7 +12845,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
  */
 
 var inherits = __webpack_require__(1);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var K = [0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3, 0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786, 0x0FC19DC6, 0x240CA1CC, 0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA, 0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7, 0xC6E00BF3, 0xD5A79147, 0x06CA6351, 0x14292967, 0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13, 0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85, 0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070, 0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208, 0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2];
 
@@ -12961,7 +12961,7 @@ module.exports = Sha256;
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var inherits = __webpack_require__(1);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var K = [0x428a2f98, 0xd728ae22, 0x71374491, 0x23ef65cd, 0xb5c0fbcf, 0xec4d3b2f, 0xe9b5dba5, 0x8189dbbc, 0x3956c25b, 0xf348b538, 0x59f111f1, 0xb605d019, 0x923f82a4, 0xaf194f9b, 0xab1c5ed5, 0xda6d8118, 0xd807aa98, 0xa3030242, 0x12835b01, 0x45706fbe, 0x243185be, 0x4ee4b28c, 0x550c7dc3, 0xd5ffb4e2, 0x72be5d74, 0xf27b896f, 0x80deb1fe, 0x3b1696b1, 0x9bdc06a7, 0x25c71235, 0xc19bf174, 0xcf692694, 0xe49b69c1, 0x9ef14ad2, 0xefbe4786, 0x384f25e3, 0x0fc19dc6, 0x8b8cd5b5, 0x240ca1cc, 0x77ac9c65, 0x2de92c6f, 0x592b0275, 0x4a7484aa, 0x6ea6e483, 0x5cb0a9dc, 0xbd41fbd4, 0x76f988da, 0x831153b5, 0x983e5152, 0xee66dfab, 0xa831c66d, 0x2db43210, 0xb00327c8, 0x98fb213f, 0xbf597fc7, 0xbeef0ee4, 0xc6e00bf3, 0x3da88fc2, 0xd5a79147, 0x930aa725, 0x06ca6351, 0xe003826f, 0x14292967, 0x0a0e6e70, 0x27b70a85, 0x46d22ffc, 0x2e1b2138, 0x5c26c926, 0x4d2c6dfc, 0x5ac42aed, 0x53380d13, 0x9d95b3df, 0x650a7354, 0x8baf63de, 0x766a0abb, 0x3c77b2a8, 0x81c2c92e, 0x47edaee6, 0x92722c85, 0x1482353b, 0xa2bfe8a1, 0x4cf10364, 0xa81a664b, 0xbc423001, 0xc24b8b70, 0xd0f89791, 0xc76c51a3, 0x0654be30, 0xd192e819, 0xd6ef5218, 0xd6990624, 0x5565a910, 0xf40e3585, 0x5771202a, 0x106aa070, 0x32bbd1b8, 0x19a4c116, 0xb8d2d0c8, 0x1e376c08, 0x5141ab53, 0x2748774c, 0xdf8eeb99, 0x34b0bcb5, 0xe19b48a8, 0x391c0cb3, 0xc5c95a63, 0x4ed8aa4a, 0xe3418acb, 0x5b9cca4f, 0x7763e373, 0x682e6ff3, 0xd6b2b8a3, 0x748f82ee, 0x5defb2fc, 0x78a5636f, 0x43172f60, 0x84c87814, 0xa1f0ab72, 0x8cc70208, 0x1a6439ec, 0x90befffa, 0x23631e28, 0xa4506ceb, 0xde82bde9, 0xbef9a3f7, 0xb2c67915, 0xc67178f2, 0xe372532b, 0xca273ece, 0xea26619c, 0xd186b8c7, 0x21c0c207, 0xeada7dd6, 0xcde0eb1e, 0xf57d4f7f, 0xee6ed178, 0x06f067aa, 0x72176fba, 0x0a637dc5, 0xa2c898a6, 0x113f9804, 0xbef90dae, 0x1b710b35, 0x131c471b, 0x28db77f5, 0x23047d84, 0x32caab7b, 0x40c72493, 0x3c9ebe0a, 0x15c9bebc, 0x431d67c4, 0x9c100d4c, 0x4cc5d4be, 0xcb3e42b6, 0x597f299c, 0xfc657e2a, 0x5fcb6fab, 0x3ad6faec, 0x6c44198c, 0x4a475817];
 
@@ -15304,7 +15304,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(12);
+var Resource = __webpack_require__(13);
 
 /**
  * The base class for all Content types
@@ -15695,9 +15695,9 @@ module.exports = {
     Entity: __webpack_require__(19),
     FieldSchema: __webpack_require__(42),
     index: __webpack_require__(96),
-    Media: __webpack_require__(14),
+    Media: __webpack_require__(15),
     Project: __webpack_require__(59),
-    Resource: __webpack_require__(12),
+    Resource: __webpack_require__(13),
     Schema: __webpack_require__(31),
     Template: __webpack_require__(97),
     User: __webpack_require__(32)
@@ -15716,7 +15716,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(12);
+var Resource = __webpack_require__(13);
 
 /**
  * The Template model
@@ -16044,8 +16044,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(14);
-var Modal = __webpack_require__(17);
+var Media = __webpack_require__(15);
+var Modal = __webpack_require__(11);
 
 var MediaHelper = __webpack_require__(29);
 var RequestHelper = __webpack_require__(2);
@@ -16249,9 +16249,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(14);
+var Media = __webpack_require__(15);
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 var MediaHelper = __webpack_require__(29);
 var RequestHelper = __webpack_require__(2);
@@ -17971,7 +17971,7 @@ module.exports = function hash(buf, fn) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
-var Transform = __webpack_require__(15).Transform;
+var Transform = __webpack_require__(16).Transform;
 var inherits = __webpack_require__(1);
 
 function HashBase(blockSize) {
@@ -18062,14 +18062,14 @@ module.exports = HashBase;
 
 /* WEBPACK VAR INJECTION */(function(process) {var Stream = function () {
   try {
-    return __webpack_require__(15); // hack to fix a circular dependency issue when used with browserify
+    return __webpack_require__(16); // hack to fix a circular dependency issue when used with browserify
   } catch (_) {}
 }();
 exports = module.exports = __webpack_require__(61);
 exports.Stream = Stream || exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(49);
-exports.Duplex = __webpack_require__(13);
+exports.Duplex = __webpack_require__(14);
 exports.Transform = __webpack_require__(51);
 exports.PassThrough = __webpack_require__(63);
 
@@ -18425,7 +18425,7 @@ module.exports = __webpack_require__(49);
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(13);
+module.exports = __webpack_require__(14);
 
 /***/ }),
 /* 118 */
@@ -18452,7 +18452,7 @@ module.exports = __webpack_require__(63);
  */
 
 var inherits = __webpack_require__(1);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0];
 
@@ -18551,7 +18551,7 @@ module.exports = Sha;
  */
 
 var inherits = __webpack_require__(1);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0];
 
@@ -18654,7 +18654,7 @@ module.exports = Sha1;
 
 var inherits = __webpack_require__(1);
 var Sha256 = __webpack_require__(64);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var W = new Array(64);
 
@@ -18704,7 +18704,7 @@ module.exports = Sha224;
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var inherits = __webpack_require__(1);
 var SHA512 = __webpack_require__(65);
-var Hash = __webpack_require__(16);
+var Hash = __webpack_require__(17);
 
 var W = new Array(160);
 
@@ -20337,7 +20337,7 @@ function formatReturnValue(bn, enc) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var createHash = __webpack_require__(21);
-var stream = __webpack_require__(15);
+var stream = __webpack_require__(16);
 var inherits = __webpack_require__(1);
 var sign = __webpack_require__(144);
 var verify = __webpack_require__(180);
@@ -25676,7 +25676,7 @@ module.exports = {
     FieldSchema: __webpack_require__(42),
     Form: __webpack_require__(190),
     index: __webpack_require__(96),
-    Media: __webpack_require__(14),
+    Media: __webpack_require__(15),
     Project: __webpack_require__(59),
     Schema: __webpack_require__(31),
     Template: __webpack_require__(97),
@@ -25696,7 +25696,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(12);
+var Resource = __webpack_require__(13);
 
 /**
  * The Form class
@@ -26526,7 +26526,7 @@ module.exports = Input;
  */
 
 module.exports = {
-    Modal: __webpack_require__(17),
+    Modal: __webpack_require__(11),
     MediaUploader: __webpack_require__(100),
     MediaBrowser: __webpack_require__(101),
     IconModal: __webpack_require__(198),
@@ -26547,7 +26547,7 @@ module.exports = {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Media = __webpack_require__(14);
+var Media = __webpack_require__(15);
 
 /**
  * A helper for Media objects
@@ -26656,7 +26656,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var icons = __webpack_require__(102).icons;
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 /**
  * A modal for picking icons
@@ -26750,7 +26750,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 /**
  * A modal for confirming actions
@@ -26831,7 +26831,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 /**
  * A modal for picking dates
@@ -26979,7 +26979,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 /**
  * A dialog for editing publishing settings for Content nodes
@@ -27064,7 +27064,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(17);
+var Modal = __webpack_require__(11);
 
 /**
  * A modal for showng iframes
@@ -27970,14 +27970,16 @@ var UIHelper = function () {
                 return;
             }
 
-            var itemKey = element.querySelector('.editor__field__sort-key').value;
+            var itemSortKeyElement = element.querySelector('.editor__field__sort-key');
+            var itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
             var itemValue = object[itemKey];
 
             // Try to get the next key
             var nextKey = '';
+            var nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
 
-            if (element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
-                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            if (nextSortKeyElement) {
+                nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
             }
 
             // Construct a new object based on the old one

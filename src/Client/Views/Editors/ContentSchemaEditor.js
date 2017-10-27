@@ -87,7 +87,7 @@ class ContentSchemaEditor extends SchemaEditor {
                         let renderField = () => {
                             _.append($field.empty(),
                                 _.div({class: 'editor__field__sort-key'},
-                                    HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId).name
+                                    fieldKey
                                 ),
                                 _.div({class: 'editor__field__key'},
                                     new HashBrown.Views.Widgets.Input({
@@ -101,8 +101,10 @@ class ContentSchemaEditor extends SchemaEditor {
                                             fieldKey = newKey;
 
                                             this.model.fields.properties[fieldKey] = fieldValue;
+
+                                            $field.find('.editor__field__sort-key').html(fieldKey);
                                         }
-                                    }),
+                                    }).$element,
                                     new HashBrown.Views.Widgets.Input({
                                         type: 'text',
                                         placeholder: 'A label, e.g. "My field"',

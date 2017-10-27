@@ -78,14 +78,16 @@ class UIHelper {
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let itemKey = element.querySelector('.editor__field__sort-key').value;
+            let itemSortKeyElement = element.querySelector('.editor__field__sort-key');
+            let itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
             let itemValue = object[itemKey];
 
             // Try to get the next key
             let nextKey = '';
-            
-            if(element.nextElementSibling && element.nextElementSibling.querySelector('.editor__field__sort-key')) {
-                nextKey = element.nextElementSibling.querySelector('.editor__field__sort-key').value;
+            let nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
+
+            if(nextSortKeyElement) {
+                nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
             }
 
             // Construct a new object based on the old one
