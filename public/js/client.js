@@ -33307,15 +33307,7 @@ var UIHelper = function () {
 
 
     UIHelper.context = function context(element, items) {
-        element.addEventListener('contextmenu', function (e) {
-            // If this is not a right click, end
-            if (e.which !== 3) {
-                return;
-            }
-
-            e.preventDefault();
-            e.stopPropagation();
-
+        var openContextMenu = function openContextMenu(e) {
             // Find any existing context menu targets and remove their classes
             var existingTargets = document.querySelectorAll('.context-menu-target');
 
@@ -33363,6 +33355,32 @@ var UIHelper = function () {
 
             // Append to body
             document.body.appendChild(dropdown.element);
+        };
+
+        var touchTimeout = null;
+
+        element.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        element.addEventListener('mousedown', function (e) {
+            var timeout = 300;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.which === 3 || e.ctrlKey) {
+                timeout = 0;
+            }
+
+            touchTimeout = setTimeout(function () {
+                openContextMenu(e);
+            }, timeout);
+        });
+        element.addEventListener('mouseup', function (e) {
+            if (touchTimeout) {
+                clearTimeout(touchTimeout);
+            }
         });
     };
 

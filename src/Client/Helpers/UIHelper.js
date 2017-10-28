@@ -571,13 +571,7 @@ class UIHelper {
      * Creates a context menu
      */
     static context(element, items) {
-        element.addEventListener('contextmenu', (e) => {
-            // If this is not a right click, end
-            if(e.which !== 3) { return; }
-            
-            e.preventDefault();
-            e.stopPropagation();
-
+        let openContextMenu = (e) => {
             // Find any existing context menu targets and remove their classes
             let existingTargets = document.querySelectorAll('.context-menu-target');
         
@@ -619,6 +613,32 @@ class UIHelper {
 
             // Append to body
             document.body.appendChild(dropdown.element);
+        };
+        
+        let touchTimeout = null;
+
+        element.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        element.addEventListener('mousedown', (e) => {
+            let timeout = 300;
+
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if(e.which === 3 || e.ctrlKey) {
+                timeout = 0;
+            }
+
+            touchTimeout = setTimeout(() => {
+                openContextMenu(e);
+            }, timeout);
+        });
+        element.addEventListener('mouseup', (e) => {
+            if(touchTimeout) {
+                clearTimeout(touchTimeout);
+            }
         });
     }
 }
