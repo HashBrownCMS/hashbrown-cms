@@ -489,7 +489,8 @@ h1, h2, h3, h4, h5, h6 {
       overflow-y: auto;
       overflow-x: hidden; }
     .navbar-main__pane__item {
-      position: relative; }
+      position: relative;
+      user-select: none; }
       .navbar-main__pane__item.active:before {
         content: '';
         display: block;
@@ -534,6 +535,7 @@ h1, h2, h3, h4, h5, h6 {
         display: none;
         transform: translateY(50%); }
       .navbar-main__pane__item__content {
+        user-select: none;
         color: #333333;
         display: flex;
         border-radius: 0;
@@ -559,6 +561,7 @@ h1, h2, h3, h4, h5, h6 {
       .navbar-main__pane__item__label {
         position: relative;
         white-space: nowrap;
+        user-select: none;
         overflow-x: hidden;
         text-overflow: ellipsis;
         flex-grow: 1; }
@@ -1861,7 +1864,8 @@ h1, h2, h3, h4, h5, h6 {
   flex-grow: 1;
   background-color: #ffffff;
   border-radius: 0.2rem;
-  border: 1px solid #eeeeee; }
+  border: 1px solid #eeeeee;
+  user-select: none; }
   .widget--dropdown.small {
     max-width: 2rem;
     width: 2rem; }
@@ -1936,7 +1940,8 @@ h1, h2, h3, h4, h5, h6 {
     color: #333333;
     white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden; }
+    overflow: hidden;
+    user-select: none; }
     .widget--dropdown__value .fa {
       text-align: center;
       height: calc(2rem - 2px);
@@ -1945,6 +1950,7 @@ h1, h2, h3, h4, h5, h6 {
       display: block; }
   .widget--dropdown__toggle {
     position: absolute;
+    user-select: none;
     opacity: 0;
     top: 0;
     left: 0;
@@ -1999,7 +2005,8 @@ h1, h2, h3, h4, h5, h6 {
     margin: 1rem 0 0.5rem 0;
     text-transform: uppercase;
     color: #21303b;
-    font-weight: bold; }
+    font-weight: bold;
+    user-select: none; }
     .widget--dropdown__separator:first-child {
       margin-top: 0; }
   .widget--dropdown__options {
@@ -2015,7 +2022,8 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #ffffff;
     width: 100%;
     max-height: 10rem;
-    overflow-y: auto; }
+    overflow-y: auto;
+    user-select: none; }
   .widget--dropdown__option {
     line-height: 2rem;
     padding: 0 0.5rem;
@@ -2028,7 +2036,8 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    cursor: pointer; }
+    cursor: pointer;
+    user-select: none; }
     .widget--dropdown__option:hover {
       background-color: #e70d3b;
       color: #ffffff; }

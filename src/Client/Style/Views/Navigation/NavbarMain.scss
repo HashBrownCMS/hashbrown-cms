@@ -215,6 +215,7 @@
         // Individual item
         &__item {
             position: relative;
+            user-select: none;
 
             // Active state
             &.active:before { 
@@ -292,6 +293,7 @@
 
             // Content
             &__content {
+                user-select: none;
                 color: $standard-text;
                 display: flex;
                 border-radius: 0;
@@ -328,6 +330,7 @@
             &__label {
                 position: relative;
                 white-space: nowrap;
+                user-select: none;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 flex-grow: 1;

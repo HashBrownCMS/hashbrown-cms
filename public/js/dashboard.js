@@ -28537,8 +28537,8 @@ var UIHelper = function () {
 
             // Set styles
             dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.style.top = e.pageY;
-            dropdown.element.style.left = e.pageX;
+            dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
+            dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX;
 
             // Open it
             dropdown.toggle(true);
@@ -28554,20 +28554,23 @@ var UIHelper = function () {
         });
 
         element.addEventListener('mousedown', function (e) {
-            var timeout = 300;
-
             e.preventDefault();
             e.stopPropagation();
 
             if (e.which === 3 || e.ctrlKey) {
-                timeout = 0;
+                openContextMenu(e);
             }
+        });
+
+        element.addEventListener('touchstart', function (e) {
+            e.preventDefault();
 
             touchTimeout = setTimeout(function () {
                 openContextMenu(e);
-            }, timeout);
+            }, 300);
         });
-        element.addEventListener('mouseup', function (e) {
+
+        element.addEventListener('touchend', function (e) {
             if (touchTimeout) {
                 clearTimeout(touchTimeout);
             }
