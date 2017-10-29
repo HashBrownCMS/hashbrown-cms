@@ -26098,7 +26098,7 @@ var Dropdown = function (_Widget) {
         }
 
         // Cancel
-        this.onCancel();
+        this.toggle(false);
 
         // The value is a function, execute it and return
         if (typeof this.value === 'function') {
@@ -26137,17 +26137,6 @@ var Dropdown = function (_Widget) {
     };
 
     /**
-     * Event: Cancel
-     */
-
-
-    Dropdown.prototype.onCancel = function onCancel() {
-        this.toggle(false);
-
-        this.trigger('cancel');
-    };
-
-    /**
      * Toggles open/closed
      *
      * @param {Boolean} isOpen
@@ -26162,6 +26151,10 @@ var Dropdown = function (_Widget) {
         }
 
         toggle.checked = isOpen;
+
+        if (!isOpen) {
+            this.trigger('cancel');
+        }
     };
 
     /**
@@ -26187,7 +26180,9 @@ var Dropdown = function (_Widget) {
         _.div({ class: 'widget--dropdown__value' }, this.getValueLabel()),
 
         // Toggle
-        _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }),
+        _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }).click(function (e) {
+            _this3.toggle(e.currentTarget.checked);
+        }),
 
         // Typeahead input
         _.if(this.useTypeAhead, _.span({ class: 'widget--dropdown__typeahead__icon fa fa-search' }), _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
@@ -28499,13 +28494,17 @@ var UIHelper = function () {
     UIHelper.context = function context(element, items) {
         var openContextMenu = function openContextMenu(e) {
             // Find any existing context menu targets and remove their classes
-            var existingTargets = document.querySelectorAll('.context-menu-target');
+            var clearTargets = function clearTargets() {
+                var targets = document.querySelectorAll('.context-menu-target');
 
-            if (existingTargets) {
-                for (var i = 0; i < existingTargets.length; i++) {
-                    existingTargets[i].classList.remove('context-menu-target');
+                if (targets) {
+                    for (var i = 0; i < targets.length; i++) {
+                        targets[i].classList.remove('context-menu-target');
+                    }
                 }
-            }
+            };
+
+            clearTargets();
 
             // Set new target
             element.classList.toggle('context-menu-target', true);
@@ -28530,9 +28529,18 @@ var UIHelper = function () {
                 }
             });
 
+            // Prevent the toggle button from blocking new context menu events
+            var toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
+
+            toggle.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+                dropdown.toggle(false);
+            });
+
             // Set cancel event
             dropdown.on('cancel', function () {
                 dropdown.remove();
+                clearTargets();
             });
 
             // Set styles
@@ -28551,9 +28559,10 @@ var UIHelper = function () {
 
         element.addEventListener('contextmenu', function (e) {
             e.preventDefault();
+            e.stopPropagation();
         });
 
-        element.addEventListener('mousedown', function (e) {
+        element.addEventListener('mouseup', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -28567,7 +28576,7 @@ var UIHelper = function () {
 
             touchTimeout = setTimeout(function () {
                 openContextMenu(e);
-            }, 300);
+            }, 400);
         });
 
         element.addEventListener('touchend', function (e) {

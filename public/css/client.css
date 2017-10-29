@@ -558,6 +558,8 @@ h1, h2, h3, h4, h5, h6 {
           line-height: 4rem;
           display: block;
           width: 2rem; }
+        .navbar-main__pane__item__content.context-menu-target {
+          background-color: #dddddd; }
       .navbar-main__pane__item__label {
         position: relative;
         white-space: nowrap;

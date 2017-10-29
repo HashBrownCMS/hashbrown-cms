@@ -573,13 +573,17 @@ class UIHelper {
     static context(element, items) {
         let openContextMenu = (e) => {
             // Find any existing context menu targets and remove their classes
-            let existingTargets = document.querySelectorAll('.context-menu-target');
-        
-            if(existingTargets) {
-                for(let i = 0; i < existingTargets.length; i++) {
-                    existingTargets[i].classList.remove('context-menu-target');
+            let clearTargets = () => {
+                let targets = document.querySelectorAll('.context-menu-target');
+            
+                if(targets) {
+                    for(let i = 0; i < targets.length; i++) {
+                        targets[i].classList.remove('context-menu-target');
+                    }
                 }
-            }
+            };
+
+            clearTargets();
 
             // Set new target
             element.classList.toggle('context-menu-target', true);
@@ -600,8 +604,19 @@ class UIHelper {
                 }
             });
 
+            // Prevent the toggle button from blocking new context menu events
+            let toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
+
+            toggle.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                dropdown.toggle(false);
+            });
+
             // Set cancel event
-            dropdown.on('cancel', () => { dropdown.remove(); });
+            dropdown.on('cancel', () => {
+                dropdown.remove();
+                clearTargets();
+            });
 
             // Set styles
             dropdown.element.classList.toggle('context-menu', true);
@@ -619,9 +634,10 @@ class UIHelper {
 
         element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
+            e.stopPropagation();
         });
 
-        element.addEventListener('mousedown', (e) => {
+        element.addEventListener('mouseup', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
@@ -635,7 +651,7 @@ class UIHelper {
 
             touchTimeout = setTimeout(() => {
                 openContextMenu(e);
-            }, 300);
+            }, 400);
         });
 
         element.addEventListener('touchend', (e) => {

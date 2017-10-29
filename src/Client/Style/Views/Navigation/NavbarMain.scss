@@ -324,6 +324,11 @@
                     display: block;
                     width: 2rem;
                 }
+
+                // Context menu target
+                &.context-menu-target {
+                    background-color: $standard-darker;
+                }
             }
             
             // Label

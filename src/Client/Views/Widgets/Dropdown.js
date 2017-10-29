@@ -187,7 +187,7 @@ class Dropdown extends Widget {
         }
 
         // Cancel
-        this.onCancel();
+        this.toggle(false);
 
         // The value is a function, execute it and return
         if(typeof this.value === 'function') {
@@ -222,15 +222,6 @@ class Dropdown extends Widget {
     }
 
     /**
-     * Event: Cancel
-     */
-    onCancel() {
-        this.toggle(false);
-
-        this.trigger('cancel');
-    }
-
-    /**
      * Toggles open/closed
      *
      * @param {Boolean} isOpen
@@ -243,6 +234,10 @@ class Dropdown extends Widget {
         }
 
         toggle.checked = isOpen;
+
+        if(!isOpen) {
+            this.trigger('cancel');
+        }
     }
 
     /**
@@ -262,7 +257,10 @@ class Dropdown extends Widget {
             _.div({class: 'widget--dropdown__value'}, this.getValueLabel()),
             
             // Toggle
-            _.input({class: 'widget--dropdown__toggle', type: 'checkbox'}),
+            _.input({class: 'widget--dropdown__toggle', type: 'checkbox'})
+                .click((e) => {
+                    this.toggle(e.currentTarget.checked);     
+                }),
             
             // Typeahead input
             _.if(this.useTypeAhead,
