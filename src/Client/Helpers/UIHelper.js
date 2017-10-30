@@ -615,7 +615,11 @@ class UIHelper {
             // Set cancel event
             dropdown.on('cancel', () => {
                 dropdown.remove();
-                clearTargets();
+
+                // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+                setTimeout(() => {
+                    clearTargets();
+                }, 100);
             });
 
             // Set styles

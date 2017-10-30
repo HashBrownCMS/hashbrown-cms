@@ -81,6 +81,7 @@ class DropdownEditor extends FieldEditor {
                     useClearButton: true,
                     options: this.config.options,
                     valueKey: 'value',
+                    tooltip: this.description || '',
                     labelKey: 'label',
                     onChange: (newValue) => {
                         this.value = newValue;

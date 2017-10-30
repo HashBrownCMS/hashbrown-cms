@@ -351,137 +351,193 @@ class ContentHelper extends ContentHelperCommon {
         environment = requiredParam('environment'),
         user = requieredParam('user')
     ) {
-        // Rich Text Page
-        let richTextPageSchema = new ContentSchema({
-            id: ContentSchema.createId(),
+        // Demo page Schema
+        let demoPageSchemaId = ContentSchema.createId();
+        
+        let demoPageSchema = new ContentSchema({
+            id: demoPageSchemaId,
             icon: 'file',
             type: 'content',
             defaultTabId: 'content',
-            name: 'Rich Text Page',
+            name: 'Demo Page',
             parentSchemaId: 'page',
             fields: {
                 properties: {
-                    text: {
-                        label: 'Text',
+                    array: {
                         tabId: 'content',
-                        schemaId: 'richText'
-                    }
-                }
-            }
-        });
-
-        let richTextPageContent = new Content({
-            id: Content.createId(),
-            createDate: Date.now(),
-            updateDate: Date.now(),
-            schemaId: richTextPageSchema.id,
-            sort: 10000,
-            properties: {
-                url: '/my-rich-text-page/',
-                title: 'My Rich Text Page',
-                text: '<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>'
-            }
-        });
-
-        // Section page
-        let sectionSchema = new FieldSchema({
-            id: FieldSchema.createId(),
-            name: 'Section',
-            icon: 'arrows-h',
-            type: 'field',
-            editorId: 'struct',
-            parentSchemaId: 'struct',
-            config: {
-                struct: {
-                    heading: {
-                        label: 'Heading text',
-                        schemaId: 'string'
-                    },
-                    body: {
-                        label: 'Body text',
-                        schemaId: 'richText'
-                    }
-                }
-            }
-        });
-
-        let sectionPageSchema = new ContentSchema({
-            id: ContentSchema.createId(),
-            icon: 'file',
-            type: 'content',
-            defaultTabId: 'content',
-            name: 'Section Page',
-            parentSchemaId: 'page',
-            fields: {
-                properties: {
-                    sections: {
-                        label: 'Sections',
-                        tabId: 'content',
+                        label: 'Array',
                         schemaId: 'array',
+                        description: 'A list of values',
                         config: {
-                            allowedSchemas: [ sectionSchema.id ]
+                            minItems: 0,
+                            maxItems: 2,
+                            allowedSchemas: [ 'string', 'richText' ]
                         }
+                    },
+                    boolean: {
+                        tabId: 'content',
+                        schemaId: 'boolean',
+                        label: 'Boolean',
+                        description: 'A true/false value'
+                    },
+                    contentReference: {
+                        tabId: 'content',
+                        schemaId: 'contentReference',
+                        label: 'Content Reference',
+                        description: 'A reference to another Content node',
+                        config: {
+                            allowedSchemas: [ demoPageSchemaId ]
+                        }
+                    },
+                    contentSchemaReference: {
+                        tabId: 'content',
+                        schemaId: 'contentSchemaReference',
+                        label: 'Content Schema Reference',
+                        description: 'A reference to a Content Schema',
+                        config: {
+                            allowedSchemas: [ demoPageSchemaId ]
+                        }
+                    },
+                    date: {
+                        tabId: 'content',
+                        schemaId: 'date',
+                        label: 'Date',
+                        description: 'A date picker'
+                    },
+                    dropdown: {
+                        tabId: 'content',
+                        schemaId: 'dropdown',
+                        label: 'Dropdown',
+                        description: 'A dropdown list of options',
+                        config: {
+                            options: [
+                                {
+                                    label: 'Option #1',
+                                    value: 'option1'
+                                },
+                                {
+                                    label: 'Option #2',
+                                    value: 'option2'
+                                },
+                                {
+                                    label: 'Option #3',
+                                    value: 'option3'
+                                }
+                            ]
+                        }
+                    },
+                    language: {
+                        tabId: 'content',
+                        schemaId: 'language',
+                        label: 'Language',
+                        description: 'A dropdown list of available languages'
+                    },
+                    mediaReference: {
+                        tabId: 'content',
+                        schemaId: 'mediaReference',
+                        label: 'Media Reference',
+                        description: 'A reference to a Media node'
+                    },
+                    number: {
+                        tabId: 'content',
+                        schemaId: 'number',
+                        label: 'Number',
+                        description: 'A number picker, which can optionally be a slider',
+                        config: {
+                            step: 0.5,
+                            min: 0,
+                            max: 10,
+                            isSlider: true
+                        }
+                    },
+                    richText: {
+                        tabId: 'content',
+                        schemaId: 'richText',
+                        label: 'Rich Text',
+                        description: 'A formatted text field'
+                    },
+                    string: {
+                        tabId: 'content',
+                        schemaId: 'string',
+                        label: 'String',
+                        description: 'A simple text string'
+                    },
+                    struct: {
+                        tabId: 'content',
+                        schemaId: 'struct',
+                        label: 'Struct',
+                        description: 'A combination of fields',
+                        config: {
+                            struct: {
+                                string: {
+                                    schemaId: 'string',
+                                    label: 'String',
+                                    description: 'A simple text string'
+                                },
+                                boolean: {
+                                    schemaId: 'boolean',
+                                    label: 'Boolean',
+                                    description: 'A true/false value'
+                                }
+                            }
+                        }
+                    },
+                    tags: {
+                        tabId: 'content',
+                        schemaId: 'tags',
+                        label: 'Tabs',
+                        description: 'A comma-separated list of tags'
+                    },
+                    template: {
+                        tabId: 'content',
+                        schemaId: 'templateReference',
+                        label: 'Template',
+                        description: 'A reference to a Template',
+                        config: {
+                            type: 'page',
+                            allowedTemplates: []
+                        }
+                    },
+                    url: {
+                        tabId: 'content',
+                        schemaId: 'url',
+                        label: 'URL',
+                        description: 'A URL value, custom or automatically generated'
                     }
                 }
             }
         });
 
-        let sectionPageContent = new Content({
+        // Demo page Content node
+        let demoPageContent = new Content({
             id: Content.createId(),
             createDate: Date.now(),
             updateDate: Date.now(),
-            schemaId: sectionPageSchema.id,
+            schemaId: demoPageSchema.id,
             sort: 10000,
             properties: {
-                url: '/my-section-page/',
-                title: 'My Section Page',
-                sections: {
-                    items: [ { heading: 'This is a section', body: '<p>With a heading and some body text</p>' } ],
-                    schemaBindings: [ sectionSchema.id ]
-                }
+                url: '/my-demo-page/',
+                title: 'My Demo Page',
+
             }
         });
 
-        // Create rich text page
+        // Create demo page
         return SchemaHelper.setSchemaById(
             project,
             environment,
-            richTextPageSchema.id,
-            richTextPageSchema,
+            demoPageSchema.id,
+            demoPageSchema,
             true
         )
         .then(ContentHelper.setContentById(
             project,
             environment,
-            richTextPageContent.id,
-            richTextPageContent,
+            demoPageContent.id,
+            demoPageContent,
             user,
             true
         ))
-        
-        // Create section page
-        .then(SchemaHelper.setSchemaById(
-            project,
-            environment,
-            sectionSchema.id,
-            sectionSchema, 
-            true
-        ))
-        .then(SchemaHelper.setSchemaById(
-            project,
-            environment,
-            sectionPageSchema.id,
-            sectionPageSchema, 
-            true
-        ))
-        .then(ContentHelper.setContentById(
-            project,
-            environment,
-            sectionPageContent.id,
-            sectionPageContent,
-            user,
-            true
-        ));
     }
 }
 

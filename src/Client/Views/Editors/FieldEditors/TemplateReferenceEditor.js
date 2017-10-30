@@ -165,6 +165,7 @@ class TemplateReferenceEditor extends FieldEditor {
             new HashBrown.Views.Widgets.Dropdown({
                 useTypeAhead: true,
                 value: this.value,
+                tooltip: this.description || '',
                 options: this.getOptions(),
                 labelKey: 'name',
                 valueKey: 'id',

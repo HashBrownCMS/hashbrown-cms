@@ -299,7 +299,7 @@ class RichTextEditor extends FieldEditor {
     template() {
         let activeView = getCookie('rteview') || 'wysiwyg';
 
-        return _.div({class: 'editor__field__value editor__field--rich-text-editor'},
+        return _.div({class: 'editor__field__value editor__field--rich-text-editor', title: this.description || ''},
             _.div({class: 'editor__field--rich-text-editor__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
                     return _.button({class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'}, label)

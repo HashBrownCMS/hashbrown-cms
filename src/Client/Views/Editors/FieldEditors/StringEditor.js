@@ -36,6 +36,7 @@ class StringEditor extends FieldEditor {
             new HashBrown.Views.Widgets.Input({
                 type: 'text',
                 value: this.value,
+                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 

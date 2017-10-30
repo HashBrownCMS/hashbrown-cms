@@ -196,6 +196,12 @@
             margin-right: 1rem;
             line-height: 2rem;
 
+            // Following state
+            &.following &__actions {
+                position: fixed;
+                top: 60px;
+            }
+            
             // Widgets inside key
             .widget:not(:last-child) {
                 margin-bottom: 0.5rem;
@@ -203,11 +209,7 @@
 
             // Key actions
             &__actions {
-                // Following state
-                &.following {
-                    position: fixed;
-                    top: 80px;
-                }
+                position: absolute;
             }
 
             // Key action button
@@ -218,8 +220,6 @@
                 display: block;
                 padding: 0;
                 margin-top: 0.5rem;
-                float: left;
-                clear: both;
                 background-color: transparent;
                 color: $primary;
                 text-transform: uppercase;
@@ -377,8 +377,8 @@
         &__actions {
             display: flex;
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 0;
+            right: 0;
         }
 
         &__action {

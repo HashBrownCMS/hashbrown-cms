@@ -37,50 +37,26 @@ class FormsPane extends NavbarPane {
         let id = $element.data('id');
         let form = resources.forms.filter((form) => { return form.id == id; })[0];
 
-        function onSuccess() {
-            debug.log('Removed Form with id "' + form.id + '"', view); 
-            
-            return RequestHelper.reloadResource('forms')
-            .then(function() {
-                NavbarMain.reload();
-                
-                // Cancel the FormEditor view
-                location.hash = '/forms/';
-            });
-        }
+        UI.confirmModal(
+            'delete',
+            'Delete form',
+            'Are you sure you want to delete the form "' + form.title + '"?',
+            () => {
+                RequestHelper.request('delete', 'forms/' + form.id)
+                .then(() => {
+                    debug.log('Removed Form with id "' + form.id + '"', view); 
 
-        function onError(err) {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err.message
-                }
-            });
-        }
+                    return RequestHelper.reloadResource('forms');
+                })
+                .then(() => {
+                    NavbarMain.reload();
 
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Delete form',
-                body: 'Are you sure you want to delete the form "' + form.title + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {
-                    }
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: () => {
-                        RequestHelper.request('delete', 'forms/' + form.id)
-                        .then(onSuccess)
-                        .catch(onError);
-                    }
-                }
-            ]
-        });
+                    // Cancel the FormEditor view
+                    location.hash = '/forms/';
+                })
+                .catch(UI.errorModal);
+            }
+        );
     }
     
     /**

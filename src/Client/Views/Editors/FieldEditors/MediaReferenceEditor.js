@@ -36,7 +36,7 @@ class MediaReferenceEditor extends FieldEditor {
     template() {
         let media = MediaHelper.getMediaByIdSync(this.value);
 
-        return _.div({class: 'editor__field__value editor__field--media-reference'},
+        return _.div({class: 'editor__field__value editor__field--media-reference', title: this.description || ''},
             _.button({class: 'editor__field--media-reference__pick'},
                 _.do(()=> {
                     if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }

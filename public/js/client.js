@@ -30082,17 +30082,17 @@ var Dropdown = function (_Widget) {
         var options = this.getFlattenedOptions();
 
         if (this.useMultiple) {
-            var multipleLabel = '';
+            var labels = [];
 
             for (var key in options) {
                 var value = options[key];
 
                 if (this.value.indexOf(key) > -1) {
-                    multipleLabel += value + ', ';
+                    labels.push(value);
                 }
             }
 
-            label = multipleLabel || label;
+            label = labels.join(', ');
         } else {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;
         }
@@ -30151,8 +30151,13 @@ var Dropdown = function (_Widget) {
 
             toggle.checked = isChecked;
 
-            _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
-            _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
+            var isAtRight = bounds.right >= window.innerWidth - 10;
+            var isAtBottom = bounds.bottom >= window.innerHeight - 10;
+
+            console.log(bounds.bottom, window.innerHeight, isAtBottom);
+
+            _this2.element.classList.toggle('right', isAtRight);
+            _this2.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     };
 
@@ -30261,16 +30266,9 @@ var Dropdown = function (_Widget) {
         if (!isOpen) {
             this.trigger('cancel');
         }
-    };
 
-    /**
-     * Post render
-     */
-
-
-    Dropdown.prototype.postrender = function postrender() {
-        this.updateSelectedClasses();
         this.updatePositionClasses();
+        this.updateSelectedClasses();
     };
 
     /**
@@ -31591,17 +31589,18 @@ var ContentEditor = function (_Crisp$View) {
         var followingField = void 0;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key > .editor__field__key__actions').each(function (i, field) {
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each(function (i, field) {
             field.classList.remove('following');
 
-            // Ignore smaller fields
-            if (field.parentElement.getBoundingClientRect().height < 100) {
-                return;
+            var rect = field.getBoundingClientRect();
+            var actions = field.querySelector('.editor__field__key__actions');
+            var actionRect = void 0;
+
+            if (actions) {
+                actionRect = actions.getBoundingClientRect();
             }
 
-            var rect = field.getBoundingClientRect();
-
-            if (rect.top <= 80 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
+            if (rect.top <= 40 && actionRect && rect.bottom >= actionRect.height + 60 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
                 followingField = field;
             }
         });
@@ -31610,6 +31609,7 @@ var ContentEditor = function (_Crisp$View) {
             followingField.classList.add('following');
         }
 
+        // Cache the last scroll position
         this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
     };
 
@@ -31813,6 +31813,7 @@ var ContentEditor = function (_Crisp$View) {
                     value: fieldValue,
                     disabled: fieldDefinition.disabled || false,
                     config: config || {},
+                    description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
                     multilingual: fieldDefinition.multilingual
                 });
@@ -31860,7 +31861,6 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.renderFields = function renderFields(tabId, fieldDefinitions, fieldValues) {
         var _this5 = this;
 
-        var view = this;
         var tabFieldDefinitions = {};
 
         // Map out field definitions to render
@@ -31900,10 +31900,10 @@ var ContentEditor = function (_Crisp$View) {
 
             return _.div({ class: 'editor__field', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'editor__field__key' }, fieldDefinition.label || key, $keyContent = _.div({ class: 'editor__field__key__actions' })),
+            _.div({ class: 'editor__field__key', title: fieldDefinition.description || '' }, fieldDefinition.label || key, $keyContent = _.div({ class: 'editor__field__key__actions' })),
 
             // Render the field editor
-            view.renderField(
+            _this5.renderField(
             // If the field definition is set to multilingual, pass value from object
             fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
@@ -33350,7 +33350,11 @@ var UIHelper = function () {
             // Set cancel event
             dropdown.on('cancel', function () {
                 dropdown.remove();
-                clearTargets();
+
+                // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+                setTimeout(function () {
+                    clearTargets();
+                }, 100);
             });
 
             // Set styles
@@ -41077,14 +41081,7 @@ var FormEditor = function (_Crisp$View) {
             var navbar = Crisp.View.get('NavbarMain');
 
             navbar.reload();
-        }).catch(function (err) {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+        }).catch(UI.errorModal);
     };
 
     /**
@@ -41489,7 +41486,11 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.')], 'text');
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button expanded', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+        RequestHelper.request('post', 'content/example').then(function () {
+            location.reload();
+        }).catch(UI.errorModal);
+    })], 'text');
 });
 
 // Edit (JSON editor)
@@ -43851,42 +43852,17 @@ var FormsPane = function (_NavbarPane) {
             return form.id == id;
         })[0];
 
-        function onSuccess() {
-            debug.log('Removed Form with id "' + form.id + '"', view);
+        UI.confirmModal('delete', 'Delete form', 'Are you sure you want to delete the form "' + form.title + '"?', function () {
+            RequestHelper.request('delete', 'forms/' + form.id).then(function () {
+                debug.log('Removed Form with id "' + form.id + '"', view);
 
-            return RequestHelper.reloadResource('forms').then(function () {
+                return RequestHelper.reloadResource('forms');
+            }).then(function () {
                 NavbarMain.reload();
 
                 // Cancel the FormEditor view
                 location.hash = '/forms/';
-            });
-        }
-
-        function onError(err) {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err.message
-                }
-            });
-        }
-
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Delete form',
-                body: 'Are you sure you want to delete the form "' + form.title + '"?'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default',
-                callback: function callback() {}
-            }, {
-                label: 'Delete',
-                class: 'btn-danger',
-                callback: function callback() {
-                    RequestHelper.request('delete', 'forms/' + form.id).then(onSuccess).catch(onError);
-                }
-            }]
+            }).catch(UI.errorModal);
         });
     };
 
@@ -44452,53 +44428,29 @@ var SchemaPane = function (_NavbarPane) {
      * Event: Click remove schema
      */
     SchemaPane.onClickRemoveSchema = function onClickRemoveSchema() {
+        var _this2 = this;
+
         var $element = $('.context-menu-target');
         var id = $element.data('id');
         var schema = SchemaHelper.getSchemaByIdSync(id);
 
-        function onSuccess() {
-            debug.log('Removed schema with id "' + id + '"', this);
-
-            RequestHelper.reloadResource('schemas').then(function () {
-                NavbarMain.reload();
-
-                // Cancel the SchemaEditor view if it was displaying the deleted content
-                if (location.hash == '#/schemas/' + id) {
-                    location.hash = '/schemas/';
-                }
-            });
-        }
-
         if (!schema.isLocked) {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Delete schema',
-                    body: 'Are you sure you want to delete the schema "' + schema.name + '"?'
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function callback() {}
-                }, {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: function callback() {
-                        RequestHelper.request('delete', 'schemas/' + id).then(onSuccess).catch(UI.errorModal);
+            UI.confirmModal('delete', 'Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', function () {
+                RequestHelper.request('delete', 'schemas/' + id).then(function () {
+                    debug.log('Removed schema with id "' + id + '"', _this2);
+
+                    return RequestHelper.reloadResource('schemas');
+                }).then(function () {
+                    NavbarMain.reload();
+
+                    // Cancel the SchemaEditor view if it was displaying the deleted content
+                    if (location.hash == '#/schemas/' + id) {
+                        location.hash = '/schemas/';
                     }
-                }]
+                }).catch(UI.errorModal);
             });
         } else {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Delete schema',
-                    body: 'The schema "' + schema.name + '" is locked and cannot be removed'
-                },
-                buttons: [{
-                    label: 'OK',
-                    class: 'btn-default',
-                    callback: function callback() {}
-                }]
-            });
+            UI.messageModal('Delete schema', 'The schema "' + schema.name + '" is locked and cannot be removed');
         }
     };
 
@@ -44569,7 +44521,7 @@ var SchemaPane = function (_NavbarPane) {
 
 
     SchemaPane.init = function init() {
-        var _this2 = this;
+        var _this3 = this;
 
         if (!currentUserHasScope('schemas')) {
             return;
@@ -44587,15 +44539,15 @@ var SchemaPane = function (_NavbarPane) {
 
                 menu['This schema'] = '---';
                 menu['New child schema'] = function () {
-                    _this2.onClickNewSchema();
+                    _this3.onClickNewSchema();
                 };
                 menu['Copy id'] = function () {
-                    _this2.onClickCopyItemId();
+                    _this3.onClickCopyItemId();
                 };
 
                 if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
-                        _this2.onClickRemoveSchema();
+                        _this3.onClickRemoveSchema();
                     };
                 }
 
@@ -44608,19 +44560,19 @@ var SchemaPane = function (_NavbarPane) {
 
                     if (!item.sync.isRemote) {
                         menu['Push to remote'] = function () {
-                            _this2.onClickPushSchema();
+                            _this3.onClickPushSchema();
                         };
                     }
 
                     if (item.sync.hasRemote) {
                         menu['Remove local copy'] = function () {
-                            _this2.onClickRemoveSchema();
+                            _this3.onClickRemoveSchema();
                         };
                     }
 
                     if (item.sync.isRemote) {
                         menu['Pull from remote'] = function () {
-                            _this2.onClickPullSchema();
+                            _this3.onClickPullSchema();
                         };
                     }
                 }
@@ -44632,7 +44584,7 @@ var SchemaPane = function (_NavbarPane) {
             paneContextMenu: {
                 'General': '---',
                 'Refresh': function Refresh() {
-                    _this2.onClickRefreshResource('schemas');
+                    _this3.onClickRefreshResource('schemas');
                 }
             },
 
@@ -45926,6 +45878,7 @@ var BooleanEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
             type: 'checkbox',
             value: this.value,
+            tooltip: this.description || '',
             onChange: function onChange(newValue) {
                 _this2.value = newValue;
 
@@ -46056,6 +46009,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
             useMultiple: true,
+            value: config.allowedSchemas,
             useClearButton: true,
             valueKey: 'id',
             labelKey: 'name',
@@ -46079,6 +46033,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
             useTypeAhead: true,
             valueKey: 'id',
             useClearButton: true,
+            tooltip: this.description || '',
             labelKey: 'title',
             onChange: function onChange(newValue) {
                 _this2.value = newValue;
@@ -46241,6 +46196,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
             useMultiple: true,
+            value: config.allowedSchemas,
             useClearButton: true,
             valueKey: 'id',
             labelKey: 'name',
@@ -46262,6 +46218,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
             value: this.value,
             options: this.getDropdownOptions(),
             valueKey: 'id',
+            tooltip: this.description || '',
             labelKey: 'name',
             useClearButton: true,
             onChange: function onChange(newValue) {
@@ -46409,7 +46366,7 @@ var DateEditor = function (_FieldEditor) {
                 return _this3.formatDate(_this3.value);
             }
 
-            return _.div({ class: 'widget widget-group' }, _.button({ class: 'widget widget--button low' }, _this3.formatDate(_this3.value)).click(function () {
+            return _.div({ class: 'widget widget-group', title: _this3.description || '' }, _.button({ class: 'widget widget--button low' }, _this3.formatDate(_this3.value)).click(function () {
                 _this3.onClickOpen();
             }), _.div({ class: 'widget widget--button small fa fa-remove' }).click(function () {
                 _this3.onClickRemove();
@@ -46518,6 +46475,7 @@ var DropdownEditor = function (_FieldEditor) {
             useClearButton: true,
             options: this.config.options,
             valueKey: 'value',
+            tooltip: this.description || '',
             labelKey: 'label',
             onChange: function onChange(newValue) {
                 _this2.value = newValue;
@@ -46605,6 +46563,7 @@ var LanguageEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             value: this.value,
             options: LanguageHelper.getLanguagesSync(),
+            tooltip: this.description || '',
             onChange: function onChange(newValue) {
                 _this2.value = newValue;
 
@@ -46677,7 +46636,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 
         var media = MediaHelper.getMediaByIdSync(this.value);
 
-        return _.div({ class: 'editor__field__value editor__field--media-reference' }, _.button({ class: 'editor__field--media-reference__pick' }, _.do(function () {
+        return _.div({ class: 'editor__field__value editor__field--media-reference', title: this.description || '' }, _.button({ class: 'editor__field--media-reference__pick' }, _.do(function () {
             if (!media) {
                 return _.div({ class: 'editor__field--media-reference__empty' });
             }
@@ -46824,9 +46783,10 @@ var NumberEditor = function (_FieldEditor) {
         var _this2 = this;
 
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
-            value: this.value,
+            value: this.value || '0',
             type: this.config.isSlider ? 'range' : 'number',
             step: this.config.step || 'any',
+            tooltip: this.description || '',
             min: this.config.min || '0',
             max: this.config.max || '0',
             onChange: function onChange(newValue) {
@@ -47287,7 +47247,7 @@ var RichTextEditor = function (_FieldEditor) {
 
         var activeView = getCookie('rteview') || 'wysiwyg';
 
-        return _.div({ class: 'editor__field__value editor__field--rich-text-editor' }, _.div({ class: 'editor__field--rich-text-editor__header' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
+        return _.div({ class: 'editor__field__value editor__field--rich-text-editor', title: this.description || '' }, _.div({ class: 'editor__field--rich-text-editor__header' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
             return _.button({ class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab' }, label).click(function () {
                 _this6.onClickTab(alias);
             });
@@ -47382,6 +47342,7 @@ var StringEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
             type: 'text',
             value: this.value,
+            tooltip: this.description || '',
             onChange: function onChange(newValue) {
                 _this2.value = newValue;
 
@@ -47710,6 +47671,7 @@ var TagsEditor = function (_FieldEditor) {
         var _this2 = this;
 
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Chips({
+            tooltip: this.description || '',
             value: (this.value || '').split(','),
             onChange: function onChange(newValue) {
                 _this2.value = newValue.join(',');
@@ -47917,6 +47879,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             useTypeAhead: true,
             value: this.value,
+            tooltip: this.description || '',
             options: this.getOptions(),
             labelKey: 'name',
             valueKey: 'id',
@@ -48163,7 +48126,7 @@ var UrlEditor = function (_FieldEditor) {
     UrlEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
+        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group', title: this.description || '' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
             _this2.onChange();
         }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();

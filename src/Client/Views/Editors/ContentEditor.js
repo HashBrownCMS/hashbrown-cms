@@ -28,15 +28,22 @@ class ContentEditor extends Crisp.View {
         let followingField;
 
         // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key > .editor__field__key__actions').each((i, field) => {
+        this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each((i, field) => {
             field.classList.remove('following');
            
-            // Ignore smaller fields
-            if(field.parentElement.getBoundingClientRect().height < 100) { return; }
-            
             let rect = field.getBoundingClientRect();
+            let actions = field.querySelector('.editor__field__key__actions');
+            let actionRect;
 
-            if(rect.top <= 80 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
+            if(actions) { 
+                actionRect = actions.getBoundingClientRect();
+            }
+
+            if(
+                rect.top <= 40 &&
+                actionRect && rect.bottom >= (actionRect.height + 60) &&
+                (!followingField || followingField.getBoundingClientRect().top < rect.top)
+            ) {
                 followingField = field;
             }
         });
@@ -44,7 +51,8 @@ class ContentEditor extends Crisp.View {
         if(followingField) {
             followingField.classList.add('following');
         }
-        
+       
+        // Cache the last scroll position
         this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
     }
 
@@ -219,6 +227,7 @@ class ContentEditor extends Crisp.View {
                     value: fieldValue,
                     disabled: fieldDefinition.disabled || false,
                     config: config || {},
+                    description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
                     multilingual: fieldDefinition.multilingual
                 });
@@ -262,7 +271,6 @@ class ContentEditor extends Crisp.View {
      * @returns {Array} A list of HTMLElements to render
      */
     renderFields(tabId, fieldDefinitions, fieldValues) {
-        let view = this;
         let tabFieldDefinitions = {};
 
         // Map out field definitions to render
@@ -302,13 +310,13 @@ class ContentEditor extends Crisp.View {
 
             return _.div({class: 'editor__field', 'data-key': key},
                 // Render the label and icon
-                _.div({class: 'editor__field__key'},
+                _.div({class: 'editor__field__key', title: fieldDefinition.description || ''},
                     fieldDefinition.label || key,
                     $keyContent = _.div({class: 'editor__field__key__actions'})
                 ),
 
                 // Render the field editor
-                view.renderField(
+                this.renderField(
                     // If the field definition is set to multilingual, pass value from object
                     fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 

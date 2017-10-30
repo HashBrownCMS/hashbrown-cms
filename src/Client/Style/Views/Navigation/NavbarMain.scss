@@ -232,6 +232,10 @@
                 font-weight: 700;
                 color: $primary-text;
 
+                &:hover {
+                    background-color: transparent;
+                }
+
                 &:after {
                     color: $primary-text !important;
                     opacity: 0.5;
@@ -311,9 +315,8 @@
                 }
 
                 &:hover {
-                    .pane-item-label {
-                        font-weight: 700;
-                    }
+                    background-color: $standard-darker;
+                    font-weight: 700;
                 }
 
                 &:after {
@@ -323,11 +326,6 @@
                     line-height: 4rem;
                     display: block;
                     width: 2rem;
-                }
-
-                // Context menu target
-                &.context-menu-target {
-                    background-color: $standard-darker;
                 }
             }
             

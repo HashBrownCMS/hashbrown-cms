@@ -49,6 +49,7 @@ class LanguageEditor extends FieldEditor {
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: LanguageHelper.getLanguagesSync(),
+                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 

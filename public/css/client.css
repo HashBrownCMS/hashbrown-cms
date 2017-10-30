@@ -18,6 +18,8 @@ html, body {
 
 button, a {
   cursor: pointer; }
+  button:focus, a:focus {
+    outline: none; }
 
 /**
  * All basic rules regarding typography
@@ -502,6 +504,8 @@ h1, h2, h3, h4, h5, h6 {
       .navbar-main__pane__item.active > .navbar-main__pane__item__content {
         font-weight: 700;
         color: #ffffff; }
+        .navbar-main__pane__item.active > .navbar-main__pane__item__content:hover {
+          background-color: transparent; }
         .navbar-main__pane__item.active > .navbar-main__pane__item__content:after {
           color: #ffffff !important;
           opacity: 0.5; }
@@ -549,7 +553,8 @@ h1, h2, h3, h4, h5, h6 {
         position: relative; }
         .navbar-main__pane__item__content, .navbar-main__pane__item__content:focus, .navbar-main__pane__item__content:hover, .navbar-main__pane__item__content:active {
           text-decoration: none; }
-        .navbar-main__pane__item__content:hover .pane-item-label {
+        .navbar-main__pane__item__content:hover {
+          background-color: #dddddd;
           font-weight: 700; }
         .navbar-main__pane__item__content:after {
           font-family: 'FontAwesome';
@@ -558,8 +563,6 @@ h1, h2, h3, h4, h5, h6 {
           line-height: 4rem;
           display: block;
           width: 2rem; }
-        .navbar-main__pane__item__content.context-menu-target {
-          background-color: #dddddd; }
       .navbar-main__pane__item__label {
         position: relative;
         white-space: nowrap;
@@ -726,11 +729,13 @@ h1, h2, h3, h4, h5, h6 {
       flex-shrink: 0;
       margin-right: 1rem;
       line-height: 2rem; }
+      .editor__field__key.following .editor__field__key__actions {
+        position: fixed;
+        top: 60px; }
       .editor__field__key .widget:not(:last-child) {
         margin-bottom: 0.5rem; }
-      .editor__field__key__actions.following {
-        position: fixed;
-        top: 80px; }
+      .editor__field__key__actions {
+        position: absolute; }
       .editor__field__key__action {
         border: 0px;
         line-height: 2rem;
@@ -738,8 +743,6 @@ h1, h2, h3, h4, h5, h6 {
         display: block;
         padding: 0;
         margin-top: 0.5rem;
-        float: left;
-        clear: both;
         background-color: transparent;
         color: #e70d3b;
         text-transform: uppercase;
@@ -823,8 +826,8 @@ h1, h2, h3, h4, h5, h6 {
     .editor__field__actions {
       display: flex;
       position: absolute;
-      top: 1rem;
-      right: 1rem; }
+      top: 0;
+      right: 0; }
     .editor__field__action {
       background-color: transparent;
       line-height: 2rem;

@@ -40,14 +40,7 @@ class FormEditor extends Crisp.View {
             
             navbar.reload();
         })
-        .catch((err) => {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+        .catch(UI.errorModal);
     }
 
     /**

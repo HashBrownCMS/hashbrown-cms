@@ -25976,17 +25976,17 @@ var Dropdown = function (_Widget) {
         var options = this.getFlattenedOptions();
 
         if (this.useMultiple) {
-            var multipleLabel = '';
+            var labels = [];
 
             for (var key in options) {
                 var value = options[key];
 
                 if (this.value.indexOf(key) > -1) {
-                    multipleLabel += value + ', ';
+                    labels.push(value);
                 }
             }
 
-            label = multipleLabel || label;
+            label = labels.join(', ');
         } else {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;
         }
@@ -26045,8 +26045,13 @@ var Dropdown = function (_Widget) {
 
             toggle.checked = isChecked;
 
-            _this2.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
-            _this2.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
+            var isAtRight = bounds.right >= window.innerWidth - 10;
+            var isAtBottom = bounds.bottom >= window.innerHeight - 10;
+
+            console.log(bounds.bottom, window.innerHeight, isAtBottom);
+
+            _this2.element.classList.toggle('right', isAtRight);
+            _this2.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     };
 
@@ -26155,16 +26160,9 @@ var Dropdown = function (_Widget) {
         if (!isOpen) {
             this.trigger('cancel');
         }
-    };
 
-    /**
-     * Post render
-     */
-
-
-    Dropdown.prototype.postrender = function postrender() {
-        this.updateSelectedClasses();
         this.updatePositionClasses();
+        this.updateSelectedClasses();
     };
 
     /**
@@ -28540,7 +28538,11 @@ var UIHelper = function () {
             // Set cancel event
             dropdown.on('cancel', function () {
                 dropdown.remove();
-                clearTargets();
+
+                // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+                setTimeout(function () {
+                    clearTargets();
+                }, 100);
             });
 
             // Set styles

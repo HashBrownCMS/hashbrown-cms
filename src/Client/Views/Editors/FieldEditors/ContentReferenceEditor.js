@@ -80,6 +80,7 @@ class ContentReferenceEditor extends FieldEditor {
                 new HashBrown.Views.Widgets.Dropdown({
                     options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
                     useMultiple: true,
+                    value: config.allowedSchemas,
                     useClearButton: true,
                     valueKey: 'id',
                     labelKey: 'name',
@@ -102,6 +103,7 @@ class ContentReferenceEditor extends FieldEditor {
                 useTypeAhead: true,
                 valueKey: 'id',
                 useClearButton: true,
+                tooltip: this.description || '',
                 labelKey: 'title',
                 onChange: (newValue) => {
                     this.value = newValue;

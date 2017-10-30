@@ -34,6 +34,7 @@ class TagsEditor extends FieldEditor {
     template() {
         return _.div({class: 'editor__field__value'},
             new HashBrown.Views.Widgets.Chips({
+                tooltip: this.description || '',
                 value: (this.value || '').split(','),
                 onChange: (newValue) => {
                     this.value = newValue.join(',');

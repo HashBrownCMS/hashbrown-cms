@@ -75,17 +75,17 @@ class Dropdown extends Widget {
         let options = this.getFlattenedOptions();
 
         if(this.useMultiple) {
-            let multipleLabel = '';
+            let labels = [];
 
             for(let key in options) {
                 let value = options[key];
 
                 if(this.value.indexOf(key) > -1) {
-                    multipleLabel += value + ', ';
+                    labels.push(value);
                 }
             }
 
-            label = multipleLabel || label;
+            label = labels.join(', ');
 
         } else {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;
@@ -136,8 +136,13 @@ class Dropdown extends Widget {
             
             toggle.checked = isChecked;
 
-            this.element.classList.toggle('right', window.innerWidth - (bounds.x + bounds.width) < bounds.width);
-            this.element.classList.toggle('bottom', window.innerHeight - (bounds.y + bounds.height) < bounds.height);
+            let isAtRight = bounds.right >= window.innerWidth - 10;
+            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
+
+            console.log(bounds.bottom, window.innerHeight, isAtBottom);
+
+            this.element.classList.toggle('right', isAtRight);
+            this.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     }
 
@@ -238,14 +243,9 @@ class Dropdown extends Widget {
         if(!isOpen) {
             this.trigger('cancel');
         }
-    }
-
-    /**
-     * Post render
-     */
-    postrender() {
-        this.updateSelectedClasses();
+        
         this.updatePositionClasses();
+        this.updateSelectedClasses();
     }
 
     /**

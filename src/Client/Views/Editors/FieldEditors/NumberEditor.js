@@ -115,9 +115,10 @@ class NumberEditor extends FieldEditor {
     template() {
         return _.div({class: 'editor__field__value'},
             new HashBrown.Views.Widgets.Input({
-                value: this.value,
+                value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',
                 step: this.config.step || 'any',
+                tooltip: this.description || '',
                 min: this.config.min || '0',
                 max: this.config.max || '0',
                 onChange: (newValue) => {

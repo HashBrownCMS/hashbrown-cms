@@ -21,59 +21,34 @@ class SchemaPane extends NavbarPane {
         let id = $element.data('id');
         let schema = SchemaHelper.getSchemaByIdSync(id);
         
-        function onSuccess() {
-            debug.log('Removed schema with id "' + id + '"', this); 
-            
-            RequestHelper.reloadResource('schemas')
-            .then(function() {
-                NavbarMain.reload();
-                
-                // Cancel the SchemaEditor view if it was displaying the deleted content
-                if(location.hash == '#/schemas/' + id) {
-                    location.hash = '/schemas/';
-                }
-            });
-        }
-
         if(!schema.isLocked) {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Delete schema',
-                    body: 'Are you sure you want to delete the schema "' + schema.name + '"?'
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default',
-                        callback: function() {
+            UI.confirmModal(
+                'delete',
+                'Delete schema',
+                'Are you sure you want to delete the schema "' + schema.name + '"?',
+                () => {
+                    RequestHelper.request('delete', 'schemas/' + id)
+                    .then(() => {
+                        debug.log('Removed schema with id "' + id + '"', this); 
+
+                        return RequestHelper.reloadResource('schemas');
+                    })
+                    .then(() => {
+                        NavbarMain.reload();
+
+                        // Cancel the SchemaEditor view if it was displaying the deleted content
+                        if(location.hash == '#/schemas/' + id) {
+                            location.hash = '/schemas/';
                         }
-                    },
-                    {
-                        label: 'OK',
-                        class: 'btn-danger',
-                        callback: function() {
-                            RequestHelper.request('delete', 'schemas/' + id)
-                            .then(onSuccess)
-                            .catch(UI.errorModal);
-                        }
-                    }
-                ]
-            });
+                    })
+                    .catch(UI.errorModal);
+                }
+            );
         } else {
-            new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    title: 'Delete schema',
-                    body: 'The schema "' + schema.name + '" is locked and cannot be removed'
-                },
-                buttons: [
-                    {
-                        label: 'OK',
-                        class: 'btn-default',
-                        callback: function() {
-                        }
-                    }
-                ]
-            });
+            UI.messageModal(
+                'Delete schema',
+                'The schema "' + schema.name + '" is locked and cannot be removed'
+            );
         }
     }
 
