@@ -114,7 +114,7 @@ class UpdateHelper {
             debug.log('Pulling update from GitHub...', this);
             
             return new Promise((resolve, reject) => {
-                let git = ChildProcess.exec('git pull origin stable', {
+                let git = ChildProcess.exec('git pull origin stable && git submodule update --recursive --init', {
                     cwd: appRoot
                 });
 
