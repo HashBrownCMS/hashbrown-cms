@@ -17,6 +17,15 @@ npm install
 node hashbrown.js
 ```
 
+## Updating HashBrown
+To update the cora HashBrown version and all of its dependencies:
+```
+cd /to/your/hashbrown/dir
+git pull
+git submodule update--recursive --init
+npm install
+```
+
 ## Getting started
 - [Guides](http://hashbrown.rocks/guides)
 - [Documentation](http://hashbrown.rocks/docs)
