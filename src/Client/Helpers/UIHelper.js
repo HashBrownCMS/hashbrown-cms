@@ -639,9 +639,11 @@ class UIHelper {
         element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
+                
+            openContextMenu(e);
         });
 
-        element.addEventListener('mouseup', (e) => {
+        element.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
