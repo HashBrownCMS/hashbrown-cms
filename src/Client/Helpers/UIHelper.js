@@ -644,10 +644,10 @@ class UIHelper {
         });
 
         element.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
             if(e.which === 3 || e.ctrlKey) {
+                e.preventDefault();
+                e.stopPropagation();
+            
                 openContextMenu(e);
             }
         });

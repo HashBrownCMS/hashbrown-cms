@@ -11,6 +11,7 @@
         }
     }
     
+    // Spaces
     &__spaces {
         display: flex;
         height: 100%;
@@ -18,11 +19,18 @@
         opacity: 1;
         position: relative;
         z-index: 2;
+
+        // Mobile mode
+        @media($xs) {
+            flex-direction: column;
+        }
     }
 
+    // Space
     &__space {
         position: relative;
 
+        // Menu
         &--menu {
             position: absolute;
             right: 0.5rem;
@@ -35,24 +43,35 @@
             z-index: 50;
         }
 
+        // Navigation
         &--nav {
             width: 30rem;
             flex-basis: 30rem;
             flex-shrink: 0;
             height: 100%;
             transition: width 0.5s, flex-basis 0.5s;
-            
+           
+            // Mobile mode
             @media($sm) {
-                overflow-x: hidden;
+                overflow: hidden;
+                width: 100%;
+                height: 80vh;
+
+                &:not(.expanded) {
+                    flex-basis: 6rem;
+                    height: 6rem;
+                }
             }
         }
 
+        // Editor
         &--editor {
             flex-grow: 1;
             height: 100%;
             display: flex;
             align-items: center;
 
+            // Text presentation
             &__text {
                 width: 100%;
                 max-width: calc(100% - 7rem);

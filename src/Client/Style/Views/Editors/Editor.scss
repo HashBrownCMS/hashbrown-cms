@@ -150,6 +150,11 @@
             border-bottom: 0;
         }
 
+        // Mobile mode
+        @media($xs) {
+            display: block;
+        }
+
         // Collapsed & sorting mode
         .editor__field__value.collapsed &,
         .editor__field__value.sorting &,

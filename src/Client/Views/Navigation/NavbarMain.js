@@ -81,6 +81,8 @@ class NavbarMain extends Crisp.View {
      * @param {String} tabName
      */
     showTab(tabRoute) {
+        $('.page--environment__space--nav').toggleClass('expanded', true);
+
         this.$element.find('.navbar-main__pane').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
