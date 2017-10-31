@@ -33384,9 +33384,11 @@ var UIHelper = function () {
         element.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             e.stopPropagation();
+
+            openContextMenu(e);
         });
 
-        element.addEventListener('mouseup', function (e) {
+        element.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
