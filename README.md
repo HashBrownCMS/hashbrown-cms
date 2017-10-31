@@ -18,7 +18,7 @@ node hashbrown.js
 ```
 
 ## Updating HashBrown
-To update the cora HashBrown version and all of its dependencies:
+To update the core HashBrown version and all of its dependencies:
 ```
 cd /to/your/hashbrown/dir
 git pull
