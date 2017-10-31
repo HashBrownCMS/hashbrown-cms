@@ -23,6 +23,17 @@ class FieldEditor extends Crisp.View {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {}
+
+    /**
+     * Post render
+     */
+    postrender() {
+        if(!this.$keyActions) { return; }
+
+        _.append(this.$keyActions.empty(),
+            this.renderKeyActions()
+        );
+    }
 }
 
 module.exports = FieldEditor;

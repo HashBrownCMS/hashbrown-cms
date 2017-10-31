@@ -6381,6 +6381,19 @@ var FieldEditor = function (_Crisp$View) {
 
   FieldEditor.prototype.renderKeyActions = function renderKeyActions() {};
 
+  /**
+   * Post render
+   */
+
+
+  FieldEditor.prototype.postrender = function postrender() {
+    if (!this.$keyActions) {
+      return;
+    }
+
+    _.append(this.$keyActions.empty(), this.renderKeyActions());
+  };
+
   return FieldEditor;
 }(Crisp.View);
 
@@ -31794,13 +31807,13 @@ var ContentEditor = function (_Crisp$View) {
      * @param {FieldSchema} fieldDefinition The field definition
      * @param {Function} onChange The change event
      * @param {Object} config The field config
-     * @param {HTMLElement} keyContent The key content container
+     * @param {HTMLElement} keyActions The key content container
      *
      * @return {Object} element
      */
 
 
-    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
+    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyActions) {
         var _this4 = this;
 
         var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
@@ -31815,7 +31828,8 @@ var ContentEditor = function (_Crisp$View) {
                     config: config || {},
                     description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual
+                    multilingual: fieldDefinition.multilingual,
+                    $keyActions: $keyActions
                 });
 
                 fieldEditorInstance.on('change', function (newValue) {
@@ -31835,8 +31849,6 @@ var ContentEditor = function (_Crisp$View) {
 
                     onChange(newValue);
                 });
-
-                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
             } else {
@@ -31895,12 +31907,12 @@ var ContentEditor = function (_Crisp$View) {
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
-            // Render the field container
-            var $keyContent = void 0;
+            // Render the field actions container
+            var $keyActions = void 0;
 
             return _.div({ class: 'editor__field', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'editor__field__key', title: fieldDefinition.description || '' }, fieldDefinition.label || key, $keyContent = _.div({ class: 'editor__field__key__actions' })),
+            _.div({ class: 'editor__field__key', title: fieldDefinition.description || '' }, _.div({ class: 'editor__field__key__label' }, fieldDefinition.label || key), _.if(fieldDefinition.description, _.div({ class: 'editor__field__key__description' }, fieldDefinition.description)), $keyActions = _.div({ class: 'editor__field__key__actions' })),
 
             // Render the field editor
             _this5.renderField(
@@ -31926,8 +31938,8 @@ var ContentEditor = function (_Crisp$View) {
             // Pass the field definition config, and use the field's schema config as fallback
             fieldDefinition.config || fieldSchema.config,
 
-            // Pass the key content container, so the field editor can populate it
-            $keyContent));
+            // Pass the key actions container, so the field editor can populate it
+            $keyActions));
         });
     };
 
@@ -45285,21 +45297,37 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 fieldValue.schemaId = fieldValue.schemaId || 'array';
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Key'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
                         value: fieldKey,
                         onChange: function onChange(newKey) {
-                            delete _this2.model.fields.properties[fieldKey];
+                            if (!newKey) {
+                                return;
+                            }
 
+                            var newProperties = {};
+
+                            // Insert the changed key into the correct place in the object
+                            for (var key in _this2.model.fields.properties) {
+                                if (key === fieldKey) {
+                                    newProperties[newKey] = _this2.model.fields.properties[fieldKey];
+                                } else {
+                                    newProperties[key] = _this2.model.fields.properties[key];
+                                }
+                            }
+
+                            // Change internal reference to new key
                             fieldKey = newKey;
 
-                            _this2.model.fields.properties[fieldKey] = fieldValue;
+                            // Reassign the properties object
+                            _this2.model.fields.properties = newProperties;
 
+                            // Update the sort key
                             $field.find('.editor__field__sort-key').html(fieldKey);
                         }
-                    }).$element, new HashBrown.Views.Widgets.Input({
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Label'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -45307,15 +45335,22 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                         onChange: function onChange(newValue) {
                             fieldValue.label = newValue;
                         }
-                    }).$element, new HashBrown.Views.Widgets.Input({
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Description'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A description',
+                        tooltip: 'The field description',
+                        value: fieldValue.description,
+                        onChange: function onChange(newValue) {
+                            fieldValue.description = newValue;
+                        }
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Multilingual'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'checkbox',
-                        placeholder: 'Multilingual',
                         tooltip: 'Whether or not this field should support multiple languages',
                         value: fieldValue.multilingual || false,
                         onChange: function onChange(newValue) {
                             fieldValue.multilingual = newValue;
                         }
-                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                         useClearButton: true,
                         options: _this2.compiledSchema.tabs,
                         value: fieldValue.tabId,
@@ -45560,6 +45595,10 @@ var ArrayEditor = function (_FieldEditor) {
     ArrayEditor.prototype.renderKeyActions = function renderKeyActions() {
         var _this2 = this;
 
+        if (!this.value || this.value.length < 1) {
+            return;
+        }
+
         return [_.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
             HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
                 _this2.value = newArray;
@@ -45670,7 +45709,7 @@ var ArrayEditor = function (_FieldEditor) {
 
         // The value was below the required amount
         if (this.value.length < this.config.minItems) {
-            var diff = this.config.minItems - this.value.items.length;
+            var diff = this.config.minItems - this.value.length;
 
             for (var _i = 0; _i < diff; _i++) {
                 this.value.push({ value: null, schemaId: null });
@@ -45686,7 +45725,7 @@ var ArrayEditor = function (_FieldEditor) {
     };
 
     /**
-     * Prerender
+     * Pre render
      */
 
 
@@ -45795,6 +45834,7 @@ var ArrayEditor = function (_FieldEditor) {
 
             _this4.trigger('change', _this4.value);
 
+            // Restore the scroll position with 100ms delay
             HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
 
             _this4.fetch();
@@ -47479,21 +47519,37 @@ var StructEditor = function (_FieldEditor) {
                 var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Key'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
                         value: fieldKey,
                         onChange: function onChange(newKey) {
-                            delete config.struct[fieldKey];
+                            if (!newKey) {
+                                return;
+                            }
 
+                            var newStruct = {};
+
+                            // Insert the changed key into the correct place in the struct
+                            for (var key in config.struct) {
+                                if (key === fieldKey) {
+                                    newStruct[newKey] = config.struct[fieldKey];
+                                } else {
+                                    newStruct[key] = config.struct[key];
+                                }
+                            }
+
+                            // Change internal reference to new key
                             fieldKey = newKey;
 
-                            config.struct[fieldKey] = fieldValue;
+                            // Reassign the struct object
+                            config.struct = newStruct;
 
+                            // Update the sort key
                             $field.find('.editor__field__sort-key').html(fieldKey);
                         }
-                    }), new HashBrown.Views.Widgets.Input({
+                    }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Label'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A label, e.g. "My field"',
                         tooltip: 'The field label',
@@ -47501,15 +47557,22 @@ var StructEditor = function (_FieldEditor) {
                         onChange: function onChange(newValue) {
                             fieldValue.label = newValue;
                         }
-                    }).$element, new HashBrown.Views.Widgets.Input({
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Description'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A description',
+                        tooltip: 'The field description',
+                        value: fieldValue.description,
+                        onChange: function onChange(newValue) {
+                            fieldValue.description = newValue;
+                        }
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Multilingual'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'checkbox',
-                        placeholder: 'Multilingual',
                         tooltip: 'Whether or not this field should support multiple languages',
                         value: fieldValue.multilingual || false,
                         onChange: function onChange(newValue) {
                             fieldValue.multilingual = newValue;
                         }
-                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                         useTypeAhead: true,
                         options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
                         value: fieldValue.schemaId,
@@ -47606,7 +47669,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             // Return the DOM element
-            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, keySchema.label, fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, keySchema.label), _.if(keySchema.description, _.div({ class: 'editor__field__key__description' }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
         }));
     };
 

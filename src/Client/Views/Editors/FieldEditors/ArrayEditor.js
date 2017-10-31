@@ -43,6 +43,8 @@ class ArrayEditor extends FieldEditor {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {
+        if(!this.value || this.value.length < 1) { return; }
+
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                 .click((e) => {
@@ -168,7 +170,7 @@ class ArrayEditor extends FieldEditor {
 
         // The value was below the required amount
         if(this.value.length < this.config.minItems) {
-            let diff = this.config.minItems - this.value.items.length;
+            let diff = this.config.minItems - this.value.length;
 
             for(let i = 0; i < diff; i++) {
                 this.value.push({ value: null, schemaId: null });
@@ -184,7 +186,7 @@ class ArrayEditor extends FieldEditor {
     }
 
     /**
-     * Prerender
+     * Pre render
      */
     prerender() {
         this.sanityCheck();
@@ -306,6 +308,7 @@ class ArrayEditor extends FieldEditor {
 
                     this.trigger('change', this.value);
 
+                    // Restore the scroll position with 100ms delay
                     HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
                     
                     this.fetch();

@@ -110,6 +110,9 @@ h1, h2, h3, h4, h5, h6 {
   background-image: url("/img/bg-secondary.jpg");
   background-attachment: fixed;
   background-position: 0px 0px; }
+  .page--login__logo {
+    max-width: 10rem;
+    margin: 0 auto; }
   .page--login__login {
     position: fixed;
     top: 50%;
@@ -728,14 +731,20 @@ h1, h2, h3, h4, h5, h6 {
       flex-basis: 10rem;
       flex-shrink: 0;
       margin-right: 1rem;
-      line-height: 2rem; }
+      line-height: 1.5rem; }
       .editor__field__key.following .editor__field__key__actions {
         position: fixed;
         top: 60px; }
       .editor__field__key .widget:not(:last-child) {
         margin-bottom: 0.5rem; }
+      .editor__field__key__description {
+        margin-top: 0.5rem;
+        color: #666666; }
       .editor__field__key__actions {
-        position: absolute; }
+        position: absolute;
+        line-height: 2rem; }
+        .editor__field__key__actions.hidden {
+          display: none; }
       .editor__field__key__action {
         border: 0px;
         line-height: 2rem;

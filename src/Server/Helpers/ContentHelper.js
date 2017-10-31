@@ -351,15 +351,15 @@ class ContentHelper extends ContentHelperCommon {
         environment = requiredParam('environment'),
         user = requieredParam('user')
     ) {
-        // Demo page Schema
-        let demoPageSchemaId = ContentSchema.createId();
+        // Example page Schema
+        let examplePageSchemaId = ContentSchema.createId();
         
-        let demoPageSchema = new ContentSchema({
-            id: demoPageSchemaId,
+        let examplePageSchema = new ContentSchema({
+            id: examplePageSchemaId,
             icon: 'file',
             type: 'content',
             defaultTabId: 'content',
-            name: 'Demo Page',
+            name: 'Example Page',
             parentSchemaId: 'page',
             fields: {
                 properties: {
@@ -386,7 +386,7 @@ class ContentHelper extends ContentHelperCommon {
                         label: 'Content Reference',
                         description: 'A reference to another Content node',
                         config: {
-                            allowedSchemas: [ demoPageSchemaId ]
+                            allowedSchemas: [ examplePageSchemaId ]
                         }
                     },
                     contentSchemaReference: {
@@ -395,7 +395,7 @@ class ContentHelper extends ContentHelperCommon {
                         label: 'Content Schema Reference',
                         description: 'A reference to a Content Schema',
                         config: {
-                            allowedSchemas: [ demoPageSchemaId ]
+                            allowedSchemas: [ examplePageSchemaId ]
                         }
                     },
                     date: {
@@ -485,7 +485,7 @@ class ContentHelper extends ContentHelperCommon {
                     tags: {
                         tabId: 'content',
                         schemaId: 'tags',
-                        label: 'Tabs',
+                        label: 'Tags',
                         description: 'A comma-separated list of tags'
                     },
                     template: {
@@ -508,33 +508,33 @@ class ContentHelper extends ContentHelperCommon {
             }
         });
 
-        // Demo page Content node
-        let demoPageContent = new Content({
+        // Example page Content node
+        let examplePageContent = new Content({
             id: Content.createId(),
             createDate: Date.now(),
             updateDate: Date.now(),
-            schemaId: demoPageSchema.id,
+            schemaId: examplePageSchema.id,
             sort: 10000,
             properties: {
-                url: '/my-demo-page/',
-                title: 'My Demo Page',
+                url: '/my-example-page/',
+                title: 'My Example Page',
 
             }
         });
 
-        // Create demo page
+        // Create example page
         return SchemaHelper.setSchemaById(
             project,
             environment,
-            demoPageSchema.id,
-            demoPageSchema,
+            examplePageSchema.id,
+            examplePageSchema,
             true
         )
         .then(ContentHelper.setContentById(
             project,
             environment,
-            demoPageContent.id,
-            demoPageContent,
+            examplePageContent.id,
+            examplePageContent,
             user,
             true
         ))

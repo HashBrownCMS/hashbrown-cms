@@ -117,38 +117,78 @@ class StructEditor extends FieldEditor {
                                     _.div({class: 'editor__field__sort-key'},
                                         fieldKey
                                     ),
-                                    _.div({class: 'editor__field__key'},
-                                        new HashBrown.Views.Widgets.Input({
-                                            type: 'text',
-                                            placeholder: 'A variable name, e.g. "myField"',
-                                            tooltip: 'The field variable name',
-                                            value: fieldKey,
-                                            onChange: (newKey) => {
-                                                delete config.struct[fieldKey];
-
-                                                fieldKey = newKey;
-
-                                                config.struct[fieldKey] = fieldValue;
-                                            
-                                                $field.find('.editor__field__sort-key').html(fieldKey);
-                                            }
-                                        }),
-                                        new HashBrown.Views.Widgets.Input({
-                                            type: 'text',
-                                            placeholder: 'A label, e.g. "My field"',
-                                            tooltip: 'The field label',
-                                            value: fieldValue.label,
-                                            onChange: (newValue) => { fieldValue.label = newValue; }
-                                        }).$element,
-                                        new HashBrown.Views.Widgets.Input({
-                                            type: 'checkbox',
-                                            placeholder: 'Multilingual',
-                                            tooltip: 'Whether or not this field should support multiple languages',
-                                            value: fieldValue.multilingual || false,
-                                            onChange: (newValue) => { fieldValue.multilingual = newValue; }
-                                        }).$element
-                                    ),
                                     _.div({class: 'editor__field__value'},
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Key'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Input({
+                                                    type: 'text',
+                                                    placeholder: 'A variable name, e.g. "myField"',
+                                                    tooltip: 'The field variable name',
+                                                    value: fieldKey,
+                                                    onChange: (newKey) => {
+                                                        if(!newKey) { return; }
+
+                                                        let newStruct = {};
+
+                                                        // Insert the changed key into the correct place in the struct
+                                                        for(let key in config.struct) {
+                                                            if(key === fieldKey) {
+                                                                newStruct[newKey] = config.struct[fieldKey];
+                                                            
+                                                            } else {
+                                                                newStruct[key] = config.struct[key];
+
+                                                            }
+                                                        }
+
+                                                        // Change internal reference to new key
+                                                        fieldKey = newKey;
+
+                                                        // Reassign the struct object
+                                                        config.struct = newStruct;
+                                                    
+                                                        // Update the sort key
+                                                        $field.find('.editor__field__sort-key').html(fieldKey);
+                                                    }
+                                                })
+                                            )
+                                        ),
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Label'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Input({
+                                                    type: 'text',
+                                                    placeholder: 'A label, e.g. "My field"',
+                                                    tooltip: 'The field label',
+                                                    value: fieldValue.label,
+                                                    onChange: (newValue) => { fieldValue.label = newValue; }
+                                                }).$element
+                                            )
+                                        ),
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Description'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Input({
+                                                    type: 'text',
+                                                    placeholder: 'A description',
+                                                    tooltip: 'The field description',
+                                                    value: fieldValue.description,
+                                                    onChange: (newValue) => { fieldValue.description = newValue; }
+                                                }).$element
+                                            )
+                                        ),
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Multilingual'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Input({
+                                                    type: 'checkbox',
+                                                    tooltip: 'Whether or not this field should support multiple languages',
+                                                    value: fieldValue.multilingual || false,
+                                                    onChange: (newValue) => { fieldValue.multilingual = newValue; }
+                                                }).$element
+                                            )
+                                        ),
                                         _.div({class: 'editor__field'},
                                             _.div({class: 'editor__field__key'}, 'Schema'),
                                             _.div({class: 'editor__field__value'},
@@ -255,7 +295,10 @@ class StructEditor extends FieldEditor {
                 // Return the DOM element
                 return _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
-                        keySchema.label,
+                        _.div({class: 'editor__field__key__label'}, keySchema.label),
+                        _.if(keySchema.description,
+                            _.div({class: 'editor__field__key__description'}, keySchema.description)
+                        ),
                         fieldEditorInstance.renderKeyActions()
                     ),
                     fieldEditorInstance.$element

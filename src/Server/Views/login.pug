@@ -19,7 +19,7 @@ html
 
         form.page--login__login(data-first-time=(firstTime ? 'true': '' ), data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
             .page--login__login__heading
-                img.lg.logo(src='/svg/logo_pink.svg')
+                img.page--login__logo(src='/svg/logo_pink.svg')
                 h2 HashBrown
             .page--login__login__body
                     if(invitedUser)

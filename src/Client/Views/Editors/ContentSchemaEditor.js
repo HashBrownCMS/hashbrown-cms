@@ -89,38 +89,78 @@ class ContentSchemaEditor extends SchemaEditor {
                                 _.div({class: 'editor__field__sort-key'},
                                     fieldKey
                                 ),
-                                _.div({class: 'editor__field__key'},
-                                    new HashBrown.Views.Widgets.Input({
-                                        type: 'text',
-                                        placeholder: 'A variable name, e.g. "myField"',
-                                        tooltip: 'The field variable name',
-                                        value: fieldKey,
-                                        onChange: (newKey) => {
-                                            delete this.model.fields.properties[fieldKey];
-
-                                            fieldKey = newKey;
-
-                                            this.model.fields.properties[fieldKey] = fieldValue;
-
-                                            $field.find('.editor__field__sort-key').html(fieldKey);
-                                        }
-                                    }).$element,
-                                    new HashBrown.Views.Widgets.Input({
-                                        type: 'text',
-                                        placeholder: 'A label, e.g. "My field"',
-                                        tooltip: 'The field label',
-                                        value: fieldValue.label,
-                                        onChange: (newValue) => { fieldValue.label = newValue; }
-                                    }).$element,
-                                    new HashBrown.Views.Widgets.Input({
-                                        type: 'checkbox',
-                                        placeholder: 'Multilingual',
-                                        tooltip: 'Whether or not this field should support multiple languages',
-                                        value: fieldValue.multilingual || false,
-                                        onChange: (newValue) => { fieldValue.multilingual = newValue; }
-                                    }).$element
-                                ),
                                 _.div({class: 'editor__field__value'},
+                                    _.div({class: 'editor__field'},
+                                        _.div({class: 'editor__field__key'}, 'Key'),
+                                        _.div({class: 'editor__field__value'},
+                                            new HashBrown.Views.Widgets.Input({
+                                                type: 'text',
+                                                placeholder: 'A variable name, e.g. "myField"',
+                                                tooltip: 'The field variable name',
+                                                value: fieldKey,
+                                                onChange: (newKey) => {
+                                                    if(!newKey) { return; }
+
+                                                    let newProperties = {};
+
+                                                    // Insert the changed key into the correct place in the object
+                                                    for(let key in this.model.fields.properties) {
+                                                        if(key === fieldKey) {
+                                                            newProperties[newKey] = this.model.fields.properties[fieldKey];
+                                                        
+                                                        } else {
+                                                            newProperties[key] = this.model.fields.properties[key];
+
+                                                        }
+                                                    }
+
+                                                    // Change internal reference to new key
+                                                    fieldKey = newKey;
+
+                                                    // Reassign the properties object
+                                                    this.model.fields.properties = newProperties;
+
+                                                    // Update the sort key
+                                                    $field.find('.editor__field__sort-key').html(fieldKey);
+                                                }
+                                            }).$element
+                                        )
+                                    ),
+                                    _.div({class: 'editor__field'},
+                                        _.div({class: 'editor__field__key'}, 'Label'),
+                                        _.div({class: 'editor__field__value'},
+                                            new HashBrown.Views.Widgets.Input({
+                                                type: 'text',
+                                                placeholder: 'A label, e.g. "My field"',
+                                                tooltip: 'The field label',
+                                                value: fieldValue.label,
+                                                onChange: (newValue) => { fieldValue.label = newValue; }
+                                            }).$element
+                                        )
+                                    ),
+                                    _.div({class: 'editor__field'},
+                                        _.div({class: 'editor__field__key'}, 'Description'),
+                                        _.div({class: 'editor__field__value'},
+                                            new HashBrown.Views.Widgets.Input({
+                                                type: 'text',
+                                                placeholder: 'A description',
+                                                tooltip: 'The field description',
+                                                value: fieldValue.description,
+                                                onChange: (newValue) => { fieldValue.description = newValue; }
+                                            }).$element
+                                        )
+                                    ),
+                                    _.div({class: 'editor__field'},
+                                        _.div({class: 'editor__field__key'}, 'Multilingual'),
+                                        _.div({class: 'editor__field__value'},
+                                            new HashBrown.Views.Widgets.Input({
+                                                type: 'checkbox',
+                                                tooltip: 'Whether or not this field should support multiple languages',
+                                                value: fieldValue.multilingual || false,
+                                                onChange: (newValue) => { fieldValue.multilingual = newValue; }
+                                            }).$element
+                                        )
+                                    ),
                                     _.div({class: 'editor__field'},
                                         _.div({class: 'editor__field__key'}, 'Tab'),
                                         _.div({class: 'editor__field__value'},

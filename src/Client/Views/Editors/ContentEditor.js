@@ -212,11 +212,11 @@ class ContentEditor extends Crisp.View {
      * @param {FieldSchema} fieldDefinition The field definition
      * @param {Function} onChange The change event
      * @param {Object} config The field config
-     * @param {HTMLElement} keyContent The key content container
+     * @param {HTMLElement} keyActions The key content container
      *
      * @return {Object} element
      */
-    renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
+    renderField(fieldValue, fieldDefinition, onChange, config, $keyActions) {
         let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
         if(compiledSchema) {
@@ -229,7 +229,8 @@ class ContentEditor extends Crisp.View {
                     config: config || {},
                     description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual
+                    multilingual: fieldDefinition.multilingual,
+                    $keyActions: $keyActions
                 });
 
                 fieldEditorInstance.on('change', (newValue) => {
@@ -245,8 +246,6 @@ class ContentEditor extends Crisp.View {
                     
                     onChange(newValue);
                 });
-
-                $keyContent.append(fieldEditorInstance.renderKeyActions());
 
                 return fieldEditorInstance.$element;
 
@@ -305,14 +304,17 @@ class ContentEditor extends Crisp.View {
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
-            // Render the field container
-            let $keyContent;
+            // Render the field actions container
+            let $keyActions;
 
             return _.div({class: 'editor__field', 'data-key': key},
                 // Render the label and icon
                 _.div({class: 'editor__field__key', title: fieldDefinition.description || ''},
-                    fieldDefinition.label || key,
-                    $keyContent = _.div({class: 'editor__field__key__actions'})
+                    _.div({class: 'editor__field__key__label'}, fieldDefinition.label || key),
+                    _.if(fieldDefinition.description,
+                        _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
+                    ),
+                    $keyActions = _.div({class: 'editor__field__key__actions'})
                 ),
 
                 // Render the field editor
@@ -339,8 +341,8 @@ class ContentEditor extends Crisp.View {
                     // Pass the field definition config, and use the field's schema config as fallback
                     fieldDefinition.config || fieldSchema.config,
 
-                    // Pass the key content container, so the field editor can populate it
-                    $keyContent
+                    // Pass the key actions container, so the field editor can populate it
+                    $keyActions
                 )
             );
         });

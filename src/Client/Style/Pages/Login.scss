@@ -3,7 +3,12 @@
     height: 100%;
 
     @include background('secondary');
-    
+
+    &__logo {
+        max-width: 10rem;
+        margin: 0 auto;
+    }
+
     &__login {
         position: fixed;
         top: 50%;
