@@ -28565,10 +28565,10 @@ var UIHelper = function () {
         });
 
         element.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
             if (e.which === 3 || e.ctrlKey) {
+                e.preventDefault();
+                e.stopPropagation();
+
                 openContextMenu(e);
             }
         });

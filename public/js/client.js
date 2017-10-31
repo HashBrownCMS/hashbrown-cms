@@ -10341,6 +10341,8 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.showTab = function showTab(tabRoute) {
+        $('.page--environment__space--nav').toggleClass('expanded', true);
+
         this.$element.find('.navbar-main__pane').each(function (i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
@@ -33389,10 +33391,10 @@ var UIHelper = function () {
         });
 
         element.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
             if (e.which === 3 || e.ctrlKey) {
+                e.preventDefault();
+                e.stopPropagation();
+
                 openContextMenu(e);
             }
         });

@@ -251,6 +251,9 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
   position: relative;
   z-index: 2; }
+  @media (max-width: 767px) {
+    .page--environment__spaces {
+      flex-direction: column; } }
 
 .page--environment__space {
   position: relative; }
@@ -272,7 +275,12 @@ h1, h2, h3, h4, h5, h6 {
     transition: width 0.5s, flex-basis 0.5s; }
     @media (max-width: 991px) {
       .page--environment__space--nav {
-        overflow-x: hidden; } }
+        overflow: hidden;
+        width: 100%;
+        height: 80vh; }
+        .page--environment__space--nav:not(.expanded) {
+          flex-basis: 6rem;
+          height: 6rem; } }
   .page--environment__space--editor {
     flex-grow: 1;
     height: 100%;
@@ -353,6 +361,9 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   position: relative;
   z-index: 100; }
+  @media (max-width: 767px) {
+    .navbar-main {
+      flex-direction: column; } }
   .navbar-main.hide-tabs .navbar-main__tabs {
     display: none; }
   .navbar-main__panes, .navbar-main__tabs {
@@ -368,6 +379,12 @@ h1, h2, h3, h4, h5, h6 {
     background-image: url("/img/bg-secondary.jpg");
     background-attachment: fixed;
     background-position: 0px 0px; }
+    @media (max-width: 767px) {
+      .navbar-main__tabs {
+        display: flex;
+        width: 100%;
+        height: 6rem;
+        overflow-x: auto; } }
     .navbar-main__tabs:after {
       content: '';
       display: block;
@@ -380,7 +397,8 @@ h1, h2, h3, h4, h5, h6 {
   .navbar-main__tab {
     background-color: transparent;
     height: 6rem;
-    width: 100%;
+    width: 6rem;
+    min-width: 6rem;
     color: #ffffff;
     padding: 1.5rem 0 1rem 0;
     margin: 0;
@@ -414,6 +432,10 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     z-index: 5;
     border-right: 1px solid #21303b; }
+    @media (max-width: 767px) {
+      .navbar-main__panes {
+        border-right: 0;
+        border-bottom: 1px solid #21303b; } }
   .navbar-main__pane {
     display: none;
     height: 100%; }
@@ -705,6 +727,9 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid #dddddd; }
     .editor__field:last-of-type {
       border-bottom: 0; }
+    @media (max-width: 767px) {
+      .editor__field {
+        display: block; } }
     .editor__field__value.collapsed .editor__field,
     .editor__field__value.sorting .editor__field, .editor__field.collapsed {
       height: 4rem;
