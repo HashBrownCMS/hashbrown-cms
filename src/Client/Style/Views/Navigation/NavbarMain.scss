@@ -30,7 +30,33 @@
         transition: opacity 0.5s, width 0.5s;
         overflow-x: hidden;
     }
-   
+  
+    // Toggle
+    &__toggle {
+        display: none;
+        line-height: 0;
+        height: 2rem;
+        padding: 0;
+        margin: 0;
+        color: $secondary-text;
+        background-color: $secondary;
+        border: 0;
+        flex-shrink: 0;
+
+        &:after {
+            font-family: 'FontAwesome';
+            content: '\f107';
+        }
+
+        .page--environment__space--nav.expanded &:after {
+            content: '\f106';
+        }
+
+        @media($xs) {
+            display: block;
+        }
+    }
+
     // Tabs
     &__tabs {
         width: 6rem;

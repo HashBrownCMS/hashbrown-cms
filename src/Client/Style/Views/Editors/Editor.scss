@@ -211,11 +211,24 @@
             .widget:not(:last-child) {
                 margin-bottom: 0.5rem;
             }
-        
+
+            // Label
+            &__label {
+                // Mobile mode
+                @media($xs) {
+                    margin-bottom: 0.5rem;
+                }
+            }
+
             // Description
             &__description {
                 margin-top: 0.5rem;
                 color: $standard-darkest;
+            
+                // Mobile mode
+                @media($xs) {
+                    margin-bottom: 0.5rem;
+                }
             }
 
             // Key actions

@@ -33381,8 +33381,6 @@ var UIHelper = function () {
             document.body.appendChild(dropdown.element);
         };
 
-        var touchTimeout = null;
-
         element.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -33400,16 +33398,11 @@ var UIHelper = function () {
         });
 
         element.addEventListener('touchstart', function (e) {
-            e.preventDefault();
+            if (e.touchTargets && e.touchTargets.length > 1) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            touchTimeout = setTimeout(function () {
                 openContextMenu(e);
-            }, 400);
-        });
-
-        element.addEventListener('touchend', function (e) {
-            if (touchTimeout) {
-                clearTimeout(touchTimeout);
             }
         });
     };
@@ -40784,7 +40777,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.9",
+	"version": "0.10.0",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -43332,7 +43325,12 @@ module.exports = function () {
         }
 
         return $pane;
-    })));
+    })),
+
+    // Toggle button (mobile only)
+    _.button({ class: 'navbar-main__toggle' }).click(function (e) {
+        $('.page--environment__space--nav').toggleClass('expanded');
+    }));
 };
 
 /***/ }),
