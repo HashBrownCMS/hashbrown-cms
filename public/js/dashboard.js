@@ -26048,8 +26048,6 @@ var Dropdown = function (_Widget) {
             var isAtRight = bounds.right >= window.innerWidth - 10;
             var isAtBottom = bounds.bottom >= window.innerHeight - 10;
 
-            console.log(bounds.bottom, window.innerHeight, isAtBottom);
-
             _this2.element.classList.toggle('right', isAtRight);
             _this2.element.classList.toggle('bottom', isAtBottom);
         }, 1);

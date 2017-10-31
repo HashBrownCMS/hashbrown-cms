@@ -145,7 +145,7 @@ class FormEditor extends Crisp.View {
             _.each(this.model.inputs, (key, input) => {
                 return _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__actions'},
-                        _.button({class: 'editor__field__action editor__field__actions--remove'})
+                        _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
                             .click(() => { view.onClickRemoveInput(key); })
                     ),
                     _.div({class: 'editor__field__value'},
@@ -160,8 +160,6 @@ class FormEditor extends Crisp.View {
                                         key = newValue;
 
                                         this.model.inputs[key] = input;
-
-                                        this.fetch();
                                     }
                                 }).$element
                             )

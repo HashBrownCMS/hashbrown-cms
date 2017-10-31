@@ -359,6 +359,7 @@ class ContentHelper extends ContentHelperCommon {
             icon: 'file',
             type: 'content',
             defaultTabId: 'content',
+            allowedChildSchemas: [ examplePageSchemaId ],
             name: 'Example Page',
             parentSchemaId: 'page',
             fields: {

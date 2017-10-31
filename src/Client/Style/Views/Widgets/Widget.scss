@@ -2,8 +2,8 @@
  * A generic widget
  */
 @keyframes widget__spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .widget {
@@ -97,14 +97,10 @@
             font-family: 'FontAwesome';
             content: '\f1ce';
             position: absolute;
-            right: 0;
+            right: 0.5rem;
             top: 50%;
-            margin-top: -1rem;
-            width: 2rem;
-            line-height: 2rem;
-            height: 2rem;
-            text-align: center;
             z-index: 10;
+            display: block;
             animation: widget__spinner 1s linear infinite;
         }
     }

@@ -9,7 +9,7 @@
     color: $primary-text;
     height: 3rem;
     line-height: 3rem;
-    padding: 0 0.5rem;
+    padding: 0 1rem;
     text-transform: uppercase;
     display: block;
     font-weight: bold;
@@ -27,6 +27,7 @@
         width: 3rem;
         min-width: 0;
         border-radius: 50%;
+        padding: 0;
     }
 
     &.right {
@@ -47,6 +48,7 @@
     &.small {
         width: 2rem;
         line-height: 2rem;
+        padding: 0;
         height: 2rem;
         min-width: 0;
         flex-basis: 2rem;
@@ -85,7 +87,7 @@
         text-transform: none;
     }
 
-    .fa {
+    .fa:not(:last-child) {
         margin-right: 0.5rem;
     }
 }

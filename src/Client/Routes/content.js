@@ -16,7 +16,7 @@ Crisp.Router.route('/content/', () => {
             _.h1('Content'),
             _.p('Right click in the Content pane to create a new Content.'),
             _.p('Click on a Content node to edit it.'),
-            _.button({class: 'widget widget--button expanded', title: 'Click here to get some example content'}, 'Get example content')
+            _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
                 .click(() => {
                     RequestHelper.request('post', 'content/example')
                     .then(() => {

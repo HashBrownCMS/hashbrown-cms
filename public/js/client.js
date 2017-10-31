@@ -30167,8 +30167,6 @@ var Dropdown = function (_Widget) {
             var isAtRight = bounds.right >= window.innerWidth - 10;
             var isAtBottom = bounds.bottom >= window.innerHeight - 10;
 
-            console.log(bounds.bottom, window.innerHeight, isAtBottom);
-
             _this2.element.classList.toggle('right', isAtRight);
             _this2.element.classList.toggle('bottom', isAtBottom);
         }, 1);
@@ -41200,7 +41198,7 @@ var FormEditor = function (_Crisp$View) {
         var types = ['checkbox', 'hidden', 'number', 'select', 'text'];
 
         return _.div({ class: 'editor__field__value segmented' }, _.each(this.model.inputs, function (key, input) {
-            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__actions--remove' }).click(function () {
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__actions' }, _.button({ class: 'editor__field__action editor__field__action--remove', title: 'Remove field' }).click(function () {
                 view.onClickRemoveInput(key);
             })), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Name'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                 value: key,
@@ -41210,8 +41208,6 @@ var FormEditor = function (_Crisp$View) {
                     key = newValue;
 
                     _this6.model.inputs[key] = input;
-
-                    _this6.fetch();
                 }
             }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                 value: input.type,
@@ -41498,7 +41494,7 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button expanded', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
@@ -44312,9 +44308,9 @@ var MediaPane = function (_NavbarPane) {
 
                 // Refresh on replace
                 if (replaceId) {
-                    var src = $('.media-preview img').attr('src');
+                    var src = $('.editor--media__preview').attr('src');
 
-                    $('.media-preview img').attr('src', src + '?date=' + Date.now());
+                    $('.editor--media__preview').attr('src', src + '?date=' + Date.now());
                 }
             },
             replaceId: replaceId,

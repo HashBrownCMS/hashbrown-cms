@@ -1,10 +1,10 @@
 @keyframes navbar-main__pane__item__spinner {
     0% {
-        transform: rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
     }
     
     100% {
-        transform: rotate(359deg);
+        transform: translate(-50%, -50%) rotate(359deg);
     }
 }
 /**
@@ -142,17 +142,10 @@
             z-index: -1;
         }
 
-        &.select-dir &__item[data-is-directory="true"]:not(.moving-item) > &__item__content:hover > &__item__toggle-children {
-            color: $primary-text;
-        }
-
         &.select-dir &__item[data-is-directory="true"]:not(.moving-item) > &__item__content:hover {
-            color: $primary-text;
-
             &:after {
                 opacity: 1;
                 font-weight: bold;
-                color: $primary-text;
                 font-family: 'FontAwesome';
                 content: '\f060';
                 display: block;
@@ -280,6 +273,14 @@
                 color: $primary;
                 animation: navbar-main__pane__item__spinner 1s linear infinite;
                 opacity: 1;
+                top: 50%;
+                right: -0.5rem;
+                position: absolute;
+                display: block;
+                height: 2rem;
+                line-height: 2rem;
+                width: 2rem;
+                text-align: center;
             }
             
             // Insert below placeholder

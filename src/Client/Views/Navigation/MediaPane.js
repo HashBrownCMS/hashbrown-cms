@@ -99,9 +99,9 @@ class MediaPane extends NavbarPane {
 
                 // Refresh on replace
                 if(replaceId) {
-                    let src = $('.media-preview img').attr('src');
+                    let src = $('.editor--media__preview').attr('src');
                     
-                    $('.media-preview img').attr('src', src + '?date=' + Date.now());
+                    $('.editor--media__preview').attr('src', src + '?date=' + Date.now());
                 }
             },
             replaceId: replaceId,

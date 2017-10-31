@@ -139,8 +139,6 @@ class Dropdown extends Widget {
             let isAtRight = bounds.right >= window.innerWidth - 10;
             let isAtBottom = bounds.bottom >= window.innerHeight - 10;
 
-            console.log(bounds.bottom, window.innerHeight, isAtBottom);
-
             this.element.classList.toggle('right', isAtRight);
             this.element.classList.toggle('bottom', isAtBottom);
         }, 1);
