@@ -29,8 +29,6 @@ class Content extends ContentCommon {
         .then((parents) => {
             for(let parentContent of parents) {
                 let settings = parentContent.settings[key] || {};
-                
-                console.log(parentContent.id, settings);
 
                 if(settings.applyToChildren) {
                     // Make clone as to avoid interference with inherent values
