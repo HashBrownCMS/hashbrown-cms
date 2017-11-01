@@ -634,8 +634,6 @@ class UIHelper {
             document.body.appendChild(dropdown.element);
         };
         
-        let touchTimeout = null;
-
         element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -653,16 +651,11 @@ class UIHelper {
         });
         
         element.addEventListener('touchstart', (e) => {
-            e.preventDefault();
+            if(e.touchTargets && e.touchTargets.length > 1) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            touchTimeout = setTimeout(() => {
                 openContextMenu(e);
-            }, 400);
-        });
-
-        element.addEventListener('touchend', (e) => {
-            if(touchTimeout) {
-                clearTimeout(touchTimeout);
             }
         });
     }

@@ -33381,8 +33381,6 @@ var UIHelper = function () {
             document.body.appendChild(dropdown.element);
         };
 
-        var touchTimeout = null;
-
         element.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -33400,16 +33398,11 @@ var UIHelper = function () {
         });
 
         element.addEventListener('touchstart', function (e) {
-            e.preventDefault();
+            if (e.touchTargets && e.touchTargets.length > 1) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            touchTimeout = setTimeout(function () {
                 openContextMenu(e);
-            }, 400);
-        });
-
-        element.addEventListener('touchend', function (e) {
-            if (touchTimeout) {
-                clearTimeout(touchTimeout);
             }
         });
     };
@@ -40784,7 +40777,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.9",
+	"version": "0.10.1",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -40823,7 +40816,6 @@ module.exports = {
 		"json-loader": "^0.5.4",
 		"node-sass": "^3.13.1",
 		"sass-loader": "^6.0.6",
-		"sass-material-colors": "0.0.5",
 		"style-loader": "^0.13.1",
 		"webpack": "^3.0.0"
 	}
@@ -43332,7 +43324,12 @@ module.exports = function () {
         }
 
         return $pane;
-    })));
+    })),
+
+    // Toggle button (mobile only)
+    _.button({ class: 'navbar-main__toggle' }).click(function (e) {
+        $('.page--environment__space--nav').toggleClass('expanded');
+    }));
 };
 
 /***/ }),
@@ -45777,14 +45774,19 @@ var ArrayEditor = function (_FieldEditor) {
                 // Perform sanity check on item value
                 item.value = ContentHelper.fieldSanityCheck(item.value, schema);
 
-                // Instantiate editor
+                // Init the field editor
                 var editorInstance = new editorClass({
                     value: item.value,
                     config: schema.config,
                     schema: schema
                 });
 
+                // Hook up the change event
                 editorInstance.on('change', function (newValue) {
+                    item.value = newValue;
+                });
+
+                editorInstance.on('silentchange', function (newValue) {
                     item.value = newValue;
                 });
 
@@ -47668,6 +47670,10 @@ var StructEditor = function (_FieldEditor) {
                 _this2.onChange(newValue, k, keySchema);
             });
 
+            fieldEditorInstance.on('silentchange', function (newValue) {
+                _this2.onChange(newValue, k, keySchema);
+            });
+
             // Return the DOM element
             return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, keySchema.label), _.if(keySchema.description, _.div({ class: 'editor__field__key__description' }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
         }));
@@ -47872,7 +47878,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
             // Apply changes on next CPU cycle
             setTimeout(function () {
                 _this2.trigger('silentchange', _this2.value);
-            }, 1);
+            }, 500);
         }
     };
 

@@ -6,7 +6,7 @@ const SyncHelper = require('Server/Helpers/SyncHelper');
 const SchemaHelper = require('Server/Helpers/SchemaHelper');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 
-const Content = require('Common/Models/Content');
+const Content = require('Server/Models/Content');
 const ContentSchema = require('Common/Models/ContentSchema');
 const FieldSchema = require('Common/Models/FieldSchema');
 const User = require('Server/Models/User');

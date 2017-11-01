@@ -28555,8 +28555,6 @@ var UIHelper = function () {
             document.body.appendChild(dropdown.element);
         };
 
-        var touchTimeout = null;
-
         element.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -28574,16 +28572,11 @@ var UIHelper = function () {
         });
 
         element.addEventListener('touchstart', function (e) {
-            e.preventDefault();
+            if (e.touchTargets && e.touchTargets.length > 1) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            touchTimeout = setTimeout(function () {
                 openContextMenu(e);
-            }, 400);
-        });
-
-        element.addEventListener('touchend', function (e) {
-            if (touchTimeout) {
-                clearTimeout(touchTimeout);
             }
         });
     };
@@ -35958,7 +35951,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.9",
+	"version": "0.10.1",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -35997,7 +35990,6 @@ module.exports = {
 		"json-loader": "^0.5.4",
 		"node-sass": "^3.13.1",
 		"sass-loader": "^6.0.6",
-		"sass-material-colors": "0.0.5",
 		"style-loader": "^0.13.1",
 		"webpack": "^3.0.0"
 	}

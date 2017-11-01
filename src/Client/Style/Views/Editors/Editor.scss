@@ -150,8 +150,8 @@
             border-bottom: 0;
         }
 
-        // Mobile mode
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             display: block;
         }
 
@@ -211,11 +211,24 @@
             .widget:not(:last-child) {
                 margin-bottom: 0.5rem;
             }
-        
+
+            // Label
+            &__label {
+                // Tablet mode
+                @media($sm) {
+                    margin-bottom: 0.5rem;
+                }
+            }
+
             // Description
             &__description {
                 margin-top: 0.5rem;
                 color: $standard-darkest;
+            
+                // Tablet mode
+                @media($sm) {
+                    margin-bottom: 0.5rem;
+                }
             }
 
             // Key actions

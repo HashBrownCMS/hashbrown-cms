@@ -291,6 +291,10 @@ class StructEditor extends FieldEditor {
                 fieldEditorInstance.on('change', (newValue) => {
                     this.onChange(newValue, k, keySchema);
                 });
+                
+                fieldEditorInstance.on('silentchange', (newValue) => {
+                    this.onChange(newValue, k, keySchema);
+                });
 
                 // Return the DOM element
                 return _.div({class: 'editor__field'},

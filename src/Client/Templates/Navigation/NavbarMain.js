@@ -109,6 +109,12 @@ module.exports = function() {
                 
                 return $pane;
             })
-        )
+        ),
+
+        // Toggle button (mobile only)
+        _.button({class: 'navbar-main__toggle'})
+            .click((e) => {
+                $('.page--environment__space--nav').toggleClass('expanded');
+            })
     );
 };
