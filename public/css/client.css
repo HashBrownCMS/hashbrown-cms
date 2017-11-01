@@ -1551,7 +1551,7 @@ h1, h2, h3, h4, h5, h6 {
       font-family: 'FontAwesome';
       content: '\F1CE';
       position: absolute;
-      right: 0.5rem;
+      right: 0rem;
       top: 50%;
       z-index: 10;
       display: block;
@@ -1876,11 +1876,7 @@ h1, h2, h3, h4, h5, h6 {
     .widget--input.checkbox:hover {
       background-color: #b70a2f; }
     .widget--input.checkbox.working:after {
-      color: #ffffff;
-      width: 2rem;
-      height: 2rem;
-      line-height: 2rem;
-      margin-top: -1rem; }
+      color: #ffffff; }
   .widget--input__checkbox-input, .widget--input__checkbox-extra {
     position: absolute;
     top: 0;

@@ -45775,14 +45775,19 @@ var ArrayEditor = function (_FieldEditor) {
                 // Perform sanity check on item value
                 item.value = ContentHelper.fieldSanityCheck(item.value, schema);
 
-                // Instantiate editor
+                // Init the field editor
                 var editorInstance = new editorClass({
                     value: item.value,
                     config: schema.config,
                     schema: schema
                 });
 
+                // Hook up the change event
                 editorInstance.on('change', function (newValue) {
+                    item.value = newValue;
+                });
+
+                editorInstance.on('silentchange', function (newValue) {
                     item.value = newValue;
                 });
 
@@ -47666,6 +47671,10 @@ var StructEditor = function (_FieldEditor) {
                 _this2.onChange(newValue, k, keySchema);
             });
 
+            fieldEditorInstance.on('silentchange', function (newValue) {
+                _this2.onChange(newValue, k, keySchema);
+            });
+
             // Return the DOM element
             return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, keySchema.label), _.if(keySchema.description, _.div({ class: 'editor__field__key__description' }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
         }));
@@ -47870,7 +47879,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
             // Apply changes on next CPU cycle
             setTimeout(function () {
                 _this2.trigger('silentchange', _this2.value);
-            }, 1);
+            }, 500);
         }
     };
 

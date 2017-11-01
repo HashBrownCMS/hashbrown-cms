@@ -111,7 +111,7 @@ class TemplateReferenceEditor extends FieldEditor {
             // Apply changes on next CPU cycle
             setTimeout(() => {
                 this.trigger('silentchange', this.value);
-            }, 1);
+            }, 500);
         }
     }
 

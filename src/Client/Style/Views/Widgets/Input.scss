@@ -152,10 +152,6 @@
         &.working {
             &:after {
                 color: $primary-text;
-                width: 2rem;
-                height: 2rem;
-                line-height: 2rem;
-                margin-top: -1rem;
             }
         }
     }

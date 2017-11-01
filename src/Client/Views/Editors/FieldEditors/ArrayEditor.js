@@ -233,14 +233,19 @@ class ArrayEditor extends FieldEditor {
                     // Perform sanity check on item value
                     item.value = ContentHelper.fieldSanityCheck(item.value, schema);
 
-                    // Instantiate editor
+                    // Init the field editor
                     let editorInstance = new editorClass({
                         value: item.value,
                         config: schema.config,
                         schema: schema
                     });
 
+                    // Hook up the change event
                     editorInstance.on('change', (newValue) => {
+                        item.value = newValue;
+                    });
+                    
+                    editorInstance.on('silentchange', (newValue) => {
                         item.value = newValue;
                     });
 
