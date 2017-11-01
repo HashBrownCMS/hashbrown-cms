@@ -251,7 +251,7 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
   position: relative;
   z-index: 2; }
-  @media (max-width: 767px) {
+  @media (max-width: 991px) {
     .page--environment__spaces {
       flex-direction: column; } }
 
@@ -361,7 +361,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   position: relative;
   z-index: 100; }
-  @media (max-width: 767px) {
+  @media (max-width: 991px) {
     .navbar-main {
       flex-direction: column; } }
   .navbar-main.hide-tabs .navbar-main__tabs {
@@ -384,7 +384,7 @@ h1, h2, h3, h4, h5, h6 {
       content: '\F107'; }
     .page--environment__space--nav.expanded .navbar-main__toggle:after {
       content: '\F106'; }
-    @media (max-width: 767px) {
+    @media (max-width: 991px) {
       .navbar-main__toggle {
         display: block; } }
   .navbar-main__tabs {
@@ -397,10 +397,11 @@ h1, h2, h3, h4, h5, h6 {
     background-image: url("/img/bg-secondary.jpg");
     background-attachment: fixed;
     background-position: 0px 0px; }
-    @media (max-width: 767px) {
+    @media (max-width: 991px) {
       .navbar-main__tabs {
         display: flex;
         width: 100%;
+        justify-content: center;
         height: 6rem;
         overflow-x: auto; } }
     .navbar-main__tabs:after {
@@ -450,7 +451,7 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     z-index: 5;
     border-right: 1px solid #21303b; }
-    @media (max-width: 767px) {
+    @media (max-width: 991px) {
       .navbar-main__panes {
         border-right: 0;
         border-bottom: 1px solid #21303b; } }
@@ -745,7 +746,7 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid #dddddd; }
     .editor__field:last-of-type {
       border-bottom: 0; }
-    @media (max-width: 767px) {
+    @media (max-width: 991px) {
       .editor__field {
         display: block; } }
     .editor__field__value.collapsed .editor__field,
@@ -783,13 +784,13 @@ h1, h2, h3, h4, h5, h6 {
         top: 60px; }
       .editor__field__key .widget:not(:last-child) {
         margin-bottom: 0.5rem; }
-      @media (max-width: 767px) {
+      @media (max-width: 991px) {
         .editor__field__key__label {
           margin-bottom: 0.5rem; } }
       .editor__field__key__description {
         margin-top: 0.5rem;
         color: #666666; }
-        @media (max-width: 767px) {
+        @media (max-width: 991px) {
           .editor__field__key__description {
             margin-bottom: 0.5rem; } }
       .editor__field__key__actions {
@@ -985,6 +986,9 @@ h1, h2, h3, h4, h5, h6 {
   width: 100px;
   border-radius: 0.2rem;
   border: 1px solid #dddddd; }
+  @media (max-width: 991px) {
+    .editor__field--rich-text-editor {
+      width: auto; } }
   .editor__field--rich-text-editor__header {
     padding: 1rem 0 0 1rem;
     background-color: #dddddd;

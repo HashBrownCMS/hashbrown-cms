@@ -20,8 +20,8 @@
         position: relative;
         z-index: 2;
 
-        // Mobile mode
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             flex-direction: column;
         }
     }

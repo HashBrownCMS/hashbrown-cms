@@ -7,6 +7,11 @@
     border-radius: 0.2rem;
     border: 1px solid $standard-darker;
 
+    // Tablet mode
+    @media($sm) {
+        width: auto;
+    }
+
     // Header
     &__header {
         padding: 1rem 0 0 1rem;

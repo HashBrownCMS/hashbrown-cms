@@ -150,8 +150,8 @@
             border-bottom: 0;
         }
 
-        // Mobile mode
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             display: block;
         }
 
@@ -214,8 +214,8 @@
 
             // Label
             &__label {
-                // Mobile mode
-                @media($xs) {
+                // Tablet mode
+                @media($sm) {
                     margin-bottom: 0.5rem;
                 }
             }
@@ -225,8 +225,8 @@
                 margin-top: 0.5rem;
                 color: $standard-darkest;
             
-                // Mobile mode
-                @media($xs) {
+                // Tablet mode
+                @media($sm) {
                     margin-bottom: 0.5rem;
                 }
             }

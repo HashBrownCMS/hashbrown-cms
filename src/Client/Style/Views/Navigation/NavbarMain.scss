@@ -17,8 +17,8 @@
     position: relative;
     z-index: 100;
 
-    // Mobile mode
-    @media($xs) {
+    // Tablet mode
+    @media($sm) {
         flex-direction: column;
     }
 
@@ -52,7 +52,8 @@
             content: '\f106';
         }
 
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             display: block;
         }
     }
@@ -68,10 +69,11 @@
 
         @include background('secondary');
 
-        // Mobile mode
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             display: flex;
             width: 100%;
+            justify-content: center;
             height: 6rem;
             overflow-x: auto;
         }
@@ -103,11 +105,6 @@
         display: block;
         z-index: 2;
         
-        // Mobile mode
-        @media($xs) {
-
-        }
-
         &[data-route="about"] {
             font-weight: bold;
         }
@@ -144,8 +141,8 @@
         z-index: 5;
         border-right: 1px solid $secondary;
 
-        // Mobile mode
-        @media($xs) {
+        // Tablet mode
+        @media($sm) {
             border-right: 0;
             border-bottom: 1px solid $secondary;
         }
