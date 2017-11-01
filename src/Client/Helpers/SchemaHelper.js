@@ -98,8 +98,6 @@ class SchemaHelper extends SchemaHelperCommon {
         for(let i in resources.schemas) {
             let schema = resources.schemas[i];
 
-            if(!schema) { console.log(i); }
-
             if(schema.id == id) {
                 if(schema instanceof ContentSchema || schema instanceof FieldSchema) {
                     return schema;

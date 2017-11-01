@@ -7037,10 +7037,6 @@ var SchemaHelper = function (_SchemaHelperCommon) {
         for (var i in resources.schemas) {
             var schema = resources.schemas[i];
 
-            if (!schema) {
-                console.log(i);
-            }
-
             if (schema.id == id) {
                 if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
                     return schema;

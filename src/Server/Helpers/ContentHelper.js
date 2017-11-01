@@ -170,8 +170,6 @@ class ContentHelper extends ContentHelperCommon {
             // TODO: Check if allowed at root
             if(!content.parentId) { return Promise.resolve(); }
 
-            console.log(this.isSchemaAllowedAsChild);
-
             // Check for allowed Schemas
             return this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId);
         })()
