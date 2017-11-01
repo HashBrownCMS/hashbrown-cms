@@ -40816,7 +40816,6 @@ module.exports = {
 		"json-loader": "^0.5.4",
 		"node-sass": "^3.13.1",
 		"sass-loader": "^6.0.6",
-		"sass-material-colors": "0.0.5",
 		"style-loader": "^0.13.1",
 		"webpack": "^3.0.0"
 	}
