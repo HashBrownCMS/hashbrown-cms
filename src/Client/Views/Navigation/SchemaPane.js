@@ -156,12 +156,15 @@ class SchemaPane extends NavbarPane {
                     }
                 }
 
+                menu['General'] = '---';
+                menu['Refresh'] = () => { this.onClickRefreshResource('schemas'); };
+
                 return menu;
             },
             
             // Set general context menu items
             paneContextMenu: {
-                'General': '---',
+                'Schemas': '---',
                 'Refresh': () => { this.onClickRefreshResource('schemas'); }
             },
 

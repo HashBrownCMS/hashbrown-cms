@@ -43012,7 +43012,6 @@ module.exports = {
     NavbarMain: __webpack_require__(45),
     NavbarPane: __webpack_require__(44),
     SchemaPane: __webpack_require__(246),
-    SettingsPane: __webpack_require__(247),
     TemplatePane: __webpack_require__(248)
 };
 
@@ -43224,7 +43223,7 @@ var ConnectionPane = function (_NavbarPane) {
 
             // General context menu
             paneContextMenu: {
-                'General': '---',
+                'Connections': '---',
                 'New connection': function NewConnection() {
                     _this3.onClickNewConnection();
                 },
@@ -43783,7 +43782,7 @@ var ContentPane = function (_NavbarPane) {
 
             // Set general context menu items
             paneContextMenu: {
-                'General': '---',
+                'Content': '---',
                 'New content': function NewContent() {
                     _this2.onClickNewContent();
                 },
@@ -43994,7 +43993,7 @@ var FormsPane = function (_NavbarPane) {
                     }
                 }
 
-                menu['Forms'] = '---';
+                menu['General'] = '---';
                 menu['New form'] = function () {
                     _this2.onClickNewForm();
                 };
@@ -44389,6 +44388,7 @@ var MediaPane = function (_NavbarPane) {
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
                 },
+                'General': '---',
                 'Refresh': function Refresh() {
                     _this2.onClickRefreshResource('media');
                 }
@@ -44396,7 +44396,7 @@ var MediaPane = function (_NavbarPane) {
 
             // General context menu
             paneContextMenu: {
-                'General': '---',
+                'Media': '---',
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
                 },
@@ -44605,12 +44605,17 @@ var SchemaPane = function (_NavbarPane) {
                     }
                 }
 
+                menu['General'] = '---';
+                menu['Refresh'] = function () {
+                    _this3.onClickRefreshResource('schemas');
+                };
+
                 return menu;
             },
 
             // Set general context menu items
             paneContextMenu: {
-                'General': '---',
+                'Schemas': '---',
                 'Refresh': function Refresh() {
                     _this3.onClickRefreshResource('schemas');
                 }
@@ -44635,55 +44640,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 247 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var NavbarPane = __webpack_require__(44);
-var NavbarMain = __webpack_require__(45);
-
-/**
- * The Settings navbar pane
- * 
- * @memberof HashBrown.Client.Views.Navigation
- */
-
-var SettingsPane = function (_NavbarPane) {
-    _inherits(SettingsPane, _NavbarPane);
-
-    function SettingsPane() {
-        _classCallCheck(this, SettingsPane);
-
-        return _possibleConstructorReturn(this, _NavbarPane.apply(this, arguments));
-    }
-
-    /**
-     * Init
-     */
-    SettingsPane.init = function init() {
-        NavbarMain.addTabPane('/settings/', 'Settings', 'wrench', {
-            items: [{
-                name: 'Providers',
-                path: 'providers',
-                icon: 'gift'
-            }]
-        });
-    };
-
-    return SettingsPane;
-}(NavbarPane);
-
-module.exports = SettingsPane;
-
-/***/ }),
+/* 247 */,
 /* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -44954,7 +44911,7 @@ var TemplatePane = function (_NavbarPane) {
 
             // General context menu
             paneContextMenu: {
-                'General': '---',
+                'Templates': '---',
                 'Add template': function AddTemplate() {
                     _this2.onClickAddTemplate();
                 },

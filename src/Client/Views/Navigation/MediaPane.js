@@ -146,12 +146,13 @@ class MediaPane extends NavbarPane {
             dirContextMenu: {
                 'Directory': '---',
                 'Upload new media': () => { this.onClickUploadMedia(); },
+                'General': '---',
                 'Refresh': () => { this.onClickRefreshResource('media'); }
             },
 
             // General context menu
             paneContextMenu: {
-                'General': '---',
+                'Media': '---',
                 'Upload new media': () => { this.onClickUploadMedia(); },
                 'Refresh': () => { this.onClickRefreshResource('media'); }
             }

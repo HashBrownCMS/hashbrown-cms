@@ -411,7 +411,7 @@ class ContentPane extends NavbarPane {
 
             // Set general context menu items
             paneContextMenu: {
-                'General': '---',
+                'Content': '---',
                 'New content': () => { this.onClickNewContent(); },
                 'Refresh': () => { this.onClickRefreshResource('content'); }
             },

@@ -155,7 +155,7 @@ class FormsPane extends NavbarPane {
                     }
                 }
                 
-                menu['Forms'] = '---';
+                menu['General'] = '---';
                 menu['New form'] = () => { this.onClickNewForm(); };
                 menu['Refresh'] = () => { this.onClickRefreshResource('forms'); };
 
