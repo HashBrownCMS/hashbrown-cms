@@ -120,40 +120,114 @@ class ConnectionEditor extends Crisp.View {
     }
     
     /**
-     * Renders the settings editor
+     * Renders the preset editor
      */
-    renderSettingsEditor() {
-        let editor = HashBrown.Views.Editors.ConnectionEditors[this.model.type];
-
-        this.model.settings = this.model.settings || {};
-
-        if(editor) {
-            let $editor = new editor({
-                model: this.model.settings
-            }).$element;
-
-            return $editor;
-
-        } else {
-            debug.log('No connection editor found for type alias "' + this.model.type + '"', this);
-            return '';
-
-        }
-    }
-    
-    /**
-     * Renders the type editor
-     */
-    renderTypeEditor() {
+    renderPresetEditor() {
         return new HashBrown.Views.Widgets.Dropdown({
-            value: this.model.type,
-            options: Object.keys(HashBrown.Views.Editors.ConnectionEditors),
+            options: [
+                {
+                    label: 'GitHub Pages',
+                    value: 'github-pages'
+                },
+                {
+                    label: 'HashBrown Driver',
+                    value: 'hashbrown-driver'
+                }
+            ],
+            valueKey: 'value',
+            labelKey: 'label',
+            placeholder: 'Preset',
             onChange: (newValue) => {
-                this.model.type = newValue;
+                this.model.settings = HashBrown.Models.Connection.getPresetSettings(newValue);
 
                 this.fetch();
             }
         }).$element;
+    }
+
+    /**
+     * Renders the processing settings editor
+     */
+    renderProcessingSettingsEditor() {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Type'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: this.model.settings.processing.type,
+                        options: [
+                            {
+                                label: 'Jekyll',
+                                value: 'jekyll'
+                            },
+                            {
+                                label: 'JSON',
+                                value: 'json'
+                            }
+                        ],
+                        valueKey: 'value',
+                        labelKey: 'label',
+                        placeholder: 'Type',
+                        onChange: (newValue) => {
+                            this.model.settings.processing.type = newValue;
+
+                            this.fetch();
+                        }
+                    }).$element
+                )
+            )
+        ];
+    }
+    
+    /**
+     * Renders the deployment settings editor
+     */
+    renderDeploymentSettingsEditor() {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Type'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: this.model.settings.deployment.type,
+                        options: [
+                            {
+                                label: 'API',
+                                value: 'api'
+                            },
+                            {
+                                label: 'Git',
+                                value: 'git'
+                            },
+                            {
+                                label: 'GitHub',
+                                value: 'github'
+                            },
+                            {
+                                label: 'HashBrown Driver',
+                                value: 'hashbrown-driver'
+                            }
+                        ],
+                        valueKey: 'value',
+                        labelKey: 'label',
+                        placeholder: 'Type',
+                        onChange: (newValue) => {
+                            this.model.settings.deployment.type = newValue;
+
+                            this.fetch();
+                        }
+                    }).$element
+                )
+            )
+        ];
+    }
+
+    /**
+     * Prerender
+     */
+    prerender() {
+        if(this.model instanceof HashBrown.Models.Connection === false) {
+            this.model = new HashBrown.Models.Connection(this.model);
+        }
     }
 
     /**
@@ -191,15 +265,21 @@ class ConnectionEditor extends Crisp.View {
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Type'),
+                    _.div({class: 'editor__field__key'}, 'Preset'),
                     _.div({class: 'editor__field__value'},
-                        this.renderTypeEditor()
+                        this.renderPresetEditor()
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Settings'),
+                    _.div({class: 'editor__field__key'}, 'Processing'),
                     _.div({class: 'editor__field__value'},
-                        this.renderSettingsEditor()
+                        this.renderProcessingSettingsEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'}, 'Deployment'),
+                    _.div({class: 'editor__field__value'},
+                        this.renderDeploymentSettingsEditor()
                     )
                 )
             ),

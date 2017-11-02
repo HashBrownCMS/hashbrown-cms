@@ -14,17 +14,31 @@ const Connection = require('Common/Models/Connection');
  */
 class ConnectionHelper extends ConnectionHelperCommon {
     /**
-     * Registers a connection type
+     * Registers a deployer
      *
      * @param {String} name
-     * @param {Connection} connection
+     * @param {Deployer} deployer
      */
-    static registerConnectionType(name, connection) {
-        if(!this.connectionTypes) {
-            this.connectionTypes = {};
+    static registerDeployer(name, deployer) {
+        if(!this.deployers) {
+            this.deployers = {};
         }
 
-        this.connectionTypes[name] = connection;
+        this.deployers[name] = deployer;
+    }
+    
+    /**
+     * Registers a processor
+     *
+     * @param {String} name
+     * @param {Processor} processor
+     */
+    static registerDeployer(name, processor) {
+        if(!this.processors) {
+            this.processors = {};
+        }
+
+        this.processors[name] = processor;
     }
 
     /**

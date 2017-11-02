@@ -16,7 +16,6 @@ class Connection extends Resource {
         // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'title');
-        this.def(String, 'type');
         this.def(String, 'url');
         this.def(Boolean, 'isLocked');
         
@@ -24,7 +23,10 @@ class Connection extends Resource {
         this.def(Object, 'sync');
         
         // Extensible settings
-        this.def(Object, 'settings', {});
+        this.def(Object, 'settings', {
+            deployment: {},
+            processing: {}
+        });
     }
 
     /**
@@ -35,7 +37,69 @@ class Connection extends Resource {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
+        // Backwards compatibility: Convert from old structure
+        if(params.type) {
+            params.settings = this.getPresetSettings(params.type.toLowerCase().replace(/ /g, '-'), params.settings, params.settings);
+
+            delete params.type;
+        }
+
+        // Settings
+        if(!params.settings) { params.settings = {}; }
+        if(!params.settings.processing) { params.settings.processing = {}; }
+        if(!params.settings.deployment) { params.settings.deployment = {}; }
+
         return super.paramsCheck(params);
+    }
+
+    /**
+     * Gets preset settings
+     *
+     * @param {String} preset
+     * @param {Object} processingSettings
+     * @param {Object} deploymentSettings
+     */
+    static getPresetSettings(preset, processingSettings, deploymentSettings) {
+        processingSettings = processingSettings || {};
+        deploymentSettings = deploymentSettings || {};
+
+        let settings;
+
+        switch(preset) {
+            case 'github-pages':
+                settings = {
+                    processing: {
+                        type: 'jekyll'
+                    },
+                    deployment: {
+                        type: 'github',
+                        partialTemplatesFolder: '/_includes/partials/',
+                        pageTemplatesFolder: '/_layouts/',
+                        token: deploymentSettings.token || '',
+                        org: deploymentSettings.org || '',
+                        repo: deploymentSettings.repo || '',
+                        branch: deploymentSettings.branch || '',
+                        isLocal: deploymentSettings.isLocal || false,
+                        localPath: deploymentSettings.localPath || ''
+                    }
+                };
+                break;
+
+            case 'hashbrown-driver':
+                settings = {
+                    processing: {
+                        type: 'json',
+                        mode: 'segmented'
+                    },
+                    deployment: {
+                        type: 'hashbrown-driver',
+                        token: deploymentSettings.token || ''
+                    }
+                };
+                break;
+        }
+
+        return settings;
     }
 
     /**
