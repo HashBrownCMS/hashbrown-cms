@@ -54,8 +54,9 @@ class StructEditor extends FieldEditor {
      * @param {Object} newValue
      * @param {String} key
      * @param {Object} keySchema
+     * @param {Boolean} isSilent
      */
-    onChange(newValue, key, keySchema) {
+    onChange(newValue, key, keySchema, isSilent) {
         if(keySchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if(!this.value[key] || typeof this.value[key] !== 'object') {
@@ -69,7 +70,7 @@ class StructEditor extends FieldEditor {
             this.value[key] = newValue;
         }
 
-        this.trigger('change', this.value);
+        this.trigger(isSilent ? 'silentchange' : 'change', this.value);
     }
 
     /**
@@ -293,7 +294,7 @@ class StructEditor extends FieldEditor {
                 });
                 
                 fieldEditorInstance.on('silentchange', (newValue) => {
-                    this.onChange(newValue, k, keySchema);
+                    this.onChange(newValue, k, keySchema, true);
                 });
 
                 // Return the DOM element

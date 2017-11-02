@@ -379,15 +379,6 @@ class ContentPane extends NavbarPane {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
                 
-                menu['Folder'] = '---';
-
-                menu['New content'] = () => {
-                    let targetId = $('.context-menu-target').data('id');
-                    let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
-                    
-                    this.onClickNewContent(parentId);
-                };
-
                 if(!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
@@ -412,7 +403,7 @@ class ContentPane extends NavbarPane {
                 }
 
                 menu['General'] = '---';
-                menu['New content'] = () => { this.onClickNewContent(); };
+                menu['New content'] = () => { this.onClickNewContent(); };  
                 menu['Refresh'] = () => { this.onClickRefreshResource('content'); };
 
                 return menu;

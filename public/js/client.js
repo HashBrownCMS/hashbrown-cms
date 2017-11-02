@@ -43737,15 +43737,6 @@ var ContentPane = function (_NavbarPane) {
                     };
                 }
 
-                menu['Folder'] = '---';
-
-                menu['New content'] = function () {
-                    var targetId = $('.context-menu-target').data('id');
-                    var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
-
-                    _this2.onClickNewContent(parentId);
-                };
-
                 if (!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
                     menu['Publishing'] = function () {
@@ -47508,10 +47499,11 @@ var StructEditor = function (_FieldEditor) {
      * @param {Object} newValue
      * @param {String} key
      * @param {Object} keySchema
+     * @param {Boolean} isSilent
      */
 
 
-    StructEditor.prototype.onChange = function onChange(newValue, key, keySchema) {
+    StructEditor.prototype.onChange = function onChange(newValue, key, keySchema, isSilent) {
         if (keySchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if (!this.value[key] || _typeof(this.value[key]) !== 'object') {
@@ -47524,7 +47516,7 @@ var StructEditor = function (_FieldEditor) {
             this.value[key] = newValue;
         }
 
-        this.trigger('change', this.value);
+        this.trigger(isSilent ? 'silentchange' : 'change', this.value);
     };
 
     /**
@@ -47706,7 +47698,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             fieldEditorInstance.on('silentchange', function (newValue) {
-                _this2.onChange(newValue, k, keySchema);
+                _this2.onChange(newValue, k, keySchema, true);
             });
 
             // Return the DOM element
