@@ -16347,7 +16347,7 @@ var MediaBrowser = function (_Modal) {
 
 
     MediaBrowser.prototype.renderBody = function renderBody() {
-        return _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') });
+        return _.iframe({ src: location.href.substring(0, location.href.indexOf('#')) + '/#/media/' + (this.value || '') });
     };
 
     return MediaBrowser;
