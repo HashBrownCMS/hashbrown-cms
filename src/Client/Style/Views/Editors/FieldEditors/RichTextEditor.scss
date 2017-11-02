@@ -73,6 +73,11 @@
         }
     }
 
+    // Body
+    &__body {
+        min-height: 462px;
+    }
+
     // CodeMirror styling
     .CodeMirror {
         min-height: 462px;
@@ -90,7 +95,13 @@
         border-radius: 0px;
         box-shadow: none;
         min-height: 462px;
-        
+       
+        .cke_editable {
+            img {
+                max-width: 20rem;
+            }
+        }
+
         .cke_inner {
             border-radius: 0px;
 

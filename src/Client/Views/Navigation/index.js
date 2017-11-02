@@ -12,6 +12,5 @@ module.exports = {
     NavbarMain: require('./NavbarMain'),
     NavbarPane: require('./NavbarPane'),
     SchemaPane: require('./SchemaPane'),
-    SettingsPane: require('./SettingsPane'),
     TemplatePane: require('./TemplatePane')
 };
