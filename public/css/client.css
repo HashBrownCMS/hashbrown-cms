@@ -1034,6 +1034,8 @@ h1, h2, h3, h4, h5, h6 {
         font-family: 'FontAwesome';
         content: '\F1C5';
         margin-right: 0.5rem; }
+  .editor__field--rich-text-editor__body {
+    min-height: 462px; }
   .editor__field--rich-text-editor .CodeMirror {
     min-height: 462px; }
     .editor__field--rich-text-editor .CodeMirror p, .editor__field--rich-text-editor .CodeMirror pre, .editor__field--rich-text-editor .CodeMirror span, .editor__field--rich-text-editor .CodeMirror .cke_editable {
@@ -1045,6 +1047,8 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 0px;
     box-shadow: none;
     min-height: 462px; }
+    .editor__field--rich-text-editor .cke .cke_editable img {
+      max-width: 20rem; }
     .editor__field--rich-text-editor .cke .cke_inner {
       border-radius: 0px; }
       .editor__field--rich-text-editor .cke .cke_inner .cke_top, .editor__field--rich-text-editor .cke .cke_inner .cke_contents, .editor__field--rich-text-editor .cke .cke_inner .cke_bottom {

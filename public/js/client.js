@@ -47080,7 +47080,7 @@ var RichTextEditor = function (_FieldEditor) {
     RichTextEditor.prototype.onClickTab = function onClickTab(source) {
         this.silentChange = true;
 
-        document.cookie = 'rteview = ' + source;
+        this.activeView = source;
 
         this.fetch();
     };
@@ -47105,9 +47105,9 @@ var RichTextEditor = function (_FieldEditor) {
                     html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
                 }
 
-                var source = getCookie('rteview');
+                var activeView = _this2.activeView || 'wysiwyg';
 
-                switch (source) {
+                switch (activeView) {
                     case 'wysiwyg':
                         _this2.wysiwyg.insertHtml(html);
                         break;
@@ -47313,7 +47313,7 @@ var RichTextEditor = function (_FieldEditor) {
     RichTextEditor.prototype.template = function template() {
         var _this6 = this;
 
-        var activeView = getCookie('rteview') || 'wysiwyg';
+        var activeView = this.activeView || 'wysiwyg';
 
         return _.div({ class: 'editor__field__value editor__field--rich-text-editor', title: this.description || '' }, _.div({ class: 'editor__field--rich-text-editor__header' }, _.each({ wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML' }, function (alias, label) {
             return _.button({ class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab' }, label).click(function () {
@@ -47330,7 +47330,7 @@ var RichTextEditor = function (_FieldEditor) {
 
 
     RichTextEditor.prototype.postrender = function postrender() {
-        var activeView = getCookie('rteview') || 'wysiwyg';
+        var activeView = this.activeView || 'wysiwyg';
 
         switch (activeView) {
             case 'html':

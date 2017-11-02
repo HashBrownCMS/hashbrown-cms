@@ -69,8 +69,8 @@ class RichTextEditor extends FieldEditor {
     onClickTab(source) {
         this.silentChange = true;
 
-        document.cookie = 'rteview = ' + source;
-        
+        this.activeView = source;
+
         this.fetch();
     }
 
@@ -91,9 +91,9 @@ class RichTextEditor extends FieldEditor {
                     html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
                 }
 
-                let source = getCookie('rteview');
+                let activeView = this.activeView || 'wysiwyg';
 
-                switch(source) {
+                switch(activeView) {
                     case 'wysiwyg':
                         this.wysiwyg.insertHtml(html);
                         break;
@@ -297,7 +297,7 @@ class RichTextEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        let activeView = getCookie('rteview') || 'wysiwyg';
+        let activeView = this.activeView || 'wysiwyg';
 
         return _.div({class: 'editor__field__value editor__field--rich-text-editor', title: this.description || ''},
             _.div({class: 'editor__field--rich-text-editor__header'},
@@ -333,7 +333,7 @@ class RichTextEditor extends FieldEditor {
      * Post render
      */
     postrender() {
-        let activeView = getCookie('rteview') || 'wysiwyg';
+        let activeView = this.activeView || 'wysiwyg';
        
         switch(activeView) {
             case 'html':
