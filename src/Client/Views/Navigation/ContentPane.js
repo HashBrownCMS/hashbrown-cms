@@ -411,6 +411,10 @@ class ContentPane extends NavbarPane {
                     }
                 }
 
+                menu['General'] = '---';
+                menu['New content'] = () => { this.onClickNewContent(); };
+                menu['Refresh'] = () => { this.onClickRefreshResource('content'); };
+
                 return menu;
             },
 

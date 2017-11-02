@@ -16,6 +16,8 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  */
 class MediaBrowser extends Modal {
     constructor(params) {
+        params = params || {};
+
         params.className = 'media-browser';
         params.title = 'Pick media'; 
 
@@ -86,7 +88,7 @@ class MediaBrowser extends Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        return _.iframe({src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')});
+        return _.iframe({src: location.href.substring(0, location.href.indexOf('#')) + '/#/media/' + (this.value || '')});
     }
 }
 

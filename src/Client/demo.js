@@ -593,26 +593,26 @@ HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
 // ----------
 // Crisp UI
 // ----------
-View.prototype.fetch = function fetch() {
+Crisp.View.prototype.fetch = function fetch() {
     let view = this;
 
     function getModel() {
         // Get model from URL
         if(!view.model && typeof view.modelUrl === 'string') {
             view.model = DemoApi.requestSync('get', view.modelUrl);
-            view.init();
+            view._init();
         
         // Get model with function
         } else if(!view.model && typeof view.modelFunction === 'function') {
             view.modelFunction(function(data) {
                 view.model = data;
 
-                view.init();
+                view._init();
             });
 
         // Just perform the initialisation
         } else {
-            view.init();
+            view._init();
         }
     }
 

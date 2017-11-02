@@ -378,7 +378,10 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
     background-color: #21303b;
     border: 0;
-    flex-shrink: 0; }
+    flex-shrink: 0;
+    background-image: url("/img/bg-secondary.jpg");
+    background-attachment: fixed;
+    background-position: 0px 0px; }
     .navbar-main__toggle:after {
       font-family: 'FontAwesome';
       content: '\F107'; }
@@ -401,7 +404,6 @@ h1, h2, h3, h4, h5, h6 {
       .navbar-main__tabs {
         display: flex;
         width: 100%;
-        justify-content: center;
         height: 6rem;
         overflow-x: auto; } }
     .navbar-main__tabs:after {
@@ -453,8 +455,7 @@ h1, h2, h3, h4, h5, h6 {
     border-right: 1px solid #21303b; }
     @media (max-width: 991px) {
       .navbar-main__panes {
-        border-right: 0;
-        border-bottom: 1px solid #21303b; } }
+        border-right: 0; } }
   .navbar-main__pane {
     display: none;
     height: 100%; }
@@ -1042,7 +1043,8 @@ h1, h2, h3, h4, h5, h6 {
     background: none;
     border: 0px;
     border-radius: 0px;
-    box-shadow: none; }
+    box-shadow: none;
+    min-height: 462px; }
     .editor__field--rich-text-editor .cke .cke_inner {
       border-radius: 0px; }
       .editor__field--rich-text-editor .cke .cke_inner .cke_top, .editor__field--rich-text-editor .cke .cke_inner .cke_contents, .editor__field--rich-text-editor .cke .cke_inner .cke_bottom {
@@ -2178,14 +2180,14 @@ h1, h2, h3, h4, h5, h6 {
     color: #21303b;
     font-size: 2rem;
     top: 50%;
-    left: 50%;
+    left: calc(50% - 8rem);
     transform: translate(-50%, -50%);
     animation-name: widget--spinner__image;
     animation-duration: 2s;
     animation-timing-function: linear;
     animation-iteration-count: infinite; }
   .widget--spinner__messages {
-    left: calc(50% + 5rem);
+    left: calc(50% - 3rem);
     top: 50%;
     position: absolute;
     transform: translate(0%, -50%);

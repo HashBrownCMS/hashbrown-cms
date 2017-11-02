@@ -10304,6 +10304,8 @@ var NavbarMain = function (_Crisp$View) {
         } else {
             this.showTab(route);
         }
+
+        $('.page--environment__space--nav').toggleClass('expanded', true);
     };
 
     /**
@@ -10337,8 +10339,6 @@ var NavbarMain = function (_Crisp$View) {
 
 
     NavbarMain.prototype.showTab = function showTab(tabRoute) {
-        $('.page--environment__space--nav').toggleClass('expanded', true);
-
         this.$element.find('.navbar-main__pane').each(function (i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
@@ -17038,6 +17038,8 @@ var MediaBrowser = function (_Modal) {
     function MediaBrowser(params) {
         _classCallCheck(this, MediaBrowser);
 
+        params = params || {};
+
         params.className = 'media-browser';
         params.title = 'Pick media';
 
@@ -17117,7 +17119,7 @@ var MediaBrowser = function (_Modal) {
 
 
     MediaBrowser.prototype.renderBody = function renderBody() {
-        return _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') });
+        return _.iframe({ src: location.href.substring(0, location.href.indexOf('#')) + '/#/media/' + (this.value || '') });
     };
 
     return MediaBrowser;
@@ -43209,6 +43211,14 @@ var ConnectionPane = function (_NavbarPane) {
                     }
                 }
 
+                menu['General'] = '---';
+                menu['New connection'] = function () {
+                    _this3.onClickNewConnection();
+                };
+                menu['Refresh'] = function () {
+                    _this3.onClickRefreshResource('connections');
+                };
+
                 return menu;
             },
 
@@ -43769,6 +43779,14 @@ var ContentPane = function (_NavbarPane) {
                     }
                 }
 
+                menu['General'] = '---';
+                menu['New content'] = function () {
+                    _this2.onClickNewContent();
+                };
+                menu['Refresh'] = function () {
+                    _this2.onClickRefreshResource('content');
+                };
+
                 return menu;
             },
 
@@ -43984,6 +44002,14 @@ var FormsPane = function (_NavbarPane) {
                         };
                     }
                 }
+
+                menu['Forms'] = '---';
+                menu['New form'] = function () {
+                    _this2.onClickNewForm();
+                };
+                menu['Refresh'] = function () {
+                    _this2.onClickRefreshResource('forms');
+                };
 
                 return menu;
             },
@@ -44357,9 +44383,12 @@ var MediaPane = function (_NavbarPane) {
                 'Replace': function Replace() {
                     _this2.onClickReplaceMedia();
                 },
-                'Folder': '---',
+                'General': '---',
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('media');
                 }
             },
 
@@ -44368,6 +44397,9 @@ var MediaPane = function (_NavbarPane) {
                 'Directory': '---',
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('media');
                 }
             },
 
@@ -44919,12 +44951,19 @@ var TemplatePane = function (_NavbarPane) {
                 },
                 'Remove': function Remove() {
                     _this2.onClickRemoveTemplate();
+                },
+                'General': '---',
+                'Add template': function AddTemplate() {
+                    _this2.onClickAddTemplate();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('templates');
                 }
             },
 
             // General context menu
             paneContextMenu: {
-                'Template': '---',
+                'General': '---',
                 'Add template': function AddTemplate() {
                     _this2.onClickAddTemplate();
                 },
