@@ -16266,6 +16266,8 @@ var MediaBrowser = function (_Modal) {
     function MediaBrowser(params) {
         _classCallCheck(this, MediaBrowser);
 
+        params = params || {};
+
         params.className = 'media-browser';
         params.title = 'Pick media';
 

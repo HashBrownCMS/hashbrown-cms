@@ -137,14 +137,16 @@ class MediaPane extends NavbarPane {
                 'Move': () => { this.onClickMoveItem(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
-                'Folder': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); }
+                'General': '---',
+                'Upload new media': () => { this.onClickUploadMedia(); },
+                'Refresh': () => { this.onClickRefreshResource('media'); }
             },
 
             // Dir context menu
             dirContextMenu: {
                 'Directory': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); }
+                'Upload new media': () => { this.onClickUploadMedia(); },
+                'Refresh': () => { this.onClickRefreshResource('media'); }
             },
 
             // General context menu

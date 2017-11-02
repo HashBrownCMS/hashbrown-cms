@@ -42,6 +42,8 @@
         background-color: $secondary;
         border: 0;
         flex-shrink: 0;
+        
+        @include background('secondary');
 
         &:after {
             font-family: 'FontAwesome';
@@ -73,7 +75,6 @@
         @media($sm) {
             display: flex;
             width: 100%;
-            justify-content: center;
             height: 6rem;
             overflow-x: auto;
         }
@@ -144,7 +145,6 @@
         // Tablet mode
         @media($sm) {
             border-right: 0;
-            border-bottom: 1px solid $secondary;
         }
     }
 

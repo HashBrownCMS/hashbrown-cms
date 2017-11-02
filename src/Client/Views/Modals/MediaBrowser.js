@@ -16,6 +16,8 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  */
 class MediaBrowser extends Modal {
     constructor(params) {
+        params = params || {};
+
         params.className = 'media-browser';
         params.title = 'Pick media'; 
 

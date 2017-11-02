@@ -152,6 +152,10 @@ class ConnectionPane extends NavbarPane {
                         menu['Pull from remote'] = () => { this.onClickPullConnection(); };
                     }
                 }
+                
+                menu['General'] = '---';
+                menu['New connection'] = () => { this.onClickNewConnection(); };
+                menu['Refresh'] = () => { this.onClickRefreshResource('connections'); };
 
                 return menu;
             },

@@ -154,6 +154,10 @@ class FormsPane extends NavbarPane {
                         menu['Pull from remote'] = () => { this.onClickPullForm(); };
                     }
                 }
+                
+                menu['Forms'] = '---';
+                menu['New form'] = () => { this.onClickNewForm(); };
+                menu['Refresh'] = () => { this.onClickRefreshResource('forms'); };
 
                 return menu;
             },

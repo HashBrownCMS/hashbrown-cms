@@ -211,12 +211,15 @@ class TemplatePane extends NavbarPane {
                 'This template': '---',
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Rename': () => { this.onClickRenameTemplate(); },
-                'Remove': () => { this.onClickRemoveTemplate(); }
+                'Remove': () => { this.onClickRemoveTemplate(); },
+                'General': '---',
+                'Add template': () => { this.onClickAddTemplate(); },
+                'Refresh': () => { this.onClickRefreshResource('templates'); }
             },
 
             // General context menu
             paneContextMenu: {
-                'Template': '---',
+                'General': '---',
                 'Add template': () => { this.onClickAddTemplate(); },
                 'Refresh': () => { this.onClickRefreshResource('templates'); }
             }
