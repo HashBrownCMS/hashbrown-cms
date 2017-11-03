@@ -5,7 +5,8 @@ let ConnectionHelper = require('Server/Helpers/ConnectionHelper');
 
 class HashBrownDriver {
     static init(app) {
-        ConnectionHelper.registerConnectionType('HashBrown Driver', Connection);
+
+        //ConnectionHelper.registerConnectionType('HashBrown Driver', Connection);
     }
 }
 

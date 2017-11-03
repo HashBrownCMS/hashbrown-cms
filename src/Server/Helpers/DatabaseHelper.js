@@ -7,7 +7,7 @@ const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 
 const Content = require('Server/Models/Content');
-const Connection = require('Common/Models/Connection');
+const Connection = require('Server/Models/Connection');
 const User = require('Server/Models/User');
 
 /**

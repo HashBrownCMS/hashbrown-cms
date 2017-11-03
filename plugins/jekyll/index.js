@@ -7,7 +7,7 @@ const Processor = require('./server/Processor');
  */
 class Jekyll {
     static init(app) {
-        ConnectionHelper.registerProcessor('Jekyll', Processor);
+        HashBrown.Helpers.ConnectionHelper.registerProcessor('Jekyll', Processor);
     }
 }
 

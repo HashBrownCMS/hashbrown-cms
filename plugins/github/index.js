@@ -1,6 +1,5 @@
 'use strict';
 
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
 const ConfigHelper = require('Server/Helpers/ConfigHelper');
 const RequestHelper = require('Server/Helpers/RequestHelper');
 const ApiController = require('Server/Controllers/ApiController');
@@ -17,7 +16,7 @@ class GitHub {
     static init(app) {
         let config = ConfigHelper.getSync('plugins/github');
 
-        ConnectionHelper.registerDeployer('GitHub', Deployer);
+        HashBrown.Helpers.ConnectionHelper.registerDeployer('GitHub', Deployer);
 
         /**
          * Starts the oAuth flow
@@ -113,4 +112,4 @@ class GitHub {
     }
 }
 
-module.exports = GitHubPages;
+module.exports = GitHub;

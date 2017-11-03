@@ -5,7 +5,7 @@ const ContentHelper = require('Server/Helpers/ContentHelper');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
-const Connection = require('Common/Models/Connection');
+const Connection = require('Server/Models/Connection');
 
 /**
  * The helper class for Connections

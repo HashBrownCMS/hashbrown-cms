@@ -6339,82 +6339,6 @@ module.exports = Modal;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Entity = __webpack_require__(19);
-
-/**
- * Basic resource class
- *
- * @memberof HashBrown.Common.Models
- */
-
-var Resource = function (_Entity) {
-    _inherits(Resource, _Entity);
-
-    function Resource() {
-        _classCallCheck(this, Resource);
-
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
-    }
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    Resource.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            if (typeof params.sync.isRemote === 'undefined') {
-                params.sync.hasRemote = params.local;
-            }
-
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            if (typeof params.sync.isRemote === 'undefined') {
-                params.sync.isRemote = params.remote;
-            }
-
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            if (typeof params.isLocked === 'undefined') {
-                params.isLocked = params.locked;
-            }
-
-            delete params.locked;
-        }
-
-        return params;
-    };
-
-    return Resource;
-}(Entity);
-
-module.exports = Resource;
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -6492,7 +6416,7 @@ function forEach(xs, f) {
 }
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6506,7 +6430,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Path = __webpack_require__(104);
 
-var Resource = __webpack_require__(13);
+var Resource = __webpack_require__(15);
 
 /**
  * The base class for all Media objects
@@ -6701,6 +6625,82 @@ var Media = function (_Resource) {
 }(Resource);
 
 module.exports = Media;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(19);
+
+/**
+ * Basic resource class
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Resource = function (_Entity) {
+    _inherits(Resource, _Entity);
+
+    function Resource() {
+        _classCallCheck(this, Resource);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    Resource.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.hasRemote = params.local;
+            }
+
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.isRemote = params.remote;
+            }
+
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            if (typeof params.isLocked === 'undefined') {
+                params.isLocked = params.locked;
+            }
+
+            delete params.locked;
+        }
+
+        return params;
+    };
+
+    return Resource;
+}(Entity);
+
+module.exports = Resource;
 
 /***/ }),
 /* 16 */
@@ -7593,10 +7593,199 @@ base.Node = __webpack_require__(171);
 
 /***/ }),
 /* 28 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-throw new Error("Module build failed: SyntaxError: Unexpected token (57:55)\n\n\u001b[0m \u001b[90m 55 | \u001b[39m        \n \u001b[90m 56 | \u001b[39m        \u001b[90m// Processor\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 57 | \u001b[39m        \u001b[36mif\u001b[39m(\u001b[33m!\u001b[39mparams\u001b[33m.\u001b[39mprocessor) { params\u001b[33m.\u001b[39mprocessor \u001b[33m=\u001b[39m {}\u001b[33m;\u001b[39m )\n \u001b[90m    | \u001b[39m                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 58 | \u001b[39m        \n \u001b[90m 59 | \u001b[39m        \u001b[36mif\u001b[39m(params\u001b[33m.\u001b[39mprocessor \u001b[36minstanceof\u001b[39m \u001b[33mProcessor\u001b[39m \u001b[33m===\u001b[39m \u001b[36mfalse\u001b[39m) {\n \u001b[90m 60 | \u001b[39m            params\u001b[33m.\u001b[39mprocessor \u001b[33m=\u001b[39m \u001b[33mHashBrown\u001b[39m\u001b[33m.\u001b[39m\u001b[33mHelpers\u001b[39m\u001b[33m.\u001b[39m\u001b[33mConnectionHelper\u001b[39m\u001b[33m.\u001b[39mgetProcessor(params\u001b[33m.\u001b[39mprocessor\u001b[33m.\u001b[39mtype)\u001b[33m;\u001b[39m \u001b[0m\n");
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Path = __webpack_require__(104);
+
+var Processor = __webpack_require__(296);
+var Deployer = __webpack_require__(297);
+var Resource = __webpack_require__(15);
+
+/**
+ * The Connection class
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Connection = function (_Resource) {
+    _inherits(Connection, _Resource);
+
+    /**
+     * Constructor
+     */
+    function Connection(params) {
+        _classCallCheck(this, Connection);
+
+        return _possibleConstructorReturn(this, _Resource.call(this, Connection.paramsCheck(params)));
+    }
+
+    /**
+     * Structure
+     */
+
+
+    Connection.prototype.structure = function structure() {
+        this.def(String, 'id');
+        this.def(String, 'title');
+        this.def(String, 'url');
+        this.def(Boolean, 'useLocal');
+        this.def(Boolean, 'isLocked');
+
+        this.def(Processor, 'processor');
+        this.def(Deployer, 'deployer');
+
+        // Sync
+        this.def(Object, 'sync');
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Connection.paramsCheck = function paramsCheck(params) {
+        // Backwards compatibility: Convert from old structure
+        if (params.type) {
+            params = this.getPresetSettings(params.type.toLowerCase().replace(/ /g, '-'), params.settings);
+        }
+
+        // Paths
+        if (!params.paths) {
+            params.paths = {};
+        }
+        if (!params.paths.templates) {
+            params.paths.templates = {};
+        }
+
+        // Deployer and processor
+        if (!params.processor) {
+            params.processor = {};
+        }
+        if (!params.deployer) {
+            params.deployer = {};
+        }
+
+        return _Resource.paramsCheck.call(this, params);
+    };
+
+    /**
+     * Gets preset settings
+     *
+     * @param {String} preset
+     * @param {Object} oldSettings
+     */
+
+
+    Connection.getPresetSettings = function getPresetSettings(preset, oldSettings) {
+        oldSettings = oldSettings || {};
+
+        var settings = void 0;
+
+        switch (preset) {
+            case 'github-pages':
+                settings = {
+                    useLocal: oldSettings.isLocal || false,
+                    url: oldSettings.url || '',
+                    processor: {
+                        type: 'Jekyll'
+                    },
+                    deployer: {
+                        type: 'GitHub',
+                        token: oldSettings.token || '',
+                        org: oldSettings.org || '',
+                        repo: oldSettings.repo || '',
+                        branch: oldSettings.branch || ''
+                    },
+                    paths: {
+                        templates: {
+                            partial: '/_includes/partials/',
+                            page: '/_layouts/'
+                        },
+                        content: '/content/',
+                        media: '/media/'
+                    }
+                };
+                break;
+
+            case 'hashbrown-driver':
+                settings = {
+                    url: oldSettings.url || '',
+                    processor: {
+                        type: 'json'
+                    },
+                    deployer: {
+                        type: 'api',
+                        token: oldSettings.token || ''
+                    },
+                    paths: {
+                        templates: {
+                            partial: '/hashbrown/api/templates/partial/',
+                            page: '/hashbrown/api/templates/page/'
+                        },
+                        content: '/hashbrown/api/content/',
+                        media: '/hashbrown/api/media/'
+                    }
+                };
+                break;
+        }
+
+        return settings;
+    };
+
+    /**
+     * Creates a new Connection object
+     *
+     * @return {Connection} connection
+     */
+
+
+    Connection.create = function create() {
+        return new Connection({
+            id: Connection.createId(),
+            title: 'New connection'
+        });
+    };
+
+    /**
+     * Gets the remote URL
+     *
+     * @param {Boolean} withSlash
+     *
+     * @returns {String} URL
+     */
+
+
+    Connection.prototype.getRemoteUrl = function getRemoteUrl() {
+        var withSlash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+        var url = this.url;
+
+        if (!withSlash && url[url.length - 1] == '/') {
+            url = url.substring(0, url.length - 1);
+        } else if (withSlash && url[url.length - 1] != '/') {
+            url += '/';
+        }
+
+        return url;
+    };
+
+    return Connection;
+}(Resource);
+
+module.exports = Connection;
 
 /***/ }),
 /* 29 */
@@ -8017,7 +8206,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(13);
+var Resource = __webpack_require__(15);
 
 /**
  * The base class for all Schema types
@@ -10113,7 +10302,7 @@ function WriteReq(chunk, encoding, cb) {
 
 var Duplex;
 function WritableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(14);
+  Duplex = Duplex || __webpack_require__(13);
 
   options = options || {};
 
@@ -10229,7 +10418,7 @@ WritableState.prototype.getBuffer = function writableStateGetBuffer() {
 
 var Duplex;
 function Writable(options) {
-  Duplex = Duplex || __webpack_require__(14);
+  Duplex = Duplex || __webpack_require__(13);
 
   // Writable ctor is applied to Duplexes, though they're not
   // instanceof Writable, they're instanceof Readable.
@@ -10856,7 +11045,7 @@ function base64DetectIncompleteChar(buffer) {
 
 module.exports = Transform;
 
-var Duplex = __webpack_require__(14);
+var Duplex = __webpack_require__(13);
 
 /*<replacement>*/
 var util = __webpack_require__(22);
@@ -11478,7 +11667,7 @@ function prependListener(emitter, event, fn) {
 
 var Duplex;
 function ReadableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(14);
+  Duplex = Duplex || __webpack_require__(13);
 
   options = options || {};
 
@@ -11548,7 +11737,7 @@ function ReadableState(options, stream) {
 
 var Duplex;
 function Readable(options) {
-  Duplex = Duplex || __webpack_require__(14);
+  Duplex = Duplex || __webpack_require__(13);
 
   if (!(this instanceof Readable)) return new Readable(options);
 
@@ -14905,7 +15094,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(13);
+var Resource = __webpack_require__(15);
 
 /**
  * The base class for all Content types
@@ -15296,9 +15485,9 @@ module.exports = {
     Entity: __webpack_require__(19),
     FieldSchema: __webpack_require__(42),
     index: __webpack_require__(96),
-    Media: __webpack_require__(15),
+    Media: __webpack_require__(14),
     Project: __webpack_require__(59),
-    Resource: __webpack_require__(13),
+    Resource: __webpack_require__(15),
     Schema: __webpack_require__(31),
     Template: __webpack_require__(97),
     User: __webpack_require__(32)
@@ -15317,7 +15506,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(13);
+var Resource = __webpack_require__(15);
 
 /**
  * The Template model
@@ -15645,7 +15834,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(15);
+var Media = __webpack_require__(14);
 var Modal = __webpack_require__(11);
 
 var MediaHelper = __webpack_require__(29);
@@ -15850,7 +16039,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(15);
+var Media = __webpack_require__(14);
 
 var Modal = __webpack_require__(11);
 
@@ -17672,7 +17861,7 @@ exports = module.exports = __webpack_require__(61);
 exports.Stream = Stream || exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(47);
-exports.Duplex = __webpack_require__(14);
+exports.Duplex = __webpack_require__(13);
 exports.Transform = __webpack_require__(49);
 exports.PassThrough = __webpack_require__(63);
 
@@ -18028,7 +18217,7 @@ module.exports = __webpack_require__(47);
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(14);
+module.exports = __webpack_require__(13);
 
 /***/ }),
 /* 118 */
@@ -25279,7 +25468,7 @@ module.exports = {
     FieldSchema: __webpack_require__(42),
     Form: __webpack_require__(190),
     index: __webpack_require__(96),
-    Media: __webpack_require__(15),
+    Media: __webpack_require__(14),
     Project: __webpack_require__(59),
     Schema: __webpack_require__(31),
     Template: __webpack_require__(97),
@@ -25299,7 +25488,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Resource = __webpack_require__(13);
+var Resource = __webpack_require__(15);
 
 /**
  * The Form class
@@ -26148,7 +26337,7 @@ module.exports = {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Media = __webpack_require__(15);
+var Media = __webpack_require__(14);
 
 /**
  * A helper for Media objects
@@ -36989,6 +37178,264 @@ var MigrationEditor = function (_HashBrown$Views$Moda) {
 }(HashBrown.Views.Modals.Modal);
 
 module.exports = MigrationEditor;
+
+/***/ }),
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(19);
+
+/**
+ * A class for processing Content before it is deployed
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Processor = function (_Entity) {
+  _inherits(Processor, _Entity);
+
+  function Processor() {
+    _classCallCheck(this, Processor);
+
+    return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+  }
+
+  /**
+   * Structure
+   */
+  Processor.prototype.structure = function structure() {
+    this.def(String, 'alias');
+    this.def(String, 'name');
+    this.def(Object, 'settings', {});
+  };
+
+  /**
+   * Processes a Content node
+   *
+   * @param {Content} content
+   *
+   * @returns {Object} Output
+   */
+
+
+  Processor.prototype.process = function process(content) {
+    return null;
+  };
+
+  return Processor;
+}(Entity);
+
+module.exports = Processor;
+
+/***/ }),
+/* 297 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(19);
+
+/**
+ * A class for deploying and retrieving data to and from a server
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Deployer = function (_Entity) {
+    _inherits(Deployer, _Entity);
+
+    function Deployer() {
+        _classCallCheck(this, Deployer);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    /**
+     * Structure
+     */
+    Deployer.prototype.structure = function structure() {
+        this.def(String, 'type');
+        this.def(String, 'name');
+        this.def(String, 'isLocal');
+        this.def(Object, 'paths', {
+            templates: {
+                page: '',
+                partial: ''
+            },
+            media: '',
+            content: ''
+        });
+    };
+
+    /**
+     * Gets the root path
+     *
+     * @returns {String} Root
+     */
+
+
+    Deployer.prototype.getRootPath = function getRootPath() {
+        throw new Error('The method "getRootPath" must be overridden');
+    };
+
+    /**
+     * Gets a deployment path
+     *
+     * @param {String} path
+     *
+     * @returns {String} Path
+     */
+
+
+    Deployer.prototype.getPath = function getPath(path) {
+        var lvl1 = path.split('/')[0];
+        var lvl2 = path.split('/')[1];
+
+        path = this.getRootPath();
+
+        // Add slash if needed
+        if (path.lastIndexOf('/') !== path.length - 1) {
+            path += '/';
+        }
+
+        // Add level 2 path if it exists
+        if (lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
+            path += this.paths[lvl1][lvl2];
+        }
+
+        // Add level 1 path if it exists
+        else if (lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
+                path += this.paths[lvl1];
+            }
+
+        // Add slash if needed
+        if (path.lastIndexOf('/') !== path.length - 1) {
+            path += '/';
+        }
+
+        // Remove any double slashes
+        path = path.replace(/\/\//g, '/');
+
+        return path;
+    };
+
+    /**
+     * Tests this deployment
+     *
+     * @returns {Promise} Result
+     */
+
+
+    Deployer.prototype.test = function test() {
+        return Promise.reject(new Error('The "test" method should be overridden.'));
+    };
+
+    /**
+     * Sets a file
+     *
+     * @param {String} path
+     * @param {String} base64
+     *
+     * @returns {Promise} Result
+     */
+
+
+    Deployer.prototype.setFile = function setFile(path, content) {
+        return Promise.reject(new Error('The "setFile" method should be overridden.'));
+    };
+
+    /**
+     * Gets a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} File
+     */
+
+
+    Deployer.prototype.getFile = function getFile(path) {
+        return Promise.reject(new Error('The "getFile" method should be overridden.'));
+    };
+
+    /**
+     * Removes a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
+
+
+    Deployer.prototype.removeFile = function removeFile(path) {
+        return Promise.reject(new Error('The "removeFile" method should be overridden.'));
+    };
+
+    /**
+     * Gets a list of files
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Files
+     */
+
+
+    Deployer.prototype.getFolder = function getFolder(path) {
+        return Promise.reject(new Error('The "getFolder" method should be overridden.'));
+    };
+
+    /**
+     * Removes a folder
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
+
+
+    Deployer.prototype.removeFolder = function removeFolder(path) {
+        return Promise.reject(new Error('The "removeFolder" method should be overridden.'));
+    };
+
+    return Deployer;
+}(Entity);
+
+module.exports = Deployer;
 
 /***/ })
 /******/ ]);
