@@ -39,7 +39,7 @@ class Content extends Resource {
         // Settings
         this.def(Object, 'settings', {
             publishing: {
-                connections: []
+                connectionId: ''
             }
         }); 
     }

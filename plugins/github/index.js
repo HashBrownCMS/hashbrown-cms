@@ -17,7 +17,7 @@ class GitHub {
     static init(app) {
         let config = ConfigHelper.getSync('plugins/github');
 
-        ConnectionHelper.registerDeployer('github', Deployer);
+        ConnectionHelper.registerDeployer('GitHub', Deployer);
 
         /**
          * Starts the oAuth flow

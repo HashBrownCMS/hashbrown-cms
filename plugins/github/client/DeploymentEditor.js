@@ -1,6 +1,6 @@
 'use strict';
 
-class GitHubPagesConnectionEditor extends Crisp.View {
+class GitHubDeploymentEditor extends Crisp.View {
     /**
      * Constructor
      */
@@ -190,4 +190,4 @@ class GitHubPagesConnectionEditor extends Crisp.View {
     }
 }
 
-HashBrown.Views.Editors.ConnectionEditors['GitHub Pages'] = GitHubPagesConnectionEditor;
+HashBrown.Views.Editors.DeploymentEditors.GitHub = GitHubDeploymentEditor;

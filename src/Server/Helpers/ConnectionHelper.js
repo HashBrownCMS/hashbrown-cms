@@ -33,7 +33,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {String} name
      * @param {Processor} processor
      */
-    static registerDeployer(name, processor) {
+    static registerProcessor(name, processor) {
         if(!this.processors) {
             this.processors = {};
         }
@@ -42,23 +42,25 @@ class ConnectionHelper extends ConnectionHelperCommon {
     }
 
     /**
-     * Inits a connection with the appropriate constructor
+     * Gets a deployer
      *
-     * @param {Object} data
+     * @string {String} name
      *
-     * @returns {Connection} connection
+     * @returns {Deployer} Deployer
      */
-    static initConnection(data) {
-        let constructor = this.connectionTypes[data.type];
-        let connection;
-           
-        if(typeof constructor === 'function') {
-            connection = new constructor(data);
-        } else {
-            connection = new Connection(data);
-        }
-
-        return connection;
+    static getDeployer(name) {
+        return this.deployers[name];
+    }
+    
+    /**
+     * Gets a processor
+     *
+     * @string {String} name
+     *
+     * @returns {Processor} Processor
+     */
+    static getProcessor(name) {
+        return this.processors[name];
     }
 
     /**

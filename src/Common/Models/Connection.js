@@ -1,5 +1,9 @@
 'use strict';
 
+const Path = require('path');
+
+const Processor = require('./Processor');
+const Deployer = require('./Deployer');
 const Resource = require('./Resource');
 
 /**
@@ -8,25 +12,28 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Connection extends Resource {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(Connection.paramsCheck(params));
     }
 
+    /**
+     * Structure
+     */
     structure() {
-        // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'url');
+        this.def(Boolean, 'useLocal');
         this.def(Boolean, 'isLocked');
+
+        this.def(Processor, 'processor');
+        this.def(Deployer, 'deployer');
         
         // Sync
         this.def(Object, 'sync');
-        
-        // Extensible settings
-        this.def(Object, 'settings', {
-            deployment: {},
-            processing: {}
-        });
     }
 
     /**
@@ -39,15 +46,26 @@ class Connection extends Resource {
     static paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
         if(params.type) {
-            params.settings = this.getPresetSettings(params.type.toLowerCase().replace(/ /g, '-'), params.settings, params.settings);
-
-            delete params.type;
+            params = this.getPresetSettings(params.type.toLowerCase().replace(/ /g, '-'), params.settings);
         }
 
-        // Settings
-        if(!params.settings) { params.settings = {}; }
-        if(!params.settings.processing) { params.settings.processing = {}; }
-        if(!params.settings.deployment) { params.settings.deployment = {}; }
+        // Paths
+        if(!params.paths) { params.paths = {}; }
+        if(!params.paths.templates) { params.paths.templates = {}; }
+        
+        // Processor
+        if(!params.processor) { params.processor = {}; )
+        
+        if(params.processor instanceof Processor === false) {
+            params.processor = HashBrown.Helpers.ConnectionHelper.getProcessor(params.processor.type); 
+        }
+
+        // Deployer
+        if(!params.deployer) { params.deployer = {}; )
+        
+        if(params.deployer instanceof Deployer === false) {
+            params.deployer = HashBrown.Helpers.ConnectionHelper.getDeployer(params.deployer.type); 
+        }
 
         return super.paramsCheck(params);
     }
@@ -56,44 +74,56 @@ class Connection extends Resource {
      * Gets preset settings
      *
      * @param {String} preset
-     * @param {Object} processingSettings
-     * @param {Object} deploymentSettings
+     * @param {Object} oldSettings
      */
-    static getPresetSettings(preset, processingSettings, deploymentSettings) {
-        processingSettings = processingSettings || {};
-        deploymentSettings = deploymentSettings || {};
+    static getPresetSettings(preset, oldSettings) {
+        oldSettings = oldSettings || {};
 
         let settings;
 
         switch(preset) {
             case 'github-pages':
                 settings = {
-                    processing: {
-                        type: 'jekyll'
+                    useLocal: oldSettings.isLocal || false,
+                    url: oldSettings.url || '',
+                    processor: {
+                        type: 'Jekyll'
                     },
-                    deployment: {
-                        type: 'github',
-                        partialTemplatesFolder: '/_includes/partials/',
-                        pageTemplatesFolder: '/_layouts/',
-                        token: deploymentSettings.token || '',
-                        org: deploymentSettings.org || '',
-                        repo: deploymentSettings.repo || '',
-                        branch: deploymentSettings.branch || '',
-                        isLocal: deploymentSettings.isLocal || false,
-                        localPath: deploymentSettings.localPath || ''
+                    deployer: {
+                        type: 'GitHub',
+                        token: oldSettings.token || '',
+                        org: oldSettings.org || '',
+                        repo: oldSettings.repo || '',
+                        branch: oldSettings.branch || '',
+                    },
+                    paths: {
+                        templates: {
+                            partial: '/_includes/partials/',
+                            page: '/_layouts/'
+                        },
+                        content: '/content/',
+                        media: '/media/'
                     }
                 };
                 break;
 
             case 'hashbrown-driver':
                 settings = {
-                    processing: {
-                        type: 'json',
-                        mode: 'segmented'
+                    url: oldSettings.url || '',
+                    processor: {
+                        type: 'json'
                     },
-                    deployment: {
-                        type: 'hashbrown-driver',
-                        token: deploymentSettings.token || ''
+                    deployer: {
+                        type: 'api',
+                        token: oldSettings.token || ''
+                    },
+                    paths: {
+                        templates: {
+                            partial: '/hashbrown/api/templates/partial/',
+                            page: '/hashbrown/api/templates/page/'
+                        },
+                        content: '/hashbrown/api/content/',
+                        media: '/hashbrown/api/media/'
                     }
                 };
                 break;
@@ -108,22 +138,10 @@ class Connection extends Resource {
      * @return {Connection} connection
      */
     static create() {
-        let connection = new Connection({
+        return new Connection({
             id: Connection.createId(),
-            title: 'New connection',
-            settings: {}
+            title: 'New connection'
         });
-        
-        return connection;
-    }
-
-    /**
-     * Gets templates
-     *
-     * @returns {Promise} Array of Templates
-     */
-    getTemplates() {
-        return Promise.resolve([]);
     }
 
     /**
@@ -146,80 +164,6 @@ class Connection extends Resource {
 
         return url;
     }
-
-    /**
-     * Gets whether this connection is serving local content
-     *
-     * @returns {Boolean} Is local
-     */
-    isLocal() {
-        return false;
-    }
-
-    /**
-     * Gets the media path
-     *
-     * @returns {String} path
-     */
-    getMediaPath() {
-        return '';
-    }
-
-    /**
-     * Gets all Media objects
-     *
-     * @returns {Promise(Array)} media
-     */
-    getAllMedia() {
-        return Promise.resolve([]);
-    }
-    
-    /**
-     * Gets a Media object
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Media)} media
-     */
-    getMedia(id) {
-        return Promise.resolve(null);
-    }
-    
-    /**
-     * Sets media
-     *
-     * @param {String} id
-     * @param {Object} file
-     *
-     * @returns {Promise} Array of Media
-     */
-    setMedia(id, file) {
-        return Promise.resolve();
-    }
-    
-    /**
-     * Sets template by id
-     *
-     * @param {String} type
-     * @param {String} id
-     * @param {Template} newTemplate
-     *
-     * @returns {Promise}
-     */
-    setTemplateById(type, id, newTemplate) {
-        return Promise.resolve();
-    }
-    
-    /**
-     * Removes media
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Array of Media items
-     */
-    removeMedia(id) {
-        return Promise.resolve();
-    }
     
     /**
      *  Unpublishes content
@@ -235,11 +179,9 @@ class Connection extends Resource {
         environment = requiredParam('environment'),
         content = requiredParam('content')
     ) {
-        let connection = this;
-
         debug.log('Unpublishing all localised property sets...', this);
         
-        return connection.removePreview(project, environment, content)
+        return this.removePreview(project, environment, content)
         .then(() => {
             return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
@@ -253,7 +195,7 @@ class Connection extends Resource {
                     return Promise.resolve();
                 }
 
-                return connection.deleteContentProperties(content.id, language)
+                return this.removeContent(content.id, language)
                 .then(() => {
                     return next();
                 });
@@ -295,7 +237,7 @@ class Connection extends Resource {
                     return Promise.resolve();
                 }
 
-                return this.deleteContentProperties(content.id + '_preview', language)
+                return this.removeContent(content.id + '_preview', language)
                 .then(() => {
                     return next();  
                 });
@@ -325,18 +267,14 @@ class Connection extends Resource {
         
         return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
         .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
         .then((sets) => {
-            let properties = sets[language];
+            content.url = '/preview' + content.url;
 
-            let url = '/preview/' + content.id;
-            
-            properties.url = url;
-
-            return this.postContentProperties(properties, content.id + '_preview', language, content.getMeta())
+            return this.setContent(content.id + '_preview', content, language)
             .then(() => {
-                return Promise.resolve(this.url + url);
+                return Promise.resolve(this.url + content.url);
             });
         });
     }
@@ -355,34 +293,25 @@ class Connection extends Resource {
         environment = requiredParam('environment'),
         content = requiredParam('content')
     ) {
-        let connection = this;
+        debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
-        debug.log('Publishing all localised property sets...', this);
-
-        return connection.removePreview(project, environment, content)
+        return this.removePreview(project, environment, content)
         .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
-        .then((sets) => {
-            let languages = Object.keys(sets);
-            
-            function next(i) {
-                let language = languages[i];
-                let properties = sets[language];
+        .then((languages) => {
+            let next = () => {
+                let language = languages.pop();
 
-                return connection.postContentProperties(properties, content.id, language, content.getMeta())
+                if(!language) {
+                    debug.log('Published all localisations successfully!', this);
+                    
+                    return Promise.resolve();
+                }
+
+                return this.setContent(content.id, content, language)
                 .then(() => {
-                    i++;
-
-                    if(i < languages.length) {
-                        return next(i);
-                    
-                    } else {
-                        debug.log('Published all localised property sets successfully!', connection);
-                            
-                        return Promise.resolve();
-                    
-                    }
+                    return next();
                 })
             }
 
@@ -391,28 +320,186 @@ class Connection extends Resource {
     }
     
     /**
-     * Deletes content properties from the remote target
+     * Sets a Content node by id
      *
      * @param {String} id
      * @param {String} language
+     * @param {Content} content
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Result
      */
-    deleteContentProperties(id, language) {
-        return Promise.resolve();
-    }
+    setContent(id, language, content) {
+        return this.processor.process(content, language)
+        .then((result) => {
+            // Convert to base64
+            if(result.lastIndexOf('=') === result.length - 1) {
+                result = new Buffer(result, 'base64').toString();
+            }
 
+            return this.deployer.setFile(this.deployer.getPath('content') + language + '/' + id, result);
+        });
+    }
+    
     /**
-     * Posts content properties to the remote target
+     * Removes a Content node by id
      *
-     * @param {Object} properties
      * @param {String} id
      * @param {String} language
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Result
      */
-    postContentProperties(properties, id, language) {
-        return Promise.resolve();
+    removeContent(id, language) {
+        return this.deployer.removeFile(this.deployer.getPath('content') + language + '/' + id, result);
+    }
+    
+    /**
+     * Gets a list of Templates
+     *
+     * @param {String} type
+     *
+     * @returns {Promise} Templates
+     */
+    getAllTemplates(type) {
+        return this.deployer.getFolder(this.deployer.getPath('templates/' + type))
+        .then((files) => {
+            if(!files) { return Promise.resolve([]); }
+
+            let allTemplates = [];
+
+            for(let file of files) {
+                let name = Path.basename(file.path || file);
+                
+                let template = new HashBrown.Models.Template({
+                    name: name,
+                    type: type,
+                    remotePath: this.paths.templates[type] + name,
+                    isRemote: this.useLocal !== true
+                });
+
+                allTemplates.push(template);
+            }
+
+            return Promise.resolve(allTemplates);
+        });
+    }
+    
+    /**
+     * Gets a Template by name
+     *
+     * @param {String} type
+     * @param {String} name
+     *
+     * @returns {Promise} Template
+     */
+    getTemplate(type, name) {
+        return this.deployer.getFile(this.deployer.getPath('templates/' + type) + name)
+        .then((file) => {
+            if(!file) { return Promise.reject(new Error('Template "' + name + '" not found')); }
+
+            let name = Path.basename(file.path || file);
+            
+            return Promise.resolve(new HashBrown.Models.Template({
+                name: name,
+                type: type,
+                url: (this.useLocal ? this.localRoot : this.remoteRoot) + this.paths.templates[type] + name
+            }));
+        });
+    }
+    
+    /**
+     * Sets a Template by name
+     *
+     * @param {String} type
+     * @param {String} name
+     * @param {String} content
+     *
+     * @returns {Promise} Result
+     */
+    setTemplate(type, name, content) {
+        return this.deployer.setFile(this.deployer.getPath('templates/' + type) + name, content);
+    }
+   
+    /**
+     * Removes a Template by name
+     *
+     * @param {String} name
+     *
+     * @returns {Promise} Result
+     */
+    removeTemplate(id) {
+        return this.deployer.removeFile(this.deployer.getPath('templates/' + type) + name, content);
+    }
+    
+    /**
+     * Gets a list of Media nodes
+     *
+     * @returns {Promise} Media
+     */
+    getAllMedia() {
+        return this.deployer.getFolder(this.deployer.getPath('media'))
+        .then((folders) => {
+            if(!folders) { return Promise.resolve([]); }
+
+            let allMedia = [];
+
+            for(let folder of folders) {
+                let name = Path.basename(folder.path || folder);
+                
+                let media = new HashBrown.Models.Media({
+                    id: name
+                });
+
+                allMedia.push(media);
+            }
+
+            return Promise.resolve(allMedia);
+        });
+    }
+    
+    /**
+     * Gets a Media node by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Media node
+     */
+    getMedia(id) {
+        return this.deployer.getFolder(this.deployer.getPath('media') + id)
+        .then((files) => {
+            if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
+
+            let file = files[0];
+            let name = Path.basename(file.path || file);
+            
+            return Promise.resolve(new HashBrown.Models.Media({
+                id: id,
+                name: name
+            }));
+        });
+    }
+    
+    /**
+     * Sets a Media node by id
+     *
+     * @param {String} id
+     * @param {String} name
+     * @param {String} base64
+     *
+     * @returns {Promise} Media node
+     */
+    setMedia(id, name, base64) {
+        return this.deployer.setFile(this.deployer.getPath('media') + name, content);
+    }
+    
+    /**
+     * Removes a Media node by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Result
+     */
+    removeMedia(id) {
+        return this.deployer.removeFolder(this.deployer.getPath('media') + id, content);
     }
 }
 
