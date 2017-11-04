@@ -9,7 +9,7 @@ let Schema = require('./Schema');
  */
 class ContentSchema extends Schema {
     constructor(properties) {
-        super(properties);
+        super(ContentSchema.paramsCheck(properties));
     }
     
     structure() {
@@ -17,11 +17,25 @@ class ContentSchema extends Schema {
 
         this.def(String, 'defaultTabId');
         this.def(Object, 'tabs', {});
-        this.def(Object, 'fields', {});
+        this.def(Object, 'fields', { properties: {} });
         this.def(Array, 'allowedChildSchemas', []);
 
         this.name = 'New content schema';
         this.type = 'content';
+    }
+    
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        if(!params.fields) { params.fields = {}; }
+        if(!params.fields.properties) { params.fields.properties = {}; }
+
+        return super.paramsCheck(params);
     }
 
     /**
