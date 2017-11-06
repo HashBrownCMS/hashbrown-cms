@@ -11242,8 +11242,8 @@ var Connection = function (_Resource) {
 
     Connection.paramsCheck = function paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
-        if (params.type) {
-            var newParams = this.getPresetSettings(params.type, params.settings);
+        if (params.type || params.preset) {
+            var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
 
             newParams.id = params.id;
             newParams.title = params.title;

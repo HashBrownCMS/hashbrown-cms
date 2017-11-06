@@ -42,8 +42,8 @@ class Connection extends Resource {
      */
     static paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
-        if(params.type) {
-            let newParams = this.getPresetSettings(params.type, params.settings);
+        if(params.type || params.preset) {
+            let newParams = this.getPresetSettings(params.type || params.preset, params.settings);
 
             newParams.id = params.id;
             newParams.title = params.title;

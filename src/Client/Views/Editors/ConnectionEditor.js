@@ -125,20 +125,16 @@ class ConnectionEditor extends Crisp.View {
     renderPresetEditor() {
         return new HashBrown.Views.Widgets.Dropdown({
             options: [
-                {
-                    label: 'GitHub Pages',
-                    value: 'github-pages'
-                },
-                {
-                    label: 'HashBrown Driver',
-                    value: 'hashbrown-driver'
-                }
+                'GitHub Pages',
+                'HashBrown Driver'
             ],
-            valueKey: 'value',
-            labelKey: 'label',
             placeholder: 'Preset',
             onChange: (newValue) => {
-                this.model.settings = HashBrown.Models.Connection.getPresetSettings(newValue);
+                let newModel = this.model.getObject();
+                
+                newModel.preset = newValue;
+               
+                this.model = new HashBrown.Models.Connection(newModel);
 
                 this.fetch();
             }
@@ -196,10 +192,6 @@ class ConnectionEditor extends Crisp.View {
             {
                 label: 'GitHub',
                 value: 'github'
-            },
-            {
-                label: 'HashBrown driver',
-                value: 'hashbrown-driver'
             }
         ];
 

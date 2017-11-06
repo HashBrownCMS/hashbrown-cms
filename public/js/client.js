@@ -11307,8 +11307,8 @@ var Connection = function (_Resource) {
 
     Connection.paramsCheck = function paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
-        if (params.type) {
-            var newParams = this.getPresetSettings(params.type, params.settings);
+        if (params.type || params.preset) {
+            var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
 
             newParams.id = params.id;
             newParams.title = params.title;
@@ -45220,18 +45220,14 @@ var ConnectionEditor = function (_Crisp$View) {
         var _this7 = this;
 
         return new HashBrown.Views.Widgets.Dropdown({
-            options: [{
-                label: 'GitHub Pages',
-                value: 'github-pages'
-            }, {
-                label: 'HashBrown Driver',
-                value: 'hashbrown-driver'
-            }],
-            valueKey: 'value',
-            labelKey: 'label',
+            options: ['GitHub Pages', 'HashBrown Driver'],
             placeholder: 'Preset',
             onChange: function onChange(newValue) {
-                _this7.model.settings = HashBrown.Models.Connection.getPresetSettings(newValue);
+                var newModel = _this7.model.getObject();
+
+                newModel.preset = newValue;
+
+                _this7.model = new HashBrown.Models.Connection(newModel);
 
                 _this7.fetch();
             }
@@ -45284,9 +45280,6 @@ var ConnectionEditor = function (_Crisp$View) {
         }, {
             label: 'GitHub',
             value: 'github'
-        }, {
-            label: 'HashBrown driver',
-            value: 'hashbrown-driver'
         }];
 
         return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
