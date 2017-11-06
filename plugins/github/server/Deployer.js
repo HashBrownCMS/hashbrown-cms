@@ -5,20 +5,14 @@ const Path = require('path');
 const Glob = require('glob');
 const RimRaf = require('rimraf');
 
-const Deployer = require('Common/Models/Deployer');
-const Content = require('Common/Models/Content');
-const Media = require('Common/Models/Media');
-const Template = require('Common/Models/Template');
-
-const RequestHelper = require('Server/Helpers/RequestHelper');
-const UserHelper = require('Server/Helpers/UserHelper');
-const MediaHelper = require('Server/Helpers/MediaHelper');
-const ContentHelper = require('Server/Helpers/ContentHelper');
-
 /**
  * GitHub deployer
  */
-class GitHubDeployer extends Deployer {
+class GitHubDeployer extends HashBrown.Models.Deployer {
+    // Name and alias
+    static get name() { return 'GitHub'; }
+    static get alias() { return 'github'; }
+
     /**
      * Structure
      */
@@ -67,7 +61,7 @@ class GitHubDeployer extends Deployer {
      * @returns {Promise} Result
      */
     test() {
-        return RequestHelper.request('get', 'https://api.github.com/user?token=' + this.token)
+        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/user?token=' + this.token)
         .then(() => {
             return Promise.resolve(true);  
         });
@@ -97,7 +91,7 @@ class GitHubDeployer extends Deployer {
         }
 
         // If not, proceed with API call
-        return RequestHelper.request('get', path)
+        return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             if(!data) { return Promise.resolve(); }
             
@@ -133,7 +127,7 @@ class GitHubDeployer extends Deployer {
         }
 
         // If not, proceed with API call
-        return RequestHelper.request('get', path)
+        return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             if(!data) { return Promise.resolve(); }
             
@@ -159,7 +153,7 @@ class GitHubDeployer extends Deployer {
             return new Promise((resolve, reject) => {
                 let dirPath = path.slice(0, path.lastIndexOf('/'));
 
-                MediaHelper.mkdirRecursively(this.getLocalUrl() + dirPath);
+                HashBrown.Helpers.MediaHelper.mkdirRecursively(this.getLocalUrl() + dirPath);
 
                 debug.log('Writing file "' + this.getLocalUrl() + path + '"...', this);
 
@@ -177,7 +171,7 @@ class GitHubDeployer extends Deployer {
         // Fetch first to get the SHA
         debug.log('Getting SHA...', this);
         
-        return RequestHelper.request('get', path)
+        return HashBrown.Helpers.RequestHelper.request('get', path)
         .catch((e) => {
             // If the file wasn't found, just proceed
             
@@ -195,7 +189,7 @@ class GitHubDeployer extends Deployer {
             // Commit the file
             debug.log('Committing data...', this);
 
-            return RequestHelper.request('put', path, postData);
+            return HashBrown.Helpers.RequestHelper.request('put', path, postData);
         })
         .then((data) => {
             if(data.message) {
@@ -233,7 +227,7 @@ class GitHubDeployer extends Deployer {
         // Fetch first to get the SHA
         debug.log('Getting SHA...', this, 2);
         
-        return RequestHelper.request('get', path)
+        return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             // Data wasn't found, nothing needs to be deleted
             if(!data || !data.sha) {
@@ -250,7 +244,7 @@ class GitHubDeployer extends Deployer {
             // Remove the file
             debug.log('Removing data...', this, 2);
 
-            return RequestHelper.request('delete', path, postData);
+            return HashBrown.Helpers.RequestHelper.request('delete', path, postData);
         })
         .then((data) => {    
             if(data.message) {

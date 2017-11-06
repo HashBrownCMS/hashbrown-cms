@@ -28,9 +28,6 @@ class Connection extends Resource {
         this.def(String, 'url');
         this.def(Boolean, 'useLocal');
         this.def(Boolean, 'isLocked');
-
-        this.def(Processor, 'processor');
-        this.def(Deployer, 'deployer');
         
         // Sync
         this.def(Object, 'sync');
@@ -46,7 +43,14 @@ class Connection extends Resource {
     static paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
         if(params.type) {
-            params = this.getPresetSettings(params.type.toLowerCase().replace(/ /g, '-'), params.settings);
+            let newParams = this.getPresetSettings(params.type, params.settings);
+
+            newParams.id = params.id;
+            newParams.title = params.title;
+            newParams.url = params.url;
+            newParams.isLocked = params.isLocked;
+
+            params = newParams;
         }
 
         // Paths
@@ -72,39 +76,39 @@ class Connection extends Resource {
         let settings;
 
         switch(preset) {
-            case 'github-pages':
+            case 'GitHub Pages':
                 settings = {
                     useLocal: oldSettings.isLocal || false,
                     url: oldSettings.url || '',
                     processor: {
-                        type: 'Jekyll'
+                        alias: 'jekyll'
                     },
                     deployer: {
-                        type: 'GitHub',
+                        alias: 'github',
                         token: oldSettings.token || '',
                         org: oldSettings.org || '',
                         repo: oldSettings.repo || '',
                         branch: oldSettings.branch || '',
-                    },
-                    paths: {
-                        templates: {
-                            partial: '/_includes/partials/',
-                            page: '/_layouts/'
-                        },
-                        content: '/content/',
-                        media: '/media/'
+                        paths: {
+                            templates: {
+                                partial: '/_includes/partials/',
+                                page: '/_layouts/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
                     }
                 };
                 break;
 
-            case 'hashbrown-driver':
+            case 'HashBrown Driver':
                 settings = {
                     url: oldSettings.url || '',
                     processor: {
-                        type: 'json'
+                        alias: 'json'
                     },
                     deployer: {
-                        type: 'api',
+                        alias: 'api',
                         token: oldSettings.token || ''
                     },
                     paths: {

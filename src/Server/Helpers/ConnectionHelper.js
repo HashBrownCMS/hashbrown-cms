@@ -16,51 +16,49 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Registers a deployer
      *
-     * @param {String} name
      * @param {Deployer} deployer
      */
-    static registerDeployer(name, deployer) {
+    static registerDeployer(deployer) {
         if(!this.deployers) {
             this.deployers = {};
         }
 
-        this.deployers[name] = deployer;
+        this.deployers[deployer.alias] = deployer;
     }
     
     /**
      * Registers a processor
      *
-     * @param {String} name
      * @param {Processor} processor
      */
-    static registerProcessor(name, processor) {
+    static registerProcessor(processor) {
         if(!this.processors) {
             this.processors = {};
         }
 
-        this.processors[name] = processor;
+        this.processors[processor.alias] = processor;
     }
 
     /**
      * Gets a deployer
      *
-     * @string {String} name
+     * @string {String} alias
      *
      * @returns {Deployer} Deployer
      */
-    static getDeployer(name) {
-        return this.deployers[name];
+    static getDeployer(alias) {
+        return this.deployers[alias];
     }
     
     /**
      * Gets a processor
      *
-     * @string {String} name
+     * @string {String} alias
      *
      * @returns {Processor} Processor
      */
-    static getProcessor(name) {
-        return this.processors[name];
+    static getProcessor(alias) {
+        return this.processors[alias];
     }
 
     /**
@@ -206,7 +204,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return SyncHelper.mergeResource(project, environment, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
-                    connections[i] = this.initConnection(connections[i]);
+                    connections[i] = new Connection(connections[i]);
                 }
 
                 return Promise.resolve(connections);
@@ -240,11 +238,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
             if(!data) {
                 return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
-                    return Promise.resolve(this.initConnection(resourceItem));
+                    return Promise.resolve(new Connection(resourceItem));
                 });
             } 
             
-            return Promise.resolve(this.initConnection(data));
+            return Promise.resolve(new Connection(data));
         });
     }
     

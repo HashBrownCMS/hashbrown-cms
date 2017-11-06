@@ -1,6 +1,9 @@
 'use strict';
 
-class GitHubDeploymentEditor extends Crisp.View {
+class GitHubDeployerEditor extends Crisp.View {
+    // Alias
+    static get alias() { return 'github'; }
+
     /**
      * Constructor
      */
@@ -64,7 +67,7 @@ class GitHubDeploymentEditor extends Crisp.View {
                     let w = window.open('/plugins/github/oauth/start');
 
                     w.addEventListener('load', () => {
-                        this.model.token = w.document.body.innerHTML;
+                        this.model.token = w.docuer.body.innerHTML;
 
                         this.fetch();
                         
@@ -144,7 +147,7 @@ class GitHubDeploymentEditor extends Crisp.View {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'github-editor'},
+        return _.div({class: 'deployer-editor deployer-editor--github'},
             // Local switch
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Local'),
@@ -190,4 +193,4 @@ class GitHubDeploymentEditor extends Crisp.View {
     }
 }
 
-HashBrown.Views.Editors.DeploymentEditors.GitHub = GitHubDeploymentEditor;
+HashBrown.Views.Editors.DeployerEditors.GitHub = GitHubDeployerEditor;

@@ -27,4 +27,4 @@ class HashBrownDriverConnectionEditor extends Crisp.View {
 
 }
     
-HashBrown.Views.Editors.ConnectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;
+//HashBrown.Views.Editors.ConnectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;

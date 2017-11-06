@@ -23,7 +23,7 @@ class PluginController extends Controller {
      * Serves JS files
      */
     static getJs(req, res) {
-        Glob(appRoot + '/plugins/**/client.js', (err, paths) => {
+        Glob(appRoot + '/plugins/*/client/**/*.js', (err, paths) => {
             let compiledJs = '';
 
             for(let path of paths) {
@@ -38,7 +38,7 @@ class PluginController extends Controller {
      * Serves CSS files
      */
     static getCss(req, res) {
-        Glob(appRoot + '/plugins/**/client.css', (err, paths) => {
+        Glob(appRoot + '/plugins/*/client/**/*.css', (err, paths) => {
             let compiledCss = '';
 
             for(let path of paths) {

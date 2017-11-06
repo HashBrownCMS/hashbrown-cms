@@ -1,7 +1,7 @@
 'use strict';
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
-const Connection = require('Common/Models/Connection');
+const Connection = require('Client/Models/Connection');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 

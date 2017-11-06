@@ -148,13 +148,13 @@ class ConnectionEditor extends Crisp.View {
     /**
      * Renders the processing settings editor
      */
-    renderProcessingSettingsEditor() {
+    renderProcessorSettingsEditor() {
         return [
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Type'),
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
-                        value: this.model.settings.processing.type,
+                        value: this.model.processor.alias,
                         options: [
                             {
                                 label: 'Jekyll',
@@ -169,7 +169,7 @@ class ConnectionEditor extends Crisp.View {
                         labelKey: 'label',
                         placeholder: 'Type',
                         onChange: (newValue) => {
-                            this.model.settings.processing.type = newValue;
+                            this.model.processor.alias = newValue;
 
                             this.fetch();
                         }
@@ -182,42 +182,104 @@ class ConnectionEditor extends Crisp.View {
     /**
      * Renders the deployment settings editor
      */
-    renderDeploymentSettingsEditor() {
+    renderDeployerSettingsEditor() {
+        // TODO: Fetch these options from available plugins
+        let options = [
+            {
+                label: 'API',
+                value: 'api'
+            },
+            {
+                label: 'Git',
+                value: 'git'
+            },
+            {
+                label: 'GitHub',
+                value: 'github'
+            },
+            {
+                label: 'HashBrown Driver',
+                value: 'hashbrown-driver'
+            }
+        ];
+
         return [
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Type'),
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
-                        value: this.model.settings.deployment.type,
-                        options: [
-                            {
-                                label: 'API',
-                                value: 'api'
-                            },
-                            {
-                                label: 'Git',
-                                value: 'git'
-                            },
-                            {
-                                label: 'GitHub',
-                                value: 'github'
-                            },
-                            {
-                                label: 'HashBrown Driver',
-                                value: 'hashbrown-driver'
-                            }
-                        ],
+                        value: this.model.deployer.alias,
+                        options: options, 
                         valueKey: 'value',
                         labelKey: 'label',
                         placeholder: 'Type',
                         onChange: (newValue) => {
-                            this.model.settings.deployment.type = newValue;
+                            this.model.deployer.alias = newValue;
 
                             this.fetch();
                         }
                     }).$element
                 )
-            )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'},
+                    _.div({class: 'editor__field__key__label'}, 'Paths'),
+                    _.div({class: 'editor__field__key__description'}, 'Where to store the individual resources')
+                ),
+                _.div({class: 'editor__field__value'},
+                    _.div({class: 'editor__field'},
+                        _.div({class: 'editor__field__key'}, 'Content'),
+                        _.div({class: 'editor__field__value'},
+                            new HashBrown.Views.Widgets.Input({
+                                value: this.model.deployer.paths.content,
+                                onChange: (newValue) => {
+                                    this.model.deployer.paths.content = newValue;
+                                }
+                            })
+                        )
+                    ),
+                    _.div({class: 'editor__field'},
+                        _.div({class: 'editor__field__key'}, 'Media'),
+                        _.div({class: 'editor__field__value'},
+                            new HashBrown.Views.Widgets.Input({
+                                value: this.model.deployer.paths.media,
+                                onChange: (newValue) => {
+                                    this.model.deployer.paths.media = newValue;
+                                }
+                            })
+                        )
+                    ),
+                    _.div({class: 'editor__field'},
+                        _.div({class: 'editor__field__key'}, 'Page templates'),
+                        _.div({class: 'editor__field__value'},
+                            new HashBrown.Views.Widgets.Input({
+                                value: this.model.deployer.paths.templates.page,
+                                onChange: (newValue) => {
+                                    this.model.deployer.paths.templates.page = newValue;
+                                }
+                            })
+                        )
+                    ),
+                    _.div({class: 'editor__field'},
+                        _.div({class: 'editor__field__key'}, 'Partial templates'),
+                        _.div({class: 'editor__field__value'},
+                            new HashBrown.Views.Widgets.Input({
+                                value: this.model.deployer.paths.templates.partial,
+                                onChange: (newValue) => {
+                                    this.model.deployer.paths.templates.partial = newValue;
+                                }
+                            })
+                        )
+                    )
+                )
+            ),
+            _.each(HashBrown.Views.Editors.DeployerEditors, (name, editor) => {
+                if(editor.alias !== this.model.deployer.alias) { return; }
+                    
+                return new editor({
+                    model: this.model.deployer
+                }).$element;
+            })
         ];
     }
 
@@ -271,15 +333,21 @@ class ConnectionEditor extends Crisp.View {
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Processing'),
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Processor'),
+                        _.div({class: 'editor__field__key__description'}, 'Which format to deploy Content in')
+                    ),
                     _.div({class: 'editor__field__value'},
-                        this.renderProcessingSettingsEditor()
+                        this.renderProcessorSettingsEditor()
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Deployment'),
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Deployer'),
+                        _.div({class: 'editor__field__key__description'}, 'How to transfer data to and from the endpoint server')
+                    ),
                     _.div({class: 'editor__field__value'},
-                        this.renderDeploymentSettingsEditor()
+                        this.renderDeployerSettingsEditor()
                     )
                 )
             ),

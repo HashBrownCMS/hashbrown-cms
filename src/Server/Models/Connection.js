@@ -1,5 +1,8 @@
 'use strict';
 
+const Processor = require('Common/Models/Processor');
+const Deployer = require('Common/Models/Deployer');
+
 const ConnectionCommon = require('Common/Models/Connection');
 
 /**
@@ -9,6 +12,23 @@ const ConnectionCommon = require('Common/Models/Connection');
  */
 class Connection extends ConnectionCommon {
     /**
+     * Constructor
+     */
+    constructor(params) {
+        super(Connection.paramsCheck(params));
+    }
+    
+    /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(Processor, 'processor');
+        this.def(Deployer, 'deployer');
+    }
+
+    /**
      * Checks the format of the params
      *
      * @params {Object} params
@@ -17,13 +37,21 @@ class Connection extends ConnectionCommon {
      */
     static paramsCheck(params) {
         params = super.paramsCheck(params);
-        
+
         if(params.processor instanceof Processor === false) {
-            params.processor = HashBrown.Helpers.ConnectionHelper.getProcessor(params.processor.type); 
+            let processor = HashBrown.Helpers.ConnectionHelper.getProcessor(params.processor.alias);
+
+            if(processor) {
+                params.processor = new processor(params.processor);
+            }
         }
         
         if(params.deployer instanceof Deployer === false) {
-            params.deployer = HashBrown.Helpers.ConnectionHelper.getDeployer(params.deployer.type); 
+            let deployer = HashBrown.Helpers.ConnectionHelper.getDeployer(params.deployer.alias);
+
+            if(deployer) {
+                params.deployer = new deployer(params.deployer);
+            }
         }
 
         return params;
