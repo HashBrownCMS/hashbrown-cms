@@ -33,7 +33,10 @@ class JekyllProcessor extends HashBrown.Models.Processor {
         frontMatter += Yaml.stringify(properties, 50); 
         frontMatter += '---';
 
-        return Promise.resolve(frontMatter);
+        return Promise.resolve({
+            data: frontMatter,
+            filename: content.id + '.md'
+        });
     }
 }
 

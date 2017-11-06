@@ -14,13 +14,6 @@ class FileSystemDeployerEditor extends Crisp.View {
     }
     
     /**
-     * Get organisations
-     */
-    getOrgs() {
-        return HashBrown.Helpers.RequestHelper.customRequest('get', '/plugins/github/orgs/?connectionId=' + Router.params.id);
-    };
-   
-    /**
      * Render local path editor
      */
     renderPathEditor() {
@@ -38,7 +31,7 @@ class FileSystemDeployerEditor extends Crisp.View {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'deployer-editor deployer-editor--github'},
+        return _.div({class: 'deployer-editor deployer-editor--filesystem'},
             // Path
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'},

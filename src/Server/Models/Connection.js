@@ -217,20 +217,20 @@ class Connection extends ConnectionCommon {
      * Sets a Content node by id
      *
      * @param {String} id
-     * @param {String} language
      * @param {Content} content
+     * @param {String} language
      *
      * @returns {Promise} Result
      */
-    setContent(id, language, content) {
+    setContent(id, content, language) {
         return this.processor.process(content, language)
         .then((result) => {
             // Convert to base64
-            if(result.lastIndexOf('=') === result.length - 1) {
-                result = new Buffer(result, 'base64').toString();
+            if(result.data.lastIndexOf('=') !== result.data.length - 1) {
+                result.data = Buffer.from(result.data, 'utf8').toString('base64');
             }
 
-            return this.deployer.setFile(this.deployer.getPath('content') + language + '/' + id, result);
+            return this.deployer.setFile(this.deployer.getPath('content') + language + '/' + (result.filename || id), result.data);
         });
     }
     

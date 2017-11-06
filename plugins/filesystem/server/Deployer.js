@@ -37,10 +37,7 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      * @returns {Promise} Result
      */
     test() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/user?token=' + this.token)
-        .then(() => {
-            return Promise.resolve(true);  
-        });
+        return Promise.resolve(true);  
     }
 
     /**
@@ -76,16 +73,12 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      * @returns {Promise} Result
      */
     getFolder(path, recursions) {
+        path += '*';
+
         if(recursions > 0) {
-            path += '*/';
-
-            let subdirs = [];
-
             for(let i = 0; i < recursions || 0; i++) {
-                subdirs.push('*');
+                path += '/*';
             }
-
-            path += subdirs.join('/');
         }
 
         return new Promise((resolve, reject) => {
@@ -111,13 +104,13 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      */
     setFile(path, base64) {
         return new Promise((resolve, reject) => {
-            let dirPath = path.slice(0, path.lastIndexOf('/'));
+            let dirPath = Path.dirname(path);
 
-            HashBrown.Helpers.MediaHelper.mkdirRecursively(this.getLocalUrl() + dirPath);
+            HashBrown.Helpers.MediaHelper.mkdirRecursively(dirPath);
 
-            debug.log('Writing file "' + this.getLocalUrl() + path + '"...', this);
+            debug.log('Writing file "' + path + '"...', this);
 
-            FileSystem.writeFile(path, Buffer.from(base64, 'base64'), (err) => {
+            FileSystem.writeFile(path, Buffer.from(base64, 'base64').toString('utf8'), (err) => {
                 if(err) {
                     reject(err);
                 } else {
