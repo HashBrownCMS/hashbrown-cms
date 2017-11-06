@@ -46,7 +46,7 @@ class Template extends Resource {
      * Updates id from name
      */
     updateId() {
-        this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
+        this.id = this.name;
     }
 }
 

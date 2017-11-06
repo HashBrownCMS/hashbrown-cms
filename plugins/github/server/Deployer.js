@@ -1,10 +1,5 @@
 'use strict';
 
-const FileSystem = require('fs');
-const Path = require('path');
-const Glob = require('glob');
-const RimRaf = require('rimraf');
-
 /**
  * GitHub deployer
  */
@@ -30,17 +25,7 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * @returns {String} Root
      */
     getRootPath() {
-        let path = '';
-
-        if(this.isLocal) {
-            return this.localRoot;
-        
-        } else {
-            return 'https://api.github.com/repos/' + this.repo + '/contents/';
-
-        }
-        
-        return path;
+        return 'https://api.github.com/repos/' + this.repo + '/contents/';
     }
 
     /**
@@ -75,22 +60,6 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * @return {Promise} Promise
      */
     getFile(path) {
-        // Fetch using filesystem
-        if(this.isLocal) {
-            return new Promise((resolve, reject) => {
-                FileSystem.readFile(path, (err, data) => {
-                    if(err) {
-                        reject(err);
-                    
-                    } else {
-                        resolve(data);
-
-                    }
-                });
-            });
-        }
-
-        // If not, proceed with API call
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             if(!data) { return Promise.resolve(); }
@@ -111,21 +80,6 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * @returns {Promise} Result
      */
     getFolder(path) {
-        // Fetch using filesystem
-        if(this.isLocal) {
-            return new Promise((resolve, reject) => {
-                FileSystem.readDir(path, (err, data) => {
-                    if(err) {
-                        reject(err);
-                    
-                    } else {
-                        resolve(data);
-
-                    }
-                });
-            });
-        }
-
         // If not, proceed with API call
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
@@ -148,26 +102,6 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * @return {Promise} Promise
      */
     setFile(path, base64) {
-        // Local
-        if(this.isLocal) {
-            return new Promise((resolve, reject) => {
-                let dirPath = path.slice(0, path.lastIndexOf('/'));
-
-                HashBrown.Helpers.MediaHelper.mkdirRecursively(this.getLocalUrl() + dirPath);
-
-                debug.log('Writing file "' + this.getLocalUrl() + path + '"...', this);
-
-                FileSystem.writeFile(path, Buffer.from(base64, 'base64'), (err) => {
-                    if(err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                        debug.log('Uploaded file successfully to ' + path, this);
-                    }
-                });
-            });
-        }
-
         // Fetch first to get the SHA
         debug.log('Getting SHA...', this);
         
@@ -208,19 +142,6 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * @return {Promise} Promise
      */
     removeFile(path) {
-        // Delete content locally
-        if(this.isLocal) {
-            return new Promise((resolve, reject) => {
-                RimRaf(path, (err) => {
-                    if(err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-        }
-
         // Delete from repo
         debug.log('Removing "' + path + '"...', this, 2);
 

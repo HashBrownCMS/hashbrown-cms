@@ -55,7 +55,7 @@ class TemplateController extends ApiController {
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.deleteTemplateById(type, id);
+            return connection.deleteTemplate(type, id);
         })
         .then(() => {
             res.status(200).send('OK');
@@ -77,7 +77,7 @@ class TemplateController extends ApiController {
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.getTemplateById(type, id);
+            return connection.getTemplate(type, id);
         })
         .then((template) => {
             res.status(200).send(template);
@@ -91,38 +91,32 @@ class TemplateController extends ApiController {
      * Gets an array of all templates
      */
     static getTemplates(req, res) {
+        let allTemplates = [];
+        let provider;
+        
         return ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
-           
-            let allTemplates = [];
 
-            return connection.getTemplates('page')
-            .then((pageTemplates) => {
-                if(Array.isArray(pageTemplates)) {
-                    allTemplates = allTemplates.concat(pageTemplates);
-                }
+            provider = connection;
 
-                return connection.getTemplates('partial');
-            })
-            .catch((e) => {
-                debug.error(e.message, this);
-            })
-            .then((partialTemplates) => {
-                if(Array.isArray(partialTemplates)) {
-                    allTemplates = allTemplates.concat(partialTemplates);
-                }
-
-                return Promise.resolve();
-            })
-            .catch((e) => {
-                debug.error(e.message, this);
-            })
-            .then(() => {
-                return Promise.resolve(allTemplates);
-            });
+            return provider.getAllTemplates('page');
         })
-        .then((allTemplates) => {
+        .then((pageTemplates) => {
+            if(Array.isArray(pageTemplates)) {
+                allTemplates = allTemplates.concat(pageTemplates);
+            }
+
+            return provider.getAllTemplates('partial');
+        })
+        .then((partialTemplates) => {
+            if(Array.isArray(partialTemplates)) {
+                allTemplates = allTemplates.concat(partialTemplates);
+            }
+
+            return Promise.resolve();
+        })
+        .then(() => {
             res.status(200).send(allTemplates);
         })
         .catch((e) => {

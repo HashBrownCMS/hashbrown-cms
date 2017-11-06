@@ -190,15 +190,15 @@ class ConnectionEditor extends Crisp.View {
                 value: 'api'
             },
             {
-                label: 'Git',
-                value: 'git'
+                label: 'File system',
+                value: 'filesystem'
             },
             {
                 label: 'GitHub',
                 value: 'github'
             },
             {
-                label: 'HashBrown Driver',
+                label: 'HashBrown driver',
                 value: 'hashbrown-driver'
             }
         ];
@@ -221,6 +221,13 @@ class ConnectionEditor extends Crisp.View {
                     }).$element
                 )
             ),
+            _.each(HashBrown.Views.Editors.DeployerEditors, (name, editor) => {
+                if(editor.alias !== this.model.deployer.alias) { return; }
+                    
+                return new editor({
+                    model: this.model.deployer
+                }).$element;
+            }),
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'},
                     _.div({class: 'editor__field__key__label'}, 'Paths'),
@@ -272,14 +279,7 @@ class ConnectionEditor extends Crisp.View {
                         )
                     )
                 )
-            ),
-            _.each(HashBrown.Views.Editors.DeployerEditors, (name, editor) => {
-                if(editor.alias !== this.model.deployer.alias) { return; }
-                    
-                return new editor({
-                    model: this.model.deployer
-                }).$element;
-            })
+            )
         ];
     }
 

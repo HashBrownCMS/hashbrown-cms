@@ -13,5 +13,6 @@ module.exports = {
     Processor: require('Common/Models/Processor'),
     Schema: require('./Schema'),
     Task: require('./Task'),
+    Template: require('Common/Models/Template'),
     User: require('./User')
 };

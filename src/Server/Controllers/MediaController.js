@@ -46,12 +46,14 @@ class MediaController extends ApiController {
                     return res.status(404).send('Not found');
                 }
 
-                if(connection.isLocal()) {
+                // Serve local files directly
+                if(media.url.indexOf('http') < 0) {
                     res.sendFile(media.url);
 
+                // Serve remote files through redirection
+                // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server
+                // NOTE: The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
                 } else {
-                    // Piping the data through would be a more elegant solution, but ultimately more work for the server
-                    // The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
                     res.redirect(media.url);
                 }
             });

@@ -28,7 +28,6 @@ class Deployer extends Entity {
     structure() {
         this.def(String, 'name');
         this.def(String, 'alias');
-        this.def(String, 'isLocal');
         this.def(Object, 'paths', {
             templates: {
                 page: '',

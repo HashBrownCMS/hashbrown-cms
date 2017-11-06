@@ -1,5 +1,7 @@
 'use strict';
 
+const Path = require('path');
+
 const Processor = require('Common/Models/Processor');
 const Deployer = require('Common/Models/Deployer');
 
@@ -83,7 +85,7 @@ class Connection extends ConnectionCommon {
 
                 // No more languauges to publish for
                 if(!language) {
-                    debug.log('Unpublished all localised property sets successfully!', connection);
+                    debug.log('Unpublished all localised property sets successfully!', this);
                     return Promise.resolve();
                 }
 
@@ -263,9 +265,7 @@ class Connection extends ConnectionCommon {
                 
                 let template = new HashBrown.Models.Template({
                     name: name,
-                    type: type,
-                    remotePath: this.paths.templates[type] + name,
-                    isRemote: this.useLocal !== true
+                    type: type
                 });
 
                 allTemplates.push(template);
@@ -291,9 +291,9 @@ class Connection extends ConnectionCommon {
             let name = Path.basename(file.path || file);
             
             return Promise.resolve(new HashBrown.Models.Template({
-                name: name,
+                name: file.name,
                 type: type,
-                url: (this.useLocal ? this.localRoot : this.remoteRoot) + this.paths.templates[type] + name
+                markup: file.data
             }));
         });
     }
@@ -318,7 +318,7 @@ class Connection extends ConnectionCommon {
      *
      * @returns {Promise} Result
      */
-    removeTemplate(id) {
+    removeTemplate(name) {
         return this.deployer.removeFile(this.deployer.getPath('templates/' + type) + name, content);
     }
     
@@ -328,7 +328,7 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media
      */
     getAllMedia() {
-        return this.deployer.getFolder(this.deployer.getPath('media'))
+        return this.deployer.getFolder(this.deployer.getPath('media'), 1)
         .then((folders) => {
             if(!folders) { return Promise.resolve([]); }
 
@@ -336,9 +336,11 @@ class Connection extends ConnectionCommon {
 
             for(let folder of folders) {
                 let name = Path.basename(folder.path || folder);
+                let id = Path.dirname(folder.path || folder).split(Path.sep).pop();
                 
                 let media = new HashBrown.Models.Media({
-                    id: name
+                    id: id,
+                    name: name
                 });
 
                 allMedia.push(media);
@@ -356,16 +358,17 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media node
      */
     getMedia(id) {
-        return this.deployer.getFolder(this.deployer.getPath('media') + id)
+        return this.deployer.getFolder(this.deployer.getPath('media') + id, 1)
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
 
             let file = files[0];
-            let name = Path.basename(file.path || file);
+            let name = Path.basename(file.path || file.url || file);
             
             return Promise.resolve(new HashBrown.Models.Media({
                 id: id,
-                name: name
+                name: name,
+                url: file.path || file.url || file
             }));
         });
     }

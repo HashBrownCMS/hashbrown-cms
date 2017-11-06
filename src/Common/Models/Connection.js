@@ -78,8 +78,6 @@ class Connection extends Resource {
         switch(preset) {
             case 'GitHub Pages':
                 settings = {
-                    useLocal: oldSettings.isLocal || false,
-                    url: oldSettings.url || '',
                     processor: {
                         alias: 'jekyll'
                     },
@@ -103,21 +101,20 @@ class Connection extends Resource {
 
             case 'HashBrown Driver':
                 settings = {
-                    url: oldSettings.url || '',
                     processor: {
                         alias: 'json'
                     },
                     deployer: {
                         alias: 'api',
-                        token: oldSettings.token || ''
-                    },
-                    paths: {
-                        templates: {
-                            partial: '/hashbrown/api/templates/partial/',
-                            page: '/hashbrown/api/templates/page/'
-                        },
-                        content: '/hashbrown/api/content/',
-                        media: '/hashbrown/api/media/'
+                        token: oldSettings.token || '',
+                        paths: {
+                            templates: {
+                                partial: '/hashbrown/api/templates/partial/',
+                                page: '/hashbrown/api/templates/page/'
+                            },
+                            content: '/hashbrown/api/content/',
+                            media: '/hashbrown/api/media/'
+                        }
                     }
                 };
                 break;
