@@ -302,13 +302,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        connection = requiredParam('connection'),
-        create = false
-    ) {
+    static setConnectionById(project, environment, id, connection, create = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(connection, 'connection', HashBrown.Models.Connection);
+
         // Unset automatic flags
         connection.isLocked = false;
 
@@ -323,7 +322,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             {
                 id: id
             },
-            connection,
+            connection.getObject(),
             {
                 upsert: create
             }

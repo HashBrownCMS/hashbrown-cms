@@ -11224,7 +11224,6 @@ var Connection = function (_Resource) {
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'url');
-        this.def(Boolean, 'useLocal');
         this.def(Boolean, 'isLocked');
 
         // Sync
@@ -11251,14 +11250,6 @@ var Connection = function (_Resource) {
             newParams.isLocked = params.isLocked;
 
             params = newParams;
-        }
-
-        // Paths
-        if (!params.paths) {
-            params.paths = {};
-        }
-        if (!params.paths.templates) {
-            params.paths.templates = {};
         }
 
         // Deployer and processor
@@ -11291,7 +11282,18 @@ var Connection = function (_Resource) {
                     processor: {
                         alias: 'jekyll'
                     },
-                    deployer: {
+                    deployer: oldSettings.isLocal ? {
+                        alias: 'filesystem',
+                        rootPath: oldSettings.localPath,
+                        paths: {
+                            templates: {
+                                partial: '/_includes/partials/',
+                                page: '/_layouts/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
+                    } : {
                         alias: 'github',
                         token: oldSettings.token || '',
                         org: oldSettings.org || '',
@@ -15277,7 +15279,6 @@ var Processor = function (_Entity) {
   Processor.prototype.structure = function structure() {
     this.def(String, 'name');
     this.def(String, 'alias');
-    this.def(Object, 'settings', {});
   };
 
   /**
@@ -15392,8 +15393,8 @@ var Deployer = function (_Entity) {
 
 
     Deployer.prototype.getPath = function getPath(path) {
-        var lvl1 = path.split('/')[0];
-        var lvl2 = path.split('/')[1];
+        var lvl1 = path ? path.split('/')[0] : null;
+        var lvl2 = path ? path.split('/')[1] : null;
 
         path = this.getRootPath();
 

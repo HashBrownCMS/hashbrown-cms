@@ -180,7 +180,7 @@ class RequestHelper {
             
             let makeRequest = () => {
                 let protocol = url.protocol === 'https:' ? HTTPS : HTTP;
-
+                
                 let options = {
                     port: url.port,
                     host: url.hostname,
@@ -236,7 +236,8 @@ class RequestHelper {
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
                                 let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str);
-                                
+                               
+                                error.url = url;
                                 error.statusCode = res.statusCode;
 
                                 return reject(error);
@@ -249,6 +250,8 @@ class RequestHelper {
                
                 // Handle errors
                 req.on('error', (e) => {
+                    e.url = url;
+
                     reject(e);
                 });
 

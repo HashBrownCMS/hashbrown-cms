@@ -21,8 +21,8 @@ class ConnectionController extends ApiController {
         app.get('/api/:project/:environment/connections/:id', this.middleware(), this.getConnection);
         
         app.post('/api/:project/:environment/connections/new', this.middleware({scope: 'connections'}), this.createConnection);
-        app.post('/api/:project/:environment/connections/pull/:id', this.middleware(), this.pullConnection);
-        app.post('/api/:project/:environment/connections/push/:id', this.middleware(), this.pushConnection);
+        app.post('/api/:project/:environment/connections/pull/:id', this.middleware({scope: 'connections'}), this.pullConnection);
+        app.post('/api/:project/:environment/connections/push/:id', this.middleware({scope: 'connections'}), this.pushConnection);
         app.post('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.postConnection);
         
         app.delete('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.deleteConnection);
@@ -80,7 +80,7 @@ class ConnectionController extends ApiController {
         let id = req.params.id;
         let connection = req.body;
 
-        ConnectionHelper.setConnectionById(req.project, req.environment, id, connection)
+        ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection))
         .then(() => {
             res.status(200).send(connection);
         })

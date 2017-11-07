@@ -26,7 +26,6 @@ class Connection extends Resource {
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'url');
-        this.def(Boolean, 'useLocal');
         this.def(Boolean, 'isLocked');
         
         // Sync
@@ -53,10 +52,6 @@ class Connection extends Resource {
             params = newParams;
         }
 
-        // Paths
-        if(!params.paths) { params.paths = {}; }
-        if(!params.paths.templates) { params.paths.templates = {}; }
-       
         // Deployer and processor
         if(!params.processor) { params.processor = {}; }
         if(!params.deployer) { params.deployer = {}; }
@@ -81,7 +76,18 @@ class Connection extends Resource {
                     processor: {
                         alias: 'jekyll'
                     },
-                    deployer: {
+                    deployer: oldSettings.isLocal ? {
+                        alias: 'filesystem',
+                        rootPath: oldSettings.localPath,
+                        paths: {
+                            templates: {
+                                partial: '/_includes/partials/',
+                                page: '/_layouts/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
+                    } : {
                         alias: 'github',
                         token: oldSettings.token || '',
                         org: oldSettings.org || '',

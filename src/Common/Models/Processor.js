@@ -28,7 +28,6 @@ class Processor extends Entity {
     structure() {
         this.def(String, 'name');
         this.def(String, 'alias');
-        this.def(Object, 'settings', {});
     }
 
     /**

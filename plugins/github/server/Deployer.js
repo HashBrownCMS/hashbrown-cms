@@ -14,9 +14,28 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
     structure() {
         super.structure();
 
-        this.def(Object, 'token');
+        this.def(String, 'token');
         this.def(String, 'repo');
         this.def(String, 'branch');
+    }
+
+    /**
+     * Extracts the sub path from a full path
+     *
+     * @param {String} path
+     *
+     * @returns {String} Subpath
+     */
+    extractSubPath(path) {
+        if(!path) { return ''; }
+
+        let matches = path.match(/.*\/contents\/([a-zA-Z0-9\/]+)\?access_token/);
+
+        if(matches) {
+            return matches[1];
+        }
+
+        return '';
     }
 
     /**
@@ -36,6 +55,9 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
     getPath(path) {
         path = super.getPath(path);
         path += '?access_token=' + this.token + '&' + 'ref=' + (this.branch || 'gh-pages');
+
+        // Remove trailing slashes before access token
+        path = path.replace('/?access_token', '?access_token');
 
         return path;
     }
@@ -76,11 +98,36 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
      * Gets a folder
      *
      * @param {String} path
+     * @param {Number} recursions
      *
      * @returns {Promise} Result
      */
-    getFolder(path) {
-        // If not, proceed with API call
+    getFolder(path, recursions = 0) {
+        // If using recursion, get tree instead
+        if(recursions > 0) {
+            path = this.extractSubPath(path);
+
+            return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/' + this.repo + '/git/trees/' + (this.branch || 'gh-pages') + '?recursive=1&access_token=' + this.token)
+            .then((data) => {
+                if(!data || !data.tree) { 
+                    return Promise.reject(new Error('No data in GitHub response'));
+                }
+
+                return Promise.resolve(data.tree);    
+            })
+            .then((tree) => {
+                for(let i = tree.length -1; i >= 0; i--) {
+                    if(tree[i].mode !== '100644' || tree[i].path.indexOf(path) !== 0) {
+                        tree.splice(i, 1);
+                    }
+                }
+
+                return Promise.resolve(tree);
+            }); 
+        }
+
+        console.log(path);
+
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             if(!data) { return Promise.resolve(); }

@@ -55,8 +55,8 @@ class Deployer extends Entity {
      * @returns {String} Path
      */
     getPath(path) {
-        let lvl1 = path.split('/')[0];
-        let lvl2 = path.split('/')[1];
+        let lvl1 = path ? path.split('/')[0] : null;
+        let lvl2 = path ? path.split('/')[1] : null;
         
         path = this.getRootPath();
         
@@ -80,8 +80,11 @@ class Deployer extends Entity {
             path += '/';
         }
 
-        // Remove any double slashes
+        // Remove any unwanted double slashes
         path = path.replace(/\/\//g, '/');
+
+        // Add back double slashes for protocols
+        path = path.replace(':/', '://');
 
         return path;
     }

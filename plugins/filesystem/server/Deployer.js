@@ -72,7 +72,7 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} Result
      */
-    getFolder(path, recursions) {
+    getFolder(path, recursions = 0) {
         path += '*';
 
         if(recursions > 0) {
