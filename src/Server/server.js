@@ -31,8 +31,22 @@ app.use(Express.static(appRoot + '/public'));
 // ----------
 // Global methods
 // ----------
-global.requiredParam = function(name) {
+global.requiredParam = (name) => {
     throw new Error('Parameter "' + name + '" is required');
+}
+
+global.checkParam = (value, name, type, ) => {
+    if(value === undefined) {
+        throw new Error('Parameter "' + name + '" is required');
+    }
+    
+    if(value === null) { return; }
+    if(value.constructor === type) { return; }
+    if(value.prototype instanceof type) { return; }
+    if(value instanceof type) { return; }
+    if(value === type) { return; }
+
+    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
 }
 
 // ----------

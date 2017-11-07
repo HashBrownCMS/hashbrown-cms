@@ -19,11 +19,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {Deployer} deployer
      */
     static registerDeployer(deployer) {
+        checkParam(deployer, 'deployer', HashBrown.Models.Deployer);
+
         if(!this.deployers) {
-            this.deployers = {};
+            this.deployers = [];
         }
 
-        this.deployers[deployer.alias] = deployer;
+        this.deployers.push(deployer);
     }
     
     /**
@@ -32,11 +34,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {Processor} processor
      */
     static registerProcessor(processor) {
+        checkParam(processor, 'processor', HashBrown.Models.Processor);
+
         if(!this.processors) {
-            this.processors = {};
+            this.processors = [];
         }
 
-        this.processors[processor.alias] = processor;
+        this.processors.push(processor);
     }
 
     /**
@@ -47,7 +51,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @returns {Deployer} Deployer
      */
     static getDeployer(alias) {
-        return this.deployers[alias];
+        checkParam(alias, 'alias', String);
+
+        if(!this.deployers) { return; }
+
+        for(let deployer of this.deployers) {
+            if(deployer.alias !== alias) { continue; }
+
+            return deployer;
+        }
     }
     
     /**
@@ -58,7 +70,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @returns {Processor} Processor
      */
     static getProcessor(alias) {
-        return this.processors[alias];
+        checkParam(alias, 'alias', String);
+
+        if(!this.processors) { return; }
+
+        for(let processor of this.processors) {
+            if(processor.alias !== alias) { continue; }
+
+            return processor;
+        }
     }
 
     /**

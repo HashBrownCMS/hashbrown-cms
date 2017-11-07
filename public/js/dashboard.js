@@ -11405,7 +11405,9 @@ var Widget = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.fetch();
+        if (!params.isAsync) {
+            _this.fetch();
+        }
         return _this;
     }
 
@@ -26001,10 +26003,25 @@ var Widget = __webpack_require__(56);
 var Dropdown = function (_Widget) {
     _inherits(Dropdown, _Widget);
 
-    function Dropdown() {
+    /**
+     * Constructor
+     */
+    function Dropdown(params) {
+        var _this;
+
         _classCallCheck(this, Dropdown);
 
-        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+        if (params.optionsUrl) {
+            params.isAsync = true;
+
+            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl).then(function (options) {
+                _this.options = options;
+
+                _this.fetch();
+            });
+        }
+
+        return _this = _possibleConstructorReturn(this, _Widget.call(this, params));
     }
 
     /**
@@ -26012,6 +26029,8 @@ var Dropdown = function (_Widget) {
      *
      * @returns {Object} Options
      */
+
+
     Dropdown.prototype.getFlattenedOptions = function getFlattenedOptions() {
         if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
             return this.options;

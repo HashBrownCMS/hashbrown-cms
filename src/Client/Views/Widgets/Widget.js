@@ -12,7 +12,9 @@ class Widget extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.fetch();
+        if(!params.isAsync) {
+            this.fetch();
+        }
     }
 
     /**

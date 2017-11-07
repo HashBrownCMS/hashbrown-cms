@@ -11470,7 +11470,9 @@ var Widget = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.fetch();
+        if (!params.isAsync) {
+            _this.fetch();
+        }
         return _this;
     }
 
@@ -30122,10 +30124,25 @@ var Widget = __webpack_require__(56);
 var Dropdown = function (_Widget) {
     _inherits(Dropdown, _Widget);
 
-    function Dropdown() {
+    /**
+     * Constructor
+     */
+    function Dropdown(params) {
+        var _this;
+
         _classCallCheck(this, Dropdown);
 
-        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+        if (params.optionsUrl) {
+            params.isAsync = true;
+
+            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl).then(function (options) {
+                _this.options = options;
+
+                _this.fetch();
+            });
+        }
+
+        return _this = _possibleConstructorReturn(this, _Widget.call(this, params));
     }
 
     /**
@@ -30133,6 +30150,8 @@ var Dropdown = function (_Widget) {
      *
      * @returns {Object} Options
      */
+
+
     Dropdown.prototype.getFlattenedOptions = function getFlattenedOptions() {
         if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
             return this.options;
@@ -45244,15 +45263,9 @@ var ConnectionEditor = function (_Crisp$View) {
 
         return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             value: this.model.processor.alias,
-            options: [{
-                label: 'Jekyll',
-                value: 'jekyll'
-            }, {
-                label: 'JSON',
-                value: 'json'
-            }],
-            valueKey: 'value',
-            labelKey: 'label',
+            optionsUrl: 'connections/processors',
+            valueKey: 'alias',
+            labelKey: 'name',
             placeholder: 'Type',
             onChange: function onChange(newValue) {
                 _this8.model.processor.alias = newValue;
@@ -45270,23 +45283,11 @@ var ConnectionEditor = function (_Crisp$View) {
     ConnectionEditor.prototype.renderDeployerSettingsEditor = function renderDeployerSettingsEditor() {
         var _this9 = this;
 
-        // TODO: Fetch these options from available plugins
-        var options = [{
-            label: 'API',
-            value: 'api'
-        }, {
-            label: 'File system',
-            value: 'filesystem'
-        }, {
-            label: 'GitHub',
-            value: 'github'
-        }];
-
         return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Type'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
             value: this.model.deployer.alias,
-            options: options,
-            valueKey: 'value',
-            labelKey: 'label',
+            optionsUrl: 'connections/deployers',
+            valueKey: 'alias',
+            labelKey: 'name',
             placeholder: 'Type',
             onChange: function onChange(newValue) {
                 _this9.model.deployer.alias = newValue;

@@ -151,18 +151,9 @@ class ConnectionEditor extends Crisp.View {
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
                         value: this.model.processor.alias,
-                        options: [
-                            {
-                                label: 'Jekyll',
-                                value: 'jekyll'
-                            },
-                            {
-                                label: 'JSON',
-                                value: 'json'
-                            }
-                        ],
-                        valueKey: 'value',
-                        labelKey: 'label',
+                        optionsUrl: 'connections/processors', 
+                        valueKey: 'alias',
+                        labelKey: 'name',
                         placeholder: 'Type',
                         onChange: (newValue) => {
                             this.model.processor.alias = newValue;
@@ -179,31 +170,15 @@ class ConnectionEditor extends Crisp.View {
      * Renders the deployment settings editor
      */
     renderDeployerSettingsEditor() {
-        // TODO: Fetch these options from available plugins
-        let options = [
-            {
-                label: 'API',
-                value: 'api'
-            },
-            {
-                label: 'File system',
-                value: 'filesystem'
-            },
-            {
-                label: 'GitHub',
-                value: 'github'
-            }
-        ];
-
         return [
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Type'),
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
                         value: this.model.deployer.alias,
-                        options: options, 
-                        valueKey: 'value',
-                        labelKey: 'label',
+                        optionsUrl: 'connections/deployers', 
+                        valueKey: 'alias',
+                        labelKey: 'name',
                         placeholder: 'Type',
                         onChange: (newValue) => {
                             this.model.deployer.alias = newValue;

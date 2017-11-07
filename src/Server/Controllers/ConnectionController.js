@@ -16,6 +16,8 @@ class ConnectionController extends ApiController {
      */
     static init(app) {
         app.get('/api/:project/:environment/connections', this.middleware(), this.getConnections);
+        app.get('/api/:project/:environment/connections/deployers', this.middleware(), this.getDeployers);
+        app.get('/api/:project/:environment/connections/processors', this.middleware(), this.getProcessors);
         app.get('/api/:project/:environment/connections/:id', this.middleware(), this.getConnection);
         
         app.post('/api/:project/:environment/connections/new', this.middleware({scope: 'connections'}), this.createConnection);
@@ -25,6 +27,38 @@ class ConnectionController extends ApiController {
         
         app.delete('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.deleteConnection);
     }        
+    
+    /**
+     * Gets all deployers
+     */
+    static getDeployers(req, res) {
+        let deployers = [];
+
+        for(let deployer of ConnectionHelper.deployers) {
+            deployers.push({
+                alias: deployer.alias,
+                name: deployer.name
+            });
+        }
+
+        res.send(deployers);
+    }
+    
+    /**
+     * Gets all processors
+     */
+    static getProcessors(req, res) {
+        let processors = [];
+
+        for(let processor of ConnectionHelper.processors) {
+            processors.push({
+                alias: processor.alias,
+                name: processor.name
+            });
+        }
+
+        res.send(processors);
+    }
     
     /**
      * Gets all connections

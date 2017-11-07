@@ -9,6 +9,24 @@ const Widget = require('./Widget');
  */
 class Dropdown extends Widget {
     /**
+     * Constructor
+     */
+    constructor(params) {
+        if(params.optionsUrl) {
+            params.isAsync = true;
+            
+            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl)
+            .then((options) => {
+                this.options = options;
+
+                this.fetch();
+            });
+        }
+                
+        super(params);
+    }
+    
+    /**
      * Converts options into a flattened structure
      *
      * @returns {Object} Options

@@ -10,7 +10,7 @@ const RimRaf = require('rimraf');
  */
 class FileSystemDeployer extends HashBrown.Models.Deployer {
     // Name and alias
-    static get name() { return 'FileSystem'; }
+    static get name() { return 'File system'; }
     static get alias() { return 'filesystem'; }
 
     /**
