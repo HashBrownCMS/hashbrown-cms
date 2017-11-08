@@ -29,7 +29,7 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
     extractSubPath(path) {
         if(!path) { return ''; }
 
-        let matches = path.match(/.*\/contents\/([a-zA-Z0-9\/]+)\?access_token/);
+        let matches = path.match(/.*\/contents\/([^\?]+)/);
 
         if(matches) {
             return matches[1];
@@ -50,10 +50,13 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
     /**
      * Gets a deployment path
      *
+     * @param {String} path
+     * @param {String} filename
+     *
      * @returns {String} Path
      */
-    getPath(path) {
-        path = super.getPath(path);
+    getPath(path, filename) {
+        path = super.getPath(path, filename);
         path += '?access_token=' + this.token + '&' + 'ref=' + (this.branch || 'gh-pages');
 
         // Remove trailing slashes before access token
@@ -85,7 +88,7 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             if(!data) { return Promise.resolve(); }
-            
+           
             if(data.message) {
                 return Promise.reject(new Error('Couldn\'t find "' + path + '". GitHub response: ' + JSON.stringify(data.message)));
             }
@@ -117,16 +120,19 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
             })
             .then((tree) => {
                 for(let i = tree.length -1; i >= 0; i--) {
+                    // Remove anything that's not a file or is not in the target path
                     if(tree[i].mode !== '100644' || tree[i].path.indexOf(path) !== 0) {
                         tree.splice(i, 1);
+                        continue;
                     }
+
+                    // Replace API URL with static url
+                    tree[i].url = 'https://raw.githubusercontent.com/' + this.repo + '/' + (this.branch || 'gh-pages') + '/' + tree[i].path + '?sanitize=true';
                 }
 
                 return Promise.resolve(tree);
             }); 
         }
-
-        console.log(path);
 
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {

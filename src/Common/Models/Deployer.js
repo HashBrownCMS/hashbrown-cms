@@ -51,10 +51,11 @@ class Deployer extends Entity {
      * Gets a deployment path
      *
      * @param {String} path
+     * @param {String} filename
      *
      * @returns {String} Path
      */
-    getPath(path) {
+    getPath(path, filename) {
         let lvl1 = path ? path.split('/')[0] : null;
         let lvl2 = path ? path.split('/')[1] : null;
         
@@ -78,6 +79,11 @@ class Deployer extends Entity {
         // Add slash if needed
         if(path.lastIndexOf('/') !== path.length - 1) {
             path += '/';
+        }
+
+        // Add filename if needed
+        if(filename) {
+            path += filename;
         }
 
         // Remove any unwanted double slashes

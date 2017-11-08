@@ -284,16 +284,22 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Template
      */
     getTemplate(type, name) {
-        return this.deployer.getFile(this.deployer.getPath('templates/' + type) + name)
+        return this.deployer.getFile(this.deployer.getPath('templates/' + type, name))
         .then((file) => {
             if(!file) { return Promise.reject(new Error('Template "' + name + '" not found')); }
 
             let name = Path.basename(file.path || file);
-            
+            let content = file.data || file.content;
+
+            // Convert from base64
+            if(content && content.lastIndexOf('=') !== content.length - 1) {
+                content = Buffer.from(content, 'base64').toString('utf8');
+            }
+
             return Promise.resolve(new HashBrown.Models.Template({
                 name: file.name,
                 type: type,
-                markup: file.data
+                markup: content
             }));
         });
     }
@@ -358,17 +364,19 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media node
      */
     getMedia(id) {
-        return this.deployer.getFolder(this.deployer.getPath('media') + id, 1)
+        return this.deployer.getFolder(this.deployer.getPath('media', id), 1)
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
 
             let file = files[0];
-            let name = Path.basename(file.path || file.url || file);
-            
+
+            let name = Path.basename(file.url || file.path || file);
+           
             return Promise.resolve(new HashBrown.Models.Media({
                 id: id,
                 name: name,
-                url: file.path || file.url || file
+                url: file.url,
+                path: file.path || file
             }));
         });
     }

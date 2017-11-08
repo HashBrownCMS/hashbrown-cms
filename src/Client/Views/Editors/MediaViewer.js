@@ -33,7 +33,7 @@ class MediaViewer extends Crisp.View {
      * Renders this editor
      */
     template() {
-        let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        let mediaSrc = this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
         return _.div({class: 'editor editor--media'},
             _.div({class: 'editor__header'},

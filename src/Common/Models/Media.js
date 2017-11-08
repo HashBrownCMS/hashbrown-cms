@@ -40,6 +40,7 @@ class Media extends Resource {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
+        this.def(String, 'path');
         this.def(String, 'folder', '/');
     }
 

@@ -109,7 +109,7 @@ class SyncHelper {
                             hasRemote: false
                         };
                     }
-
+                    
                     debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
                         
                     return Promise.resolve(data);

@@ -99,7 +99,7 @@ class ConnectionController extends ApiController {
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Connection "' + id + '"')); }
         
-            return ConnectionHelper.setConnectionById(req.project, req.environment, id, resourceItem, true)
+            return ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(resourceItem), true)
             .then((newConnection) => {
                 res.status(200).send(id);
             });

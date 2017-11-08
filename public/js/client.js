@@ -7147,6 +7147,7 @@ var Media = function (_Resource) {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
+        this.def(String, 'path');
         this.def(String, 'folder', '/');
     };
 
@@ -11313,6 +11314,7 @@ var Connection = function (_Resource) {
             newParams.title = params.title;
             newParams.url = params.url;
             newParams.isLocked = params.isLocked;
+            newParams.sync = params.sync;
 
             params = newParams;
         }
@@ -16159,12 +16161,13 @@ var Deployer = function (_Entity) {
      * Gets a deployment path
      *
      * @param {String} path
+     * @param {String} filename
      *
      * @returns {String} Path
      */
 
 
-    Deployer.prototype.getPath = function getPath(path) {
+    Deployer.prototype.getPath = function getPath(path, filename) {
         var lvl1 = path ? path.split('/')[0] : null;
         var lvl2 = path ? path.split('/')[1] : null;
 
@@ -16190,8 +16193,16 @@ var Deployer = function (_Entity) {
             path += '/';
         }
 
-        // Remove any double slashes
+        // Add filename if needed
+        if (filename) {
+            path += filename;
+        }
+
+        // Remove any unwanted double slashes
         path = path.replace(/\/\//g, '/');
+
+        // Add back double slashes for protocols
+        path = path.replace(':/', '://');
 
         return path;
     };
@@ -41000,7 +41011,7 @@ var MediaViewer = function (_Crisp$View) {
 
 
     MediaViewer.prototype.template = function template() {
-        var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        var mediaSrc = this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
         return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true, src: mediaSrc }))));
     };

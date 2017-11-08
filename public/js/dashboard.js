@@ -7082,6 +7082,7 @@ var Media = function (_Resource) {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
+        this.def(String, 'path');
         this.def(String, 'folder', '/');
     };
 
@@ -11248,6 +11249,7 @@ var Connection = function (_Resource) {
             newParams.title = params.title;
             newParams.url = params.url;
             newParams.isLocked = params.isLocked;
+            newParams.sync = params.sync;
 
             params = newParams;
         }
@@ -15387,12 +15389,13 @@ var Deployer = function (_Entity) {
      * Gets a deployment path
      *
      * @param {String} path
+     * @param {String} filename
      *
      * @returns {String} Path
      */
 
 
-    Deployer.prototype.getPath = function getPath(path) {
+    Deployer.prototype.getPath = function getPath(path, filename) {
         var lvl1 = path ? path.split('/')[0] : null;
         var lvl2 = path ? path.split('/')[1] : null;
 
@@ -15418,8 +15421,16 @@ var Deployer = function (_Entity) {
             path += '/';
         }
 
-        // Remove any double slashes
+        // Add filename if needed
+        if (filename) {
+            path += filename;
+        }
+
+        // Remove any unwanted double slashes
         path = path.replace(/\/\//g, '/');
+
+        // Add back double slashes for protocols
+        path = path.replace(':/', '://');
 
         return path;
     };

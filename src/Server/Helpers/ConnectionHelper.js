@@ -258,6 +258,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
             if(!data) {
                 return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
+                    if(!resourceItem) {
+                        return Promise.reject(new Error('Connection by id "' + id + '" was not found'));
+                    }
+
                     return Promise.resolve(new Connection(resourceItem));
                 });
             } 

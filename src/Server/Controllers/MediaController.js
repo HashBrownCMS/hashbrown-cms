@@ -47,8 +47,8 @@ class MediaController extends ApiController {
                 }
 
                 // Serve local files directly
-                if(media.url.indexOf('http') < 0) {
-                    res.sendFile(media.url);
+                if(!media.url) {
+                    res.sendFile(media.path);
 
                 // Serve remote files through redirection
                 // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server

@@ -48,6 +48,7 @@ class Connection extends Resource {
             newParams.title = params.title;
             newParams.url = params.url;
             newParams.isLocked = params.isLocked;
+            newParams.sync = params.sync;
 
             params = newParams;
         }
