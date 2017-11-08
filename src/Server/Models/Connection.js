@@ -68,11 +68,11 @@ class Connection extends ConnectionCommon {
      *
      * @returns {Promise} Promise
      */
-    unpublishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
+    unpublishContent(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        
         debug.log('Unpublishing all localised property sets...', this);
         
         return this.removePreview(project, environment, content)
@@ -110,11 +110,11 @@ class Connection extends ConnectionCommon {
      *
      * @returns {Promise} Preview URL
      */
-    removePreview(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
+    removePreview(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        
         if(!content.hasPreview) { return Promise.resolve(); }
 
         content.hasPreview = false;
@@ -151,12 +151,12 @@ class Connection extends ConnectionCommon {
      *
      * @returns {Promise} Preview URL
      */
-    generatePreview(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        language = requiredParam('language')
-    ) {
+    generatePreview(project, environment, content, language) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(language, 'language', String);
+        
         content.hasPreview = true;
         
         return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
@@ -182,11 +182,11 @@ class Connection extends ConnectionCommon {
      *
      * @returns {Promise} Promise
      */
-    publishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
+    publishContent(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
         return this.removePreview(project, environment, content)
@@ -223,14 +223,18 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Result
      */
     setContent(id, content, language) {
+        checkParam(id, 'id', String);
+        checkParam(content,  'content', HashBrown.Models.Content);
+        checkParam(language, 'language', String);
+        
         return this.processor.process(content, language)
         .then((result) => {
             // Convert to base64
-            if(result.data.lastIndexOf('=') !== result.data.length - 1) {
-                result.data = Buffer.from(result.data, 'utf8').toString('base64');
+            if(result.lastIndexOf('=') !== result.length - 1) {
+                result = Buffer.from(result, 'utf8').toString('base64');
             }
 
-            return this.deployer.setFile(this.deployer.getPath('content') + language + '/' + (result.filename || id), result.data);
+            return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.constructor.extension), result);
         });
     }
     
@@ -243,7 +247,10 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Result
      */
     removeContent(id, language) {
-        return this.deployer.removeFile(this.deployer.getPath('content') + language + '/' + id, result);
+        checkParam(id, 'id', String);
+        checkParam(language, 'language', String);
+
+        return this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.constructor.extension));
     }
     
     /**
@@ -254,6 +261,8 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Templates
      */
     getAllTemplates(type) {
+        checkParam(type, 'type', String);
+
         return this.deployer.getFolder(this.deployer.getPath('templates/' + type))
         .then((files) => {
             if(!files) { return Promise.resolve([]); }
@@ -284,9 +293,12 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Template
      */
     getTemplate(type, name) {
+        checkParam(type, 'type', String);
+        checkParam(name, 'name', String);
+
         return this.deployer.getFile(this.deployer.getPath('templates/' + type, name))
         .then((file) => {
-            if(!file) { return Promise.reject(new Error('Template "' + name + '" not found')); }
+            if(!file) { return Promise.reject(new Error('Template by id "' + id + '" not found')); }
 
             let name = Path.basename(file.path || file);
             let content = file.data || file.content;
@@ -314,18 +326,26 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Result
      */
     setTemplate(type, name, content) {
-        return this.deployer.setFile(this.deployer.getPath('templates/' + type) + name, content);
+        checkParam(type, 'type', String);
+        checkParam(name, 'name', String);
+        checkParam(content, 'content', String);
+
+        return this.deployer.setFile(this.deployer.getPath('templates/' + type, name), content);
     }
    
     /**
      * Removes a Template by name
      *
+     * @param {String} type
      * @param {String} name
      *
      * @returns {Promise} Result
      */
-    removeTemplate(name) {
-        return this.deployer.removeFile(this.deployer.getPath('templates/' + type) + name, content);
+    removeTemplate(type, name) {
+        checkParam(type, 'type', String);
+        checkParam(name, 'name', String);
+
+        return this.deployer.removeFile(this.deployer.getPath('templates/' + type, name), content);
     }
     
     /**
@@ -364,6 +384,8 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media node
      */
     getMedia(id) {
+        checkParam(id, 'id', String);
+
         return this.deployer.getFolder(this.deployer.getPath('media', id), 1)
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
@@ -391,7 +413,11 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media node
      */
     setMedia(id, name, base64) {
-        return this.deployer.setFile(this.deployer.getPath('media') + name, content);
+        checkParam(id, 'id', String);
+        checkParam(name, 'name', String);
+        checkParam(base64, 'base64', String);
+
+        return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), content);
     }
     
     /**
@@ -402,7 +428,9 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Result
      */
     removeMedia(id) {
-        return this.deployer.removeFolder(this.deployer.getPath('media') + id, content);
+        checkParam(id, 'id', String);
+
+        return this.deployer.removeFolder(this.deployer.getPath('media', id), content);
     }
 }
 

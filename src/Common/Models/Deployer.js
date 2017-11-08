@@ -20,6 +20,9 @@ class Deployer extends Entity {
 
         this.name = this.constructor.name;
         this.alias = this.constructor.alias;
+
+        if(!this.paths) { this.paths = {}; }
+        if(!this.paths.templates) { this.paths.templates = {}; }
     }
     
     /**

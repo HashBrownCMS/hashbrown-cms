@@ -51,15 +51,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @returns {Deployer} Deployer
      */
     static getDeployer(alias) {
-        checkParam(alias, 'alias', String);
-
-        if(!this.deployers) { return; }
+        if(!this.deployers) { return null; }
 
         for(let deployer of this.deployers) {
             if(deployer.alias !== alias) { continue; }
 
             return deployer;
         }
+
+        return null;
     }
     
     /**
@@ -70,15 +70,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @returns {Processor} Processor
      */
     static getProcessor(alias) {
-        checkParam(alias, 'alias', String);
-
-        if(!this.processors) { return; }
+        if(!this.processors) { return null; }
 
         for(let processor of this.processors) {
             if(processor.alias !== alias) { continue; }
 
             return processor;
         }
+
+        return null;
     }
 
     /**
@@ -144,7 +144,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return this.getConnectionById(project, environment, settings.connectionId);
         })
         .then((connection) => {
-            debug.log('Publishing through connection "' + connection.id + '" of type "' + connection.type + '"...', helper);
+            debug.log('Publishing through connection "' + connection.id + '"...', helper);
 
             return connection.publishContent(project, environment, content);
         })
@@ -188,7 +188,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
         .then((connection) => {
             if(!unpublishFirst) { return Promise.resolve(); }
             
-            debug.log('Unpublishing through connection "' + connection.id + '" of type "' + connection.type + '"...', this);
+            debug.log('Unpublishing through connection "' + connection.id + '"...', this);
 
             return connection.unpublishContent(project, environment, content);
         })

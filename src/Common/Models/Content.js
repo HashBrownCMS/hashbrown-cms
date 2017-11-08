@@ -213,10 +213,11 @@ class Content extends Resource {
     /**
      * Gets all meta fields
      *
-     * @returns {Object} meta
+     * @returns {Object} Meta
      */
     getMeta() {
         return {
+            id: this.id,
             parentId: this.parentId,
             createDate: this.createDate,
             updateDate: this.updateDate,

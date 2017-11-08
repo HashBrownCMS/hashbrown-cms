@@ -56,6 +56,8 @@ class Connection extends Resource {
         // Deployer and processor
         if(!params.processor) { params.processor = {}; }
         if(!params.deployer) { params.deployer = {}; }
+        if(!params.deployer.paths) { params.deployer.paths = {}; }
+        if(!params.deployer.paths.templates) { params.deployer.paths.templates = {}; }
         
         return super.paramsCheck(params);
     }

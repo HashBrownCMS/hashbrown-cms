@@ -11326,6 +11326,12 @@ var Connection = function (_Resource) {
         if (!params.deployer) {
             params.deployer = {};
         }
+        if (!params.deployer.paths) {
+            params.deployer.paths = {};
+        }
+        if (!params.deployer.paths.templates) {
+            params.deployer.paths.templates = {};
+        }
 
         return _Resource.paramsCheck.call(this, params);
     };
@@ -16019,14 +16025,25 @@ var Processor = function (_Entity) {
   _createClass(Processor, null, [{
     key: 'name',
 
-    // Name and alias
+    // Getter: Display name of this Processor
     get: function get() {
       return 'Processor';
     }
+
+    // Getter: Alias of this Processor (used to link with the client-side editor)
+
   }, {
     key: 'alias',
     get: function get() {
       return 'processor';
+    }
+
+    // Getter: Extension (used to append the filename that is delpoyed)
+
+  }, {
+    key: 'extension',
+    get: function get() {
+      return '';
     }
 
     /**
@@ -16125,6 +16142,13 @@ var Deployer = function (_Entity) {
 
         _this.name = _this.constructor.name;
         _this.alias = _this.constructor.alias;
+
+        if (!_this.paths) {
+            _this.paths = {};
+        }
+        if (!_this.paths.templates) {
+            _this.paths.templates = {};
+        }
         return _this;
     }
 
@@ -29701,12 +29725,13 @@ var Content = function (_Resource) {
     /**
      * Gets all meta fields
      *
-     * @returns {Object} meta
+     * @returns {Object} Meta
      */
 
 
     Content.prototype.getMeta = function getMeta() {
         return {
+            id: this.id,
             parentId: this.parentId,
             createDate: this.createDate,
             updateDate: this.updateDate,
@@ -30087,7 +30112,7 @@ var Template = function (_Resource) {
 
 
     Template.prototype.updateId = function updateId() {
-        this.id = this.name;
+        this.id = this.name.substring(0, this.name.lastIndexOf('.'));
     };
 
     return Template;
@@ -45314,27 +45339,33 @@ var ConnectionEditor = function (_Crisp$View) {
             return new editor({
                 model: _this9.model.deployer
             }).$element;
-        }), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Paths'), _.div({ class: 'editor__field__key__description' }, 'Where to store the individual resources')), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Content'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
-            value: this.model.deployer.paths.content,
-            onChange: function onChange(newValue) {
-                _this9.model.deployer.paths.content = newValue;
+        }), _.do(function () {
+            if (!_this9.model.deployer || !_this9.model.deployer.paths) {
+                return;
             }
-        }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Media'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
-            value: this.model.deployer.paths.media,
-            onChange: function onChange(newValue) {
-                _this9.model.deployer.paths.media = newValue;
-            }
-        }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Page templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
-            value: this.model.deployer.paths.templates.page,
-            onChange: function onChange(newValue) {
-                _this9.model.deployer.paths.templates.page = newValue;
-            }
-        }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Partial templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
-            value: this.model.deployer.paths.templates.partial,
-            onChange: function onChange(newValue) {
-                _this9.model.deployer.paths.templates.partial = newValue;
-            }
-        })))))];
+
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Paths'), _.div({ class: 'editor__field__key__description' }, 'Where to store the individual resources')), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Content'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: _this9.model.deployer.paths.content,
+                onChange: function onChange(newValue) {
+                    _this9.model.deployer.paths.content = newValue;
+                }
+            }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Media'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: _this9.model.deployer.paths.media,
+                onChange: function onChange(newValue) {
+                    _this9.model.deployer.paths.media = newValue;
+                }
+            }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Page templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: _this9.model.deployer.paths.templates.page,
+                onChange: function onChange(newValue) {
+                    _this9.model.deployer.paths.templates.page = newValue;
+                }
+            }))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Partial templates'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                value: _this9.model.deployer.paths.templates.partial,
+                onChange: function onChange(newValue) {
+                    _this9.model.deployer.paths.templates.partial = newValue;
+                }
+            })))));
+        })];
     };
 
     /**

@@ -8,10 +8,15 @@ const Entity = require('./Entity');
  * @memberof HashBrown.Common.Models
  */
 class Processor extends Entity {
-    // Name and alias
+    // Getter: Display name of this Processor
     static get name() { return 'Processor'; }
+
+    // Getter: Alias of this Processor (used to link with the client-side editor)
     static get alias() { return 'processor'; }
-    
+   
+    // Getter: Extension (used to append the filename that is delpoyed)
+    static get extension() { return ''; }
+
     /**
      * Constructor
      */

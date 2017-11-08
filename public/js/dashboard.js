@@ -11261,6 +11261,12 @@ var Connection = function (_Resource) {
         if (!params.deployer) {
             params.deployer = {};
         }
+        if (!params.deployer.paths) {
+            params.deployer.paths = {};
+        }
+        if (!params.deployer.paths.templates) {
+            params.deployer.paths.templates = {};
+        }
 
         return _Resource.paramsCheck.call(this, params);
     };
@@ -15247,14 +15253,25 @@ var Processor = function (_Entity) {
   _createClass(Processor, null, [{
     key: 'name',
 
-    // Name and alias
+    // Getter: Display name of this Processor
     get: function get() {
       return 'Processor';
     }
+
+    // Getter: Alias of this Processor (used to link with the client-side editor)
+
   }, {
     key: 'alias',
     get: function get() {
       return 'processor';
+    }
+
+    // Getter: Extension (used to append the filename that is delpoyed)
+
+  }, {
+    key: 'extension',
+    get: function get() {
+      return '';
     }
 
     /**
@@ -15353,6 +15370,13 @@ var Deployer = function (_Entity) {
 
         _this.name = _this.constructor.name;
         _this.alias = _this.constructor.alias;
+
+        if (!_this.paths) {
+            _this.paths = {};
+        }
+        if (!_this.paths.templates) {
+            _this.paths.templates = {};
+        }
         return _this;
     }
 
@@ -25580,12 +25604,13 @@ var Content = function (_Resource) {
     /**
      * Gets all meta fields
      *
-     * @returns {Object} meta
+     * @returns {Object} Meta
      */
 
 
     Content.prototype.getMeta = function getMeta() {
         return {
+            id: this.id,
             parentId: this.parentId,
             createDate: this.createDate,
             updateDate: this.updateDate,
@@ -25966,7 +25991,7 @@ var Template = function (_Resource) {
 
 
     Template.prototype.updateId = function updateId() {
-        this.id = this.name;
+        this.id = this.name.substring(0, this.name.lastIndexOf('.'));
     };
 
     return Template;

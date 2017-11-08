@@ -195,58 +195,62 @@ class ConnectionEditor extends Crisp.View {
                     model: this.model.deployer
                 }).$element;
             }),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'},
-                    _.div({class: 'editor__field__key__label'}, 'Paths'),
-                    _.div({class: 'editor__field__key__description'}, 'Where to store the individual resources')
-                ),
-                _.div({class: 'editor__field__value'},
-                    _.div({class: 'editor__field'},
-                        _.div({class: 'editor__field__key'}, 'Content'),
-                        _.div({class: 'editor__field__value'},
-                            new HashBrown.Views.Widgets.Input({
-                                value: this.model.deployer.paths.content,
-                                onChange: (newValue) => {
-                                    this.model.deployer.paths.content = newValue;
-                                }
-                            })
-                        )
+            _.do(() => {
+                if(!this.model.deployer || !this.model.deployer.paths) { return; }
+                
+                return _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Paths'),
+                        _.div({class: 'editor__field__key__description'}, 'Where to store the individual resources')
                     ),
-                    _.div({class: 'editor__field'},
-                        _.div({class: 'editor__field__key'}, 'Media'),
-                        _.div({class: 'editor__field__value'},
-                            new HashBrown.Views.Widgets.Input({
-                                value: this.model.deployer.paths.media,
-                                onChange: (newValue) => {
-                                    this.model.deployer.paths.media = newValue;
-                                }
-                            })
-                        )
-                    ),
-                    _.div({class: 'editor__field'},
-                        _.div({class: 'editor__field__key'}, 'Page templates'),
-                        _.div({class: 'editor__field__value'},
-                            new HashBrown.Views.Widgets.Input({
-                                value: this.model.deployer.paths.templates.page,
-                                onChange: (newValue) => {
-                                    this.model.deployer.paths.templates.page = newValue;
-                                }
-                            })
-                        )
-                    ),
-                    _.div({class: 'editor__field'},
-                        _.div({class: 'editor__field__key'}, 'Partial templates'),
-                        _.div({class: 'editor__field__value'},
-                            new HashBrown.Views.Widgets.Input({
-                                value: this.model.deployer.paths.templates.partial,
-                                onChange: (newValue) => {
-                                    this.model.deployer.paths.templates.partial = newValue;
-                                }
-                            })
+                    _.div({class: 'editor__field__value'},
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Content'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.content,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.content = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Media'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.media,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.media = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Page templates'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.templates.page,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.templates.page = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Partial templates'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.templates.partial,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.templates.partial = newValue;
+                                    }
+                                })
+                            )
                         )
                     )
-                )
-            )
+                );
+            })
         ];
     }
 
