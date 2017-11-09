@@ -99,10 +99,11 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      *
      * @param {String} path
      * @param {String} base64
+     * @param {Boolean} isBinary
      *
      * @return {Promise} Promise
      */
-    setFile(path, base64) {
+    setFile(path, base64, isBinary) {
         return new Promise((resolve, reject) => {
             let dirPath = Path.dirname(path);
 
@@ -110,7 +111,13 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
 
             debug.log('Writing file "' + path + '"...', this);
 
-            FileSystem.writeFile(path, Buffer.from(base64, 'base64').toString('utf8'), (err) => {
+            let fileData = Buffer.from(base64, 'base64');
+
+            if(!isBinary) {
+                fileData = fileData.toString('utf8');
+            }
+
+            FileSystem.writeFile(path, fileData, (err) => {
                 if(err) {
                     reject(err);
                 } else {

@@ -229,6 +229,15 @@ class Connection extends ConnectionCommon {
         
         return this.processor.process(content, language)
         .then((result) => {
+            // Convert to string
+            if(typeof result !== 'string') {
+                try {
+                    result = JSON.stringify(result);
+                } catch(e) {
+                    result = result.toString();
+                }
+            }
+
             // Convert to base64
             if(result.lastIndexOf('=') !== result.length - 1) {
                 result = Buffer.from(result, 'utf8').toString('base64');
@@ -428,7 +437,7 @@ class Connection extends ConnectionCommon {
             return Promise.resolve();
         })
         .then(() => {
-            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
+            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64, true);
         });
     }
     
