@@ -204,24 +204,37 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
         return HashBrown.Helpers.RequestHelper.request('get', path)
         .then((data) => {
             // Data wasn't found, nothing needs to be deleted
-            if(!data || !data.sha) {
+            if(!data) {
                 return Promise.resolve();
             }
+            
+            let files = Array.isArray(data) ? data : [ data ];
 
-            let postData = {
-                sha: data.sha,
-                path: path,
-                message: 'Removed by HashBrown CMS',
-                branch: this.branch || 'gh-pages'
+            let removeNext = () => {
+                let file = files.pop();
+
+                if(!file) { return Promise.resolve(); }
+
+                let postData = {
+                    sha: file.sha,
+                    path: file.path,
+                    message: 'Removed by HashBrown CMS',
+                    branch: this.branch || 'gh-pages'
+                };
+
+                // Remove the file
+                debug.log('Removing data...', this, 2);
+
+                return HashBrown.Helpers.RequestHelper.request('delete', this.getPath(null, file.path), postData)
+                .then(() => {
+                    return removeNext();  
+                });
             };
 
-            // Remove the file
-            debug.log('Removing data...', this, 2);
-
-            return HashBrown.Helpers.RequestHelper.request('delete', path, postData);
+            return removeNext();
         })
         .then((data) => {    
-            if(data.message) {
+            if(data && data.message) {
                 debug.log('Removing file failed: ' + data.message, this, 2);
                 return Promise.reject(new Error(data.message));    
 

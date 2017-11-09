@@ -421,8 +421,15 @@ class Connection extends ConnectionCommon {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         checkParam(base64, 'base64', String);
-
-        return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), content);
+        
+        return this.removeMedia(id)
+        .catch((e) => {
+            // It doesn't matter if the file was not found, we don't want it there anyway
+            return Promise.resolve();
+        })
+        .then(() => {
+            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
+        });
     }
     
     /**
@@ -435,7 +442,7 @@ class Connection extends ConnectionCommon {
     removeMedia(id) {
         checkParam(id, 'id', String);
 
-        return this.deployer.removeFolder(this.deployer.getPath('media', id), content);
+        return this.deployer.removeFolder(this.deployer.getPath('media', id));
     }
 }
 

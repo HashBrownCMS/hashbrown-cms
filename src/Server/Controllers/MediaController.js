@@ -180,7 +180,7 @@ class MediaController extends ApiController {
         }
 
         if(file) {
-            ConnectionHelper.getMediaProvider(req.project, req.environment)
+            HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(id, file);
             })
@@ -217,17 +217,14 @@ class MediaController extends ApiController {
                 if(!file) {
                     return Promise.resolve();
                 }
-
+                
                 let media = Media.create();
 
-                return ConnectionHelper.getMediaProvider(req.project, req.environment)
-                .then((connection) => {
-                    return connection.setMedia(media.id, file);
-                })
+                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, media.id, file.path)
                 .then(() => {
                     ids.push(media.id);
-
-                    return next();  
+                    
+                    return next();
                 });
             };
 

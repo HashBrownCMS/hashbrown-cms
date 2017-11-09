@@ -164,7 +164,56 @@ class MediaHelper extends MediaHelperCommon {
 
         });
     }
-    
+
+    /**
+     * Uploads a file from temp storage
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} tempPath
+     *
+     * @returns {Promise} Result
+     */
+    static uploadFromTemp(project, environment, id, tempPath) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(tempPath, 'tempPath', String);
+
+        let connection;
+        let filename = Path.basename(tempPath);
+
+        // Get Media provider
+        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
+        .then((provider) => {
+            connection = provider;
+
+            // Read the file from temp
+            return new Promise((resolve, reject)  => {
+                FileSystem.readFile(tempPath, (err, fileData) => {
+                    if(err) { return reject(err); }
+
+                    resolve(fileData);
+                });
+            });
+        })
+        .then((fileData) => {
+            // Upload the data
+            return connection.setMedia(id, filename, fileData.toString('base64'));
+        })
+        .then(() => {
+            // Remove the file from temp storage
+            return new Promise((resolve, reject)  => {
+                FileSystem.unlink(tempPath, (err) => {
+                    if(err) { return reject(err); }
+
+                    resolve();
+                });
+            });
+        });
+    }
+
     /**
      * Gets the Media tree
      *

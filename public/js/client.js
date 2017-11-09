@@ -41548,7 +41548,7 @@ __webpack_require__(231);
 __webpack_require__(232);
 
 // Common
-__webpack_require__(299);
+__webpack_require__(241);
 
 // Resource cache
 window.resources = {
@@ -43193,7 +43193,66 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 241 */,
+/* 241 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var base = void 0;
+
+if (typeof window !== 'undefined') {
+    base = window;
+} else if (typeof global !== 'undefined') {
+    base = global;
+}
+
+if (!base) {
+    throw new Error('Base not found');
+}
+
+/**
+ * Throws an error if parameter was null (used as a default param hack)
+ *
+ * @param {String} name
+ */
+base.requiredParam = function (name) {
+    throw new Error('Parameter "' + name + '" is required');
+};
+
+/**
+ * Checks a parameter for type
+ *
+ * @param {Anything} value
+ * @param {String} name
+ * @param {Type} type
+ */
+base.checkParam = function (value, name, type) {
+    if (value === undefined) {
+        throw new Error('Parameter "' + name + '" is required');
+    }
+
+    if (value === null) {
+        return;
+    }
+    if (value.constructor === type) {
+        return;
+    }
+    if (value.prototype instanceof type) {
+        return;
+    }
+    if (value instanceof type) {
+        return;
+    }
+    if (value === type) {
+        return;
+    }
+
+    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+
+/***/ }),
 /* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -48466,93 +48525,6 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
-
-/***/ }),
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */,
-/* 290 */,
-/* 291 */,
-/* 292 */,
-/* 293 */,
-/* 294 */,
-/* 295 */,
-/* 296 */,
-/* 297 */,
-/* 298 */,
-/* 299 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-var base = void 0;
-
-if (typeof window !== 'undefined') {
-    base = window;
-} else if (typeof global !== 'undefined') {
-    base = global;
-}
-
-if (!base) {
-    throw new Error('Base not found');
-}
-
-/**
- * Throws an error if parameter was null (used as a default param hack)
- *
- * @param {String} name
- */
-base.requiredParam = function (name) {
-    throw new Error('Parameter "' + name + '" is required');
-};
-
-/**
- * Checks a parameter for type
- *
- * @param {Anything} value
- * @param {String} name
- * @param {Type} type
- */
-base.checkParam = function (value, name, type) {
-    if (value === undefined) {
-        throw new Error('Parameter "' + name + '" is required');
-    }
-
-    if (value === null) {
-        return;
-    }
-    if (value.constructor === type) {
-        return;
-    }
-    if (value.prototype instanceof type) {
-        return;
-    }
-    if (value instanceof type) {
-        return;
-    }
-    if (value === type) {
-        return;
-    }
-
-    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
-};
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ })
 /******/ ]);
