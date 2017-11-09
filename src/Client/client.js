@@ -10,6 +10,9 @@ require('Client/Style/client');
 // Get routes
 require('Client/Routes');
 
+// Common
+require('Common/common');
+
 // Resource cache
 window.resources = {
     connections: [],

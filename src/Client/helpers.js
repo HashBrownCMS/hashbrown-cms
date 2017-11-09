@@ -26,13 +26,6 @@ window.currentUserHasScope = function currentUsr(scope) {
 }
 
 /**
- * Handles a required parameter
- */
-window.requiredParam = function requiredParam(name) {
-    throw new Error('Parameter "' + name + '" is required');
-}
-
-/**
  * Gets a cookie by name
  *
  * @param {String} name

@@ -4,6 +4,9 @@
  * @namespace HashBrown.Server
  */
 
+// Common
+require('Common/common');
+
 // ----------
 // Libs
 // ----------
@@ -27,27 +30,6 @@ app.set('views', appRoot + '/src/Server/Views');
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
 app.use(Express.static(appRoot + '/public'));
-
-// ----------
-// Global methods
-// ----------
-global.requiredParam = (name) => {
-    throw new Error('Parameter "' + name + '" is required');
-}
-
-global.checkParam = (value, name, type, ) => {
-    if(value === undefined) {
-        throw new Error('Parameter "' + name + '" is required');
-    }
-    
-    if(value === null) { return; }
-    if(value.constructor === type) { return; }
-    if(value.prototype instanceof type) { return; }
-    if(value instanceof type) { return; }
-    if(value === type) { return; }
-
-    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
-}
 
 // ----------
 // Namespaces

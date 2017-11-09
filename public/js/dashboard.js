@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 271);
+/******/ 	return __webpack_require__(__webpack_require__.s = 272);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -28023,6 +28023,41 @@ var TemplateHelper = function () {
         return templates;
     };
 
+    /**
+     * Gets a template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Template} Template
+     */
+
+
+    TemplateHelper.getTemplate = function getTemplate(type, id) {
+        for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
+
+            if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
+            } else {
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
+            }
+
+            var template = _ref2;
+
+            if (template.type !== type || template.id !== id) {
+                continue;
+            }
+
+            return template;
+        }
+
+        return null;
+    };
+
     return TemplateHelper;
 }();
 
@@ -28775,13 +28810,6 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  */
 window.currentUserHasScope = function currentUsr(scope) {
     return User.current.hasScope(ProjectHelper.currentProject, scope);
-};
-
-/**
- * Handles a required parameter
- */
-window.requiredParam = function requiredParam(name) {
-    throw new Error('Parameter "' + name + '" is required');
 };
 
 /**
@@ -36200,7 +36228,8 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */
+/* 271 */,
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36245,7 +36274,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
     projects = projects || [];
 
-    var ProjectEditor = __webpack_require__(272);
+    var ProjectEditor = __webpack_require__(273);
 
     for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
@@ -36488,7 +36517,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36502,11 +36531,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Project = __webpack_require__(100);
 var RequestHelper = __webpack_require__(2);
-var InfoEditor = __webpack_require__(273);
-var SyncEditor = __webpack_require__(274);
-var LanguageEditor = __webpack_require__(275);
-var BackupEditor = __webpack_require__(276);
-var MigrationEditor = __webpack_require__(277);
+var InfoEditor = __webpack_require__(274);
+var SyncEditor = __webpack_require__(275);
+var LanguageEditor = __webpack_require__(276);
+var BackupEditor = __webpack_require__(277);
+var MigrationEditor = __webpack_require__(278);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -36790,7 +36819,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36881,7 +36910,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 274 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37107,7 +37136,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 275 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37192,7 +37221,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 276 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37408,7 +37437,7 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 277 */
+/* 278 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

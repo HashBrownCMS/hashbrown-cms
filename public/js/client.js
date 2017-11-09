@@ -11724,7 +11724,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(243);
+        _this.template = __webpack_require__(244);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.ContentPane.init();
@@ -32849,6 +32849,41 @@ var TemplateHelper = function () {
         return templates;
     };
 
+    /**
+     * Gets a template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Template} Template
+     */
+
+
+    TemplateHelper.getTemplate = function getTemplate(type, id) {
+        for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
+
+            if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
+            } else {
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
+            }
+
+            var template = _ref2;
+
+            if (template.type !== type || template.id !== id) {
+                continue;
+            }
+
+            return template;
+        }
+
+        return null;
+    };
+
     return TemplateHelper;
 }();
 
@@ -33601,13 +33636,6 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  */
 window.currentUserHasScope = function currentUsr(scope) {
     return User.current.hasScope(ProjectHelper.currentProject, scope);
-};
-
-/**
- * Handles a required parameter
- */
-window.requiredParam = function requiredParam(name) {
-    throw new Error('Parameter "' + name + '" is required');
 };
 
 /**
@@ -41092,7 +41120,7 @@ var TemplateEditor = function (_Crisp$View) {
 
         this.$saveBtn.toggleClass('working', true);
 
-        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
+        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.name, this.model).then(function () {
             return RequestHelper.reloadResource('templates');
         }).then(function () {
             HashBrown.Views.Navigation.NavbarMain.reload();
@@ -41519,6 +41547,9 @@ __webpack_require__(231);
 // Get routes
 __webpack_require__(232);
 
+// Common
+__webpack_require__(299);
+
 // Resource cache
 window.resources = {
     connections: [],
@@ -41539,11 +41570,11 @@ HashBrown.Models = __webpack_require__(189);
 HashBrown.Views = {};
 HashBrown.Views.Widgets = __webpack_require__(193);
 HashBrown.Views.Modals = __webpack_require__(197);
-HashBrown.Views.Navigation = __webpack_require__(241);
-HashBrown.Views.Editors = __webpack_require__(250);
+HashBrown.Views.Navigation = __webpack_require__(242);
+HashBrown.Views.Editors = __webpack_require__(251);
 HashBrown.Views.Editors.DeployerEditors = {};
 HashBrown.Views.Editors.ProcessorEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(254);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(255);
 HashBrown.Helpers = __webpack_require__(210);
 
 // Helper shortcuts
@@ -41891,11 +41922,17 @@ Crisp.Router.route('/templates/', function () {
 
 // Edit
 Crisp.Router.route('/templates/:type/:id', function () {
+    var template = HashBrown.Helpers.TemplateHelper.getTemplate(this.type, this.id);
+
+    if (!template) {
+        return UI.errorModal('Template by id "' + this.id + '" could not be found');
+    }
+
     if (currentUserHasScope('templates')) {
-        Crisp.View.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/templates/', template.type + '/' + template.id);
 
         var templateEditor = new TemplateEditor({
-            modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('templates/' + template.type + '/' + template.name)
         });
 
         UI.setEditorSpaceContent(templateEditor.$element);
@@ -43156,7 +43193,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 241 */
+/* 241 */,
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43167,19 +43205,19 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
  */
 
 module.exports = {
-    ConnectionPane: __webpack_require__(242),
-    ContentPane: __webpack_require__(244),
-    FormsPane: __webpack_require__(245),
-    MainMenu: __webpack_require__(246),
-    MediaPane: __webpack_require__(247),
+    ConnectionPane: __webpack_require__(243),
+    ContentPane: __webpack_require__(245),
+    FormsPane: __webpack_require__(246),
+    MainMenu: __webpack_require__(247),
+    MediaPane: __webpack_require__(248),
     NavbarMain: __webpack_require__(58),
     NavbarPane: __webpack_require__(57),
-    SchemaPane: __webpack_require__(248),
-    TemplatePane: __webpack_require__(249)
+    SchemaPane: __webpack_require__(249),
+    TemplatePane: __webpack_require__(250)
 };
 
 /***/ }),
-/* 242 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43403,7 +43441,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 243 */
+/* 244 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -43501,7 +43539,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 244 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43969,7 +44007,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 245 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44186,7 +44224,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 246 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44374,7 +44412,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44581,7 +44619,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 248 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44803,7 +44841,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 249 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44881,12 +44919,11 @@ var TemplatePane = function (_NavbarPane) {
                 var template = _ref;
 
                 if (template.id == newTemplate.id && template.type == newTemplate.type) {
-                    UI.errorModal(new Error('A Template of type "' + template.type + '" and id "' + template.id + '" already exists'));
-                    return;
+                    return UI.errorModal(new Error('A Template of type "' + template.type + '" and name "' + template.name + '" already exists'));
                 }
             }
 
-            RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate).then(function () {
+            RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.name, newTemplate).then(function () {
                 return RequestHelper.reloadResource('templates');
             }).then(function () {
                 NavbarMain.reload();
@@ -44928,12 +44965,11 @@ var TemplatePane = function (_NavbarPane) {
         }
 
         if (!model) {
-            UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-            return;
+            return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
         }
 
         UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', function () {
-            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.id).then(function () {
+            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.name).then(function () {
                 $element.parent().remove();
 
                 return RequestHelper.reloadResource('templates');
@@ -44955,33 +44991,14 @@ var TemplatePane = function (_NavbarPane) {
 
     TemplatePane.onClickRenameTemplate = function onClickRenameTemplate() {
         var id = $('.context-menu-target').data('id');
-        var type = $('.context-menu-target').attr('href').replace('#/templates/', '').replace('/' + id, '');
-        var templateEditor = Crisp.View.get('TemplateEditor');
-        var model = void 0;
-
-        for (var _iterator3 = resources.templates, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-            var _ref3;
-
-            if (_isArray3) {
-                if (_i3 >= _iterator3.length) break;
-                _ref3 = _iterator3[_i3++];
-            } else {
-                _i3 = _iterator3.next();
-                if (_i3.done) break;
-                _ref3 = _i3.value;
-            }
-
-            var template = _ref3;
-
-            if (template.id == id && template.type == type) {
-                model = template;
-            }
-        }
+        var type = Crisp.Router.params.type;
+        var model = HashBrown.Helpers.TemplateHelper.getTemplate(type, id);
 
         if (!model) {
-            UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-            return;
+            return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
         }
+
+        var oldName = model.name;
 
         UI.confirmModal('rename', 'Rename "' + model.name + '"', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'New name'), new HashBrown.Views.Widgets.Input({
             value: model.name,
@@ -44990,12 +45007,14 @@ var TemplatePane = function (_NavbarPane) {
                 model.name = newValue;
             }
         }).$element), function () {
-            RequestHelper.request('post', 'templates/' + type + '/' + id, model).then(function (newTemplate) {
+            RequestHelper.request('post', 'templates/' + type + '/' + model.name + (oldName ? '?oldName=' + oldName : ''), model).then(function (newTemplate) {
                 return RequestHelper.reloadResource('templates');
             }).then(function () {
                 NavbarMain.reload();
 
                 // Go to new Template if TemplateEditor was showing the old one
+                var templateEditor = Crisp.View.get('TemplateEditor');
+
                 if (templateEditor && templateEditor.model.id == model.id) {
                     model.updateId();
 
@@ -45090,7 +45109,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 250 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45101,10 +45120,10 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(251),
+    ConnectionEditor: __webpack_require__(252),
     ContentEditor: __webpack_require__(207),
-    ContentSchemaEditor: __webpack_require__(252),
-    FieldSchemaEditor: __webpack_require__(253),
+    ContentSchemaEditor: __webpack_require__(253),
+    FieldSchemaEditor: __webpack_require__(254),
     FormEditor: __webpack_require__(229),
     JSONEditor: __webpack_require__(186),
     MediaViewer: __webpack_require__(227),
@@ -45114,7 +45133,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 251 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45400,7 +45419,7 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 252 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45632,7 +45651,7 @@ var ContentSchemaEditor = function (_SchemaEditor) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 253 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45710,7 +45729,7 @@ var FieldSchemaEditor = function (_SchemaEditor) {
 module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 254 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45721,27 +45740,27 @@ module.exports = FieldSchemaEditor;
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(255),
-    BooleanEditor: __webpack_require__(256),
-    ContentReferenceEditor: __webpack_require__(257),
-    ContentSchemaReferenceEditor: __webpack_require__(258),
-    DateEditor: __webpack_require__(259),
-    DropdownEditor: __webpack_require__(260),
+    ArrayEditor: __webpack_require__(256),
+    BooleanEditor: __webpack_require__(257),
+    ContentReferenceEditor: __webpack_require__(258),
+    ContentSchemaReferenceEditor: __webpack_require__(259),
+    DateEditor: __webpack_require__(260),
+    DropdownEditor: __webpack_require__(261),
     FieldEditor: __webpack_require__(12),
-    LanguageEditor: __webpack_require__(261),
-    MediaReferenceEditor: __webpack_require__(262),
-    NumberEditor: __webpack_require__(263),
-    ResourceReferenceEditor: __webpack_require__(264),
-    RichTextEditor: __webpack_require__(265),
-    StringEditor: __webpack_require__(266),
-    StructEditor: __webpack_require__(267),
-    TagsEditor: __webpack_require__(268),
-    TemplateReferenceEditor: __webpack_require__(269),
-    UrlEditor: __webpack_require__(270)
+    LanguageEditor: __webpack_require__(262),
+    MediaReferenceEditor: __webpack_require__(263),
+    NumberEditor: __webpack_require__(264),
+    ResourceReferenceEditor: __webpack_require__(265),
+    RichTextEditor: __webpack_require__(266),
+    StringEditor: __webpack_require__(267),
+    StructEditor: __webpack_require__(268),
+    TagsEditor: __webpack_require__(269),
+    TemplateReferenceEditor: __webpack_require__(270),
+    UrlEditor: __webpack_require__(271)
 };
 
 /***/ }),
-/* 255 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46065,7 +46084,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 256 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46151,7 +46170,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 257 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46307,7 +46326,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46493,7 +46512,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46638,7 +46657,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46749,7 +46768,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46836,7 +46855,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 262 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46925,7 +46944,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47061,7 +47080,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47181,7 +47200,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47543,7 +47562,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47615,7 +47634,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47902,7 +47921,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47973,7 +47992,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 269 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48183,7 +48202,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 270 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48447,6 +48466,93 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var base = void 0;
+
+if (typeof window !== 'undefined') {
+    base = window;
+} else if (typeof global !== 'undefined') {
+    base = global;
+}
+
+if (!base) {
+    throw new Error('Base not found');
+}
+
+/**
+ * Throws an error if parameter was null (used as a default param hack)
+ *
+ * @param {String} name
+ */
+base.requiredParam = function (name) {
+    throw new Error('Parameter "' + name + '" is required');
+};
+
+/**
+ * Checks a parameter for type
+ *
+ * @param {Anything} value
+ * @param {String} name
+ * @param {Type} type
+ */
+base.checkParam = function (value, name, type) {
+    if (value === undefined) {
+        throw new Error('Parameter "' + name + '" is required');
+    }
+
+    if (value === null) {
+        return;
+    }
+    if (value.constructor === type) {
+        return;
+    }
+    if (value.prototype instanceof type) {
+        return;
+    }
+    if (value instanceof type) {
+        return;
+    }
+    if (value === type) {
+        return;
+    }
+
+    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ })
 /******/ ]);

@@ -15,26 +15,51 @@ class TemplateController extends ApiController {
      */
     static init(app) {
         app.get('/api/:project/:environment/templates', this.middleware(), this.getTemplates)
-        app.get('/api/:project/:environment/templates/:type/:id', this.middleware(), this.getTemplate)
+        app.get('/api/:project/:environment/templates/:type/:name', this.middleware(), this.getTemplate)
         
-        app.post('/api/:project/:environment/templates/:type/:id', this.middleware(), this.postTemplate)
+        app.post('/api/:project/:environment/templates/:type/:name', this.middleware(), this.postTemplate)
         
-        app.delete('/api/:project/:environment/templates/:type/:id', this.middleware(), this.deleteTemplate)
+        app.delete('/api/:project/:environment/templates/:type/:name', this.middleware(), this.deleteTemplate)
     }
     
     /**
-     * Posts a Template by id
+     * Posts a Template by name
      */
     static postTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
+        let oldName = req.query.oldName;
         let template = req.body;
-
+        let connection;
+       
+        // Get template provider
         ConnectionHelper.getTemplateProvider(req.project, req.environment)
-        .then((connection) => {
+        .then((provider) => {
+            connection = provider;
+
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
-            
-            return connection.setTemplateById(type, id, template);
+
+            // If an old name was specified, get the markup first
+            if(oldName) {
+                return connection.getTemplate(type, oldName)
+                .then((oldTemplate) => {
+                    template.markup = oldTemplate.markup;    
+                });
+            }
+
+            return Promise.resolve();
+        })
+        .then(() => {
+            // Set new template
+            return connection.setTemplate(type, name, template.markup);
+        })
+        .then(() => {
+            // If an old name was specified, remove it
+            if(oldName) {
+                return connection.removeTemplate(type, oldName);
+            }
+
+            return Promise.resolve();
         })
         .then(() => {
             res.status(200).send('OK');
@@ -45,17 +70,17 @@ class TemplateController extends ApiController {
     }
     
     /**
-     * Deletes a Template by id
+     * Deletes a Template by name
      */
     static deleteTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
 
         ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.deleteTemplate(type, id);
+            return connection.removeTemplate(type, name);
         })
         .then(() => {
             res.status(200).send('OK');
@@ -67,17 +92,17 @@ class TemplateController extends ApiController {
 
 
     /**
-     * Gets a Template by id
+     * Gets a Template by name
      */
     static getTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
 
         ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.getTemplate(type, id);
+            return connection.getTemplate(type, name);
         })
         .then((template) => {
             res.status(200).send(template);

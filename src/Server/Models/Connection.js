@@ -330,6 +330,11 @@ class Connection extends ConnectionCommon {
         checkParam(name, 'name', String);
         checkParam(content, 'content', String);
 
+        // Convert to base64
+        if(content.lastIndexOf('=') !== content.length - 1) {
+            content = Buffer.from(content, 'utf8').toString('base64');
+        }
+        
         return this.deployer.setFile(this.deployer.getPath('templates/' + type, name), content);
     }
    
@@ -345,7 +350,7 @@ class Connection extends ConnectionCommon {
         checkParam(type, 'type', String);
         checkParam(name, 'name', String);
 
-        return this.deployer.removeFile(this.deployer.getPath('templates/' + type, name), content);
+        return this.deployer.removeFile(this.deployer.getPath('templates/' + type, name));
     }
     
     /**
