@@ -243,7 +243,7 @@ class Connection extends ConnectionCommon {
                 result = Buffer.from(result, 'utf8').toString('base64');
             }
 
-            return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.constructor.extension), result);
+            return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
         });
     }
     
@@ -259,7 +259,7 @@ class Connection extends ConnectionCommon {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
-        return this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.constructor.extension));
+        return this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
     }
     
     /**

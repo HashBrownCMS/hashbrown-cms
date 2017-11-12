@@ -6,7 +6,6 @@ class JekyllProcessor extends HashBrown.Models.Processor {
     // Getters
     static get name() { return 'Jekyll'; }
     static get alias() { return 'jekyll'; }
-    static get extension() { return '.md'; }
     
     /**
      * Compiles content for Jekyll
@@ -74,7 +73,7 @@ class JekyllProcessor extends HashBrown.Models.Processor {
 
             // Date and author go in as main properties in Jekyll, not as meta
             properties.date = dateString;
-            properties.author = createdBy.fullName || createdBy.username;
+            properties.author = updatedBy.fullName || upadtedBy.username || createdBy.fullName || createdBy.username;
 
             // Remap "url" to "permalink"
             if(properties.url) {

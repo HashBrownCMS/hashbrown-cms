@@ -4,7 +4,6 @@ class JsonProcessor extends HashBrown.Models.Processor {
     // Getters
     static get name() { return 'JSON'; }
     static get alias() { return 'json'; }
-    static get extension() { return '.json'; }
     
     /**
      * Compiles content as JSON
@@ -56,8 +55,8 @@ class JsonProcessor extends HashBrown.Models.Processor {
                 };
             }
 
-            meta.createdBy = createdBy;
-            meta.updatedBy = updatedBy;
+            meta.createdBy = createdBy.fullName || createdBy.username;
+            meta.updatedBy = updatedBy.fullName || createdBy.username;
 
             // Combine all data into one
             let data = {

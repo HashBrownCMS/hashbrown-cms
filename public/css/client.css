@@ -2168,6 +2168,8 @@ h1, h2, h3, h4, h5, h6 {
     pointer-events: none; }
   .widget--spinner.embedded {
     position: absolute; }
+  .widget--spinner.embedded .widget--spinner__image {
+    left: 50%; }
   .widget--spinner__inner {
     position: absolute;
     top: 0%;

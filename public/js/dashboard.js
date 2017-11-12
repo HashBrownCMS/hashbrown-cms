@@ -11243,6 +11243,9 @@ var Connection = function (_Resource) {
     Connection.paramsCheck = function paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
         if (params.type || params.preset) {
+            params.settings = params.settings || {};
+            params.settings.url = params.settings.url || params.url;
+
             var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
 
             newParams.id = params.id;
@@ -11288,7 +11291,8 @@ var Connection = function (_Resource) {
             case 'GitHub Pages':
                 settings = {
                     processor: {
-                        alias: 'jekyll'
+                        alias: 'jekyll',
+                        fileExtension: '.md'
                     },
                     deployer: oldSettings.isLocal ? {
                         alias: 'filesystem',
@@ -11322,18 +11326,20 @@ var Connection = function (_Resource) {
             case 'HashBrown Driver':
                 settings = {
                     processor: {
-                        alias: 'json'
+                        alias: 'json',
+                        fileExtension: '.json'
                     },
                     deployer: {
                         alias: 'api',
+                        url: (oldSettings.url || 'https://example.com') + '/hashbrown/api/',
                         token: oldSettings.token || '',
                         paths: {
                             templates: {
-                                partial: '/hashbrown/api/templates/partial/',
-                                page: '/hashbrown/api/templates/page/'
+                                partial: '/templates/partial/',
+                                page: '/templates/page/'
                             },
-                            content: '/hashbrown/api/content/',
-                            media: '/hashbrown/api/media/'
+                            content: '/content/',
+                            media: '/media/'
                         }
                     }
                 };
@@ -15266,14 +15272,6 @@ var Processor = function (_Entity) {
       return 'processor';
     }
 
-    // Getter: Extension (used to append the filename that is delpoyed)
-
-  }, {
-    key: 'extension',
-    get: function get() {
-      return '';
-    }
-
     /**
      * Constructor
      */
@@ -15298,6 +15296,7 @@ var Processor = function (_Entity) {
   Processor.prototype.structure = function structure() {
     this.def(String, 'name');
     this.def(String, 'alias');
+    this.def(String, 'fileExtension', '.json');
   };
 
   /**

@@ -128,7 +128,7 @@ class ConnectionEditor extends Crisp.View {
                 'GitHub Pages',
                 'HashBrown Driver'
             ],
-            placeholder: 'Preset',
+            placeholder: 'Pick a preset...',
             onChange: (newValue) => {
                 let newModel = this.model.getObject();
                 
@@ -161,6 +161,27 @@ class ConnectionEditor extends Crisp.View {
                             this.fetch();
                         }
                     }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'},
+                    _.div({class: 'editor__field__key__label'}, 'File extension'),
+                    _.div({class: 'editor__field__key__description'}, 'A file extension such as .json or .md')
+                ),
+                _.each(HashBrown.Views.Editors.ProcessorEditors, (name, editor) => {
+                    if(editor.alias !== this.model.processor.alias) { return; }
+                        
+                    return new editor({
+                        model: this.model.processor
+                    }).$element;
+                }),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        value: this.model.processor.fileExtension,
+                        onChange: (newValue) => {
+                            this.model.processor.fileExtension = newValue;
+                        }
+                    })
                 )
             )
         ];
@@ -315,7 +336,7 @@ class ConnectionEditor extends Crisp.View {
                 _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
                         _.div({class: 'editor__field__key__label'}, 'Deployer'),
-                        _.div({class: 'editor__field__key__description'}, 'How to transfer data to and from the endpoint server')
+                        _.div({class: 'editor__field__key__description'}, 'How to transfer data to and from the website\'s server')
                     ),
                     _.div({class: 'editor__field__value'},
                         this.renderDeployerSettingsEditor()

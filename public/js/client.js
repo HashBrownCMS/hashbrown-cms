@@ -11308,6 +11308,9 @@ var Connection = function (_Resource) {
     Connection.paramsCheck = function paramsCheck(params) {
         // Backwards compatibility: Convert from old structure
         if (params.type || params.preset) {
+            params.settings = params.settings || {};
+            params.settings.url = params.settings.url || params.url;
+
             var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
 
             newParams.id = params.id;
@@ -11353,7 +11356,8 @@ var Connection = function (_Resource) {
             case 'GitHub Pages':
                 settings = {
                     processor: {
-                        alias: 'jekyll'
+                        alias: 'jekyll',
+                        fileExtension: '.md'
                     },
                     deployer: oldSettings.isLocal ? {
                         alias: 'filesystem',
@@ -11387,18 +11391,20 @@ var Connection = function (_Resource) {
             case 'HashBrown Driver':
                 settings = {
                     processor: {
-                        alias: 'json'
+                        alias: 'json',
+                        fileExtension: '.json'
                     },
                     deployer: {
                         alias: 'api',
+                        url: (oldSettings.url || 'https://example.com') + '/hashbrown/api/',
                         token: oldSettings.token || '',
                         paths: {
                             templates: {
-                                partial: '/hashbrown/api/templates/partial/',
-                                page: '/hashbrown/api/templates/page/'
+                                partial: '/templates/partial/',
+                                page: '/templates/page/'
                             },
-                            content: '/hashbrown/api/content/',
-                            media: '/hashbrown/api/media/'
+                            content: '/content/',
+                            media: '/media/'
                         }
                     }
                 };
@@ -16038,14 +16044,6 @@ var Processor = function (_Entity) {
       return 'processor';
     }
 
-    // Getter: Extension (used to append the filename that is delpoyed)
-
-  }, {
-    key: 'extension',
-    get: function get() {
-      return '';
-    }
-
     /**
      * Constructor
      */
@@ -16070,6 +16068,7 @@ var Processor = function (_Entity) {
   Processor.prototype.structure = function structure() {
     this.def(String, 'name');
     this.def(String, 'alias');
+    this.def(String, 'fileExtension', '.json');
   };
 
   /**
@@ -45355,7 +45354,7 @@ var ConnectionEditor = function (_Crisp$View) {
 
         return new HashBrown.Views.Widgets.Dropdown({
             options: ['GitHub Pages', 'HashBrown Driver'],
-            placeholder: 'Preset',
+            placeholder: 'Pick a preset...',
             onChange: function onChange(newValue) {
                 var newModel = _this7.model.getObject();
 
@@ -45387,7 +45386,20 @@ var ConnectionEditor = function (_Crisp$View) {
 
                 _this8.fetch();
             }
-        }).$element))];
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'File extension'), _.div({ class: 'editor__field__key__description' }, 'A file extension such as .json or .md')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
+            if (editor.alias !== _this8.model.processor.alias) {
+                return;
+            }
+
+            return new editor({
+                model: _this8.model.processor
+            }).$element;
+        }), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            value: this.model.processor.fileExtension,
+            onChange: function onChange(newValue) {
+                _this8.model.processor.fileExtension = newValue;
+            }
+        })))];
     };
 
     /**
@@ -45465,7 +45477,7 @@ var ConnectionEditor = function (_Crisp$View) {
     ConnectionEditor.prototype.template = function template() {
         var _this10 = this;
 
-        return _.div({ class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-exchange' }), _.h4({ class: 'editor__header__title' }, this.model.title)), _.div({ class: 'editor__body' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Template provider'), _.div({ class: 'editor__field__value' }, this.renderTemplateProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Media provider'), _.div({ class: 'editor__field__value' }, this.renderMediaProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Title'), _.div({ class: 'editor__field__value' }, this.renderTitleEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'URL'), _.div({ class: 'editor__field__value' }, this.renderUrlEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Preset'), _.div({ class: 'editor__field__value' }, this.renderPresetEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Processor'), _.div({ class: 'editor__field__key__description' }, 'Which format to deploy Content in')), _.div({ class: 'editor__field__value' }, this.renderProcessorSettingsEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Deployer'), _.div({ class: 'editor__field__key__description' }, 'How to transfer data to and from the endpoint server')), _.div({ class: 'editor__field__value' }, this.renderDeployerSettingsEditor()))), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+        return _.div({ class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-exchange' }), _.h4({ class: 'editor__header__title' }, this.model.title)), _.div({ class: 'editor__body' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Template provider'), _.div({ class: 'editor__field__value' }, this.renderTemplateProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Is Media provider'), _.div({ class: 'editor__field__value' }, this.renderMediaProviderEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Title'), _.div({ class: 'editor__field__value' }, this.renderTitleEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'URL'), _.div({ class: 'editor__field__value' }, this.renderUrlEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Preset'), _.div({ class: 'editor__field__value' }, this.renderPresetEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Processor'), _.div({ class: 'editor__field__key__description' }, 'Which format to deploy Content in')), _.div({ class: 'editor__field__value' }, this.renderProcessorSettingsEditor())), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Deployer'), _.div({ class: 'editor__field__key__description' }, 'How to transfer data to and from the website\'s server')), _.div({ class: 'editor__field__value' }, this.renderDeployerSettingsEditor()))), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
             _this10.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
             _this10.onClickSave();

@@ -14,9 +14,6 @@ class Processor extends Entity {
     // Getter: Alias of this Processor (used to link with the client-side editor)
     static get alias() { return 'processor'; }
    
-    // Getter: Extension (used to append the filename that is delpoyed)
-    static get extension() { return ''; }
-
     /**
      * Constructor
      */
@@ -33,6 +30,7 @@ class Processor extends Entity {
     structure() {
         this.def(String, 'name');
         this.def(String, 'alias');
+        this.def(String, 'fileExtension', '.json');
     }
 
     /**
