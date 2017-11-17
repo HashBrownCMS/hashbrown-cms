@@ -13,7 +13,7 @@ Then checkout and run HashBrown:
 ```
 git clone https://github.com/Putaitu/hashbrown-cms.git -b stable --single-branch --recursive
 cd ./hashbrown-cms
-npm install
+npm install --production
 node hashbrown.js
 ```
 
@@ -22,8 +22,8 @@ To update the core HashBrown version and all of its dependencies:
 ```
 cd /to/your/hashbrown/dir
 git pull
-git submodule update--recursive --init
-npm install
+git submodule update --recursive --init
+npm install --production
 ```
 
 ## Getting started
