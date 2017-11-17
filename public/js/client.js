@@ -45386,7 +45386,7 @@ var ConnectionEditor = function (_Crisp$View) {
 
                 _this8.fetch();
             }
-        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'File extension'), _.div({ class: 'editor__field__key__description' }, 'A file extension such as .json or .md')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'File extension'), _.div({ class: 'editor__field__key__description' }, 'A file extension such as .json or .xml')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
             if (editor.alias !== _this8.model.processor.alias) {
                 return;
             }
@@ -45434,7 +45434,7 @@ var ConnectionEditor = function (_Crisp$View) {
                 return;
             }
 
-            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Paths'), _.div({ class: 'editor__field__key__description' }, 'Where to store the individual resources')), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Content'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Paths'), _.div({ class: 'editor__field__key__description' }, 'Where to send the individual resources')), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Content'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                 value: _this9.model.deployer.paths.content,
                 onChange: function onChange(newValue) {
                     _this9.model.deployer.paths.content = newValue;

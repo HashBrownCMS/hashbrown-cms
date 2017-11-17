@@ -437,7 +437,7 @@ class Connection extends ConnectionCommon {
             return Promise.resolve();
         })
         .then(() => {
-            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64, true);
+            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
         });
     }
     

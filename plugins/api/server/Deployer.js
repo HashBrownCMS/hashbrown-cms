@@ -62,15 +62,11 @@ class ApiDeployer extends HashBrown.Models.Deployer {
      *
      * @param {String} path
      * @param {String} base64
-     * @param {Boolean} isBinary
      *
      * @return {Promise} Promise
      */
-    setFile(path, base64, isBinary) {
-        return HashBrown.Helpers.RequestHelper.request('post', path, {
-            isBinary: isBinary || false,
-            content: base64
-        });
+    setFile(path, base64) {
+        return HashBrown.Helpers.RequestHelper.request('post', path, base64);
     }
    
     /**

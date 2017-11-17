@@ -779,6 +779,7 @@ h1, h2, h3, h4, h5, h6 {
       flex-basis: 10rem;
       flex-shrink: 0;
       margin-right: 1rem;
+      padding-top: 0.25rem;
       line-height: 1.5rem; }
       .editor__field__key.following .editor__field__key__actions {
         position: fixed;

@@ -166,7 +166,7 @@ class ConnectionEditor extends Crisp.View {
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'},
                     _.div({class: 'editor__field__key__label'}, 'File extension'),
-                    _.div({class: 'editor__field__key__description'}, 'A file extension such as .json or .md')
+                    _.div({class: 'editor__field__key__description'}, 'A file extension such as .json or .xml')
                 ),
                 _.each(HashBrown.Views.Editors.ProcessorEditors, (name, editor) => {
                     if(editor.alias !== this.model.processor.alias) { return; }
@@ -222,7 +222,7 @@ class ConnectionEditor extends Crisp.View {
                 return _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
                         _.div({class: 'editor__field__key__label'}, 'Paths'),
-                        _.div({class: 'editor__field__key__description'}, 'Where to store the individual resources')
+                        _.div({class: 'editor__field__key__description'}, 'Where to send the individual resources')
                     ),
                     _.div({class: 'editor__field__value'},
                         _.div({class: 'editor__field'},
