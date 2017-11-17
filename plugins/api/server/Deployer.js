@@ -23,7 +23,8 @@ class ApiDeployer extends HashBrown.Models.Deployer {
     structure() {
         super.structure();
 
-        this.def(String, 'rootPath');
+        this.def(String, 'url');
+        this.def(String, 'token');
     }
 
     /**

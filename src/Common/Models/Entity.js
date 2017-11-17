@@ -11,17 +11,18 @@ class Entity {
     /**
      * Constructs an entity
      *
-     * @param {Object} properties
+     * @param {Object} params
      */
-    constructor(properties) {
+    constructor(params) {
         this.structure();
+        params = this.constructor.paramsCheck(params);
 
         Object.seal(this);
 
-        for(let k in properties) {
+        for(let k in params) {
             try {
-                if(typeof properties[k] !== 'undefined') {
-                    this[k] = properties[k]
+                if(typeof params[k] !== 'undefined') {
+                    this[k] = params[k]
                 }
             
             } catch(e) {
@@ -35,6 +36,17 @@ class Entity {
      */
     structure() {
 
+    }
+
+    /**
+     * Checks the parameters berfore they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        return params;
     }
 
     /**

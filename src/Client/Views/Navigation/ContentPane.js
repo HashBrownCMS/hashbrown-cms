@@ -136,7 +136,6 @@ class ContentPane extends NavbarPane {
      * @param {String} parentId
      */
     static onClickNewContent(parentId, asSibling) {
-
         // Try to get a parent Schema if it exists
         return function getParentSchema() {
             if(parentId) {
@@ -173,6 +172,8 @@ class ContentPane extends NavbarPane {
                 schemaReference.on('change', (newValue) => {
                     schemaId = newValue;
                 });
+
+                schemaReference.pickFirstSchema();
 
                 // Render the confirmation modal
                 UI.confirmModal(

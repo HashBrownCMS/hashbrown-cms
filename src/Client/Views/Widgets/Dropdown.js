@@ -24,8 +24,37 @@ class Dropdown extends Widget {
         }
                 
         super(params);
+
+        this.optionIcons = {};
     }
-    
+   
+    /**
+     * Gets option icon
+     *
+     * @param {String} label
+     *
+     * @returns {String} Icon
+     */
+    getOptionIcon(label) {
+        if(!this.iconKey || !this.labelKey || !this.options) { return ''; }
+        
+        for(let key in this.options) {
+            let value = this.options[key];
+
+            let optionLabel = this.labelKey ? value[this.labelKey] : value;
+           
+            if(typeof optionLabel !== 'string') { 
+                optionLabel = optionLabel ? optionLabel.toString() : '';
+            }
+        
+            if(optionLabel === label) {
+                return value[this.iconKey] || '';
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Converts options into a flattened structure
      *
@@ -86,7 +115,7 @@ class Dropdown extends Widget {
         this.sanityCheck();
        
         if(this.icon) {
-            return '<span class="fa fa-' + this.icon + '"></span>';
+            return '<span class="widget--dropdown__value__tool-icon fa fa-' + this.icon + '"></span>';
         }
 
         let label = this.placeholder || '(none)';
@@ -110,7 +139,14 @@ class Dropdown extends Widget {
         
         }
 
-        return label;
+        let icon = this.getOptionIcon(label);
+
+        return [
+            _.if(icon,
+                _.span({class: 'widget--dropdown__value__icon fa fa-' + icon})
+            ),
+            label
+        ];
     }
 
     /**
@@ -288,6 +324,8 @@ class Dropdown extends Widget {
             // Dropdown options
             _.div({class: 'widget--dropdown__options'},
                 _.each(this.getFlattenedOptions(), (optionValue, optionLabel) => {
+                    let optionIcon = this.getOptionIcon(optionLabel);
+
                     // Reverse keys option
                     if(this.reverseKeys) {
                         let key = optionLabel;
@@ -302,6 +340,9 @@ class Dropdown extends Widget {
                     }
 
                     return _.button({class: 'widget--dropdown__option', 'data-value': optionValue}, 
+                        _.if(optionIcon, 
+                            _.span({class: 'widget--dropdown__option__icon fa fa-' + optionIcon})
+                        ),
                         optionLabel
                     ).click((e) => {
                         this.onChangeInternal(optionValue);

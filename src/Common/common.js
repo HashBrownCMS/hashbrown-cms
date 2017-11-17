@@ -28,7 +28,7 @@ base.requiredParam = (name) => {
  * @param {String} name
  * @param {Type} type
  */
-base.checkParam = (value, name, type, ) => {
+base.checkParam = (value, name, type) => {
     if(value === undefined) {
         throw new Error('Parameter "' + name + '" is required');
     }
@@ -39,5 +39,15 @@ base.checkParam = (value, name, type, ) => {
     if(value instanceof type) { return; }
     if(value === type) { return; }
 
-    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
+    let valueTypeName = typeof value;
+
+    if(value.constructor) {
+        valueTypeName = value.constructor.name;
+    
+    } else if(value.prototype) {
+        valueTypename = value.prototype.name;
+
+    }
+
+    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
 }

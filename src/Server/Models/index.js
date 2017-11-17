@@ -11,7 +11,7 @@ module.exports = {
     FieldSchema: require('./FieldSchema'),
     Media: require('./Media'),
     Processor: require('Common/Models/Processor'),
-    Schema: require('./Schema'),
+    Schema: require('Common/Models/Schema'),
     Task: require('./Task'),
     Template: require('Common/Models/Template'),
     User: require('./User')

@@ -243,12 +243,15 @@ class SchemaHelper extends SchemaHelperCommon {
         return promise
         .then((schemaData) => {
             if(schemaData && Object.keys(schemaData).length > 0) {
-                return Promise.resolve(this.getModel(schemaData));
+                return Promise.resolve(schemaData);
             
             } else {
                 return SyncHelper.getResourceItem(project, environment, 'schemas', id);
 
             }
+        })
+        .then((schemaData) => {
+            return Promise.resolve(this.getModel(schemaData));  
         });
     }
    

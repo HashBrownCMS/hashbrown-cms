@@ -9,6 +9,15 @@ const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
  */
 class FieldSchemaEditor extends SchemaEditor {
     /**
+     * Pre render
+     */
+    prerender() {
+        if(!this.model.editorId) { 
+            this.model.editorId = this.compiledSchema.editorId;
+        }
+    }
+
+    /**
      * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element

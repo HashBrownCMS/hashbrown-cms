@@ -8,10 +8,6 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Content extends Resource {
-    constructor(params) {
-        super(Content.paramsCheck(params)); 
-    }
-   
     structure() {
         // Fundamental fields
         this.def(String, 'id');

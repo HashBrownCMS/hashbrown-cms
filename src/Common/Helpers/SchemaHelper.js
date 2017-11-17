@@ -1,9 +1,5 @@
 'use strict';
 
-// Models
-const FieldSchema = require('Common/Models/FieldSchema');
-const ContentSchema = require('Common/Models/ContentSchema');
-
 /**
  * The common base for SchemaHelper
  *
@@ -34,7 +30,7 @@ class SchemaHelper {
         if(!properties) { return null; }
 
         // If the properties object is already a recognised model, return it
-        if(properties instanceof ContentSchema || properties instanceof FieldSchema) {
+        if(properties instanceof HashBrown.Models.ContentSchema || properties instanceof HashBrown.Models.FieldSchema) {
             return properties;
         }
 
@@ -44,9 +40,9 @@ class SchemaHelper {
         }
 
         if(properties.type === 'content') {
-            return new ContentSchema(properties);
+            return new HashBrown.Models.ContentSchema(properties);
         } else if(properties.type === 'field') {
-            return new FieldSchema(properties);
+            return new HashBrown.Models.FieldSchema(properties);
         }
 
         throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
@@ -64,8 +60,8 @@ class SchemaHelper {
         checkParam(childSchema, 'childSchema', HashBrown.Models.Schema);
         checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
 
-        childSchema = JSON.parse(JSON.stringify(childSchema));
-        parentSchema = JSON.parse(JSON.stringify(parentSchema));
+        childSchema = childSchema.getObject();
+        parentSchema = parentSchema.getObject();
 
         let mergedSchema = parentSchema;
 
@@ -92,6 +88,10 @@ class SchemaHelper {
         
         // Specific values for schema types
         switch(mergedSchema.type) {
+            case 'field':
+                mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+                break;
+
             case 'content':
                 let mergedTabs = {};
                 
@@ -111,7 +111,7 @@ class SchemaHelper {
                 break;
         }
 
-        return mergedSchema;
+        return this.getModel(mergedSchema);
     }
 }
 

@@ -1958,6 +1958,10 @@ var RequestHelper = function () {
                             }
                         }
 
+                        if (response === '') {
+                            response = null;
+                        }
+
                         resolve(response);
                     } else {
                         var error = new Error(xhr.responseText);
@@ -6579,19 +6583,20 @@ var Entity = function () {
     /**
      * Constructs an entity
      *
-     * @param {Object} properties
+     * @param {Object} params
      */
-    function Entity(properties) {
+    function Entity(params) {
         _classCallCheck(this, Entity);
 
         this.structure();
+        params = this.constructor.paramsCheck(params);
 
         Object.seal(this);
 
-        for (var k in properties) {
+        for (var k in params) {
             try {
-                if (typeof properties[k] !== 'undefined') {
-                    this[k] = properties[k];
+                if (typeof params[k] !== 'undefined') {
+                    this[k] = params[k];
                 }
             } catch (e) {
                 debug.log(e.message, this, 4);
@@ -6605,6 +6610,19 @@ var Entity = function () {
 
 
     Entity.prototype.structure = function structure() {};
+
+    /**
+     * Checks the parameters berfore they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Entity.paramsCheck = function paramsCheck(params) {
+        return params;
+    };
 
     /**
      * Generates a new random id
@@ -7113,10 +7131,10 @@ var Resource = __webpack_require__(14);
 var Media = function (_Resource) {
     _inherits(Media, _Resource);
 
-    function Media(params) {
+    function Media() {
         _classCallCheck(this, Media);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Media.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
     }
 
     /**
@@ -7126,8 +7144,6 @@ var Media = function (_Resource) {
      *
      * @returns {Object} Params
      */
-
-
     Media.paramsCheck = function paramsCheck(params) {
         params = _Resource.paramsCheck.call(this, params);
 
@@ -7141,6 +7157,11 @@ var Media = function (_Resource) {
 
         return params;
     };
+
+    /**
+     * Structure
+     */
+
 
     Media.prototype.structure = function structure() {
         this.def(String, 'id');
@@ -7869,13 +7890,13 @@ var SettingsHelper = function (_SettingsHelperCommon) {
      *
      * @return {Promise(Object)}  settings
      */
-    SettingsHelper.getSettings = function getSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-
+    SettingsHelper.getSettings = function getSettings(project) {
         var _this2 = this;
 
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        checkParam(project, 'project', String);
 
         if (environment === '*') {
             environment = null;
@@ -7912,10 +7933,11 @@ var SettingsHelper = function (_SettingsHelperCommon) {
      */
 
 
-    SettingsHelper.cacheSanityCheck = function cacheSanityCheck() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    SettingsHelper.cacheSanityCheck = function cacheSanityCheck(project) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        checkParam(project, 'project', String);
 
         if (environment === '*') {
             environment = null;
@@ -7945,11 +7967,13 @@ var SettingsHelper = function (_SettingsHelperCommon) {
      */
 
 
-    SettingsHelper.updateCache = function updateCache() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    SettingsHelper.updateCache = function updateCache(project) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+        var settings = arguments[3];
+
+        checkParam(project, 'project', String);
+        checkParam(settings, 'settings', Object);
 
         if (environment === '*') {
             environment = null;
@@ -7981,10 +8005,11 @@ var SettingsHelper = function (_SettingsHelperCommon) {
      */
 
 
-    SettingsHelper.getCachedSettings = function getCachedSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    SettingsHelper.getCachedSettings = function getCachedSettings(project) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        checkParam(project, 'project', String);
 
         if (environment === '*') {
             environment = null;
@@ -8019,14 +8044,16 @@ var SettingsHelper = function (_SettingsHelperCommon) {
      */
 
 
-    SettingsHelper.setSettings = function setSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    SettingsHelper.setSettings = function setSettings(project) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
         var _this3 = this;
 
         var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+        var settings = arguments[3];
+
+        checkParam(project, 'project', String);
+        checkParam(settings, 'settings', Object);
 
         if (environment === '*') {
             environment = null;
@@ -9290,12 +9317,15 @@ var Resource = __webpack_require__(14);
 var Schema = function (_Resource) {
     _inherits(Schema, _Resource);
 
-    function Schema(params) {
+    function Schema() {
         _classCallCheck(this, Schema);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Schema.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
     }
 
+    /**
+     * Structure
+     */
     Schema.prototype.structure = function structure() {
         this.def(String, 'id');
         this.def(String, 'name');
@@ -9307,19 +9337,6 @@ var Schema = function (_Resource) {
         this.def(Object, 'sync');
 
         this.def(Array, 'hiddenProperties', []);
-    };
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-
-
-    Schema.paramsCheck = function paramsCheck(params) {
-        return _Resource.paramsCheck.call(this, params);
     };
 
     /**
@@ -9344,8 +9361,8 @@ var Schema = function (_Resource) {
      */
 
 
-    Schema.create = function create() {
-        var parentSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('parentSchema');
+    Schema.create = function create(parentSchema) {
+        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
 
         return HashBrown.Helpers.SchemaHelper.getModel({
             id: Schema.createId(),
@@ -11127,6 +11144,9 @@ var FieldSchema = function (_Schema) {
         return _possibleConstructorReturn(this, _Schema.apply(this, arguments));
     }
 
+    /**
+     * Structure
+     */
     FieldSchema.prototype.structure = function structure() {
         _Schema.prototype.structure.call(this);
 
@@ -11135,6 +11155,26 @@ var FieldSchema = function (_Schema) {
 
         this.name = 'New field schema';
         this.type = 'field';
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    FieldSchema.paramsCheck = function paramsCheck(params) {
+        params = _Schema.paramsCheck.call(this, params);
+
+        // Backwards compatible editor names
+        if (params.editorId && params.editorId.indexOf('Editor') < 0) {
+            params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
+        }
+
+        return params;
     };
 
     /**
@@ -11272,20 +11312,15 @@ var Resource = __webpack_require__(14);
 var Connection = function (_Resource) {
     _inherits(Connection, _Resource);
 
-    /**
-     * Constructor
-     */
-    function Connection(params) {
+    function Connection() {
         _classCallCheck(this, Connection);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Connection.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
     }
 
     /**
      * Structure
      */
-
-
     Connection.prototype.structure = function structure() {
         this.def(String, 'id');
         this.def(String, 'title');
@@ -16363,8 +16398,8 @@ var ConnectionHelper = function (_ConnectionHelperComm) {
      */
 
 
-    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync(id) {
+        checkParam(id, 'id', String);
 
         for (var i in resources.connections) {
             var connection = resources.connections[i];
@@ -16380,16 +16415,16 @@ var ConnectionHelper = function (_ConnectionHelperComm) {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {string} id
+     * @param {String} id
      *
      * @return {Promise(Connection)} promise
      */
 
 
-    ConnectionHelper.getConnectionById = function getConnectionById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+    ConnectionHelper.getConnectionById = function getConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
 
         for (var i in resources.connections) {
             var connection = resources.connections[i];
@@ -16547,9 +16582,9 @@ var LanguageHelper = function (_LanguageHelperCommon) {
      */
 
 
-    LanguageHelper.setLanguages = function setLanguages() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
+    LanguageHelper.setLanguages = function setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', String);
 
         if (!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
@@ -25968,20 +26003,15 @@ function compare(a, b) {
 "use strict";
 
 
-// Models
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var FieldSchema = __webpack_require__(53);
-var ContentSchema = __webpack_require__(52);
-
 /**
  * The common base for SchemaHelper
  *
  * @memberof HashBrown.Common.Helpers
  */
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SchemaHelper = function () {
     function SchemaHelper() {
@@ -26016,7 +26046,7 @@ var SchemaHelper = function () {
         }
 
         // If the properties object is already a recognised model, return it
-        if (properties instanceof ContentSchema || properties instanceof FieldSchema) {
+        if (properties instanceof HashBrown.Models.ContentSchema || properties instanceof HashBrown.Models.FieldSchema) {
             return properties;
         }
 
@@ -26026,9 +26056,9 @@ var SchemaHelper = function () {
         }
 
         if (properties.type === 'content') {
-            return new ContentSchema(properties);
+            return new HashBrown.Models.ContentSchema(properties);
         } else if (properties.type === 'field') {
-            return new FieldSchema(properties);
+            return new HashBrown.Models.FieldSchema(properties);
         }
 
         throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
@@ -26044,12 +26074,12 @@ var SchemaHelper = function () {
      */
 
 
-    SchemaHelper.mergeSchemas = function mergeSchemas() {
-        var childSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('childSchema');
-        var parentSchema = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('parentSchema');
+    SchemaHelper.mergeSchemas = function mergeSchemas(childSchema, parentSchema) {
+        checkParam(childSchema, 'childSchema', HashBrown.Models.Schema);
+        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
 
-        childSchema = JSON.parse(JSON.stringify(childSchema));
-        parentSchema = JSON.parse(JSON.stringify(parentSchema));
+        childSchema = childSchema.getObject();
+        parentSchema = parentSchema.getObject();
 
         var mergedSchema = parentSchema;
 
@@ -26074,6 +26104,10 @@ var SchemaHelper = function () {
 
         // Specific values for schema types
         switch (mergedSchema.type) {
+            case 'field':
+                mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+                break;
+
             case 'content':
                 var mergedTabs = {};
 
@@ -26093,7 +26127,7 @@ var SchemaHelper = function () {
                 break;
         }
 
-        return mergedSchema;
+        return this.getModel(mergedSchema);
     };
 
     return SchemaHelper;
@@ -29506,10 +29540,10 @@ var Resource = __webpack_require__(14);
 var Content = function (_Resource) {
     _inherits(Content, _Resource);
 
-    function Content(params) {
+    function Content() {
         _classCallCheck(this, Content);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Content.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
     }
 
     Content.prototype.structure = function structure() {
@@ -29640,9 +29674,9 @@ var Content = function (_Resource) {
      */
 
 
-    Content.prototype.getParent = function getParent() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    Content.prototype.getParent = function getParent(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         if (!this.parentId) {
             return Promise.resolve(null);
@@ -29665,9 +29699,9 @@ var Content = function (_Resource) {
      */
 
 
-    Content.prototype.getParents = function getParents() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    Content.prototype.getParents = function getParents(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         var parents = [];
 
@@ -29893,12 +29927,15 @@ var Resource = __webpack_require__(14);
 var Form = function (_Resource) {
     _inherits(Form, _Resource);
 
-    function Form(params) {
+    function Form() {
         _classCallCheck(this, Form);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Form.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
     }
 
+    /**
+     * Structure
+     */
     Form.prototype.structure = function structure() {
         // Fundamental fields
         this.def(String, 'id');
@@ -29914,19 +29951,6 @@ var Form = function (_Resource) {
         // Mutable fields
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
-    };
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-
-
-    Form.paramsCheck = function paramsCheck(params) {
-        return _Resource.paramsCheck.call(this, params);
     };
 
     /**
@@ -30069,7 +30093,7 @@ var Template = function (_Resource) {
     function Template(params) {
         _classCallCheck(this, Template);
 
-        var _this = _possibleConstructorReturn(this, _Resource.call(this, Template.paramsCheck(params)));
+        var _this = _possibleConstructorReturn(this, _Resource.call(this, params));
 
         _this.updateId();
         return _this;
@@ -30093,6 +30117,11 @@ var Template = function (_Resource) {
 
         return params;
     };
+
+    /**
+     * Structure
+     */
+
 
     Template.prototype.structure = function structure() {
         this.def(String, 'id');
@@ -30164,8 +30193,6 @@ var Dropdown = function (_Widget) {
      * Constructor
      */
     function Dropdown(params) {
-        var _this;
-
         _classCallCheck(this, Dropdown);
 
         if (params.optionsUrl) {
@@ -30178,8 +30205,42 @@ var Dropdown = function (_Widget) {
             });
         }
 
-        return _this = _possibleConstructorReturn(this, _Widget.call(this, params));
+        var _this = _possibleConstructorReturn(this, _Widget.call(this, params));
+
+        _this.optionIcons = {};
+        return _this;
     }
+
+    /**
+     * Gets option icon
+     *
+     * @param {String} label
+     *
+     * @returns {String} Icon
+     */
+
+
+    Dropdown.prototype.getOptionIcon = function getOptionIcon(label) {
+        if (!this.iconKey || !this.labelKey || !this.options) {
+            return '';
+        }
+
+        for (var key in this.options) {
+            var value = this.options[key];
+
+            var optionLabel = this.labelKey ? value[this.labelKey] : value;
+
+            if (typeof optionLabel !== 'string') {
+                optionLabel = optionLabel ? optionLabel.toString() : '';
+            }
+
+            if (optionLabel === label) {
+                return value[this.iconKey] || '';
+            }
+        }
+
+        return '';
+    };
 
     /**
      * Converts options into a flattened structure
@@ -30249,7 +30310,7 @@ var Dropdown = function (_Widget) {
         this.sanityCheck();
 
         if (this.icon) {
-            return '<span class="fa fa-' + this.icon + '"></span>';
+            return '<span class="widget--dropdown__value__tool-icon fa fa-' + this.icon + '"></span>';
         }
 
         var label = this.placeholder || '(none)';
@@ -30271,7 +30332,9 @@ var Dropdown = function (_Widget) {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;
         }
 
-        return label;
+        var icon = this.getOptionIcon(label);
+
+        return [_.if(icon, _.span({ class: 'widget--dropdown__value__icon fa fa-' + icon })), label];
     };
 
     /**
@@ -30467,6 +30530,8 @@ var Dropdown = function (_Widget) {
 
         // Dropdown options
         _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+            var optionIcon = _this3.getOptionIcon(optionLabel);
+
             // Reverse keys option
             if (_this3.reverseKeys) {
                 var key = optionLabel;
@@ -30480,7 +30545,7 @@ var Dropdown = function (_Widget) {
                 return _.div({ class: 'widget--dropdown__separator' }, optionLabel);
             }
 
-            return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
+            return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, _.if(optionIcon, _.span({ class: 'widget--dropdown__option__icon fa fa-' + optionIcon })), optionLabel).click(function (e) {
                 _this3.onChangeInternal(optionValue);
             });
         })),
@@ -30885,8 +30950,8 @@ var MediaHelper = function () {
      */
 
 
-    MediaHelper.getTempPath = function getTempPath() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    MediaHelper.getTempPath = function getTempPath(project) {
+        checkParam(project, 'project', String);
 
         var path = '/storage/' + ProjectHelper.currentProject + '/temp';
 
@@ -31410,9 +31475,9 @@ var ContentHelper = function () {
      *
      * @return {Promise} promise
      */
-    ContentHelper.getAllContents = function getAllContents() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    ContentHelper.getAllContents = function getAllContents(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return Promise.resolve();
     };
@@ -31435,16 +31500,16 @@ var ContentHelper = function () {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
+     * @param {String} id
      *
      * @return {Promise} promise
      */
 
 
-    ContentHelper.getContentById = function getContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+    ContentHelper.getContentById = function getContentById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
 
         return Promise.resolve();
     };
@@ -31454,18 +31519,18 @@ var ContentHelper = function () {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
-     * @param {Object} content
+     * @param {String} id
+     * @param {Content} content
      *
      * @return {Promise} promise
      */
 
 
-    ContentHelper.setContentById = function setContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
+    ContentHelper.setContentById = function setContentById(project, environment, id, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
 
         return new Promise(function (resolve, reject) {
             resolve();
@@ -31484,11 +31549,11 @@ var ContentHelper = function () {
      */
 
 
-    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
-        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
+    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(parentId, 'parentId', String);
+        checkParam(childSchemaId, 'childSchemaId', String);
 
         // No parent ID means root, and all Schemas are allowed there
         if (!parentId) {
@@ -31574,9 +31639,9 @@ var ConnectionHelper = function () {
      *
      * @returns {Promise(Array)} connections
      */
-    ConnectionHelper.getAllConnections = function getAllConnections() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    ConnectionHelper.getAllConnections = function getAllConnections(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return Promise.resolve();
     };
@@ -31592,10 +31657,11 @@ var ConnectionHelper = function () {
      */
 
 
-    ConnectionHelper.setTemplateProvider = function setTemplateProvider() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider(project, environment) {
         var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
             providers = providers || {};
@@ -31615,11 +31681,11 @@ var ConnectionHelper = function () {
      */
 
 
-    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider(project, environment) {
         var _this = this;
 
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
 
@@ -31655,10 +31721,11 @@ var ConnectionHelper = function () {
      */
 
 
-    ConnectionHelper.setMediaProvider = function setMediaProvider() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+    ConnectionHelper.setMediaProvider = function setMediaProvider(project, environment) {
         var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
             providers = providers || {};
@@ -31678,11 +31745,11 @@ var ConnectionHelper = function () {
      */
 
 
-    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+    ConnectionHelper.getMediaProvider = function getMediaProvider(project, environment) {
         var _this2 = this;
 
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
 
@@ -32446,8 +32513,8 @@ var LanguageHelper = function () {
      *
      * @returns {Array} List of language names
      */
-    LanguageHelper.getLanguages = function getLanguages() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+    LanguageHelper.getLanguages = function getLanguages(project) {
+        checkParam(project, 'project', String);
 
         return Promise.resolve([]);
     };
@@ -32462,9 +32529,9 @@ var LanguageHelper = function () {
      */
 
 
-    LanguageHelper.setLanguages = function setLanguages() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
+    LanguageHelper.setLanguages = function setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', Array);
 
         return Promise.resolve();
     };
@@ -32480,10 +32547,10 @@ var LanguageHelper = function () {
      */
 
 
-    LanguageHelper.getAllLocalizedPropertySets = function getAllLocalizedPropertySets() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+    LanguageHelper.getAllLocalizedPropertySets = function getAllLocalizedPropertySets(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
 
         return this.getLanguages(project).then(function (languages) {
             var sets = {};
@@ -41065,7 +41132,7 @@ var MediaViewer = function (_Crisp$View) {
     MediaViewer.prototype.template = function template() {
         var mediaSrc = this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
-        return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true, src: mediaSrc }))));
+        return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true }, _.source({ src: mediaSrc, type: this.model.getContentTypeHeader() })))));
     };
 
     return MediaViewer;
@@ -43198,6 +43265,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var base = void 0;
 
 if (typeof window !== 'undefined') {
@@ -43247,7 +43316,15 @@ base.checkParam = function (value, name, type) {
         return;
     }
 
-    throw new TypeError('Parameter "' + name + '" is not of type "' + type.name + '"');
+    var valueTypeName = typeof value === 'undefined' ? 'undefined' : _typeof(value);
+
+    if (value.constructor) {
+        valueTypeName = value.constructor.name;
+    } else if (value.prototype) {
+        valueTypename = value.prototype.name;
+    }
+
+    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
 };
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
@@ -43758,7 +43835,6 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.onClickNewContent = function onClickNewContent(parentId, asSibling) {
-
         // Try to get a parent Schema if it exists
         return function getParentSchema() {
             if (parentId) {
@@ -43794,6 +43870,8 @@ var ContentPane = function (_NavbarPane) {
                 schemaReference.on('change', function (newValue) {
                     schemaId = newValue;
                 });
+
+                schemaReference.pickFirstSchema();
 
                 // Render the confirmation modal
                 UI.confirmModal('OK', 'Create new content', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Schema'), schemaReference.$element),
@@ -44580,9 +44658,13 @@ var MediaPane = function (_NavbarPane) {
 
                 // Refresh on replace
                 if (replaceId) {
-                    var src = $('.editor--media__preview').attr('src');
+                    var mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
-                    $('.editor--media__preview').attr('src', src + '?date=' + Date.now());
+                    if (mediaViewer) {
+                        mediaViewer.model = null;
+
+                        mediaViewer.fetch();
+                    }
                 }
             },
             replaceId: replaceId,
@@ -45752,10 +45834,21 @@ var FieldSchemaEditor = function (_SchemaEditor) {
     }
 
     /**
+     * Pre render
+     */
+    FieldSchemaEditor.prototype.prerender = function prerender() {
+        if (!this.model.editorId) {
+            this.model.editorId = this.compiledSchema.editorId;
+        }
+    };
+
+    /**
      * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
      */
+
+
     FieldSchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
         var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
 
@@ -46103,6 +46196,7 @@ var ArrayEditor = function (_FieldEditor) {
                         placeholder: 'Schema',
                         valueKey: 'id',
                         labelKey: 'name',
+                        iconKey: 'icon',
                         options: resources.schemas.filter(function (schema) {
                             return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
                         }),
@@ -46548,10 +46642,24 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
             useClearButton: true,
             valueKey: 'id',
             labelKey: 'name',
+            iconKey: 'icon',
             onChange: function onChange(newValue) {
                 config.allowedSchemas = newValue;
             }
         }).$element));
+    };
+
+    /**
+     * Picks the first available Schema
+     */
+
+
+    ContentSchemaReferenceEditor.prototype.pickFirstSchema = function pickFirstSchema() {
+        this.value = this.getDropdownOptions()[0].id;
+
+        this.trigger('change', this.value);
+
+        this.fetch();
     };
 
     /**
@@ -46568,6 +46676,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
             valueKey: 'id',
             tooltip: this.description || '',
             labelKey: 'name',
+            iconKey: 'icon',
             useClearButton: true,
             onChange: function onChange(newValue) {
                 _this2.value = newValue;

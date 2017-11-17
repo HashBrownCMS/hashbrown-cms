@@ -172,7 +172,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
-        checkParam(user, 'user', hashBrown.Models.User);
+        checkParam(user, 'user', HashBrown.Models.User);
 
         debug.log('Unpublishing content "' + content.id + '"...', this);
         

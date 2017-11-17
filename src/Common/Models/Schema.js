@@ -8,10 +8,9 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Schema extends Resource {
-    constructor(params) {
-        super(Schema.paramsCheck(params));
-    }
-    
+    /**
+     * Structure
+     */
     structure() {
         this.def(String, 'id');
         this.def(String, 'name');
@@ -23,17 +22,6 @@ class Schema extends Resource {
         this.def(Object, 'sync');
 
         this.def(Array, 'hiddenProperties', []);
-    }
-    
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    static paramsCheck(params) {
-        return super.paramsCheck(params);
     }
 
     /**

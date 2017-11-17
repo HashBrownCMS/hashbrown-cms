@@ -13,13 +13,6 @@ const Resource = require('./Resource');
  */
 class Connection extends Resource {
     /**
-     * Constructor
-     */
-    constructor(params) {
-        super(Connection.paramsCheck(params));
-    }
-
-    /**
      * Structure
      */
     structure() {

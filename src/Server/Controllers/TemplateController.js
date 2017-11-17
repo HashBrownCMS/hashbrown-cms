@@ -1,15 +1,11 @@
 'use strict';
 
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller fro templates
  *
  * @memberof HashBrown.Server.Controllers
  */
-class TemplateController extends ApiController {
+class TemplateController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -33,7 +29,7 @@ class TemplateController extends ApiController {
         let connection;
        
         // Get template provider
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((provider) => {
             connection = provider;
 
@@ -65,7 +61,7 @@ class TemplateController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
     
@@ -76,7 +72,7 @@ class TemplateController extends ApiController {
         let type = req.params.type;
         let name = req.params.name;
 
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
@@ -86,7 +82,7 @@ class TemplateController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 
@@ -98,7 +94,7 @@ class TemplateController extends ApiController {
         let type = req.params.type;
         let name = req.params.name;
 
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
@@ -108,7 +104,7 @@ class TemplateController extends ApiController {
             res.status(200).send(template);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 
@@ -119,7 +115,7 @@ class TemplateController extends ApiController {
         let allTemplates = [];
         let provider;
         
-        return ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        return HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
 
@@ -145,7 +141,7 @@ class TemplateController extends ApiController {
             res.status(200).send(allTemplates);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 }

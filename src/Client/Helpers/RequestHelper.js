@@ -107,6 +107,8 @@ class RequestHelper {
                             }
                         }
 
+                        if(response === '') { response = null; }
+
                         resolve(response);
 
                     } else {

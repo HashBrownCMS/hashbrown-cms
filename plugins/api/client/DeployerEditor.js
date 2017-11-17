@@ -36,7 +36,7 @@ class ApiDeployerEditor extends Crisp.View {
             value: this.model.token,
             placeholder: 'Input token',
             onChange: (newValue) => {
-                this.model.tokenl = newValue;
+                this.model.token = newValue;
             }
         }).$element;
     }

@@ -14,13 +14,6 @@ const ConnectionCommon = require('Common/Models/Connection');
  */
 class Connection extends ConnectionCommon {
     /**
-     * Constructor
-     */
-    constructor(params) {
-        super(Connection.paramsCheck(params));
-    }
-    
-    /**
      * Structure
      */
     structure() {
@@ -279,7 +272,13 @@ class Connection extends ConnectionCommon {
             let allTemplates = [];
 
             for(let file of files) {
-                let name = Path.basename(file.path || file);
+                let name = file.path || file.name;
+                
+                if(!name && typeof file === 'string') {
+                    name = file;
+                }
+
+                name = Path.basename(name);
                 
                 let template = new HashBrown.Models.Template({
                     name: name,
@@ -309,12 +308,25 @@ class Connection extends ConnectionCommon {
         .then((file) => {
             if(!file) { return Promise.reject(new Error('Template by id "' + id + '" not found')); }
 
-            let name = Path.basename(file.path || file);
-            let content = file.data || file.content;
+            let name = file.path || file.name;
+            
+            if(!name && typeof file === 'string') {
+                name = file;
+            }
 
-            // Convert from base64
-            if(content && content.lastIndexOf('=') !== content.length - 1) {
-                content = Buffer.from(content, 'base64').toString('utf8');
+            name = Path.basename(name);
+            
+            let content = file.data || file.content || file.markup;
+
+            // Detect base64 and convert if necessary
+            // NOTE: This is a good guess, but not perfect, as it's basically impossible to be sure
+            if(typeof content === 'string' && content.indexOf(' ') < 0) {
+                let test = content.replace(/\r?\n|\r/g, '');
+                let matches = test.match(/[A-Za-z0-9+/=]+/);
+
+                if(matches && matches.length > 0 && matches[0].length === test.length) {
+                    content = Buffer.from(content, 'base64').toString('utf8');
+                }
             }
 
             return Promise.resolve(new HashBrown.Models.Template({
@@ -375,11 +387,28 @@ class Connection extends ConnectionCommon {
             let allMedia = [];
 
             for(let folder of folders) {
-                let name = Path.basename(folder.path || folder);
-                let id = Path.dirname(folder.path || folder).split(Path.sep).pop();
+                let name = folder.name || folder.filename || folder.path;
+
+                if(!name && typeof folder === 'string') {
+                    name = folder;
+                }
+                    
+                name = Path.basename(name);
+
+                let id = folder.path || folder.id;
+                
+                if(!id && typeof folder === 'string') {
+                    id = folder;
+                }
+                
+                // Get last bit of the path, if it's a path
+                if(id.indexOf(Path.sep) > -1) {
+                    id = Path.dirname(id).split(Path.sep).pop();
+                }
                 
                 let media = new HashBrown.Models.Media({
                     id: id,
+                    url: this.deployer.getPath('media', id + '/' + name),
                     name: name
                 });
 
@@ -404,10 +433,16 @@ class Connection extends ConnectionCommon {
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
 
-            let file = files[0];
+            let file = Array.isArray(files) ? files[0] : files;
 
-            let name = Path.basename(file.url || file.path || file);
-           
+            let name = file.name || file.filename || file.url || file.path;
+            
+            if(!name && typeof file === 'string') {
+                name = file;
+            }
+
+            name = Path.basename(name);
+
             return Promise.resolve(new HashBrown.Models.Media({
                 id: id,
                 name: name,
@@ -437,7 +472,7 @@ class Connection extends ConnectionCommon {
             return Promise.resolve();
         })
         .then(() => {
-            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
+            return this.deployer.setFile(this.deployer.getPath('media', id), { filename: name, content: base64 });
         });
     }
     

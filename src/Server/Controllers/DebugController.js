@@ -19,7 +19,7 @@ class DebugController extends ApiController {
      * Gets debug socket
      */
     static wsDebug(ws, req) {
-        return ApiController.authenticate(req.cookies.token, null, null)
+        return DebugController.authenticate(req.cookies.token, null, null)
         .then((user) => {
             debug.setLogHandler('websocket', (dateString, senderString, message, type) => {
                 // We only want warnings and errors
