@@ -27,9 +27,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Connection
      */
-    static getConnectionByIdSync(
-        id = requiredParam('id')
-    ) {
+    static getConnectionByIdSync(id) {
+        checkParam(id, 'id', String);
+
         for(let i in resources.connections) {
             let connection = resources.connections[i];
 
@@ -44,15 +44,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {string} id
+     * @param {String} id
      *
      * @return {Promise(Connection)} promise
      */
-    static getConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         for(let i in resources.connections) {
             let connection = resources.connections[i];
 

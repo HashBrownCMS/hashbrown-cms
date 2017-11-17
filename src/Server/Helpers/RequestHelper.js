@@ -20,10 +20,10 @@ class RequestHelper {
      * @param {String} url
      * @param {Object} res
      */
-    static pipe(
-        url = requiredParam('url'),
-        res = requiredParam('res')
-    ) {
+    static pipe(url, res) {
+        checkParam(url, 'url', String);
+        checkParam(res, 'res', Object);
+
         url = url.replace('HTTP://', '');
         url = url.replace('HTTPS://', '');
 
@@ -54,10 +54,10 @@ class RequestHelper {
      *
      * @returns {Promise} Result
      */
-    static download(
-        url = requiredParam('url'),
-        destination = requiredParam('destination')
-    ) {
+    static download(url, destination) {
+        checkParam(url, 'url', String);
+        checkParam(destination, 'destination', String);
+
         return this.request('get', url)
         .then((data) => {
             let stream = FileSystem.createWriteStream(destination);
@@ -94,11 +94,9 @@ class RequestHelper {
      *
      * @returns {Promise} Response
      */
-    static getPaginated(
-        url = requiredParam('url'),
-        data = null,
-        maxPages = 10
-    ) {
+    static getPaginated(url, data = null, maxPages = 10) {
+        checkParam(url, 'url', String);
+
         if(!data) {
             data = {};
         }
@@ -135,12 +133,10 @@ class RequestHelper {
      *
      * @returns {Promise} Response
      */
-    static request(
-        method = requiredParam('method'),
-        url = requiredParam('url'),
-        data = null,
-        asQueryString = false
-    ) {
+    static request(method, url, data = null, asQueryString = false) {
+        checkParam(method, 'method', String);
+        checkParam(url, 'url', String);
+
         return new Promise((resolve, reject) => {
             method = method.toUpperCase();
 

@@ -54,9 +54,9 @@ class Schema extends Resource {
      *
      * @returns {Schema} schema
      */
-    static create(
-        parentSchema = requiredParam('parentSchema')
-    ) {
+    static create(parentSchema) {
+        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+
         return HashBrown.Helpers.SchemaHelper.getModel({
             id: Schema.createId(),
             icon: parentSchema.icon || 'file',

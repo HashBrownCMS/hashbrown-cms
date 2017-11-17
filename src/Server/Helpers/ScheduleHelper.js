@@ -75,9 +75,9 @@ class ScheduleHelper {
      *
      * @return {Promise} Promise
      */
-    static runTask(
-        task = requiredParam('task')
-    ) {
+    static runTask(task) {
+        checkParam(task, 'task', HashBrown.Models.Task);
+
         debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);
 
         let user;
@@ -158,14 +158,14 @@ class ScheduleHelper {
      *
      * @returns {Promise} Promise
      */
-    static updateTask(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        type = requiredParam('type'),
-        contentId = requiredParam('contentId'),
-        date = requiredParam('date'),
-        user = requiredParam('user')
-    ) {
+    static updateTask(project, environment, type, contentId, date, user) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(type, 'type', String);
+        checkParam(contentId, 'contentId', String);
+        checkParam(date, 'date', Date);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         // If the date is invalid, remove instead
         if(!date || isNaN(new Date(date).getTime()) || new Date(date).getFullYear() == 1970) {
             return Promise.reject(new Error('Date "' + date + '" is invalid'));
@@ -210,12 +210,12 @@ class ScheduleHelper {
      *
      * @returns {Promise} Promise
      */
-    static removeTask(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        type = requiredParam('type'),
-        contentId = requiredParam('contentId')
-    ) {
+    static removeTask(project, environment, type, contentId) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(type, 'type', String);
+        checkParam(contentId, 'contentId', String);
+
         let query = {
             type: type,
             content: contentId,

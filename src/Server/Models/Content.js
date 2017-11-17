@@ -17,11 +17,11 @@ class Content extends ContentCommon {
      *
      * @returns {Promise} settings
      */
-    getSettings(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        key = requiredParam('key')
-    ) {
+    getSettings(project, environment, key) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(key, 'key', String);
+
         this.settingsSanityCheck(key);
 
         // Loop through all parent content to find a governing setting

@@ -20,11 +20,11 @@ class FormHelper {
      *
      * @returns {Promise} Form
      */
-    static getForm(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getForm(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.forms';
     
         return DatabaseHelper.findOne(
@@ -55,11 +55,11 @@ class FormHelper {
      *
      * @returns {Promise} Promise
      */
-    static deleteForm(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static deleteForm(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.forms';
     
         return DatabaseHelper.removeOne(
@@ -79,10 +79,10 @@ class FormHelper {
      *
      * @returns {Promise} Array of forms
      */
-    static getAllForms(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllForms(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.forms';
         
         return DatabaseHelper.find(
@@ -106,13 +106,12 @@ class FormHelper {
      *
      * @returns {Promise} Form
      */
-    static setForm(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        properties = requiredParam('properties'),
-        create = true
-    ) {
+    static setForm(project, environment, id, properties, create = true) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(properties, 'properties', Object);
+
         let collection = environment + '.forms';
 
         // Unset automatic flags
@@ -147,10 +146,10 @@ class FormHelper {
      *
      * @returns {Promise} Form
      */
-    static createForm(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static createForm(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let form = Form.create();
         let collection = environment + '.forms';
 
@@ -174,12 +173,12 @@ class FormHelper {
      *
      * @returns {Promise} Promise
      */
-    static addEntry(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        entry = requiredParam('entry')
-    ) {
+    static addEntry(project, environment, id, entry) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(entry, 'entry', Object);
+
         return this.getForm(project, environment, id)
         .then((form) => {
             form.addEntry(entry);
@@ -197,11 +196,11 @@ class FormHelper {
      *
      * @returns {Promise} Promise
      */
-    static clearAllEntries(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static clearAllEntries(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         return this.getForm(project, environment, id)
         .then((form) => {
             form.clearAllEntries();

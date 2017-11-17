@@ -92,13 +92,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} Promise
      */
-    static previewContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user'),
-        language = requiredParam('language')
-    ) {
+    static previewContent(project, environment, content, user, language) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+        checkParam(language, 'language', String);
+
         return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
             if(!settings.connectionId) {
@@ -125,12 +125,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} Promise
      */
-    static publishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user')
-    ) {
+    static publishContent(project, environment, content, user) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         let helper = this;
 
         debug.log('Publishing content "' + content.id + '"...', this);
@@ -168,13 +168,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} promise
      */
-    static unpublishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user'),
-        unpublishFirst = true
-    ) {
+    static unpublishContent(project, environment, content, user, unpublishFirst = true) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', hashBrown.Models.User);
+
         debug.log('Unpublishing content "' + content.id + '"...', this);
         
         return content.getSettings(project, environment, 'publishing')
@@ -210,10 +209,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Array of Connections
      */
-    static getAllConnections(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllConnections(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.connections';
         
         return DatabaseHelper.find(
@@ -241,11 +240,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Connection
      */
-    static getConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.connections';
        
         return DatabaseHelper.findOne(
@@ -279,11 +278,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static removeConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static removeConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.connections';
         
         return DatabaseHelper.removeOne(
@@ -343,10 +342,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} New Connection
      */
-    static createConnection(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static createConnection(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let connection = Connection.create();
 
         return DatabaseHelper.insertOne(

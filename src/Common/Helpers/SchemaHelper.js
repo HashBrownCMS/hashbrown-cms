@@ -60,10 +60,10 @@ class SchemaHelper {
      *
      * @returns {Schema} Merged Schema
      */
-    static mergeSchemas(
-        childSchema = requiredParam('childSchema'),
-        parentSchema = requiredParam('parentSchema')
-    ) {
+    static mergeSchemas(childSchema, parentSchema) {
+        checkParam(childSchema, 'childSchema', HashBrown.Models.Schema);
+        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+
         childSchema = JSON.parse(JSON.stringify(childSchema));
         parentSchema = JSON.parse(JSON.stringify(parentSchema));
 

@@ -17,11 +17,11 @@ class SyncHelper {
      *
      * @returns {Promise} New token
      */
-    static renewToken(
-        project = requiredParam('project'),
-        username = requiredParam('username'),
-        password = requiredParam('password')
-    ) {
+    static renewToken(project, username, password) {
+        checkParam(project, 'project', String);
+        checkParam(username, 'username', String);
+        checkParam(password, 'password', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             if(!this.validateSettings(settings, true)) {
@@ -76,12 +76,12 @@ class SyncHelper {
      *
      * @returns {Promise} Resource
      */
-    static getResourceItem(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        remoteResourceName = requiredParam('remoteResourceName'),
-        remoteItemName = requiredParam('remoteItemName')
-    ) {
+    static getResourceItem(project, environment, remoteResourceName, remoteItemName) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(remoteResourceName, 'remoteResourceName', String);
+        checkParam(remoteItemName, 'remoteItemName', String);
+
         if(!remoteItemName) {
             return this.getResource(project, environment, remoteResourceName);
         }
@@ -142,13 +142,13 @@ class SyncHelper {
      *
      * @returns {Promise} Whether setting was successful
      */
-    static setResourceItem(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        remoteResourceName = requiredParam('remoteResourceName'),
-        remoteItemName = requiredParam('remoteItemName'),
-        remoteItemData = requiredParam('remoteItemData')
-    ) {
+    static setResourceItem(project, environment, remoteResourceName, remoteItemName, remoteItemData) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(remoteResourceName, 'remoteResourceName', String);
+        checkParam(remoteItemName, 'remoteItemName', String);
+        checkParam(remoteItemData, 'remoteItemData', Object);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             if(this.validateSettings(settings)) {
@@ -194,12 +194,11 @@ class SyncHelper {
      *
      * @returns {Promise} Resource
      */
-    static getResource(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        remoteResourceName = requiredParam('remoteResourceName'),
-        params = {}
-    ) {
+    static getResource(project, environment, remoteResourceName, params = {}) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(remoteResourceName, 'remoteResourceName', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             if(this.validateSettings(settings)) {
@@ -247,13 +246,12 @@ class SyncHelper {
      *
      * @return {Promise} Merged resource
      */
-    static mergeResource(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        remoteResourceName = requiredParam('remoteResourceName'),
-        localResource = requiredParam('localResource'),
-        params = {}
-    ) {
+    static mergeResource(project, environment, remoteResourceName, localResource, params = {}) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(remoteResourceName, 'remoteResourceName', String);
+        checkParam(localResource, 'localResource', Array);
+
         return this.getResource(project, environment, remoteResourceName, params)
         .then((remoteResource) => {
             let mergedResource;

@@ -71,10 +71,9 @@ class MediaHelper extends MediaHelperCommon {
      * @param {String} dirPath
      * @param {Function} callback
      */
-    static mkdirRecursively(
-        dirPath = requiredParam('dirPath'),
-        callback = null
-    ) {
+    static mkdirRecursively(dirPath, callback = null) {
+        checkParam(dirPath, 'dirPath', String);
+
         let parents = dirPath.split('/');
         let finalPath = '/';
 
@@ -106,10 +105,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setMediaData(
-        id = requiredParam('id'),
-        file = requiredParam('file')
-    ) {
+    static setMediaData(id, file) {
+        checkParam(id, 'id', Number);
+        checkParam(file, 'file', Object);
+
         return new Promise((resolve, reject) => {
             let oldPath = file.path;
             let name = Path.basename(oldPath);
@@ -226,10 +225,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} Tree
      */
-    static getTree(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getTree(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.media';
        
         return SyncHelper.getResource(project, environment, 'media/tree')
@@ -274,12 +273,12 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setTreeItem(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),       
-        id = requiredParam('id'),
-        item = requiredParam('item')
-    ) {
+    static setTreeItem(project, environment, id, item) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(item, 'item', Object);
+
         return SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
         .then((wasItemSet) => {
             if(wasItemSet) { return Promise.resolve(); }        
@@ -320,9 +319,9 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @returns {String} path
      */
-    static getTempPath(
-        project = requiredParam('project')
-    ) {
+    static getTempPath(project) {
+        checkParam(project, 'project', String);
+
         let path = 
             appRoot +
             '/storage/' +
