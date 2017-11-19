@@ -53,16 +53,18 @@ class Deployer extends Entity {
     /**
      * Gets a deployment path
      *
-     * @param {String} path
+     * @param {String} query
      * @param {String} filename
      *
      * @returns {String} Path
      */
-    getPath(path, filename) {
-        let lvl1 = path ? path.split('/')[0] : null;
-        let lvl2 = path ? path.split('/')[1] : null;
+    getPath(query, filename) {
+        // The "query" variable is a syntax for getting the paths defined in the config
+        let lvl1 = query ? query.split('/')[0] : null;
+        let lvl2 = query ? query.split('/')[1] : null;
         
-        path = this.getRootPath();
+        // Start with the root path
+        let path = this.getRootPath();
         
         // Add slash if needed
         if(path.lastIndexOf('/') !== path.length - 1) {

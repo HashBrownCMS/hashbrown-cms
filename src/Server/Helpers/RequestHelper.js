@@ -5,6 +5,7 @@ const HTTPS = require('https');
 const QueryString = require('querystring');
 const FileSystem = require('fs');
 const URL = require('url');
+const Path = require('path');
 
 const MAX_REDIRECTS = 10;
 
@@ -235,7 +236,7 @@ class RequestHelper {
                             
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
-                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str);
+                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + method + ' ' + url.protocol + '//' + Path.join(url.host, url.path) + '\n\n' + str);
                                
                                 error.url = url;
                                 error.statusCode = res.statusCode;

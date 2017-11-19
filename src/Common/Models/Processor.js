@@ -30,7 +30,7 @@ class Processor extends Entity {
     structure() {
         this.def(String, 'name');
         this.def(String, 'alias');
-        this.def(String, 'fileExtension', '.json');
+        this.def(String, 'fileExtension');
     }
 
     /**

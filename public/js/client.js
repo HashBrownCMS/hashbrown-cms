@@ -11277,11 +11277,11 @@ var Connection = function (_Resource) {
                 settings = {
                     processor: {
                         alias: 'json',
-                        fileExtension: '.json'
+                        fileExtension: ''
                     },
                     deployer: {
                         alias: 'api',
-                        url: (oldSettings.url || 'https://example.com') + '/hashbrown/api/',
+                        url: (oldSettings.url || 'https://example.com') + '/api/',
                         token: oldSettings.token || '',
                         paths: {
                             templates: {
@@ -16103,7 +16103,7 @@ var Processor = function (_Entity) {
   Processor.prototype.structure = function structure() {
     this.def(String, 'name');
     this.def(String, 'alias');
-    this.def(String, 'fileExtension', '.json');
+    this.def(String, 'fileExtension');
   };
 
   /**
@@ -16218,18 +16218,20 @@ var Deployer = function (_Entity) {
     /**
      * Gets a deployment path
      *
-     * @param {String} path
+     * @param {String} query
      * @param {String} filename
      *
      * @returns {String} Path
      */
 
 
-    Deployer.prototype.getPath = function getPath(path, filename) {
-        var lvl1 = path ? path.split('/')[0] : null;
-        var lvl2 = path ? path.split('/')[1] : null;
+    Deployer.prototype.getPath = function getPath(query, filename) {
+        // The "query" variable is a syntax for getting the paths defined in the config
+        var lvl1 = query ? query.split('/')[0] : null;
+        var lvl2 = query ? query.split('/')[1] : null;
 
-        path = this.getRootPath();
+        // Start with the root path
+        var path = this.getRootPath();
 
         // Add slash if needed
         if (path.lastIndexOf('/') !== path.length - 1) {
@@ -41200,7 +41202,7 @@ var MediaViewer = function (_Crisp$View) {
 
 
     MediaViewer.prototype.template = function template() {
-        var mediaSrc = this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        var mediaSrc = (this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id) + '?' + Date.now();
 
         return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true }, _.source({ src: mediaSrc, type: this.model.getContentTypeHeader() })))));
     };

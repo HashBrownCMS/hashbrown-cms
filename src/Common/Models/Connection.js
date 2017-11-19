@@ -109,11 +109,11 @@ class Connection extends Resource {
                 settings = {
                     processor: {
                         alias: 'json',
-                        fileExtension: '.json'
+                        fileExtension: ''
                     },
                     deployer: {
                         alias: 'api',
-                        url: (oldSettings.url || 'https://example.com') + '/hashbrown/api/',
+                        url: (oldSettings.url || 'https://example.com') + '/api/',
                         token: oldSettings.token || '',
                         paths: {
                             templates: {
