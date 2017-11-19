@@ -140,6 +140,8 @@ class RequestHelper {
         return new Promise((resolve, reject) => {
             method = method.toUpperCase();
 
+            let contentType = 'text/plain';
+
             if(method === 'GET') {
                 asQueryString = true;
             }
@@ -152,8 +154,10 @@ class RequestHelper {
                     data = null;
 
                 // To JSON string
-                } else {
+                } else if(typeof data === 'object') {
                     data = JSON.stringify(data);
+                    contentType = 'application/json';
+                
                 }
             }
             
@@ -163,7 +167,7 @@ class RequestHelper {
             let headers = {
                 'Accept': '*/*',
                 'User-Agent': 'HashBrown CMS',
-                'Content-Type': 'application/json; charset=utf-8',
+                'Content-Type': contentType + '; charset=utf-8',
                 'Host': url.hostname
             };
             

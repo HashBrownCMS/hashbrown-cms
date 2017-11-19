@@ -117,7 +117,7 @@ class TemplatePane extends NavbarPane {
      */
     static onClickRenameTemplate() {
         let id = $('.context-menu-target').data('id');
-        let type = Crisp.Router.params.type;
+        let type = $('.context-menu-target').parent().data('routing-path').split('/')[0];
         let model = HashBrown.Helpers.TemplateHelper.getTemplate(type, id);
 
         if(!model) {

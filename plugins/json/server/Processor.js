@@ -57,13 +57,18 @@ class JsonProcessor extends HashBrown.Models.Processor {
 
             meta.createdBy = createdBy.fullName || createdBy.username;
             meta.updatedBy = updatedBy.fullName || createdBy.username;
+            meta.language = language;
 
             // Combine all data into one
-            let data = {
-                meta: meta,
-                properties: properties,
-                language: language
-            };
+            let data = {};
+
+            for(let k in properties) {
+                data[k] = properties[k];
+            }
+            
+            for(let k in meta) {
+                data[k] = meta[k];
+            }
 
             return Promise.resolve(data);
         });

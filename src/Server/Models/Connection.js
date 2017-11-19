@@ -231,10 +231,7 @@ class Connection extends ConnectionCommon {
                 }
             }
 
-            // Convert to base64
-            if(result.lastIndexOf('=') !== result.length - 1) {
-                result = Buffer.from(result, 'utf8').toString('base64');
-            }
+            result = Buffer.from(result, 'utf8').toString('base64');
 
             return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
         });
@@ -351,10 +348,7 @@ class Connection extends ConnectionCommon {
         checkParam(name, 'name', String);
         checkParam(content, 'content', String);
 
-        // Convert to base64
-        if(content.lastIndexOf('=') !== content.length - 1) {
-            content = Buffer.from(content, 'utf8').toString('base64');
-        }
+        content = Buffer.from(content, 'utf8').toString('base64');
         
         return this.deployer.setFile(this.deployer.getPath('templates/' + type, name), content);
     }
@@ -472,7 +466,7 @@ class Connection extends ConnectionCommon {
             return Promise.resolve();
         })
         .then(() => {
-            return this.deployer.setFile(this.deployer.getPath('media', id), { filename: name, content: base64 });
+            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
         });
     }
     
