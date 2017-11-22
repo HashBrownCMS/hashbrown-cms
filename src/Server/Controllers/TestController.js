@@ -23,7 +23,7 @@ class TestController extends ApiController {
         let project = req.params.project;
         let environment = req.params.environment;
 
-        return ApiController.authenticate(req.cookies.token, project, environment, true)
+        return TestController.authenticate(req.cookies.token, project, environment, true)
         .then((user) => {
             if(!user.isAdmin) {
                 return Promise.reject(new Error('The testing tool requires admin privileges'));

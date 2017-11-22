@@ -8,10 +8,9 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Form extends Resource {
-    constructor(params) {
-        super(Form.paramsCheck(params)); 
-    }
-
+    /**
+     * Structure
+     */
     structure() {
         // Fundamental fields
         this.def(String, 'id');
@@ -27,17 +26,6 @@ class Form extends Resource {
         // Mutable fields
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
-    }
-
-    /**
-     * Checks the format of the params
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    static paramsCheck(params) {
-        return super.paramsCheck(params);
     }
 
     /**

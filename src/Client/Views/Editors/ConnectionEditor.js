@@ -120,40 +120,168 @@ class ConnectionEditor extends Crisp.View {
     }
     
     /**
-     * Renders the settings editor
+     * Renders the preset editor
      */
-    renderSettingsEditor() {
-        let editor = HashBrown.Views.Editors.ConnectionEditors[this.model.type];
-
-        this.model.settings = this.model.settings || {};
-
-        if(editor) {
-            let $editor = new editor({
-                model: this.model.settings
-            }).$element;
-
-            return $editor;
-
-        } else {
-            debug.log('No connection editor found for type alias "' + this.model.type + '"', this);
-            return '';
-
-        }
-    }
-    
-    /**
-     * Renders the type editor
-     */
-    renderTypeEditor() {
+    renderPresetEditor() {
         return new HashBrown.Views.Widgets.Dropdown({
-            value: this.model.type,
-            options: Object.keys(HashBrown.Views.Editors.ConnectionEditors),
+            options: [
+                'GitHub Pages',
+                'HashBrown Driver'
+            ],
+            placeholder: 'Pick a preset...',
             onChange: (newValue) => {
-                this.model.type = newValue;
+                let newModel = this.model.getObject();
+                
+                newModel.preset = newValue;
+               
+                this.model = new HashBrown.Models.Connection(newModel);
 
                 this.fetch();
             }
         }).$element;
+    }
+
+    /**
+     * Renders the processing settings editor
+     */
+    renderProcessorSettingsEditor() {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Type'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: this.model.processor.alias,
+                        optionsUrl: 'connections/processors', 
+                        valueKey: 'alias',
+                        labelKey: 'name',
+                        placeholder: 'Type',
+                        onChange: (newValue) => {
+                            this.model.processor.alias = newValue;
+
+                            this.fetch();
+                        }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'},
+                    _.div({class: 'editor__field__key__label'}, 'File extension'),
+                    _.div({class: 'editor__field__key__description'}, 'A file extension such as .json or .xml')
+                ),
+                _.each(HashBrown.Views.Editors.ProcessorEditors, (name, editor) => {
+                    if(editor.alias !== this.model.processor.alias) { return; }
+                        
+                    return new editor({
+                        model: this.model.processor
+                    }).$element;
+                }),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        value: this.model.processor.fileExtension,
+                        onChange: (newValue) => {
+                            this.model.processor.fileExtension = newValue;
+                        }
+                    })
+                )
+            )
+        ];
+    }
+    
+    /**
+     * Renders the deployment settings editor
+     */
+    renderDeployerSettingsEditor() {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Type'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: this.model.deployer.alias,
+                        optionsUrl: 'connections/deployers', 
+                        valueKey: 'alias',
+                        labelKey: 'name',
+                        placeholder: 'Type',
+                        onChange: (newValue) => {
+                            this.model.deployer.alias = newValue;
+
+                            this.fetch();
+                        }
+                    }).$element
+                )
+            ),
+            _.each(HashBrown.Views.Editors.DeployerEditors, (name, editor) => {
+                if(editor.alias !== this.model.deployer.alias) { return; }
+                    
+                return new editor({
+                    model: this.model.deployer
+                }).$element;
+            }),
+            _.do(() => {
+                if(!this.model.deployer || !this.model.deployer.paths) { return; }
+                
+                return _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Paths'),
+                        _.div({class: 'editor__field__key__description'}, 'Where to send the individual resources')
+                    ),
+                    _.div({class: 'editor__field__value'},
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Content'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.content,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.content = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Media'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.media,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.media = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Page templates'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.templates.page,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.templates.page = newValue;
+                                    }
+                                })
+                            )
+                        ),
+                        _.div({class: 'editor__field'},
+                            _.div({class: 'editor__field__key'}, 'Partial templates'),
+                            _.div({class: 'editor__field__value'},
+                                new HashBrown.Views.Widgets.Input({
+                                    value: this.model.deployer.paths.templates.partial,
+                                    onChange: (newValue) => {
+                                        this.model.deployer.paths.templates.partial = newValue;
+                                    }
+                                })
+                            )
+                        )
+                    )
+                );
+            })
+        ];
+    }
+
+    /**
+     * Prerender
+     */
+    prerender() {
+        if(this.model instanceof HashBrown.Models.Connection === false) {
+            this.model = new HashBrown.Models.Connection(this.model);
+        }
     }
 
     /**
@@ -191,15 +319,27 @@ class ConnectionEditor extends Crisp.View {
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Type'),
+                    _.div({class: 'editor__field__key'}, 'Preset'),
                     _.div({class: 'editor__field__value'},
-                        this.renderTypeEditor()
+                        this.renderPresetEditor()
                     )
                 ),
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Settings'),
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Processor'),
+                        _.div({class: 'editor__field__key__description'}, 'Which format to deploy Content in')
+                    ),
                     _.div({class: 'editor__field__value'},
-                        this.renderSettingsEditor()
+                        this.renderProcessorSettingsEditor()
+                    )
+                ),
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Deployer'),
+                        _.div({class: 'editor__field__key__description'}, 'How to transfer data to and from the website\'s server')
+                    ),
+                    _.div({class: 'editor__field__value'},
+                        this.renderDeployerSettingsEditor()
                     )
                 )
             ),

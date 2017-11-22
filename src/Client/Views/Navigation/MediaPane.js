@@ -99,9 +99,13 @@ class MediaPane extends NavbarPane {
 
                 // Refresh on replace
                 if(replaceId) {
-                    let src = $('.editor--media__preview').attr('src');
-                    
-                    $('.editor--media__preview').attr('src', src + '?date=' + Date.now());
+                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+
+                    if(mediaViewer) {
+                        mediaViewer.model = null;
+
+                        mediaViewer.fetch();
+                    }
                 }
             },
             replaceId: replaceId,

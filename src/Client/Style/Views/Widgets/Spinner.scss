@@ -31,6 +31,10 @@
         position: absolute;
     }
 
+    &.embedded &__image {
+        left: 50%;
+    }
+
     &__inner {
         position: absolute;
         top: 0%;

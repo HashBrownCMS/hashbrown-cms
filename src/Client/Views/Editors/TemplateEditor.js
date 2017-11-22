@@ -23,7 +23,7 @@ class TemplateEditor extends Crisp.View {
     onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.id, this.model)
+        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.name, this.model)
         .then(() => {
             return RequestHelper.reloadResource('templates');
         })

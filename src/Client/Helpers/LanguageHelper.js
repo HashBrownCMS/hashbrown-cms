@@ -57,10 +57,10 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Promise} promise
      */
-    static setLanguages(
-        project = requiredParam('project'),
-        languages = requiredParam('languages')
-    ) {
+    static setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', String);
+
         if(!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
         }

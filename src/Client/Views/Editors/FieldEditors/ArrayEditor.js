@@ -260,6 +260,7 @@ class ArrayEditor extends FieldEditor {
                                         placeholder: 'Schema',
                                         valueKey: 'id',
                                         labelKey: 'name',
+                                        iconKey: 'icon',
                                         options: resources.schemas.filter((schema) => {
                                             return this.config.allowedSchemas.indexOf(schema.id) > -1;
                                         }),

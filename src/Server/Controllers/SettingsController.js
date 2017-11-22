@@ -1,16 +1,11 @@
 'use strict';
 
-const SettingsHelper = require('Server/Helpers/SettingsHelper');
-const ProjectHelper = require('Server/Helpers/ProjectHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller for settings
  *
  * @memberof HashBrown.Server.Controllers
  */
-class SettingsController extends ApiController {
+class SettingsController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -32,7 +27,7 @@ class SettingsController extends ApiController {
      * Get environments
      */
     static getEnvironments(req, res) {
-        ProjectHelper.getAllEnvironments(req.params.project)
+        HashBrown.Helpers.ProjectHelper.getAllEnvironments(req.params.project)
         .then((environments) => {
             res.status(200).send(environments);
         })
@@ -45,7 +40,7 @@ class SettingsController extends ApiController {
      * Get settings object
      */
     static getSettings(req, res) {
-        SettingsHelper.getSettings(req.params.project, req.params.environment, req.params.section)
+        HashBrown.Helpers.SettingsHelper.getSettings(req.params.project, req.params.environment, req.params.section)
         .then((settings) => {
             res.status(200).send(settings);
         })
@@ -60,7 +55,7 @@ class SettingsController extends ApiController {
     static setSettings(req, res) {
         let settings = req.body;
 
-        SettingsHelper.setSettings(req.params.project, req.params.environment, req.params.section, settings)
+        HashBrown.Helpers.SettingsHelper.setSettings(req.params.project, req.params.environment, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })

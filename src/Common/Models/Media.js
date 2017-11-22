@@ -10,10 +10,6 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Media extends Resource {
-    constructor(params) {
-        super(Media.paramsCheck(params)); 
-    }
-    
     /**
      * Checks the format of the params
      *
@@ -35,11 +31,15 @@ class Media extends Resource {
         return params;
     }
     
+    /**
+     * Structure
+     */
     structure() {
         this.def(String, 'id');
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
+        this.def(String, 'path');
         this.def(String, 'folder', '/');
     }
 

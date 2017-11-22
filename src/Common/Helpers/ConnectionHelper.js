@@ -16,10 +16,10 @@ class ConnectionHelper {
      *
      * @returns {Promise(Array)} connections
      */
-    static getAllConnections(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllConnections(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return Promise.resolve();
     }
     
@@ -32,11 +32,10 @@ class ConnectionHelper {
      *
      * @return {Promise} Promise
      */
-    static setTemplateProvider(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = null
-    ) {
+    static setTemplateProvider(project, environment, id = null) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
@@ -54,10 +53,10 @@ class ConnectionHelper {
      *
      * @return {Promise} Connection object
      */
-    static getTemplateProvider(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getTemplateProvider(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         
         // Previously, providers were set project-wide, so retrieve automatically if needed
@@ -91,11 +90,10 @@ class ConnectionHelper {
      *
      * @return {Promise} Promise
      */
-    static setMediaProvider(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = null
-    ) {
+    static setMediaProvider(project, environment, id = null) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
@@ -113,10 +111,10 @@ class ConnectionHelper {
      *
      * @return {Promise} Connection object
      */
-    static getMediaProvider(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getMediaProvider(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         
         // Previously, providers were set project-wide, so retrieve automatically if needed

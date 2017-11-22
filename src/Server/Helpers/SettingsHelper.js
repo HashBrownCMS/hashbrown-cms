@@ -17,10 +17,9 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @returns {Promise} Promise
      */
-    static migrateOldSettings(
-        project = requiredParam('project'),
-        commitChanges = false
-    ) {
+    static migrateOldSettings(project, commitChanges = false) {
+        checkParam(project, 'project', String);
+
         debug.log('Migrating old settings for project "' + project + '"...', this);
 
         let collection = [];
@@ -182,9 +181,9 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @returns {Boolean} Migration is needed or not
      */
-    static checkIfNeedsMigration(
-        project = requiredParam('project')
-    ) {
+    static checkIfNeedsMigration(project) {
+        checkParam(project, 'project', String);
+
         return DatabaseHelper.findOne(
             project,
             'settings',
@@ -239,11 +238,9 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @return {Promise} Settings
      */
-    static getSettings(
-        project = requiredParam('project'),
-        environment = null,
-        section = null
-    ) {
+    static getSettings(project, environment = null, section = null) {
+        checkParam(project, 'project', String);
+
         // Is the environment is a wildcard, just discard it
         if(environment === '*') {
             environment = null;
@@ -307,13 +304,10 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setSettings(
-        project = requiredParam('project'),
-        environment = null,
-        section = null,
-        settings = requiredParam('settings'),
-        upsertEnvironment = false
-    ) {
+    static setSettings(project, environment = null, section = null, settings, upsertEnvironment = false) {
+        checkParam(project, 'project', String);
+        checkParam(settings, 'settings', Object);
+
         debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
     
         // Check if the environment exists

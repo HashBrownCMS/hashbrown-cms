@@ -1,5 +1,8 @@
 'use strict';
 
+// Common
+require('Common/common');
+
 // Namespaces
 window._ = Crisp.Elements;
 

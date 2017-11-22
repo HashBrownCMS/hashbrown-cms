@@ -5,7 +5,7 @@ const ContentHelper = require('Server/Helpers/ContentHelper');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
-const Connection = require('Common/Models/Connection');
+const Connection = require('Server/Models/Connection');
 
 /**
  * The helper class for Connections
@@ -14,37 +14,71 @@ const Connection = require('Common/Models/Connection');
  */
 class ConnectionHelper extends ConnectionHelperCommon {
     /**
-     * Registers a connection type
+     * Registers a deployer
      *
-     * @param {String} name
-     * @param {Connection} connection
+     * @param {Deployer} deployer
      */
-    static registerConnectionType(name, connection) {
-        if(!this.connectionTypes) {
-            this.connectionTypes = {};
+    static registerDeployer(deployer) {
+        checkParam(deployer, 'deployer', HashBrown.Models.Deployer);
+
+        if(!this.deployers) {
+            this.deployers = [];
         }
 
-        this.connectionTypes[name] = connection;
+        this.deployers.push(deployer);
+    }
+    
+    /**
+     * Registers a processor
+     *
+     * @param {Processor} processor
+     */
+    static registerProcessor(processor) {
+        checkParam(processor, 'processor', HashBrown.Models.Processor);
+
+        if(!this.processors) {
+            this.processors = [];
+        }
+
+        this.processors.push(processor);
     }
 
     /**
-     * Inits a connection with the appropriate constructor
+     * Gets a deployer
      *
-     * @param {Object} data
+     * @string {String} alias
      *
-     * @returns {Connection} connection
+     * @returns {Deployer} Deployer
      */
-    static initConnection(data) {
-        let constructor = this.connectionTypes[data.type];
-        let connection;
-           
-        if(typeof constructor === 'function') {
-            connection = new constructor(data);
-        } else {
-            connection = new Connection(data);
+    static getDeployer(alias) {
+        if(!this.deployers) { return null; }
+
+        for(let deployer of this.deployers) {
+            if(deployer.alias !== alias) { continue; }
+
+            return deployer;
         }
 
-        return connection;
+        return null;
+    }
+    
+    /**
+     * Gets a processor
+     *
+     * @string {String} alias
+     *
+     * @returns {Processor} Processor
+     */
+    static getProcessor(alias) {
+        if(!this.processors) { return null; }
+
+        for(let processor of this.processors) {
+            if(processor.alias !== alias) { continue; }
+
+            return processor;
+        }
+
+        return null;
     }
 
     /**
@@ -58,13 +92,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} Promise
      */
-    static previewContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user'),
-        language = requiredParam('language')
-    ) {
+    static previewContent(project, environment, content, user, language) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+        checkParam(language, 'language', String);
+
         return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
             if(!settings.connectionId) {
@@ -91,12 +125,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} Promise
      */
-    static publishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user')
-    ) {
+    static publishContent(project, environment, content, user) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         let helper = this;
 
         debug.log('Publishing content "' + content.id + '"...', this);
@@ -110,7 +144,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return this.getConnectionById(project, environment, settings.connectionId);
         })
         .then((connection) => {
-            debug.log('Publishing through connection "' + connection.id + '" of type "' + connection.type + '"...', helper);
+            debug.log('Publishing through connection "' + connection.id + '"...', helper);
 
             return connection.publishContent(project, environment, content);
         })
@@ -134,13 +168,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise} promise
      */
-    static unpublishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        user = requiredParam('user'),
-        unpublishFirst = true
-    ) {
+    static unpublishContent(project, environment, content, user, unpublishFirst = true) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         debug.log('Unpublishing content "' + content.id + '"...', this);
         
         return content.getSettings(project, environment, 'publishing')
@@ -154,7 +187,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
         .then((connection) => {
             if(!unpublishFirst) { return Promise.resolve(); }
             
-            debug.log('Unpublishing through connection "' + connection.id + '" of type "' + connection.type + '"...', this);
+            debug.log('Unpublishing through connection "' + connection.id + '"...', this);
 
             return connection.unpublishContent(project, environment, content);
         })
@@ -176,10 +209,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Array of Connections
      */
-    static getAllConnections(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllConnections(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.connections';
         
         return DatabaseHelper.find(
@@ -190,7 +223,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return SyncHelper.mergeResource(project, environment, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
-                    connections[i] = this.initConnection(connections[i]);
+                    connections[i] = new Connection(connections[i]);
                 }
 
                 return Promise.resolve(connections);
@@ -207,11 +240,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Connection
      */
-    static getConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.connections';
        
         return DatabaseHelper.findOne(
@@ -224,11 +257,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
             if(!data) {
                 return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
-                    return Promise.resolve(this.initConnection(resourceItem));
+                    if(!resourceItem) {
+                        return Promise.reject(new Error('Connection by id "' + id + '" was not found'));
+                    }
+
+                    return Promise.resolve(new Connection(resourceItem));
                 });
             } 
             
-            return Promise.resolve(this.initConnection(data));
+            return Promise.resolve(new Connection(data));
         });
     }
     
@@ -241,11 +278,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static removeConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static removeConnectionById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.connections';
         
         return DatabaseHelper.removeOne(
@@ -268,13 +305,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setConnectionById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        connection = requiredParam('connection'),
-        create = false
-    ) {
+    static setConnectionById(project, environment, id, connection, create = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(connection, 'connection', HashBrown.Models.Connection);
+
         // Unset automatic flags
         connection.isLocked = false;
 
@@ -289,7 +325,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             {
                 id: id
             },
-            connection,
+            connection.getObject(),
             {
                 upsert: create
             }
@@ -306,10 +342,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} New Connection
      */
-    static createConnection(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static createConnection(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let connection = Connection.create();
 
         return DatabaseHelper.insertOne(

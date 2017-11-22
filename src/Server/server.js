@@ -4,6 +4,9 @@
  * @namespace HashBrown.Server
  */
 
+// Common
+require('Common/common');
+
 // ----------
 // Libs
 // ----------
@@ -27,13 +30,6 @@ app.set('views', appRoot + '/src/Server/Views');
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
 app.use(Express.static(appRoot + '/public'));
-
-// ----------
-// Global methods
-// ----------
-global.requiredParam = function(name) {
-    throw new Error('Parameter "' + name + '" is required');
-}
 
 // ----------
 // Namespaces

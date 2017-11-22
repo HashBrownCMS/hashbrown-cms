@@ -779,6 +779,7 @@ h1, h2, h3, h4, h5, h6 {
       flex-basis: 10rem;
       flex-shrink: 0;
       margin-right: 1rem;
+      padding-top: 0.25rem;
       line-height: 1.5rem; }
       .editor__field__key.following .editor__field__key__actions {
         position: fixed;
@@ -977,7 +978,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .editor--media__preview {
   max-width: 90%;
-  max-height: 90%; }
+  max-height: 90vh; }
 
 /**
  * A rich text editor
@@ -2012,12 +2013,19 @@ h1, h2, h3, h4, h5, h6 {
     text-overflow: ellipsis;
     overflow: hidden;
     user-select: none; }
-    .widget--dropdown__value .fa {
+    .widget--dropdown__value__tool-icon {
       text-align: center;
-      height: calc(2rem - 2px);
-      line-height: calc(2rem - 2px);
+      height: 2rem;
+      line-height: 2rem;
       width: 2rem;
       display: block; }
+    .widget--dropdown__value__icon {
+      display: inline-block;
+      width: 2rem;
+      line-height: 2rem;
+      margin-left: -0.5rem;
+      margin-right: 0.5rem;
+      text-align: center; }
   .widget--dropdown__toggle {
     position: absolute;
     user-select: none;
@@ -2125,6 +2133,13 @@ h1, h2, h3, h4, h5, h6 {
         position: absolute;
         font-family: 'FontAwesome';
         content: '\F00C'; }
+    .widget--dropdown__option__icon {
+      display: inline-block;
+      width: 2rem;
+      line-height: 2rem;
+      margin-left: -0.5rem;
+      margin-right: 0.5rem;
+      text-align: center; }
   .widget--dropdown__clear {
     border: 0;
     height: 2rem;
@@ -2168,6 +2183,8 @@ h1, h2, h3, h4, h5, h6 {
     pointer-events: none; }
   .widget--spinner.embedded {
     position: absolute; }
+  .widget--spinner.embedded .widget--spinner__image {
+    left: 50%; }
   .widget--spinner__inner {
     position: absolute;
     top: 0%;

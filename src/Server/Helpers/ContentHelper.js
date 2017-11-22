@@ -25,10 +25,10 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} promise
      */
-    static getAllContents(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllContents(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.content';
 
         return DatabaseHelper.find(
@@ -71,12 +71,11 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} Promise
      */
-    static getContentById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        localOnly = false
-    ) {
+    static getContentById(project, environment, id, localOnly = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.content';
         let content;
 
@@ -120,13 +119,15 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Updates a Content object (quick, no checks)
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Content} content
      */
-    static updateContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
+    static updateContent(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
         return DatabaseHelper.updateOne(
             project,
             environment + '.content',
@@ -147,14 +148,13 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} Promise
      */
-    static setContentById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        content = requiredParam('content'),
-        user = requiredParam('user'),
-        create = false
-    ) {
+    static setContentById(project, environment, id, content, user, create = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         // Check for empty Content object
         if(!content || Object.keys(content).length < 1) {
             return Promise.reject(new Error('Posted content with id "' + id + '" is empty'));
@@ -232,18 +232,16 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} parentId
      * @param {User} user
      * @param {Object} properties
+     * @param {Number} sortIndex
      *
      * @return {Promise} New Content object
      */
-    static createContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        schemaId = requiredParam('schemaId'),
-        parentId = null,
-        user = requiredParam('user'),
-        properties = null,
-        sortIndex = 10000
-    ) {
+    static createContent(project, environment, schemaId, parentId = null, user, properties = null, sortIndex = 10000) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(schemaId, 'schemaId', String);
+        checkParam(user, 'user', HashBrown.Models.User);
+
         return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
         .then(() => {
             return SchemaHelper.getSchemaById(project, environment, schemaId);
@@ -286,12 +284,11 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} promise
      */
-    static removeContentById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        removeChildren = false
-    ) {
+    static removeContentById(project, environment, id, removeChildren = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         debug.log('Removing content "' + id + '"...', this);
 
         let collection = environment + '.content';
@@ -344,11 +341,10 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @returns {Promise} Result
      */
-    static createExampleContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        user = requieredParam('user')
-    ) {
+    static createExampleContent(project, environment, user = requieredParam('user')) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         // Example page Schema
         let examplePageSchemaId = ContentSchema.createId();
         
