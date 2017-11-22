@@ -1,5 +1,5 @@
 # HashBrown CMS
-A free and open-source CMS built with Node.js and MongoDB
+A free and open-source headless CMS built with Node.js and MongoDB
 
 ## The centralised approach
 Ever wonder why you have to run a completely separate CMS for every single project? We did too, and that's why HashBrown exists today. This is the new central brain for your extended project structure.
