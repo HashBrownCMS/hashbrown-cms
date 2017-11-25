@@ -100,10 +100,17 @@ class Dropdown extends Widget {
 
             if(isDisabled) { continue; }
 
-            options[optionValue] = optionLabel;
+            options[optionLabel] = optionValue;
         }
 
-        return options;
+        // Sort options alphabetically
+        let sortedOptions = {};
+
+        for(let label of Object.keys(options).sort()) {
+            sortedOptions[options[label]] = label;
+        }
+
+        return sortedOptions;
     }
 
     /**
@@ -127,7 +134,7 @@ class Dropdown extends Widget {
             for(let key in options) {
                 let value = options[key];
 
-                if(this.value.indexOf(key) > -1) {
+                if(value && this.value.indexOf(key) > -1) {
                     labels.push(value);
                 }
             }
@@ -139,14 +146,7 @@ class Dropdown extends Widget {
         
         }
 
-        let icon = this.getOptionIcon(label);
-
-        return [
-            _.if(icon,
-                _.span({class: 'widget--dropdown__value__icon fa fa-' + icon})
-            ),
-            label
-        ];
+        return label;
     }
 
     /**

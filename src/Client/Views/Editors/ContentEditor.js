@@ -428,6 +428,9 @@ class ContentEditor extends Crisp.View {
 
             if(connection && connection.url) {
                 remoteUrl = connection.url + url;
+
+                // Remove unnecessary slashes
+                remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
             }
         }
             

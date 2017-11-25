@@ -6,7 +6,7 @@ function initServiceTest() {
     var btnStart = document.querySelector('.page--dashboard__backend-test__run');
     var ulSection = null;    
 
-    var url = 'ws://' + location.host + '/api' + location.pathname;
+    var url = 'ws://' + location.host + '/api' + location.pathname.replace('/backend', '');
     var socket = new WebSocket(url);
 
     var errors = 0;

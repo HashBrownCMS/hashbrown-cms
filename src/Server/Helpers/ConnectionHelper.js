@@ -330,7 +330,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 upsert: create
             }
         ).then(() => {
-            return Promise.resolve(new Connection(connection));  
+            return Promise.resolve(connection);  
         });
     }
     

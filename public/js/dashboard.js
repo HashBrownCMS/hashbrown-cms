@@ -16306,7 +16306,7 @@ var MediaBrowser = function (_Modal) {
 
 
     MediaBrowser.prototype.renderBody = function renderBody() {
-        return _.iframe({ src: location.href.substring(0, location.href.indexOf('#')) + '/#/media/' + (this.value || '') });
+        return _.iframe({ src: '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') });
     };
 
     return MediaBrowser;
@@ -26264,10 +26264,30 @@ var Dropdown = function (_Widget) {
                 continue;
             }
 
-            options[optionValue] = optionLabel;
+            options[optionLabel] = optionValue;
         }
 
-        return options;
+        // Sort options alphabetically
+        var sortedOptions = {};
+
+        for (var _iterator = Object.keys(options).sort(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var label = _ref;
+
+            sortedOptions[options[label]] = label;
+        }
+
+        return sortedOptions;
     };
 
     /**
@@ -26293,7 +26313,7 @@ var Dropdown = function (_Widget) {
             for (var key in options) {
                 var value = options[key];
 
-                if (this.value.indexOf(key) > -1) {
+                if (value && this.value.indexOf(key) > -1) {
                     labels.push(value);
                 }
             }
@@ -26303,9 +26323,7 @@ var Dropdown = function (_Widget) {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;
         }
 
-        var icon = this.getOptionIcon(label);
-
-        return [_.if(icon, _.span({ class: 'widget--dropdown__value__icon fa fa-' + icon })), label];
+        return label;
     };
 
     /**
