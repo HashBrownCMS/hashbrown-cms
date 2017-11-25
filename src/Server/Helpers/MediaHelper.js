@@ -65,38 +65,35 @@ class MediaHelper extends MediaHelperCommon {
         }
     }
 
-    /**
+	/**
      * Makes a directory recursively
      *
      * @param {String} dirPath
      * @param {Function} callback
+	 * @param {Number} position
      */
-    static mkdirRecursively(dirPath, callback = null) {
-        checkParam(dirPath, 'dirPath', String);
-
-        let parents = dirPath.split('/');
-        let finalPath = '/';
-
-        for(let i in parents) {
-            if(!parents[i]) { continue; }
-
-            finalPath += parents[i];
-
-            if(!FileSystem.existsSync(finalPath)) {
-                debug.log('Creating parent directory ' + finalPath + '...', this);
-                FileSystem.mkdirSync(finalPath);
-            }
-
-            if(i < parents.length - 1) {
-                finalPath += '/';
-            }
-        }
-        
-        if(callback) {
-            callback();
-        }
+    static mkdirRecursively(dirPath, callback = null, position = 0) {
+		checkParam(dirPath, 'dirPath', String);
+		
+        let parts = Path.normalize(dirPath).split(Path.sep);
+		
+		if(position >= parts.length) {      
+			if(callback) {
+				callback();
+			}
+			
+			return;
+		}
+		
+		let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
+       	   
+		if(!FileSystem.existsSync(currentDirPath)) {
+			FileSystem.mkdirSync(currentDirPath);
+		}
+		
+		MediaHelper.mkdirRecursively(dirPath, callback, position + 1);
     }
-
+	
     /**
      * Sets a Media object
      *
@@ -322,13 +319,7 @@ class MediaHelper extends MediaHelperCommon {
     static getTempPath(project) {
         checkParam(project, 'project', String);
 
-        let path = 
-            appRoot +
-            '/storage/' +
-            project +
-            '/temp';
-
-        return path;
+        return Path.join(appRoot, 'storage', project, 'temp');
     }
 }
 
