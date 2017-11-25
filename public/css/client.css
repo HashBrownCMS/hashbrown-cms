@@ -186,6 +186,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
   margin: 0; }
   .page--dashboard__body__container {
+    width: calc(100% - 2rem);
     max-width: 60rem;
     margin: 0 auto; }
 
@@ -196,6 +197,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -0.5rem; }
+  @media (max-width: 767px) {
+    .page--dashboard__projects__list {
+      flex-direction: column; } }
   .page--dashboard__projects__list .cr-placeholder {
     padding: 1rem;
     margin: 0.5rem;
@@ -312,6 +316,14 @@ h1, h2, h3, h4, h5, h6 {
   transform-origin: center;
   transition: transform 0.25s ease;
   box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
+  @media (max-width: 991px) {
+    .page--dashboard__project {
+      flex-basis: calc(50% - 1rem);
+      width: calc(50% - 1rem); } }
+  @media (max-width: 767px) {
+    .page--dashboard__project {
+      flex-basis: 0;
+      width: auto; } }
   .page--dashboard__project__remove {
     padding: 0rem;
     position: absolute;

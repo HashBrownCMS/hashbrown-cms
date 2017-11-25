@@ -75,6 +75,7 @@
         margin: 0;
 
         &__container {
+            width: calc(100% - 2rem);
             max-width: 60rem;
             margin: 0 auto;
         }
@@ -96,6 +97,11 @@
             flex-wrap: wrap;
             margin: 0 -0.5rem;
 
+            @media($xs) {
+                flex-direction: column;
+            }
+
+            // The element that is placed while waiting for the view to be fetched
             .cr-placeholder {
                 padding: 1rem;
                 margin: 0.5rem;
