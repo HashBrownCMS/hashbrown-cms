@@ -11448,6 +11448,17 @@ var Pane = function () {
     };
 
     /**
+     * Event: Click open in new tab
+     */
+
+
+    Pane.onClickOpenInNewTab = function onClickOpenInNewTab() {
+        var href = $('.context-menu-target').attr('href');
+
+        window.open(location.protocol + '//' + location.host + '/' + href);
+    };
+
+    /**
      * Event: Click refresh resource
      *
      * @param {String} resource
@@ -16606,7 +16617,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 
     LanguageHelper.setLanguages = function setLanguages(project, languages) {
         checkParam(project, 'project', String);
-        checkParam(languages, 'languages', String);
+        checkParam(languages, 'languages', Array);
 
         if (!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
@@ -30610,6 +30621,10 @@ var Dropdown = function (_Widget) {
 
         if (!isOpen) {
             this.trigger('cancel');
+        } else {
+            if (this.useTypeAhead) {
+                this.element.querySelector('.widget--dropdown__typeahead').focus();
+            }
         }
 
         this.updatePositionClasses();

@@ -15834,7 +15834,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 
     LanguageHelper.setLanguages = function setLanguages(project, languages) {
         checkParam(project, 'project', String);
-        checkParam(languages, 'languages', String);
+        checkParam(languages, 'languages', Array);
 
         if (!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
@@ -26489,6 +26489,10 @@ var Dropdown = function (_Widget) {
 
         if (!isOpen) {
             this.trigger('cancel');
+        } else {
+            if (this.useTypeAhead) {
+                this.element.querySelector('.widget--dropdown__typeahead').focus();
+            }
         }
 
         this.updatePositionClasses();
@@ -36631,8 +36635,9 @@ $('.page--dashboard__users__add').click(function () {
                         var subject = 'Invitation to HashBrown';
                         var url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
                         var body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
+                        var href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
 
-                        location.href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
+                        location.href = href;
 
                         UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', function () {
                             location.reload();
@@ -37392,11 +37397,16 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 
 
     LanguageEditor.prototype.renderBody = function renderBody() {
+        var _this3 = this;
+
         return _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Selected languages'), new HashBrown.Views.Widgets.Dropdown({
             value: this.model,
             useTypeAhead: true,
             useMultiple: true,
-            options: LanguageHelper.getLanguageOptions(this.projectId)
+            options: LanguageHelper.getLanguageOptions(this.projectId),
+            onChange: function onChange(newValue) {
+                _this3.model = newValue;
+            }
         }).$element);
     };
 

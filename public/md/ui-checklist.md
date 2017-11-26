@@ -85,9 +85,6 @@
   - Navbar items are updated
   - Content currently being edited is being updated
 
-## HashBrown
-- Informational pages are displayed correctly
-
 ## Content
 ### Navbar
 - Can create new Content

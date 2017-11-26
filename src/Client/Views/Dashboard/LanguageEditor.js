@@ -54,11 +54,14 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
     renderBody() {
         return _.div({class: 'widget-group'},
             _.label({class: 'widget widget--label'}, 'Selected languages'),
-                new HashBrown.Views.Widgets.Dropdown({
+            new HashBrown.Views.Widgets.Dropdown({
                 value: this.model,
                 useTypeAhead: true,
                 useMultiple: true,
-                options: LanguageHelper.getLanguageOptions(this.projectId)
+                options: LanguageHelper.getLanguageOptions(this.projectId),
+                onChange: (newValue) => {
+                    this.model = newValue;
+                }
             }).$element
         );
     }

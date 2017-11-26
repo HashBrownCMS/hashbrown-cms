@@ -216,8 +216,9 @@ $('.page--dashboard__users__add').click(() => {
                             let subject = 'Invitation to HashBrown';
                             let url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
                             let body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
+                            let href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
 
-                            location.href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
+                            location.href = href;
 
                             UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', () => {
                                 location.reload();

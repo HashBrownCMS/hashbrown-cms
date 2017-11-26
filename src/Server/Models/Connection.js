@@ -219,7 +219,11 @@ class Connection extends ConnectionCommon {
         checkParam(id, 'id', String);
         checkParam(content,  'content', HashBrown.Models.Content);
         checkParam(language, 'language', String);
-        
+       
+        if(!this.processor || typeof this.processor.process !== 'function') {
+            return Promise.reject(new Error('This Connection has no processor defined'));
+        }
+
         return this.processor.process(content, language)
         .then((result) => {
             // Convert to string
@@ -232,6 +236,10 @@ class Connection extends ConnectionCommon {
             }
 
             result = Buffer.from(result, 'utf8').toString('base64');
+
+            if(!this.deployer || typeof this.deployer.setFile !== 'function') {
+                return Promise.reject(new Error('This Connection has no deployer defined'));
+            }
 
             return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
         });
@@ -249,6 +257,10 @@ class Connection extends ConnectionCommon {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
+        if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
+
         return this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
     }
     
@@ -261,6 +273,10 @@ class Connection extends ConnectionCommon {
      */
     getAllTemplates(type) {
         checkParam(type, 'type', String);
+
+        if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
 
         return this.deployer.getFolder(this.deployer.getPath('templates/' + type))
         .then((files) => {
@@ -300,6 +316,10 @@ class Connection extends ConnectionCommon {
     getTemplate(type, name) {
         checkParam(type, 'type', String);
         checkParam(name, 'name', String);
+
+        if(!this.deployer || typeof this.deployer.getFile !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
 
         return this.deployer.getFile(this.deployer.getPath('templates/' + type, name))
         .then((file) => {
@@ -350,6 +370,10 @@ class Connection extends ConnectionCommon {
 
         content = Buffer.from(content, 'utf8').toString('base64');
         
+        if(!this.deployer || typeof this.deployer.setFile !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
+
         return this.deployer.setFile(this.deployer.getPath('templates/' + type, name), content);
     }
    
@@ -365,6 +389,10 @@ class Connection extends ConnectionCommon {
         checkParam(type, 'type', String);
         checkParam(name, 'name', String);
 
+        if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
+
         return this.deployer.removeFile(this.deployer.getPath('templates/' + type, name));
     }
     
@@ -374,6 +402,10 @@ class Connection extends ConnectionCommon {
      * @returns {Promise} Media
      */
     getAllMedia() {
+        if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
+
         return this.deployer.getFolder(this.deployer.getPath('media'), 1)
         .then((folders) => {
             if(!folders) { return Promise.resolve([]); }
@@ -422,6 +454,10 @@ class Connection extends ConnectionCommon {
      */
     getMedia(id) {
         checkParam(id, 'id', String);
+
+        if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
 
         return this.deployer.getFolder(this.deployer.getPath('media', id), 1)
         .then((files) => {
@@ -479,6 +515,10 @@ class Connection extends ConnectionCommon {
      */
     removeMedia(id) {
         checkParam(id, 'id', String);
+
+        if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
+            return Promise.reject(new Error('This Connection has no deployer defined'));
+        }
 
         return this.deployer.removeFolder(this.deployer.getPath('media', id));
     }

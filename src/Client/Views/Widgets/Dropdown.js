@@ -294,6 +294,10 @@ class Dropdown extends Widget {
 
         if(!isOpen) {
             this.trigger('cancel');
+        } else {
+            if(this.useTypeAhead) {
+                this.element.querySelector('.widget--dropdown__typeahead').focus();
+            }
         }
         
         this.updatePositionClasses();
