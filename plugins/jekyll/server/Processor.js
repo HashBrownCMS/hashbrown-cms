@@ -73,7 +73,7 @@ class JekyllProcessor extends HashBrown.Models.Processor {
 
             // Date and author go in as main properties in Jekyll, not as meta
             properties.date = dateString;
-            properties.author = updatedBy.fullName || upadtedBy.username || createdBy.fullName || createdBy.username;
+            properties.author = updatedBy.fullName || updatedBy.username || createdBy.fullName || createdBy.username;
 
             // Remap "url" to "permalink"
             if(properties.url) {
