@@ -27377,6 +27377,7 @@ var PublishingSettingsModal = function (_Modal) {
                 value: this.value.connectionId,
                 valueKey: 'id',
                 labelKey: 'title',
+                useClearButton: true,
                 onChange: function onChange(newValue) {
                     _this2.value.connectionId = newValue;
                 }
@@ -36319,7 +36320,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.10.3",
+	"version": "1.0.0",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {

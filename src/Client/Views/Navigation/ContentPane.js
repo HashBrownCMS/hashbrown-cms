@@ -366,12 +366,14 @@ class ContentPane extends NavbarPane {
                 
                 menu['This content'] = '---';
                 
+                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+                
                 menu['New child content'] = () => {
                     this.onClickNewContent($('.context-menu-target').data('id'));
                 };
                                 
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-
                 if(!item.sync.isRemote && !item.isLocked) {
                     menu['Move'] = () => { this.onClickMoveItem(); };
                 }

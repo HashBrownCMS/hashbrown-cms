@@ -203,6 +203,7 @@ class TemplatePane extends NavbarPane {
             // Item context menu
             itemContextMenu: {
                 'This template': '---',
+                'Open in new tab': () => { this.onClickOpenInNewTab(); },
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Rename': () => { this.onClickRenameTemplate(); },
                 'Remove': () => { this.onClickRemoveTemplate(); },

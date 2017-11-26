@@ -131,8 +131,12 @@ class SchemaPane extends NavbarPane {
                 let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 menu['This schema'] = '---';
-                menu['New child schema'] = () => { this.onClickNewSchema(); };
+                
+                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+               
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
+                
+                menu['New child schema'] = () => { this.onClickNewSchema(); };
                 
                 if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveSchema(); };

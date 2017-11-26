@@ -28,7 +28,7 @@ class Pane {
     static onClickOpenInNewTab() {
         let href = $('.context-menu-target').attr('href');
 
-        window.open(location.protocol + '//' + location.host + '/' + href);
+        window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
     }
 
     /**

@@ -11455,7 +11455,7 @@ var Pane = function () {
     Pane.onClickOpenInNewTab = function onClickOpenInNewTab() {
         var href = $('.context-menu-target').attr('href');
 
-        window.open(location.protocol + '//' + location.host + '/' + href);
+        window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
     };
 
     /**
@@ -31509,6 +31509,7 @@ var PublishingSettingsModal = function (_Modal) {
                 value: this.value.connectionId,
                 valueKey: 'id',
                 labelKey: 'title',
+                useClearButton: true,
                 onChange: function onChange(newValue) {
                     _this2.value.connectionId = newValue;
                 }
@@ -32179,7 +32180,7 @@ var ContentEditor = function (_Crisp$View) {
                     config: config || {},
                     description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual,
+                    multilingual: fieldDefinition.multilingual === true,
                     $keyActions: $keyActions
                 });
 
@@ -41159,7 +41160,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.10.3",
+	"version": "1.0.0",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -43581,6 +43582,11 @@ var ConnectionPane = function (_NavbarPane) {
                 var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 menu['This connection'] = '---';
+
+                menu['Open in new tab'] = function () {
+                    _this3.onClickOpenInNewTab();
+                };
+
                 menu['Copy id'] = function () {
                     _this3.onClickCopyItemId();
                 };
@@ -44124,12 +44130,16 @@ var ContentPane = function (_NavbarPane) {
 
                 menu['This content'] = '---';
 
-                menu['New child content'] = function () {
-                    _this2.onClickNewContent($('.context-menu-target').data('id'));
+                menu['Open in new tab'] = function () {
+                    _this2.onClickOpenInNewTab();
                 };
 
                 menu['Copy id'] = function () {
                     _this2.onClickCopyItemId();
+                };
+
+                menu['New child content'] = function () {
+                    _this2.onClickNewContent($('.context-menu-target').data('id'));
                 };
 
                 if (!item.sync.isRemote && !item.isLocked) {
@@ -44367,6 +44377,11 @@ var FormsPane = function (_NavbarPane) {
                 var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 menu['This form'] = '---';
+
+                menu['Open in new tab'] = function () {
+                    _this2.onClickOpenInNewTab();
+                };
+
                 menu['Copy id'] = function () {
                     _this2.onClickCopyItemId();
                 };
@@ -44775,6 +44790,9 @@ var MediaPane = function (_NavbarPane) {
             // Item context menu
             itemContextMenu: {
                 'This media': '---',
+                'Open in new tab': function OpenInNewTab() {
+                    _this2.onClickOpenInNewTab();
+                },
                 'Copy id': function CopyId() {
                     _this2.onClickCopyItemId();
                 },
@@ -44980,11 +44998,17 @@ var SchemaPane = function (_NavbarPane) {
                 var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 menu['This schema'] = '---';
-                menu['New child schema'] = function () {
-                    _this3.onClickNewSchema();
+
+                menu['Open in new tab'] = function () {
+                    _this3.onClickOpenInNewTab();
                 };
+
                 menu['Copy id'] = function () {
                     _this3.onClickCopyItemId();
+                };
+
+                menu['New child schema'] = function () {
+                    _this3.onClickNewSchema();
                 };
 
                 if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
@@ -45285,6 +45309,9 @@ var TemplatePane = function (_NavbarPane) {
             // Item context menu
             itemContextMenu: {
                 'This template': '---',
+                'Open in new tab': function OpenInNewTab() {
+                    _this2.onClickOpenInNewTab();
+                },
                 'Copy id': function CopyId() {
                     _this2.onClickCopyItemId();
                 },

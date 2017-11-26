@@ -69,13 +69,13 @@ function checkArgs() {
 
     switch(cmd) {
         case 'create-user':
-            return HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin == 'true');
+            return HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin === 'true');
        
         case 'make-user-admin':
             return HashBrown.Helpers.UserHelper.makeUserAdmin(args.u);
 
         case 'revoke-tokens':
-            return HashBrown.Helpers.UserHelper.revokeTokens(args.u, args.p);
+            return HashBrown.Helpers.UserHelper.revokeTokens(args.u);
     
         case 'set-user-scopes':
             return HashBrown.Helpers.UserHelper.findUser(args.u)
@@ -98,15 +98,6 @@ function checkArgs() {
 
                 return HashBrown.Helpers.UserHelper.updateUser(args.u, user.getObject());
             });
-
-        case 'eval':
-            let val = eval(args.cmd);
-
-            if(val && typeof val.then === 'function') {
-                return val;
-            }
-
-            return Promise.resolve();
 
         default:
             return Promise.resolve('proceed');  

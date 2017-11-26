@@ -229,7 +229,7 @@ class ContentEditor extends Crisp.View {
                     config: config || {},
                     description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual,
+                    multilingual: fieldDefinition.multilingual === true,
                     $keyActions: $keyActions
                 });
 
