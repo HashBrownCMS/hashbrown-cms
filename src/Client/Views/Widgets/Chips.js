@@ -119,33 +119,32 @@ class Chips extends Widget {
                         })
                 );
             }),
-            _.button({class: 'widget widget--button round widget--chips__add', title: 'Add item'},
-                _.span({class: 'fa fa-plus'})
-            ).click(() => {
-                let newValue = this.placeholder || 'New item';
-                let newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+            _.button({class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item'})
+                .click(() => {
+                    let newValue = this.placeholder || 'New item';
+                    let newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
 
 
-                if(this.useObject === true || this.useArray === false) {
-                    this.value[newKey] = newValue;
-                
-                } else if (this.valueKey && this.labelKey) {
-                    let newObject = {};
-
-                    newObject[this.valueKey] = newKey;
-                    newObject[this.labelKey] = newValue;
+                    if(this.useObject === true || this.useArray === false) {
+                        this.value[newKey] = newValue;
                     
-                    this.value.push(newObject);
-                
-                } else {
-                    this.value.push(newValue);
-                
-                }
+                    } else if (this.valueKey && this.labelKey) {
+                        let newObject = {};
 
-                this.onChangeInternal();
+                        newObject[this.valueKey] = newKey;
+                        newObject[this.labelKey] = newValue;
+                        
+                        this.value.push(newObject);
+                    
+                    } else {
+                        this.value.push(newValue);
+                    
+                    }
 
-                this.fetch();
-            })
+                    this.onChangeInternal();
+
+                    this.fetch();
+                })
         );
     }
 }

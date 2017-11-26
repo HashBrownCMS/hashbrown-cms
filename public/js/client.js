@@ -30807,7 +30807,7 @@ var Chips = function (_Widget) {
 
                 _this2.fetch();
             }));
-        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+        }), _.button({ class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item' }).click(function () {
             var newValue = _this2.placeholder || 'New item';
             var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
 
@@ -30912,7 +30912,7 @@ var Input = function (_Widget) {
             case 'checkbox':
                 return _.div({ class: config.class, title: config.title }, _.if(config.placeholder, _.label({ for: 'checkbox-' + this.guid, class: 'widget--input__checkbox-label' }, config.placeholder)), _.input({ id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
                     _this2.onChangeInternal(e.currentTarget.checked);
-                }), _.div({ class: 'widget--input__checkbox-switch' }), _.div({ class: 'widget--input__checkbox-background' }));
+                }), _.div({ class: 'widget--input__checkbox-background' }), _.div({ class: 'widget--input__checkbox-switch' }));
 
             case 'file':
                 return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
@@ -32024,7 +32024,7 @@ var ContentEditor = function (_Crisp$View) {
             }
         }).catch(function (e) {
             _this2.$saveBtn.toggleClass('working', false);
-            UI.errorModal();
+            UI.errorModal(e);
         });
     };
 
@@ -41978,7 +41978,20 @@ var RequestHelper = __webpack_require__(2);
 Crisp.Router.route('/media/', function () {
     Crisp.View.get('NavbarMain').showTab('/media/');
 
-    UI.setEditorSpaceContent([_.h1('Media'), _.p('Right click in the Media pane to upload, edit and sort Media items.')], 'text');
+    UI.setEditorSpaceContent([_.h1('Media'), _.p('Right click in the Media pane to upload, edit and sort Media items.'), _.button({ class: 'widget widget--button' }, 'Upload media').click(function () {
+        new HashBrown.Views.Modals.MediaUploader({
+            onSuccess: function onSuccess(ids) {
+                // We got one id back
+                if (typeof ids === 'string') {
+                    location.hash = '/media/' + ids;
+
+                    // We got several ids back
+                } else {
+                    location.hash = '/media/' + ids[0];
+                }
+            }
+        });
+    })], 'text');
 });
 
 // Preview
@@ -43541,6 +43554,8 @@ var ConnectionPane = function (_NavbarPane) {
         }
 
         NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+            icon: 'exchange',
+
             getItems: function getItems() {
                 return resources.connections;
             },
@@ -44315,6 +44330,8 @@ var FormsPane = function (_NavbarPane) {
         var _this2 = this;
 
         NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+            icon: 'wpforms',
+
             getItems: function getItems() {
                 return resources.forms;
             },

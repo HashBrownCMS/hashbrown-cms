@@ -121,6 +121,8 @@ class ConnectionPane extends NavbarPane {
         if(!currentUserHasScope('connections')) { return; }
 
         NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+            icon: 'exchange',
+            
             getItems: () => { return resources.connections; },
 
             // Item context menu

@@ -119,7 +119,7 @@ class ContentEditor extends Crisp.View {
         })
         .catch((e) => {
             this.$saveBtn.toggleClass('working', false);
-            UI.errorModal();
+            UI.errorModal(e);
         });
     }
 
