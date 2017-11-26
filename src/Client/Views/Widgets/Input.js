@@ -59,8 +59,8 @@ class Input extends Widget {
                         .on('change', (e) => {
                             this.onChangeInternal(e.currentTarget.checked);
                         }),
-                    _.div({class: 'widget--input__checkbox-switch'}),
-                    _.div({class: 'widget--input__checkbox-background'})
+                    _.div({class: 'widget--input__checkbox-background'}),
+                    _.div({class: 'widget--input__checkbox-switch'})
                 );
       
             case 'file':

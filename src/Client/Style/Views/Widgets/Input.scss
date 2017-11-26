@@ -142,7 +142,6 @@
         flex-grow: 0;
         flex-shrink: 0;
         border-radius: 0.2rem;
-        background-color: $standard-darker;
         margin: 0;
 
         &.working {
@@ -153,7 +152,7 @@
     }
 
     &__checkbox {
-        &-input, &-switch {
+        &-input, &-switch, &-background {
             position: absolute;
             margin: 0 !important;
         }
@@ -192,6 +191,17 @@
             height: 100%;
         }
 
+        &-background {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: $standard-darker;
+            pointer-events: none;
+            border-radius: inherit;
+            transition: background-color 0.33s ease;
+        }
+
         &-switch {
             top: 0.2rem;
             left: 0.2rem;
@@ -199,17 +209,16 @@
             height: 1.6rem;
             pointer-events: none;
             border-radius: 0.2rem;
-            transition: background-color 0.33s ease, transform 0.33s ease;
-        }
-        
-        &-input:not(:checked) + &-extra {
-            transform: translateX(0rem);
+            transition: transform 0.33s ease;
             background-color: $standard;
         }
-
-        &-input:checked + &-extra {
+        
+        &-input:checked ~ &-switch {
             transform: translateX(0.8rem);
-            background-color: $standard-darkest;
+        }
+        
+        &-input:checked ~ &-background {
+            background-color: $primary;
         }
     }
 }

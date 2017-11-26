@@ -1918,11 +1918,10 @@ h1, h2, h3, h4, h5, h6 {
     flex-grow: 0;
     flex-shrink: 0;
     border-radius: 0.2rem;
-    background-color: #dddddd;
     margin: 0; }
     .widget--input.checkbox.working:after {
       color: #ffffff; }
-  .widget--input__checkbox-input, .widget--input__checkbox-switch {
+  .widget--input__checkbox-input, .widget--input__checkbox-switch, .widget--input__checkbox-background {
     position: absolute;
     margin: 0 !important; }
   .widget--input__checkbox-label {
@@ -1953,6 +1952,15 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%; }
+  .widget--input__checkbox-background {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #dddddd;
+    pointer-events: none;
+    border-radius: inherit;
+    transition: background-color 0.33s ease; }
   .widget--input__checkbox-switch {
     top: 0.2rem;
     left: 0.2rem;
@@ -1960,13 +1968,12 @@ h1, h2, h3, h4, h5, h6 {
     height: 1.6rem;
     pointer-events: none;
     border-radius: 0.2rem;
-    transition: background-color 0.33s ease, transform 0.33s ease; }
-  .widget--input__checkbox-input:not(:checked) + .widget--input__checkbox-extra {
-    transform: translateX(0rem);
+    transition: transform 0.33s ease;
     background-color: #ffffff; }
-  .widget--input__checkbox-input:checked + .widget--input__checkbox-extra {
-    transform: translateX(0.8rem);
-    background-color: #666666; }
+  .widget--input__checkbox-input:checked ~ .widget--input__checkbox-switch {
+    transform: translateX(0.8rem); }
+  .widget--input__checkbox-input:checked ~ .widget--input__checkbox-background {
+    background-color: #e70d3b; }
 
 /**
  * A dropdown widget with typeahead
