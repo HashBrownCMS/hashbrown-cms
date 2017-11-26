@@ -113,6 +113,8 @@ class FormsPane extends NavbarPane {
      */
     static init() {
         NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+            icon: 'wpforms',
+            
             getItems: () => { return resources.forms; },
 
             // Hierarchy logic

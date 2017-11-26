@@ -43554,6 +43554,8 @@ var ConnectionPane = function (_NavbarPane) {
         }
 
         NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+            icon: 'exchange',
+
             getItems: function getItems() {
                 return resources.connections;
             },
@@ -44328,6 +44330,8 @@ var FormsPane = function (_NavbarPane) {
         var _this2 = this;
 
         NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+            icon: 'wpforms',
+
             getItems: function getItems() {
                 return resources.forms;
             },
