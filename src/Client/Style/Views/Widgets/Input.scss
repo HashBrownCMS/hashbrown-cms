@@ -202,12 +202,12 @@
             transition: background-color 0.33s ease, transform 0.33s ease;
         }
         
-        &-input:not(:checked) + &-extra {
+        &-input:not(:checked) ~ &-extra {
             transform: translateX(0rem);
             background-color: $standard;
         }
 
-        &-input:checked + &-extra {
+        &-input:checked ~ &-extra {
             transform: translateX(0.8rem);
             background-color: $standard-darkest;
         }

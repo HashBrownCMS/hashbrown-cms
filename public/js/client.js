@@ -32370,7 +32370,7 @@ var ContentEditor = function (_Crisp$View) {
         // Save & publish
         _.div({ class: 'widget widget-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this7.onClickSave();
-        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button condensed' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     /**

@@ -455,7 +455,7 @@ class ContentEditor extends Crisp.View {
                         ).click(() => { this.onClickSave(); }),
                         _.if(connection,
                             _.span({class: 'widget widget--button widget-group__separator'}, '&'),
-                            _.select({class: 'widget widget--button condensed'},
+                            _.select({class: 'widget widget--button'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
                                 _.if(this.model.isPublished, 

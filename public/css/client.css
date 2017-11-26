@@ -1961,10 +1961,10 @@ h1, h2, h3, h4, h5, h6 {
     pointer-events: none;
     border-radius: 0.2rem;
     transition: background-color 0.33s ease, transform 0.33s ease; }
-  .widget--input__checkbox-input:not(:checked) + .widget--input__checkbox-extra {
+  .widget--input__checkbox-input:not(:checked) ~ .widget--input__checkbox-extra {
     transform: translateX(0rem);
     background-color: #ffffff; }
-  .widget--input__checkbox-input:checked + .widget--input__checkbox-extra {
+  .widget--input__checkbox-input:checked ~ .widget--input__checkbox-extra {
     transform: translateX(0.8rem);
     background-color: #666666; }
 
