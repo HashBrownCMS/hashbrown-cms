@@ -9,6 +9,53 @@ const Widget = require('./Widget');
  */
 class Dropdown extends Widget {
     /**
+     * Constructor
+     */
+    constructor(params) {
+        if(params.optionsUrl) {
+            params.isAsync = true;
+            
+            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl)
+            .then((options) => {
+                this.options = options;
+
+                this.fetch();
+            });
+        }
+                
+        super(params);
+
+        this.optionIcons = {};
+    }
+   
+    /**
+     * Gets option icon
+     *
+     * @param {String} label
+     *
+     * @returns {String} Icon
+     */
+    getOptionIcon(label) {
+        if(!this.iconKey || !this.labelKey || !this.options) { return ''; }
+        
+        for(let key in this.options) {
+            let value = this.options[key];
+
+            let optionLabel = this.labelKey ? value[this.labelKey] : value;
+           
+            if(typeof optionLabel !== 'string') { 
+                optionLabel = optionLabel ? optionLabel.toString() : '';
+            }
+        
+            if(optionLabel === label) {
+                return value[this.iconKey] || '';
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Converts options into a flattened structure
      *
      * @returns {Object} Options
@@ -53,10 +100,17 @@ class Dropdown extends Widget {
 
             if(isDisabled) { continue; }
 
-            options[optionValue] = optionLabel;
+            options[optionLabel] = optionValue;
         }
 
-        return options;
+        // Sort options alphabetically
+        let sortedOptions = {};
+
+        for(let label of Object.keys(options).sort()) {
+            sortedOptions[options[label]] = label;
+        }
+
+        return sortedOptions;
     }
 
     /**
@@ -68,7 +122,7 @@ class Dropdown extends Widget {
         this.sanityCheck();
        
         if(this.icon) {
-            return '<span class="fa fa-' + this.icon + '"></span>';
+            return '<span class="widget--dropdown__value__tool-icon fa fa-' + this.icon + '"></span>';
         }
 
         let label = this.placeholder || '(none)';
@@ -80,7 +134,7 @@ class Dropdown extends Widget {
             for(let key in options) {
                 let value = options[key];
 
-                if(this.value.indexOf(key) > -1) {
+                if(value && this.value.indexOf(key) > -1) {
                     labels.push(value);
                 }
             }
@@ -240,6 +294,10 @@ class Dropdown extends Widget {
 
         if(!isOpen) {
             this.trigger('cancel');
+        } else {
+            if(this.useTypeAhead) {
+                this.element.querySelector('.widget--dropdown__typeahead').focus();
+            }
         }
         
         this.updatePositionClasses();
@@ -270,6 +328,8 @@ class Dropdown extends Widget {
             // Dropdown options
             _.div({class: 'widget--dropdown__options'},
                 _.each(this.getFlattenedOptions(), (optionValue, optionLabel) => {
+                    let optionIcon = this.getOptionIcon(optionLabel);
+
                     // Reverse keys option
                     if(this.reverseKeys) {
                         let key = optionLabel;
@@ -284,6 +344,9 @@ class Dropdown extends Widget {
                     }
 
                     return _.button({class: 'widget--dropdown__option', 'data-value': optionValue}, 
+                        _.if(optionIcon, 
+                            _.span({class: 'widget--dropdown__option__icon fa fa-' + optionIcon})
+                        ),
                         optionLabel
                     ).click((e) => {
                         this.onChangeInternal(optionValue);

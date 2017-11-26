@@ -1,15 +1,11 @@
 'use strict';
 
-const ApiController = require('Server/Controllers/ApiController');
-const SchemaHelper = require('Server/Helpers/SchemaHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
 /**
  * The Controller for Schemas
  *
  * @memberof HashBrown.Server.Controllers
  */
-class SchemaController extends ApiController {
+class SchemaController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -31,9 +27,9 @@ class SchemaController extends ApiController {
     static getSchemas(req, res) {
         let getter = function() {
             if(req.query.customOnly) {
-                return SchemaHelper.getCustomSchemas(req.project, req.environment);
+                return HashBrown.Helpers.SchemaHelper.getCustomSchemas(req.project, req.environment);
             } else {
-                return SchemaHelper.getAllSchemas(req.project, req.environment);
+                return HashBrown.Helpers.SchemaHelper.getAllSchemas(req.project, req.environment);
             }
         };
 
@@ -52,9 +48,9 @@ class SchemaController extends ApiController {
     static getSchema(req, res) {
         let getter = () => {
             if(req.query.withParentFields) {
-                return SchemaHelper.getSchemaWithParentFields(req.project, req.environment, req.params.id);
+                return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(req.project, req.environment, req.params.id);
             } else {
-                return SchemaHelper.getSchemaById(req.project, req.environment, req.params.id);
+                return HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, req.params.id);
             }
         }
 
@@ -72,10 +68,10 @@ class SchemaController extends ApiController {
      */
     static setSchema(req, res) {
         let id = req.params.id;
-        let schema = req.body;
+        let schema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        SchemaHelper.setSchemaById(req.project, req.environment, id, schema, shouldCreate)
+        HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, schema, shouldCreate)
         .then(() => {
             res.status(200).send(schema);
         })
@@ -90,11 +86,11 @@ class SchemaController extends ApiController {
     static pullSchema(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, req.environment, 'schemas', id)
+        HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'schemas', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
         
-            return SchemaHelper.setSchemaById(req.project, req.environment, id, resourceItem, true)
+            return HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, HashBrown.Helpers.SchemaHelper.getModel(resourceItem), true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -110,9 +106,9 @@ class SchemaController extends ApiController {
     static pushSchema(req, res) {
         let id = req.params.id;
 
-        SchemaHelper.getSchemaById(req.project, req.environment, id)
+        HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, id)
         .then((localSchema) => {
-            return SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
+            return HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
         })
         .then(() => {
             res.status(200).send(id);
@@ -126,9 +122,9 @@ class SchemaController extends ApiController {
      * Creates a new Schema
      */
     static createSchema(req, res) {
-        let parentSchema = req.body;
+        let parentSchema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
 
-        SchemaHelper.createSchema(req.project, req.environment, parentSchema)
+        HashBrown.Helpers.SchemaHelper.createSchema(req.project, req.environment, parentSchema)
         .then((newSchema) => {
             res.status(200).send(newSchema.getObject());
         })
@@ -143,7 +139,7 @@ class SchemaController extends ApiController {
     static deleteSchema(req, res) {
         let id = req.params.id;
         
-        SchemaHelper.removeSchemaById(req.project, req.environment, id)
+        HashBrown.Helpers.SchemaHelper.removeSchemaById(req.project, req.environment, id)
         .then(() => {
             res.status(200).send('Schema with id "' + id + '" deleted successfully');
         })

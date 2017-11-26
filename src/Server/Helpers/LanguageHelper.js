@@ -16,9 +16,9 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Array} List of language names
      */
-    static getLanguages(
-        project = requiredParam('project')
-    ) {
+    static getLanguages(project) {
+        checkParam(project, 'project', String);
+
         return SettingsHelper.getSettings(project, null, 'languages')
         .then((selected) => {
             if(!selected || !Array.isArray(selected)) {
@@ -39,10 +39,10 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Promise}
      */
-    static setLanguages(
-        project = requiredParam('project'),
-        languages = requiredParam('languages')
-    ) {
+    static setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', Array);
+
         // Check format
         if(!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));

@@ -21,6 +21,15 @@ class Pane {
 
         copyToClipboard(id);
     }
+    
+    /**
+     * Event: Click open in new tab
+     */
+    static onClickOpenInNewTab() {
+        let href = $('.context-menu-target').attr('href');
+
+        window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
+    }
 
     /**
      * Event: Click refresh resource

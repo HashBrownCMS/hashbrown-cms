@@ -33,7 +33,7 @@ class MediaViewer extends Crisp.View {
      * Renders this editor
      */
     template() {
-        let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        let mediaSrc = (this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id) + '?' + Date.now();
 
         return _.div({class: 'editor editor--media'},
             _.div({class: 'editor__header'},
@@ -50,7 +50,9 @@ class MediaViewer extends Crisp.View {
                     _.img({class: 'editor--media__preview', src: mediaSrc})
                 ),
                 _.if(this.model.isVideo(),
-                    _.video({class: 'editor--media__preview', controls: true, src: mediaSrc})
+                    _.video({class: 'editor--media__preview', controls: true},
+                        _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
+                    )
                 )
             )
         );

@@ -15,10 +15,11 @@ class ContentSchemaEditor extends SchemaEditor {
         let $element = super.renderFields();
 
         // Default tab
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+        
         $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
             options: this.compiledSchema.tabs,
             value: this.model.defaultTabId,
-            useClearButton: true,
             onChange: (newValue) => {
                 this.model.defaultTabId = newValue;
             }

@@ -8,10 +8,6 @@ const Resource = require('./Resource');
  * @memberof HashBrown.Common.Models
  */
 class Content extends Resource {
-    constructor(params) {
-        super(Content.paramsCheck(params)); 
-    }
-   
     structure() {
         // Fundamental fields
         this.def(String, 'id');
@@ -39,7 +35,7 @@ class Content extends Resource {
         // Settings
         this.def(Object, 'settings', {
             publishing: {
-                connections: []
+                connectionId: ''
             }
         }); 
     }
@@ -130,10 +126,10 @@ class Content extends Resource {
      *
      * @returns {Promise} Parent
      */
-    getParent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    getParent(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         if(!this.parentId) {
             return Promise.resolve(null);
         }
@@ -155,10 +151,10 @@ class Content extends Resource {
      *
      * @returns {Promise} parents
      */
-    getParents(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    getParents(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let parents = [];
 
         let getNextParent = (content) => {
@@ -213,10 +209,11 @@ class Content extends Resource {
     /**
      * Gets all meta fields
      *
-     * @returns {Object} meta
+     * @returns {Object} Meta
      */
     getMeta() {
         return {
+            id: this.id,
             parentId: this.parentId,
             createDate: this.createDate,
             updateDate: this.updateDate,

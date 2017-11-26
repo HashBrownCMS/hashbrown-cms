@@ -1,8 +1,6 @@
 'use strict';
 
-const NodeMailer = require('nodemailer');
 const Crypto = require('crypto');
-const XOAuth2 = require('xoauth2');
 
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const ConfigHelper = require('Server/Helpers/ConfigHelper');
@@ -16,58 +14,6 @@ const User = require('Server/Models/User');
  */
 class UserHelper {
     /**
-     * Initialises this helper
-     */
-    static init() {
-        ConfigHelper.get('mail')
-        .then((cfg) => {
-            this.mailConfig = cfg;
-            this.cachedAccessToken = this.mailConfig.accessToken;
-        })
-        .catch((e) => {
-            debug.log('There was an error reading mail config: ' + e.message, this);
-        });
-    }
-
-    /**
-     * Sends an email
-     *
-     * @param {Object} mailOptions
-     *
-     * @returns {Promise} Promise
-     */
-    static sendEmail(mailOptions) {
-        if(!this.mailConfig) {
-            return Promise.reject(new Error('Email services are not configured for this instance'));
-        }
-
-        return new Promise((resolve, reject) => {
-            let mailTransport = NodeMailer.createTransport({
-                service: this.mailConfig.service,
-                auth: {
-                    OAuth2: {
-                        user: this.mailConfig.user,
-                        clientId: this.mailConfig.clientId,
-                        clientSecret: this.mailConfig.clientSecret,
-                        refreshToken: this.mailConfig.refreshToken
-                    }
-                }
-            });
-
-            mailTransport.sendMail(mailOptions, (err, info) => {
-                if(err){
-                    reject(new Error(err));
-                
-                } else {
-                    resolve('Message sent: ' + info.response);
-                
-                }
-            });
-
-        });
-    }
-
-    /**
      * Sends a welcome message
      *
      * @param {String} email
@@ -76,19 +22,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static invite(email, project) {
-        if(!this.mailConfig) {
-            return Promise.reject(new Error('Email services are not configured for this instance'));
-        }
-
         let token = Crypto.randomBytes(10).toString('hex');
-
-        let mailOptions = {
-            from: '"' + this.mailConfig.displayName + '" <' + this.mailConfig.email + '>',
-            to: email,
-            subject: 'Welcome to HashBrown',
-            html: '<p>You have been kindly invited to join a HashBrown instance.</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
-        };
-
         let user = User.create();
 
         user.inviteToken = token;
@@ -99,17 +33,14 @@ class UserHelper {
             user.scopes[project] = [];
         }
         
-        return this.sendEmail(mailOptions)
-        .then((msg) => { 
-            return DatabaseHelper.insertOne(
-                'users',
-                'users',
-                user.getObject()
-            ).then(() => {
-                debug.log('Created new user "' + email + '" successfully', this);
-                 
-                return Promise.resolve(msg);
-            });
+        return DatabaseHelper.insertOne(
+            'users',
+            'users',
+            user.getObject()
+        ).then(() => {
+            debug.log('Created new user "' + email + '" successfully', this);
+             
+            return Promise.resolve(token);
         });
     }
 
@@ -376,6 +307,8 @@ class UserHelper {
             );
         }).then((existingUser) => {
             if(!existingUser) {
+                console.log(newUser.getObject());
+
                 return this.updateUserById(newUser.id, newUser.getObject());
             
             } else {
@@ -601,7 +534,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static updateUserById(id, properties) {
-        if(typeof properties.password === 'string') {
+        if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
             properties.password = User.createPasswordHashSalt(properties.password);
         }
         
@@ -628,7 +561,7 @@ class UserHelper {
      * @returns {Promise} promise
      */
     static updateUser(username, properties) {
-        if(typeof properties.password === 'string') {
+        if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
             properties.password = User.createPasswordHashSalt(properties.password);
         }
 
@@ -644,7 +577,5 @@ class UserHelper {
         });
     }
 }
-
-UserHelper.init();
 
 module.exports = UserHelper;

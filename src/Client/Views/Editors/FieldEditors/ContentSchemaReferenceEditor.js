@@ -131,12 +131,24 @@ class ContentSchemaReferenceEditor extends FieldEditor {
                     useClearButton: true,
                     valueKey: 'id',
                     labelKey: 'name',
+                    iconKey: 'icon',
                     onChange: (newValue) => {
                         config.allowedSchemas = newValue;
                     }
                 }).$element
             )
         );
+    }
+
+    /**
+     * Picks the first available Schema
+     */
+    pickFirstSchema() {
+        this.value = this.getDropdownOptions()[0].id;
+
+        this.trigger('change', this.value);
+
+        this.fetch();
     }
 
     /**
@@ -150,6 +162,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
                 valueKey: 'id',
                 tooltip: this.description || '',
                 labelKey: 'name',
+                iconKey: 'icon',
                 useClearButton: true,
                 onChange: (newValue) => {
                     this.value = newValue;

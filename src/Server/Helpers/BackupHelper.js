@@ -7,7 +7,7 @@ const Multer = require('multer');
 const MediaHelper = require('Server/Helpers/MediaHelper');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 
-const Connection = require('Common/Models/Connection');
+const Connection = require('Server/Models/Connection');
 
 /**
  * A helper class for managing backups

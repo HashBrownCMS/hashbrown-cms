@@ -14,10 +14,10 @@ class ContentHelper {
      *
      * @return {Promise} promise
      */
-    static getAllContents(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllContents(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return Promise.resolve();
     }
 
@@ -46,15 +46,15 @@ class ContentHelper {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
+     * @param {String} id
      *
      * @return {Promise} promise
      */
-    static getContentById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getContentById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         return Promise.resolve();
     }
     
@@ -63,17 +63,17 @@ class ContentHelper {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
-     * @param {Object} content
+     * @param {String} id
+     * @param {Content} content
      *
      * @return {Promise} promise
      */
-    static setContentById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        content = requiredParam('content')
-    ) {
+    static setContentById(project, environment, id, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
         return new Promise((resolve, reject) => {
             resolve();
         });
@@ -89,12 +89,12 @@ class ContentHelper {
      *
      * @returns {Promise} Is the Content node allowed as a child
      */
-    static isSchemaAllowedAsChild(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        parentId = requiredParam('parentId'),
-        childSchemaId = requiredParam('childSchemaId')
-    ) {
+    static isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(parentId, 'parentId', String);
+        checkParam(childSchemaId, 'childSchemaId', String);
+
         // No parent ID means root, and all Schemas are allowed there
         if(!parentId) {
             return Promise.resolve();

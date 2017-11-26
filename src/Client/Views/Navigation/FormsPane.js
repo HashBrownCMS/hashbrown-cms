@@ -113,6 +113,8 @@ class FormsPane extends NavbarPane {
      */
     static init() {
         NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+            icon: 'wpforms',
+            
             getItems: () => { return resources.forms; },
 
             // Hierarchy logic
@@ -131,6 +133,9 @@ class FormsPane extends NavbarPane {
                 let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This form'] = '---';
+
+                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
                 if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {

@@ -25,11 +25,17 @@ Crisp.Router.route('/templates/', function() {
 
 // Edit
 Crisp.Router.route('/templates/:type/:id', function() {
+    let template = HashBrown.Helpers.TemplateHelper.getTemplate(this.type, this.id);
+
+    if(!template) {
+        return UI.errorModal('Template by id "' + this.id + '" could not be found');
+    }
+
     if(currentUserHasScope('templates')) {
-        Crisp.View.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/templates/', template.type + '/' + template.id);
         
         let templateEditor = new TemplateEditor({
-            modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('templates/' + template.type + '/' + template.name)
         });
 
         UI.setEditorSpaceContent(templateEditor.$element);

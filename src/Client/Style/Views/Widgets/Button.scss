@@ -87,7 +87,7 @@
         text-transform: none;
     }
 
-    .fa:not(:last-child) {
+    .fa:first-child {
         margin-right: 0.5rem;
     }
 }

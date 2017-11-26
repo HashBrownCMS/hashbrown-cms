@@ -121,7 +121,7 @@ $('.page--login__login').each(function() {
         })
         .catch(function(e) {
             $('.widget--message').remove();
-            $('.page--login').prepend('<div class="widget widget--message">' + e + '</div>');
+            $('.page--login').prepend('<div class="widget widget--message fixed fixed--top warning">' + e + '</div>');
         });
     }); 
 }); 

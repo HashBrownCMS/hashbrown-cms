@@ -1,15 +1,11 @@
 'use strict';
 
-const UserHelper = require('Server/Helpers/UserHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller for Users
  *
  * @memberof HashBrown.Server.Controllers
  */
-class UserController extends ApiController {
+class UserController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -41,7 +37,7 @@ class UserController extends ApiController {
         let password = req.body.password;
         let inviteToken = req.body.inviteToken;
 
-        UserHelper.activateUser(username, password, fullName, inviteToken)
+        HashBrown.Helpers.UserHelper.activateUser(username, password, fullName, inviteToken)
         .then((token) => {
             res.status(200).cookie('token', token).send(token);
         })
@@ -54,7 +50,7 @@ class UserController extends ApiController {
      * Invites a user
      */
     static postInvite(req, res) {
-        UserHelper.invite(req.body.email, req.body.project)
+        HashBrown.Helpers.UserHelper.invite(req.body.email, req.body.project)
         .then((msg) => {
             res.status(200).send(msg);
         })
@@ -71,7 +67,7 @@ class UserController extends ApiController {
         let password = req.body.password;
         let persist = req.query.persist == 'true' || req.query.persist == true;
 
-        UserHelper.loginUser(username, password, persist)
+        HashBrown.Helpers.UserHelper.loginUser(username, password, persist)
         .then((token) => {
             res.status(200).cookie('token', token).send(token);
         })
@@ -84,7 +80,7 @@ class UserController extends ApiController {
      * Logs out a user
      */
     static logout(req, res) {
-        UserHelper.logoutUser(req.cookies.token)
+        HashBrown.Helpers.UserHelper.logoutUser(req.cookies.token)
         .then(() => {
             res.status(200).cookie('token', '').redirect('/');
         })
@@ -97,7 +93,7 @@ class UserController extends ApiController {
      * Gets current user
      */
     static getCurrentUser(req, res) {
-        ApiController.authenticate(req.cookies.token)
+        UserController.authenticate(req.cookies.token)
         .then((user) => {
             user = user.getObject();
 
@@ -116,7 +112,7 @@ class UserController extends ApiController {
      * Get current scopes
      */
     static getScopes(req, res) {
-        ApiController.authenticate(req.cookies.token)
+        UserController.authenticate(req.cookies.token)
         .then((user) => {
             res.send(user.scopes);
         })
@@ -131,7 +127,7 @@ class UserController extends ApiController {
     static getUsers(req, res) {
         let project = req.params.project;
 
-        UserHelper.getAllUsers(project)
+        HashBrown.Helpers.UserHelper.getAllUsers(project)
         .then((users) => {
             for(let i in users) {
                 users[i] = users[i].getObject();
@@ -155,7 +151,7 @@ class UserController extends ApiController {
     static getUser(req, res) {
         let id = req.params.id;
 
-        UserHelper.getUserById(id)
+        HashBrown.Helpers.UserHelper.getUserById(id)
         .then((user) => {
             res.status(200).send(user);
         })
@@ -171,7 +167,7 @@ class UserController extends ApiController {
         let id = req.params.id;
         let properties = req.body;
 
-        ApiController.authenticate(req.cookies.token, req.params.project)
+        UserController.authenticate(req.cookies.token, req.params.project)
         .then((user) => {
             let hasScope = user.hasScope(req.params.project, 'users');
 
@@ -188,7 +184,7 @@ class UserController extends ApiController {
             return Promise.reject(new Error('User "' + user.name + '" does not have scope "users"'));
         })
         .then(() => {
-            UserHelper.updateUserById(id, properties);
+            HashBrown.Helpers.UserHelper.updateUserById(id, properties);
         })
         .then((user) => {
             res.status(200).send(user);
@@ -204,7 +200,7 @@ class UserController extends ApiController {
     static deleteUser(req, res) {
         let id = req.params.id;
 
-        UserHelper.removeUser(id)
+        HashBrown.Helpers.UserHelper.removeUser(id)
         .then((user) => {
             res.status(200).send(user);
         })
@@ -220,16 +216,16 @@ class UserController extends ApiController {
         let username = req.body.username;
         let password = req.body.password;
 
-        UserHelper.getAllUsers()
+        HashBrown.Helpers.UserHelper.getAllUsers()
         .then((users) => {
             if(users && users.length > 0) {
                 return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please create the new admin with the server console.'));
             }
 
-            return UserHelper.createUser(username, password, true);
+            return HashBrown.Helpers.UserHelper.createUser(username, password, true);
         })
         .then((user) => {
-            return UserHelper.loginUser(username, password);
+            return HashBrown.Helpers.UserHelper.loginUser(username, password);
         })
         .then((token) => {
             res.status(200).cookie('token', token).send(token);
@@ -247,7 +243,7 @@ class UserController extends ApiController {
         let password = req.body.password;
         let scopes = req.body.scopes;
 
-        UserHelper.createUser(username, password, false, scopes)
+        HashBrown.Helpers.UserHelper.createUser(username, password, false, scopes)
         .then((user) => {
             res.status(200).send(user);
         })

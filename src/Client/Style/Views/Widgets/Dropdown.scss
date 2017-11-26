@@ -137,13 +137,23 @@
         overflow: hidden;
         user-select: none;
 
-        // Icon
-        .fa {
+        // Tool icon
+        &__tool-icon {
             text-align: center;
-            height: calc(2rem - 2px);
-            line-height: calc(2rem - 2px);
+            height: 2rem;
+            line-height: 2rem;
             width: 2rem;
             display: block;
+        }
+
+        // Value icon
+        &__icon {
+            display: inline-block;
+            width: 2rem;
+            line-height: 2rem;
+            margin-left: -0.5rem;
+            margin-right: 0.5rem;
+            text-align: center;
         }
     }
 
@@ -285,6 +295,16 @@
                 font-family: 'FontAwesome';
                 content: '\f00c';
             }
+        }
+        
+        // Icon
+        &__icon {
+            display: inline-block;
+            width: 2rem;
+            line-height: 2rem;
+            margin-left: -0.5rem;
+            margin-right: 0.5rem;
+            text-align: center;
         }
     }
 

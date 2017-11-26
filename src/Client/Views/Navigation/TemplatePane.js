@@ -55,12 +55,11 @@ class TemplatePane extends NavbarPane {
                 // Look for duplicate id
                 for(let template of resources.templates) {
                     if(template.id == newTemplate.id && template.type == newTemplate.type) {
-                        UI.errorModal(new Error('A Template of type "' + template.type + '" and id "' + template.id + '" already exists'));
-                        return;
+                        return UI.errorModal(new Error('A Template of type "' + template.type + '" and name "' + template.name + '" already exists'));
                     }
                 }
 
-                RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate)
+                RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.name, newTemplate)
                 .then(() => {
                     return RequestHelper.reloadResource('templates');
                 })
@@ -91,12 +90,11 @@ class TemplatePane extends NavbarPane {
         }
 
         if(!model) {
-            UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-            return;
+            return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
         }
         
         UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', () => {
-            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.id)
+            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.name)
             .then(() => {
                 $element.parent().remove();
 
@@ -119,20 +117,14 @@ class TemplatePane extends NavbarPane {
      */
     static onClickRenameTemplate() {
         let id = $('.context-menu-target').data('id');
-        let type = $('.context-menu-target').attr('href').replace('#/templates/', '').replace('/' + id, '');
-        let templateEditor = Crisp.View.get('TemplateEditor');
-        let model;
-
-        for(let template of resources.templates) {
-            if(template.id == id && template.type == type) {
-                model = template;
-            }
-        }
+        let type = $('.context-menu-target').parent().data('routing-path').split('/')[0];
+        let model = HashBrown.Helpers.TemplateHelper.getTemplate(type, id);
 
         if(!model) {
-            UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-            return;
+            return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
         }
+
+        let oldName = model.name;
 
         UI.confirmModal(
             'rename',
@@ -148,7 +140,7 @@ class TemplatePane extends NavbarPane {
                 }).$element
             ),
             () => {
-                RequestHelper.request('post', 'templates/' + type + '/' + id, model)
+                RequestHelper.request('post', 'templates/' + type + '/' + model.name + (oldName ? '?oldName=' + oldName : ''), model)
                 .then((newTemplate) => {
                     return RequestHelper.reloadResource('templates');
                 })
@@ -156,6 +148,8 @@ class TemplatePane extends NavbarPane {
                     NavbarMain.reload();
 
                     // Go to new Template if TemplateEditor was showing the old one
+                    let templateEditor = Crisp.View.get('TemplateEditor');
+
                     if(templateEditor && templateEditor.model.id == model.id) {
                         model.updateId();
                        
@@ -209,6 +203,7 @@ class TemplatePane extends NavbarPane {
             // Item context menu
             itemContextMenu: {
                 'This template': '---',
+                'Open in new tab': () => { this.onClickOpenInNewTab(); },
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Rename': () => { this.onClickRenameTemplate(); },
                 'Remove': () => { this.onClickRemoveTemplate(); },

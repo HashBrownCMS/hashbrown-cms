@@ -9,7 +9,7 @@ const Resource = require('./Resource');
  */
 class Template extends Resource {
     constructor(params) {
-        super(Template.paramsCheck(params));
+        super(params);
 
         this.updateId();
     }
@@ -31,6 +31,9 @@ class Template extends Resource {
         return params;
     }
 
+    /**
+     * Structure
+     */
     structure() {
         this.def(String, 'id');
         this.def(String, 'parentId');
@@ -46,7 +49,7 @@ class Template extends Resource {
      * Updates id from name
      */
     updateId() {
-        this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
+        this.id = this.name.substring(0, this.name.lastIndexOf('.'));
     }
 }
 

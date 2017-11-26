@@ -13,9 +13,9 @@ class LanguageHelper {
      *
      * @returns {Array} List of language names
      */
-    static getLanguages(
-        project = requiredParam('project')
-    ) {
+    static getLanguages(project) {
+        checkParam(project, 'project', String);
+
         return Promise.resolve([]);
     }
     
@@ -27,10 +27,10 @@ class LanguageHelper {
      *
      * @returns {Promise} Promise
      */
-    static setLanguages(
-        project = requiredParam('project'),
-        languages = requiredParam('languages')
-    ) {
+    static setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', Array);
+
         return Promise.resolve();
     }
 
@@ -43,11 +43,11 @@ class LanguageHelper {
      *
      * @return {Promise} Properties
      */
-    static getAllLocalizedPropertySets(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
+    static getAllLocalizedPropertySets(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
         return this.getLanguages(project)
         .then((languages) => {
             let sets = {};

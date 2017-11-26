@@ -99,9 +99,13 @@ class MediaPane extends NavbarPane {
 
                 // Refresh on replace
                 if(replaceId) {
-                    let src = $('.editor--media__preview').attr('src');
-                    
-                    $('.editor--media__preview').attr('src', src + '?date=' + Date.now());
+                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+
+                    if(mediaViewer) {
+                        mediaViewer.model = null;
+
+                        mediaViewer.fetch();
+                    }
                 }
             },
             replaceId: replaceId,
@@ -133,6 +137,7 @@ class MediaPane extends NavbarPane {
             // Item context menu
             itemContextMenu: {
                 'This media': '---',
+                'Open in new tab': () => { this.onClickOpenInNewTab(); },
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Move': () => { this.onClickMoveItem(); },
                 'Remove': () => { this.onClickRemoveMedia(); },

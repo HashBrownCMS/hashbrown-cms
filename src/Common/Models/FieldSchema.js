@@ -8,6 +8,9 @@ let Schema = require('./Schema');
  * @memberof HashBrown.Common.Models
  */
 class FieldSchema extends Schema {
+    /**
+     * Structure
+     */
     structure() {
         super.structure();
 
@@ -16,6 +19,24 @@ class FieldSchema extends Schema {
 
         this.name = 'New field schema';        
         this.type = 'field';
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = super.paramsCheck(params);
+
+        // Backwards compatible editor names
+        if(params.editorId && params.editorId.indexOf('Editor') < 0) {
+            params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
+        }
+
+        return params;
     }
 
     /**

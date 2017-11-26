@@ -69,6 +69,8 @@ class MediaReferenceEditor extends FieldEditor {
                     .click(() => {
                         this.value = null;
 
+                        this.trigger('change', this.value);
+
                         this.fetch();
                     })
             )

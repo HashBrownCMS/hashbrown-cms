@@ -52,9 +52,9 @@ class MediaHelper {
      *
      * @returns {String} Path
      */
-    static getTempPath(
-        project = requiredParam('project')
-    ) {
+    static getTempPath(project) {
+        checkParam(project, 'project', String);
+
         let path = 
             '/storage/' +
             ProjectHelper.currentProject +

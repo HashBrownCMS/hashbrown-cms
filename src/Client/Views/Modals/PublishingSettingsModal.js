@@ -60,6 +60,7 @@ class PublishingSettingsModal extends Modal {
                         value: this.value.connectionId,
                         valueKey: 'id',
                         labelKey: 'title',
+                        useClearButton: true,
                         onChange: (newValue) => {
                             this.value.connectionId = newValue;
                         }

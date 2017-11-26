@@ -26,6 +26,24 @@ class TemplateHelper {
 
         return templates;
     }
+
+    /**
+     * Gets a template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Template} Template
+     */
+    static getTemplate(type, id) {
+        for(let template of resources.templates) {
+            if(template.type !== type || template.id !== id) { continue; }
+
+            return template;
+        }
+
+        return null;
+    }
 }
 
 module.exports = TemplateHelper;

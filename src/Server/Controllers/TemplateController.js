@@ -1,89 +1,110 @@
 'use strict';
 
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller fro templates
  *
  * @memberof HashBrown.Server.Controllers
  */
-class TemplateController extends ApiController {
+class TemplateController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
     static init(app) {
         app.get('/api/:project/:environment/templates', this.middleware(), this.getTemplates)
-        app.get('/api/:project/:environment/templates/:type/:id', this.middleware(), this.getTemplate)
+        app.get('/api/:project/:environment/templates/:type/:name', this.middleware(), this.getTemplate)
         
-        app.post('/api/:project/:environment/templates/:type/:id', this.middleware(), this.postTemplate)
+        app.post('/api/:project/:environment/templates/:type/:name', this.middleware(), this.postTemplate)
         
-        app.delete('/api/:project/:environment/templates/:type/:id', this.middleware(), this.deleteTemplate)
+        app.delete('/api/:project/:environment/templates/:type/:name', this.middleware(), this.deleteTemplate)
     }
     
     /**
-     * Posts a Template by id
+     * Posts a Template by name
      */
     static postTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
+        let oldName = req.query.oldName;
         let template = req.body;
+        let connection;
+       
+        // Get template provider
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        .then((provider) => {
+            connection = provider;
 
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
-        .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
-            
-            return connection.setTemplateById(type, id, template);
+
+            // If an old name was specified, get the markup first
+            if(oldName) {
+                return connection.getTemplate(type, oldName)
+                .then((oldTemplate) => {
+                    template.markup = oldTemplate.markup;    
+                });
+            }
+
+            return Promise.resolve();
+        })
+        .then(() => {
+            // Set new template
+            return connection.setTemplate(type, name, template.markup);
+        })
+        .then(() => {
+            // If an old name was specified, remove it
+            if(oldName) {
+                return connection.removeTemplate(type, oldName);
+            }
+
+            return Promise.resolve();
         })
         .then(() => {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
     
     /**
-     * Deletes a Template by id
+     * Deletes a Template by name
      */
     static deleteTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
 
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.deleteTemplateById(type, id);
+            return connection.removeTemplate(type, name);
         })
         .then(() => {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 
 
     /**
-     * Gets a Template by id
+     * Gets a Template by name
      */
     static getTemplate(req, res) {
         let type = req.params.type;
-        let id = req.params.id;
+        let name = req.params.name;
 
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
-            return connection.getTemplateById(type, id);
+            return connection.getTemplate(type, name);
         })
         .then((template) => {
             res.status(200).send(template);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 
@@ -91,42 +112,36 @@ class TemplateController extends ApiController {
      * Gets an array of all templates
      */
     static getTemplates(req, res) {
-        return ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        let allTemplates = [];
+        let provider;
+        
+        return HashBrown.Helpers.ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
-           
-            let allTemplates = [];
 
-            return connection.getTemplates('page')
-            .then((pageTemplates) => {
-                if(Array.isArray(pageTemplates)) {
-                    allTemplates = allTemplates.concat(pageTemplates);
-                }
+            provider = connection;
 
-                return connection.getTemplates('partial');
-            })
-            .catch((e) => {
-                debug.error(e.message, this);
-            })
-            .then((partialTemplates) => {
-                if(Array.isArray(partialTemplates)) {
-                    allTemplates = allTemplates.concat(partialTemplates);
-                }
-
-                return Promise.resolve();
-            })
-            .catch((e) => {
-                debug.error(e.message, this);
-            })
-            .then(() => {
-                return Promise.resolve(allTemplates);
-            });
+            return provider.getAllTemplates('page');
         })
-        .then((allTemplates) => {
+        .then((pageTemplates) => {
+            if(Array.isArray(pageTemplates)) {
+                allTemplates = allTemplates.concat(pageTemplates);
+            }
+
+            return provider.getAllTemplates('partial');
+        })
+        .then((partialTemplates) => {
+            if(Array.isArray(partialTemplates)) {
+                allTemplates = allTemplates.concat(partialTemplates);
+            }
+
+            return Promise.resolve();
+        })
+        .then(() => {
             res.status(200).send(allTemplates);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e, false));
+            res.status(404).send(TemplateController.printError(e, false));
         });            
     }
 }

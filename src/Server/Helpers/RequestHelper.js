@@ -5,6 +5,7 @@ const HTTPS = require('https');
 const QueryString = require('querystring');
 const FileSystem = require('fs');
 const URL = require('url');
+const Path = require('path');
 
 const MAX_REDIRECTS = 10;
 
@@ -20,10 +21,10 @@ class RequestHelper {
      * @param {String} url
      * @param {Object} res
      */
-    static pipe(
-        url = requiredParam('url'),
-        res = requiredParam('res')
-    ) {
+    static pipe(url, res) {
+        checkParam(url, 'url', String);
+        checkParam(res, 'res', Object);
+
         url = url.replace('HTTP://', '');
         url = url.replace('HTTPS://', '');
 
@@ -54,10 +55,10 @@ class RequestHelper {
      *
      * @returns {Promise} Result
      */
-    static download(
-        url = requiredParam('url'),
-        destination = requiredParam('destination')
-    ) {
+    static download(url, destination) {
+        checkParam(url, 'url', String);
+        checkParam(destination, 'destination', String);
+
         return this.request('get', url)
         .then((data) => {
             let stream = FileSystem.createWriteStream(destination);
@@ -94,11 +95,9 @@ class RequestHelper {
      *
      * @returns {Promise} Response
      */
-    static getPaginated(
-        url = requiredParam('url'),
-        data = null,
-        maxPages = 10
-    ) {
+    static getPaginated(url, data = null, maxPages = 10) {
+        checkParam(url, 'url', String);
+
         if(!data) {
             data = {};
         }
@@ -135,14 +134,14 @@ class RequestHelper {
      *
      * @returns {Promise} Response
      */
-    static request(
-        method = requiredParam('method'),
-        url = requiredParam('url'),
-        data = null,
-        asQueryString = false
-    ) {
+    static request(method, url, data = null, asQueryString = false) {
+        checkParam(method, 'method', String);
+        checkParam(url, 'url', String);
+
         return new Promise((resolve, reject) => {
             method = method.toUpperCase();
+
+            let contentType = 'text/plain';
 
             if(method === 'GET') {
                 asQueryString = true;
@@ -156,8 +155,10 @@ class RequestHelper {
                     data = null;
 
                 // To JSON string
-                } else {
+                } else if(typeof data === 'object') {
                     data = JSON.stringify(data);
+                    contentType = 'application/json';
+                
                 }
             }
             
@@ -167,7 +168,7 @@ class RequestHelper {
             let headers = {
                 'Accept': '*/*',
                 'User-Agent': 'HashBrown CMS',
-                'Content-Type': 'application/json; charset=utf-8',
+                'Content-Type': contentType + '; charset=utf-8',
                 'Host': url.hostname
             };
             
@@ -180,7 +181,7 @@ class RequestHelper {
             
             let makeRequest = () => {
                 let protocol = url.protocol === 'https:' ? HTTPS : HTTP;
-
+                
                 let options = {
                     port: url.port,
                     host: url.hostname,
@@ -235,8 +236,9 @@ class RequestHelper {
                             
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
-                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str);
-                                
+                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + method + ' ' + url.protocol + '//' + Path.join(url.host, url.path) + '\n\n' + str);
+                               
+                                error.url = url;
                                 error.statusCode = res.statusCode;
 
                                 return reject(error);
@@ -249,6 +251,8 @@ class RequestHelper {
                
                 // Handle errors
                 req.on('error', (e) => {
+                    e.url = url;
+
                     reject(e);
                 });
 
