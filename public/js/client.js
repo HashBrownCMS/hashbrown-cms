@@ -30807,7 +30807,7 @@ var Chips = function (_Widget) {
 
                 _this2.fetch();
             }));
-        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+        }), _.button({ class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item' }).click(function () {
             var newValue = _this2.placeholder || 'New item';
             var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
 
@@ -41978,7 +41978,20 @@ var RequestHelper = __webpack_require__(2);
 Crisp.Router.route('/media/', function () {
     Crisp.View.get('NavbarMain').showTab('/media/');
 
-    UI.setEditorSpaceContent([_.h1('Media'), _.p('Right click in the Media pane to upload, edit and sort Media items.')], 'text');
+    UI.setEditorSpaceContent([_.h1('Media'), _.p('Right click in the Media pane to upload, edit and sort Media items.'), _.button({ class: 'widget widget--button' }, 'Upload media').click(function () {
+        new HashBrown.Views.Modals.MediaUploader({
+            onSuccess: function onSuccess(ids) {
+                // We got one id back
+                if (typeof ids === 'string') {
+                    location.hash = '/media/' + ids;
+
+                    // We got several ids back
+                } else {
+                    location.hash = '/media/' + ids[0];
+                }
+            }
+        });
+    })], 'text');
 });
 
 // Preview

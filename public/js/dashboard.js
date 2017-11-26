@@ -26686,7 +26686,7 @@ var Chips = function (_Widget) {
 
                 _this2.fetch();
             }));
-        }), _.button({ class: 'widget widget--button round widget--chips__add', title: 'Add item' }, _.span({ class: 'fa fa-plus' })).click(function () {
+        }), _.button({ class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item' }).click(function () {
             var newValue = _this2.placeholder || 'New item';
             var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
 

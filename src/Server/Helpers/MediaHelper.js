@@ -65,35 +65,37 @@ class MediaHelper extends MediaHelperCommon {
         }
     }
 
-	/**
+    /**
      * Makes a directory recursively
      *
      * @param {String} dirPath
      * @param {Function} callback
-	 * @param {Number} position
+     * @param {Number} position
      */
     static mkdirRecursively(dirPath, callback = null, position = 0) {
-		checkParam(dirPath, 'dirPath', String);
-		
+        checkParam(dirPath, 'dirPath', String);
+        
         let parts = Path.normalize(dirPath).split(Path.sep);
-		
-		if(position >= parts.length) {      
-			if(callback) {
-				callback();
-			}
-			
-			return;
-		}
-		
-		let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
-       	   
-		if(!FileSystem.existsSync(currentDirPath)) {
-			FileSystem.mkdirSync(currentDirPath);
-		}
-		
-		MediaHelper.mkdirRecursively(dirPath, callback, position + 1);
+        
+        if(position >= parts.length) {      
+            if(callback) {
+                callback();
+            }
+            
+            return;
+        }
+        
+        let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
+          
+        if(currentDirPath) {
+            if(!FileSystem.existsSync(currentDirPath)) {
+                FileSystem.mkdirSync(currentDirPath);
+            }
+        }
+        
+        MediaHelper.mkdirRecursively(dirPath, callback, position + 1);
     }
-	
+    
     /**
      * Sets a Media object
      *
