@@ -185,6 +185,7 @@ $('.page--dashboard__users__add').click(() => {
          */
         function onSubmit() {
             let username = addUserModal.$element.find('input').val();
+            let currentUsername = HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username;
 
             // Check if username was email
             let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -211,8 +212,16 @@ $('.page--dashboard__users__add').click(() => {
                         HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', {
                             email: username,
                         })
-                        .then(() => {
-                            UI.messageModal('Invite user', 'Invitation was sent to ' + username);
+                        .then((token) => {
+                            let subject = 'Invitation to HashBrown';
+                            let url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
+                            let body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
+
+                            location.href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
+
+                            UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', () => {
+                                location.reload();
+                            }); 
                         })
                         .catch(UI.errorModal);
 

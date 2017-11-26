@@ -189,7 +189,9 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             onChange: (newValue) => {
                 this.model.isAdmin = newValue;
 
-                this.fetch();
+                setTimeout(() => {
+                    this.fetch();
+                }, 300);
             }
         }).$element;
     }
@@ -226,7 +228,6 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
                     _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(this.projects, (i, project) => {
                         return _.div({class: 'widget-group'},
-                            _.div({class: 'widget widget--label'}, project),
                             new HashBrown.Views.Widgets.Input({
                                 type: 'checkbox',
                                 value: this.model.hasScope(project),
@@ -235,11 +236,10 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
                                         this.model.giveScope(project);
                                     } else {
                                         this.model.removeScope(project);
-               
-                                        this.fetch();
                                     }
                                 }
                             }).$element,
+                            _.div({class: 'widget widget--label'}, project),
                             this.renderScopesEditor(project)
                         );
                     })

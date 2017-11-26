@@ -184,7 +184,7 @@ class UserController extends require('./ApiController') {
             return Promise.reject(new Error('User "' + user.name + '" does not have scope "users"'));
         })
         .then(() => {
-            HashBrown.Helpers.UserHelper.updateUserById(id, new HashBrown.Models.User(properties));
+            HashBrown.Helpers.UserHelper.updateUserById(id, properties);
         })
         .then((user) => {
             res.status(200).send(user);

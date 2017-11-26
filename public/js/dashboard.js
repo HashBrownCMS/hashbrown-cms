@@ -17242,7 +17242,9 @@ var UserEditor = function (_HashBrown$Views$Moda) {
             onChange: function onChange(newValue) {
                 _this8.model.isAdmin = newValue;
 
-                _this8.fetch();
+                setTimeout(function () {
+                    _this8.fetch();
+                }, 300);
             }
         }).$element;
     };
@@ -17267,7 +17269,7 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         var _this9 = this;
 
         return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({ class: 'widget widget--separator' }, 'Projects'), _.each(this.projects, function (i, project) {
-            return _.div({ class: 'widget-group' }, _.div({ class: 'widget widget--label' }, project), new HashBrown.Views.Widgets.Input({
+            return _.div({ class: 'widget-group' }, new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: _this9.model.hasScope(project),
                 onChange: function onChange(newValue) {
@@ -17275,11 +17277,9 @@ var UserEditor = function (_HashBrown$Views$Moda) {
                         _this9.model.giveScope(project);
                     } else {
                         _this9.model.removeScope(project);
-
-                        _this9.fetch();
                     }
                 }
-            }).$element, _this9.renderScopesEditor(project));
+            }).$element, _.div({ class: 'widget widget--label' }, project), _this9.renderScopesEditor(project));
         })))];
     };
 
@@ -26791,7 +26791,7 @@ var Input = function (_Widget) {
             case 'checkbox':
                 return _.div({ class: config.class, title: config.title }, _.if(config.placeholder, _.label({ for: 'checkbox-' + this.guid, class: 'widget--input__checkbox-label' }, config.placeholder)), _.input({ id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value }).on('change', function (e) {
                     _this2.onChangeInternal(e.currentTarget.checked);
-                }), _.div({ class: 'widget--input__checkbox-extra fa fa-check' }));
+                }), _.div({ class: 'widget--input__checkbox-switch' }), _.div({ class: 'widget--input__checkbox-background' }));
 
             case 'file':
                 return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
@@ -36335,13 +36335,11 @@ module.exports = {
 		"marked": "^0.3.5",
 		"mongodb": "^2.1.7",
 		"multer": "^1.1.0",
-		"nodemailer": "^4.0.1",
 		"path-to-regexp": "^1.2.1",
 		"pug": "^2.0.0-beta11",
 		"rimraf": "^2.5.2",
 		"semver": "^5.4.1",
-		"to-markdown": "^2.0.1",
-		"xoauth2": "^1.2.0"
+		"to-markdown": "^2.0.1"
 	},
 	"devDependencies": {
 		"babel-core": "^6.18.0",
@@ -36607,6 +36605,7 @@ $('.page--dashboard__users__add').click(function () {
          */
         function onSubmit() {
             var username = addUserModal.$element.find('input').val();
+            var currentUsername = HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username;
 
             // Check if username was email
             var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -36628,8 +36627,16 @@ $('.page--dashboard__users__add').click(function () {
                 var _modal = UI.confirmModal('invite', 'Add user', 'Do you want to invite a new user with email "' + username + '"?', function () {
                     HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', {
                         email: username
-                    }).then(function () {
-                        UI.messageModal('Invite user', 'Invitation was sent to ' + username);
+                    }).then(function (token) {
+                        var subject = 'Invitation to HashBrown';
+                        var url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
+                        var body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
+
+                        location.href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
+
+                        UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', function () {
+                            location.reload();
+                        });
                     }).catch(UI.errorModal);
 
                     var $buttons = _modal.$element.find('button').attr('disabled', true).addClass('disabled');

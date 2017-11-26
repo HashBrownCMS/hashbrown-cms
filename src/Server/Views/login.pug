@@ -13,7 +13,7 @@ html
         title HashBrown CMS
     body.page.page--login
         if(message)
-            .widget.widget--message
+            .widget.widget--message.fixed.fixed--top.warning
                 | #{message}
 
 
@@ -23,11 +23,11 @@ html
                 h2 HashBrown
             .page--login__login__body
                     if(invitedUser)
-                        p
+                        .widget.widget--message.expanded.secondary
                             | Activate the account for #{invitedUser.email}
-                        input(type='text', id='full-name', class='widget widget--input text', placeholder='Full name (optional)')
+                        input(type='text', id='full-name', class='widget widget--input text tall expanded', placeholder='Full name (optional)')
                     if(firstTime)
-                        p
+                        .widget.widget--message.expanded.secondary
                             | Please create your first admin account
                     input.widget.widget--input.tall.expanded.text(type='text', id='username', placeholder='Username')
                     input.widget.widget--input.tall.expanded.text(type='password', id='password', placeholder='Password')
