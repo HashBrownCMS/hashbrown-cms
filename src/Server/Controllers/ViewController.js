@@ -97,7 +97,6 @@ class ViewController extends Controller {
 
         // Dashboard
         app.get('/dashboard/:tab', (req, res) => {
-
             ViewController.authenticate(req.cookies.token)
             .then((user) => {
                 res.render('dashboard', {
@@ -108,7 +107,6 @@ class ViewController extends Controller {
                 });
             })
             .catch((e) => {
-                debug.error(e, this);
                 res.status(403).redirect('/login');  
             });
         });
@@ -139,8 +137,6 @@ class ViewController extends Controller {
                 });
             })
             .catch((e) => {
-                return res.send(e.message);
-
                 if(e.message.indexOf('404') == 0) {
                     res.status(404).render('404', { message: e.message });
                 } else {

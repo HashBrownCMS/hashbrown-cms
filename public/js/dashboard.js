@@ -28439,17 +28439,19 @@ var UIHelper = function () {
         }
 
         _.each(children, function (i, child) {
-            if (isActive) {
-                child.setAttribute('draggable', true);
-            } else {
-                child.removeAttribute('draggable');
-            }
+            child.draggable = isActive;
 
             if (isActive) {
-                child.ondrag = function (e) {
+                child.ondragstart = function (e) {
+                    e.dataTransfer.setData('text/plain', '');
+                };
+
+                parentElement.ondragover = function (e) {
                     if (!canSort) {
                         return;
                     }
+
+                    var bodyRect = document.body.getBoundingClientRect();
 
                     _.each(children, function (i, sibling) {
                         if (sibling === child || !canSort || e.pageY < 1) {
@@ -28457,8 +28459,8 @@ var UIHelper = function () {
                         }
 
                         var cursorY = e.pageY;
-                        var childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-                        var siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var childY = child.getBoundingClientRect().y - bodyRect.y;
+                        var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
                         var hasMoved = false;
 
                         // Dragging above a sibling
@@ -28502,6 +28504,7 @@ var UIHelper = function () {
             } else {
                 child.ondragstart = null;
                 child.ondrag = null;
+                parentElement.ondragover = null;
                 child.ondragstop = null;
                 child.ondragcancel = null;
             }
@@ -36434,9 +36437,6 @@ __webpack_require__(216);
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
-
-// Start debug socket
-debug.startSocket();
 
 // --------------------
 // Get current user

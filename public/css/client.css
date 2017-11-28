@@ -248,6 +248,12 @@ h1, h2, h3, h4, h5, h6 {
 .page--environment.media-picker .page--environment__space--editor .editor__header {
   display: none; }
 
+.page--environment__demo__reset {
+  position: fixed !important;
+  z-index: 9999;
+  bottom: 1rem;
+  left: 1rem; }
+
 .page--environment__spaces {
   display: flex;
   height: 100%;

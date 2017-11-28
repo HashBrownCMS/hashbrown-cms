@@ -55,9 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $('.page--environment__spinner').toggleClass('hidden', false);
 
-    // Start debug socket
-    debug.startSocket();
-
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {
         return LanguageHelper.getLanguages(ProjectHelper.currentProject);

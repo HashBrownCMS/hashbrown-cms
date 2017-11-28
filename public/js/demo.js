@@ -126,7 +126,7 @@ var DemoApi = function () {
         }
 
         for (var i in cache[resource]) {
-            if (cache[resource][i].id == id) {
+            if (cache[resource][i].id === id || cache[resource][i].name === id) {
                 return cache[resource][i];
             }
         }
@@ -608,6 +608,11 @@ var DemoApi = function () {
 
 HashBrown.DemoApi = DemoApi;
 
+// Add reset button
+_.append(document.body, _.button({ class: 'widget widget--button condensed page--environment__demo__reset' }, 'Reset demo').click(function () {
+    DemoApi.reset();
+}));
+
 // Override normal api call
 HashBrown.Helpers.RequestHelper.request = DemoApi.request;
 HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
@@ -627,10 +632,6 @@ HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = function (id) {
         return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId).then(function (parentSchema) {
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
-                    if (typeof parentSchema.getObject === 'function') {
-                        parentSchema = parentSchema.getObject();
-                    }
-
                     var mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
 
                     resolve(mergedSchema);

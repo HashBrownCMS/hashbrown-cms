@@ -21,9 +21,6 @@ require('Client/helpers');
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
-// Start debug socket
-debug.startSocket();
-
 // --------------------
 // Get current user
 // --------------------

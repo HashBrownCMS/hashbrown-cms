@@ -10,7 +10,15 @@
             display: none;
         }
     }
-    
+   
+    // Demo reset button
+    &__demo__reset {
+        position: fixed !important;
+        z-index: 9999;
+        bottom: 1rem;
+        left: 1rem;
+    }
+
     // Spaces
     &__spaces {
         display: flex;
