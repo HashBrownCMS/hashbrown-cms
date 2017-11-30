@@ -14,7 +14,15 @@ class ScheduleController extends require('./ApiController') {
     }        
 
     /**
-     * Gets a list of tasks
+     * @api {get} /api/:project/:environment/schedule/:contentId
+     *
+     * @apiGroup Schedule
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} contentId
+     *
+     * @apiSuccess {Array} Tasks
      */
     static getTasks(req, res) {
          HashBrown.Helpers.ScheduleHelper.getTasks(null, { content: req.params.contentId })

@@ -48,7 +48,14 @@ class FormsController extends require('./ApiController') {
     }
 
     /**
-     * Gets all forms
+     * @api {get} /api/:project/:environment/forms
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Array} Forms
      */
     static getAllForms(req, res) {
         HashBrown.Helpers.FormHelper.getAllForms(req.project, req.environment)
@@ -61,7 +68,13 @@ class FormsController extends require('./ApiController') {
     }
     
     /**
-     * Deletes a single Form by id
+     * @api {delete} /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
      */
     static deleteForm(req, res) {
         HashBrown.Helpers.FormHelper.deleteForm(req.project, req.environment, req.params.id)
@@ -74,7 +87,15 @@ class FormsController extends require('./ApiController') {
     }
     
     /**
-     * Pulls Form by id
+     * @api {post} /api/:project/:environment/forms/pull/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Form} The pulled Form
      */
     static pullForm(req, res) {
         let id = req.params.id;
@@ -94,7 +115,15 @@ class FormsController extends require('./ApiController') {
     }
     
     /**
-     * Pushes Form by id
+     * @api {post} /api/:project/:environment/forms/push/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Form} The pushed Form id
      */
     static pushForm(req, res) {
         let id = req.params.id;
@@ -112,7 +141,15 @@ class FormsController extends require('./ApiController') {
     }
 
     /**
-     * Gets a single form by id
+     * @api {get} /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Form} Form
      */
     static getForm(req, res) {
         HashBrown.Helpers.FormHelper.getForm(req.project, req.environment, req.params.id)
@@ -125,7 +162,15 @@ class FormsController extends require('./ApiController') {
     }
     
     /**
-     * Gets all entries from a Form as CSV
+     * @api {get} /api/:project/:environment/forms/:id/entries
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {String} CSV string
      */
     static getAllEntries(req, res) {
         HashBrown.Helpers.FormHelper.getForm(req.project, req.environment, req.params.id)
@@ -160,7 +205,17 @@ class FormsController extends require('./ApiController') {
     }
     
     /**
-     * Sets a single form by id
+     * @api {post} /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiParam {Form} The Form model to update
+     *
+     * @apiSuccess {Form} Form
      */
     static postForm(req, res) {
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
@@ -175,7 +230,14 @@ class FormsController extends require('./ApiController') {
     }
 
     /**
-     * Creates a form
+     * @api {post} /api/:project/:environment/forms/new
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {String} The created Form id
      */
     static postNew(req, res) {
         HashBrown.Helpers.FormHelper.createForm(req.project, req.environment)
@@ -188,7 +250,15 @@ class FormsController extends require('./ApiController') {
     }
 
     /**
-     * Submits a form
+     * @api {post} /api/:project/:environment/forms/:id/submit
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiParam {Object} entries The submitted entries
      */
     static postSubmit(req, res) {
         // Prevent spam
@@ -226,7 +296,13 @@ class FormsController extends require('./ApiController') {
     }
 
     /**
-     * Clears all form entries
+     * @api {post} /api/:project/:environment/forms/clear/:id
+     *
+     * @apiGroup Forms
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
      */
     static postClearAllEntries(req, res) {
         HashBrown.Helpers.FormHelper.clearAllEntries(req.project, req.environment, req.params.id)

@@ -24,7 +24,14 @@ class ConnectionController extends require('./ApiController') {
     }        
     
     /**
-     * Gets all deployers
+     * @api {get} /api/:project/:environment/connections/deployers
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Array} Deployers
      */
     static getDeployers(req, res) {
         let deployers = [];
@@ -40,7 +47,14 @@ class ConnectionController extends require('./ApiController') {
     }
     
     /**
-     * Gets all processors
+     * @api {get} /api/:project/:environment/connections/processors
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Array} Processors
      */
     static getProcessors(req, res) {
         let processors = [];
@@ -56,7 +70,14 @@ class ConnectionController extends require('./ApiController') {
     }
     
     /**
-     * Gets all connections
+     * @api {get} /api/:project/:environment/connections
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Array} Connections
      */
     static getConnections(req, res) {
         HashBrown.Helpers.ConnectionHelper.getAllConnections(req.project, req.environment)
@@ -69,7 +90,15 @@ class ConnectionController extends require('./ApiController') {
     }
 
     /**
-     * Post connection by id
+     * @api {post} /api/:project/:environment/connections/:id
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Connection} Connection
      */
     static postConnection(req, res) {
         let id = req.params.id;
@@ -85,7 +114,15 @@ class ConnectionController extends require('./ApiController') {
     }
     
     /**
-     * Pulls Connection by id
+     * @api {post} /api/:project/:environment/connections/pull/:id
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {String} Connection id
      */
     static pullConnection(req, res) {
         let id = req.params.id;
@@ -105,7 +142,15 @@ class ConnectionController extends require('./ApiController') {
     }
     
     /**
-     * Pushes Connection by id
+     * @api {post} /api/:project/:environment/connections/push/:id
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {String} Connection id
      */
     static pushConnection(req, res) {
         let id = req.params.id;
@@ -122,9 +167,16 @@ class ConnectionController extends require('./ApiController') {
         }); 
     }
 
-    
     /**
-     * Gets a connection by id
+     * @api {get} /api/:project/:environment/connections/:id
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Connection} Connection
      */
     static getConnection(req, res) {
         let id = req.params.id;
@@ -145,9 +197,14 @@ class ConnectionController extends require('./ApiController') {
     }
     
     /**
-     * Creates a new connection
+     * @api {post} /api/:project/:environment/connections/new
      *
-     * @return {Object} Content
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Connection} Connection
      */
     static createConnection(req, res) {
         HashBrown.Helpers.ConnectionHelper.createConnection(req.project, req.environment)
@@ -160,7 +217,15 @@ class ConnectionController extends require('./ApiController') {
     }
 
     /**
-     * Deletes a connection by id
+     * @api {delete} /api/:project/:environment/connections/:id
+     *
+     * @apiGroup Connection
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Connection} Connection
      */
     static deleteConnection(req, res) {
         let id = req.params.id;

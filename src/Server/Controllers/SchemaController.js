@@ -22,7 +22,14 @@ class SchemaController extends require('./ApiController') {
     }        
     
     /**
-     * Get a list of all Schemas
+     * @api {get} /api/:project/:environment/schemas
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Array} Schemas
      */
     static getSchemas(req, res) {
         let getter = function() {
@@ -43,7 +50,15 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Get a Schema by id
+     * @api {get} /api/:project/:environment/schemas/:id
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Schema} Schema
      */
     static getSchema(req, res) {
         let getter = () => {
@@ -64,7 +79,17 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Set a Schema by id
+     * @api {post} /api/:project/:environment/schemas/:id
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiParam {Schema} schema The Schema model to update
+     *
+     * @apiSuccess {Schema} Schema
      */
     static setSchema(req, res) {
         let id = req.params.id;
@@ -81,7 +106,15 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Pulls Schema by id
+     * @api {post} /api/:project/:environment/schemas/pull/:id
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Schema} The pulled Schema
      */
     static pullSchema(req, res) {
         let id = req.params.id;
@@ -101,7 +134,15 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Pushes Schema by id
+     * @api {post} /api/:project/:environment/schemas/push/:id
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
+     *
+     * @apiSuccess {Schema} The pushed Schema
      */
     static pushSchema(req, res) {
         let id = req.params.id;
@@ -119,7 +160,14 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Creates a new Schema
+     * @api {post} /api/:project/:environment/schemas/new
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     *
+     * @apiSuccess {Schema} The created Schema
      */
     static createSchema(req, res) {
         let parentSchema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
@@ -134,7 +182,13 @@ class SchemaController extends require('./ApiController') {
     }
     
     /**
-     * Deletes a Schema by id
+     * @api {delete} /api/:project/:environment/schemas/:id
+     *
+     * @apiGroup Schema
+     *
+     * @apiParam {String} project
+     * @apiParam {String} environment
+     * @apiParam {String} id
      */
     static deleteSchema(req, res) {
         let id = req.params.id;
