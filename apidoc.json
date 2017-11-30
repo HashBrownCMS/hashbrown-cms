@@ -1,5 +1,4 @@
 {
     "title": "HashBrown API docs",
-    "description": "All requests must be authenticated using the /user/login endpoint and the resulting token appended to every query (/api/endpoint?token=12345678)",
-    "url": "http://hashbrown.rocks/docs/api"
+    "description": "All requests must be authenticated using the /user/login endpoint and the resulting token appended to every query (/api/endpoint?token=12345678)"
 }
