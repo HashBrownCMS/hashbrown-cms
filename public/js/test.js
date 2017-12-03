@@ -6,7 +6,7 @@ function initServiceTest() {
     var btnStart = document.querySelector('.page--dashboard__backend-test__run');
     var ulSection = null;    
 
-    var url = 'ws://' + location.host + '/api' + location.pathname;
+    var url = 'ws://' + location.host + '/api' + location.pathname.replace('/backend', '');
     var socket = new WebSocket(url);
 
     var errors = 0;
@@ -107,8 +107,11 @@ function initUITests() {
         var div = document.createElement('div');
         div.className = 'widget widget--input checkbox page--dashboard__frontend-test__check__checkbox';
 
-        var extra = document.createElement('div');
-        extra.className = 'widget--input__checkbox-extra fa fa-check';
+        var sw = document.createElement('div');
+        sw.className = 'widget--input__checkbox-switch';
+        
+        var bg = document.createElement('div');
+        bg.className = 'widget--input__checkbox-background';
 
         var input = document.createElement('input');
         input.className = 'widget--input__checkbox-input';
@@ -116,7 +119,8 @@ function initUITests() {
         input.id = 'checkbox-' + checkKey;
 
         div.appendChild(input);
-        div.appendChild(extra);
+        div.appendChild(bg);
+        div.appendChild(sw);
 
         liCheck.insertBefore(div, liCheck.firstChild);
 

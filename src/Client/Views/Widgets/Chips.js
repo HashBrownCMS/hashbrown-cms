@@ -4,6 +4,8 @@ const Widget = require('./Widget');
 
 /**
  * A group of chips
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 class Chips extends Widget {
     /**
@@ -86,7 +88,7 @@ class Chips extends Widget {
                 return _.div({class: 'widget--chips__chip'},
                     _.if(this.useObject === true || this.useArray === false || this.valueKey,
                         _.input({class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[this.valueKey] || i, pattern: '.{1,}'})
-                            .on('input', (e) => {
+                            .on('change', (e) => {
                                 if(this.valueKey) {
                                     item[this.valueKey] = e.currentTarget.value || '';
 
@@ -100,7 +102,7 @@ class Chips extends Widget {
                             }),
                     ),
                     _.input({class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: this.labelKey ? item[this.labelKey] : item, pattern: '.{1,}'})
-                        .on('input', (e) => {
+                        .on('change', (e) => {
                             if(this.labelKey) {
                                 item[this.labelKey] = e.currentTarget.value || '';
                             } else {
@@ -119,33 +121,32 @@ class Chips extends Widget {
                         })
                 );
             }),
-            _.button({class: 'widget widget--button round widget--chips__add', title: 'Add item'},
-                _.span({class: 'fa fa-plus'})
-            ).click(() => {
-                let newValue = this.placeholder || 'New item';
-                let newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+            _.button({class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item'})
+                .click(() => {
+                    let newValue = this.placeholder || 'New item';
+                    let newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
 
 
-                if(this.useObject === true || this.useArray === false) {
-                    this.value[newKey] = newValue;
-                
-                } else if (this.valueKey && this.labelKey) {
-                    let newObject = {};
-
-                    newObject[this.valueKey] = newKey;
-                    newObject[this.labelKey] = newValue;
+                    if(this.useObject === true || this.useArray === false) {
+                        this.value[newKey] = newValue;
                     
-                    this.value.push(newObject);
-                
-                } else {
-                    this.value.push(newValue);
-                
-                }
+                    } else if (this.valueKey && this.labelKey) {
+                        let newObject = {};
 
-                this.onChangeInternal();
+                        newObject[this.valueKey] = newKey;
+                        newObject[this.labelKey] = newValue;
+                        
+                        this.value.push(newObject);
+                    
+                    } else {
+                        this.value.push(newValue);
+                    
+                    }
 
-                this.fetch();
-            })
+                    this.onChangeInternal();
+
+                    this.fetch();
+                })
         );
     }
 }

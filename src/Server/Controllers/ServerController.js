@@ -1,19 +1,11 @@
 'use strict';
 
-const BackupHelper = require('Server/Helpers/BackupHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SettingsHelper = require('Server/Helpers/SettingsHelper');
-const UpdateHelper = require('Server/Helpers/UpdateHelper');
-const ProjectHelper = require('Server/Helpers/ProjectHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller for dashboard related operations
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ServerController extends ApiController {
+class ServerController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -29,7 +21,7 @@ class ServerController extends ApiController {
         app.post('/api/server/restart', this.middleware({ needsAdmin: true, setProject: false }), this.postRestartServer);
         app.post('/api/server/projects/new', this.middleware({ needsAdmin: true, setProject: false }), this.createProject);
         app.post('/api/server/backups/:project/new', this.middleware({ needsAdmin: true, setProject: false }), this.postBackupProject);
-        app.post('/api/server/backups/:project/upload', this.middleware({ needsAdmin: true, setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
+        app.post('/api/server/backups/:project/upload', this.middleware({ needsAdmin: true, setProject: false }), HashBrown.Helpers.BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ needsAdmin: true, setProject: false }), this.postRestoreProjectBackup);
         app.post('/api/server/settings/:project/:section', this.middleware({ needsAdmin: true, setProject: false }), this.postProjectSettings);
         app.post('/api/server/migrate/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postMigrateContent);
@@ -61,10 +53,10 @@ class ServerController extends ApiController {
 
             let getFromDb = () => {
                 if(name === 'settings') {
-                    return DatabaseHelper.find(project, 'settings', { usedBy: data[source] });
+                    return HashBrown.Helpers.DatabaseHelper.find(project, 'settings', { usedBy: data[source] });
                 }
 
-                return DatabaseHelper.find(project, data[source] + '.' + name, query || {});
+                return HashBrown.Helpers.DatabaseHelper.find(project, data[source] + '.' + name, query || {});
             }
 
             return getFromDb()
@@ -96,7 +88,7 @@ class ServerController extends ApiController {
                 if(data.settings.replace) {
                     debug.log('Updating "' + (item.id || item) + '" into ' + resource + '...', ServerController);
                 
-                    mongoPromise = DatabaseHelper.updateOne(
+                    mongoPromise = HashBrown.Helpers.DatabaseHelper.updateOne(
                         project,
                         data.to + '.' + resource,
                         { id: item.id },
@@ -106,7 +98,7 @@ class ServerController extends ApiController {
                 
                 // Don't overwrite, keep target resource
                 } else {
-                    mongoPromise = DatabaseHelper.count(
+                    mongoPromise = HashBrown.Helpers.DatabaseHelper.count(
                         project,
                         data.to + '.' + resource,
                         { id: item.id }
@@ -115,7 +107,7 @@ class ServerController extends ApiController {
                         if(amount < 1) {
                             debug.log('Inserting "' + item.id + '" into ' + resource + '...', this);
                             
-                            return DatabaseHelper.insertOne(
+                            return HashBrown.Helpers.DatabaseHelper.insertOne(
                                 project,
                                 data.to + '.' + resource,
                                 item
@@ -155,7 +147,7 @@ class ServerController extends ApiController {
 
                 debug.log('Merging settings from "' + data.from + '" into "' + data.to + '"...', ServerController);
 
-                return DatabaseHelper.updateOne(project, 'settings', { usedBy: data.to }, fromSettings, { upsert: true }); 
+                return HashBrown.Helpers.DatabaseHelper.updateOne(project, 'settings', { usedBy: data.to }, fromSettings, { upsert: true }); 
             }
 
             // Merge non-settings
@@ -239,9 +231,9 @@ class ServerController extends ApiController {
     static postProjectSettings(req, res) {
         let settings = req.body;
    
-        ProjectHelper.checkProject(req.params.project)
+        HashBrown.Helpers.ProjectHelper.checkProject(req.params.project)
         .then(() => {
-            return SettingsHelper.setSettings(req.params.project, null, req.params.section, settings);
+            return HashBrown.Helpers.SettingsHelper.setSettings(req.params.project, null, req.params.section, settings);
         })
         .then(() => {
             res.status(200).send(settings);
@@ -255,7 +247,7 @@ class ServerController extends ApiController {
      * Checks for new updates
      */
     static getUpdateCheck(req, res) {
-        UpdateHelper.check()
+        HashBrown.Helpers.UpdateHelper.check()
         .then((statusObj) => {
             res.status(200).send(statusObj);
         })
@@ -278,7 +270,7 @@ class ServerController extends ApiController {
      * Updates the server
      */
     static postUpdateServer(req, res) {
-        UpdateHelper.update()
+        HashBrown.Helpers.UpdateHelper.update()
         .then(() => {
             res.status(200).send('OK');
 
@@ -294,7 +286,7 @@ class ServerController extends ApiController {
      * Gets the backup config
      */
    static getBackupConfig(req, res) {
-       BackupHelper.getConfig()
+       HashBrown.Helpers.BackupHelper.getConfig()
        .then((config) => {
             res.status(200).send(config);
        })
@@ -321,7 +313,7 @@ class ServerController extends ApiController {
      * Deletes a backup of a project
      */
     static deleteBackup(req, res) {
-        BackupHelper.deleteBackup(req.params.project, req.params.timestamp)
+        HashBrown.Helpers.BackupHelper.deleteBackup(req.params.project, req.params.timestamp)
         .then((path) => {
             res.status(200).send('OK');
         })
@@ -334,7 +326,7 @@ class ServerController extends ApiController {
      * Gets a backup of a project
      */
     static getBackup(req, res) {
-        BackupHelper.getBackupPath(req.params.project, req.params.timestamp)
+        HashBrown.Helpers.BackupHelper.getBackupPath(req.params.project, req.params.timestamp)
         .then((path) => {
             res.status(200).sendFile(path);
         })
@@ -347,7 +339,7 @@ class ServerController extends ApiController {
      * Restores a backup of a project
      */
     static postRestoreProjectBackup(req, res) {
-        BackupHelper.restoreBackup(req.params.project, req.params.timestamp)
+        HashBrown.Helpers.BackupHelper.restoreBackup(req.params.project, req.params.timestamp)
         .then((data) => {
             res.status(200).send(data);
         })
@@ -360,7 +352,7 @@ class ServerController extends ApiController {
      * Makes a backup of a project
      */
     static postBackupProject(req, res) {
-        BackupHelper.createBackup(req.params.project)
+        HashBrown.Helpers.BackupHelper.createBackup(req.params.project)
         .then((data) => {
             res.status(200).send('' + data);
         })
@@ -373,7 +365,7 @@ class ServerController extends ApiController {
      * Gets a list of all projects
      */
     static getAllProjectNames(req, res) {
-        ProjectHelper.getAllProjectNames()
+        HashBrown.Helpers.ProjectHelper.getAllProjectNames()
         .then((projects) => {
             let scopedProjects = [];
 
@@ -415,7 +407,7 @@ class ServerController extends ApiController {
         let project = req.params.project;
 
         if(req.user.isAdmin || req.user.scopes[project])  {
-            ProjectHelper.getProject(project)
+            HashBrown.Helpers.ProjectHelper.getProject(project)
             .then((project) => {
                 res.status(200).send(project);
             })
@@ -436,7 +428,7 @@ class ServerController extends ApiController {
         let project = req.params.project;
 
         if(req.user.hasScope(project))  {
-            ProjectHelper.getAllEnvironments(project)
+            HashBrown.Helpers.ProjectHelper.getAllEnvironments(project)
             .then((environments) => {
                 res.status(200).send(environments);
             })
@@ -456,7 +448,7 @@ class ServerController extends ApiController {
     static deleteProject(req, res) {
         let project = req.params.project;
 
-        ProjectHelper.deleteProject(project)
+        HashBrown.Helpers.ProjectHelper.deleteProject(project)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -472,7 +464,7 @@ class ServerController extends ApiController {
         let project = req.params.project;
         let environment = req.params.environment;
 
-        ProjectHelper.addEnvironment(project, environment)
+        HashBrown.Helpers.ProjectHelper.addEnvironment(project, environment)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -488,7 +480,7 @@ class ServerController extends ApiController {
         let project = req.params.project;
         let environment = req.params.environment;
 
-        ProjectHelper.deleteEnvironment(project, environment)
+        HashBrown.Helpers.ProjectHelper.deleteEnvironment(project, environment)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -503,7 +495,7 @@ class ServerController extends ApiController {
     static createProject(req, res) {
         let project = req.body
         
-        ProjectHelper.createProject(project.name, req.user.id)
+        HashBrown.Helpers.ProjectHelper.createProject(project.name, req.user.id)
         .then((project) => {
             res.status(200).send(project);
         })

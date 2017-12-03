@@ -1,18 +1,11 @@
 'use strict';
 
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-const ContentHelper = require('Server/Helpers/ContentHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
-const ApiController = require('Server/Controllers/ApiController');
-const Content = require('Server/Models/Content');
-
 /**
  * Controller for Content
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ContentController extends ApiController {
+class ContentController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -33,10 +26,17 @@ class ContentController extends ApiController {
     }
    
     /**
-     * Creates the example content
+     * @example POST /api/:project/:environment/content/example
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {String} OK
      */
     static createExampleContent(req, res) {
-        ContentHelper.createExampleContent(req.project, req.environment, req.user)
+        HashBrown.Helpers.ContentHelper.createExampleContent(req.project, req.environment, req.user)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -46,10 +46,17 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Gets a list of all Content objects
+     * @example GET /api/:project/:environment/content
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Array} Content nodes
      */
     static getAllContents(req, res) {
-        ContentHelper.getAllContents(req.project, req.environment)
+        HashBrown.Helpers.ContentHelper.getAllContents(req.project, req.environment)
         .then((nodes) => {
             res.status(200).send(nodes);
         })
@@ -59,15 +66,21 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Gets a Content object by id
+     * @example GET /api/:project/:environment/content/:id
      *
-     * @return {Object} Content
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {Content} Content
      */
     static getContent(req, res) {
         let id = req.params.id;
    
         if(id && id != 'undefined') {
-            ContentHelper.getContentById(req.project, req.environment, id)
+            HashBrown.Helpers.ContentHelper.getContentById(req.project, req.environment, id)
             .then((node) => {
                 res.status(200).send(node);
             })
@@ -82,12 +95,21 @@ class ContentController extends ApiController {
     }
     
     /**
-     * Creates a Content preview by id
+     * @example POST /api/:project/:environment/content/preview
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @param {Content} content The Content model to preview
+     *
+     * @returns {String} Preview URL
      */
     static previewContent(req, res) {
-        let content = new Content(req.body);
+        let content = new HashBrown.Models.Content(req.body);
 
-        ConnectionHelper.previewContent(req.project, req.environment, content, req.user, req.query.language || 'en')
+        HashBrown.Helpers.ConnectionHelper.previewContent(req.project, req.environment, content, req.user, req.query.language || 'en')
         .then((previewUrl) => {
             res.status(200).send(previewUrl);
         })
@@ -97,9 +119,19 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Creates a new Content object
+     * @example POST /api/:project/:environment/content/new/:schemaId
      *
-     * @return {Content} content
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} schemaId
+     *
+     * @param {String} sort A sorting index (optional)
+     * @param {String} parent A parent id (optional)
+     * @param {Content} content The Content model to create (optional)
+     *
+     * @returns {Content} The created Content node
      */
     static createContent(req, res) {
         let parentId = req.query.parent;
@@ -112,7 +144,7 @@ class ContentController extends ApiController {
             properties = properties.properties;
         }
         
-        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties, sortIndex)
+        HashBrown.Helpers.ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties, sortIndex)
         .then((node) => {
             res.status(200).send(node);
         })
@@ -122,16 +154,26 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Posts a Content object by id
+     * @example POST /api/:project/:environment/content/:id
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @param {Content} content The Content model to update
+     *
+     * @returns {Content} The created Content node
      */
     static postContent(req, res) {
         let id = req.params.id;
-        let node = req.body;
+        let content = new HashBrown.Models.Content(req.body);
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
         
-        ContentHelper.setContentById(req.project, req.environment, id, node, req.user, shouldCreate)
+        HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, content, req.user, shouldCreate)
         .then(() => {
-            res.status(200).send(node);
+            res.status(200).send(content);
         })
         .catch((e) => {
             res.status(502).send(ContentController.printError(e));   
@@ -139,16 +181,24 @@ class ContentController extends ApiController {
     }
    
     /**
-     * Pulls Content by id
+     * @example POST /api/:project/:environment/content/pull/:id
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {Content} The pulled Content node
      */
     static pullContent(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, req.environment, 'content', id)
+        HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'content', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
         
-            return ContentHelper.setContentById(req.project, req.environment, id, resourceItem, req.user, true)
+            return HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, resourceItem, req.user, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -159,14 +209,22 @@ class ContentController extends ApiController {
     }
     
     /**
-     * Pushes Content by id
+     * @example POST /api/:project/:environment/content/push/:id
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {String} The pushed Content id
      */
     static pushContent(req, res) {
         let id = req.params.id;
 
-        ContentHelper.getContentById(req.project, req.environment, id, true)
+        HashBrown.Helpers.ContentHelper.getContentById(req.project, req.environment, id, true)
         .then((localContent) => {
-            return SyncHelper.setResourceItem(req.project, req.environment, 'content', id, localContent);
+            return HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'content', id, localContent);
         })
         .then(() => {
             res.status(200).send(id);
@@ -177,12 +235,21 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Publishes a Content node
+     * @example POST /api/:project/:environment/content/publish
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @param {Content} content the Content model to publish
+     *
+     * @returns {String} The published Content
      */
     static publishContent(req, res) {
-        let content = new Content(req.body);
+        let content = new HashBrown.Models.Content(req.body);
 
-        ConnectionHelper.publishContent(req.project, req.environment, content, req.user)
+        HashBrown.Helpers.ConnectionHelper.publishContent(req.project, req.environment, content, req.user)
         .then(() => {
             res.status(200).send(req.body);
         })
@@ -192,12 +259,21 @@ class ContentController extends ApiController {
     }
     
     /**
-     * Unpublishes a Content node
+     * @example POST /api/:project/:environment/content/unpublish
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @param {Content} content the Content model to unpublish
+     *
+     * @returns {String} The unpublished Content
      */
     static unpublishContent(req, res) {
-        let content = new Content(req.body);
+        let content = new HashBrown.Models.Content(req.body);
 
-        ConnectionHelper.unpublishContent(req.project, req.environment, content, req.user)
+        HashBrown.Helpers.ConnectionHelper.unpublishContent(req.project, req.environment, content, req.user)
         .then(() => {
             res.status(200).send(content);
         })
@@ -207,13 +283,21 @@ class ContentController extends ApiController {
     }
 
     /**
-     * Deletes a Content object by id
+     * @example DELETE /api/:project/:environment/content/:id
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {String} The deleted Content id
      */
     static deleteContent(req, res) {
         let id = req.params.id;
         let removeChildren = req.query.removeChildren == true || req.query.removeChildren == 'true';
 
-        ContentHelper.removeContentById(req.project, req.environment, id, removeChildren)
+        HashBrown.Helpers.ContentHelper.removeContentById(req.project, req.environment, id, removeChildren)
         .then(() => {
             res.status(200).send(id);
         })

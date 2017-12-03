@@ -26,6 +26,7 @@
         > .widget {
             border-radius: 0 !important;
             flex-grow: 1;
+            flex-basis: 0;
         }
 
         &:not(.vertical) > .widget {

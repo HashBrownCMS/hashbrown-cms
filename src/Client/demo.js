@@ -2,6 +2,8 @@
 
 /**
  * Demo API
+ *
+ * @memberof HashBrown.Client
  */
 class DemoApi {
     /**
@@ -46,7 +48,7 @@ class DemoApi {
         }
 
         for(let i in cache[resource]) {
-            if(cache[resource][i].id == id) {
+            if(cache[resource][i].id === id || cache[resource][i].name === id) {
                 return cache[resource][i];
             }
         }
@@ -553,6 +555,15 @@ class DemoApi {
 
 HashBrown.DemoApi = DemoApi;
 
+// Add reset button
+_.append(document.body, 
+    _.button({class: 'widget widget--button condensed page--environment__demo__reset'},
+        'Reset demo'
+    ).click(() => {
+        DemoApi.reset();               
+    })
+);
+
 // Override normal api call
 HashBrown.Helpers.RequestHelper.request = DemoApi.request;
 HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
@@ -573,10 +584,6 @@ HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
         .then((parentSchema) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    if(typeof parentSchema.getObject === 'function') {
-                        parentSchema = parentSchema.getObject();
-                    }
-
                     let mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
 
                     resolve(mergedSchema);

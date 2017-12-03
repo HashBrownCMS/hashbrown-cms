@@ -4,6 +4,8 @@ const Widget = require('./Widget');
 
 /**
  * A versatile input widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 class Input extends Widget {
     /**
@@ -59,7 +61,8 @@ class Input extends Widget {
                         .on('change', (e) => {
                             this.onChangeInternal(e.currentTarget.checked);
                         }),
-                    _.div({class: 'widget--input__checkbox-extra fa fa-check'})
+                    _.div({class: 'widget--input__checkbox-background'}),
+                    _.div({class: 'widget--input__checkbox-switch'})
                 );
       
             case 'file':

@@ -7,7 +7,7 @@ const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 
 const Content = require('Server/Models/Content');
-const Connection = require('Common/Models/Connection');
+const Connection = require('Server/Models/Connection');
 const User = require('Server/Models/User');
 
 /**
@@ -231,7 +231,7 @@ class DatabaseHelper {
      *
      * @param {String} databaseName
      *
-     * returns {Promise} Whether or not database exists
+     * @returns {Promise} Whether or not database exists
      */
     static databaseExists(databaseName) {
         return this.listDatabases()
@@ -246,7 +246,7 @@ class DatabaseHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      *
-     * returns {Promise} Whether or not collection exists
+     * @returns {Promise} Whether or not collection exists
      */
     static collectionExists(databaseName, collectionName) {
         return this.listCollections(databaseName)

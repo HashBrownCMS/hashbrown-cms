@@ -4,6 +4,9 @@
  * @namespace HashBrown.Server
  */
 
+// Common
+require('Common/common');
+
 // ----------
 // Libs
 // ----------
@@ -27,13 +30,6 @@ app.set('views', appRoot + '/src/Server/Views');
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
 app.use(Express.static(appRoot + '/public'));
-
-// ----------
-// Global methods
-// ----------
-global.requiredParam = function(name) {
-    throw new Error('Parameter "' + name + '" is required');
-}
 
 // ----------
 // Namespaces
@@ -73,13 +69,13 @@ function checkArgs() {
 
     switch(cmd) {
         case 'create-user':
-            return HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin == 'true');
+            return HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin === 'true');
        
         case 'make-user-admin':
             return HashBrown.Helpers.UserHelper.makeUserAdmin(args.u);
 
         case 'revoke-tokens':
-            return HashBrown.Helpers.UserHelper.revokeTokens(args.u, args.p);
+            return HashBrown.Helpers.UserHelper.revokeTokens(args.u);
     
         case 'set-user-scopes':
             return HashBrown.Helpers.UserHelper.findUser(args.u)
@@ -103,15 +99,6 @@ function checkArgs() {
                 return HashBrown.Helpers.UserHelper.updateUser(args.u, user.getObject());
             });
 
-        case 'eval':
-            let val = eval(args.cmd);
-
-            if(val && typeof val.then === 'function') {
-                return val;
-            }
-
-            return Promise.resolve();
-
         default:
             return Promise.resolve('proceed');  
     }
@@ -134,7 +121,7 @@ function ready(files) {
     })
     .then(() => {
 		// Start HTTP server
-		let port = HashBrown.Helpers.ConfigHelper.getSync('server').port || process.env.PORT || 8080;
+		let port = process.env.PORT || 8080;
 		
 		global.server = HTTP.createServer(app).listen(port);
 

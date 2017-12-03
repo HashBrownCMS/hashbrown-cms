@@ -10,6 +10,9 @@ require('Client/Style/client');
 // Get routes
 require('Client/Routes');
 
+// Common
+require('Common/common');
+
 // Resource cache
 window.resources = {
     connections: [],
@@ -32,7 +35,8 @@ HashBrown.Views.Widgets = require('Client/Views/Widgets');
 HashBrown.Views.Modals = require('Client/Views/Modals');
 HashBrown.Views.Navigation = require('Client/Views/Navigation');
 HashBrown.Views.Editors = require('Client/Views/Editors');
-HashBrown.Views.Editors.ConnectionEditors = {};
+HashBrown.Views.Editors.DeployerEditors = {};
+HashBrown.Views.Editors.ProcessorEditors = {};
 HashBrown.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditors');
 HashBrown.Helpers = require('Client/Helpers');
 
@@ -50,9 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
     $('.page--environment__spinner').toggleClass('hidden', false);
-
-    // Start debug socket
-    debug.startSocket();
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {

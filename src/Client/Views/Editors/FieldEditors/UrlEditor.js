@@ -72,7 +72,7 @@ class UrlEditor extends FieldEditor {
     generateUrl(contentId) {
         let nodes = UrlEditor.getAllParents(contentId);
         let url = '/';
-       
+      
         if(this.multilingual) {
             url += window.language + '/';
         }

@@ -1,30 +1,28 @@
 'use strict';
 
+const Path = require('path');
+
+const Processor = require('./Processor');
+const Deployer = require('./Deployer');
 const Resource = require('./Resource');
 
 /**
- * The base class for all Connection types
+ * The Connection class
  *
  * @memberof HashBrown.Common.Models
  */
 class Connection extends Resource {
-    constructor(params) {
-        super(Connection.paramsCheck(params));
-    }
-
+    /**
+     * Structure
+     */
     structure() {
-        // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'title');
-        this.def(String, 'type');
         this.def(String, 'url');
         this.def(Boolean, 'isLocked');
         
         // Sync
         this.def(Object, 'sync');
-        
-        // Extensible settings
-        this.def(Object, 'settings', {});
     }
 
     /**
@@ -35,7 +33,102 @@ class Connection extends Resource {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
+        // Backwards compatibility: Convert from old structure
+        if(params.type || params.preset) {
+            params.settings = params.settings || {};
+            params.settings.url = params.settings.url || params.url;
+
+            let newParams = this.getPresetSettings(params.type || params.preset, params.settings);
+
+            newParams.id = params.id;
+            newParams.title = params.title;
+            newParams.url = params.url;
+            newParams.isLocked = params.isLocked;
+            newParams.sync = params.sync;
+
+            params = newParams;
+        }
+
+        // Deployer and processor
+        if(!params.processor) { params.processor = {}; }
+        if(!params.deployer) { params.deployer = {}; }
+        if(!params.deployer.paths) { params.deployer.paths = {}; }
+        if(!params.deployer.paths.templates) { params.deployer.paths.templates = {}; }
+        
         return super.paramsCheck(params);
+    }
+
+    /**
+     * Gets preset settings
+     *
+     * @param {String} preset
+     * @param {Object} oldSettings
+     */
+    static getPresetSettings(preset, oldSettings) {
+        oldSettings = oldSettings || {};
+
+        let settings;
+
+        switch(preset) {
+            case 'GitHub Pages':
+                settings = {
+                    processor: {
+                        alias: 'jekyll',
+                        fileExtension: '.md'
+                    },
+                    deployer: oldSettings.isLocal ? {
+                        alias: 'filesystem',
+                        rootPath: oldSettings.localPath,
+                        paths: {
+                            templates: {
+                                partial: '/_includes/partials/',
+                                page: '/_layouts/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
+                    } : {
+                        alias: 'github',
+                        token: oldSettings.token || '',
+                        org: oldSettings.org || '',
+                        repo: oldSettings.repo || '',
+                        branch: oldSettings.branch || '',
+                        paths: {
+                            templates: {
+                                partial: '/_includes/partials/',
+                                page: '/_layouts/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
+                    }
+                };
+                break;
+
+            case 'HashBrown Driver':
+                settings = {
+                    processor: {
+                        alias: 'json',
+                        fileExtension: ''
+                    },
+                    deployer: {
+                        alias: 'api',
+                        url: (oldSettings.url || 'https://example.com') + '/api/',
+                        token: oldSettings.token || '',
+                        paths: {
+                            templates: {
+                                partial: '/templates/partial/',
+                                page: '/templates/page/'
+                            },
+                            content: '/content/',
+                            media: '/media/'
+                        }
+                    }
+                };
+                break;
+        }
+
+        return settings;
     }
 
     /**
@@ -44,22 +137,10 @@ class Connection extends Resource {
      * @return {Connection} connection
      */
     static create() {
-        let connection = new Connection({
+        return new Connection({
             id: Connection.createId(),
-            title: 'New connection',
-            settings: {}
+            title: 'New connection'
         });
-        
-        return connection;
-    }
-
-    /**
-     * Gets templates
-     *
-     * @returns {Promise} Array of Templates
-     */
-    getTemplates() {
-        return Promise.resolve([]);
     }
 
     /**
@@ -81,274 +162,6 @@ class Connection extends Resource {
         }
 
         return url;
-    }
-
-    /**
-     * Gets whether this connection is serving local content
-     *
-     * @returns {Boolean} Is local
-     */
-    isLocal() {
-        return false;
-    }
-
-    /**
-     * Gets the media path
-     *
-     * @returns {String} path
-     */
-    getMediaPath() {
-        return '';
-    }
-
-    /**
-     * Gets all Media objects
-     *
-     * @returns {Promise(Array)} media
-     */
-    getAllMedia() {
-        return Promise.resolve([]);
-    }
-    
-    /**
-     * Gets a Media object
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Media)} media
-     */
-    getMedia(id) {
-        return Promise.resolve(null);
-    }
-    
-    /**
-     * Sets media
-     *
-     * @param {String} id
-     * @param {Object} file
-     *
-     * @returns {Promise} Array of Media
-     */
-    setMedia(id, file) {
-        return Promise.resolve();
-    }
-    
-    /**
-     * Sets template by id
-     *
-     * @param {String} type
-     * @param {String} id
-     * @param {Template} newTemplate
-     *
-     * @returns {Promise}
-     */
-    setTemplateById(type, id, newTemplate) {
-        return Promise.resolve();
-    }
-    
-    /**
-     * Removes media
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Array of Media items
-     */
-    removeMedia(id) {
-        return Promise.resolve();
-    }
-    
-    /**
-     *  Unpublishes content
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     *
-     * @returns {Promise} Promise
-     */
-    unpublishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
-        let connection = this;
-
-        debug.log('Unpublishing all localised property sets...', this);
-        
-        return connection.removePreview(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((languages) => {
-            let next = () => {
-                let language = languages.pop();
-
-                // No more languauges to publish for
-                if(!language) {
-                    debug.log('Unpublished all localised property sets successfully!', connection);
-                    return Promise.resolve();
-                }
-
-                return connection.deleteContentProperties(content.id, language)
-                .then(() => {
-                    return next();
-                });
-            };
-
-            return next();
-        });
-    }
-    
-    /**
-     * Removes a Content preview
-     *
-     * @params {Content} content
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     *
-     * @returns {Promise} Preview URL
-     */
-    removePreview(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
-        if(!content.hasPreview) { return Promise.resolve(); }
-
-        content.hasPreview = false;
-        
-        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((languages) => {
-            let next = () => {
-                let language = languages.pop();
-
-                if(!language) {
-                    return Promise.resolve();
-                }
-
-                return this.deleteContentProperties(content.id + '_preview', language)
-                .then(() => {
-                    return next();  
-                });
-            };
-
-            return next();
-        });
-    }
-
-    /**
-     * Generates a Content preview
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     * @param {String} language
-     *
-     * @returns {Promise} Preview URL
-     */
-    generatePreview(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content'),
-        language = requiredParam('language')
-    ) {
-        content.hasPreview = true;
-        
-        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
-        })
-        .then((sets) => {
-            let properties = sets[language];
-
-            let url = '/preview/' + content.id;
-            
-            properties.url = url;
-
-            return this.postContentProperties(properties, content.id + '_preview', language, content.getMeta())
-            .then(() => {
-                return Promise.resolve(this.url + url);
-            });
-        });
-    }
-
-    /**
-     * Publishes content
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     *
-     * @returns {Promise} Promise
-     */
-    publishContent(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        content = requiredParam('content')
-    ) {
-        let connection = this;
-
-        debug.log('Publishing all localised property sets...', this);
-
-        return connection.removePreview(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
-        })
-        .then((sets) => {
-            let languages = Object.keys(sets);
-            
-            function next(i) {
-                let language = languages[i];
-                let properties = sets[language];
-
-                return connection.postContentProperties(properties, content.id, language, content.getMeta())
-                .then(() => {
-                    i++;
-
-                    if(i < languages.length) {
-                        return next(i);
-                    
-                    } else {
-                        debug.log('Published all localised property sets successfully!', connection);
-                            
-                        return Promise.resolve();
-                    
-                    }
-                })
-            }
-
-            return next(0);
-        });
-    }
-    
-    /**
-     * Deletes content properties from the remote target
-     *
-     * @param {String} id
-     * @param {String} language
-     *
-     * @returns {Promise} promise
-     */
-    deleteContentProperties(id, language) {
-        return Promise.resolve();
-    }
-
-    /**
-     * Posts content properties to the remote target
-     *
-     * @param {Object} properties
-     * @param {String} id
-     * @param {String} language
-     *
-     * @returns {Promise} promise
-     */
-    postContentProperties(properties, id, language) {
-        return Promise.resolve();
     }
 }
 

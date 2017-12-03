@@ -1,15 +1,11 @@
 'use strict';
 
-const ScheduleHelper = require('Server/Helpers/ScheduleHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The Controller for scheduled Tasks
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ScheduleController extends ApiController {
+class ScheduleController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -18,10 +14,18 @@ class ScheduleController extends ApiController {
     }        
 
     /**
-     * Gets a list of tasks
+     * @example GET /api/:project/:environment/schedule/:contentId
+     *
+     * @apiGroup Schedule
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} contentId
+     *
+     * @returns {Array} Tasks
      */
     static getTasks(req, res) {
-         ScheduleHelper.getTasks(null, { content: req.params.contentId })
+         HashBrown.Helpers.ScheduleHelper.getTasks(null, { content: req.params.contentId })
         .then((tasks) => {
             res.status(200).send(tasks);
         })

@@ -97,8 +97,7 @@ class ViewController extends Controller {
 
         // Dashboard
         app.get('/dashboard/:tab', (req, res) => {
-
-            ApiController.authenticate(req.cookies.token)
+            ViewController.authenticate(req.cookies.token)
             .then((user) => {
                 res.render('dashboard', {
                     tab: req.params.tab,
@@ -108,7 +107,6 @@ class ViewController extends Controller {
                 });
             })
             .catch((e) => {
-                debug.error(e, this);
                 res.status(403).redirect('/login');  
             });
         });
@@ -123,7 +121,7 @@ class ViewController extends Controller {
                     return Promise.reject(new Error('404: The project and environment "' + req.params.project + '/' + req.params.environment + '" could not be found'));
                 }
 
-                return ApiController.authenticate(req.cookies.token);
+                return ViewController.authenticate(req.cookies.token);
             })
             .then((authUser) => {
                 user = authUser;
@@ -139,8 +137,6 @@ class ViewController extends Controller {
                 });
             })
             .catch((e) => {
-                return res.send(e.message);
-
                 if(e.message.indexOf('404') == 0) {
                     res.status(404).render('404', { message: e.message });
                 } else {
@@ -155,7 +151,7 @@ class ViewController extends Controller {
         });
 
         app.get('/:project/:environment/test/:tab', (req, res) => {
-            ApiController.authenticate(req.cookies.token)
+            ViewController.authenticate(req.cookies.token)
             .then((user) => {
                 FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
                     if(err) {

@@ -1,19 +1,22 @@
 'use strict';
 
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
 const ConfigHelper = require('Server/Helpers/ConfigHelper');
 const RequestHelper = require('Server/Helpers/RequestHelper');
 const ApiController = require('Server/Controllers/ApiController');
 
-const Connection = require('./server/Connection');
+const Deployer = require('./server/Deployer');
 
-let route = '';
-
-class GitHubPages {
+/**
+ * The HashBrown GitHub plugin
+ */
+class GitHub {
+    /**
+     * Init this plugin
+     */
     static init(app) {
         let config = ConfigHelper.getSync('plugins/github');
 
-        ConnectionHelper.registerConnectionType('GitHub Pages', Connection);
+        HashBrown.Helpers.ConnectionHelper.registerDeployer(Deployer);
 
         /**
          * Starts the oAuth flow
@@ -22,8 +25,6 @@ class GitHubPages {
             if(!config || !config.clientId || !config.clientSecret) {
                 res.status(502).send('Malformed or non-existent GitHub config file (/config/plugins/github.cfg)');
             }
-
-            route = req.query.route;
 
             res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.clientId + '&scope=repo read:org');
         });
@@ -111,4 +112,4 @@ class GitHubPages {
     }
 }
 
-module.exports = GitHubPages;
+module.exports = GitHub;

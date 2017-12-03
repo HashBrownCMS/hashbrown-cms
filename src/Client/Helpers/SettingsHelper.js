@@ -19,11 +19,9 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @return {Promise(Object)}  settings
      */
-    static getSettings(
-        project = requiredParam('project'),
-        environment = null,
-        section = null
-    ) {
+    static getSettings(project, environment = null, section = null) {
+        checkParam(project, 'project', String);
+
         if(environment === '*') { environment = null; }
 
         let apiUrl = '/api/' + project + '/';
@@ -55,11 +53,9 @@ class SettingsHelper extends SettingsHelperCommon {
      * @param {String} environment
      * @param {String} section
      */
-    static cacheSanityCheck(
-        project = requiredParam('project'),
-        environment = null,
-        section = null
-    ) {
+    static cacheSanityCheck(project, environment = null, section = null) {
+        checkParam(project, 'project', String);
+
         if(environment === '*') { environment = null; }
 
         this.cache = this.cache || {};
@@ -86,12 +82,10 @@ class SettingsHelper extends SettingsHelperCommon {
      * @param {String} section
      * @param {Object} settings
      */
-    static updateCache(
-        project = requiredParam('project'),
-        environment = null,
-        section = null,
-        settings = requiredParam('settings')
-    ) {
+    static updateCache(project, environment = null, section = null, settings) {
+        checkParam(project, 'project', String);
+        checkParam(settings, 'settings', Object);
+
         if(environment === '*') { environment = null; }
 
         this.cacheSanityCheck(project, environment, section);
@@ -118,11 +112,9 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @returns {Object} Settings
      */
-    static getCachedSettings(
-        project = requiredParam('project'),
-        environment = null,
-        section = null,
-    ) {
+    static getCachedSettings(project, environment = null, section = null) {
+        checkParam(project, 'project', String);
+
         if(environment === '*') { environment = null; }
 
         this.cacheSanityCheck(project, environment, section);
@@ -152,12 +144,10 @@ class SettingsHelper extends SettingsHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setSettings(
-        project = requiredParam('project'),
-        environment = null,
-        section = null,
-        settings = requiredParam('settings')
-    ) {
+    static setSettings(project, environment = null, section = null, settings) {
+        checkParam(project, 'project', String);
+        checkParam(settings, 'settings', Object);
+
         if(environment === '*') { environment = null; }
 
         let apiUrl = '/api/' + project + '/';

@@ -11,17 +11,18 @@ class Entity {
     /**
      * Constructs an entity
      *
-     * @param {Object} properties
+     * @param {Object} params
      */
-    constructor(properties) {
+    constructor(params) {
         this.structure();
+        params = this.constructor.paramsCheck(params);
 
         Object.seal(this);
 
-        for(let k in properties) {
+        for(let k in params) {
             try {
-                if(typeof properties[k] !== 'undefined') {
-                    this[k] = properties[k]
+                if(typeof params[k] !== 'undefined') {
+                    this[k] = params[k]
                 }
             
             } catch(e) {
@@ -38,12 +39,28 @@ class Entity {
     }
 
     /**
+     * Checks the parameters berfore they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        return params;
+    }
+
+    /**
      * Generates a new random id
+     *
+     * @param {Number} length
      *
      * @returns {String} id
      */
-    static createId() {
-        return crypto.randomBytes(20).toString('hex');
+    static createId(length) {
+        if(!length) { length = 20; }
+        if(length < 4) { length = 4; }
+
+        return crypto.randomBytes(length).toString('hex');
     }
 
     /**
@@ -148,7 +165,7 @@ class Entity {
 
                     let thatType = thatValue.constructor;
 
-                    if(thisType.name !== thatType.name) {
+                    if(thisType.name !== thatType.name && thatValue instanceof thisType === false) {
                         throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
                     } else {
                         thisValue = thatValue; 

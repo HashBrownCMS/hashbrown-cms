@@ -18,13 +18,14 @@ class TestHelper {
      * BackupHelper test
      *
      * @param {String} project
+     * @param {Function} onMessage
      *
      * @returns {Promise}
      */
-    static testBackupHelper(
-        project = requiredParam('project'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testBackupHelper(project, onMessage) {
+        checkParam(project, 'project', String);
+        checkParam(onMessage, 'onMessage', Function);
+
         let timestamp;
 
         onMessage('Get backups for project "' + project + '"');
@@ -56,11 +57,11 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testConnectionHelper(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testConnectionHelper(project, environment, onMessage) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(onMessage, 'onMessage', Function);
+
         onMessage('Create connection')
         return ConnectionHelper.createConnection(project, environment)
         .then((testConnection) => {
@@ -90,11 +91,11 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testFormHelper(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testFormHelper(project, environment, onMessage) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(onMessage, 'onMessage', Function);
+
         onMessage('Create form')
         return FormHelper.createForm(project, environment)
         .then((testForm) => {
@@ -129,12 +130,12 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testContentHelper(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        user = requiredParam('user'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testContentHelper(project, environment, user, onMessage) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(user, 'user', HashBrown.Models.User);
+        checkParam(onMessage, 'onMessage', Function);
+
         onMessage('Create content');
         return ContentHelper.createContent(
             project,
@@ -168,10 +169,10 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testProjectHelper(
-        user = requiredParam('user'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testProjectHelper(user, onMessage) {
+        checkParam(user, 'user', HashBrown.Models.User);
+        checkParam(onMessage, 'onMessage', Function);
+
         let testProject;
 
         onMessage('Create project "Tæ$tp_r ojéct"');
@@ -209,11 +210,11 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testSchemaHelper(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        onMessage = requiredParam('onMessage')
-    ) {
+    static testSchemaHelper(project, environment, onMessage) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(onMessage, 'onMessage', Function);
+
         onMessage('Get native schemas');
         return SchemaHelper.getNativeSchemas()
         .then((nativeSchemas) => {

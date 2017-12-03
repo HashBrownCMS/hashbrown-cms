@@ -88,7 +88,7 @@ class MediaBrowser extends Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        return _.iframe({src: location.href.substring(0, location.href.indexOf('#')) + '/#/media/' + (this.value || '')});
+        return _.iframe({src: '//' + location.host  + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')});
     }
 }
 

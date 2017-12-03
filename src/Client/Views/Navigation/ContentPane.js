@@ -136,7 +136,6 @@ class ContentPane extends NavbarPane {
      * @param {String} parentId
      */
     static onClickNewContent(parentId, asSibling) {
-
         // Try to get a parent Schema if it exists
         return function getParentSchema() {
             if(parentId) {
@@ -173,6 +172,8 @@ class ContentPane extends NavbarPane {
                 schemaReference.on('change', (newValue) => {
                     schemaId = newValue;
                 });
+
+                schemaReference.pickFirstSchema();
 
                 // Render the confirmation modal
                 UI.confirmModal(
@@ -365,12 +366,14 @@ class ContentPane extends NavbarPane {
                 
                 menu['This content'] = '---';
                 
+                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+                
                 menu['New child content'] = () => {
                     this.onClickNewContent($('.context-menu-target').data('id'));
                 };
                                 
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-
                 if(!item.sync.isRemote && !item.isLocked) {
                     menu['Move'] = () => { this.onClickMoveItem(); };
                 }

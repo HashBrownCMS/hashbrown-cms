@@ -35,7 +35,7 @@ class ProjectEditor extends Crisp.View {
         let modal = new HashBrown.Views.Modals.Modal({
             title: 'Delete ' + this.model.settings.info.name,
             body: _.div({class: 'widget-group'},
-                    _.p({class: 'widget widget--label'}, 'Please input the project name to confirm'),
+                    _.p({class: 'widget widget--label'}, 'Type the project name to confirm'),
                     _.input({class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name})
                         .on('input', (e) => {
                             let $btn = modal.$element.find('.widget.warning');

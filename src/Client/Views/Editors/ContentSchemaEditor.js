@@ -9,35 +9,52 @@ const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
  */
 class ContentSchemaEditor extends SchemaEditor {
     /**
+     * Gets parent tabs
+     *
+     * @returns {Object} Parent tabs
+     */
+    getParentTabs() {
+        // Cache tab object to maintain original state
+        if(!this.parentTabs) {
+            this.parentTabs = {};
+
+            for(let tabId in this.compiledSchema.tabs) {
+                // We only want parent tabs
+                if(this.model.tabs[tabId]) { continue; }
+            
+                this.parentTabs[tabId] = this.compiledSchema.tabs[tabId];
+            }
+        }
+
+        return this.parentTabs;
+    }
+
+    /**
+     * Gets all tabs
+     *
+     * @returns {Object} All tabs
+     */
+    getAllTabs() {
+        let allTabs = {};
+        let parentTabs = this.getParentTabs();
+
+        for(let tabId in parentTabs) {
+            allTabs[tabId] = parentTabs[tabId];
+        }
+        
+        for(let tabId in this.model.tabs) {
+            allTabs[tabId] = this.model.tabs[tabId];
+        }
+
+        return allTabs;
+    }
+
+    /**
      * Renders the editor fields
      */
     renderFields() {
         let $element = super.renderFields();
 
-        // Default tab
-        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
-            options: this.compiledSchema.tabs,
-            value: this.model.defaultTabId,
-            useClearButton: true,
-            onChange: (newValue) => {
-                this.model.defaultTabId = newValue;
-            }
-        }).$element));
-        
-        // Tabs
-        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
-            disabledValue: Object.values(this.compiledSchema.tabs),
-            value: Object.values(this.model.tabs),
-            placeholder: 'New tab',
-            onChange: (newValue) => {
-                this.model.tabs = {};
-
-                for(let tab of newValue) {
-                    this.model.tabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
-                }
-            }
-        }).$element));
-        
         // Allowed child Schemas
         $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
             options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
@@ -52,12 +69,70 @@ class ContentSchemaEditor extends SchemaEditor {
             }
         }).$element));
         
+        // Default tab
+        let defaultTabEditor = new HashBrown.Views.Widgets.Dropdown({
+            options: this.getAllTabs(),
+            useClearButton: true,
+            value: this.model.defaultTabId,
+            onChange: (newValue) => {
+                this.model.defaultTabId = newValue;
+            }
+        });
+
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+        
+        $element.append(this.renderField('Default tab', defaultTabEditor.$element));
+        
+        // Tabs
+        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+            disabledValue: Object.values(this.getParentTabs()),
+            value: Object.values(this.model.tabs),
+            placeholder: 'New tab',
+            onChange: (newValue) => {
+                let newTabs = {};
+
+                for(let tab of newValue) {
+                    newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
+                }
+                
+                this.model.tabs = newTabs;
+
+                defaultTabEditor.options = this.getAllTabs();
+                defaultTabEditor.fetch();
+
+                renderFieldProperties();
+            }
+        }).$element));
+       
         // Field properties
+        let $tabs = _.div({class: 'editor--schema__tabs'});
         let $fieldProperties = _.div({class: 'editor__field'});
         
+        $element.append($tabs);
         $element.append($fieldProperties);
 
         let renderFieldProperties = () => {
+            if(!this.currentTab) {
+                this.currentTab = Object.keys(this.getAllTabs())[0] || 'meta';
+            }
+       
+            _.append($tabs.empty(),
+                _.each(this.getAllTabs(), (id, name) => {
+                    return _.button({class: 'editor--schema__tab' + (this.currentTab === id ? ' active' : '')}, name)
+                        .click(() => {
+                            this.currentTab = id;
+                    
+                            renderFieldProperties();
+                        });
+                }),
+                _.button({class: 'editor--schema__tab' + (this.currentTab === 'meta' ? ' active' : '')}, 'meta')
+                    .click(() => {
+                        this.currentTab = 'meta';
+                    
+                        renderFieldProperties();
+                    })
+            );
+
             _.append($fieldProperties.empty(),
                 _.div({class: 'editor__field__key'},
                     'Properties',
@@ -78,6 +153,11 @@ class ContentSchemaEditor extends SchemaEditor {
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                         if(!fieldValue) { return; }
 
+                        let isValidTab = !!this.getAllTabs()[fieldValue.tabId];
+
+                        if(isValidTab && fieldValue.tabId !== this.currentTab) { return; }
+                        if(!isValidTab && this.currentTab !== 'meta') { return; }
+
                         let $field = _.div({class: 'editor__field'});
 
                         // Sanity check
@@ -90,6 +170,21 @@ class ContentSchemaEditor extends SchemaEditor {
                                     fieldKey
                                 ),
                                 _.div({class: 'editor__field__value'},
+                                    _.div({class: 'editor__field'},
+                                        _.div({class: 'editor__field__key'}, 'Tab'),
+                                        _.div({class: 'editor__field__value'},
+                                            new HashBrown.Views.Widgets.Dropdown({
+                                                useClearButton: true,
+                                                options: this.getAllTabs(),
+                                                value: fieldValue.tabId,
+                                                onChange: (newValue) => {
+                                                    fieldValue.tabId = newValue;
+
+                                                    renderFieldProperties();
+                                                }
+                                            }).$element
+                                        )
+                                    ),
                                     _.div({class: 'editor__field'},
                                         _.div({class: 'editor__field__key'}, 'Key'),
                                         _.div({class: 'editor__field__value'},
@@ -162,19 +257,6 @@ class ContentSchemaEditor extends SchemaEditor {
                                         )
                                     ),
                                     _.div({class: 'editor__field'},
-                                        _.div({class: 'editor__field__key'}, 'Tab'),
-                                        _.div({class: 'editor__field__value'},
-                                            new HashBrown.Views.Widgets.Dropdown({
-                                                useClearButton: true,
-                                                options: this.compiledSchema.tabs,
-                                                value: fieldValue.tabId,
-                                                onChange: (newValue) => {
-                                                    fieldValue.tabId = newValue;
-                                                }
-                                            }).$element
-                                        )
-                                    ),
-                                    _.div({class: 'editor__field'},
                                         _.div({class: 'editor__field__key'}, 'Schema'),
                                         _.div({class: 'editor__field__value'},
                                             new HashBrown.Views.Widgets.Dropdown({
@@ -226,7 +308,9 @@ class ContentSchemaEditor extends SchemaEditor {
 
                             this.model.fields.properties.newField = {
                                 label: 'New field',
-                                schemaId: 'array'
+                                schemaId: 'array',
+                                tabId: this.currentTab
+
                             };
 
                             renderFieldProperties();

@@ -102,10 +102,10 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Array of Schemas
      */
-    static getCustomSchemas(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getCustomSchemas(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.schemas';
         let result = [];
        
@@ -131,10 +131,10 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Array of Schemas
      */
-    static getAllSchemas(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getAllSchemas(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return this.getNativeSchemas()
         .then((nativeSchemas) => {
             return this.getCustomSchemas(project, environment)
@@ -214,15 +214,15 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
+     * @param {String} id
      *
      * @return {Promise} Schema
      */
-    static getSchemaById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getSchemaById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.schemas';
 
         if(!id) {
@@ -243,12 +243,15 @@ class SchemaHelper extends SchemaHelperCommon {
         return promise
         .then((schemaData) => {
             if(schemaData && Object.keys(schemaData).length > 0) {
-                return Promise.resolve(this.getModel(schemaData));
+                return Promise.resolve(schemaData);
             
             } else {
                 return SyncHelper.getResourceItem(project, environment, 'schemas', id);
 
             }
+        })
+        .then((schemaData) => {
+            return Promise.resolve(this.getModel(schemaData));  
         });
     }
    
@@ -261,11 +264,11 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Schema with all aprent fields
      */
-    static getSchemaWithParentFields(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static getSchemaWithParentFields(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         // Get the Schema by id
         return this.getSchemaById(project, environment, id)
 
@@ -298,15 +301,15 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
+     * @param {String} id
      *
      * @return {Promise} Promise
      */
-    static removeSchemaById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id')
-    ) {
+    static removeSchemaById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
         let collection = environment + '.schemas';
         let thisSchema;
       
@@ -373,13 +376,12 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @return {Promise} Resulting Schema
      */
-    static setSchemaById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        schema = requiredParam('schema'),
-        create = false
-    ) {
+    static setSchemaById(project, environment, id, schema, create = false) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(schema, 'schema', HashBrown.Models.Schema);
+
         let collection = environment + '.schemas';
        
         schema = schema || {};
@@ -417,11 +419,11 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Created Schema
      */
-    static createSchema(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        parentSchema = requiredParam('parentSchema')
-    ) {
+    static createSchema(project, environment, parentSchema) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+
         let collection = environment + '.schemas';
         let newSchema = Schema.create(parentSchema);
 

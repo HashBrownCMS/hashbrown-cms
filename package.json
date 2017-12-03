@@ -1,7 +1,7 @@
 {
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.10.2",
+  "version": "1.0.1",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -21,13 +21,12 @@
     "marked": "^0.3.5",
     "mongodb": "^2.1.7",
     "multer": "^1.1.0",
-    "nodemailer": "^4.0.1",
     "path-to-regexp": "^1.2.1",
     "pug": "^2.0.0-beta11",
     "rimraf": "^2.5.2",
     "semver": "^5.4.1",
     "to-markdown": "^2.0.1",
-    "xoauth2": "^1.2.0"
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "babel-core": "^6.18.0",

@@ -2,12 +2,57 @@
  * A notification message
  */
 .widget--message {
-    position: absolute;
-    top: 4rem;
-    margin: 0px auto;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: $warning;
+    margin: 1rem auto;
     font-weight: 700;
-    z-index: 900;
+    border-radius: 0.2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+
+    &.expanded {
+        width: 100%;
+    }
+
+    &.fixed {
+        position: fixed;
+        z-index: 900;
+        
+        &--top {
+            left: 50%;
+            top: 2rem;
+            transform: translateX(-50%);
+        }
+        
+        &--bottom {
+            left: 50%;
+            bottom: 2rem;
+            transform: translateX(-50%);
+        }
+        
+        &--left {
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%);
+        }
+        
+        &--right {
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+        }
+    }
+
+    &.warning {
+        background-color: $warning;
+        color: $warning-text;
+    }
+    
+    &.primary {
+        background-color: $primary;
+        color: $primary-text;
+    }
+    
+    &.secondary {
+        background-color: $secondary;
+        color: $secondary-text;
+    }
 }

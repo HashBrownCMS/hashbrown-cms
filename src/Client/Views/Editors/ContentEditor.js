@@ -119,7 +119,7 @@ class ContentEditor extends Crisp.View {
         })
         .catch((e) => {
             this.$saveBtn.toggleClass('working', false);
-            UI.errorModal();
+            UI.errorModal(e);
         });
     }
 
@@ -229,7 +229,7 @@ class ContentEditor extends Crisp.View {
                     config: config || {},
                     description: fieldDefinition.description || '',
                     schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual,
+                    multilingual: fieldDefinition.multilingual === true,
                     $keyActions: $keyActions
                 });
 
@@ -277,9 +277,9 @@ class ContentEditor extends Crisp.View {
         for(let key in fieldDefinitions) {
             let fieldDefinition = fieldDefinitions[key];
 
-            let noTabAssigned = !fieldDefinition.tabId;
+            let noTabAssigned = !this.schema.tabs[fieldDefinition.tabId];
             let isMetaTab = tabId === 'meta';
-            let thisTabAssigned = fieldDefinition.tabId == tabId;
+            let thisTabAssigned = fieldDefinition.tabId === tabId;
 
             // Don't include "properties" field, if this is the meta tab
             if(isMetaTab && key === 'properties') {
@@ -360,7 +360,7 @@ class ContentEditor extends Crisp.View {
      * Renders the editor
      *
      * @param {Content} content
-     * @param {Object} schema
+     * @param {ContentSchema} schema
      *
      * @return {Object} element
      */
@@ -428,6 +428,9 @@ class ContentEditor extends Crisp.View {
 
             if(connection && connection.url) {
                 remoteUrl = connection.url + url;
+
+                // Remove unnecessary slashes
+                remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
             }
         }
             
@@ -452,7 +455,7 @@ class ContentEditor extends Crisp.View {
                         ).click(() => { this.onClickSave(); }),
                         _.if(connection,
                             _.span({class: 'widget widget--button widget-group__separator'}, '&'),
-                            _.select({class: 'widget widget--button condensed'},
+                            _.select({class: 'widget widget--button'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
                                 _.if(this.model.isPublished, 
@@ -494,6 +497,8 @@ class ContentEditor extends Crisp.View {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
+
+            this.schema = contentSchema;
 
             this.$element.html(
                 this.renderEditor(this.model, contentSchema)

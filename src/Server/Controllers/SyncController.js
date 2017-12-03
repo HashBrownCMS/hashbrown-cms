@@ -1,15 +1,11 @@
 'use strict';
 
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
-const ApiController = require('./ApiController');
-
 /**
  * The controller for sync
  *
  * @memberof HashBrown.Server.Controllers
  */
-class SyncController extends ApiController {
+class SyncController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -21,7 +17,7 @@ class SyncController extends ApiController {
      * Logs in a user remotely
      */
     static postLogin(req, res) {
-        SyncHelper.renewToken(req.params.project, req.body.username, req.body.password)
+        HashBrown.Helpers.SyncHelper.renewToken(req.params.project, req.body.username, req.body.password)
         .then((token) => {
             res.status(200).send(token);
         })

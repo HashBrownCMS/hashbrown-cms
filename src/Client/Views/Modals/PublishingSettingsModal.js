@@ -4,6 +4,8 @@ const Modal = require('./Modal');
 
 /**
  * A dialog for editing publishing settings for Content nodes
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 class PublishingSettingsModal extends Modal {
     /**
@@ -60,6 +62,7 @@ class PublishingSettingsModal extends Modal {
                         value: this.value.connectionId,
                         valueKey: 'id',
                         labelKey: 'title',
+                        useClearButton: true,
                         onChange: (newValue) => {
                             this.value.connectionId = newValue;
                         }

@@ -2,11 +2,6 @@
 
 const BodyParser = require('body-parser');
 
-const FormHelper = require('Server/Helpers/FormHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
-const ApiController = require('./ApiController');
-
 const SUBMISSION_TIMEOUT_MS = 1000;
 
 // Private vars
@@ -18,7 +13,7 @@ let lastIp = '';
  *
  * @memberof HashBrown.Server.Controllers
  */
-class FormsController extends ApiController {
+class FormsController extends require('./ApiController') {
     /**
      * Initialises this controller
      */
@@ -46,17 +41,24 @@ class FormsController extends ApiController {
      * @returns {Promise} Result
      */
     static checkCORS(req, res) {
-        return FormHelper.getForm(req.params.project, req.params.environment, req.params.id)
+        return HashBrown.Helpers.FormHelper.getForm(req.params.project, req.params.environment, req.params.id)
         .then((form) => {
             return Promise.resolve(form.allowedOrigin || '*');
         });
     }
 
     /**
-     * Gets all forms
+     * @example GET /api/:project/:environment/forms
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Array} Forms
      */
     static getAllForms(req, res) {
-        FormHelper.getAllForms(req.project, req.environment)
+        HashBrown.Helpers.FormHelper.getAllForms(req.project, req.environment)
         .then((forms) => {
             res.status(200).send(forms);
         })
@@ -66,10 +68,16 @@ class FormsController extends ApiController {
     }
     
     /**
-     * Deletes a single Form by id
+     * @example DELETE /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      */
     static deleteForm(req, res) {
-        FormHelper.deleteForm(req.project, req.environment, req.params.id)
+        HashBrown.Helpers.FormHelper.deleteForm(req.project, req.environment, req.params.id)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -79,16 +87,24 @@ class FormsController extends ApiController {
     }
     
     /**
-     * Pulls Form by id
+     * @example POST /api/:project/:environment/forms/pull/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {Form} The pulled Form
      */
     static pullForm(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, req.environment, 'forms', id)
+        HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'forms', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Form "' + id + '"')); }
        
-            return FormHelper.setForm(req.project, req.environment, id, resourceItem)
+            return HashBrown.Helpers.FormHelper.setForm(req.project, req.environment, id, resourceItem)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -99,14 +115,22 @@ class FormsController extends ApiController {
     }
     
     /**
-     * Pushes Form by id
+     * @example POST /api/:project/:environment/forms/push/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {Form} The pushed Form id
      */
     static pushForm(req, res) {
         let id = req.params.id;
 
-        FormHelper.getForm(req.project, req.environment, id)
+        HashBrown.Helpers.FormHelper.getForm(req.project, req.environment, id)
         .then((localForm) => {
-            return SyncHelper.setResourceItem(req.project, req.environment, 'forms', id, localForm);
+            return HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'forms', id, localForm);
         })
         .then(() => {
             res.status(200).send(id);
@@ -117,10 +141,18 @@ class FormsController extends ApiController {
     }
 
     /**
-     * Gets a single form by id
+     * @example GET /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {Form} Form
      */
     static getForm(req, res) {
-        FormHelper.getForm(req.project, req.environment, req.params.id)
+        HashBrown.Helpers.FormHelper.getForm(req.project, req.environment, req.params.id)
         .then((form) => {
             res.status(200).send(form.getObject());
         })
@@ -130,10 +162,18 @@ class FormsController extends ApiController {
     }
     
     /**
-     * Gets all entries from a Form as CSV
+     * @example GET /api/:project/:environment/forms/:id/entries
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @returns {String} CSV string
      */
     static getAllEntries(req, res) {
-        FormHelper.getForm(req.project, req.environment, req.params.id)
+        HashBrown.Helpers.FormHelper.getForm(req.project, req.environment, req.params.id)
         .then((form) => {
             let csv = '';
 
@@ -165,12 +205,22 @@ class FormsController extends ApiController {
     }
     
     /**
-     * Sets a single form by id
+     * @example POST /api/:project/:environment/forms/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @param {Form} The Form model to update
+     *
+     * @returns {Form} Form
      */
     static postForm(req, res) {
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
         
-        FormHelper.setForm(req.project, req.environment, req.params.id, req.body, shouldCreate)
+        HashBrown.Helpers.FormHelper.setForm(req.project, req.environment, req.params.id, new HashBrown.Models.Form(req.body), shouldCreate)
         .then((form) => {
             res.status(200).send(form.getObject());
         })
@@ -180,10 +230,17 @@ class FormsController extends ApiController {
     }
 
     /**
-     * Creates a form
+     * @example POST /api/:project/:environment/forms/new
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {String} The created Form id
      */
     static postNew(req, res) {
-        FormHelper.createForm(req.project, req.environment)
+        HashBrown.Helpers.FormHelper.createForm(req.project, req.environment)
         .then((form) => {
             res.status(200).send(form.id);
         })
@@ -193,7 +250,15 @@ class FormsController extends ApiController {
     }
 
     /**
-     * Submits a form
+     * @example POST /api/:project/:environment/forms/:id/submit
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @param {Object} entries The submitted entries
      */
     static postSubmit(req, res) {
         // Prevent spam
@@ -204,7 +269,7 @@ class FormsController extends ApiController {
             lastSubmission = Date.now();
             lastIp = req.connection.remoteAddress;
 
-            FormHelper.addEntry(req.project, req.environment, req.params.id, req.body)
+            HashBrown.Helpers.FormHelper.addEntry(req.project, req.environment, req.params.id, req.body)
             .then((form) => {
                 if(form.redirect) {
                     let redirectUrl = form.redirect;
@@ -225,21 +290,27 @@ class FormsController extends ApiController {
             });
         
         } else {
-            res.status(400).send(ApiController.printError(new Error('Spam prevention triggered. Please try again later.')));
+            res.status(400).send(FormsController.printError(new Error('Spam prevention triggered. Please try again later.')));
         
         }
     }
 
     /**
-     * Clears all form entries
+     * @example POST /api/:project/:environment/forms/clear/:id
+     *
+     * @apiGroup Forms
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      */
     static postClearAllEntries(req, res) {
-        FormHelper.clearAllEntries(req.project, req.environment, req.params.id)
+        HashBrown.Helpers.FormHelper.clearAllEntries(req.project, req.environment, req.params.id)
         .then(() => {
             res.sendStatus(200);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.printError(e));
+            res.status(502).send(FormsController.printError(e));
         });
     }
 }

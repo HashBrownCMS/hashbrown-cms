@@ -186,6 +186,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
   margin: 0; }
   .page--dashboard__body__container {
+    width: calc(100% - 2rem);
     max-width: 60rem;
     margin: 0 auto; }
 
@@ -196,6 +197,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -0.5rem; }
+  @media (max-width: 767px) {
+    .page--dashboard__projects__list {
+      flex-direction: column; } }
   .page--dashboard__projects__list .cr-placeholder {
     padding: 1rem;
     margin: 0.5rem;
@@ -243,6 +247,12 @@ h1, h2, h3, h4, h5, h6 {
 .page--environment.media-picker .page--environment__space--menu,
 .page--environment.media-picker .page--environment__space--editor .editor__header {
   display: none; }
+
+.page--environment__demo__reset {
+  position: fixed !important;
+  z-index: 9999;
+  bottom: 1rem;
+  left: 1rem; }
 
 .page--environment__spaces {
   display: flex;
@@ -312,6 +322,14 @@ h1, h2, h3, h4, h5, h6 {
   transform-origin: center;
   transition: transform 0.25s ease;
   box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
+  @media (max-width: 991px) {
+    .page--dashboard__project {
+      flex-basis: calc(50% - 1rem);
+      width: calc(50% - 1rem); } }
+  @media (max-width: 767px) {
+    .page--dashboard__project {
+      flex-basis: 0;
+      width: auto; } }
   .page--dashboard__project__remove {
     padding: 0rem;
     position: absolute;
@@ -779,6 +797,7 @@ h1, h2, h3, h4, h5, h6 {
       flex-basis: 10rem;
       flex-shrink: 0;
       margin-right: 1rem;
+      padding-top: 0.25rem;
       line-height: 1.5rem; }
       .editor__field__key.following .editor__field__key__actions {
         position: fixed;
@@ -967,6 +986,34 @@ h1, h2, h3, h4, h5, h6 {
 /**
  * The editor for Schemas
  */
+.editor--schema__tabs {
+  display: flex;
+  background-color: #666666;
+  padding: 1rem 0 0 1rem;
+  height: 4rem;
+  margin: 0 -1rem; }
+
+.editor--schema__tab {
+  padding: 0 2rem;
+  border-top-left-radius: 0.2rem;
+  border-top-right-radius: 0.2rem;
+  display: inline-block;
+  height: 3rem;
+  line-height: 3rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 0;
+  background-color: #dddddd;
+  color: #666666;
+  margin-right: 0.5rem; }
+  .editor--schema__tab:hover {
+    color: #ffffff;
+    background-color: #e70d3b; }
+  .editor--schema__tab.active {
+    pointer-events: none;
+    background-color: #eeeeee;
+    color: #333333; }
+
 /**
  * The Media viewer
  */
@@ -977,7 +1024,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .editor--media__preview {
   max-width: 90%;
-  max-height: 90%; }
+  max-height: 90vh; }
 
 /**
  * A rich text editor
@@ -1509,7 +1556,8 @@ h1, h2, h3, h4, h5, h6 {
       margin-bottom: 0.5rem; }
     .widget-group > .widget {
       border-radius: 0 !important;
-      flex-grow: 1; }
+      flex-grow: 1;
+      flex-basis: 0; }
     .widget-group:not(.vertical) > .widget:first-child {
       border-top-left-radius: 0.2rem !important;
       border-bottom-left-radius: 0.2rem !important; }
@@ -1572,14 +1620,41 @@ h1, h2, h3, h4, h5, h6 {
  * A notification message
  */
 .widget--message {
-  position: absolute;
-  top: 4rem;
-  margin: 0px auto;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #FFB300;
+  margin: 1rem auto;
   font-weight: 700;
-  z-index: 900; }
+  border-radius: 0.2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem; }
+  .widget--message.expanded {
+    width: 100%; }
+  .widget--message.fixed {
+    position: fixed;
+    z-index: 900; }
+    .widget--message.fixed--top {
+      left: 50%;
+      top: 2rem;
+      transform: translateX(-50%); }
+    .widget--message.fixed--bottom {
+      left: 50%;
+      bottom: 2rem;
+      transform: translateX(-50%); }
+    .widget--message.fixed--left {
+      top: 50%;
+      left: 2rem;
+      transform: translateY(-50%); }
+    .widget--message.fixed--right {
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%); }
+  .widget--message.warning {
+    background-color: #FFB300;
+    color: #664800; }
+  .widget--message.primary {
+    background-color: #e70d3b;
+    color: #ffffff; }
+  .widget--message.secondary {
+    background-color: #21303b;
+    color: #ffffff; }
 
 /**
  * A graphical separator
@@ -1713,7 +1788,7 @@ h1, h2, h3, h4, h5, h6 {
   .widget--button.list-item {
     text-align: left;
     text-transform: none; }
-  .widget--button .fa:not(:last-child) {
+  .widget--button .fa:first-child {
     margin-right: 0.5rem; }
 
 /**
@@ -1872,23 +1947,16 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden; }
   .widget--input.checkbox {
     width: 2rem;
-    height: 2rem;
     flex-basis: 2rem;
+    height: 2rem;
     flex-grow: 0;
     flex-shrink: 0;
-    background-color: #e70d3b;
     border-radius: 0.2rem;
     margin: 0; }
-    .widget--input.checkbox:hover {
-      background-color: #b70a2f; }
     .widget--input.checkbox.working:after {
       color: #ffffff; }
-  .widget--input__checkbox-input, .widget--input__checkbox-extra {
+  .widget--input__checkbox-input, .widget--input__checkbox-switch, .widget--input__checkbox-background {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     margin: 0 !important; }
   .widget--input__checkbox-label {
     line-height: 2rem;
@@ -1907,21 +1975,39 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom-right-radius: 0.2rem;
     position: absolute;
     white-space: nowrap;
-    left: 2rem;
+    left: 4rem;
     border-left: 1px solid #ffffff; }
     .widget--input__checkbox-label:hover {
       background-color: #b70a2f; }
   .widget--input__checkbox-input {
     cursor: pointer;
-    opacity: 0; }
-  .widget--input__checkbox-extra {
+    opacity: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; }
+  .widget--input__checkbox-background {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #dddddd;
     pointer-events: none;
-    display: none;
-    line-height: 2rem;
-    text-align: center;
-    color: #ffffff; }
-  .widget--input__checkbox-input:checked + .widget--input__checkbox-extra {
-    display: block; }
+    border-radius: inherit;
+    transition: background-color 0.33s ease; }
+  .widget--input__checkbox-switch {
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 0.8rem;
+    height: 1.6rem;
+    pointer-events: none;
+    border-radius: 0.2rem;
+    transition: transform 0.33s ease;
+    background-color: #ffffff; }
+  .widget--input__checkbox-input:checked ~ .widget--input__checkbox-switch {
+    transform: translateX(0.8rem); }
+  .widget--input__checkbox-input:checked ~ .widget--input__checkbox-background {
+    background-color: #e70d3b; }
 
 /**
  * A dropdown widget with typeahead
@@ -2012,12 +2098,19 @@ h1, h2, h3, h4, h5, h6 {
     text-overflow: ellipsis;
     overflow: hidden;
     user-select: none; }
-    .widget--dropdown__value .fa {
+    .widget--dropdown__value__tool-icon {
       text-align: center;
-      height: calc(2rem - 2px);
-      line-height: calc(2rem - 2px);
+      height: 2rem;
+      line-height: 2rem;
       width: 2rem;
       display: block; }
+    .widget--dropdown__value__icon {
+      display: inline-block;
+      width: 2rem;
+      line-height: 2rem;
+      margin-left: -0.5rem;
+      margin-right: 0.5rem;
+      text-align: center; }
   .widget--dropdown__toggle {
     position: absolute;
     user-select: none;
@@ -2125,6 +2218,13 @@ h1, h2, h3, h4, h5, h6 {
         position: absolute;
         font-family: 'FontAwesome';
         content: '\F00C'; }
+    .widget--dropdown__option__icon {
+      display: inline-block;
+      width: 2rem;
+      line-height: 2rem;
+      margin-left: -0.5rem;
+      margin-right: 0.5rem;
+      text-align: center; }
   .widget--dropdown__clear {
     border: 0;
     height: 2rem;
@@ -2168,6 +2268,8 @@ h1, h2, h3, h4, h5, h6 {
     pointer-events: none; }
   .widget--spinner.embedded {
     position: absolute; }
+  .widget--spinner.embedded .widget--spinner__image {
+    left: 50%; }
   .widget--spinner__inner {
     position: absolute;
     top: 0%;

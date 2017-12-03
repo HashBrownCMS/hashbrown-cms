@@ -163,22 +163,24 @@ class UIHelper {
         }
 
         _.each(children, (i, child) => {
-            if(isActive) {
-                child.setAttribute('draggable', true);
-            } else {
-                child.removeAttribute('draggable');
-            }
+            child.draggable = isActive;
 
             if(isActive) {
-                child.ondrag = (e) => {
+                child.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', '');
+                };
+
+                parentElement.ondragover = (e) => {
                     if(!canSort) { return; }
-                    
+
+                    let bodyRect = document.body.getBoundingClientRect();
+
                     _.each(children, (i, sibling) => {
                         if(sibling === child || !canSort || e.pageY < 1) { return; }
 
                         let cursorY = e.pageY;
-                        let childY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-                        let siblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let childY = child.getBoundingClientRect().y - bodyRect.y;
+                        let siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
                         let hasMoved = false;
 
                         // Dragging above a sibling
@@ -223,6 +225,7 @@ class UIHelper {
             } else {
                 child.ondragstart = null;
                 child.ondrag = null;
+                parentElement.ondragover = null;
                 child.ondragstop = null;
                 child.ondragcancel = null;
             }

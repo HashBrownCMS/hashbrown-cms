@@ -1,6 +1,9 @@
 'use strict';
 
-class GitHubPagesConnectionEditor extends Crisp.View {
+class GitHubDeployerEditor extends Crisp.View {
+    // Alias
+    static get alias() { return 'github'; }
+
     /**
      * Constructor
      */
@@ -17,35 +20,6 @@ class GitHubPagesConnectionEditor extends Crisp.View {
         return HashBrown.Helpers.RequestHelper.customRequest('get', '/plugins/github/orgs/?connectionId=' + Router.params.id);
     };
    
-    /**
-     * Render local switch
-     */
-    renderLocalSwitch() {
-        return new HashBrown.Views.Widgets.Input({
-            value: this.model.isLocal,
-            type: 'checkbox',
-            onChange: (isLocal) => {
-                this.model.isLocal = isLocal;
-
-                this.fetch();
-            }
-        }).$element;
-    }
-
-    /**
-     * Render local path editor
-     */
-    renderLocalPathEditor() {
-        return new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            value: this.model.localPath,
-            placeholder: 'Input local path',
-            onChange: (newValue) => {
-                this.model.localPath = newValue;
-            }
-        }).$element;
-    }
-    
     /**
      * Render token editor
      */
@@ -64,7 +38,7 @@ class GitHubPagesConnectionEditor extends Crisp.View {
                     let w = window.open('/plugins/github/oauth/start');
 
                     w.addEventListener('load', () => {
-                        this.model.token = w.document.body.innerHTML;
+                        this.model.token = w.docuer.body.innerHTML;
 
                         this.fetch();
                         
@@ -144,50 +118,32 @@ class GitHubPagesConnectionEditor extends Crisp.View {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'github-editor'},
-            // Local switch
+        return _.div({class: 'deployer-editor deployer-editor--github'},
+            // Token
             _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Local'),
+                _.div({class: 'editor__field__key'}, 'Token'),
                 _.div({class: 'editor__field__value'},
-                    this.renderLocalSwitch()
+                    this.renderTokenEditor()
                 )
             ),
-            _.if(this.model.isLocal,
-                // Path
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Local path'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderLocalPathEditor()
-                    )
+            
+            // Repo picker
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Repository'),
+                _.div({class: 'editor__field__value'},
+                    this.renderRepoPicker()
                 )
             ),
-            _.if(!this.model.isLocal,
-                // Token
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Token'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderTokenEditor()
-                    )
-                ),
-                
-                // Repo picker
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Repository'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderRepoPicker()
-                    )
-                ),
-                
-                // Branch picker
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Branch'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderBranchPicker()
-                    )
+            
+            // Branch picker
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Branch'),
+                _.div({class: 'editor__field__value'},
+                    this.renderBranchPicker()
                 )
             )
         );
     }
 }
 
-HashBrown.Views.Editors.ConnectionEditors['GitHub Pages'] = GitHubPagesConnectionEditor;
+HashBrown.Views.Editors.DeployerEditors.GitHub = GitHubDeployerEditor;

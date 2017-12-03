@@ -50,7 +50,7 @@ class ProjectHelper {
      *
      * @param {String} project
      *
-     * returns {Promise} Promise
+     * @returns {Promise} Promise
      */
     static projectExists(project) {
         return DatabaseHelper.collectionExists(project, 'settings');
@@ -62,7 +62,7 @@ class ProjectHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * returns {Promise} Promise
+     * @returns {Promise} Promise
      */
     static environmentExists(project, environment) {
         if(!environment) {
@@ -82,9 +82,9 @@ class ProjectHelper {
      *
      * @returns {Promise} Result
      */
-    static checkProject(
-        project = requiredParam('project')
-    ) {
+    static checkProject(project) {
+        checkParam(project, 'project', String);
+
         return this.projectExists(project)
         .then((projectExists) => {
             if(!projectExists) {
@@ -103,10 +103,9 @@ class ProjectHelper {
      *
      * @returns {Promise} Result
      */
-    static toggleProjectSync(
-        id = requiredParam('id'),
-        isEnabled
-    ) {
+    static toggleProjectSync(id, isEnabled) {
+        checkParam(id, 'id', String);
+
         return HashBrown.Helpers.DatabaseHelper.findOne(id, 'settings', { usedBy: 'project' })
         .then((projectSettings) => {
             return Promise.resolve(projectSettings || { usedBy: 'project' });
@@ -231,10 +230,9 @@ class ProjectHelper {
      *
      * @returns {Promise} Promise
      */
-    static deleteProject(
-        id = requiredParam('id'),
-        makeBackup = true
-    ) {
+    static deleteProject(id, makeBackup = true) {
+        checkParam(id, 'id', String);
+
         return this.checkProject(id)
         .then(() => {
             // Make backup first, if specified
@@ -259,10 +257,10 @@ class ProjectHelper {
      *
      * @returns {Promise} New environment
      */
-    static addEnvironment(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static addEnvironment(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return this.checkProject(project)
         .then(() => {
             // Check if project is synced first
@@ -290,10 +288,10 @@ class ProjectHelper {
      *
      * @returns {Promise} Promise
      */
-    static deleteEnvironment(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static deleteEnvironment(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         return this.checkProject(project)
         .then(() => {
             // Check if project is synced first
@@ -356,6 +354,9 @@ class ProjectHelper {
      * @returns {Promise} The new Project
      */
     static createProject(name, userId) {
+        checkParam(name, 'name', String);
+        checkParam(userId, 'userId', String);
+        
         if(!name || !userId) {
             return Promise.reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
         }

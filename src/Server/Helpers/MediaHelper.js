@@ -70,34 +70,32 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @param {String} dirPath
      * @param {Function} callback
+     * @param {Number} position
      */
-    static mkdirRecursively(
-        dirPath = requiredParam('dirPath'),
-        callback = null
-    ) {
-        let parents = dirPath.split('/');
-        let finalPath = '/';
-
-        for(let i in parents) {
-            if(!parents[i]) { continue; }
-
-            finalPath += parents[i];
-
-            if(!FileSystem.existsSync(finalPath)) {
-                debug.log('Creating parent directory ' + finalPath + '...', this);
-                FileSystem.mkdirSync(finalPath);
+    static mkdirRecursively(dirPath, callback = null, position = 0) {
+        checkParam(dirPath, 'dirPath', String);
+        
+        let parts = Path.normalize(dirPath).split(Path.sep);
+        
+        if(position >= parts.length) {      
+            if(callback) {
+                callback();
             }
-
-            if(i < parents.length - 1) {
-                finalPath += '/';
+            
+            return;
+        }
+        
+        let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
+          
+        if(currentDirPath) {
+            if(!FileSystem.existsSync(currentDirPath)) {
+                FileSystem.mkdirSync(currentDirPath);
             }
         }
         
-        if(callback) {
-            callback();
-        }
+        MediaHelper.mkdirRecursively(dirPath, callback, position + 1);
     }
-
+    
     /**
      * Sets a Media object
      *
@@ -106,10 +104,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setMediaData(
-        id = requiredParam('id'),
-        file = requiredParam('file')
-    ) {
+    static setMediaData(id, file) {
+        checkParam(id, 'id', Number);
+        checkParam(file, 'file', Object);
+
         return new Promise((resolve, reject) => {
             let oldPath = file.path;
             let name = Path.basename(oldPath);
@@ -164,7 +162,56 @@ class MediaHelper extends MediaHelperCommon {
 
         });
     }
-    
+
+    /**
+     * Uploads a file from temp storage
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} tempPath
+     *
+     * @returns {Promise} Result
+     */
+    static uploadFromTemp(project, environment, id, tempPath) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(tempPath, 'tempPath', String);
+
+        let connection;
+        let filename = Path.basename(tempPath);
+
+        // Get Media provider
+        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
+        .then((provider) => {
+            connection = provider;
+
+            // Read the file from temp
+            return new Promise((resolve, reject)  => {
+                FileSystem.readFile(tempPath, (err, fileData) => {
+                    if(err) { return reject(err); }
+
+                    resolve(fileData);
+                });
+            });
+        })
+        .then((fileData) => {
+            // Upload the data
+            return connection.setMedia(id, filename, fileData.toString('base64'));
+        })
+        .then(() => {
+            // Remove the file from temp storage
+            return new Promise((resolve, reject)  => {
+                FileSystem.unlink(tempPath, (err) => {
+                    if(err) { return reject(err); }
+
+                    resolve();
+                });
+            });
+        });
+    }
+
     /**
      * Gets the Media tree
      *
@@ -177,10 +224,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} Tree
      */
-    static getTree(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
+    static getTree(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
         let collection = environment + '.media';
        
         return SyncHelper.getResource(project, environment, 'media/tree')
@@ -225,12 +272,12 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setTreeItem(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),       
-        id = requiredParam('id'),
-        item = requiredParam('item')
-    ) {
+    static setTreeItem(project, environment, id, item) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(item, 'item', Object);
+
         return SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
         .then((wasItemSet) => {
             if(wasItemSet) { return Promise.resolve(); }        
@@ -271,16 +318,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @returns {String} path
      */
-    static getTempPath(
-        project = requiredParam('project')
-    ) {
-        let path = 
-            appRoot +
-            '/storage/' +
-            project +
-            '/temp';
+    static getTempPath(project) {
+        checkParam(project, 'project', String);
 
-        return path;
+        return Path.join(appRoot, 'storage', project, 'temp');
     }
 }
 
