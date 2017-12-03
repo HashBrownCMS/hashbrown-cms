@@ -64,6 +64,11 @@ class ViewController extends Controller {
             });
         });
 
+        // First time setup
+        app.get('/setup/:step', (req, res) => {
+            res.render('setup', { step: req.params.step });
+        });
+
         // Login
         app.get('/login/', (req, res) => {
             if(req.query.inviteToken) {
@@ -82,9 +87,11 @@ class ViewController extends Controller {
             } else {
                 UserHelper.getAllUsers()
                 .then((users) => {
-                    res.render('login', {
-                        firstTime: !users || users.length < 1
-                    });
+                    if(!users || users.length < 1) { 
+                        res.redirect('/setup/1');
+                    } else {
+                        res.render('login');
+                    }
                 })
                 .catch((e) => {
                     res.render('login', {

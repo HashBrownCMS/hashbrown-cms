@@ -130,6 +130,29 @@ h1, h2, h3, h4, h5, h6 {
     .page--login__login__body .widget {
       margin-bottom: 1rem; }
 
+.page--setup {
+  background-color: #21303b;
+  height: 100%;
+  background-image: url("/img/bg-secondary.jpg");
+  background-attachment: fixed;
+  background-position: 0px 0px; }
+  .page--setup__step {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 374px;
+    transform: translate(-50%, -50%);
+    padding: 40px;
+    color: #ffffff;
+    background-color: transparent;
+    text-align: center; }
+    .page--setup__step__heading {
+      margin-bottom: 2rem; }
+      .page--setup__step__heading h2 {
+        margin-top: 0px; }
+    .page--setup__step__body .widget {
+      margin-bottom: 1rem; }
+
 /**
  * The dashboard page
  */

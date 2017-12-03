@@ -11,24 +11,23 @@ html
         link(href='/css/client.css', rel='stylesheet')
         
         title HashBrown CMS
-    body.page.page--login
+    body.page.page--setup
         if(message)
             .widget.widget--message.fixed.fixed--top.warning
                 | #{message}
 
-
-        form.page--login__login(data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
-            .page--login__login__heading
-                img.page--login__logo(src='/svg/logo_pink.svg')
-                h2 HashBrown
-            .page--login__login__body
-                    if(invitedUser)
-                        .widget.widget--message.expanded.secondary
-                            | Activate the account for #{invitedUser.email}
-                        input(type='text', id='full-name', class='widget widget--input text tall expanded', placeholder='Full name (optional)')
+        form(class='page--setup__step page--setup__step-' + step)
+            .page--setup__step__heading
+                h2 Step #{step}
+            .page--setup__step__body
+                if(step == 1)
+                    .widget.widget--message.expanded.secondary
+                        | Please create your first admin account
                     input.widget.widget--input.tall.expanded.text(type='text', id='username', placeholder='Username')
                     input.widget.widget--input.tall.expanded.text(type='password', id='password', placeholder='Password')
-                    input.widget.widget--button.expanded(type='submit', value=(invitedUser || firstTime ? 'Create' : 'Login'))
+                    input.widget.widget--button.expanded(type='submit', value='Create')
+                
+                if(step == 2)
+                    | STEP 2
     
         script(src='/lib/jquery/jquery.min.js')
-        script(src='/js/login.js')
