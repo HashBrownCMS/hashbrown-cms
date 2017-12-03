@@ -26,14 +26,14 @@ class ContentController extends require('./ApiController') {
     }
    
     /**
-     * @api {post} /api/:project/:environment/content/example
+     * @example POST /api/:project/:environment/content/example
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiSuccess {String} OK
+     * @returns {String} OK
      */
     static createExampleContent(req, res) {
         HashBrown.Helpers.ContentHelper.createExampleContent(req.project, req.environment, req.user)
@@ -46,14 +46,14 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {get} /api/:project/:environment/content
+     * @example GET /api/:project/:environment/content
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiSuccess {Array} Content nodes
+     * @returns {Array} Content nodes
      */
     static getAllContents(req, res) {
         HashBrown.Helpers.ContentHelper.getAllContents(req.project, req.environment)
@@ -66,15 +66,15 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {get} /api/:project/:environment/content/:id
+     * @example GET /api/:project/:environment/content/:id
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiSuccess {Content} Content
+     * @returns {Content} Content
      */
     static getContent(req, res) {
         let id = req.params.id;
@@ -95,16 +95,16 @@ class ContentController extends require('./ApiController') {
     }
     
     /**
-     * @api {post} /api/:project/:environment/content/preview
+     * @example POST /api/:project/:environment/content/preview
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiParam {Content} content The Content model to preview
+     * @param {Content} content The Content model to preview
      *
-     * @apiSuccess {String} Preview URL
+     * @returns {String} Preview URL
      */
     static previewContent(req, res) {
         let content = new HashBrown.Models.Content(req.body);
@@ -119,19 +119,19 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {post} /api/:project/:environment/content/new/:schemaId
+     * @example POST /api/:project/:environment/content/new/:schemaId
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} schemaId
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} schemaId
      *
-     * @apiParam {String} sort A sorting index (optional)
-     * @apiParam {String} parent A parent id (optional)
-     * @apiParam {Content} content The Content model to create (optional)
+     * @param {String} sort A sorting index (optional)
+     * @param {String} parent A parent id (optional)
+     * @param {Content} content The Content model to create (optional)
      *
-     * @apiSuccess {Content} The created Content node
+     * @returns {Content} The created Content node
      */
     static createContent(req, res) {
         let parentId = req.query.parent;
@@ -154,17 +154,17 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {post} /api/:project/:environment/content/:id
+     * @example POST /api/:project/:environment/content/:id
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiParam {Content} content The Content model to update
+     * @param {Content} content The Content model to update
      *
-     * @apiSuccess {Content} The created Content node
+     * @returns {Content} The created Content node
      */
     static postContent(req, res) {
         let id = req.params.id;
@@ -181,15 +181,15 @@ class ContentController extends require('./ApiController') {
     }
    
     /**
-     * @api {post} /api/:project/:environment/content/pull/:id
+     * @example POST /api/:project/:environment/content/pull/:id
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiSuccess {Content} The pulled Content node
+     * @returns {Content} The pulled Content node
      */
     static pullContent(req, res) {
         let id = req.params.id;
@@ -209,15 +209,15 @@ class ContentController extends require('./ApiController') {
     }
     
     /**
-     * @api {post} /api/:project/:environment/content/push/:id
+     * @example POST /api/:project/:environment/content/push/:id
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiSuccess {String} The pushed Content id
+     * @returns {String} The pushed Content id
      */
     static pushContent(req, res) {
         let id = req.params.id;
@@ -235,16 +235,16 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {post} /api/:project/:environment/content/publish
+     * @example POST /api/:project/:environment/content/publish
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiParam {Content} content the Content model to publish
+     * @param {Content} content the Content model to publish
      *
-     * @apiSuccess {String} The published Content
+     * @returns {String} The published Content
      */
     static publishContent(req, res) {
         let content = new HashBrown.Models.Content(req.body);
@@ -259,16 +259,16 @@ class ContentController extends require('./ApiController') {
     }
     
     /**
-     * @api {post} /api/:project/:environment/content/unpublish
+     * @example POST /api/:project/:environment/content/unpublish
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiParam {Content} content the Content model to unpublish
+     * @param {Content} content the Content model to unpublish
      *
-     * @apiSuccess {String} The unpublished Content
+     * @returns {String} The unpublished Content
      */
     static unpublishContent(req, res) {
         let content = new HashBrown.Models.Content(req.body);
@@ -283,15 +283,15 @@ class ContentController extends require('./ApiController') {
     }
 
     /**
-     * @api {delete} /api/:project/:environment/content/:id
+     * @example DELETE /api/:project/:environment/content/:id
      *
      * @apiGroup Content
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiSuccess {String} The deleted Content id
+     * @returns {String} The deleted Content id
      */
     static deleteContent(req, res) {
         let id = req.params.id;

@@ -50,7 +50,7 @@ class ProjectHelper {
      *
      * @param {String} project
      *
-     * returns {Promise} Promise
+     * @returns {Promise} Promise
      */
     static projectExists(project) {
         return DatabaseHelper.collectionExists(project, 'settings');
@@ -62,7 +62,7 @@ class ProjectHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * returns {Promise} Promise
+     * @returns {Promise} Promise
      */
     static environmentExists(project, environment) {
         if(!environment) {

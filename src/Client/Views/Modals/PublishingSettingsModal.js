@@ -4,6 +4,8 @@ const Modal = require('./Modal');
 
 /**
  * A dialog for editing publishing settings for Content nodes
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 class PublishingSettingsModal extends Modal {
     /**

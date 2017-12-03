@@ -14,15 +14,15 @@ class ScheduleController extends require('./ApiController') {
     }        
 
     /**
-     * @api {get} /api/:project/:environment/schedule/:contentId
+     * @example GET /api/:project/:environment/schedule/:contentId
      *
      * @apiGroup Schedule
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} contentId
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} contentId
      *
-     * @apiSuccess {Array} Tasks
+     * @returns {Array} Tasks
      */
     static getTasks(req, res) {
          HashBrown.Helpers.ScheduleHelper.getTasks(null, { content: req.params.contentId })

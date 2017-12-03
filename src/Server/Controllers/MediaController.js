@@ -58,14 +58,14 @@ class MediaController extends require('./ApiController') {
     }
     
     /**
-     * @api {get} /api/:project/:environment/media/tree
+     * @example GET /api/:project/:environment/media/tree
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiSuccess {Object} Media tree
+     * @returns {Object} Media tree
      */
     static getMediaTree(req, res) {
         HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment)
@@ -78,17 +78,17 @@ class MediaController extends require('./ApiController') {
     }
     
     /**
-     * @api {post} /api/:project/:environment/media/tree/:id
+     * @example POST /api/:project/:environment/media/tree/:id
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      
-     * @apiParam {Object} item
+     * @param {Object} item
      *
-     * @apiSuccess {Object} Media tree item
+     * @returns {Object} Media tree item
      */
     static setMediaTreeItem(req, res) {
         let id = req.params.id;
@@ -104,14 +104,14 @@ class MediaController extends require('./ApiController') {
     }
     
     /**
-     * @api {get} /api/:project/:environment/media
+     * @example GET /api/:project/:environment/media
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      
-     * @apiSuccess {Array} All Media nodes
+     * @returns {Array} All Media nodes
      */
     static getMedia(req, res) {
         let media;
@@ -141,15 +141,15 @@ class MediaController extends require('./ApiController') {
     }
     
     /**
-     * @api {get} /api/:project/:environment/media/:id
+     * @example GET /api/:project/:environment/media/:id
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      
-     * @apiSuccess {Media} Media
+     * @returns {Media} Media
      */
     static getSingleMedia(req, res) {
         let id = req.params.id;
@@ -176,13 +176,13 @@ class MediaController extends require('./ApiController') {
     }
     
     /**
-     * @api {delete} /api/:project/:environment/media/:id
+     * @example DELETE /api/:project/:environment/media/:id
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      */
     static deleteMedia(req, res) {
         let id = req.params.id;
@@ -200,15 +200,15 @@ class MediaController extends require('./ApiController') {
     }
 
     /**
-     * @api {get} /api/:project/:environment/media/:id
+     * @example GET /api/:project/:environment/media/:id
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
-     * @apiParam {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
      *
-     * @apiParam {FileData} files Binary Media data
+     * @param {FileData} files Binary Media data
      */
     static setMedia(req, res) {
         let file = req.file;
@@ -243,16 +243,16 @@ class MediaController extends require('./ApiController') {
     }
 
     /**
-     * @api {get} /api/:project/:environment/media/new
+     * @example GET /api/:project/:environment/media/new
      *
      * @apiGroup Media
      *
-     * @apiParam {String} project
-     * @apiParam {String} environment
+     * @param {String} project
+     * @param {String} environment
      *
-     * @apiParam {FileData} files Binary Media data
+     * @param {FileData} files Binary Media data
      *
-     * @apiSuccess {String} Created Media id
+     * @returns {String} Created Media id
      */
     static createMedia(req, res) {
         let files = req.files || [ req.file ];

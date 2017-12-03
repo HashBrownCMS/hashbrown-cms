@@ -2,6 +2,8 @@
 
 /**
  * Demo API
+ *
+ * @memberof HashBrown.Client
  */
 class DemoApi {
     /**

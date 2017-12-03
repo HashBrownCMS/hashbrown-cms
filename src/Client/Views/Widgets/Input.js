@@ -4,6 +4,8 @@ const Widget = require('./Widget');
 
 /**
  * A versatile input widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 class Input extends Widget {
     /**

@@ -60,15 +60,15 @@ class UserController extends require('./ApiController') {
     } 
 
     /**
-     * @api {post} /api/user/login
+     * @example POST /api/user/login
      *
      * @apiGroup User
      *
-     * @apiParam {Object} credentials { username: String, password: String } 
+     * @param {Object} credentials { username: String, password: String } 
      *
-     * @apiParam {String} persist "true"/"false"
+     * @param {String} persist "true"/"false"
      *
-     * @apiSuccess {String} Session token
+     * @returns {String} Session token
      */
     static login(req, res) {
         let username = req.body.username;

@@ -121,7 +121,7 @@ function ready(files) {
     })
     .then(() => {
 		// Start HTTP server
-		let port = HashBrown.Helpers.ConfigHelper.getSync('server').port || process.env.PORT || 8080;
+		let port = process.env.PORT || 8080;
 		
 		global.server = HTTP.createServer(app).listen(port);
 

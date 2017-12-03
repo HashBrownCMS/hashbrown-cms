@@ -25,7 +25,8 @@
     "pug": "^2.0.0-beta11",
     "rimraf": "^2.5.2",
     "semver": "^5.4.1",
-    "to-markdown": "^2.0.1"
+    "to-markdown": "^2.0.1",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "babel-core": "^6.18.0",
