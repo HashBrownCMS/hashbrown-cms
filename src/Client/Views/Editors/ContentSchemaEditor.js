@@ -70,15 +70,18 @@ class ContentSchemaEditor extends SchemaEditor {
         }).$element));
         
         // Default tab
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
-        
-        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
+        let defaultTabEditor = new HashBrown.Views.Widgets.Dropdown({
             options: this.getAllTabs(),
+            useClearButton: true,
             value: this.model.defaultTabId,
             onChange: (newValue) => {
                 this.model.defaultTabId = newValue;
             }
-        }).$element));
+        });
+
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+        
+        $element.append(this.renderField('Default tab', defaultTabEditor.$element));
         
         // Tabs
         $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
@@ -94,6 +97,9 @@ class ContentSchemaEditor extends SchemaEditor {
                 
                 this.model.tabs = newTabs;
 
+                defaultTabEditor.options = this.getAllTabs();
+                defaultTabEditor.fetch();
+
                 renderFieldProperties();
             }
         }).$element));
@@ -107,7 +113,7 @@ class ContentSchemaEditor extends SchemaEditor {
 
         let renderFieldProperties = () => {
             if(!this.currentTab) {
-                this.currentTab = Object.keys(this.getAllTabs())[0];
+                this.currentTab = Object.keys(this.getAllTabs())[0] || 'meta';
             }
        
             _.append($tabs.empty(),
@@ -302,7 +308,9 @@ class ContentSchemaEditor extends SchemaEditor {
 
                             this.model.fields.properties.newField = {
                                 label: 'New field',
-                                schemaId: 'array'
+                                schemaId: 'array',
+                                tabId: this.currentTab
+
                             };
 
                             renderFieldProperties();
