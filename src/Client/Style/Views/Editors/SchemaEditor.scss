@@ -4,11 +4,10 @@
 .editor--schema {
     &__tabs {
         display: flex;
-        flex-wrap: wrap;
-        background-color: $secondary;
+        background-color: $standard-darkest;
         padding: 1rem 0 0 1rem;
-        color: $secondary-text;
         height: 4rem;
+        margin: 0 -1rem;
     }
 
     &__tab {
@@ -21,9 +20,8 @@
         text-transform: uppercase;
         font-weight: bold;
         border: 0;
-        background-color: transparent;
-        color: $secondary-text;
-        background-color: $secondary-light;
+        background-color: $standard-darker;
+        color: $standard-darkest;
         margin-right: 0.5rem;
 
         &:hover {
@@ -33,8 +31,8 @@
 
         &.active {
             pointer-events: none;
-            color: $standard-text;
             background-color: $standard-dark;
+            color: $standard-text;
         }
     }
 }

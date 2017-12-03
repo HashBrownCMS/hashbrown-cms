@@ -988,11 +988,10 @@ h1, h2, h3, h4, h5, h6 {
  */
 .editor--schema__tabs {
   display: flex;
-  flex-wrap: wrap;
-  background-color: #21303b;
+  background-color: #666666;
   padding: 1rem 0 0 1rem;
-  color: #ffffff;
-  height: 4rem; }
+  height: 4rem;
+  margin: 0 -1rem; }
 
 .editor--schema__tab {
   padding: 0 2rem;
@@ -1004,17 +1003,16 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   font-weight: bold;
   border: 0;
-  background-color: transparent;
-  color: #ffffff;
-  background-color: #283b48;
+  background-color: #dddddd;
+  color: #666666;
   margin-right: 0.5rem; }
   .editor--schema__tab:hover {
     color: #ffffff;
     background-color: #e70d3b; }
   .editor--schema__tab.active {
     pointer-events: none;
-    color: #333333;
-    background-color: #eeeeee; }
+    background-color: #eeeeee;
+    color: #333333; }
 
 /**
  * The Media viewer
