@@ -6627,12 +6627,21 @@ var Entity = function () {
     /**
      * Generates a new random id
      *
+     * @param {Number} length
+     *
      * @returns {String} id
      */
 
 
-    Entity.createId = function createId() {
-        return crypto.randomBytes(20).toString('hex');
+    Entity.createId = function createId(length) {
+        if (!length) {
+            length = 20;
+        }
+        if (length < 4) {
+            length = 4;
+        }
+
+        return crypto.randomBytes(length).toString('hex');
     };
 
     /**
@@ -16753,7 +16762,7 @@ var Project = function (_Entity) {
 
     Project.create = function create(name) {
         var project = new Project({
-            id: Project.safeName(name)
+            id: Entity.createId(10)
         });
 
         project.settings.usedBy = 'project';
@@ -30705,6 +30714,8 @@ var Widget = __webpack_require__(54);
 
 /**
  * A group of chips
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 
 var Chips = function (_Widget) {
@@ -30797,7 +30808,7 @@ var Chips = function (_Widget) {
         return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
             return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
         }), _.each(this.value, function (i, item) {
-            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('input', function (e) {
+            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('change', function (e) {
                 if (_this2.valueKey) {
                     item[_this2.valueKey] = e.currentTarget.value || '';
                 } else {
@@ -30807,7 +30818,7 @@ var Chips = function (_Widget) {
                 }
 
                 _this2.onChangeInternal();
-            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('input', function (e) {
+            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('change', function (e) {
                 if (_this2.labelKey) {
                     item[_this2.labelKey] = e.currentTarget.value || '';
                 } else {
@@ -30867,6 +30878,8 @@ var Widget = __webpack_require__(54);
 
 /**
  * A versatile input widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 
 var Input = function (_Widget) {
@@ -31452,6 +31465,8 @@ var Modal = __webpack_require__(11);
 
 /**
  * A dialog for editing publishing settings for Content nodes
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 
 var PublishingSettingsModal = function (_Modal) {
@@ -32232,9 +32247,9 @@ var ContentEditor = function (_Crisp$View) {
         for (var key in fieldDefinitions) {
             var fieldDefinition = fieldDefinitions[key];
 
-            var noTabAssigned = !fieldDefinition.tabId;
+            var noTabAssigned = !this.schema.tabs[fieldDefinition.tabId];
             var isMetaTab = tabId === 'meta';
-            var thisTabAssigned = fieldDefinition.tabId == tabId;
+            var thisTabAssigned = fieldDefinition.tabId === tabId;
 
             // Don't include "properties" field, if this is the meta tab
             if (isMetaTab && key === 'properties') {
@@ -32308,7 +32323,7 @@ var ContentEditor = function (_Crisp$View) {
      * Renders the editor
      *
      * @param {Content} content
-     * @param {Object} schema
+     * @param {ContentSchema} schema
      *
      * @return {Object} element
      */
@@ -32423,6 +32438,8 @@ var ContentEditor = function (_Crisp$View) {
 
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
             contentSchema = schema;
+
+            _this8.schema = contentSchema;
 
             _this8.$element.html(_this8.renderEditor(_this8.model, contentSchema));
 
@@ -41163,7 +41180,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -41187,7 +41204,8 @@ module.exports = {
 		"pug": "^2.0.0-beta11",
 		"rimraf": "^2.5.2",
 		"semver": "^5.4.1",
-		"to-markdown": "^2.0.1"
+		"to-markdown": "^2.0.1",
+		"yamljs": "^0.3.0"
 	},
 	"devDependencies": {
 		"babel-core": "^6.18.0",
@@ -45702,50 +45720,59 @@ var ContentSchemaEditor = function (_SchemaEditor) {
     }
 
     /**
+     * Gets parent tabs
+     *
+     * @returns {Object} Parent tabs
+     */
+    ContentSchemaEditor.prototype.getParentTabs = function getParentTabs() {
+        // Cache tab object to maintain original state
+        if (!this.parentTabs) {
+            this.parentTabs = {};
+
+            for (var tabId in this.compiledSchema.tabs) {
+                // We only want parent tabs
+                if (this.model.tabs[tabId]) {
+                    continue;
+                }
+
+                this.parentTabs[tabId] = this.compiledSchema.tabs[tabId];
+            }
+        }
+
+        return this.parentTabs;
+    };
+
+    /**
+     * Gets all tabs
+     *
+     * @returns {Object} All tabs
+     */
+
+
+    ContentSchemaEditor.prototype.getAllTabs = function getAllTabs() {
+        var allTabs = {};
+        var parentTabs = this.getParentTabs();
+
+        for (var tabId in parentTabs) {
+            allTabs[tabId] = parentTabs[tabId];
+        }
+
+        for (var _tabId in this.model.tabs) {
+            allTabs[_tabId] = this.model.tabs[_tabId];
+        }
+
+        return allTabs;
+    };
+
+    /**
      * Renders the editor fields
      */
+
+
     ContentSchemaEditor.prototype.renderFields = function renderFields() {
         var _this2 = this;
 
         var $element = _SchemaEditor.prototype.renderFields.call(this);
-
-        // Default tab
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
-
-        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
-            options: this.compiledSchema.tabs,
-            value: this.model.defaultTabId,
-            onChange: function onChange(newValue) {
-                _this2.model.defaultTabId = newValue;
-            }
-        }).$element));
-
-        // Tabs
-        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
-            disabledValue: Object.values(this.compiledSchema.tabs),
-            value: Object.values(this.model.tabs),
-            placeholder: 'New tab',
-            onChange: function onChange(newValue) {
-                _this2.model.tabs = {};
-
-                for (var _iterator = newValue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                    var _ref;
-
-                    if (_isArray) {
-                        if (_i >= _iterator.length) break;
-                        _ref = _iterator[_i++];
-                    } else {
-                        _i = _iterator.next();
-                        if (_i.done) break;
-                        _ref = _i.value;
-                    }
-
-                    var tab = _ref;
-
-                    _this2.model.tabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
-                }
-            }
-        }).$element));
 
         // Allowed child Schemas
         $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
@@ -45761,18 +45788,87 @@ var ContentSchemaEditor = function (_SchemaEditor) {
             }
         }).$element));
 
+        // Default tab
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+
+        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
+            options: this.getAllTabs(),
+            value: this.model.defaultTabId,
+            onChange: function onChange(newValue) {
+                _this2.model.defaultTabId = newValue;
+            }
+        }).$element));
+
+        // Tabs
+        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+            disabledValue: Object.values(this.getParentTabs()),
+            value: Object.values(this.model.tabs),
+            placeholder: 'New tab',
+            onChange: function onChange(newValue) {
+                var newTabs = {};
+
+                for (var _iterator = newValue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                    var _ref;
+
+                    if (_isArray) {
+                        if (_i >= _iterator.length) break;
+                        _ref = _iterator[_i++];
+                    } else {
+                        _i = _iterator.next();
+                        if (_i.done) break;
+                        _ref = _i.value;
+                    }
+
+                    var tab = _ref;
+
+                    newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
+                }
+
+                _this2.model.tabs = newTabs;
+
+                renderFieldProperties();
+            }
+        }).$element));
+
         // Field properties
+        var $tabs = _.div({ class: 'editor--schema__tabs' });
         var $fieldProperties = _.div({ class: 'editor__field' });
 
+        $element.append($tabs);
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
+            if (!_this2.currentTab) {
+                _this2.currentTab = Object.keys(_this2.getAllTabs())[0];
+            }
+
+            _.append($tabs.empty(), _.each(_this2.getAllTabs(), function (id, name) {
+                return _.button({ class: 'editor--schema__tab' + (_this2.currentTab === id ? ' active' : '') }, name).click(function () {
+                    _this2.currentTab = id;
+
+                    renderFieldProperties();
+                });
+            }), _.button({ class: 'editor--schema__tab' + (_this2.currentTab === 'meta' ? ' active' : '') }, 'meta').click(function () {
+                _this2.currentTab = 'meta';
+
+                renderFieldProperties();
+            }));
+
             _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
                     _this2.model.fields.properties = newProperties;
                 });
             }))), _.div({ class: 'editor__field__value segmented' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
                 if (!fieldValue) {
+                    return;
+                }
+
+                var isValidTab = !!_this2.getAllTabs()[fieldValue.tabId];
+
+                if (isValidTab && fieldValue.tabId !== _this2.currentTab) {
+                    return;
+                }
+                if (!isValidTab && _this2.currentTab !== 'meta') {
                     return;
                 }
 
@@ -45783,7 +45879,16 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 fieldValue.schemaId = fieldValue.schemaId || 'array';
 
                 var renderField = function renderField() {
-                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Key'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+                    _.append($field.empty(), _.div({ class: 'editor__field__sort-key' }, fieldKey), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useClearButton: true,
+                        options: _this2.getAllTabs(),
+                        value: fieldValue.tabId,
+                        onChange: function onChange(newValue) {
+                            fieldValue.tabId = newValue;
+
+                            renderFieldProperties();
+                        }
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Key'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
                         type: 'text',
                         placeholder: 'A variable name, e.g. "myField"',
                         tooltip: 'The field variable name',
@@ -45835,13 +45940,6 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                         value: fieldValue.multilingual || false,
                         onChange: function onChange(newValue) {
                             fieldValue.multilingual = newValue;
-                        }
-                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
-                        useClearButton: true,
-                        options: _this2.compiledSchema.tabs,
-                        value: fieldValue.tabId,
-                        onChange: function onChange(newValue) {
-                            fieldValue.tabId = newValue;
                         }
                     }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
                         useTypeAhead: true,

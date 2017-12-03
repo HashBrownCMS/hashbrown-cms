@@ -6562,12 +6562,21 @@ var Entity = function () {
     /**
      * Generates a new random id
      *
+     * @param {Number} length
+     *
      * @returns {String} id
      */
 
 
-    Entity.createId = function createId() {
-        return crypto.randomBytes(20).toString('hex');
+    Entity.createId = function createId(length) {
+        if (!length) {
+            length = 20;
+        }
+        if (length < 4) {
+            length = 4;
+        }
+
+        return crypto.randomBytes(length).toString('hex');
     };
 
     /**
@@ -15970,7 +15979,7 @@ var Project = function (_Entity) {
 
     Project.create = function create(name) {
         var project = new Project({
-            id: Project.safeName(name)
+            id: Entity.createId(10)
         });
 
         project.settings.usedBy = 'project';
@@ -26573,6 +26582,8 @@ var Widget = __webpack_require__(54);
 
 /**
  * A group of chips
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 
 var Chips = function (_Widget) {
@@ -26665,7 +26676,7 @@ var Chips = function (_Widget) {
         return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
             return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
         }), _.each(this.value, function (i, item) {
-            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('input', function (e) {
+            return _.div({ class: 'widget--chips__chip' }, _.if(_this2.useObject === true || _this2.useArray === false || _this2.valueKey, _.input({ class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[_this2.valueKey] || i, pattern: '.{1,}' }).on('change', function (e) {
                 if (_this2.valueKey) {
                     item[_this2.valueKey] = e.currentTarget.value || '';
                 } else {
@@ -26675,7 +26686,7 @@ var Chips = function (_Widget) {
                 }
 
                 _this2.onChangeInternal();
-            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('input', function (e) {
+            })), _.input({ class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: _this2.labelKey ? item[_this2.labelKey] : item, pattern: '.{1,}' }).on('change', function (e) {
                 if (_this2.labelKey) {
                     item[_this2.labelKey] = e.currentTarget.value || '';
                 } else {
@@ -26735,6 +26746,8 @@ var Widget = __webpack_require__(54);
 
 /**
  * A versatile input widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
  */
 
 var Input = function (_Widget) {
@@ -27320,6 +27333,8 @@ var Modal = __webpack_require__(11);
 
 /**
  * A dialog for editing publishing settings for Content nodes
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 
 var PublishingSettingsModal = function (_Modal) {
@@ -36323,7 +36338,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -36347,7 +36362,8 @@ module.exports = {
 		"pug": "^2.0.0-beta11",
 		"rimraf": "^2.5.2",
 		"semver": "^5.4.1",
-		"to-markdown": "^2.0.1"
+		"to-markdown": "^2.0.1",
+		"yamljs": "^0.3.0"
 	},
 	"devDependencies": {
 		"babel-core": "^6.18.0",
@@ -36762,7 +36778,7 @@ var ProjectEditor = function (_Crisp$View) {
 
         var modal = new HashBrown.Views.Modals.Modal({
             title: 'Delete ' + this.model.settings.info.name,
-            body: _.div({ class: 'widget-group' }, _.p({ class: 'widget widget--label' }, 'Please input the project name to confirm'), _.input({ class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name }).on('input', function (e) {
+            body: _.div({ class: 'widget-group' }, _.p({ class: 'widget widget--label' }, 'Type the project name to confirm'), _.input({ class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name }).on('input', function (e) {
                 var $btn = modal.$element.find('.widget.warning');
                 var isMatch = $(e.target).val() == _this2.model.settings.info.name;
 

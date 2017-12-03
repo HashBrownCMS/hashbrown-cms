@@ -277,9 +277,9 @@ class ContentEditor extends Crisp.View {
         for(let key in fieldDefinitions) {
             let fieldDefinition = fieldDefinitions[key];
 
-            let noTabAssigned = !fieldDefinition.tabId;
+            let noTabAssigned = !this.schema.tabs[fieldDefinition.tabId];
             let isMetaTab = tabId === 'meta';
-            let thisTabAssigned = fieldDefinition.tabId == tabId;
+            let thisTabAssigned = fieldDefinition.tabId === tabId;
 
             // Don't include "properties" field, if this is the meta tab
             if(isMetaTab && key === 'properties') {
@@ -360,7 +360,7 @@ class ContentEditor extends Crisp.View {
      * Renders the editor
      *
      * @param {Content} content
-     * @param {Object} schema
+     * @param {ContentSchema} schema
      *
      * @return {Object} element
      */
@@ -497,6 +497,8 @@ class ContentEditor extends Crisp.View {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
+
+            this.schema = contentSchema;
 
             this.$element.html(
                 this.renderEditor(this.model, contentSchema)

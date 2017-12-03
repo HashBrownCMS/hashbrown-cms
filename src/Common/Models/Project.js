@@ -82,7 +82,7 @@ class Project extends Entity {
      */
     static create(name) {
         let project = new Project({
-            id: Project.safeName(name)
+            id: Entity.createId(10)
         });
         
         project.settings.usedBy = 'project';

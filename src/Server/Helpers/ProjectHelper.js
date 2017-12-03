@@ -354,6 +354,9 @@ class ProjectHelper {
      * @returns {Promise} The new Project
      */
     static createProject(name, userId) {
+        checkParam(name, 'name', String);
+        checkParam(userId, 'userId', String);
+        
         if(!name || !userId) {
             return Promise.reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
         }

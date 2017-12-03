@@ -88,7 +88,7 @@ class Chips extends Widget {
                 return _.div({class: 'widget--chips__chip'},
                     _.if(this.useObject === true || this.useArray === false || this.valueKey,
                         _.input({class: 'widget--chips__chip__input', title: 'The key', type: 'text', value: item[this.valueKey] || i, pattern: '.{1,}'})
-                            .on('input', (e) => {
+                            .on('change', (e) => {
                                 if(this.valueKey) {
                                     item[this.valueKey] = e.currentTarget.value || '';
 
@@ -102,7 +102,7 @@ class Chips extends Widget {
                             }),
                     ),
                     _.input({class: 'widget--chips__chip__input', title: 'The label', type: 'text', value: this.labelKey ? item[this.labelKey] : item, pattern: '.{1,}'})
-                        .on('input', (e) => {
+                        .on('change', (e) => {
                             if(this.labelKey) {
                                 item[this.labelKey] = e.currentTarget.value || '';
                             } else {

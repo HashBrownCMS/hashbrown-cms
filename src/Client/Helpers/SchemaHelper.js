@@ -55,7 +55,6 @@ class SchemaHelper extends SchemaHelperCommon {
         }
     }
 
-
     /**
      * Gets a Schema by id
      *

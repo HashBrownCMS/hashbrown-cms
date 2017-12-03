@@ -2,4 +2,39 @@
  * The editor for Schemas
  */
 .editor--schema {
+    &__tabs {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: $secondary;
+        padding: 1rem 0 0 1rem;
+        color: $secondary-text;
+        height: 4rem;
+    }
+
+    &__tab {
+        padding: 0 2rem;
+        border-top-left-radius: 0.2rem;
+        border-top-right-radius: 0.2rem;
+        display: inline-block;
+        height: 3rem;
+        line-height: 3rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        border: 0;
+        background-color: transparent;
+        color: $secondary-text;
+        background-color: $secondary-light;
+        margin-right: 0.5rem;
+
+        &:hover {
+            color: $primary-text;
+            background-color: $primary;
+        }
+
+        &.active {
+            pointer-events: none;
+            color: $standard-text;
+            background-color: $standard-dark;
+        }
+    }
 }

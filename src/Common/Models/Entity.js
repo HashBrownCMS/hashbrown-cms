@@ -52,10 +52,15 @@ class Entity {
     /**
      * Generates a new random id
      *
+     * @param {Number} length
+     *
      * @returns {String} id
      */
-    static createId() {
-        return crypto.randomBytes(20).toString('hex');
+    static createId(length) {
+        if(!length) { length = 20; }
+        if(length < 4) { length = 4; }
+
+        return crypto.randomBytes(length).toString('hex');
     }
 
     /**
