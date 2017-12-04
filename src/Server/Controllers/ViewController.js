@@ -66,7 +66,14 @@ class ViewController extends Controller {
 
         // First time setup
         app.get('/setup/:step', (req, res) => {
-            res.render('setup', { step: req.params.step });
+            UserHelper.getAllUsers()
+            .then((users) => {
+                if(!users || users.length < 1) { 
+                    res.render('setup', { step: req.params.step });
+                } else {
+                    res.redirect('/');
+                }
+            })
         });
 
         // Login

@@ -61,7 +61,8 @@ function getParam(name) {
     return decodeURIComponent(results[2].replace(/\+/g, " ")) || '';
 }
 
-$('.page--login__login').each(function() {
+// Step 1
+$('.page--setup__step-1').each(function() {
     var $login = $(this);
     
     $(document).keyup(function(e) {
@@ -87,36 +88,15 @@ $('.page--login__login').each(function() {
             fullName: fullName
         };
 
-        let apiPath = '/api/user/login?persist=true';
-        let inviteToken = $login.attr('data-invite-token');
-
-        if(inviteToken) {
-            apiPath = '/api/user/activate';
-            
-            data.inviteToken = inviteToken;
-        }
+        let apiPath = '/api/user/first';
 
         apiCall('post', apiPath, data)
         .then(function() {
-            let newLocation = getParam('path');
-           
-            if(newLocation) { 
-                // Check for initial hash
-                if(newLocation[0] == '#') {
-                    newLocation = newLocation.slice(1);
-                }
-
-                // Check for initial slash
-                if(newLocation[0] != '/') {
-                    newLocation = '/' + newLocation;
-                }
-            }
-
-            location = newLocation || '/';
+            location = '/setup/2';
         })
         .catch(function(e) {
             $('.widget--message').remove();
-            $('.page--login').prepend('<div class="widget widget--message fixed fixed--top warning">' + e + '</div>');
+            $('.page--setup').prepend('<div class="widget widget--message fixed fixed--top warning">' + e + '</div>');
         });
     }); 
 }); 
