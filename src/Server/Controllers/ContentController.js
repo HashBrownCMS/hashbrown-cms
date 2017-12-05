@@ -198,7 +198,7 @@ class ContentController extends require('./ApiController') {
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
         
-            return HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, resourceItem, req.user, true)
+            return HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, new HashBrown.Models.Content(resourceItem), req.user, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });

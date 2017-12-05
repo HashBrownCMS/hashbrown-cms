@@ -104,7 +104,7 @@ class FormsController extends require('./ApiController') {
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Form "' + id + '"')); }
        
-            return HashBrown.Helpers.FormHelper.setForm(req.project, req.environment, id, resourceItem)
+            return HashBrown.Helpers.FormHelper.setForm(req.project, req.environment, id, new HashBrown.Models.Form(resourceItem))
             .then(() => {
                 res.status(200).send(resourceItem);
             });
