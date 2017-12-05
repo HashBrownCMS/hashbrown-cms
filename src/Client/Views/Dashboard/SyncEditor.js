@@ -37,12 +37,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
 
         super(params);
         
-        SettingsHelper.getSettings(this.projectId, '', 'sync')
-        .then((syncSettings) => {
-            this.model = syncSettings || {};
-
-            this.fetch();
-        });
+        this.fetch();
     }
     
     /**
@@ -102,19 +97,14 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
     }
     
     /**
-     * Renders the project name editor
+     * Renders the project id editor
      *
      * @returns {HTMLElement} Element
      */
-    renderProjectNameEditor() {
-        if(!this.model.project) {
-            this.model.project = this.projectId;
-        }
-
+    renderProjectIdEditor() {
         return new HashBrown.Views.Widgets.Input({
             name: 'name',
-            value: this.model.project || '',
-            placeholder: 'e.g. "' + ProjectHelper.currentProject + '"',
+            value: this.model.project,
             onChange: (newValue) => {
                 this.model.project = newValue;
             }
@@ -208,7 +198,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
             this.renderField('Enabled', this.renderEnabledSwitch()),
             this.renderField('API URL', this.renderUrlEditor()),
             this.renderField('API Token', this.renderTokenEditor()),
-            this.renderField('Project id', this.renderProjectNameEditor())
+            this.renderField('Project id', this.renderProjectIdEditor())
         ];
     }
 }

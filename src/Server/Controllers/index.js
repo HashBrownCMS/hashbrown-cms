@@ -5,6 +5,7 @@
  */
 module.exports = {
     ApiController: require('./ApiController'),
+    ConfigController: require('./ConfigController'),
     ConnectionController: require('./ConnectionController'),
     ContentController: require('./ContentController'),
     Controller: require('./Controller'),

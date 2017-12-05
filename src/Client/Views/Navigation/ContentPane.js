@@ -175,6 +175,8 @@ class ContentPane extends NavbarPane {
 
                 schemaReference.pickFirstSchema();
 
+                schemaReference.$element.addClass('widget');
+
                 // Render the confirmation modal
                 UI.confirmModal(
                     'OK',

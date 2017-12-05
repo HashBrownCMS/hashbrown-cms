@@ -47,22 +47,8 @@ function apiCall(method, url, data) {
     });
 };
 
-function getParam(name) {
-    var url = window.location.href;
-
-    name = name.replace(/[\[\]]/g, "\\$&");
-
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-
-    if (!results) return '';
-    if (!results[2]) return '';
-
-    return decodeURIComponent(results[2].replace(/\+/g, " ")) || '';
-}
-
-$('.page--login__login').each(function() {
-    var $login = $(this);
+$('.page--setup__step').each(function() {
+    var $form = $(this);
     
     $(document).keyup(function(e) {
         if(e.which == 13) {
@@ -70,53 +56,42 @@ $('.page--login__login').each(function() {
         }
     });
 
-    $login.submit(function(e) {
+    $form.submit(function(e) {
         e.preventDefault();
 
-        var username = $login.find('input#username').val();
-        var fullName = $login.find('input#full-name').val();
-        var password = $login.find('input#password').val();
+        var data = {};
+        var formArray = $form.serializeArray();
 
-        if(!username || !password) {
-            return;
-        }
-
-        var data = {
-            username: username,
-            password: password,
-            fullName: fullName
-        };
-
-        let apiPath = '/api/user/login?persist=true';
-        let inviteToken = $login.attr('data-invite-token');
-
-        if(inviteToken) {
-            apiPath = '/api/user/activate';
+        for (var i = 0; i < formArray.length; i++) {
+            if(!formArray[i].value) { continue; }
             
-            data.inviteToken = inviteToken;
-        }
+            let objMatches = formArray[i].name.match(/([a-zA-Z]+)\[([a-zA-Z]+)\]/);
 
-        apiCall('post', apiPath, data)
-        .then(function() {
-            let newLocation = getParam('path');
-           
-            if(newLocation) { 
-                // Check for initial hash
-                if(newLocation[0] == '#') {
-                    newLocation = newLocation.slice(1);
+            if(objMatches && objMatches.length === 3) {
+                if(!data[objMatches[1]]) {
+                    data[objMatches[1]] = {};
                 }
+               
+                data[objMatches[1]][objMatches[2]] = formArray[i].value;
 
-                // Check for initial slash
-                if(newLocation[0] != '/') {
-                    newLocation = '/' + newLocation;
-                }
+            } else {
+                data[formArray[i].name] = formArray[i].value;
             }
+        }
+        
+        apiCall('post', $form.attr('action'), data)
+        .then(function() {
+            let step = parseInt($form.data('step')); 
 
-            location = newLocation || '/';
+            if(step < 1) {
+                location = '/setup/' + (step + 1);
+            } else {
+                location = '/';
+            }
         })
         .catch(function(e) {
             $('.widget--message').remove();
-            $('.page--login').prepend('<div class="widget widget--message fixed fixed--top warning">' + e + '</div>');
+            $('.page--setup').prepend('<div class="widget widget--message fixed fixed--top warning">' + e + '</div>');
         });
     }); 
 }); 

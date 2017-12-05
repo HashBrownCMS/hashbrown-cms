@@ -17,7 +17,7 @@ html
                 | #{message}
 
 
-        form.page--login__login(data-first-time=(firstTime ? 'true': '' ), data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
+        form.page--login__login(data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
             .page--login__login__heading
                 img.page--login__logo(src='/svg/logo_pink.svg')
                 h2 HashBrown
@@ -26,9 +26,6 @@ html
                         .widget.widget--message.expanded.secondary
                             | Activate the account for #{invitedUser.email}
                         input(type='text', id='full-name', class='widget widget--input text tall expanded', placeholder='Full name (optional)')
-                    if(firstTime)
-                        .widget.widget--message.expanded.secondary
-                            | Please create your first admin account
                     input.widget.widget--input.tall.expanded.text(type='text', id='username', placeholder='Username')
                     input.widget.widget--input.tall.expanded.text(type='password', id='password', placeholder='Password')
                     input.widget.widget--button.expanded(type='submit', value=(invitedUser || firstTime ? 'Create' : 'Login'))

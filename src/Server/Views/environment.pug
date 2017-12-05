@@ -13,7 +13,7 @@ html
         link(href='/css/plugins.css', rel='stylesheet')
         link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
 
-        title #{currentProject} - HashBrown
+        title #{currentProjectName} - HashBrown
 
     body.page.page--environment
         .page--environment__spaces
@@ -38,5 +38,6 @@ html
         
         script.
             HashBrown.Helpers.ProjectHelper.currentProject = '#{currentProject}';
+            HashBrown.Helpers.ProjectHelper.currentProjectName = '#{currentProjectName}';
             HashBrown.Helpers.ProjectHelper.currentEnvironment = '#{currentEnvironment}';
         

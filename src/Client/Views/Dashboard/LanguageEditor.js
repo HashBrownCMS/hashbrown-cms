@@ -25,19 +25,14 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
 
         super(params);
         
-        LanguageHelper.getLanguages(this.projectId)
-        .then((selectedLanguages) => {
-            this.model = selectedLanguages || [];
-            
-            this.fetch();
-        });
+        this.fetch();
     }
 
     /**
      * Event: Click save
      */
     onClickSave() {
-        LanguageHelper.setLanguages(this.projectId, this.model)
+        LanguageHelper.setLanguages(this.model.id, this.model.settings.languages)
         .then(() => {
             this.close();
 
@@ -55,12 +50,12 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
         return _.div({class: 'widget-group'},
             _.label({class: 'widget widget--label'}, 'Selected languages'),
             new HashBrown.Views.Widgets.Dropdown({
-                value: this.model,
+                value: this.model.settings.languages,
                 useTypeAhead: true,
                 useMultiple: true,
-                options: LanguageHelper.getLanguageOptions(this.projectId),
+                options: LanguageHelper.getLanguageOptions(this.model.id),
                 onChange: (newValue) => {
-                    this.model = newValue;
+                    this.model.settings.languages = newValue;
                 }
             }).$element
         );

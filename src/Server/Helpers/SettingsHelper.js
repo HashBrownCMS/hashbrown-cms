@@ -203,7 +203,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * @returns {Promise} Result
      */
     static migrationCheck() {
-        return HashBrown.Helpers.ProjectHelper.getAllProjectNames()
+        return HashBrown.Helpers.ProjectHelper.getAllProjectIds()
         .then((projects) => {
             let checkNext = () => {
                 let project = projects.pop();

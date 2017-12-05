@@ -35,14 +35,14 @@ class ProjectEditor extends Crisp.View {
         let modal = new HashBrown.Views.Modals.Modal({
             title: 'Delete ' + this.model.settings.info.name,
             body: _.div({class: 'widget-group'},
-                    _.p({class: 'widget widget--label'}, 'Type the project name to confirm'),
-                    _.input({class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name})
-                        .on('input', (e) => {
-                            let $btn = modal.$element.find('.widget.warning');
-                            let isMatch = $(e.target).val() == this.model.settings.info.name;
-                            
-                            $btn.toggleClass('disabled', !isMatch);
-                        })
+                _.p({class: 'widget widget--label'}, 'Type the project name to confirm'),
+                _.input({class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name})
+                    .on('input', (e) => {
+                        let $btn = modal.$element.find('.widget.warning');
+                        let isMatch = $(e.target).val() == this.model.settings.info.name;
+                        
+                        $btn.toggleClass('disabled', !isMatch);
+                    })
             ),
             actions: [
                 {
@@ -74,7 +74,6 @@ class ProjectEditor extends Crisp.View {
             RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
             .then(() => {
                 this.model = null;
-
                 this.fetch();
             })
             .catch(UI.errorModal);
@@ -86,7 +85,7 @@ class ProjectEditor extends Crisp.View {
     onClickInfo() {
         if(!currentUserIsAdmin()) { return; }
         
-        let infoEditor = new InfoEditor({ projectId: this.model.id });
+        let infoEditor = new InfoEditor({ modelUrl: '/api/server/projects/' + this.model.id });
 
         infoEditor.on('change', (newInfo) => {
             this.model = null;
@@ -100,9 +99,12 @@ class ProjectEditor extends Crisp.View {
     onClickSync() {
         if(!currentUserIsAdmin()) { return; }
 
-        let syncEditor = new SyncEditor({ projectId: this.model.id });
+        let syncEditor = new SyncEditor({
+            projectId: this.model.id,
+            modelUrl: '/api/' + this.model.id + '/settings/sync'
+        });
         
-        syncEditor.on('change', (syncSettings) => {
+        syncEditor.on('change', (newSettings) => {
             this.model = null;
             this.fetch();
         });
@@ -114,7 +116,7 @@ class ProjectEditor extends Crisp.View {
     onClickLanguages() {
         if(!currentUserIsAdmin()) { return; }
         
-        let languageEditor = new LanguageEditor({ projectId: this.model.id });
+        let languageEditor = new LanguageEditor({ modelUrl: '/api/server/projects/' + this.model.id });
         
         languageEditor.on('change', () => {
             this.model = null;
@@ -128,7 +130,7 @@ class ProjectEditor extends Crisp.View {
     onClickBackups() {
         if(!currentUserIsAdmin()) { return; }
         
-        let backupEditor = new BackupEditor({ modelUrl: this.modelUrl });
+        let backupEditor = new BackupEditor({ modelUrl: '/api/server/projects/' + this.model.id });
 
         backupEditor.on('change', () => {
             this.model = null;
@@ -175,14 +177,11 @@ class ProjectEditor extends Crisp.View {
 
                         if(!environmentName) { return false; }
 
-                        this.model.environments.push(environmentName);
-
                         RequestHelper.request('put', 'server/projects/' + this.model.id + '/' + environmentName)
                         .then(() => {
                             modal.close();
 
                             this.model = null;
-
                             this.fetch();
                         })
                         .catch(UI.errorModal);

@@ -2,6 +2,7 @@
 
 const FileSystem = require('fs');
 const Spawn = require('child_process').spawn;
+const QueryString = require('querystring');
 
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
@@ -17,6 +18,45 @@ const User = require('Server/Models/User');
  */
 class DatabaseHelper {
     /**
+     * Gets the connection string
+     *
+     * @param {String} databaseName
+     *
+     * @returns {String} Connection string
+     */
+    static getConnectionString(databaseName) {
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+
+        let connectionString = 'mongodb://';
+       
+        if(config.username) {
+            connectionString += config.username;
+
+            if(config.password) {
+                connectionString += ':' + config.password;
+            }
+
+            connectionString += '@';
+        }
+
+        connectionString += config.url || 'localhost';
+        
+        if(config.port) {
+            connectionString += ':' + config.port;
+        }
+        
+        if(databaseName) {
+            connectionString += '/' + databaseName;
+        }
+        
+        if(config.options && Object.keys(config.options).length > 0) {
+            connectionString += '?' + QueryString.stringify(config.options);
+        }
+
+        return connectionString;
+    }
+
+    /**
      * Inits the this database
      *
      * @param {String} databaseName
@@ -25,9 +65,7 @@ class DatabaseHelper {
      */
     static getDatabase(databaseName) {
         return new Promise((resolve, reject) => {
-            let connectionString = 'mongodb://localhost/' + databaseName;
-
-            MongoClient.connect(connectionString, (err, db) => {
+            MongoClient.connect(this.getConnectionString(databaseName), (err, db) => {
                 if(err) {
                     reject(new Error(err));
                 
@@ -36,7 +74,7 @@ class DatabaseHelper {
                         resolve(db);
 
                     } else {
-                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".'));
+                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + this.getConnectionString(databaseName) + '".'));
                     
                     }
                 }
@@ -186,9 +224,7 @@ class DatabaseHelper {
         return new Promise((resolve, reject) => {
             debug.log('Listing all databases...', this, 4);
 
-            let connectionString = 'mongodb://localhost/';
-            
-            MongoClient.connect(connectionString, (err, db) => {
+            MongoClient.connect(this.getConnectionString(), (err, db) => {
                 if(err) {
                     reject(new Error(err));
                 
@@ -218,7 +254,7 @@ class DatabaseHelper {
                         });
 
                     } else {
-                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".'));
+                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + this.getConnectionString() + '".'));
                     
                     }
                 }

@@ -17280,15 +17280,15 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({ class: 'widget widget--separator' }, 'Projects'), _.each(this.projects, function (i, project) {
             return _.div({ class: 'widget-group' }, new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
-                value: _this9.model.hasScope(project),
+                value: _this9.model.hasScope(project.id),
                 onChange: function onChange(newValue) {
                     if (newValue) {
-                        _this9.model.giveScope(project);
+                        _this9.model.giveScope(project.id);
                     } else {
-                        _this9.model.removeScope(project);
+                        _this9.model.removeScope(project.id);
                     }
                 }
-            }).$element, _.div({ class: 'widget widget--label' }, project), _this9.renderScopesEditor(project));
+            }).$element, _.div({ class: 'widget widget--label' }, project.settings.info.name), _this9.renderScopesEditor(project.id));
         })))];
     };
 
@@ -36462,7 +36462,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
     User.current = new User(user);
 
-    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
 })
 
 // --------------------
@@ -36812,7 +36812,6 @@ var ProjectEditor = function (_Crisp$View) {
         var modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', function () {
             RequestHelper.request('delete', 'server/projects/' + _this3.model.id + '/' + environmentName).then(function () {
                 _this3.model = null;
-
                 _this3.fetch();
             }).catch(UI.errorModal);
         });
@@ -36829,7 +36828,7 @@ var ProjectEditor = function (_Crisp$View) {
             return;
         }
 
-        var infoEditor = new InfoEditor({ projectId: this.model.id });
+        var infoEditor = new InfoEditor({ modelUrl: '/api/server/projects/' + this.model.id });
 
         infoEditor.on('change', function (newInfo) {
             _this4.model = null;
@@ -36849,9 +36848,12 @@ var ProjectEditor = function (_Crisp$View) {
             return;
         }
 
-        var syncEditor = new SyncEditor({ projectId: this.model.id });
+        var syncEditor = new SyncEditor({
+            projectId: this.model.id,
+            modelUrl: '/api/' + this.model.id + '/settings/sync'
+        });
 
-        syncEditor.on('change', function (syncSettings) {
+        syncEditor.on('change', function (newSettings) {
             _this5.model = null;
             _this5.fetch();
         });
@@ -36869,7 +36871,7 @@ var ProjectEditor = function (_Crisp$View) {
             return;
         }
 
-        var languageEditor = new LanguageEditor({ projectId: this.model.id });
+        var languageEditor = new LanguageEditor({ modelUrl: '/api/server/projects/' + this.model.id });
 
         languageEditor.on('change', function () {
             _this6.model = null;
@@ -36889,7 +36891,7 @@ var ProjectEditor = function (_Crisp$View) {
             return;
         }
 
-        var backupEditor = new BackupEditor({ modelUrl: this.modelUrl });
+        var backupEditor = new BackupEditor({ modelUrl: '/api/server/projects/' + this.model.id });
 
         backupEditor.on('change', function () {
             _this7.model = null;
@@ -36944,13 +36946,10 @@ var ProjectEditor = function (_Crisp$View) {
                         return false;
                     }
 
-                    _this9.model.environments.push(environmentName);
-
                     RequestHelper.request('put', 'server/projects/' + _this9.model.id + '/' + environmentName).then(function () {
                         modal.close();
 
                         _this9.model = null;
-
                         _this9.fetch();
                     }).catch(UI.errorModal);
 
@@ -37066,11 +37065,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 
         var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
-        SettingsHelper.getSettings(_this.projectId, null, 'info').then(function (infoSettings) {
-            _this.model = infoSettings || {};
-
-            _this.fetch();
-        });
+        _this.fetch();
         return _this;
     }
 
@@ -37082,7 +37077,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
     InfoEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        SettingsHelper.setSettings(this.projectId, null, 'info', this.model).then(function () {
+        SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info).then(function () {
             _this2.close();
 
             _this2.trigger('change', _this2.model);
@@ -37104,9 +37099,9 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
         }
 
         return _.div({ class: 'widget-group' }, _.span({ class: 'widget widget--label' }, 'Name'), new HashBrown.Views.Widgets.Input({
-            value: this.model.name,
+            value: this.model.settings.info.name,
             onChange: function onChange(newName) {
-                _this3.model.name = newName;
+                _this3.model.settings.info.name = newName;
             }
         }));
     };
@@ -37168,11 +37163,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 
         var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
-        SettingsHelper.getSettings(_this.projectId, '', 'sync').then(function (syncSettings) {
-            _this.model = syncSettings || {};
-
-            _this.fetch();
-        });
+        _this.fetch();
         return _this;
     }
 
@@ -37243,23 +37234,18 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
     };
 
     /**
-     * Renders the project name editor
+     * Renders the project id editor
      *
      * @returns {HTMLElement} Element
      */
 
 
-    SyncEditor.prototype.renderProjectNameEditor = function renderProjectNameEditor() {
+    SyncEditor.prototype.renderProjectIdEditor = function renderProjectIdEditor() {
         var _this5 = this;
-
-        if (!this.model.project) {
-            this.model.project = this.projectId;
-        }
 
         return new HashBrown.Views.Widgets.Input({
             name: 'name',
-            value: this.model.project || '',
-            placeholder: 'e.g. "' + ProjectHelper.currentProject + '"',
+            value: this.model.project,
             onChange: function onChange(newValue) {
                 _this5.model.project = newValue;
             }
@@ -37334,7 +37320,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 
 
     SyncEditor.prototype.renderBody = function renderBody() {
-        return [this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project id', this.renderProjectNameEditor())];
+        return [this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project id', this.renderProjectIdEditor())];
     };
 
     return SyncEditor;
@@ -37383,11 +37369,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 
         var _this = _possibleConstructorReturn(this, _HashBrown$Views$Moda.call(this, params));
 
-        LanguageHelper.getLanguages(_this.projectId).then(function (selectedLanguages) {
-            _this.model = selectedLanguages || [];
-
-            _this.fetch();
-        });
+        _this.fetch();
         return _this;
     }
 
@@ -37399,7 +37381,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
     LanguageEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        LanguageHelper.setLanguages(this.projectId, this.model).then(function () {
+        LanguageHelper.setLanguages(this.model.id, this.model.settings.languages).then(function () {
             _this2.close();
 
             _this2.trigger('change');
@@ -37417,12 +37399,12 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
         var _this3 = this;
 
         return _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Selected languages'), new HashBrown.Views.Widgets.Dropdown({
-            value: this.model,
+            value: this.model.settings.languages,
             useTypeAhead: true,
             useMultiple: true,
-            options: LanguageHelper.getLanguageOptions(this.projectId),
+            options: LanguageHelper.getLanguageOptions(this.model.id),
             onChange: function onChange(newValue) {
-                _this3.model = newValue;
+                _this3.model.settings.languages = newValue;
             }
         }).$element);
     };
@@ -37485,7 +37467,6 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
                         contentType: false,
                         success: function success(id) {
                             _this2.model = null;
-
                             _this2.fetch();
 
                             uploadModal.close();
@@ -37518,7 +37499,6 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 
         RequestHelper.request('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
             _this3.model = null;
-
             _this3.fetch();
         }).catch(UI.errorModal);
     };
@@ -37579,7 +37559,6 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
                 modal.close();
 
                 _this5.model = null;
-
                 _this5.fetch();
             }).catch(UI.errorModal);
         });

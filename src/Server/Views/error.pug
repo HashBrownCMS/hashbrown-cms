@@ -7,15 +7,16 @@ html
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
         
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
-        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
         
-        title HashBrown CMS
-    body
-        .login-container
-            if(message)
-                .message.raised
-                    | #{message}
+        title Error - HashBrown CMS
+    body.page.page--error
+        img.page--error__logo(src='/svg/logo_pink.svg')
+        h2.page--error_title Error
+        
+        .widget.widget--message.warning.large
+            | #{message || 'An unspecified error occurred'}
 
-        script(src='/lib/jquery/jquery.min.js')
+        a.widget.widget--button.tall(href='/')
+            | Go to dashboard

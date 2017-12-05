@@ -144,7 +144,11 @@ class ContentSchemaReferenceEditor extends FieldEditor {
      * Picks the first available Schema
      */
     pickFirstSchema() {
-        this.value = this.getDropdownOptions()[0].id;
+        let options = this.getDropdownOptions();
+
+        if(options.length < 1) { return; }
+
+        this.value = options[0].id;
 
         this.trigger('change', this.value);
 

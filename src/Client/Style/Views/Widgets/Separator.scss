@@ -6,5 +6,9 @@
     font-weight: bold;
     text-align: center;
     text-transform: uppercase;
-    color: $secondary;
+    color: $standard-text;
+
+    &.secondary {
+        color: $secondary-text;
+    }
 }
