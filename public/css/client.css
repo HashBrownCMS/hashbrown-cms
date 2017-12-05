@@ -1687,7 +1687,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   text-align: center;
   text-transform: uppercase;
-  color: #21303b; }
+  color: #333333; }
+  .widget--separator.secondary {
+    color: #ffffff; }
 
 /**
  * A generic label
@@ -1707,6 +1709,12 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap; }
   .widget--label .fa {
     margin-right: 0.5rem; }
+  .widget--label.secondary {
+    background-color: #21303b;
+    color: #ffffff; }
+  .widget--label.tall {
+    height: 3rem;
+    line-height: 3rem; }
   .widget--label.small {
     flex-grow: 0;
     flex-shrink: 0;
@@ -1878,7 +1886,10 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
-    max-width: 20rem; }
+    max-width: 20rem;
+    flex-grow: 1; }
+    .widget--input.text.condensed, .widget--input.password.condensed, .widget--input.number.condensed {
+      max-width: 8rem; }
     .widget--input.text.expanded, .widget--input.password.expanded, .widget--input.number.expanded {
       max-width: 100%; }
     .widget--input.text.tall, .widget--input.password.tall, .widget--input.number.tall {

@@ -227,7 +227,7 @@ class UserController extends require('./ApiController') {
         HashBrown.Helpers.UserHelper.getAllUsers()
         .then((users) => {
             if(users && users.length > 0) {
-                return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please create the new admin with the server console.'));
+                return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.'));
             }
 
             return HashBrown.Helpers.UserHelper.createUser(username, password, true);

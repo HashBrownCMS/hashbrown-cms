@@ -1,6 +1,10 @@
 'use strict';
 
-let fs = require('fs');
+const FileSystem = require('fs');
+const Path = require('path');
+
+// We don't want to be querying the file system every time
+let cache = {};
 
 /**
  * A helper class for reading and writing config files
@@ -9,6 +13,79 @@ let fs = require('fs');
  */
 class ConfigHelper {
     /**
+     * Sets a config section
+     *
+     * @param {String} name
+     * @param {Object} config
+     *
+     * @returns {Promise}
+     */
+    static set(name, config) {
+        checkParam(name, 'name', String);
+        checkParam(config, 'config', Object);
+
+        return new Promise((resolve, reject) => {
+            let path = Path.join(appRoot, 'config', name + '.cfg');
+
+            FileSystem.writeFile(path, JSON.stringify(config), 'utf8', (err, data) => {
+                if(err) {
+                    reject(err);
+
+                } else {
+                    delete cache[name];
+
+                    resolve();
+
+                }
+            });
+        });
+    }
+    
+    /**
+     * Gets whether a config section exists
+     *
+     * @param {String} name
+     *
+     * @returns {Boolean} Config section exists
+     */
+    static existsSync(name) {
+        checkParam(name, 'name', String);
+       
+        let path = Path.join(appRoot, 'config', name + '.cfg');
+
+        try {
+            FileSystem.statSync(path);
+
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Gets whether a config section exists
+     *
+     * @param {String} name
+     *
+     * @returns {Promise} Config section exists
+     */
+    static exists(name) {
+        checkParam(name, 'name', String);
+       
+        let path = Path.join(appRoot, 'config', name + '.cfg');
+
+        return new Promise((resolve, reject) => {
+            FileSystem.stat(path, (err, stats) => {
+                if(err) {
+                    return resolve(false);
+                }
+
+                resolve(true);
+            });
+        });
+    }
+        
+    /**
      * Gets a particular config section
      *
      * @param {String} name
@@ -16,18 +93,28 @@ class ConfigHelper {
      * @returns {Promise} Config object
      */
     static get(name) {
-        return new Promise((resolve, reject) => {
-            let path = appRoot + '/config/' + name + '.cfg';
+        checkParam(name, 'name', String);
+       
+        if(cache[name]) { 
+            return Promise.resolve(cache[name]);
+        }
 
-            fs.exists(path, (exists) => {
+        return new Promise((resolve, reject) => {
+            let path = Path.join(appRoot, 'config', name + '.cfg');
+
+            FileSystem.exists(path, (exists) => {
                 if(exists) {
-                    fs.readFile(path, (err, data) => {
+                    FileSystem.readFile(path, (err, data) => {
                         if(err) {
                             reject(err);
 
                         } else {
                             try {
-                                resolve(JSON.parse(data));
+                                let result = JSON.parse(data);
+
+                                cache[name] = result;
+
+                                resolve(result);
 
                             } catch(e) {
                                 reject(e);
@@ -53,11 +140,17 @@ class ConfigHelper {
      * @returns {Object} Config object
      */
     static getSync(name) {
-        let path = appRoot + '/config/' + name + '.cfg';
+        checkParam(name, 'name', String);
+       
+        if(cache[name]) {
+            return cache[name];
+        }
 
-        if(!fs.existsSync(path)) { return {}; }
+        let path = Path.join(appRoot, 'config', name + '.cfg');
 
-        let data = fs.readFileSync(path);
+        if(!FileSystem.existsSync(path)) { return {}; }
+
+        let data = FileSystem.readFileSync(path);
 
         if(!data) { return {}; }
 

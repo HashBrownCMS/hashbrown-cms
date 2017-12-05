@@ -6,6 +6,7 @@ const OS = require('os');
 
 const ProjectHelper = require('Server/Helpers/ProjectHelper');
 const UserHelper = require('Server/Helpers/UserHelper');
+const ConfigHelper = require('Server/Helpers/ConfigHelper');
 
 const Controller = require('./Controller');
 const ApiController = require('./ApiController');
@@ -20,20 +21,16 @@ class ViewController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        // Catch evil-doers
-        app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
+        // Catch evildoers
+        app.get(['/admin', '/user', '/wp-admin', '/umbraco' ], (req, res) => {
             res.sendStatus(404);
         });
 
         // Root
-        app.get('/', (req, res) => {
+        app.get(['/', '/dashboard'], (req, res) => {
             res.redirect('/dashboard/projects');
         });
         
-        app.get('/dashboard', (req, res) => {
-            res.redirect('/dashboard/projects');
-        });
-
         // Text
         app.get('/text/:name', (req, res) => {
             let filename = '';
@@ -66,14 +63,39 @@ class ViewController extends Controller {
 
         // First time setup
         app.get('/setup/:step', (req, res) => {
-            UserHelper.getAllUsers()
-            .then((users) => {
-                if(!users || users.length < 1) { 
-                    res.render('setup', { step: req.params.step });
-                } else {
-                    res.redirect('/');
+            let check = () => {
+                switch(parseInt(req.params.step)) {
+                    case 1:
+                        return ConfigHelper.exists('database')
+                        .then((exists) => {
+                            if(!exists) {
+                                return Promise.resolve();
+                            }
+
+                            return Promise.reject(new Error('Database config exists already'));
+                        });
+
+                    case 2:
+                        return UserHelper.getAllUsers()
+                        .then((users) => {
+                            if(!users || users.length < 1) { 
+                                return Promise.resolve();
+                            }
+
+                            return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.'));
+                        });
                 }
+
+                return Promise.reject(new Error('No such step "' + req.params.step + '"'));
+            };
+
+            check()
+            .then(() => {
+                res.render('setup', { step: req.params.step });
             })
+            .catch((e) => {
+                res.status(400).send(e.message);
+            });
         });
 
         // Login

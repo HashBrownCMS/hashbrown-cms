@@ -19,6 +19,16 @@
         margin-right: 0.5rem;
     }
 
+    &.secondary {
+        background-color: $secondary;
+        color: $secondary-text;
+    }
+
+    &.tall {
+        height: 3rem;
+        line-height: 3rem;
+    }
+
     &.small {
         flex-grow: 0;
         flex-shrink: 0;

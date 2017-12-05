@@ -112,20 +112,20 @@ function ready(files) {
     checkArgs()
     .then((result) => {
         if(result != 'proceed') {
-			process.exit();
-			return;
-		}
-	
+            process.exit();
+            return;
+        }
+    
         // Check if any migrations are needed
         return HashBrown.Helpers.SettingsHelper.migrationCheck();
     })
     .then(() => {
-		// Start HTTP server
-		let port = process.env.PORT || 8080;
-		
-		global.server = HTTP.createServer(app).listen(port);
+        // Start HTTP server
+        let port = process.env.PORT || 8080;
+        
+        global.server = HTTP.createServer(app).listen(port);
 
-		debug.log('HTTP server restarted on port ' + port, 'HashBrown');
+        debug.log('HTTP server restarted on port ' + port, 'HashBrown');
         
         // Enable WebSockets
         ExpressWebSockets(app, server);
@@ -135,13 +135,13 @@ function ready(files) {
             HashBrown.Controllers[name].init(app);
         }
 
-		// Start schedule helper
-		HashBrown.Helpers.ScheduleHelper.startWatching();
-		
-        return Promise.resolve();	
+        // Start schedule helper
+        HashBrown.Helpers.ScheduleHelper.startWatching();
+        
+        return Promise.resolve();   
     })
 
-	// Catch errors
+    // Catch errors
     .catch((e) => {
         throw e;
     });
