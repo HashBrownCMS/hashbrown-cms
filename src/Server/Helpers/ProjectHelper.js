@@ -15,11 +15,11 @@ const Project = require('Common/Models/Project');
  */
 class ProjectHelper {
     /**
-     * Gets a list of all available projects
+     * Gets a list of all available project ids
      *
      * @returns {Promise} Array of Project names
      */
-    static getAllProjectNames() {
+    static getAllProjectIds() {
         return DatabaseHelper.listDatabases()
         .then((allDatabases) => {
             allDatabases = allDatabases || [];
@@ -36,6 +36,49 @@ class ProjectHelper {
                     if(projectExists) {
                         allProjects.push(db);
                     }
+
+                    return checkNextProject();
+                });
+            };
+
+            return checkNextProject();
+        });
+    }
+    
+    /**
+     * Gets a list of all available projects
+     *
+     * @returns {Promise} Array of Projects
+     */
+    static getAllProjects() {
+        return DatabaseHelper.listDatabases()
+        .then((allDatabases) => {
+            allDatabases = allDatabases || [];
+
+            let allProjects = [];
+
+            let checkNextProject = () => {
+                let db = allDatabases.pop();
+
+                if(!db) {
+                    allProjects.sort((a, b) => {
+                        if(a.settings.info.name < b.settings.info.name) {
+                            return -1;
+                        }
+                        
+                        if(a.settings.info.name > b.settings.info.name) {
+                            return 1;
+                        }
+
+                        return 0;
+                    });
+
+                    return Promise.resolve(allProjects);
+                }
+
+                return this.getProject(db)
+                .then((project) => {
+                    allProjects.push(project);
 
                     return checkNextProject();
                 });

@@ -130,6 +130,19 @@ h1, h2, h3, h4, h5, h6 {
     .page--login__login__body .widget {
       margin-bottom: 1rem; }
 
+.page--error {
+  background-color: #21303b;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-image: url("/img/bg-secondary.jpg");
+  background-attachment: fixed;
+  background-position: 0px 0px; }
+  .page--error .widget:not(:last-child) {
+    margin-bottom: 4rem; }
+
 .page--setup {
   background-color: #21303b;
   height: 100%;
@@ -1650,6 +1663,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 0.5rem; }
   .widget--message.expanded {
     width: 100%; }
+  .widget--message.large {
+    padding: 1rem 2rem; }
   .widget--message.fixed {
     position: fixed;
     z-index: 900; }
@@ -1709,12 +1724,6 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap; }
   .widget--label .fa {
     margin-right: 0.5rem; }
-  .widget--label.secondary {
-    background-color: #21303b;
-    color: #ffffff; }
-  .widget--label.tall {
-    height: 3rem;
-    line-height: 3rem; }
   .widget--label.small {
     flex-grow: 0;
     flex-shrink: 0;
@@ -1886,10 +1895,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
-    max-width: 20rem;
-    flex-grow: 1; }
-    .widget--input.text.condensed, .widget--input.password.condensed, .widget--input.number.condensed {
-      max-width: 8rem; }
+    max-width: 20rem; }
     .widget--input.text.expanded, .widget--input.password.expanded, .widget--input.number.expanded {
       max-width: 100%; }
     .widget--input.text.tall, .widget--input.password.tall, .widget--input.number.tall {

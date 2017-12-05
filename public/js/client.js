@@ -18063,15 +18063,15 @@ var UserEditor = function (_HashBrown$Views$Moda) {
         return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({ class: 'widget widget--label warning hidden editor--user__password-warning' }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({ class: 'widget widget--separator' }, 'Projects'), _.each(this.projects, function (i, project) {
             return _.div({ class: 'widget-group' }, new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
-                value: _this9.model.hasScope(project),
+                value: _this9.model.hasScope(project.id),
                 onChange: function onChange(newValue) {
                     if (newValue) {
-                        _this9.model.giveScope(project);
+                        _this9.model.giveScope(project.id);
                     } else {
-                        _this9.model.removeScope(project);
+                        _this9.model.removeScope(project.id);
                     }
                 }
-            }).$element, _.div({ class: 'widget widget--label' }, project), _this9.renderScopesEditor(project));
+            }).$element, _.div({ class: 'widget widget--label' }, project.settings.info.name), _this9.renderScopesEditor(project.id));
         })))];
     };
 
@@ -43968,6 +43968,8 @@ var ContentPane = function (_NavbarPane) {
 
                 schemaReference.pickFirstSchema();
 
+                schemaReference.$element.addClass('widget');
+
                 // Render the confirmation modal
                 UI.confirmModal('OK', 'Create new content', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'Schema'), schemaReference.$element),
 
@@ -46862,7 +46864,13 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 
 
     ContentSchemaReferenceEditor.prototype.pickFirstSchema = function pickFirstSchema() {
-        this.value = this.getDropdownOptions()[0].id;
+        var options = this.getDropdownOptions();
+
+        if (options.length < 1) {
+            return;
+        }
+
+        this.value = options[0].id;
 
         this.trigger('change', this.value);
 

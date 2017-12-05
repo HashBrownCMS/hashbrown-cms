@@ -30,7 +30,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
         
     User.current = new User(user);
 
-    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
 })
 
 // --------------------

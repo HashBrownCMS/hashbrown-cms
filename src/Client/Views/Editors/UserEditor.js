@@ -230,17 +230,17 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
                         return _.div({class: 'widget-group'},
                             new HashBrown.Views.Widgets.Input({
                                 type: 'checkbox',
-                                value: this.model.hasScope(project),
+                                value: this.model.hasScope(project.id),
                                 onChange: (newValue) => {
                                     if(newValue) {
-                                        this.model.giveScope(project);
+                                        this.model.giveScope(project.id);
                                     } else {
-                                        this.model.removeScope(project);
+                                        this.model.removeScope(project.id);
                                     }
                                 }
                             }).$element,
-                            _.div({class: 'widget widget--label'}, project),
-                            this.renderScopesEditor(project)
+                            _.div({class: 'widget widget--label'}, project.settings.info.name),
+                            this.renderScopesEditor(project.id)
                         );
                     })
                 )

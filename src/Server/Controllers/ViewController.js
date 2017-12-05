@@ -54,7 +54,7 @@ class ViewController extends Controller {
 
             FileSystem.readFile(appRoot + '/' + filename, (err, file) => {
                 if(err) {
-                    res.status(502).send(e.message);
+                    res.status(400).render('error', { message: e.message });
                 } else {
                     res.status(200).send(isMarkdown ? Marked(file.toString()) : file.toString());
                 }
@@ -94,7 +94,7 @@ class ViewController extends Controller {
                 res.render('setup', { step: req.params.step });
             })
             .catch((e) => {
-                res.status(400).send(e.message);
+                res.status(400).render('error', { message: e.message });
             });
         });
 
@@ -108,9 +108,7 @@ class ViewController extends Controller {
                     });
                 })
                 .catch((e) => {
-                    res.render('login', {
-                        message: e.message   
-                    });
+                    res.status(400).render('error', { message: e.message });
                 });
 
             } else {
@@ -123,9 +121,7 @@ class ViewController extends Controller {
                     }
                 })
                 .catch((e) => {
-                    res.render('login', {
-                        message: e.message   
-                    });
+                    res.status(400).render('error', { message: e.message });
                 });
 
             }
@@ -150,34 +146,34 @@ class ViewController extends Controller {
         // Environment
         app.get('/:project/:environment/', (req, res) => {
             let user;
+            let project;
 
-            ProjectHelper.environmentExists(req.params.project, req.params.environment)
-            .then((exists) => {
-                if(!exists) {
-                    return Promise.reject(new Error('404: The project and environment "' + req.params.project + '/' + req.params.environment + '" could not be found'));
+            ProjectHelper.getProject(req.params.project)
+            .then((result) => {
+                project = result;
+
+                if(project.environments.indexOf(req.params.environment) < 0) {
+                    return Promise.reject(new Error('The project and environment "' + req.params.project + '/' + req.params.environment + '" could not be found'));
                 }
 
                 return ViewController.authenticate(req.cookies.token);
             })
-            .then((authUser) => {
-                user = authUser;
+            .then((result) => {
+                user = result;
 
                 if(!user.isAdmin && !user.scopes[req.params.project]) {
                     return Promise.reject(new Error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes'));
                 }  
 
                 res.render('environment', {
-                    currentProject: req.params.project,
+                    currentProject: project.id,
+                    currentProjectName: project.settings.info.name,
                     currentEnvironment: req.params.environment,
                     user: user
                 });
             })
             .catch((e) => {
-                if(e.message.indexOf('404') == 0) {
-                    res.status(404).render('404', { message: e.message });
-                } else {
-                    res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
-                }
+                res.status(400).render('error', { message: e.message });
             });
         });
 
@@ -191,8 +187,7 @@ class ViewController extends Controller {
             .then((user) => {
                 FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
                     if(err) {
-                        return res.status(502).send(e.message);
-
+                        return res.status(400).render('error', { message: err.message });
                     }
                 
                     res.render('test', {
@@ -203,8 +198,8 @@ class ViewController extends Controller {
                 });
 
             })
-            .catch(() => {
-                res.sendStatus(401);
+            .catch((e) => {
+                res.status(400).render('error', { message: e.message });
             });
         });
 

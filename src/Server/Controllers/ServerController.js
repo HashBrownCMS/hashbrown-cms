@@ -11,7 +11,7 @@ class ServerController extends require('./ApiController') {
      */
     static init(app) {
         app.get('/api/server/update/check', this.middleware({ setProject: false }), this.getUpdateCheck);
-        app.get('/api/server/projects', this.middleware({ setProject: false }), this.getAllProjectNames);
+        app.get('/api/server/projects', this.middleware({ setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ setProject: false }), this.getAllEnvironments);
         app.get('/api/server/backups/:project/:timestamp.hba', this.middleware({ setProject: false }), this.getBackup);
@@ -364,15 +364,26 @@ class ServerController extends require('./ApiController') {
     /**
      * Gets a list of all projects
      */
-    static getAllProjectNames(req, res) {
-        HashBrown.Helpers.ProjectHelper.getAllProjectNames()
+    static getAllProjects(req, res) {
+        let getProjects = () => {
+            if(req.query.ids) {
+                return HashBrown.Helpers.ProjectHelper.getAllProjectIds();
+            }
+
+            return HashBrown.Helpers.ProjectHelper.getAllProjects();
+        };
+
+        getProjects()
         .then((projects) => {
             let scopedProjects = [];
 
             if(!req.user.isAdmin) {
                 for(let scope in (req.user.scopes || {})) {
-                    if(projects.indexOf(scope) > -1) {
-                        scopedProjects.push(scope);
+                    for(let project of projects) {
+                        if(project.id === scope || project === scope) {
+                            scopedProjects.push(project);
+                            break;
+                        }
                     }
                 }
 
@@ -380,18 +391,6 @@ class ServerController extends require('./ApiController') {
                 scopedProjects = projects;
                     
             }
-
-            scopedProjects.sort((a, b) => {
-                if(a < b) {
-                    return -1;
-                }
-                
-                if(a > b) {
-                    return 1;
-                }
-
-                return 0;
-            });
 
             res.status(200).send(scopedProjects);
         })

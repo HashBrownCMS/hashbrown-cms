@@ -20,12 +20,6 @@
         height: 2rem;
         width: 100%;
         max-width: 20rem;
-        flex-grow: 1;
-       
-        // Condensed mode
-        &.condensed {
-            max-width: 8rem;
-        }
 
         // Expanded mode
         &.expanded {

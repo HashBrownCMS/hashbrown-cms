@@ -66,7 +66,7 @@ class Controller {
      */
     static authenticate(token, project, scope, needsAdmin) {
         if(!token) {
-            return Promise.reject(new Error('No token was provided'));
+            return Promise.reject(new Error('You need to be logged in to do that'));
         }
     
         return HashBrown.Helpers.UserHelper.findToken(token)

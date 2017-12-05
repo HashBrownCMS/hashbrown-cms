@@ -12,6 +12,10 @@
         width: 100%;
     }
 
+    &.large {
+        padding: 1rem 2rem;
+    }
+
     &.fixed {
         position: fixed;
         z-index: 900;

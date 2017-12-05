@@ -29,7 +29,6 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                         contentType: false,
                         success: (id) => {
                             this.model = null;
-
                             this.fetch();
 
                             uploadModal.close();
@@ -59,7 +58,6 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
         RequestHelper.request('post', 'server/backups/' + this.model.id + '/new')
         .then((data) => {
             this.model = null;
-
             this.fetch();
         })
         .catch(UI.errorModal);
@@ -112,7 +110,6 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                 modal.close();
 
                 this.model = null;
-
                 this.fetch();
             })
             .catch(UI.errorModal);

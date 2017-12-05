@@ -25,19 +25,14 @@ class InfoEditor extends HashBrown.Views.Modals.Modal {
 
         super(params);
 
-        SettingsHelper.getSettings(this.projectId, null, 'info')
-        .then((infoSettings) => {
-            this.model = infoSettings || {};
-
-            this.fetch();
-        });
+        this.fetch();
     }
     
     /**
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        SettingsHelper.setSettings(this.projectId, null, 'info', this.model)
+        SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info)
         .then(() => {
             this.close();
 
@@ -57,9 +52,9 @@ class InfoEditor extends HashBrown.Views.Modals.Modal {
         return _.div({class: 'widget-group'},
             _.span({class: 'widget widget--label'}, 'Name'),
             new HashBrown.Views.Widgets.Input({
-                value: this.model.name,
+                value: this.model.settings.info.name,
                 onChange: (newName) => {
-                    this.model.name = newName
+                    this.model.settings.info.name = newName
                 }
             })
         );

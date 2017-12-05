@@ -1,0 +1,14 @@
+.page--error {
+    background-color: $secondary;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    @include background('secondary');
+
+    .widget:not(:last-child) {
+        margin-bottom: 4rem;
+    }
+}

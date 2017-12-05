@@ -25,7 +25,7 @@ class DatabaseHelper {
      * @returns {String} Connection string
      */
     static getConnectionString(databaseName) {
-        let config = HashBrown.Helpers.ConfigHelper.getSync('database');
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
 
         let connectionString = 'mongodb://';
        
@@ -49,7 +49,7 @@ class DatabaseHelper {
             connectionString += '/' + databaseName;
         }
         
-        if(config.options) {
+        if(config.options && Object.keys(config.options).length > 0) {
             connectionString += '?' + QueryString.stringify(config.options);
         }
 
