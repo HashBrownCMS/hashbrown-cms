@@ -7,6 +7,7 @@
     border-radius: 0.2rem;
     line-height: 2rem;
     padding: 0 0.5rem;
+    max-width: calc(100% - 2rem);
 
     &.expanded {
         width: 100%;

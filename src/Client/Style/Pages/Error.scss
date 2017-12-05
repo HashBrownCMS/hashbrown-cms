@@ -1,5 +1,6 @@
 .page--error {
     background-color: $secondary;
+    color: $secondary-text;
     height: 100%;
     display: flex;
     align-items: center;
@@ -10,5 +11,10 @@
 
     .widget:not(:last-child) {
         margin-bottom: 4rem;
+    }
+    
+    &__logo {
+        max-width: 10rem;
+        margin: 0 auto;
     }
 }

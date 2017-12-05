@@ -132,6 +132,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .page--error {
   background-color: #21303b;
+  color: #ffffff;
   height: 100%;
   display: flex;
   align-items: center;
@@ -142,6 +143,9 @@ h1, h2, h3, h4, h5, h6 {
   background-position: 0px 0px; }
   .page--error .widget:not(:last-child) {
     margin-bottom: 4rem; }
+  .page--error__logo {
+    max-width: 10rem;
+    margin: 0 auto; }
 
 .page--setup {
   background-color: #21303b;
@@ -1660,7 +1664,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   border-radius: 0.2rem;
   line-height: 2rem;
-  padding: 0 0.5rem; }
+  padding: 0 0.5rem;
+  max-width: calc(100% - 2rem); }
   .widget--message.expanded {
     width: 100%; }
   .widget--message.large {

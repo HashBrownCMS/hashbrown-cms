@@ -153,7 +153,7 @@ class ViewController extends Controller {
                 project = result;
 
                 if(project.environments.indexOf(req.params.environment) < 0) {
-                    return Promise.reject(new Error('The project and environment "' + req.params.project + '/' + req.params.environment + '" could not be found'));
+                    return Promise.reject(new Error('The environment "' + req.params.environment + '" could not be found in the project "' + project.settings.info.name + '"'));
                 }
 
                 return ViewController.authenticate(req.cookies.token);
