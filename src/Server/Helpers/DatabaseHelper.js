@@ -47,6 +47,8 @@ class DatabaseHelper {
         
         if(databaseName) {
             connectionString += '/' + databaseName;
+        } else {
+            connectionString += '/';
         }
         
         if(config.options && Object.keys(config.options).length > 0) {
