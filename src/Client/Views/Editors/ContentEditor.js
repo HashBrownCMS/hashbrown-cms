@@ -413,27 +413,24 @@ class ContentEditor extends Crisp.View {
      * Renders the action buttons
      */
     renderButtons() {
+        let url = this.model.properties.url;
+
+        if(url instanceof Object) {
+            url = url[window.language];
+        }
+
         let remoteUrl;
         let connectionId = this.model.getSettings('publishing').connectionId;
         let connection;
 
-        // Construct the remote URL, if a Connection is set up for publishing
         if(connectionId) {
             connection = ConnectionHelper.getConnectionByIdSync(connectionId);
-                
-            let contentUrl = this.model.properties.url;
 
-            if(connection && connection.url && contentUrl) {
-                // Language versioning
-                if(contentUrl instanceof Object) {
-                    contentUrl = contentUrl[window.language];
-                }
+            if(connection && connection.url) {
+                remoteUrl = connection.url + url;
 
-                // Construct remote URL
-                if(contentUrl !== '/' && contentUrl !== '//') {
-                    remoteUrl = connection.url + contentUrl;
-                    remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
-                }
+                // Remove unnecessary slashes
+                remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
             }
         }
             

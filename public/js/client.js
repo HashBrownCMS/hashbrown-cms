@@ -32369,27 +32369,24 @@ var ContentEditor = function (_Crisp$View) {
     ContentEditor.prototype.renderButtons = function renderButtons() {
         var _this7 = this;
 
+        var url = this.model.properties.url;
+
+        if (url instanceof Object) {
+            url = url[window.language];
+        }
+
         var remoteUrl = void 0;
         var connectionId = this.model.getSettings('publishing').connectionId;
         var connection = void 0;
 
-        // Construct the remote URL, if a Connection is set up for publishing
         if (connectionId) {
             connection = ConnectionHelper.getConnectionByIdSync(connectionId);
 
-            var contentUrl = this.model.properties.url;
+            if (connection && connection.url) {
+                remoteUrl = connection.url + url;
 
-            if (connection && connection.url && contentUrl) {
-                // Language versioning
-                if (contentUrl instanceof Object) {
-                    contentUrl = contentUrl[window.language];
-                }
-
-                // Construct remote URL
-                if (contentUrl !== '/' && contentUrl !== '//') {
-                    remoteUrl = connection.url + contentUrl;
-                    remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
-                }
+                // Remove unnecessary slashes
+                remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
             }
         }
 
