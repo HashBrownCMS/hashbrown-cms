@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         new HashBrown.Views.Navigation.MainMenu();
 
         Crisp.Router.check = (newRoute, cancel, proceed) => {
+            UI.highlight(false);
+
             let contentEditor = Crisp.View.get('ContentEditor');
 
             if(

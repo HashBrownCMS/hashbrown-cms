@@ -26,7 +26,7 @@
         display: none;
     }
 
-    &__panes, &__tabs {
+    &__panes {
         transition: opacity 0.5s, width 0.5s;
         overflow-x: hidden;
     }

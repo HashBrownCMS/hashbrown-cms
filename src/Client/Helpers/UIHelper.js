@@ -7,6 +7,73 @@
  */
 class UIHelper {
     /**
+     * Starts the tour of the UI
+     *
+     * @returns {Promise} Tour completed
+     */
+    static startTour() {
+        return UI.highlight('.navbar-main__tabs button[data-route="/content/"]', 'This the Content section, the one you\'re currently on', 'right', 'next <span class="fa fa-arrow-right"></span>')
+        .then(() => {
+            return UI.highlight('.navbar-main__tabs button[data-route="/schemas/"]', 'This the Content section, the one you\'re currently on', 'right');
+        });
+    }
+
+    /**
+     * Highlights an element with an optional label
+     *
+     * @param {Boolean|HTMLElement} element
+     * @param {String} label
+     * @param {String} direction
+     * @param {String} buttonLabel
+     *
+     * @return {Promise} Callback on dismiss
+     */
+    static highlight(element, label, direction = 'right', buttonLabel) {
+        if(element === false) {
+            $('.widget--highlight').remove();
+
+            return Promise.resolve();
+        }
+
+        if(typeof element === 'string') {
+            element = document.querySelector(element);
+        }
+
+        if(!element) { return Promise.resolve(); }
+
+        this.highlight(false);
+
+        return new Promise((resolve) => {
+            let dismiss = () => {
+                $highlight.remove();
+
+                resolve(element);
+            };
+            
+            let $highlight = _.div({class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;'},
+                _.div({class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;'}),
+                _.if(label,
+                    _.div({class: 'widget--highlight__label'},
+                        _.div({class: 'widget--highlight__label__text'}, label),
+                        _.if(buttonLabel,
+                            _.button({class: 'widget widget--button widget--highlight__button condensed'}, buttonLabel)
+                                .click(() => {
+                                    dismiss();
+                                })
+                        )
+                    )
+                )
+            ).click(() => {
+                if(buttonLabel) { return; }
+
+                dismiss();
+            });
+            
+            _.append(element.parentElement, $highlight);
+        });
+    }
+
+    /**
      * Sets the content of the editor space
      *
      * @param {Array|HTMLElement} content

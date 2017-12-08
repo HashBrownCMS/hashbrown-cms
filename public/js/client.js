@@ -33252,11 +33252,77 @@ var UIHelper = function () {
     }
 
     /**
+     * Starts the tour of the UI
+     *
+     * @returns {Promise} Tour completed
+     */
+    UIHelper.startTour = function startTour() {
+        return UI.highlight('.navbar-main__tabs button[data-route="/content/"]', 'This the Content section, the one you\'re currently on', 'right', 'next <span class="fa fa-arrow-right"></span>').then(function () {
+            return UI.highlight('.navbar-main__tabs button[data-route="/schemas/"]', 'This the Content section, the one you\'re currently on', 'right');
+        });
+    };
+
+    /**
+     * Highlights an element with an optional label
+     *
+     * @param {Boolean|HTMLElement} element
+     * @param {String} label
+     * @param {String} direction
+     * @param {String} buttonLabel
+     *
+     * @return {Promise} Callback on dismiss
+     */
+
+
+    UIHelper.highlight = function highlight(element, label) {
+        var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'right';
+        var buttonLabel = arguments[3];
+
+        if (element === false) {
+            $('.widget--highlight').remove();
+
+            return Promise.resolve();
+        }
+
+        if (typeof element === 'string') {
+            element = document.querySelector(element);
+        }
+
+        if (!element) {
+            return Promise.resolve();
+        }
+
+        this.highlight(false);
+
+        return new Promise(function (resolve) {
+            var dismiss = function dismiss() {
+                $highlight.remove();
+
+                resolve(element);
+            };
+
+            var $highlight = _.div({ class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;' }, _.div({ class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;' }), _.if(label, _.div({ class: 'widget--highlight__label' }, _.div({ class: 'widget--highlight__label__text' }, label), _.if(buttonLabel, _.button({ class: 'widget widget--button widget--highlight__button condensed' }, buttonLabel).click(function () {
+                dismiss();
+            }))))).click(function () {
+                if (buttonLabel) {
+                    return;
+                }
+
+                dismiss();
+            });
+
+            _.append(element.parentElement, $highlight);
+        });
+    };
+
+    /**
      * Sets the content of the editor space
      *
      * @param {Array|HTMLElement} content
      * @param {String} className
      */
+
+
     UIHelper.setEditorSpaceContent = function setEditorSpaceContent(content, className) {
         var $space = $('.page--environment__space--editor');
 
@@ -41983,6 +42049,8 @@ document.addEventListener('DOMContentLoaded', function () {
         new HashBrown.Views.Navigation.MainMenu();
 
         Crisp.Router.check = function (newRoute, cancel, proceed) {
+            UI.highlight(false);
+
             var contentEditor = Crisp.View.get('ContentEditor');
 
             if (!contentEditor || !contentEditor.model || newRoute.indexOf(contentEditor.model.id) > -1 || !contentEditor.dirty) {
@@ -42042,7 +42110,9 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create new Content.'), _.p('Click on a Content node to edit it.'), _.h2('Getting started'), _.p('Click the button below to start a tour of the CMS.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to start the tour' }, 'Start tour').click(function () {
+        UI.startTour();
+    }), _.p('Click the button below to get some example content to work with.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
@@ -46761,7 +46831,7 @@ var BooleanEditor = function (_FieldEditor) {
     BooleanEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+        return _.div({ class: 'editor__field__value field-editor--boolean' }, new HashBrown.Views.Widgets.Input({
             type: 'checkbox',
             value: this.value,
             tooltip: this.description || '',
@@ -49098,7 +49168,7 @@ var UrlEditor = function (_FieldEditor) {
     UrlEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group', title: this.description || '' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
+        return _.div({ class: 'editor__field__value field-editor--url' }, _.div({ class: 'widget-group', title: this.description || '' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
             _this2.onChange();
         }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();

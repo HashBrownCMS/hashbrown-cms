@@ -15,7 +15,7 @@
     &.password,
     &.number {
         border-radius: 0.2rem;
-        border: 1px solid $standard-dark;
+        border: 2px solid $standard;
         padding: 0 0.5rem;
         height: 2rem;
         width: 100%;
@@ -179,7 +179,7 @@
             position: absolute;
             white-space: nowrap;
             left: 4rem;
-            border-left: 1px solid $primary-text;
+            border-left: 2px solid $primary-text;
             
             &:hover {
                 background-color: $primary-dark;

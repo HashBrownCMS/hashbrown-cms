@@ -9,7 +9,7 @@
     flex-grow: 1;
     background-color: $standard;
     border-radius: 0.2rem;
-    border: 1px solid $standard-dark;
+    border: 2px solid $standard-dark;
     user-select: none;
 
     // Small
@@ -199,7 +199,8 @@
         position: absolute;
         line-height: 2rem;
         width: 100%;
-        border: 0;
+        border: 2px solid $standard;
+        border-bottom: 0;
         border-top-right-radius: 0.2rem;
         border-top-left-radius: 0.2rem;
         top: 0;
@@ -207,6 +208,11 @@
         height: 2rem;
         padding: 0 0.5rem;
         z-index: 910;
+
+        &:focus {
+            outline: 0;
+            border-color: $primary;
+        }
 
         &__icon {
             position: absolute;
@@ -248,7 +254,7 @@
         position: absolute;
         top: 2rem;
         left: 0;
-        border: 1px solid $primary;
+        border: 2px solid $primary;
         background-color: $standard;
         width: 100%;
         max-height: 10rem;

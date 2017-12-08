@@ -4,9 +4,6 @@
 /* Success */
 /* Standard */
 /* Fancy backgrounds */
-/**
- * Some basic defaults
- */
 html, body {
   height: 100%;
   font-family: 'Roboto', sans-serif;
@@ -20,6 +17,10 @@ button, a {
   cursor: pointer; }
   button:focus, a:focus {
     outline: none; }
+
+@keyframes highlight-pulse {
+  to {
+    box-shadow: 0 0 0 1rem rgba(231, 13, 59, 0); } }
 
 /**
  * All basic rules regarding typography
@@ -457,7 +458,7 @@ h1, h2, h3, h4, h5, h6 {
       flex-direction: column; } }
   .navbar-main.hide-tabs .navbar-main__tabs {
     display: none; }
-  .navbar-main__panes, .navbar-main__tabs {
+  .navbar-main__panes {
     transition: opacity 0.5s, width 0.5s;
     overflow-x: hidden; }
   .navbar-main__toggle {
@@ -1960,7 +1961,7 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 3rem; }
   .widget--input.text, .widget--input.password, .widget--input.number {
     border-radius: 0.2rem;
-    border: 1px solid #eeeeee;
+    border: 2px solid #ffffff;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%;
@@ -2087,7 +2088,7 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     white-space: nowrap;
     left: 4rem;
-    border-left: 1px solid #ffffff; }
+    border-left: 2px solid #ffffff; }
     .widget--input__checkbox-label:hover {
       background-color: #b70a2f; }
   .widget--input__checkbox-input {
@@ -2121,6 +2122,82 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #e70d3b; }
 
 /**
+ * An element for highlighting and explaining other elements
+ */
+.widget--highlight {
+  position: absolute;
+  display: flex;
+  z-index: 999999; }
+  .widget--highlight.right {
+    flex-direction: row; }
+  .widget--highlight.left {
+    flex-direction: row-reverse; }
+  .widget--highlight.top {
+    flex-direction: column-reverse; }
+  .widget--highlight.bottom {
+    flex-direction: column; }
+  .widget--highlight.right .widget--highlight__label {
+    top: 0.5rem;
+    left: calc(100% + 1.5rem); }
+    .widget--highlight.right .widget--highlight__label:after {
+      border-top: 1rem solid transparent;
+      border-bottom: 1rem solid transparent;
+      border-right: 1rem solid #e70d3b;
+      top: 0%;
+      right: 100%; }
+  .widget--highlight.left .widget--highlight__label {
+    top: 0.5rem;
+    right: calc(100% + 1.5rem); }
+    .widget--highlight.left .widget--highlight__label:after {
+      border-top: 1rem solid transparent;
+      border-bottom: 1rem solid transparent;
+      border-left: 1rem solid #e70d3b;
+      top: 0%;
+      left: 100%; }
+  .widget--highlight.top .widget--highlight__label {
+    bottom: calc(100% + 1.5rem); }
+    .widget--highlight.top .widget--highlight__label:after {
+      border-left: 1rem solid transparent;
+      border-right: 1rem solid transparent;
+      border-top: 1rem solid #e70d3b;
+      top: 100%;
+      left: 0%; }
+  .widget--highlight.bottom .widget--highlight__label {
+    top: calc(100% + 1.5rem); }
+    .widget--highlight.bottom .widget--highlight__label:after {
+      border-left: 1rem solid transparent;
+      border-right: 1rem solid transparent;
+      border-bottom: 1rem solid #e70d3b;
+      bottom: 100%;
+      left: 0%; }
+  .widget--highlight__frame {
+    border: 2px solid #e70d3b;
+    border-radius: 0.2rem;
+    box-shadow: 0 0 0 0 #e70d3b;
+    animation: highlight-pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1); }
+  .widget--highlight__label {
+    border-radius: 0.2rem;
+    border: 2px solid #e70d3b;
+    background-color: #ffffff;
+    color: #333333;
+    font-weight: bold;
+    padding: 1rem;
+    line-height: 1.5;
+    position: absolute;
+    min-height: 2rem;
+    min-width: 20rem;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); }
+    .widget--highlight__label:after {
+      position: absolute;
+      content: '';
+      display: block;
+      width: 0;
+      height: 0; }
+  .widget--highlight__button {
+    margin-top: 0.5rem;
+    margin-left: auto; }
+
+/**
  * A dropdown widget with typeahead
  */
 .widget--dropdown {
@@ -2131,7 +2208,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-grow: 1;
   background-color: #ffffff;
   border-radius: 0.2rem;
-  border: 1px solid #eeeeee;
+  border: 2px solid #eeeeee;
   user-select: none; }
   .widget--dropdown.small {
     max-width: 2rem;
@@ -2253,7 +2330,8 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     line-height: 2rem;
     width: 100%;
-    border: 0;
+    border: 2px solid #ffffff;
+    border-bottom: 0;
     border-top-right-radius: 0.2rem;
     border-top-left-radius: 0.2rem;
     top: 0;
@@ -2261,6 +2339,9 @@ h1, h2, h3, h4, h5, h6 {
     height: 2rem;
     padding: 0 0.5rem;
     z-index: 910; }
+    .widget--dropdown__typeahead:focus {
+      outline: 0;
+      border-color: #e70d3b; }
     .widget--dropdown__typeahead__icon {
       position: absolute;
       z-index: 920;
@@ -2292,7 +2373,7 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     top: 2rem;
     left: 0;
-    border: 1px solid #e70d3b;
+    border: 2px solid #e70d3b;
     background-color: #ffffff;
     width: 100%;
     max-height: 10rem;
