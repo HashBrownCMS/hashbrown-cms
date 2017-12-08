@@ -108,6 +108,26 @@
         border-top: 1px solid $standard-darker;
         color: $standard-text;
 
+        // Message
+        &__message {
+            color: $standard-darkest;
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            font-weight: bold;
+
+            &:empty {
+                display: none;
+            }
+
+            &:before {
+                content: '\f05a';
+                font-family: 'FontAwesome';
+                margin-right: 0.5rem;
+            }
+        }
+
         // Buttons
         &__buttons {
             margin: 0 0 0 auto;
@@ -371,11 +391,26 @@
                 .editor__field__sort-key {
                     color: $primary-text;
                 }
+                
+                // Hide the action buttons
+                .editor__field__action {
+                    display: none;
+                }
 
                 // Style the items inside
                 .editor__field {
                     background-color: $primary;
                     cursor: move;
+
+                    // Dragging state
+                    &.dragging {
+                        background-color: transparent;
+                        border: 2px dashed $primary;
+
+                        .editor__field__sort-key {
+                            color: $primary;
+                        }
+                    }
 
                     &__collapse,
                     &__remove {

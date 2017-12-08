@@ -136,12 +136,12 @@ class FormsPane extends NavbarPane {
 
                 menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
 
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-
                 if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveForm(); };
                 }
                 
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+
                 if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
                 if(isSyncEnabled) {

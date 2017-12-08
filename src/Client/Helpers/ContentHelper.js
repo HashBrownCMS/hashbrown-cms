@@ -44,6 +44,24 @@ class ContentHelper extends ContentHelperCommon {
             return Promise.resolve(new Content(content));
         });
     }
+    
+    /**
+     * Sets Content by id
+     *
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @returns {Promise} Content node
+     */
+    static setContentById(id, content) {
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return RequestHelper.request('post', 'content/' + id, content.getObject())
+        .then((content) => {
+            return Promise.resolve(content);
+        });
+    }
 
     /**
      * A sanity check for fields

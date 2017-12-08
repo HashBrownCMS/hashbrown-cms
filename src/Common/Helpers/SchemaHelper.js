@@ -71,15 +71,13 @@ class SchemaHelper {
                 if(typeof parentValues[k] === 'object' && typeof childValues[k] === 'object') {
                     merge(parentValues[k], childValues[k]);
                 
-                } else {
+                } else if(childValues[k]) {
                     parentValues[k] = childValues[k];
                 
                 }
             }
         }
 
-        merge(mergedSchema.fields, childSchema.fields);
-       
         // Overwrite native values 
         mergedSchema.id = childSchema.id;
         mergedSchema.name = childSchema.name;
@@ -90,22 +88,29 @@ class SchemaHelper {
         switch(mergedSchema.type) {
             case 'field':
                 mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+                
+                // Merge config
+                if(!mergedSchema.config) { mergedSchema.config = {}; }
+                if(!parentSchema.config) { parentSchema.config = {}; }
+
+                merge(mergedSchema.config, childSchema.config);
                 break;
 
             case 'content':
-                let mergedTabs = {};
-                
-                if(!mergedSchema.tabs) {
-                    mergedSchema.tabs = {};
-                }
-
-                if(!childSchema.tabs) {
-                    childSchema.tabs = {};
-                }
-               
                 // Merge tabs
+                if(!mergedSchema.tabs) { mergedSchema.tabs = {}; }
+                if(!childSchema.tabs) { childSchema.tabs = {}; }
+               
                 merge(mergedSchema.tabs, childSchema.tabs);
 
+                // Merge fields
+                if(!mergedSchema.fields) { mergedSchema.fields = {}; }
+                if(!mergedSchema.fields.properties) { mergedSchema.fields.properties = {}; }
+                if(!childSchema.fields) { childSchema.fields = {}; }
+                if(!childSchema.fields.properties) { childSchema.fields.properties = {}; }
+
+                merge(mergedSchema.fields, childSchema.fields);
+       
                 // Set default tab id
                 mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
                 break;

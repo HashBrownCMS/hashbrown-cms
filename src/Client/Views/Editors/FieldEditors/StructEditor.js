@@ -86,12 +86,60 @@ class StructEditor extends FieldEditor {
         let $element = _.div({class: 'editor--schema__struct'});
 
         let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+    
+        let getParentStruct = () => {
+            let struct = {};
+
+            let schemaEditor = Crisp.View.get('FieldSchemaEditor');
+
+            if(
+                !schemaEditor ||
+                !schemaEditor.parentSchema ||
+                !schemaEditor.parentSchema.config ||
+                !schemaEditor.parentSchema.config.struct
+            ) { return struct; }
             
+            for(let key in schemaEditor.parentSchema.config.struct) {
+                // We only want parent struct values
+                if(config.struct[key]) { continue; }
+
+                struct[key]  = schemaEditor.parentSchema.config.struct[key];
+            }
+
+            return struct;
+        };
+
         let renderEditor = () => {
             _.append($element.empty(),
+                _.if(Object.keys(getParentStruct()).length > 0,
+                    _.div({class: 'editor__field'},
+                        _.div({class: 'editor__field__key'},
+                            _.div({class: 'editor__field__key__label'}, 'Parent struct'),
+                            _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this Schema')
+                        ),
+                        _.div({class: 'editor__field__value'},
+                            _.each(getParentStruct(), (fieldKey, fieldValue) => {
+                                return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
+                                    .click(() => {
+                                        let newProperties = {};
+
+                                        newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+                                        for(let key in config.struct) {
+                                            newProperties[key] = config.struct[key];
+                                        }
+
+                                        config.struct = newProperties;
+
+                                        renderEditor();
+                                    });
+                            })
+                        )
+                    )
+                ),
                 _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
-                        'Properties',
+                        'Struct',
                         _.div({class: 'editor__field__key__actions'},
                             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                                 .click((e) => {
@@ -259,7 +307,7 @@ class StructEditor extends FieldEditor {
      * Renders this editor
      */
    template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'editor__field__value field-editor--struct'},
             // Loop through each key in the struct
             _.each(this.config.struct, (k, keySchema) => {
                 let value = this.value[k];

@@ -2077,6 +2077,8 @@ var RequestHelper = function () {
                 UI.errorModal(e);
             }
 
+            window.resources[name] = [];
+
             return Promise.resolve([]);
         });
     };
@@ -7780,7 +7782,7 @@ var MediaHelper = function (_MediaHelperCommon) {
      *
      * @param {String} id
      *
-     * @return {Promise(Media)}
+     * @return {Promise} Media object
      */
 
 
@@ -9212,6 +9214,25 @@ var ContentHelper = function (_ContentHelperCommon) {
 
         return RequestHelper.request('get', 'content/' + id).then(function (content) {
             return Promise.resolve(new Content(content));
+        });
+    };
+
+    /**
+     * Sets Content by id
+     *
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @returns {Promise} Content node
+     */
+
+
+    ContentHelper.setContentById = function setContentById(id, content) {
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return RequestHelper.request('post', 'content/' + id, content.getObject()).then(function (content) {
+            return Promise.resolve(content);
         });
     };
 
@@ -26130,13 +26151,11 @@ var SchemaHelper = function () {
             for (var k in childValues) {
                 if (_typeof(parentValues[k]) === 'object' && _typeof(childValues[k]) === 'object') {
                     merge(parentValues[k], childValues[k]);
-                } else {
+                } else if (childValues[k]) {
                     parentValues[k] = childValues[k];
                 }
             }
         }
-
-        merge(mergedSchema.fields, childSchema.fields);
 
         // Overwrite native values 
         mergedSchema.id = childSchema.id;
@@ -26148,21 +26167,44 @@ var SchemaHelper = function () {
         switch (mergedSchema.type) {
             case 'field':
                 mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+
+                // Merge config
+                if (!mergedSchema.config) {
+                    mergedSchema.config = {};
+                }
+                if (!parentSchema.config) {
+                    parentSchema.config = {};
+                }
+
+                merge(mergedSchema.config, childSchema.config);
                 break;
 
             case 'content':
-                var mergedTabs = {};
-
+                // Merge tabs
                 if (!mergedSchema.tabs) {
                     mergedSchema.tabs = {};
                 }
-
                 if (!childSchema.tabs) {
                     childSchema.tabs = {};
                 }
 
-                // Merge tabs
                 merge(mergedSchema.tabs, childSchema.tabs);
+
+                // Merge fields
+                if (!mergedSchema.fields) {
+                    mergedSchema.fields = {};
+                }
+                if (!mergedSchema.fields.properties) {
+                    mergedSchema.fields.properties = {};
+                }
+                if (!childSchema.fields) {
+                    childSchema.fields = {};
+                }
+                if (!childSchema.fields.properties) {
+                    childSchema.fields.properties = {};
+                }
+
+                merge(mergedSchema.fields, childSchema.fields);
 
                 // Set default tab id
                 mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
@@ -29922,6 +29964,27 @@ var Content = function (_Resource) {
     };
 
     /**
+     * Sets a property value
+     *
+     * @param {String} key
+     * @param {String|Number|Object} value
+     * @param {String} language
+     */
+
+
+    Content.prototype.setPropertyValue = function setPropertyValue(key, value, language) {
+        if (!this.properties) {
+            this.properties = {};
+        }
+
+        if (language && _typeof(this.properties[key]) === 'object') {
+            this.properties[key][language] = value;
+        } else {
+            this.properties[key] = value;
+        }
+    };
+
+    /**
      * Returns all properties in a given language
      *
      * @param {String} language
@@ -30943,7 +31006,7 @@ var Input = function (_Widget) {
                 }), _.div({ class: 'widget--input__checkbox-background' }), _.div({ class: 'widget--input__checkbox-switch' }));
 
             case 'file':
-                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
+                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
                     var names = [];
                     var files = e.currentTarget.files;
 
@@ -30967,7 +31030,7 @@ var Input = function (_Widget) {
                     } else {
                         btnBrowse.innerHTML = _this2.placeholder || 'Browse...';
                     }
-                }), _.if(typeof this.onSubmit === 'function', _.button({ class: 'widget widget--button widget--input__file-submit disabled small fa fa-upload', type: 'submit', title: 'Upload file' }))).on('submit', function (e) {
+                }), _.if(typeof this.onSubmit === 'function', _.button({ class: 'widget widget--button widget--input__file-submit disabled', type: 'submit', title: 'Upload file' }, _.span({ class: 'fa fa-upload' }), 'Upload'))).on('submit', function (e) {
                     e.preventDefault();
 
                     var input = e.currentTarget.querySelector('.widget--input__file-input');
@@ -31927,6 +31990,8 @@ module.exports = ConnectionHelper;
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -32173,57 +32238,97 @@ var ContentEditor = function (_Crisp$View) {
      * @param {Object} fieldValue The field value to inject into the field editor
      * @param {FieldSchema} fieldDefinition The field definition
      * @param {Function} onChange The change event
-     * @param {Object} config The field config
      * @param {HTMLElement} keyActions The key content container
      *
      * @return {Object} element
      */
 
 
-    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyActions) {
+    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
         var _this4 = this;
 
         var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
-        if (compiledSchema) {
-            var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
-
-            if (fieldEditor) {
-                var fieldEditorInstance = new fieldEditor({
-                    value: fieldValue,
-                    disabled: fieldDefinition.disabled || false,
-                    config: config || {},
-                    description: fieldDefinition.description || '',
-                    schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual === true,
-                    $keyActions: $keyActions
-                });
-
-                fieldEditorInstance.on('change', function (newValue) {
-                    if (_this4.model.isLocked) {
-                        return;
-                    }
-
-                    _this4.dirty = true;
-
-                    onChange(newValue);
-                });
-
-                fieldEditorInstance.on('silentchange', function (newValue) {
-                    if (_this4.model.isLocked) {
-                        return;
-                    }
-
-                    onChange(newValue);
-                });
-
-                return fieldEditorInstance.$element;
-            } else {
-                debug.log('No editor by id "' + fieldSchema.editorId + '" found', this);
-            }
-        } else {
-            debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
+        if (!compiledSchema) {
+            return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
         }
+
+        var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+
+        if (!fieldEditor) {
+            return debug.log('No field editor by id "' + fieldSchema.editorId + '" found', this);
+        }
+
+        // Get the config
+        var config = void 0;
+
+        // If the field has a config, check recursively if it's empty
+        // If it isn't, use this config
+        if (fieldDefinition.config) {
+            var isEmpty = true;
+            var checkRecursive = function checkRecursive(object) {
+                if (!object) {
+                    return;
+                }
+
+                // We consider a config not empty, if it has a value that is not an object
+                // Remember, null is of type 'object' too
+                if ((typeof object === 'undefined' ? 'undefined' : _typeof(object)) !== 'object') {
+                    return isEmpty = false;
+                }
+
+                for (var k in object) {
+                    checkRecursive(object[k]);
+                }
+            };
+
+            checkRecursive(fieldDefinition.config);
+
+            if (!isEmpty) {
+                config = fieldDefinition.config;
+            }
+        }
+
+        // If no config was found, and the Schema has one, use it
+        if (!config && compiledSchema.config) {
+            config = compiledSchema.config;
+        }
+
+        // If still no config was found, assign a placeholder
+        if (!config) {
+            config = {};
+        }
+
+        // Instantiate the field editor
+        var fieldEditorInstance = new fieldEditor({
+            value: fieldValue,
+            disabled: fieldDefinition.disabled || false,
+            config: config,
+            description: fieldDefinition.description || '',
+            schema: compiledSchema.getObject(),
+            multilingual: fieldDefinition.multilingual === true,
+            $keyActions: $keyActions
+        });
+
+        fieldEditorInstance.on('change', function (newValue) {
+            if (_this4.model.isLocked) {
+                return;
+            }
+
+            _this4.dirty = true;
+
+            onChange(newValue);
+        });
+
+        fieldEditorInstance.on('silentchange', function (newValue) {
+            if (_this4.model.isLocked) {
+                return;
+            }
+
+            onChange(newValue);
+        });
+
+        return fieldEditorInstance.$element;
     };
 
     /**
@@ -32263,14 +32368,6 @@ var ContentEditor = function (_Crisp$View) {
 
         // Render all fields
         return _.each(tabFieldDefinitions, function (key, fieldDefinition) {
-            // Fetch field schema
-            var fieldSchema = SchemaHelper.getSchemaByIdSync(fieldDefinition.schemaId);
-
-            if (!fieldSchema) {
-                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this5);
-                return null;
-            }
-
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
@@ -32301,9 +32398,6 @@ var ContentEditor = function (_Crisp$View) {
                     fieldValues[key] = newValue;
                 }
             },
-
-            // Pass the field definition config, and use the field's schema config as fallback
-            fieldDefinition.config || fieldSchema.config,
 
             // Pass the key actions container, so the field editor can populate it
             $keyActions));
@@ -32379,18 +32473,41 @@ var ContentEditor = function (_Crisp$View) {
         var connectionId = this.model.getSettings('publishing').connectionId;
         var connection = void 0;
 
+        // Construct the remote URL, if a Connection is set up for publishing
+        var contentUrl = this.model.properties.url;
+
         if (connectionId) {
             connection = ConnectionHelper.getConnectionByIdSync(connectionId);
 
-            if (connection && connection.url) {
-                remoteUrl = connection.url + url;
+            if (connection && connection.url && contentUrl) {
+                // Language versioning
+                if (contentUrl instanceof Object) {
+                    contentUrl = contentUrl[window.language];
+                }
 
-                // Remove unnecessary slashes
-                remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
+                // Construct remote URL
+                if (contentUrl !== '/' && contentUrl !== '//') {
+                    remoteUrl = connection.url + contentUrl;
+                    remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
+                } else {
+                    contentUrl = null;
+                }
             }
         }
 
-        _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__buttons' },
+        _.append($('.editor__footer').empty(), _.div({ class: 'editor__footer__message' }, _.do(function () {
+            if (!connection) {
+                return 'No Connection is assigned for publishing';
+            }
+
+            if (connection && !connection.url) {
+                return 'No remote URL is defined in the <a href="#/connections/' + connection.id + '">"' + connection.title + '"</a> Connection';
+            }
+
+            if (connection && connection.url && !contentUrl) {
+                return 'Content without a URL may not be visible after publishing';
+            }
+        })), _.div({ class: 'editor__footer__buttons' },
         // JSON editor
         _.button({ class: 'widget widget--button condensed embedded' }, 'Advanced').click(function () {
             _this7.onClickAdvanced();
@@ -32541,7 +32658,7 @@ var SchemaEditor = function (_Crisp$View) {
     SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
         var _this3 = this;
 
-        return _.button({ class: 'widget small widget--button fa fa-' + this.model.icon }).click(function (e) {
+        return _.button({ class: 'widget small widget--button fa fa-' + this.getIcon() }).click(function (e) {
             var modal = new HashBrown.Views.Modals.IconModal();
 
             modal.on('change', function (newIcon) {
@@ -32613,6 +32730,25 @@ var SchemaEditor = function (_Crisp$View) {
     };
 
     /**
+     * Gets the schema icon
+     *
+     * @returns {String} Icon
+     */
+
+
+    SchemaEditor.prototype.getIcon = function getIcon() {
+        if (this.model.icon) {
+            return this.model.icon;
+        }
+
+        if (this.parentSchema && this.parentSchema.icon) {
+            return this.parentSchema.icon;
+        }
+
+        return 'cogs';
+    };
+
+    /**
      * Renders this editor
      */
 
@@ -32620,7 +32756,7 @@ var SchemaEditor = function (_Crisp$View) {
     SchemaEditor.prototype.template = function template() {
         var _this5 = this;
 
-        return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.compiledSchema.icon }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
+        return _.div({ class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '') }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-' + this.getIcon() }), _.h4({ class: 'editor__header__title' }, this.model.name)), this.renderFields(), _.div({ class: 'editor__footer' }, _.div({ class: 'editor__footer__buttons' }, _.button({ class: 'widget widget--button embedded' }, 'Advanced').click(function () {
             _this5.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'widget widget--button editor__footer__buttons__save' }, _.span({ class: 'widget--button__text-default' }, 'Save '), _.span({ class: 'widget--button__text-working' }, 'Saving ')).click(function () {
             _this5.onClickSave();
@@ -33282,6 +33418,7 @@ var UIHelper = function () {
     UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
         var children = Array.prototype.slice.call(parentElement.children || []);
         var canSort = true;
+        var currentDraggedChild = void 0;
 
         children = children.filter(function (child) {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
@@ -33295,75 +33432,86 @@ var UIHelper = function () {
             isActive = !parentElement.classList.contains('sorting');
         }
 
+        if (isActive) {
+            parentElement.ondragover = function (e) {
+                if (!canSort || !currentDraggedChild) {
+                    return;
+                }
+
+                var bodyRect = document.body.getBoundingClientRect();
+
+                _.each(children, function (i, sibling) {
+                    if (sibling === currentDraggedChild || !canSort || e.pageY < 1) {
+                        return;
+                    }
+
+                    var cursorY = e.pageY;
+                    var childY = currentDraggedChild.getBoundingClientRect().y - bodyRect.y;
+                    var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
+                    var hasMoved = false;
+
+                    // Dragging above a sibling
+                    if (cursorY < siblingY && childY > siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling);
+                        hasMoved = true;
+                    }
+
+                    // Dragging below a sibling
+                    if (cursorY > siblingY && childY < siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling.nextElementSibling);
+                        hasMoved = true;
+                    }
+
+                    // Init transition
+                    if (hasMoved) {
+                        canSort = false;
+
+                        var newChildY = currentDraggedChild.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                        currentDraggedChild.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                        sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                        setTimeout(function () {
+                            currentDraggedChild.removeAttribute('style');
+                            sibling.removeAttribute('style');
+                            canSort = true;
+                        }, 100);
+                    }
+                });
+            };
+        } else {
+            parentElement.ondragover = null;
+        }
+
         _.each(children, function (i, child) {
             child.draggable = isActive;
 
             if (isActive) {
                 child.ondragstart = function (e) {
                     e.dataTransfer.setData('text/plain', '');
-                };
-
-                parentElement.ondragover = function (e) {
-                    if (!canSort) {
-                        return;
-                    }
-
-                    var bodyRect = document.body.getBoundingClientRect();
-
-                    _.each(children, function (i, sibling) {
-                        if (sibling === child || !canSort || e.pageY < 1) {
-                            return;
-                        }
-
-                        var cursorY = e.pageY;
-                        var childY = child.getBoundingClientRect().y - bodyRect.y;
-                        var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
-                        var hasMoved = false;
-
-                        // Dragging above a sibling
-                        if (cursorY < siblingY && childY > siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling);
-                            hasMoved = true;
-                        }
-
-                        // Dragging below a sibling
-                        if (cursorY > siblingY && childY < siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
-                            hasMoved = true;
-                        }
-
-                        // Init transition
-                        if (hasMoved) {
-                            canSort = false;
-
-                            var newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-                            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-
-                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
-                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
-
-                            setTimeout(function () {
-                                child.removeAttribute('style');
-                                sibling.removeAttribute('style');
-                                canSort = true;
-                            }, 100);
-                        }
-                    });
+                    child.classList.toggle('dragging', true);
+                    currentDraggedChild = child;
                 };
 
                 child.ondragend = function (e) {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
 
                 child.ondragcancel = function (e) {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
             } else {
+                child.classList.toggle('dragging', false);
                 child.ondragstart = null;
                 child.ondrag = null;
-                parentElement.ondragover = null;
                 child.ondragstop = null;
                 child.ondragcancel = null;
+                currentDraggedChild = null;
             }
         });
 
@@ -41893,7 +42041,7 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create a new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
@@ -42064,7 +42212,7 @@ Crisp.Router.route('/schemas/', function () {
 Crisp.Router.route('/schemas/:id', function () {
     if (currentUserHasScope('schemas')) {
         var schema = void 0;
-        var compiledSchema = void 0;
+        var parentSchema = void 0;
 
         Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
 
@@ -42072,24 +42220,28 @@ Crisp.Router.route('/schemas/:id', function () {
         SchemaHelper.getSchemaById(Crisp.Router.params.id).then(function (result) {
             schema = SchemaHelper.getModel(result);
 
-            return SchemaHelper.getSchemaWithParentFields(Crisp.Router.params.id);
-        })
+            // Then get the parent Schema, if available
+            if (schema.parentSchemaId) {
+                return SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId);
+            }
 
-        // Then get the compiled Schema
-        .then(function (result) {
-            compiledSchema = SchemaHelper.getModel(result);
+            return Promise.resolve(null);
+        }).then(function (result) {
+            if (result) {
+                parentSchema = SchemaHelper.getModel(result);
+            }
 
             var schemaEditor = void 0;
 
             if (schema instanceof HashBrown.Models.ContentSchema) {
                 schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
                     model: schema,
-                    compiledSchema: compiledSchema
+                    parentSchema: parentSchema
                 });
             } else {
                 schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
                     model: schema,
-                    compiledSchema: compiledSchema
+                    parentSchema: parentSchema
                 });
             }
 
@@ -43605,15 +43757,15 @@ var ConnectionPane = function (_NavbarPane) {
                     _this3.onClickOpenInNewTab();
                 };
 
-                menu['Copy id'] = function () {
-                    _this3.onClickCopyItemId();
-                };
-
                 if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this3.onClickRemoveConnection();
                     };
                 }
+
+                menu['Copy id'] = function () {
+                    _this3.onClickCopyItemId();
+                };
 
                 if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
@@ -44131,6 +44283,39 @@ var ContentPane = function (_NavbarPane) {
     };
 
     /**
+     * Event: Click rename
+     */
+
+
+    ContentPane.onClickRename = function onClickRename() {
+        var id = $('.context-menu-target').data('id');
+        var content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+
+        UI.messageModal('Rename "' + content.getPropertyValue('title', window.language) + '"', _.div({ class: 'widget-group' }, _.label({ class: 'widget widget--label' }, 'New name'), new HashBrown.Views.Widgets.Input({
+            value: content.getPropertyValue('title', window.language),
+            onChange: function onChange(newValue) {
+                content.setPropertyValue('title', newValue, window.language);
+            }
+        })), function () {
+            HashBrown.Helpers.ContentHelper.setContentById(id, content).then(function () {
+                return RequestHelper.reloadResource('content');
+            }).then(function () {
+                HashBrown.Views.Navigation.NavbarMain.reload();
+
+                // Update ContentEditor if needed
+                var contentEditor = Crisp.View.get('ContentEditor');
+
+                if (!contentEditor || contentEditor.model.id !== id) {
+                    return;
+                }
+
+                contentEditor.model = null;
+                contentEditor.fetch();
+            }).catch(UI.errorModal);
+        });
+    };
+
+    /**
      * Init
      */
 
@@ -44154,8 +44339,8 @@ var ContentPane = function (_NavbarPane) {
                     _this2.onClickOpenInNewTab();
                 };
 
-                menu['Copy id'] = function () {
-                    _this2.onClickCopyItemId();
+                menu['Rename'] = function () {
+                    _this2.onClickRename();
                 };
 
                 menu['New child content'] = function () {
@@ -44173,6 +44358,10 @@ var ContentPane = function (_NavbarPane) {
                         _this2.onClickRemoveContent(true);
                     };
                 }
+
+                menu['Copy id'] = function () {
+                    _this2.onClickCopyItemId();
+                };
 
                 if (!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
@@ -44402,15 +44591,15 @@ var FormsPane = function (_NavbarPane) {
                     _this2.onClickOpenInNewTab();
                 };
 
-                menu['Copy id'] = function () {
-                    _this2.onClickCopyItemId();
-                };
-
                 if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveForm();
                     };
                 }
+
+                menu['Copy id'] = function () {
+                    _this2.onClickCopyItemId();
+                };
 
                 if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
@@ -44813,9 +45002,6 @@ var MediaPane = function (_NavbarPane) {
                 'Open in new tab': function OpenInNewTab() {
                     _this2.onClickOpenInNewTab();
                 },
-                'Copy id': function CopyId() {
-                    _this2.onClickCopyItemId();
-                },
                 'Move': function Move() {
                     _this2.onClickMoveItem();
                 },
@@ -44824,6 +45010,9 @@ var MediaPane = function (_NavbarPane) {
                 },
                 'Replace': function Replace() {
                     _this2.onClickReplaceMedia();
+                },
+                'Copy id': function CopyId() {
+                    _this2.onClickCopyItemId();
                 },
                 'General': '---',
                 'Upload new media': function UploadNewMedia() {
@@ -45023,10 +45212,6 @@ var SchemaPane = function (_NavbarPane) {
                     _this3.onClickOpenInNewTab();
                 };
 
-                menu['Copy id'] = function () {
-                    _this3.onClickCopyItemId();
-                };
-
                 menu['New child schema'] = function () {
                     _this3.onClickNewSchema();
                 };
@@ -45036,6 +45221,10 @@ var SchemaPane = function (_NavbarPane) {
                         _this3.onClickRemoveSchema();
                     };
                 }
+
+                menu['Copy id'] = function () {
+                    _this3.onClickCopyItemId();
+                };
 
                 if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
@@ -45332,14 +45521,14 @@ var TemplatePane = function (_NavbarPane) {
                 'Open in new tab': function OpenInNewTab() {
                     _this2.onClickOpenInNewTab();
                 },
-                'Copy id': function CopyId() {
-                    _this2.onClickCopyItemId();
-                },
                 'Rename': function Rename() {
                     _this2.onClickRenameTemplate();
                 },
                 'Remove': function Remove() {
                     _this2.onClickRemoveTemplate();
+                },
+                'Copy id': function CopyId() {
+                    _this2.onClickCopyItemId();
                 },
                 'General': '---',
                 'Add template': function AddTemplate() {
@@ -45727,21 +45916,11 @@ var ContentSchemaEditor = function (_SchemaEditor) {
      * @returns {Object} Parent tabs
      */
     ContentSchemaEditor.prototype.getParentTabs = function getParentTabs() {
-        // Cache tab object to maintain original state
-        if (!this.parentTabs) {
-            this.parentTabs = {};
-
-            for (var tabId in this.compiledSchema.tabs) {
-                // We only want parent tabs
-                if (this.model.tabs[tabId]) {
-                    continue;
-                }
-
-                this.parentTabs[tabId] = this.compiledSchema.tabs[tabId];
-            }
+        if (!this.parentSchema) {
+            return {};
         }
 
-        return this.parentTabs;
+        return this.parentSchema.tabs;
     };
 
     /**
@@ -45764,6 +45943,34 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         }
 
         return allTabs;
+    };
+
+    /**
+     * Gets parent properties
+     *
+     * @param {String} tabId
+     *
+     * @returns {Object} Parent properties
+     */
+
+
+    ContentSchemaEditor.prototype.getParentProperties = function getParentProperties(tabId) {
+        var parentProperties = {};
+
+        if (!this.parentSchema) {
+            return parentProperties;
+        }
+
+        for (var key in this.parentSchema.fields.properties) {
+            // If a tab is specified, we only want properties in this tab
+            if (tabId && this.parentSchema.fields.properties[key].tabId !== tabId) {
+                continue;
+            }
+
+            parentProperties[key] = this.parentSchema.fields.properties[key];
+        }
+
+        return parentProperties;
     };
 
     /**
@@ -45800,7 +46007,9 @@ var ContentSchemaEditor = function (_SchemaEditor) {
             }
         });
 
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+        if (!this.model.defaultTabId && this.parentSchema) {
+            this.model.defaultTabId = this.parentSchema.defaultTabId;
+        }
 
         $element.append(this.renderField('Default tab', defaultTabEditor.$element));
 
@@ -45841,11 +46050,14 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         // Field properties
         var $tabs = _.div({ class: 'editor--schema__tabs' });
         var $fieldProperties = _.div({ class: 'editor__field' });
+        var $parentFieldProperties = _.div({ class: 'editor__field editor--schema__parent-field-properties' });
 
         $element.append($tabs);
+        $element.append($parentFieldProperties);
         $element.append($fieldProperties);
 
         var renderFieldProperties = function renderFieldProperties() {
+            // Render tabs
             if (!_this2.currentTab) {
                 _this2.currentTab = Object.keys(_this2.getAllTabs())[0] || 'meta';
             }
@@ -45862,7 +46074,29 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                 renderFieldProperties();
             }));
 
-            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+            // Render parent Schema's field properties
+            _.append($parentFieldProperties.empty(), _.if(Object.keys(_this2.getParentProperties(_this2.currentTab)).length > 0, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Parent properties'), _.div({ class: 'editor__field__key__description' }, 'Properties that are inherited and can be changed if you add them to this Schema')), _.div({ class: 'editor__field__value' }, _.each(_this2.getParentProperties(_this2.currentTab), function (fieldKey, fieldValue) {
+                if (_this2.model.fields.properties[fieldKey]) {
+                    return;
+                }
+
+                return _.button({ class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema' }, _.span({ class: 'fa fa-plus' }), fieldValue.label || fieldKey).click(function () {
+                    var newProperties = {};
+
+                    newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+                    for (var key in _this2.model.fields.properties) {
+                        newProperties[key] = _this2.model.fields.properties[key];
+                    }
+
+                    _this2.model.fields.properties = newProperties;
+
+                    renderFieldProperties();
+                });
+            }))));
+
+            // Render this Schema's fields
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Properties'), _.div({ class: 'editor__field__key__description' }, 'This Schema\'s own properties'), _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(_this2.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
                     _this2.model.fields.properties = newProperties;
                 });
@@ -46046,8 +46280,8 @@ var FieldSchemaEditor = function (_SchemaEditor) {
      * Pre render
      */
     FieldSchemaEditor.prototype.prerender = function prerender() {
-        if (!this.model.editorId) {
-            this.model.editorId = this.compiledSchema.editorId;
+        if (!this.model.editorId && this.parentSchema) {
+            this.model.editorId = this.parentSchema.editorId;
         }
     };
 
@@ -48141,8 +48375,43 @@ var StructEditor = function (_FieldEditor) {
 
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
+        var getParentStruct = function getParentStruct() {
+            var struct = {};
+
+            var schemaEditor = Crisp.View.get('FieldSchemaEditor');
+
+            if (!schemaEditor || !schemaEditor.parentSchema || !schemaEditor.parentSchema.config || !schemaEditor.parentSchema.config.struct) {
+                return struct;
+            }
+
+            for (var key in schemaEditor.parentSchema.config.struct) {
+                // We only want parent struct values
+                if (config.struct[key]) {
+                    continue;
+                }
+
+                struct[key] = schemaEditor.parentSchema.config.struct[key];
+            }
+
+            return struct;
+        };
+
         var renderEditor = function renderEditor() {
-            _.append($element.empty(), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Properties', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
+            _.append($element.empty(), _.if(Object.keys(getParentStruct()).length > 0, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, _.div({ class: 'editor__field__key__label' }, 'Parent struct'), _.div({ class: 'editor__field__key__description' }, 'Properties that are inherited and can be changed if you add them to this Schema')), _.div({ class: 'editor__field__value' }, _.each(getParentStruct(), function (fieldKey, fieldValue) {
+                return _.button({ class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema' }, _.span({ class: 'fa fa-plus' }), fieldValue.label || fieldKey).click(function () {
+                    var newProperties = {};
+
+                    newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+                    for (var key in config.struct) {
+                        newProperties[key] = config.struct[key];
+                    }
+
+                    config.struct = newProperties;
+
+                    renderEditor();
+                });
+            })))), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Struct', _.div({ class: 'editor__field__key__actions' }, _.button({ class: 'editor__field__key__action editor__field__key__action--sort' }).click(function (e) {
                 HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
                     config.struct = newStruct;
                 });
@@ -48269,7 +48538,7 @@ var StructEditor = function (_FieldEditor) {
     StructEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' },
+        return _.div({ class: 'editor__field__value field-editor--struct' },
         // Loop through each key in the struct
         _.each(this.config.struct, function (k, keySchema) {
             var value = _this2.value[k];
@@ -48575,7 +48844,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 
         // If no allowed templates are configured, display a warning
         if (this.config.allowedTemplates.length < 1) {
-            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning' }, 'No allowed templates configured'));
+            return _.div({ class: 'editor__field__value' }, _.span({ class: 'editor__field__value__warning', title: 'You need to add some allowed Templates to this Content Schema' }, 'No allowed templates configured'));
         }
 
         return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({

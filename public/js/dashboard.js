@@ -2077,6 +2077,8 @@ var RequestHelper = function () {
                 UI.errorModal(e);
             }
 
+            window.resources[name] = [];
+
             return Promise.resolve([]);
         });
     };
@@ -7715,7 +7717,7 @@ var MediaHelper = function (_MediaHelperCommon) {
      *
      * @param {String} id
      *
-     * @return {Promise(Media)}
+     * @return {Promise} Media object
      */
 
 
@@ -9147,6 +9149,25 @@ var ContentHelper = function (_ContentHelperCommon) {
 
         return RequestHelper.request('get', 'content/' + id).then(function (content) {
             return Promise.resolve(new Content(content));
+        });
+    };
+
+    /**
+     * Sets Content by id
+     *
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @returns {Promise} Content node
+     */
+
+
+    ContentHelper.setContentById = function setContentById(id, content) {
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return RequestHelper.request('post', 'content/' + id, content.getObject()).then(function (content) {
+            return Promise.resolve(content);
         });
     };
 
@@ -25347,13 +25368,11 @@ var SchemaHelper = function () {
             for (var k in childValues) {
                 if (_typeof(parentValues[k]) === 'object' && _typeof(childValues[k]) === 'object') {
                     merge(parentValues[k], childValues[k]);
-                } else {
+                } else if (childValues[k]) {
                     parentValues[k] = childValues[k];
                 }
             }
         }
-
-        merge(mergedSchema.fields, childSchema.fields);
 
         // Overwrite native values 
         mergedSchema.id = childSchema.id;
@@ -25365,21 +25384,44 @@ var SchemaHelper = function () {
         switch (mergedSchema.type) {
             case 'field':
                 mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+
+                // Merge config
+                if (!mergedSchema.config) {
+                    mergedSchema.config = {};
+                }
+                if (!parentSchema.config) {
+                    parentSchema.config = {};
+                }
+
+                merge(mergedSchema.config, childSchema.config);
                 break;
 
             case 'content':
-                var mergedTabs = {};
-
+                // Merge tabs
                 if (!mergedSchema.tabs) {
                     mergedSchema.tabs = {};
                 }
-
                 if (!childSchema.tabs) {
                     childSchema.tabs = {};
                 }
 
-                // Merge tabs
                 merge(mergedSchema.tabs, childSchema.tabs);
+
+                // Merge fields
+                if (!mergedSchema.fields) {
+                    mergedSchema.fields = {};
+                }
+                if (!mergedSchema.fields.properties) {
+                    mergedSchema.fields.properties = {};
+                }
+                if (!childSchema.fields) {
+                    childSchema.fields = {};
+                }
+                if (!childSchema.fields.properties) {
+                    childSchema.fields.properties = {};
+                }
+
+                merge(mergedSchema.fields, childSchema.fields);
 
                 // Set default tab id
                 mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
@@ -25786,6 +25828,27 @@ var Content = function (_Resource) {
             return this.properties[key][language];
         } else {
             return this.properties[key];
+        }
+    };
+
+    /**
+     * Sets a property value
+     *
+     * @param {String} key
+     * @param {String|Number|Object} value
+     * @param {String} language
+     */
+
+
+    Content.prototype.setPropertyValue = function setPropertyValue(key, value, language) {
+        if (!this.properties) {
+            this.properties = {};
+        }
+
+        if (language && _typeof(this.properties[key]) === 'object') {
+            this.properties[key][language] = value;
+        } else {
+            this.properties[key] = value;
         }
     };
 
@@ -26811,7 +26874,7 @@ var Input = function (_Widget) {
                 }), _.div({ class: 'widget--input__checkbox-background' }), _.div({ class: 'widget--input__checkbox-switch' }));
 
             case 'file':
-                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
+                return _.form({ class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title }, _.label({ for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button expanded' }, this.placeholder || 'Browse...'), _.input({ id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory }).on('change', function (e) {
                     var names = [];
                     var files = e.currentTarget.files;
 
@@ -26835,7 +26898,7 @@ var Input = function (_Widget) {
                     } else {
                         btnBrowse.innerHTML = _this2.placeholder || 'Browse...';
                     }
-                }), _.if(typeof this.onSubmit === 'function', _.button({ class: 'widget widget--button widget--input__file-submit disabled small fa fa-upload', type: 'submit', title: 'Upload file' }))).on('submit', function (e) {
+                }), _.if(typeof this.onSubmit === 'function', _.button({ class: 'widget widget--button widget--input__file-submit disabled', type: 'submit', title: 'Upload file' }, _.span({ class: 'fa fa-upload' }), 'Upload'))).on('submit', function (e) {
                     e.preventDefault();
 
                     var input = e.currentTarget.querySelector('.widget--input__file-input');
@@ -28440,6 +28503,7 @@ var UIHelper = function () {
     UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
         var children = Array.prototype.slice.call(parentElement.children || []);
         var canSort = true;
+        var currentDraggedChild = void 0;
 
         children = children.filter(function (child) {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
@@ -28453,75 +28517,86 @@ var UIHelper = function () {
             isActive = !parentElement.classList.contains('sorting');
         }
 
+        if (isActive) {
+            parentElement.ondragover = function (e) {
+                if (!canSort || !currentDraggedChild) {
+                    return;
+                }
+
+                var bodyRect = document.body.getBoundingClientRect();
+
+                _.each(children, function (i, sibling) {
+                    if (sibling === currentDraggedChild || !canSort || e.pageY < 1) {
+                        return;
+                    }
+
+                    var cursorY = e.pageY;
+                    var childY = currentDraggedChild.getBoundingClientRect().y - bodyRect.y;
+                    var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
+                    var hasMoved = false;
+
+                    // Dragging above a sibling
+                    if (cursorY < siblingY && childY > siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling);
+                        hasMoved = true;
+                    }
+
+                    // Dragging below a sibling
+                    if (cursorY > siblingY && childY < siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling.nextElementSibling);
+                        hasMoved = true;
+                    }
+
+                    // Init transition
+                    if (hasMoved) {
+                        canSort = false;
+
+                        var newChildY = currentDraggedChild.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                        currentDraggedChild.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                        sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                        setTimeout(function () {
+                            currentDraggedChild.removeAttribute('style');
+                            sibling.removeAttribute('style');
+                            canSort = true;
+                        }, 100);
+                    }
+                });
+            };
+        } else {
+            parentElement.ondragover = null;
+        }
+
         _.each(children, function (i, child) {
             child.draggable = isActive;
 
             if (isActive) {
                 child.ondragstart = function (e) {
                     e.dataTransfer.setData('text/plain', '');
-                };
-
-                parentElement.ondragover = function (e) {
-                    if (!canSort) {
-                        return;
-                    }
-
-                    var bodyRect = document.body.getBoundingClientRect();
-
-                    _.each(children, function (i, sibling) {
-                        if (sibling === child || !canSort || e.pageY < 1) {
-                            return;
-                        }
-
-                        var cursorY = e.pageY;
-                        var childY = child.getBoundingClientRect().y - bodyRect.y;
-                        var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
-                        var hasMoved = false;
-
-                        // Dragging above a sibling
-                        if (cursorY < siblingY && childY > siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling);
-                            hasMoved = true;
-                        }
-
-                        // Dragging below a sibling
-                        if (cursorY > siblingY && childY < siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
-                            hasMoved = true;
-                        }
-
-                        // Init transition
-                        if (hasMoved) {
-                            canSort = false;
-
-                            var newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-                            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-
-                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
-                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
-
-                            setTimeout(function () {
-                                child.removeAttribute('style');
-                                sibling.removeAttribute('style');
-                                canSort = true;
-                            }, 100);
-                        }
-                    });
+                    child.classList.toggle('dragging', true);
+                    currentDraggedChild = child;
                 };
 
                 child.ondragend = function (e) {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
 
                 child.ondragcancel = function (e) {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
             } else {
+                child.classList.toggle('dragging', false);
                 child.ondragstart = null;
                 child.ondrag = null;
-                parentElement.ondragover = null;
                 child.ondragstop = null;
                 child.ondragcancel = null;
+                currentDraggedChild = null;
             }
         });
 

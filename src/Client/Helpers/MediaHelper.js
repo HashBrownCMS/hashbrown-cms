@@ -66,7 +66,7 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @param {String} id
      *
-     * @return {Promise(Media)}
+     * @return {Promise} Media object
      */
     static getMediaById(id) {
         return new Promise((resolve, reject) => {

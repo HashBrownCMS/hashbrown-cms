@@ -355,6 +355,45 @@ class ContentPane extends NavbarPane {
     }
 
     /**
+     * Event: Click rename
+     */
+    static onClickRename() {
+        let id = $('.context-menu-target').data('id');
+        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+
+        UI.messageModal(
+            'Rename "' + content.getPropertyValue('title', window.language) + '"', 
+            _.div({class: 'widget-group'}, 
+                _.label({class: 'widget widget--label'}, 'New name'),
+                new HashBrown.Views.Widgets.Input({
+                    value: content.getPropertyValue('title', window.language), 
+                    onChange: (newValue) => {
+                        content.setPropertyValue('title', newValue, window.language);
+                    }
+                })
+            ),
+            () => {
+                HashBrown.Helpers.ContentHelper.setContentById(id, content)
+                .then(() => {
+                    return RequestHelper.reloadResource('content');
+                })
+                .then(() => {
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    // Update ContentEditor if needed
+                    let contentEditor = Crisp.View.get('ContentEditor');
+
+                    if(!contentEditor || contentEditor.model.id !== id) { return; }
+
+                    contentEditor.model = null;
+                    contentEditor.fetch();
+                })
+                .catch(UI.errorModal);
+            }
+        );
+    }
+
+    /**
      * Init
      */
     static init() {
@@ -369,9 +408,9 @@ class ContentPane extends NavbarPane {
                 menu['This content'] = '---';
                 
                 menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 
+                menu['Rename'] = () => { this.onClickRename(); };
+
                 menu['New child content'] = () => {
                     this.onClickNewContent($('.context-menu-target').data('id'));
                 };
@@ -383,6 +422,8 @@ class ContentPane extends NavbarPane {
                 if(!item.sync.hasRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
+                
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 
                 if(!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
