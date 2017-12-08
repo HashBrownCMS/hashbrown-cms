@@ -76,20 +76,33 @@
         &--editor {
             flex-grow: 1;
             height: 100%;
-            display: flex;
-            align-items: center;
 
             // Text presentation
             &__text {
                 width: 100%;
                 max-width: calc(100% - 7rem);
                 max-height: calc(100% - 4rem);
-                overflow: auto;
-                margin: 2rem;
+                margin: 10vh 2rem 2rem 4rem;
                 padding: 1rem;
                 background-color: $standard;
                 color: $standard-text;
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                position: relative;
+
+                // With an arrow pointing towards the pane
+                &:before {
+                    content: '';
+                    display: block;
+                    width: 0; 
+                    height: 0; 
+                    border-top: 2rem solid transparent;
+                    border-bottom: 2rem solid transparent; 
+                    border-right: 2rem solid $standard; 
+                    position: absolute;
+                    right: 100%;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
             }
         }
     }

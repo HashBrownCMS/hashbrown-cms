@@ -255,6 +255,27 @@ class Content extends Resource {
         
         }
     }
+    
+    /**
+     * Sets a property value
+     *
+     * @param {String} key
+     * @param {String|Number|Object} value
+     * @param {String} language
+     */
+    setPropertyValue(key, value, language) {
+        if(!this.properties) {
+            this.properties = {};
+        }
+
+        if(language && typeof this.properties[key] === 'object') {
+            this.properties[key][language] = value;
+        
+        } else {
+            this.properties[key] = value;
+        
+        }
+    }
 
     /**
      * Returns all properties in a given language

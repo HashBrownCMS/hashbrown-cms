@@ -134,13 +134,13 @@ class SchemaPane extends NavbarPane {
                 
                 menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
                
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-                
                 menu['New child schema'] = () => { this.onClickNewSchema(); };
                 
                 if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveSchema(); };
                 }
+                
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 
                 if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 

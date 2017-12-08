@@ -27,7 +27,7 @@ Crisp.Router.route('/schemas/', function() {
 Crisp.Router.route('/schemas/:id', () => {
     if(currentUserHasScope('schemas')) {
         let schema;
-        let compiledSchema;
+        let parentSchema;
 
         Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
        
@@ -36,24 +36,29 @@ Crisp.Router.route('/schemas/:id', () => {
         .then((result) => {
             schema = SchemaHelper.getModel(result);
 
-            return SchemaHelper.getSchemaWithParentFields(Crisp.Router.params.id);
+            // Then get the parent Schema, if available
+            if(schema.parentSchemaId) {
+                return SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId);
+            }
+    
+            return Promise.resolve(null);
         })
-
-        // Then get the compiled Schema
         .then((result) => {
-            compiledSchema = SchemaHelper.getModel(result);
+            if(result) {
+                parentSchema = SchemaHelper.getModel(result);
+            }
 
             let schemaEditor;
 
             if(schema instanceof HashBrown.Models.ContentSchema) {
                 schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
                     model: schema,
-                    compiledSchema: compiledSchema
+                    parentSchema: parentSchema
                 });
             } else {
                 schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
                     model: schema,
-                    compiledSchema: compiledSchema
+                    parentSchema: parentSchema
                 });
             }
             

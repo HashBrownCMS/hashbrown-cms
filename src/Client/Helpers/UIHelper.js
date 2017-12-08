@@ -151,6 +151,7 @@ class UIHelper {
     static sortable(parentElement, sortableClassName, isActive, onChange) {
         let children = Array.prototype.slice.call(parentElement.children || []);
         let canSort = true;
+        let currentDraggedChild;
         
         children = children.filter((child) => {
             return child instanceof HTMLElement && child.classList.contains(sortableClassName);
@@ -162,72 +163,85 @@ class UIHelper {
             isActive = !parentElement.classList.contains('sorting');
         }
 
+        if(isActive) {
+            parentElement.ondragover = (e) => {
+                if(!canSort || !currentDraggedChild) { return; }
+
+                let bodyRect = document.body.getBoundingClientRect();
+
+                _.each(children, (i, sibling) => {
+                    if(sibling === currentDraggedChild || !canSort || e.pageY < 1) { return; }
+
+                    let cursorY = e.pageY;
+                    let childY = currentDraggedChild.getBoundingClientRect().y - bodyRect.y;
+                    let siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
+                    let hasMoved = false;
+
+                    // Dragging above a sibling
+                    if(cursorY < siblingY && childY > siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling);    
+                        hasMoved = true;
+                    }
+
+                    // Dragging below a sibling
+                    if(cursorY > siblingY && childY < siblingY) {
+                        sibling.parentElement.insertBefore(currentDraggedChild, sibling.nextElementSibling);
+                        hasMoved = true;
+                    }
+
+                    // Init transition
+                    if(hasMoved) {
+                        canSort = false;
+
+                        let newChildY = currentDraggedChild.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+                        let newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+
+                        currentDraggedChild.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+                        sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+
+                        setTimeout(() => {
+                            currentDraggedChild.removeAttribute('style');
+                            sibling.removeAttribute('style');
+                            canSort = true;
+                        }, 100);
+                    }
+                });
+            };
+
+        } else {
+            parentElement.ondragover = null;
+
+        }
+
         _.each(children, (i, child) => {
             child.draggable = isActive;
 
             if(isActive) {
                 child.ondragstart = (e) => {
                     e.dataTransfer.setData('text/plain', '');
+                    child.classList.toggle('dragging', true);
+                    currentDraggedChild = child;
                 };
-
-                parentElement.ondragover = (e) => {
-                    if(!canSort) { return; }
-
-                    let bodyRect = document.body.getBoundingClientRect();
-
-                    _.each(children, (i, sibling) => {
-                        if(sibling === child || !canSort || e.pageY < 1) { return; }
-
-                        let cursorY = e.pageY;
-                        let childY = child.getBoundingClientRect().y - bodyRect.y;
-                        let siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
-                        let hasMoved = false;
-
-                        // Dragging above a sibling
-                        if(cursorY < siblingY && childY > siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling);    
-                            hasMoved = true;
-                        }
-
-                        // Dragging below a sibling
-                        if(cursorY > siblingY && childY < siblingY) {
-                            sibling.parentElement.insertBefore(child, sibling.nextElementSibling);
-                            hasMoved = true;
-                        }
-
-                        // Init transition
-                        if(hasMoved) {
-                            canSort = false;
-
-                            let newChildY = child.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-                            let newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-
-                            child.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
-                            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
-
-                            setTimeout(() => {
-                                child.removeAttribute('style');
-                                sibling.removeAttribute('style');
-                                canSort = true;
-                            }, 100);
-                        }
-                    });
-                };
-
+                
                 child.ondragend = (e) => {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
 
                 child.ondragcancel = (e) => {
                     onChange(child);
+                    currentDraggedChild = null;
+                    child.classList.toggle('dragging', false);
                 };
 
             } else {
+                child.classList.toggle('dragging', false);
                 child.ondragstart = null;
                 child.ondrag = null;
-                parentElement.ondragover = null;
                 child.ondragstop = null;
                 child.ondragcancel = null;
+                currentDraggedChild = null;
             }
         });
         

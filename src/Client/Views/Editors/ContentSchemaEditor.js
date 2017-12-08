@@ -14,19 +14,11 @@ class ContentSchemaEditor extends SchemaEditor {
      * @returns {Object} Parent tabs
      */
     getParentTabs() {
-        // Cache tab object to maintain original state
-        if(!this.parentTabs) {
-            this.parentTabs = {};
-
-            for(let tabId in this.compiledSchema.tabs) {
-                // We only want parent tabs
-                if(this.model.tabs[tabId]) { continue; }
-            
-                this.parentTabs[tabId] = this.compiledSchema.tabs[tabId];
-            }
+        if(!this.parentSchema) {
+            return {};
         }
 
-        return this.parentTabs;
+        return this.parentSchema.tabs;
     }
 
     /**
@@ -47,6 +39,28 @@ class ContentSchemaEditor extends SchemaEditor {
         }
 
         return allTabs;
+    }
+    
+    /**
+     * Gets parent properties
+     *
+     * @param {String} tabId
+     *
+     * @returns {Object} Parent properties
+     */
+    getParentProperties(tabId) {
+        let parentProperties = {};
+        
+        if(!this.parentSchema) { return parentProperties; }
+
+        for(let key in this.parentSchema.fields.properties) {
+            // If a tab is specified, we only want properties in this tab
+            if(tabId && this.parentSchema.fields.properties[key].tabId !== tabId) { continue; }
+
+            parentProperties[key] = this.parentSchema.fields.properties[key];
+        }
+
+        return parentProperties;
     }
 
     /**
@@ -79,7 +93,9 @@ class ContentSchemaEditor extends SchemaEditor {
             }
         });
 
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId;
+        if(!this.model.defaultTabId && this.parentSchema) {
+            this.model.defaultTabId = this.parentSchema.defaultTabId;
+        }
         
         $element.append(this.renderField('Default tab', defaultTabEditor.$element));
         
@@ -107,11 +123,14 @@ class ContentSchemaEditor extends SchemaEditor {
         // Field properties
         let $tabs = _.div({class: 'editor--schema__tabs'});
         let $fieldProperties = _.div({class: 'editor__field'});
+        let $parentFieldProperties = _.div({class: 'editor__field editor--schema__parent-field-properties'});
         
         $element.append($tabs);
+        $element.append($parentFieldProperties);
         $element.append($fieldProperties);
 
         let renderFieldProperties = () => {
+            // Render tabs
             if(!this.currentTab) {
                 this.currentTab = Object.keys(this.getAllTabs())[0] || 'meta';
             }
@@ -133,9 +152,41 @@ class ContentSchemaEditor extends SchemaEditor {
                     })
             );
 
+            // Render parent Schema's field properties
+            _.append($parentFieldProperties.empty(),
+                _.if(Object.keys(this.getParentProperties(this.currentTab)).length > 0,
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Parent properties'),
+                        _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this Schema')
+                    ),
+                    _.div({class: 'editor__field__value'},
+                        _.each(this.getParentProperties(this.currentTab), (fieldKey, fieldValue) => {
+                            if(this.model.fields.properties[fieldKey]) { return; }
+
+                            return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
+                                .click(() => {
+                                    let newProperties = {};
+
+                                    newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+                                    for(let key in this.model.fields.properties) {
+                                        newProperties[key] = this.model.fields.properties[key];
+                                    }
+
+                                    this.model.fields.properties = newProperties;
+
+                                    renderFieldProperties();
+                                });
+                        })
+                    )
+                )
+            );
+
+            // Render this Schema's fields
             _.append($fieldProperties.empty(),
                 _.div({class: 'editor__field__key'},
-                    'Properties',
+                    _.div({class: 'editor__field__key__label'}, 'Properties'),
+                    _.div({class: 'editor__field__key__description'}, 'This Schema\'s own properties'),
                     _.div({class: 'editor__field__key__actions'},
                         _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                             .click((e) => {

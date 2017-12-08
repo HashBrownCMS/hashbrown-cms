@@ -35,4 +35,14 @@
             color: $standard-text;
         }
     }
+
+    &__parent-field-properties {
+        .editor__field__value {
+            display: flex;
+
+            .widget {
+                margin: 0 0.5rem 0.5rem 0;
+            }
+        }
+    }
 }

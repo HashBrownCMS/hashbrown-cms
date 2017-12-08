@@ -138,10 +138,10 @@ class MediaPane extends NavbarPane {
             itemContextMenu: {
                 'This media': '---',
                 'Open in new tab': () => { this.onClickOpenInNewTab(); },
-                'Copy id': () => { this.onClickCopyItemId(); },
                 'Move': () => { this.onClickMoveItem(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
+                'Copy id': () => { this.onClickCopyItemId(); },
                 'General': '---',
                 'Upload new media': () => { this.onClickUploadMedia(); },
                 'Refresh': () => { this.onClickRefreshResource('media'); }

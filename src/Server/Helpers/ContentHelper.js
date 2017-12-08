@@ -482,22 +482,6 @@ class ContentHelper extends ContentHelperCommon {
                         schemaId: 'tags',
                         label: 'Tags',
                         description: 'A comma-separated list of tags'
-                    },
-                    template: {
-                        tabId: 'content',
-                        schemaId: 'templateReference',
-                        label: 'Template',
-                        description: 'A reference to a Template',
-                        config: {
-                            type: 'page',
-                            allowedTemplates: []
-                        }
-                    },
-                    url: {
-                        tabId: 'content',
-                        schemaId: 'url',
-                        label: 'URL',
-                        description: 'A URL value, custom or automatically generated'
                     }
                 }
             }

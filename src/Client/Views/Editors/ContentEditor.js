@@ -211,53 +211,85 @@ class ContentEditor extends Crisp.View {
      * @param {Object} fieldValue The field value to inject into the field editor
      * @param {FieldSchema} fieldDefinition The field definition
      * @param {Function} onChange The change event
-     * @param {Object} config The field config
      * @param {HTMLElement} keyActions The key content container
      *
      * @return {Object} element
      */
-    renderField(fieldValue, fieldDefinition, onChange, config, $keyActions) {
+    renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
         let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
-        if(compiledSchema) {
-            let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
-            
-            if(fieldEditor) {
-                let fieldEditorInstance = new fieldEditor({
-                    value: fieldValue,
-                    disabled: fieldDefinition.disabled || false,
-                    config: config || {},
-                    description: fieldDefinition.description || '',
-                    schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual === true,
-                    $keyActions: $keyActions
-                });
-
-                fieldEditorInstance.on('change', (newValue) => {
-                    if(this.model.isLocked) { return; }
-                    
-                    this.dirty = true;
-
-                    onChange(newValue);
-                });
-
-                fieldEditorInstance.on('silentchange', (newValue) => {
-                    if(this.model.isLocked) { return; }
-                    
-                    onChange(newValue);
-                });
-
-                return fieldEditorInstance.$element;
-
-            } else {
-                debug.log('No editor by id "' + fieldSchema.editorId + '" found', this);
-            
-            }
-        
-        } else {
-            debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
-
+        if(!compiledSchema) {
+            return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
         }
+
+        let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+          
+        if(!fieldEditor) {
+            return debug.log('No field editor by id "' + fieldSchema.editorId + '" found', this);
+        }
+
+        // Get the config
+        let config;
+
+        // If the field has a config, check recursively if it's empty
+        // If it isn't, use this config
+        if(fieldDefinition.config) {
+            let isEmpty = true;
+            let checkRecursive = (object) => {
+                if(!object) { return; }
+
+                // We consider a config not empty, if it has a value that is not an object
+                // Remember, null is of type 'object' too
+                if(typeof object !== 'object') { return isEmpty = false; }
+
+                for(let k in object) {
+                    checkRecursive(object[k]);
+                }
+            };
+
+            checkRecursive(fieldDefinition.config);
+
+            if(!isEmpty) {
+                config = fieldDefinition.config;
+            }
+        }
+
+        // If no config was found, and the Schema has one, use it
+        if(!config && compiledSchema.config) {
+            config = compiledSchema.config;
+        }
+
+        // If still no config was found, assign a placeholder
+        if(!config) {
+            config = {};
+        }
+
+        // Instantiate the field editor
+        let fieldEditorInstance = new fieldEditor({
+            value: fieldValue,
+            disabled: fieldDefinition.disabled || false,
+            config: config,
+            description: fieldDefinition.description || '',
+            schema: compiledSchema.getObject(),
+            multilingual: fieldDefinition.multilingual === true,
+            $keyActions: $keyActions
+        });
+
+        fieldEditorInstance.on('change', (newValue) => {
+            if(this.model.isLocked) { return; }
+            
+            this.dirty = true;
+
+            onChange(newValue);
+        });
+
+        fieldEditorInstance.on('silentchange', (newValue) => {
+            if(this.model.isLocked) { return; }
+            
+            onChange(newValue);
+        });
+
+        return fieldEditorInstance.$element;
     }
 
     /**
@@ -293,14 +325,6 @@ class ContentEditor extends Crisp.View {
 
         // Render all fields
         return _.each(tabFieldDefinitions, (key, fieldDefinition) => {
-            // Fetch field schema
-            let fieldSchema = SchemaHelper.getSchemaByIdSync(fieldDefinition.schemaId);
-
-            if(!fieldSchema) {
-                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', this);
-                return null;
-            }
-
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
@@ -337,9 +361,6 @@ class ContentEditor extends Crisp.View {
                             fieldValues[key] = newValue;
                         }
                     },
-
-                    // Pass the field definition config, and use the field's schema config as fallback
-                    fieldDefinition.config || fieldSchema.config,
 
                     // Pass the key actions container, so the field editor can populate it
                     $keyActions
@@ -418,11 +439,11 @@ class ContentEditor extends Crisp.View {
         let connection;
 
         // Construct the remote URL, if a Connection is set up for publishing
+        let contentUrl = this.model.properties.url;
+
         if(connectionId) {
             connection = ConnectionHelper.getConnectionByIdSync(connectionId);
                 
-            let contentUrl = this.model.properties.url;
-
             if(connection && connection.url && contentUrl) {
                 // Language versioning
                 if(contentUrl instanceof Object) {
@@ -433,11 +454,31 @@ class ContentEditor extends Crisp.View {
                 if(contentUrl !== '/' && contentUrl !== '//') {
                     remoteUrl = connection.url + contentUrl;
                     remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
+
+                } else {
+                    contentUrl = null;
+                
                 }
             }
         }
             
-        _.append($('.editor__footer').empty(), 
+        _.append($('.editor__footer').empty(),
+            _.div({class: 'editor__footer__message'},
+                _.do(() => {
+                    if(!connection) {
+                        return 'No Connection is assigned for publishing'   ;
+                    }
+                    
+                    if(connection && !connection.url) {
+                        return 'No remote URL is defined in the <a href="#/connections/' + connection.id + '">"' + connection.title + '"</a> Connection';
+                    }
+                    
+                    if(connection && connection.url && !contentUrl) {
+                        return 'Content without a URL may not be visible after publishing';
+                    }
+                })
+            ),
+
             _.div({class: 'editor__footer__buttons'},
                 // JSON editor
                 _.button({class: 'widget widget--button condensed embedded'},

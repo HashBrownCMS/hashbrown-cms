@@ -223,6 +223,8 @@ class RequestHelper {
             if(e.statusCode !== 404) {
                 UI.errorModal(e);
             }
+            
+            window.resources[name] = [];
 
             return Promise.resolve([]);
         });

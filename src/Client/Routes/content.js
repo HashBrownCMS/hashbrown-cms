@@ -14,7 +14,7 @@ Crisp.Router.route('/content/', () => {
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
-            _.p('Right click in the Content pane to create a new Content.'),
+            _.p('Right click in the Content pane to create new Content.'),
             _.p('Click on a Content node to edit it.'),
             _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
                 .click(() => {

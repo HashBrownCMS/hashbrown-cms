@@ -58,6 +58,10 @@
             text-align: left;
         }
 
+        &-submit {
+            max-width: 10rem;
+        }
+
         &-input:hover + &-browse {
             background-color: $primary-dark;
         }

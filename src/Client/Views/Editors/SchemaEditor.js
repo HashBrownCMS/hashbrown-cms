@@ -56,7 +56,7 @@ class SchemaEditor extends Crisp.View {
      * @return {Object} element
      */
     renderIconEditor() {
-        return _.button({class: 'widget small widget--button fa fa-' + this.model.icon})
+        return _.button({class: 'widget small widget--button fa fa-' + this.getIcon()})
             .click((e) => {
                 let modal = new HashBrown.Views.Modals.IconModal();
 
@@ -127,12 +127,29 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
+     * Gets the schema icon
+     *
+     * @returns {String} Icon
+     */
+    getIcon() {
+        if(this.model.icon) {
+            return this.model.icon;
+        }
+
+        if(this.parentSchema && this.parentSchema.icon) {
+            return this.parentSchema.icon;
+        }
+
+        return 'cogs';
+    }
+
+    /**
      * Renders this editor
      */
     template() {
         return _.div({class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '')},
             _.div({class: 'editor__header'},
-                _.span({class: 'editor__header__icon fa fa-' + this.compiledSchema.icon}),
+                _.span({class: 'editor__header__icon fa fa-' + this.getIcon()}),
                 _.h4({class: 'editor__header__title'}, this.model.name)
             ),
             this.renderFields(),

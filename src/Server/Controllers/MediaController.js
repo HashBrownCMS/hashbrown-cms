@@ -220,10 +220,7 @@ class MediaController extends require('./ApiController') {
         }
 
         if(file) {
-            HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-            .then((connection) => {
-                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
-            })
+            return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
             .then(() => {
                 // Remove temp file
                 if(FileSystem.existsSync(file.path)) {

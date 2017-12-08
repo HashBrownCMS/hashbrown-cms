@@ -10,12 +10,12 @@ class TemplateController extends require('./ApiController') {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/:project/:environment/templates', this.middleware(), this.getTemplates)
-        app.get('/api/:project/:environment/templates/:type/:name', this.middleware(), this.getTemplate)
+        app.get('/api/:project/:environment/templates', this.middleware(), this.getTemplates);
+        app.get('/api/:project/:environment/templates/:type/:name', this.middleware(), this.getTemplate);
         
-        app.post('/api/:project/:environment/templates/:type/:name', this.middleware(), this.postTemplate)
+        app.post('/api/:project/:environment/templates/:type/:name', this.middleware(), this.postTemplate);
         
-        app.delete('/api/:project/:environment/templates/:type/:name', this.middleware(), this.deleteTemplate)
+        app.delete('/api/:project/:environment/templates/:type/:name', this.middleware(), this.deleteTemplate);
     }
     
     /**

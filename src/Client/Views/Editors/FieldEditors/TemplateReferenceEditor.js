@@ -157,7 +157,7 @@ class TemplateReferenceEditor extends FieldEditor {
         // If no allowed templates are configured, display a warning
         if(this.config.allowedTemplates.length < 1) {
             return _.div({class: 'editor__field__value'}, 
-                _.span({class: 'editor__field__value__warning'}, 'No allowed templates configured')
+                _.span({class: 'editor__field__value__warning', title: 'You need to add some allowed Templates to this Content Schema'}, 'No allowed templates configured')
             );
         }
 

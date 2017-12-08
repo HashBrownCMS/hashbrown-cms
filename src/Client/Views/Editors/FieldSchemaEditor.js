@@ -12,8 +12,8 @@ class FieldSchemaEditor extends SchemaEditor {
      * Pre render
      */
     prerender() {
-        if(!this.model.editorId) { 
-            this.model.editorId = this.compiledSchema.editorId;
+        if(!this.model.editorId && this.parentSchema) { 
+            this.model.editorId = this.parentSchema.editorId;
         }
     }
 
