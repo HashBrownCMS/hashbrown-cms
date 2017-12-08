@@ -42,12 +42,18 @@
         background-color: $secondary;
         border: 0;
         flex-shrink: 0;
+        position: relative;
         
         @include background('secondary');
 
         &:after {
             font-family: 'FontAwesome';
             content: '\f107';
+            font-size: 2rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .page--environment__space--nav.expanded &:after {

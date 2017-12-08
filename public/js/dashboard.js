@@ -37087,7 +37087,7 @@ var ProjectEditor = function (_Crisp$View) {
                 }
             }
         }).$element.addClass('page--dashboard__project__menu')), _.div({ class: 'page--dashboard__project__info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'page--dashboard__project__environments' }, _.each(this.model.environments, function (i, environment) {
-            return _.div({ class: 'page--dashboard__project__environment' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this10.model.id + '/' + environment, class: 'widget widget--button expanded low' }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+            return _.div({ class: 'page--dashboard__project__environment' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this10.model.id + '/' + environment, class: 'widget widget--button expanded' }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
                 icon: 'ellipsis-v',
                 reverseKeys: true,
                 options: {

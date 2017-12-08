@@ -233,7 +233,7 @@ class ProjectEditor extends Crisp.View {
                 _.div({class: 'page--dashboard__project__environments'},
                     _.each(this.model.environments, (i, environment) => {
                         return _.div({class: 'page--dashboard__project__environment'},
-                            _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'widget widget--button expanded low'}, 
+                            _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                                 environment
                             ),
                             _.if(currentUserIsAdmin(),
