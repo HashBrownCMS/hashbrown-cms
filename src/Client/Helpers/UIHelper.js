@@ -550,15 +550,22 @@ class UIHelper {
      *
      * @param {String} title
      * @param {String} url
+     * @param {Function} onSubmit
+     * @param {Function} onCancel
      */
-    static iframeModal(title, url) {
+    static iframeModal(title, url, onSubmit, onCancel) {
         let modal = new HashBrown.Views.Modals.IframeModal({
             title: title,
             url: url
         });
 
-        modal.on('cancel', onCancel);
-        modal.on('ok', onSubmit);
+        if(typeof onSubmit === 'function') {
+            modal.on('ok', onSubmit);
+        }
+
+        if(typeof onCancel === 'function') {
+            modal.on('cancel', onCancel);
+        }
        
         return modal;
     }

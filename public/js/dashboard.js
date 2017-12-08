@@ -28913,17 +28913,24 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} url
+     * @param {Function} onSubmit
+     * @param {Function} onCancel
      */
 
 
-    UIHelper.iframeModal = function iframeModal(title, url) {
+    UIHelper.iframeModal = function iframeModal(title, url, onSubmit, onCancel) {
         var modal = new HashBrown.Views.Modals.IframeModal({
             title: title,
             url: url
         });
 
-        modal.on('cancel', onCancel);
-        modal.on('ok', onSubmit);
+        if (typeof onSubmit === 'function') {
+            modal.on('ok', onSubmit);
+        }
+
+        if (typeof onCancel === 'function') {
+            modal.on('cancel', onCancel);
+        }
 
         return modal;
     };
@@ -36413,7 +36420,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
