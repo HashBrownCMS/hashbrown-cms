@@ -51,8 +51,14 @@ class MainMenu extends Crisp.View {
     onClickQuestion(topic) {
         switch(topic) {
             case 'content':
-                UI.messageModal('Content', [ 
-                    _.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')
+                let modal = UI.messageModal('Content', [ 
+                    _.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'),
+                    _.button({class: 'widget widget--button condensed', title: 'Click here to start the tour'}, 'Start tour')
+                        .click(() => {
+                            modal.close();
+
+                            HashBrown.Helpers.ContentHelper.startTour();
+                        })
                 ]);
                 break;
 

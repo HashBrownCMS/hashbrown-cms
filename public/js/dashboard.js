@@ -9253,6 +9253,35 @@ var ContentHelper = function (_ContentHelperCommon) {
         return newIndex;
     };
 
+    /**
+     * Starts a tour of the Content section
+     */
+
+
+    ContentHelper.startTour = function startTour() {
+        if (location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                resolve();
+            }, 500);
+        }).then(function () {
+            return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
+        }).then(function () {
+            return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        }).then(function () {
+            var editor = document.querySelector('.editor--content');
+
+            if (!editor) {
+                return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+            }
+
+            return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        });
+    };
+
     return ContentHelper;
 }(ContentHelperCommon);
 
@@ -28343,17 +28372,6 @@ var UIHelper = function () {
     }
 
     /**
-     * Starts the tour of the UI
-     *
-     * @returns {Promise} Tour completed
-     */
-    UIHelper.startTour = function startTour() {
-        return UI.highlight('.navbar-main__tabs button[data-route="/content/"]', 'This the Content section, the one you\'re currently on', 'right', 'next <span class="fa fa-arrow-right"></span>').then(function () {
-            return UI.highlight('.navbar-main__tabs button[data-route="/schemas/"]', 'This the Content section, the one you\'re currently on', 'right');
-        });
-    };
-
-    /**
      * Highlights an element with an optional label
      *
      * @param {Boolean|HTMLElement} element
@@ -28363,8 +28381,6 @@ var UIHelper = function () {
      *
      * @return {Promise} Callback on dismiss
      */
-
-
     UIHelper.highlight = function highlight(element, label) {
         var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'right';
         var buttonLabel = arguments[3];
@@ -28392,7 +28408,7 @@ var UIHelper = function () {
                 resolve(element);
             };
 
-            var $highlight = _.div({ class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;' }, _.div({ class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;' }), _.if(label, _.div({ class: 'widget--highlight__label' }, _.div({ class: 'widget--highlight__label__text' }, label), _.if(buttonLabel, _.button({ class: 'widget widget--button widget--highlight__button condensed' }, buttonLabel).click(function () {
+            var $highlight = _.div({ class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;' }, _.div({ class: 'widget--highlight__backdrop' }), _.div({ class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;' }), _.if(label, _.div({ class: 'widget--highlight__label' }, _.div({ class: 'widget--highlight__label__text' }, label), _.if(buttonLabel, _.button({ class: 'widget widget--button widget--highlight__button condensed' }, buttonLabel).click(function () {
                 dismiss();
             }))))).click(function () {
                 if (buttonLabel) {

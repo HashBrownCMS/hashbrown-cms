@@ -7,18 +7,6 @@
  */
 class UIHelper {
     /**
-     * Starts the tour of the UI
-     *
-     * @returns {Promise} Tour completed
-     */
-    static startTour() {
-        return UI.highlight('.navbar-main__tabs button[data-route="/content/"]', 'This the Content section, the one you\'re currently on', 'right', 'next <span class="fa fa-arrow-right"></span>')
-        .then(() => {
-            return UI.highlight('.navbar-main__tabs button[data-route="/schemas/"]', 'This the Content section, the one you\'re currently on', 'right');
-        });
-    }
-
-    /**
      * Highlights an element with an optional label
      *
      * @param {Boolean|HTMLElement} element
@@ -51,6 +39,7 @@ class UIHelper {
             };
             
             let $highlight = _.div({class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;'},
+                _.div({class: 'widget--highlight__backdrop'}),
                 _.div({class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;'}),
                 _.if(label,
                     _.div({class: 'widget--highlight__label'},

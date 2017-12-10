@@ -24,9 +24,3 @@ $md: 'max-width: 1399px';
 $sm: 'max-width: 991px';
 $xs: 'max-width: 767px';
 
-// Highlight
-@keyframes highlight-pulse {
-    to {
-        box-shadow: 0 0 0 1rem rgba($primary, 0);
-    }
-}

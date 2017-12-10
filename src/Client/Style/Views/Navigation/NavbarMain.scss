@@ -13,7 +13,7 @@
 .navbar-main {
     display: flex;
     height: 100%;
-    width: 100%;
+    width: 24rem;
     position: relative;
     z-index: 100;
 
@@ -28,7 +28,6 @@
 
     &__panes {
         transition: opacity 0.5s, width 0.5s;
-        overflow-x: hidden;
     }
   
     // Toggle
@@ -142,6 +141,7 @@
     // Panes
     &__panes {
         height: 100%;
+        width: inherit;
         flex-grow: 1;
         background-color: $standard-dark;
         position: relative;
@@ -252,7 +252,7 @@
         // Items
         &__items {
             margin: 0;
-            width: 100%;
+            width: inherit;
             border: none;
             flex-grow: 1;
             overflow-y: auto;

@@ -14,13 +14,10 @@ Crisp.Router.route('/content/', () => {
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
-            _.p('Right click in the Content pane to create new Content.'),
-            _.p('Click on a Content node to edit it.'),
-            _.h2('Getting started'),
-            _.p('Click the button below to start a tour of the CMS.'),
+            _.p('Click the button below to start a tour of the Content section.'),
             _.button({class: 'widget widget--button condensed', title: 'Click here to start the tour'}, 'Start tour')
                 .click(() => {
-                    UI.startTour();
+                    HashBrown.Helpers.ContentHelper.startTour();
                 }),
             _.p('Click the button below to get some example content to work with.'),
             _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
