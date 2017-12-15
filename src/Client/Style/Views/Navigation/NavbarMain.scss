@@ -20,6 +20,7 @@
     // Tablet mode
     @media($sm) {
         flex-direction: column;
+        width: 100%;
     }
 
     &.hide-tabs &__tabs {
@@ -151,6 +152,7 @@
         // Tablet mode
         @media($sm) {
             border-right: 0;
+            height: 0%;
         }
     }
 
