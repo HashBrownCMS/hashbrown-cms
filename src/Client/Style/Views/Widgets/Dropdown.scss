@@ -10,6 +10,7 @@
     background-color: $standard;
     border-radius: 0.2rem;
     border: 2px solid $standard-dark;
+    height: 2rem;
     user-select: none;
 
     // Small
@@ -317,15 +318,14 @@
     // Clear button
     &__clear {
         border: 0;
-        height: 2rem;
-        line-height: 2rem;
         display: block;
         padding: 0 0.5rem;
         position: absolute;
         z-index: 5;
         background: transparent;
         right: 0;
-        top: 0;
+        top: 50%;
+        transform: translateY(-50%);
         color: $primary;
         transition: color 0.3s ease, background-color 0.3s ease;
         border-top-right-radius: 0.2rem;

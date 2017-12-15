@@ -2256,6 +2256,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #ffffff;
   border-radius: 0.2rem;
   border: 2px solid #eeeeee;
+  height: 2rem;
   user-select: none; }
   .widget--dropdown.small {
     max-width: 2rem;
@@ -2466,15 +2467,14 @@ h1, h2, h3, h4, h5, h6 {
       text-align: center; }
   .widget--dropdown__clear {
     border: 0;
-    height: 2rem;
-    line-height: 2rem;
     display: block;
     padding: 0 0.5rem;
     position: absolute;
     z-index: 5;
     background: transparent;
     right: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     color: #e70d3b;
     transition: color 0.3s ease, background-color 0.3s ease;
     border-top-right-radius: 0.2rem;
