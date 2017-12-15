@@ -246,6 +246,8 @@ class DatabaseHelper {
 
                                 if(
                                     !database.empty &&
+                                    database.name !== 'admin' &&
+                                    database.name !== 'local' &&
                                     database.name !== prefix + 'users' &&
                                     database.name !== prefix + 'schedule' &&
                                     database.name.indexOf(prefix) === 0
