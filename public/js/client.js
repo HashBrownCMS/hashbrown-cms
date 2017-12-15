@@ -41411,7 +41411,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -42126,9 +42126,7 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Click the button below to start a tour of the Content section.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to start the tour' }, 'Start tour').click(function () {
-        HashBrown.Helpers.ContentHelper.startTour();
-    }), _.p('Click the button below to get some example content to work with.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Click the button below to get some example content to work with.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
@@ -44818,11 +44816,7 @@ var MainMenu = function (_Crisp$View) {
     MainMenu.prototype.onClickQuestion = function onClickQuestion(topic) {
         switch (topic) {
             case 'content':
-                var modal = UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to start the tour' }, 'Start tour').click(function () {
-                    modal.close();
-
-                    HashBrown.Helpers.ContentHelper.startTour();
-                })]);
+                var modal = UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
                 break;
 
             case 'media':
