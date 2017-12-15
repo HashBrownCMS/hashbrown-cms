@@ -13,7 +13,7 @@
 .navbar-main {
     display: flex;
     height: 100%;
-    width: 24rem;
+    width: 100%;
     position: relative;
     z-index: 100;
 
@@ -27,10 +27,6 @@
         display: none;
     }
 
-    &__panes {
-        transition: opacity 0.5s, width 0.5s;
-    }
-  
     // Toggle
     &__toggle {
         display: none;
@@ -141,8 +137,9 @@
 
     // Panes
     &__panes {
+        transition: opacity 0.5s, width 0.5s;
         height: 100%;
-        width: inherit;
+        width: 24rem;
         flex-grow: 1;
         background-color: $standard-dark;
         position: relative;
@@ -153,6 +150,7 @@
         @media($sm) {
             border-right: 0;
             height: 0%;
+            width: 100%;
         }
     }
 

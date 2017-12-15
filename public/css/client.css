@@ -446,7 +446,7 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-main {
   display: flex;
   height: 100%;
-  width: 24rem;
+  width: 100%;
   position: relative;
   z-index: 100; }
   @media (max-width: 991px) {
@@ -455,8 +455,6 @@ h1, h2, h3, h4, h5, h6 {
       width: 100%; } }
   .navbar-main.hide-tabs .navbar-main__tabs {
     display: none; }
-  .navbar-main__panes {
-    transition: opacity 0.5s, width 0.5s; }
   .navbar-main__toggle {
     display: none;
     line-height: 0;
@@ -541,8 +539,9 @@ h1, h2, h3, h4, h5, h6 {
       font-size: 0.8rem;
       line-height: 1.5rem; }
   .navbar-main__panes {
+    transition: opacity 0.5s, width 0.5s;
     height: 100%;
-    width: inherit;
+    width: 24rem;
     flex-grow: 1;
     background-color: #eeeeee;
     position: relative;
@@ -551,7 +550,8 @@ h1, h2, h3, h4, h5, h6 {
     @media (max-width: 991px) {
       .navbar-main__panes {
         border-right: 0;
-        height: 0%; } }
+        height: 0%;
+        width: 100%; } }
   .navbar-main__pane {
     display: none;
     height: 100%; }
