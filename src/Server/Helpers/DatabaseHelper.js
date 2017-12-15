@@ -46,7 +46,8 @@ class DatabaseHelper {
         }
         
         if(databaseName) {
-            connectionString += '/' + databaseName;
+            connectionString += '/' + (config.prefix || '') + databaseName;
+
         } else {
             connectionString += '/';
         }
@@ -142,6 +143,7 @@ class DatabaseHelper {
      */
     static dump(databaseName) {
         return new Promise((resolve, reject) => {
+            let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
             let args = [];
             let basePath = appRoot + '/storage';
             let projectPath = basePath + '/' + databaseName + '/';
@@ -149,7 +151,7 @@ class DatabaseHelper {
 
             if(databaseName) {
                 args.push('--db');
-                args.push(databaseName);
+                args.push((config.prefix || '') + databaseName);
             }
 
             // Archive
@@ -224,6 +226,9 @@ class DatabaseHelper {
      */
     static listDatabases() {
         return new Promise((resolve, reject) => {
+            let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+            let prefix = config.prefix || '';
+            
             debug.log('Listing all databases...', this, 4);
 
             MongoClient.connect(this.getConnectionString(), (err, db) => {
@@ -241,14 +246,11 @@ class DatabaseHelper {
 
                                 if(
                                     !database.empty &&
-                                    database.name != 'local' &&
-                                    database.name != 'users' &&
-                                    database.name != 'schedule' &&
-                                    database.name != 'admin' &&
-                                    database.name != 'undefined' && 
-                                    database.name != 'false'
+                                    database.name !== prefix + 'users' &&
+                                    database.name !== prefix + 'schedule' &&
+                                    database.name.indexOf(prefix) === 0
                                 ) {
-                                    databases[databases.length] = database.name;
+                                    databases[databases.length] = database.name.replace(prefix, '');
                                 }
                             }
 
@@ -610,7 +612,7 @@ class DatabaseHelper {
      *
      * @param {String} databaseName
      *
-     * @return {Promise} promise
+     * @returns {Promise}
      */
     static dropDatabase(databaseName) {
         debug.log(databaseName + '::dropDatabase...', this, 4);

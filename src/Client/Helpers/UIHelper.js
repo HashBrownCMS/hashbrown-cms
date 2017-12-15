@@ -7,6 +7,62 @@
  */
 class UIHelper {
     /**
+     * Highlights an element with an optional label
+     *
+     * @param {Boolean|HTMLElement} element
+     * @param {String} label
+     * @param {String} direction
+     * @param {String} buttonLabel
+     *
+     * @return {Promise} Callback on dismiss
+     */
+    static highlight(element, label, direction = 'right', buttonLabel) {
+        if(element === false) {
+            $('.widget--highlight').remove();
+
+            return Promise.resolve();
+        }
+
+        if(typeof element === 'string') {
+            element = document.querySelector(element);
+        }
+
+        if(!element) { return Promise.resolve(); }
+
+        this.highlight(false);
+
+        return new Promise((resolve) => {
+            let dismiss = () => {
+                $highlight.remove();
+
+                resolve(element);
+            };
+            
+            let $highlight = _.div({class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;'},
+                _.div({class: 'widget--highlight__backdrop'}),
+                _.div({class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;'}),
+                _.if(label,
+                    _.div({class: 'widget--highlight__label'},
+                        _.div({class: 'widget--highlight__label__text'}, label),
+                        _.if(buttonLabel,
+                            _.button({class: 'widget widget--button widget--highlight__button condensed'}, buttonLabel)
+                                .click(() => {
+                                    dismiss();
+                                })
+                        )
+                    )
+                )
+            ).click(() => {
+                if(buttonLabel) { return; }
+
+                dismiss();
+            });
+            
+            _.append(element.parentElement, $highlight);
+        });
+    }
+
+    /**
      * Sets the content of the editor space
      *
      * @param {Array|HTMLElement} content
@@ -550,15 +606,22 @@ class UIHelper {
      *
      * @param {String} title
      * @param {String} url
+     * @param {Function} onSubmit
+     * @param {Function} onCancel
      */
-    static iframeModal(title, url) {
+    static iframeModal(title, url, onSubmit, onCancel) {
         let modal = new HashBrown.Views.Modals.IframeModal({
             title: title,
             url: url
         });
 
-        modal.on('cancel', onCancel);
-        modal.on('ok', onSubmit);
+        if(typeof onSubmit === 'function') {
+            modal.on('ok', onSubmit);
+        }
+
+        if(typeof onCancel === 'function') {
+            modal.on('cancel', onCancel);
+        }
        
         return modal;
     }

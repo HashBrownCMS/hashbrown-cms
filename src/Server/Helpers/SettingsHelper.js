@@ -241,7 +241,7 @@ class SettingsHelper extends SettingsHelperCommon {
     static getSettings(project, environment = null, section = null) {
         checkParam(project, 'project', String);
 
-        // Is the environment is a wildcard, just discard it
+        // If the environment is a wildcard, just discard it
         if(environment === '*') {
             environment = null;
         }

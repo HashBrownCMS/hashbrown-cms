@@ -177,7 +177,7 @@ class UrlEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'editor__field__value field-editor--url'},
             _.div({class: 'widget-group', title: this.description || ''},
                 this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),

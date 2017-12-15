@@ -1,0 +1,34 @@
+/**
+ * A select element
+ */
+.widget--select {
+    border: 0;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+    border-radius: 0.2rem;
+    background-color: $primary;
+    height: 3rem;
+    text-transform: uppercase;
+    display: block;
+    font-weight: bold;
+    min-width: 10rem;
+    cursor: pointer;
+    max-width: 20rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    color: $primary-text;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.5rem;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJFBMVEUAAAD///////////////////////////////////////////+0CY3pAAAAC3RSTlMAR01OU1ni4/r7/KrGLpIAAAABYktHRAsf18TAAAAAd0lEQVRIx2NgGAWjYBTgBOK7UUAhhoJqVAXbSFdgiapgEoYClm5k+V0BmK70QFawFIs3kI3AZgCKEUuxhgTCCOwGIBmxFEdgwozAZQDciKU44wNiBG4DoEYsxROlICPwGQA2YineVMHSjd8ABga1pNG8MwqGPQAALfh7P6hvc64AAAAASUVORK5CYII=');
+    
+    &:hover {
+        background-color: $primary-dark;
+    }
+
+    &:focus {
+        outline: 0;
+    }
+}

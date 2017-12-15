@@ -40,11 +40,13 @@
         &__menu {
             position: absolute !important;
             right: 0;
-            top: 0;
+            top: 0.5rem;
+            height: 3rem !important;
+            background-color: transparent !important;
 
             .widget--dropdown__value {
                 color: $primary-text;
-                background-color: $primary;
+                background-color: transparent;
                 border-radius: 0 !important;
                 border-top-right-radius: 0.2rem !important;
                 border-bottom-right-radius: 0.2rem !important;

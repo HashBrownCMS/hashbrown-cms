@@ -9318,6 +9318,35 @@ var ContentHelper = function (_ContentHelperCommon) {
         return newIndex;
     };
 
+    /**
+     * Starts a tour of the Content section
+     */
+
+
+    ContentHelper.startTour = function startTour() {
+        if (location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                resolve();
+            }, 500);
+        }).then(function () {
+            return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
+        }).then(function () {
+            return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        }).then(function () {
+            var editor = document.querySelector('.editor--content');
+
+            if (!editor) {
+                return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+            }
+
+            return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        });
+    };
+
     return ContentHelper;
 }(ContentHelperCommon);
 
@@ -32518,7 +32547,7 @@ var ContentEditor = function (_Crisp$View) {
         // Save & publish
         _.div({ class: 'widget widget-group' }, this.$saveBtn = _.button({ class: 'widget widget--button' }, _.span({ class: 'widget--button__text-default' }, 'Save'), _.span({ class: 'widget--button__text-working' }, 'Saving')).click(function () {
             _this7.onClickSave();
-        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--button' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
+        }), _.if(connection, _.span({ class: 'widget widget--button widget-group__separator' }, '&'), _.select({ class: 'widget widget--select' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     /**
@@ -33258,11 +33287,64 @@ var UIHelper = function () {
     }
 
     /**
+     * Highlights an element with an optional label
+     *
+     * @param {Boolean|HTMLElement} element
+     * @param {String} label
+     * @param {String} direction
+     * @param {String} buttonLabel
+     *
+     * @return {Promise} Callback on dismiss
+     */
+    UIHelper.highlight = function highlight(element, label) {
+        var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'right';
+        var buttonLabel = arguments[3];
+
+        if (element === false) {
+            $('.widget--highlight').remove();
+
+            return Promise.resolve();
+        }
+
+        if (typeof element === 'string') {
+            element = document.querySelector(element);
+        }
+
+        if (!element) {
+            return Promise.resolve();
+        }
+
+        this.highlight(false);
+
+        return new Promise(function (resolve) {
+            var dismiss = function dismiss() {
+                $highlight.remove();
+
+                resolve(element);
+            };
+
+            var $highlight = _.div({ class: 'widget--highlight' + (label ? ' ' + direction : ''), style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;' }, _.div({ class: 'widget--highlight__backdrop' }), _.div({ class: 'widget--highlight__frame', style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;' }), _.if(label, _.div({ class: 'widget--highlight__label' }, _.div({ class: 'widget--highlight__label__text' }, label), _.if(buttonLabel, _.button({ class: 'widget widget--button widget--highlight__button condensed' }, buttonLabel).click(function () {
+                dismiss();
+            }))))).click(function () {
+                if (buttonLabel) {
+                    return;
+                }
+
+                dismiss();
+            });
+
+            _.append(element.parentElement, $highlight);
+        });
+    };
+
+    /**
      * Sets the content of the editor space
      *
      * @param {Array|HTMLElement} content
      * @param {String} className
      */
+
+
     UIHelper.setEditorSpaceContent = function setEditorSpaceContent(content, className) {
         var $space = $('.page--environment__space--editor');
 
@@ -33828,17 +33910,24 @@ var UIHelper = function () {
      *
      * @param {String} title
      * @param {String} url
+     * @param {Function} onSubmit
+     * @param {Function} onCancel
      */
 
 
-    UIHelper.iframeModal = function iframeModal(title, url) {
+    UIHelper.iframeModal = function iframeModal(title, url, onSubmit, onCancel) {
         var modal = new HashBrown.Views.Modals.IframeModal({
             title: title,
             url: url
         });
 
-        modal.on('cancel', onCancel);
-        modal.on('ok', onSubmit);
+        if (typeof onSubmit === 'function') {
+            modal.on('ok', onSubmit);
+        }
+
+        if (typeof onCancel === 'function') {
+            modal.on('cancel', onCancel);
+        }
 
         return modal;
     };
@@ -41328,7 +41417,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -41982,6 +42071,8 @@ document.addEventListener('DOMContentLoaded', function () {
         new HashBrown.Views.Navigation.MainMenu();
 
         Crisp.Router.check = function (newRoute, cancel, proceed) {
+            UI.highlight(false);
+
             var contentEditor = Crisp.View.get('ContentEditor');
 
             if (!contentEditor || !contentEditor.model || newRoute.indexOf(contentEditor.model.id) > -1 || !contentEditor.dirty) {
@@ -42041,7 +42132,7 @@ Crisp.Router.route('/', function () {
 Crisp.Router.route('/content/', function () {
     Crisp.View.get('NavbarMain').showTab('/content/');
 
-    UI.setEditorSpaceContent([_.h1('Content'), _.p('Right click in the Content pane to create new Content.'), _.p('Click on a Content node to edit it.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
+    UI.setEditorSpaceContent([_.h1('Content'), _.p('Click the button below to get some example content to work with.'), _.button({ class: 'widget widget--button condensed', title: 'Click here to get some example content' }, 'Get example content').click(function () {
         RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
@@ -44731,7 +44822,7 @@ var MainMenu = function (_Crisp$View) {
     MainMenu.prototype.onClickQuestion = function onClickQuestion(topic) {
         switch (topic) {
             case 'content':
-                UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
+                var modal = UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
                 break;
 
             case 'media':
@@ -46760,7 +46851,7 @@ var BooleanEditor = function (_FieldEditor) {
     BooleanEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+        return _.div({ class: 'editor__field__value field-editor--boolean' }, new HashBrown.Views.Widgets.Input({
             type: 'checkbox',
             value: this.value,
             tooltip: this.description || '',
@@ -49097,7 +49188,7 @@ var UrlEditor = function (_FieldEditor) {
     UrlEditor.prototype.template = function template() {
         var _this2 = this;
 
-        return _.div({ class: 'editor__field__value' }, _.div({ class: 'widget-group', title: this.description || '' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
+        return _.div({ class: 'editor__field__value field-editor--url' }, _.div({ class: 'widget-group', title: this.description || '' }, this.$input = _.input({ class: 'widget widget--input text', type: 'text', value: this.value }).on('change', function () {
             _this2.onChange();
         }), _.button({ class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL' }).click(function () {
             _this2.regenerate();

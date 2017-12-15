@@ -49,7 +49,7 @@ class BooleanEditor extends FieldEditor {
      * Render this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'editor__field__value field-editor--boolean'},
             new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: this.value,

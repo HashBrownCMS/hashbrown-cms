@@ -129,6 +129,36 @@ class ContentHelper extends ContentHelperCommon {
 
         return newIndex;
     }
+
+    /**
+     * Starts a tour of the Content section
+     */
+    static startTour() {
+        if(location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+       
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        })
+        .then(() => {
+            return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next')
+        })
+        .then(() => {
+            return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        })
+        .then(() => {
+            let editor = document.querySelector('.editor--content');
+
+            if(!editor) {
+                return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+            }
+                
+            return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        });
+    }
 }
 
 module.exports = ContentHelper;

@@ -157,11 +157,11 @@ class Connection extends ConnectionCommon {
             return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
         .then((sets) => {
-            content.url = '/preview' + content.url;
+            content.setPropertyValue('url', '/preview' + content.getPropertyValue('url', language), language);
 
             return this.setContent(content.id + '_preview', content, language)
             .then(() => {
-                return Promise.resolve(this.url + content.url);
+                return Promise.resolve(this.url + content.getPropertyValue('url', language));
             });
         });
     }

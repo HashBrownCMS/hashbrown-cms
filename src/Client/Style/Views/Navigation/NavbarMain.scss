@@ -20,17 +20,13 @@
     // Tablet mode
     @media($sm) {
         flex-direction: column;
+        width: 100%;
     }
 
     &.hide-tabs &__tabs {
         display: none;
     }
 
-    &__panes, &__tabs {
-        transition: opacity 0.5s, width 0.5s;
-        overflow-x: hidden;
-    }
-  
     // Toggle
     &__toggle {
         display: none;
@@ -42,12 +38,18 @@
         background-color: $secondary;
         border: 0;
         flex-shrink: 0;
+        position: relative;
         
         @include background('secondary');
 
         &:after {
             font-family: 'FontAwesome';
             content: '\f107';
+            font-size: 2rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .page--environment__space--nav.expanded &:after {
@@ -135,7 +137,9 @@
 
     // Panes
     &__panes {
+        transition: opacity 0.5s, width 0.5s;
         height: 100%;
+        width: 24rem;
         flex-grow: 1;
         background-color: $standard-dark;
         position: relative;
@@ -145,6 +149,8 @@
         // Tablet mode
         @media($sm) {
             border-right: 0;
+            height: 0%;
+            width: 100%;
         }
     }
 
@@ -246,7 +252,7 @@
         // Items
         &__items {
             margin: 0;
-            width: 100%;
+            width: inherit;
             border: none;
             flex-grow: 1;
             overflow-y: auto;
