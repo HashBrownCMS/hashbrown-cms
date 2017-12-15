@@ -6265,9 +6265,9 @@ var Modal = function (_Crisp$View) {
             return;
         }
 
-        return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+        return [_.h4({ class: 'modal__title' }, this.title), _.if(!this.isBlocking, _.button({ class: 'modal__close fa fa-close' }).click(function () {
             _this4.close();
-        })];
+        }))];
     };
 
     /**
@@ -6289,7 +6289,7 @@ var Modal = function (_Crisp$View) {
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer && !this.isBlocking, _.div({ class: 'modal__footer' }, footer))));
     };
 
     /**
@@ -28980,12 +28980,15 @@ var UIHelper = function () {
 
     UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
         var modal = new HashBrown.Views.Modals.Modal({
+            isBlocking: onClickOK === false,
             title: title,
             group: group,
             body: body
         });
 
-        modal.on('ok', onClickOK);
+        if (onClickOK) {
+            modal.on('ok', onClickOK);
+        }
 
         return modal;
     };

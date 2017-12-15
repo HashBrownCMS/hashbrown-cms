@@ -33,7 +33,7 @@ class Modal extends Crisp.View {
         if(this.autoFetch !== false) {
             this.fetch();
         }
-        
+       
         document.body.appendChild(this.element);
     }
    
@@ -110,8 +110,10 @@ class Modal extends Crisp.View {
 
         return [
             _.h4({class: 'modal__title'}, this.title),
-            _.button({class: 'modal__close fa fa-close'})
-                .click(() => { this.close(); })
+            _.if(!this.isBlocking,
+                _.button({class: 'modal__close fa fa-close'})
+                    .click(() => { this.close(); })
+            )
         ];
     }
 
@@ -145,7 +147,7 @@ class Modal extends Crisp.View {
                         body 
                     )
                 ),
-                _.if(footer,
+                _.if(footer && !this.isBlocking,
                     _.div({class: 'modal__footer'},
                         footer
                     )

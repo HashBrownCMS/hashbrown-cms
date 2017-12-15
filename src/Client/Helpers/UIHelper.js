@@ -591,12 +591,15 @@ class UIHelper {
      */
     static messageModal(title, body, onClickOK, group) {
         let modal = new HashBrown.Views.Modals.Modal({
+            isBlocking: onClickOK === false,
             title: title,
             group: group,
             body: body
         });
 
-        modal.on('ok', onClickOK);
+        if(onClickOK) {
+            modal.on('ok', onClickOK);
+        }
 
         return modal;
     }
