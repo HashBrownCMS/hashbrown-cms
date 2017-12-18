@@ -2473,6 +2473,7 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 5;
     background: transparent;
     right: 0;
+    height: 100%;
     top: 50%;
     transform: translateY(-50%);
     color: #e70d3b;
