@@ -20380,7 +20380,7 @@ module.exports = {
 	"_args": [
 		[
 			"elliptic@6.4.0",
-			"/home/mrzapp/Development/Web/hashbrown-cms"
+			"/home/jz/Development/Web/hashbrown-cms"
 		]
 	],
 	"_development": true,
@@ -20406,7 +20406,7 @@ module.exports = {
 	],
 	"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
 	"_spec": "6.4.0",
-	"_where": "/home/mrzapp/Development/Web/hashbrown-cms",
+	"_where": "/home/jz/Development/Web/hashbrown-cms",
 	"author": {
 		"name": "Fedor Indutny",
 		"email": "fedor@indutny.com"

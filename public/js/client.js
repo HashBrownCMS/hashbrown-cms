@@ -21163,7 +21163,7 @@ module.exports = {
 	"_args": [
 		[
 			"elliptic@6.4.0",
-			"/home/mrzapp/Development/Web/hashbrown-cms"
+			"/home/jz/Development/Web/hashbrown-cms"
 		]
 	],
 	"_development": true,
@@ -21189,7 +21189,7 @@ module.exports = {
 	],
 	"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
 	"_spec": "6.4.0",
-	"_where": "/home/mrzapp/Development/Web/hashbrown-cms",
+	"_where": "/home/jz/Development/Web/hashbrown-cms",
 	"author": {
 		"name": "Fedor Indutny",
 		"email": "fedor@indutny.com"
@@ -41512,7 +41512,20 @@ var MediaViewer = function (_Crisp$View) {
 
 
     MediaViewer.prototype.template = function template() {
-        var mediaSrc = (this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id) + '?' + Date.now();
+        var mediaSrc = this.model.url;
+
+        if (!mediaSrc) {
+            mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        }
+
+        // Add timestamp
+        if (mediaSrc.indexOf('?') > -1) {
+            mediaSrc += '&';
+        } else {
+            mediaSrc += '?';
+        }
+
+        mediaSrc += 't=' + Date.now();
 
         return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true }, _.source({ src: mediaSrc, type: this.model.getContentTypeHeader() })))));
     };
