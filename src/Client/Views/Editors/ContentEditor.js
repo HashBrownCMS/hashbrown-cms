@@ -457,7 +457,7 @@ class ContentEditor extends Crisp.View {
                 }
 
                 // Construct remote URL
-                if(contentUrl !== '/' && contentUrl !== '//') {
+                if(contentUrl && contentUrl !== '//') {
                     remoteUrl = connection.url + contentUrl;
                     remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
 

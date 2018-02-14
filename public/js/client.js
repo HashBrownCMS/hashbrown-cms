@@ -6265,9 +6265,9 @@ var Modal = function (_Crisp$View) {
             return;
         }
 
-        return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+        return [_.h4({ class: 'modal__title' }, this.title), _.if(!this.isBlocking, _.button({ class: 'modal__close fa fa-close' }).click(function () {
             _this4.close();
-        })];
+        }))];
     };
 
     /**
@@ -6289,7 +6289,7 @@ var Modal = function (_Crisp$View) {
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer && !this.isBlocking, _.div({ class: 'modal__footer' }, footer))));
     };
 
     /**
@@ -21163,7 +21163,7 @@ module.exports = {
 	"_args": [
 		[
 			"elliptic@6.4.0",
-			"/home/mrzapp/Development/Web/hashbrown-cms"
+			"/home/jz/Development/Web/hashbrown-cms"
 		]
 	],
 	"_development": true,
@@ -21189,7 +21189,7 @@ module.exports = {
 	],
 	"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
 	"_spec": "6.4.0",
-	"_where": "/home/mrzapp/Development/Web/hashbrown-cms",
+	"_where": "/home/jz/Development/Web/hashbrown-cms",
 	"author": {
 		"name": "Fedor Indutny",
 		"email": "fedor@indutny.com"
@@ -32515,7 +32515,7 @@ var ContentEditor = function (_Crisp$View) {
                 }
 
                 // Construct remote URL
-                if (contentUrl !== '/' && contentUrl !== '//') {
+                if (contentUrl && contentUrl !== '//') {
                     remoteUrl = connection.url + contentUrl;
                     remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
                 } else {
@@ -33895,12 +33895,15 @@ var UIHelper = function () {
 
     UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
         var modal = new HashBrown.Views.Modals.Modal({
+            isBlocking: onClickOK === false,
             title: title,
             group: group,
             body: body
         });
 
-        modal.on('ok', onClickOK);
+        if (onClickOK) {
+            modal.on('ok', onClickOK);
+        }
 
         return modal;
     };
@@ -41515,7 +41518,20 @@ var MediaViewer = function (_Crisp$View) {
 
 
     MediaViewer.prototype.template = function template() {
-        var mediaSrc = (this.model.url || '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id) + '?' + Date.now();
+        var mediaSrc = this.model.url;
+
+        if (!mediaSrc) {
+            mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+        }
+
+        // Add timestamp
+        if (mediaSrc.indexOf('?') > -1) {
+            mediaSrc += '&';
+        } else {
+            mediaSrc += '?';
+        }
+
+        mediaSrc += 't=' + Date.now();
 
         return _.div({ class: 'editor editor--media' }, _.div({ class: 'editor__header' }, _.span({ class: 'editor__header__icon fa fa-file-image-o' }), _.h4({ class: 'editor__header__title' }, this.model.name, _.span({ class: 'editor__header__title__appendix' }, this.model.getContentTypeHeader()))), _.div({ class: 'editor__body' }, _.if(this.model.isImage(), _.img({ class: 'editor--media__preview', src: mediaSrc })), _.if(this.model.isVideo(), _.video({ class: 'editor--media__preview', controls: true }, _.source({ src: mediaSrc, type: this.model.getContentTypeHeader() })))));
     };

@@ -109,7 +109,8 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
         // If using recursion, get tree instead
         if(recursions > 0) {
             path = this.extractSubPath(path);
-
+        
+            // First get the entire tree
             return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/' + this.repo + '/git/trees/' + (this.branch || 'gh-pages') + '?recursive=1&access_token=' + this.token)
             .then((data) => {
                 if(!data || !data.tree) { 
@@ -118,19 +119,36 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
 
                 return Promise.resolve(data.tree);    
             })
+
+            // Then get each downloadable URL (necessary for private repos)
             .then((tree) => {
-                for(let i = tree.length -1; i >= 0; i--) {
-                    // Remove anything that's not a file or is not in the target path
-                    if(tree[i].mode !== '100644' || tree[i].path.indexOf(path) !== 0) {
-                        tree.splice(i, 1);
-                        continue;
-                    }
+                let files = [];
 
-                    // Replace API URL with static url
-                    tree[i].url = 'https://raw.githubusercontent.com/' + this.repo + '/' + (this.branch || 'gh-pages') + '/' + tree[i].path + '?sanitize=true';
-                }
+                let getNextFile = () => {
+                    let file = tree.pop();
 
-                return Promise.resolve(tree);
+                    if(!file) { return Promise.resolve(files); }
+                    
+                    // Skip anything that's not a file or is not in the target path
+                    if(file.mode !== '100644' || file.path.indexOf(path) !== 0) { return getNextFile(); }
+
+                    return HashBrown.Helpers.RequestHelper.request('get', 'http://api.github.com/repos/' + this.repo + '/contents/' + file.path + '?ref=' + (this.branch || 'gh-pages') + '&access_token=' + this.token)
+                    .then((result) => {
+                        file.url = result.download_url;
+
+                        files.push(file);
+
+                        return getNextFile();
+                    })
+
+                    // The GET request might fail if the file is too big, but then just skip it
+                    .catch(() => {
+                        return getNextFile();
+                        
+                    });
+                };
+
+                return getNextFile();
             }); 
         }
 

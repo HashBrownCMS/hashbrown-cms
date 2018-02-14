@@ -6265,9 +6265,9 @@ var Modal = function (_Crisp$View) {
             return;
         }
 
-        return [_.h4({ class: 'modal__title' }, this.title), _.button({ class: 'modal__close fa fa-close' }).click(function () {
+        return [_.h4({ class: 'modal__title' }, this.title), _.if(!this.isBlocking, _.button({ class: 'modal__close fa fa-close' }).click(function () {
             _this4.close();
-        })];
+        }))];
     };
 
     /**
@@ -6289,7 +6289,7 @@ var Modal = function (_Crisp$View) {
             }, 50);
         }
 
-        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer, _.div({ class: 'modal__footer' }, footer))));
+        return _.div({ class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '') }, _.div({ class: 'modal__dialog' }, _.div({ class: 'widget--spinner embedded hidden' }, _.div({ class: 'widget--spinner__image fa fa-refresh' })), _.if(header, _.div({ class: 'modal__header' }, header)), _.if(body, _.div({ class: 'modal__body' }, body)), _.if(footer && !this.isBlocking, _.div({ class: 'modal__footer' }, footer))));
     };
 
     /**
@@ -20380,7 +20380,7 @@ module.exports = {
 	"_args": [
 		[
 			"elliptic@6.4.0",
-			"/home/mrzapp/Development/Web/hashbrown-cms"
+			"/home/jz/Development/Web/hashbrown-cms"
 		]
 	],
 	"_development": true,
@@ -20406,7 +20406,7 @@ module.exports = {
 	],
 	"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
 	"_spec": "6.4.0",
-	"_where": "/home/mrzapp/Development/Web/hashbrown-cms",
+	"_where": "/home/jz/Development/Web/hashbrown-cms",
 	"author": {
 		"name": "Fedor Indutny",
 		"email": "fedor@indutny.com"
@@ -28980,12 +28980,15 @@ var UIHelper = function () {
 
     UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
         var modal = new HashBrown.Views.Modals.Modal({
+            isBlocking: onClickOK === false,
             title: title,
             group: group,
             body: body
         });
 
-        modal.on('ok', onClickOK);
+        if (onClickOK) {
+            modal.on('ok', onClickOK);
+        }
 
         return modal;
     };
