@@ -30,6 +30,7 @@ class PluginController extends Controller {
                 compiledJs += FileSystem.readFileSync(path, 'utf8');
             }
 
+            res.set('Content-Type', 'text/javascript');
             res.send(compiledJs);
         });
     }
@@ -45,6 +46,7 @@ class PluginController extends Controller {
                 compiledCss += FileSystem.readFileSync(path, 'utf8');
             }
 
+            res.set('Content-Type', 'text/css');
             res.send(compiledCss);
         });
     }
