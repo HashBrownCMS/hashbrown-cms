@@ -11,7 +11,7 @@ First make sure you have these dependencies met:
 
 Then checkout and run HashBrown:  
 ```
-git clone https://github.com/Putaitu/hashbrown-cms.git -b stable --single-branch --recursive
+git clone https://github.com/HashBrownCMS/hashbrown-cms.git -b stable --single-branch --recursive
 cd ./hashbrown-cms
 npm install --production
 node hashbrown.js
@@ -31,7 +31,7 @@ npm install --production
 - [Documentation](http://hashbrown.rocks/docs)
 
 ## Contribute
-If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/Putaitu/hashbrown-cms) or contact us about becoming a collaborator
+If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/HashBrownCMS/hashbrown-cms) or contact us about becoming a collaborator
 
 ## Ask a question
 Here: [/r/HashBrownCMS/](https://www.reddit.com/r/HashBrownCMS/)

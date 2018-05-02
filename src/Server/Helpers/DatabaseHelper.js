@@ -171,6 +171,8 @@ class DatabaseHelper {
 
             args.push('--archive=' + dumpPath + '/' + timestamp + '.hba');
 
+            debug.log('Dumping database "' + databaseName + '" to ' + dumpPath + '/' + timestamp + '.hba...', this);
+
             let mongodump = Spawn('mongodump', args);
 
             mongodump.stdout.on('data', (data) => {
@@ -183,9 +185,11 @@ class DatabaseHelper {
             
             mongodump.on('exit', (code) => {
                 if(code != 0) {
+                    debug.log('Dumping database failed!', this);
                     reject(new Error('mongodump exited with status code ' + code));
                 
                 } else {
+                    debug.log('Dumping database succeeded!', this);
                     resolve(timestamp);
 
                 }
