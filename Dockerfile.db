@@ -1,0 +1,7 @@
+FROM mongo
+
+COPY ./dump/* /home/dump/
+COPY restore.sh /home/restore.sh
+RUN chmod 777 /home/restore.sh
+
+CMD /home/restore.sh

@@ -18,12 +18,10 @@ html
 
         form(class='page--setup__step page--setup__step-' + step, data-step=step, action='/api/user/first')
             .page--setup__step__heading
-                if(step == 1)
-                    h2 Create your first admin account
+                h2 Create your first admin account
             .page--setup__step__body
-                if(step == 1)
-                    input.widget.widget--input.tall.expanded.text(required=true, title='Your username', type='text', name='username', placeholder='Username')
-                    input.widget.widget--input.tall.expanded.text(required=true, title='Your password', type='password', name='password', placeholder='Password')
+                input.widget.widget--input.tall.expanded.text(required=true, title='Your username', type='text', name='username', placeholder='Username')
+                input.widget.widget--input.tall.expanded.text(required=true, title='Your password', type='password', name='password', placeholder='Password')
                 
                 input.widget.widget--button.expanded(type='submit', value='Next')
     

@@ -63,38 +63,13 @@ class ViewController extends Controller {
 
         // First time setup
         app.get('/setup/:step', (req, res) => {
-            let check = () => {
-                switch(parseInt(req.params.step)) {
-                    case 1:
-                        return ConfigHelper.exists('database')
-                        .then((exists) => {
-                            if(!exists) {
-                                return Promise.resolve();
-                            }
-
-                            return Promise.reject(new Error('Database config exists already'));
-                        });
-
-                    case 2:
-                        return UserHelper.getAllUsers()
-                        .then((users) => {
-                            if(!users || users.length < 1) { 
-                                return Promise.resolve();
-                            }
-
-                            return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.'));
-                        });
+            return UserHelper.getAllUsers()
+            .then((users) => {
+                if(users && users.length > 0) { 
+                    return res.status(400).render('error', { message: 'Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.' });
                 }
 
-                return Promise.reject(new Error('No such step "' + req.params.step + '"'));
-            };
-
-            check()
-            .then(() => {
                 res.render('setup', { step: req.params.step });
-            })
-            .catch((e) => {
-                res.status(400).render('error', { message: e.message });
             });
         });
 
