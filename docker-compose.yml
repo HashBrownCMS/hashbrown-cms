@@ -25,6 +25,8 @@ services:
             - n-hashbrown
         restart: unless-stopped
         command: "node /opt/hashbrown-cms"
+        environment:
+            - MONGODB_HOST=mongodb
         volumes:
             - "./:/opt/hashbrown-cms"
             - "v-hashbrown-storage:/opt/hashbrown-cms/storage"

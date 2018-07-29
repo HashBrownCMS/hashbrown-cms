@@ -28,21 +28,26 @@ class DatabaseHelper {
         let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
 
         let connectionString = 'mongodb://';
-       
-        if(config.username) {
-            connectionString += config.username;
+      
+        let username = process.env.MONGODB_USERNAME || config.username;
+        let password = process.env.MONGODB_PASSWORD || config.password;
+        let host = process.env.MONGODB_HOST || config.host || config.url || 'localhost';
+        let port = process.env.MONGODB_PORT || config.port;
 
-            if(config.password) {
-                connectionString += ':' + config.password;
+        if(username) {
+            connectionString += username;
+
+            if(password) {
+                connectionString += ':' + password;
             }
 
             connectionString += '@';
         }
 
-        connectionString += config.url || 'localhost';
+        connectionString += host;
         
-        if(config.port) {
-            connectionString += ':' + config.port;
+        if(port) {
+            connectionString += ':' + port;
         }
         
         if(databaseName) {
