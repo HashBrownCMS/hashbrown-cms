@@ -4,9 +4,6 @@
  * @namespace HashBrown.Client
  */
 
-// Style
-require('Client/Style/client');
-
 // Get routes
 require('Client/Routes');
 

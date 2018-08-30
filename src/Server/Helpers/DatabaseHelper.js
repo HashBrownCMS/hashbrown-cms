@@ -114,7 +114,7 @@ class DatabaseHelper {
             
             } else {
                 args.push('--archive=' + archivePath);
-                args.push('--db=' + databaseName);
+                args.push('--nsInclude ' + databaseName);
 
                 let mongorestore = Spawn('mongorestore', args);
 

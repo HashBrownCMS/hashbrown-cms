@@ -259,6 +259,7 @@ class GitHubDeployer extends HashBrown.Models.Deployer {
             }
             
             debug.log('Removed file successfully!', this, 2);
+            
             return Promise.resolve();
         });
     }

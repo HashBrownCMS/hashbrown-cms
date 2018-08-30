@@ -5,9 +5,6 @@ const Path = require('path');
 const FileSystem = require('fs');
 const SemanticVersion = require('semver');
 
-const RequestHelper = require('Server/Helpers/RequestHelper');
-
-
 /**
  * The helper class for system updates
  *
@@ -20,7 +17,7 @@ class UpdateHelper {
      * @returns {Promise} Status info
      */
     static check() {
-        return RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
         .then((res) => {
             if(!res || !res.tag_name) {
                 return Promise.reject(new Error('Couldn\'t fetch update information'));
@@ -67,7 +64,7 @@ class UpdateHelper {
         debug.log('Updating HashBrown...', this);
         
         // Get latest release info
-        return RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
         
         // Check versions
         .then((res) => {

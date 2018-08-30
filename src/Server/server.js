@@ -30,6 +30,7 @@ app.set('views', appRoot + '/src/Server/Views');
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
 app.use(Express.static(appRoot + '/public'));
+app.use('/storage/plugins', Express.static(appRoot + '/storage/plugins'));
 
 // ----------
 // Namespaces

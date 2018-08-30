@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 272);
+/******/ 	return __webpack_require__(__webpack_require__.s = 271);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -36505,7 +36505,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "1.0.5",
+	"version": "1.0.7",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -36526,6 +36526,7 @@ module.exports = {
 		"mongodb": "^2.1.7",
 		"multer": "^1.1.0",
 		"path-to-regexp": "^1.2.1",
+		"production": "0.0.2",
 		"pug": "^2.0.0-beta11",
 		"rimraf": "^2.5.2",
 		"semver": "^5.4.1",
@@ -36592,8 +36593,7 @@ module.exports = {
 /* 268 */,
 /* 269 */,
 /* 270 */,
-/* 271 */,
-/* 272 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36638,7 +36638,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
     projects = projects || [];
 
-    var ProjectEditor = __webpack_require__(273);
+    var ProjectEditor = __webpack_require__(272);
 
     for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
@@ -36891,7 +36891,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 273 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36905,11 +36905,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Project = __webpack_require__(100);
 var RequestHelper = __webpack_require__(2);
-var InfoEditor = __webpack_require__(274);
-var SyncEditor = __webpack_require__(275);
-var LanguageEditor = __webpack_require__(276);
-var BackupEditor = __webpack_require__(277);
-var MigrationEditor = __webpack_require__(278);
+var InfoEditor = __webpack_require__(273);
+var SyncEditor = __webpack_require__(274);
+var LanguageEditor = __webpack_require__(275);
+var BackupEditor = __webpack_require__(276);
+var MigrationEditor = __webpack_require__(277);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -37192,7 +37192,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 274 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37279,7 +37279,7 @@ var InfoEditor = function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 275 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37496,7 +37496,7 @@ var SyncEditor = function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 276 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37582,7 +37582,7 @@ var LanguageEditor = function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 277 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37795,7 +37795,7 @@ var BackupEditor = function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 278 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

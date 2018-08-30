@@ -6,6 +6,7 @@
 module.exports = {
     AppHelper: require('./AppHelper'),
     BackupHelper: require('./BackupHelper'),
+    CacheHelper: require('./CacheHelper'),
     ConfigHelper: require('./ConfigHelper'),
     ConnectionHelper: require('./ConnectionHelper'),
     ContentHelper: require('./ContentHelper'),

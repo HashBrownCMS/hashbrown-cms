@@ -406,7 +406,7 @@ class Connection extends ConnectionCommon {
             return Promise.reject(new Error('This Connection has no deployer defined'));
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media'), 1)
+        return this.deployer.getFolder(this.deployer.getPath('media'), 2)
         .then((folders) => {
             if(!folders) { return Promise.resolve([]); }
 
