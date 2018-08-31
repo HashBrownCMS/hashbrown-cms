@@ -15,6 +15,7 @@ const Express = require('express');
 const BodyParser = require('body-parser');
 const CookieParser = require('cookie-parser');
 const ExpressWebSockets = require('express-ws');
+const FileSystem = require('fs');
 
 // ----------
 // Express app
@@ -22,15 +23,15 @@ const ExpressWebSockets = require('express-ws');
 const app = Express();
 
 app.set('view engine', 'pug');
-app.set('views', appRoot + '/src/Server/Views');
+app.set('views', APP_ROOT + '/src/Server/Views');
 
 // ----------
 // App middlewares
 // ----------
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
-app.use(Express.static(appRoot + '/public'));
-app.use('/storage/plugins', Express.static(appRoot + '/storage/plugins'));
+app.use(Express.static(APP_ROOT + '/public'));
+app.use('/storage/plugins', Express.static(APP_ROOT + '/storage/plugins'));
 
 // ----------
 // Namespaces
@@ -139,6 +140,15 @@ function ready(files) {
         // Start schedule helper
         HashBrown.Helpers.ScheduleHelper.startWatching();
         
+        // Watch the package.json for changes
+        FileSystem.watchFile(APP_ROOT + '/package.json', () => {
+            debug.log('package.json changed, reloading...', 'HashBrown');
+
+            process.exit();
+        });
+
+        debug.log('Watching package.json for changes', 'HashBrown');
+
         return Promise.resolve();   
     })
 

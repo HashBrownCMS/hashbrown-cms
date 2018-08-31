@@ -270,6 +270,7 @@ class ProjectHelper {
      * Deletes a project
      *
      * @param {String} name
+     * @param {Boolean} makeBackup
      *
      * @returns {Promise} Promise
      */

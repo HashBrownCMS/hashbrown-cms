@@ -118,28 +118,6 @@ class ConnectionEditor extends Crisp.View {
             }
         }).$element;
     }
-    
-    /**
-     * Renders the preset editor
-     */
-    renderPresetEditor() {
-        return new HashBrown.Views.Widgets.Dropdown({
-            options: [
-                'GitHub Pages',
-                'HashBrown Driver'
-            ],
-            placeholder: 'Pick a preset...',
-            onChange: (newValue) => {
-                let newModel = this.model.getObject();
-                
-                newModel.preset = newValue;
-               
-                this.model = new HashBrown.Models.Connection(newModel);
-
-                this.fetch();
-            }
-        }).$element;
-    }
 
     /**
      * Renders the processing settings editor
@@ -316,12 +294,6 @@ class ConnectionEditor extends Crisp.View {
                     _.div({class: 'editor__field__key'}, 'URL'),
                     _.div({class: 'editor__field__value'},
                         this.renderUrlEditor()
-                    )
-                ),
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Preset'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderPresetEditor()
                     )
                 ),
                 _.div({class: 'editor__field'},

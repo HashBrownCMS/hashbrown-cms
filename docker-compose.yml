@@ -1,10 +1,3 @@
-####################
-# A docker compose config for HashBrown CMS
-#
-# For this to work, please create a database.cfg file in the /config/ directory
-# The contents of the file should look like this: { "url": "mongodb" }
-####################
-
 version: "3.4"
 
 volumes:
@@ -16,7 +9,8 @@ networks:
     
 services:
     node:
-        image: node:alpine
+        image: node
+        container_name: "hashbrown-node"
         ports:
             - "8080:8080"
         depends_on:
@@ -29,15 +23,14 @@ services:
             - MONGODB_HOST=mongodb
         volumes:
             - "./:/opt/hashbrown-cms"
-            - "v-hashbrown-storage:/opt/hashbrown-cms/storage"
             - "/etc/localtime:/etc/localtime:ro"
 
     mongodb:
         image: mongo
+        container_name: "hashbrown-mongo"
         networks:
             - n-hashbrown
         restart: unless-stopped
         volumes:
             - "v-hashbrown-mongodb:/data/db"
-            - "v-hashbrown-storage:/opt/hashbrown-cms/storage"
             - "/etc/localtime:/etc/localtime:ro"

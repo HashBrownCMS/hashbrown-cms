@@ -101,7 +101,7 @@ class DatabaseHelper {
     static restore(databaseName, timestamp) {
         return new Promise((resolve, reject) => {
             let args = [];
-            let basePath = appRoot + '/storage';
+            let basePath = APP_ROOT + '/storage';
             let projectPath = basePath + '/' + databaseName + '/dump';
             let archivePath = projectPath + '/' + timestamp + '.hba';
 
@@ -150,7 +150,7 @@ class DatabaseHelper {
         return new Promise((resolve, reject) => {
             let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
             let args = [];
-            let basePath = appRoot + '/storage';
+            let basePath = APP_ROOT + '/storage';
             let projectPath = basePath + '/' + databaseName + '/';
             let dumpPath = projectPath + 'dump/';
 

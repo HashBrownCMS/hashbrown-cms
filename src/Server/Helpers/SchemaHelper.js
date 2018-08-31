@@ -25,7 +25,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchemas() {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/src/Common/Schemas/*/*.schema', function(err, paths) {
+            Glob(APP_ROOT + '/src/Common/Schemas/*/*.schema', function(err, paths) {
                 if(err) {
                     reject(new Error(err));
                 
@@ -152,8 +152,8 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Boolean} isNative
      */
     static isNativeSchema(id) {
-        let fieldPath = appRoot + '/src/Common/Schemas/Field/' + id + '.schema';
-        let contentPath = appRoot + '/src/Common/Schemas/Content/' + id + '.schema';
+        let fieldPath = APP_ROOT + '/src/Common/Schemas/Field/' + id + '.schema';
+        let contentPath = APP_ROOT + '/src/Common/Schemas/Content/' + id + '.schema';
     
         try {
             FileSystem.statSync(fieldPath);
@@ -180,7 +180,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchema(id) {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/src/Common/Schemas/*/' + id + '.schema', function(err, paths) {
+            Glob(APP_ROOT + '/src/Common/Schemas/*/' + id + '.schema', function(err, paths) {
                 if(err) {
                     reject(new Error(err));
                 

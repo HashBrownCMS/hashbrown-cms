@@ -22,7 +22,7 @@ class CacheHelper {
         return new Promise((resolve, reject) => {
             this.checkCacheFolder();
 
-            let path = Path.join(appRoot, 'storage', 'cache', Buffer.from(key).toString('base64'));
+            let path = Path.join(APP_ROOT, 'storage', 'cache', Buffer.from(key).toString('base64'));
 
             FileSystem.writeFile(path, JSON.stringify(value), 'utf8', (err, data) => {
                 if(err) {
@@ -49,7 +49,7 @@ class CacheHelper {
         return new Promise((resolve, reject) => {
             this.checkCacheFolder();
 
-            let path = Path.join(appRoot, 'storage', 'cache', Buffer.from(key).toString('base64'));
+            let path = Path.join(APP_ROOT, 'storage', 'cache', Buffer.from(key).toString('base64'));
 
             FileSystem.exists(path, (exists) => {
                 if(exists) {
@@ -89,7 +89,7 @@ class CacheHelper {
         return new Promise((resolve, reject) => {
             this.checkCacheFolder();
 
-            let path = Path.join(appRoot, 'storage', 'cache', Buffer.from(key, 'base64').toString('utf8'));
+            let path = Path.join(APP_ROOT, 'storage', 'cache', Buffer.from(key, 'base64').toString('utf8'));
 
             FileSystem.unlink(path, () => {
                 resolve();
@@ -101,8 +101,8 @@ class CacheHelper {
      * Makes sure the cache folder is present
      */
     static checkCacheFolder() {
-        let storagePath = Path.join(appRoot, 'storage');
-        let cachePath = Path.join(appRoot, 'storage', 'cache');
+        let storagePath = Path.join(APP_ROOT, 'storage');
+        let cachePath = Path.join(APP_ROOT, 'storage', 'cache');
 
         if(!FileSystem.existsSync(storagePath)) {
             FileSystem.mkdirSync(storagePath);

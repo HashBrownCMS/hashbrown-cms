@@ -20,7 +20,7 @@ class AppHelper {
         checkParam(cmd, 'cmd', String);
         checkParam(cwd, 'cwd', String);
 
-        if(!cwd) { cwd = appRoot; }
+        if(!cwd) { cwd = APP_ROOT; }
 
         return new Promise((resolve, reject) => {
             debug.log('Running command ' + cmd, this, 3);

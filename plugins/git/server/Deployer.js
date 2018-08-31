@@ -3,6 +3,7 @@
 const FileSystem = require('fs');
 const Glob = require('glob');
 const Path = require('path');
+const RimRaf = require('rimraf');
 
 /**
  * Git deployer
@@ -30,7 +31,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
      * @returns {Promise} Promise
      */
     pullRepo() {
-        let storagePath = Path.join(appRoot, 'storage');
+        let storagePath = Path.join(APP_ROOT, 'storage');
         
         if(!FileSystem.existsSync(storagePath)) { FileSystem.mkdirSync(storagePath); }
 
@@ -66,6 +67,18 @@ class GitDeployer extends HashBrown.Models.Deployer {
             return Promise.resolve();
         })()
         .then(() => {
+            return HashBrown.Helpers.AppHelper.exec('git config user.name "HashBrown CMS"', repoPath);
+        })
+        .then(() => {
+            return HashBrown.Helpers.AppHelper.exec('git config user.email "git@hashbrown.cms"', repoPath);
+        })
+        .then(() => {
+            return HashBrown.Helpers.AppHelper.exec('git checkout ' + (this.branch || 'master'), repoPath);
+        })
+        .then(() => {
+            return HashBrown.Helpers.AppHelper.exec('git reset --hard', repoPath);
+        })
+        .then(() => {
             return HashBrown.Helpers.AppHelper.exec('git pull', repoPath);
         });
     }
@@ -76,7 +89,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
      * @returns {Promise} Promise
      */
     pushRepo() {
-        let repoPath = appRoot + this.getRootPath();
+        let repoPath = APP_ROOT + this.getRootPath();
         
         return HashBrown.Helpers.AppHelper.exec('git add -A .', repoPath)
         .then(() => {
@@ -146,13 +159,13 @@ class GitDeployer extends HashBrown.Models.Deployer {
         return this.pullRepo()
         .then(() => {
             return new Promise((resolve, reject) => {
-                Glob(appRoot + path, (err, data) => {
+                Glob(APP_ROOT + path, (err, data) => {
                     if(err) { return reject(err); }
 
                     let files = [];
 
                     for(let fullPath of data) {
-                        let relativePath = fullPath.replace(appRoot + this.getRootPath(), '');
+                        let relativePath = fullPath.replace(APP_ROOT + this.getRootPath(), '');
 
                         files.push({
                             name: Path.basename(relativePath),
@@ -179,7 +192,13 @@ class GitDeployer extends HashBrown.Models.Deployer {
         return this.pullRepo()
         .then(() => {
             return new Promise((resolve, reject) => {
-                FileSystem.writeFile(appRoot + path, base64, 'base64', (err) => {
+                let folder = Path.dirname(APP_ROOT + path);
+
+                if(!FileSystem.existsSync(folder)) {
+                    FileSystem.mkdirSync(folder);
+                }
+
+                FileSystem.writeFile(APP_ROOT + path, base64, 'base64', (err) => {
                     if(err) { return reject(err); }
 
                     resolve();
@@ -202,7 +221,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
         return this.pullRepo()
         .then(() => {
             return new Promise((resolve, reject) => {
-                FileSystem.unlink(appRoot + path, (err) => {
+                FileSystem.unlink(APP_ROOT + path, (err) => {
                     if(err) { reject(err); }
 
                     resolve();
@@ -225,7 +244,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
         return this.pullRepo()
         .then(() => {
             return new Promise((resolve, reject) => {
-                FileSystem.rmdir(appRoot + path, (err) => {
+                RimRaf(APP_ROOT + path, (err) => {
                     if(err) { reject(err); }
 
                     resolve();

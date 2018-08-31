@@ -22,7 +22,7 @@ class BackupHelper {
      */
     static getConfig() {
         return new Promise((resolve, reject) => {
-            let configPath = appRoot + '/config/backup.cfg';
+            let configPath = APP_ROOT + '/config/backup.cfg';
 
             FileSystem.exists(configPath, (exists) => {
                 if(exists) {
@@ -59,7 +59,7 @@ class BackupHelper {
         let handler = Multer({
             storage: Multer.diskStorage({
                 destination: (req, file, resolve) => {
-                    let path = appRoot + '/storage/' + req.params.project + '/dump/';
+                    let path = APP_ROOT + '/storage/' + req.params.project + '/dump/';
                    
                     debug.log('Handling file upload to dump storage...', this);
 
@@ -91,12 +91,12 @@ class BackupHelper {
      */
     static getBackupsForProject(id) {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/storage/' + id + '/dump/*.hba', (err, files) => {
+            Glob(APP_ROOT + '/storage/' + id + '/dump/*.hba', (err, files) => {
                 if(err) {
                     reject(new Error(err));
                 } else {
                     for(let i in files) {
-                        files[i] = files[i].replace(appRoot + '/storage/' + id + '/dump/', '').replace('.hba', '');
+                        files[i] = files[i].replace(APP_ROOT + '/storage/' + id + '/dump/', '').replace('.hba', '');
                     }
 
                     resolve(files);
@@ -139,7 +139,7 @@ class BackupHelper {
      */
     static deleteBackup(projectName, timestamp) {
         return new Promise((resolve, reject) => {
-            let path = appRoot + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
+            let path = APP_ROOT + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
 
             if(FileSystem.existsSync(path)) {
                 FileSystem.unlinkSync(path);
@@ -161,7 +161,7 @@ class BackupHelper {
      */
     static getBackupPath(projectName, timestamp) {
         return new Promise((resolve, reject) => {
-            let path = appRoot + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
+            let path = APP_ROOT + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
 
             if(FileSystem.existsSync(path)) {
                 resolve(path);

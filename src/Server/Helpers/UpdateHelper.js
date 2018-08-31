@@ -25,7 +25,7 @@ class UpdateHelper {
 
             // Compare local and remote version numbers
             let remoteVersion = res.tag_name;
-            let localVersion = require(appRoot + '/package.json').version;
+            let localVersion = require(APP_ROOT + '/package.json').version;
 
             return Promise.resolve({
                 isBehind: this.isVersionBehind(localVersion, remoteVersion),
@@ -69,7 +69,7 @@ class UpdateHelper {
         // Check versions
         .then((res) => {
             let remoteVersion = res.tag_name;
-            let localVersion = require(appRoot + '/package.json').version;
+            let localVersion = require(APP_ROOT + '/package.json').version;
 
             if(!this.isVersionBehind(localVersion, remoteVersion)) {
                 return Promise.reject(new Error('Can\'t update, local version is not behind remote version'));
@@ -85,7 +85,7 @@ class UpdateHelper {
 
             return new Promise((resolve, reject) => {
                 let git = ChildProcess.exec('git checkout stable', {
-                    cwd: appRoot
+                    cwd: APP_ROOT
                 });
 
                 git.stdout.on('data', (data) => {
@@ -112,7 +112,7 @@ class UpdateHelper {
             
             return new Promise((resolve, reject) => {
                 let git = ChildProcess.exec('git pull origin stable', {
-                    cwd: appRoot
+                    cwd: APP_ROOT
                 });
 
                 git.stdout.on('data', (data) => {
@@ -139,7 +139,7 @@ class UpdateHelper {
             
             return new Promise((resolve, reject) => {
                 let npm = ChildProcess.exec('git submodule update --recursive --init', {
-                    cwd: appRoot
+                    cwd: APP_ROOT
                 });
 
                 npm.stdout.on('data', (data) => {
@@ -168,7 +168,7 @@ class UpdateHelper {
             
             return new Promise((resolve, reject) => {
                 let npm = ChildProcess.exec('rm -rf node_modules && npm install --production', {
-                    cwd: appRoot
+                    cwd: APP_ROOT
                 });
 
                 npm.stdout.on('data', (data) => {

@@ -43,17 +43,7 @@ class MediaHelper extends MediaHelperCommon {
                     }
                 },
                 filename: (req, file, resolve) => {
-                    let split = file.originalname.split('.');
-                    let name = split[0];
-                    let extension = split[1];
-                    
-                    name = name.replace(/\W+/g, '-').toLowerCase();
-                   
-                    if(extension) {
-                        name += '.' + extension;
-                    }
-
-                    resolve(null, name);
+                    resolve(null, file.originalname);
                 }
             })
         })
@@ -140,7 +130,7 @@ class MediaHelper extends MediaHelperCommon {
 
             // If it does exist, remove the directory
             } else {
-                RimRaf(newDir, function(err) {
+                RimRaf(newDir, (err) => {
                     if(err) {
                         reject(new Error(err));
                     
@@ -188,6 +178,8 @@ class MediaHelper extends MediaHelperCommon {
             connection = provider;
 
             // Read the file from temp
+            debug.log('Reading file from temp dir ' + tempPath + '...', this);
+
             return new Promise((resolve, reject)  => {
                 FileSystem.readFile(tempPath, (err, fileData) => {
                     if(err) { return reject(err); }
@@ -198,14 +190,16 @@ class MediaHelper extends MediaHelperCommon {
         })
         .then((fileData) => {
             // Upload the data
+            debug.log('Uploading file...', this);
+            
             return connection.setMedia(id, filename, fileData.toString('base64'));
         })
         .then(() => {
             // Remove the file from temp storage
+            debug.log('Removing temp file...', this);
+            
             return new Promise((resolve, reject)  => {
                 FileSystem.unlink(tempPath, (err) => {
-                    if(err) { return reject(err); }
-
                     resolve();
                 });
             });
@@ -321,7 +315,7 @@ class MediaHelper extends MediaHelperCommon {
     static getTempPath(project) {
         checkParam(project, 'project', String);
 
-        return Path.join(appRoot, 'storage', project, 'temp');
+        return Path.join(APP_ROOT, 'storage', project, 'temp');
     }
 }
 

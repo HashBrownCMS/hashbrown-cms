@@ -52,7 +52,7 @@ class ViewController extends Controller {
                     break;
             }
 
-            FileSystem.readFile(appRoot + '/' + filename, (err, file) => {
+            FileSystem.readFile(APP_ROOT + '/' + filename, (err, file) => {
                 if(err) {
                     res.status(400).render('error', { message: e.message });
                 } else {
@@ -110,7 +110,7 @@ class ViewController extends Controller {
                     tab: req.params.tab,
                     os: OS,
                     user: user,
-                    app: require(appRoot + '/package.json')
+                    app: require(APP_ROOT + '/package.json')
                 });
             })
             .catch((e) => {
@@ -160,7 +160,7 @@ class ViewController extends Controller {
         app.get('/:project/:environment/test/:tab', (req, res) => {
             ViewController.authenticate(req.cookies.token)
             .then((user) => {
-                FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
+                FileSystem.readFile(APP_ROOT + '/public/md/ui-checklist.md', (err, file) => {
                     if(err) {
                         return res.status(400).render('error', { message: err.message });
                     }

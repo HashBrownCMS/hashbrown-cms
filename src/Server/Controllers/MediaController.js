@@ -34,23 +34,23 @@ class MediaController extends require('./ApiController') {
 
         HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
-            return connection.getMedia(id)
-            .then((media) => {
-                if(!media) {
-                    return res.status(404).send('Not found');
-                }
+            return connection.getMedia(id);
+        })
+        .then((media) => {
+            if(!media) {
+                return res.status(404).send('Not found');
+            }
 
-                // Serve local files directly
-                if(!media.url) {
-                    res.sendFile(media.path);
+            // Serve local files directly
+            if(!media.url) {
+                res.sendFile(media.path);
 
-                // Serve remote files through redirection
-                // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server
-                // NOTE: The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
-                } else {
-                    res.redirect(media.url);
-                }
-            });
+            // Serve remote files through redirection
+            // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server
+            // NOTE: The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
+            } else {
+                res.redirect(media.url);
+            }
         })
         .catch((e) => {
             res.status(404).end(MediaController.printError(e, false));  
@@ -208,7 +208,7 @@ class MediaController extends require('./ApiController') {
      * @param {String} environment
      * @param {String} id
      *
-     * @param {FileData} files Binary Media data
+     * @param {FileData} Binary Media data
      */
     static setMedia(req, res) {
         let file = req.file;
@@ -222,12 +222,6 @@ class MediaController extends require('./ApiController') {
         if(file) {
             return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
             .then(() => {
-                // Remove temp file
-                if(FileSystem.existsSync(file.path)) {
-                    FileSystem.unlinkSync(file.path);
-                }
-
-                // Return the id
                 res.status(200).send(id);
             })            
             .catch((e) => {
@@ -279,7 +273,7 @@ class MediaController extends require('./ApiController') {
                 res.status(200).send(ids);
             })
             .catch((e) => {
-                res.status(400).send(MediaController.printError(e));    
+                res.status(500).send(MediaController.printError(e));    
             });
 
         } else {
