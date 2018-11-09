@@ -43113,14 +43113,14 @@ Crisp.Router.route('/', function () {
 
 Crisp.Router.route('/content/', function () {
   Crisp.View.get('NavbarMain').showTab('/content/');
-  UI.setEditorSpaceContent([_.h1('Content'), _.p('Click the button below to get some example content to work with.'), _.button({
+  UI.setEditorSpaceContent([_.h1('Content'), _.if(resources.content.length < 1, _.p('Click the button below to get some example content to work with.'), _.button({
     class: 'widget widget--button condensed',
     title: 'Click here to get some example content'
   }, 'Get example content').click(function () {
     RequestHelper.request('post', 'content/example').then(function () {
       location.reload();
     }).catch(UI.errorModal);
-  })], 'text');
+  })), _.if(resources.content.length > 0, _.p('Right click in the content pane to create new content.'), _.p('Click on a content node to edit it.'))], 'text');
 }); // Edit (JSON editor)
 
 Crisp.Router.route('/content/json/:id', function () {

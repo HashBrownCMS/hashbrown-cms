@@ -1,9 +1,5 @@
 version: "3.4"
 
-volumes:
-    v-hashbrown-mongodb: ~
-    v-hashbrown-storage: ~
-
 networks:
     n-hashbrown: ~
     
@@ -32,5 +28,5 @@ services:
             - n-hashbrown
         restart: unless-stopped
         volumes:
-            - "v-hashbrown-mongodb:/data/db"
+            - "./db:/data/db"
             - "/etc/localtime:/etc/localtime:ro"

@@ -14,15 +14,21 @@ Crisp.Router.route('/content/', () => {
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
-            _.p('Click the button below to get some example content to work with.'),
-            _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
-                .click(() => {
-                    RequestHelper.request('post', 'content/example')
-                    .then(() => {
-                        location.reload();
+            _.if(resources.content.length < 1,
+                _.p('Click the button below to get some example content to work with.'),
+                _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
+                    .click(() => {
+                        RequestHelper.request('post', 'content/example')
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch(UI.errorModal);
                     })
-                    .catch(UI.errorModal);
-                })
+            ),
+            _.if(resources.content.length > 0,
+                _.p('Right click in the content pane to create new content.'),
+                _.p('Click on a content node to edit it.')
+            )
         ],
         'text'
     );

@@ -11,6 +11,8 @@ const Content = require('Server/Models/Content');
 const Connection = require('Server/Models/Connection');
 const User = require('Server/Models/User');
 
+const DEFAULT_PREFIX = 'hb_';
+
 /**
  * The helper class for database operations
  *
@@ -51,7 +53,7 @@ class DatabaseHelper {
         }
         
         if(databaseName) {
-            connectionString += '/' + (config.prefix || '') + databaseName;
+            connectionString += '/' + (config.prefix || DEFAULT_PREFIX) + databaseName;
 
         } else {
             connectionString += '/';
@@ -156,7 +158,7 @@ class DatabaseHelper {
 
             if(databaseName) {
                 args.push('--db');
-                args.push((config.prefix || '') + databaseName);
+                args.push((config.prefix || DEFAULT_PREFIX) + databaseName);
             }
 
             // Archive
@@ -236,7 +238,7 @@ class DatabaseHelper {
     static listDatabases() {
         return new Promise((resolve, reject) => {
             let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
-            let prefix = config.prefix || '';
+            let prefix = config.prefix || DEFAULT_PREFIX;
             
             debug.log('Listing all databases...', this, 4);
 
