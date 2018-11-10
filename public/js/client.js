@@ -47595,10 +47595,16 @@ function (_FieldEditor) {
       });
     }), _.button({
       class: 'editor__field__key__action editor__field__key__action--collapse'
-    }).click(function (e) {
-      var isCollapsed = !e.currentTarget.classList.contains('collapsed');
-      e.currentTarget.classList.toggle('collapsed', isCollapsed);
-      $(e.currentTarget).parents('.editor__field').children('.editor__field__value')[0].classList.toggle('collapsed', isCollapsed);
+    }, 'Collapse all').click(function (e) {
+      Array.from(_this2.element.children).forEach(function (field) {
+        field.classList.toggle('collapsed', true);
+      });
+    }), _.button({
+      class: 'editor__field__key__action editor__field__key__action--expand'
+    }, 'Expand all').click(function (e) {
+      Array.from(_this2.element.children).forEach(function (field) {
+        field.classList.toggle('collapsed', false);
+      });
     })];
   };
   /**
@@ -49385,7 +49391,7 @@ function (_FieldEditor) {
 
         _this5.wysiwyg.setData(_this5.value);
       });
-    }, 1);
+    }, 100);
   };
   /**
    * Prerender

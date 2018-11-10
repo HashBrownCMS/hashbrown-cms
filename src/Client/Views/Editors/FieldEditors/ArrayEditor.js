@@ -58,12 +58,17 @@ class ArrayEditor extends FieldEditor {
                         }
                     );
                 }),
-            _.button({class: 'editor__field__key__action editor__field__key__action--collapse'})
+            _.button({class: 'editor__field__key__action editor__field__key__action--collapse'}, 'Collapse all')
                 .click((e) => {
-                    let isCollapsed = !e.currentTarget.classList.contains('collapsed');
-
-                    e.currentTarget.classList.toggle('collapsed', isCollapsed);
-                    $(e.currentTarget).parents('.editor__field').children('.editor__field__value')[0].classList.toggle('collapsed', isCollapsed);
+                    Array.from(this.element.children).forEach((field) => {
+                        field.classList.toggle('collapsed', true);
+                    });
+                }),
+            _.button({class: 'editor__field__key__action editor__field__key__action--expand'}, 'Expand all')
+                .click((e) => {
+                    Array.from(this.element.children).forEach((field) => {
+                        field.classList.toggle('collapsed', false);
+                    });
                 })
         ];
     }

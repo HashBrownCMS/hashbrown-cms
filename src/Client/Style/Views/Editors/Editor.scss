@@ -268,17 +268,16 @@
                 line-height: 2rem;
                 height: 2rem;
                 display: block;
-                padding: 0;
                 margin-top: 0.5rem;
                 background-color: transparent;
                 color: $primary;
                 text-transform: uppercase;
                 font-weight: bold;
                 text-align: left;
-                transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+                transition: background-color 0.3s ease, color 0.3s ease;
                 cursor: pointer;
                 border-radius: 0.2rem;
-                padding: 0 0.5rem 0 0;
+                padding: 0 0.5rem 0 0.5rem;
 
                 &:hover {
                     color: $primary-text;
@@ -291,30 +290,8 @@
                     display: inline-block;
                     line-height: 2rem;
                     height: 2rem;
-                    width: 2rem;
+                    width: 1rem;
                     text-align: center;
-                }
-
-                // Collapse/expand
-                &--collapse {
-                    &:after {
-                        content: 'Collapse all';
-                    }
-
-                    &:before {
-                        content: '\f066';
-                    }
-
-                    // Collapsed state
-                    &.collapsed {
-                        &:after {
-                            content: 'Expand all';
-                        }
-
-                        &:before {
-                            content: '\f065';
-                        }
-                    }
                 }
 
                 // Sort
@@ -336,6 +313,20 @@
                         &:before {
                             content: '\f00c';
                         }
+                    }
+                }
+
+                // Expand
+                &--expand {
+                    &:before {
+                        content: '\f065';
+                    }
+                }
+                
+                // Collapse
+                &--collapse {
+                    &:before {
+                        content: '\f066';
                     }
                 }
             }
@@ -455,7 +446,6 @@
             display: block;
             cursor: pointer;
             z-index: 90;
-            padding: 0;
             color: $primary;
             transition: color 0.3s ease, background-color 0.3s ease;
             border-radius: 0.2rem;

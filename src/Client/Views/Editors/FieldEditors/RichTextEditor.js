@@ -281,7 +281,7 @@ class RichTextEditor extends FieldEditor {
                 this.silentChange = true;
                 this.wysiwyg.setData(this.value);
             });
-        }, 1);
+        }, 100);
     }
 
     /**

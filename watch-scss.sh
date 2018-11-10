@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sass --watch ./src/Client/Style/client.scss:./public/css/client.css
+sass --sourcemap=none --watch ./src/Client/Style/client.scss:./public/css/client.css

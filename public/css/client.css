@@ -894,17 +894,16 @@ h1, h2, h3, h4, h5, h6 {
         line-height: 2rem;
         height: 2rem;
         display: block;
-        padding: 0;
         margin-top: 0.5rem;
         background-color: transparent;
         color: #e70d3b;
         text-transform: uppercase;
         font-weight: bold;
         text-align: left;
-        transition: padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.3s ease, color 0.3s ease;
         cursor: pointer;
         border-radius: 0.2rem;
-        padding: 0 0.5rem 0 0; }
+        padding: 0 0.5rem 0 0.5rem; }
         .editor__field__key__action:hover {
           color: #ffffff;
           background-color: #e70d3b; }
@@ -913,16 +912,8 @@ h1, h2, h3, h4, h5, h6 {
           display: inline-block;
           line-height: 2rem;
           height: 2rem;
-          width: 2rem;
+          width: 1rem;
           text-align: center; }
-        .editor__field__key__action--collapse:after {
-          content: 'Collapse all'; }
-        .editor__field__key__action--collapse:before {
-          content: '\f066'; }
-        .editor__field__key__action--collapse.collapsed:after {
-          content: 'Expand all'; }
-        .editor__field__key__action--collapse.collapsed:before {
-          content: '\f065'; }
         .editor__field__key__action--sort:after {
           content: "Sort items"; }
         .editor__field__key__action--sort:before {
@@ -931,6 +922,10 @@ h1, h2, h3, h4, h5, h6 {
           content: "Done sorting"; }
         .editor__field__key__action--sort.sorting:before {
           content: '\f00c'; }
+        .editor__field__key__action--expand:before {
+          content: '\f065'; }
+        .editor__field__key__action--collapse:before {
+          content: '\f066'; }
     .editor__field__value {
       flex-grow: 1;
       border: 0 dashed transparent;
@@ -997,7 +992,6 @@ h1, h2, h3, h4, h5, h6 {
       display: block;
       cursor: pointer;
       z-index: 90;
-      padding: 0;
       color: #e70d3b;
       transition: color 0.3s ease, background-color 0.3s ease;
       border-radius: 0.2rem; }
