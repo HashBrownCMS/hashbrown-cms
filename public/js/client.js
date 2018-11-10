@@ -30930,6 +30930,11 @@ function (_Widget) {
           _this.onSubmit(new FormData(e.currentTarget), input.files);
         });
 
+      case 'textarea':
+        return _.textarea(config).on('input', function (e) {
+          _this.onChangeInternal(e.currentTarget.value);
+        });
+
       default:
         return _.input(config).on('input', function (e) {
           _this.onChangeInternal(e.currentTarget.value);
@@ -49484,7 +49489,10 @@ var FieldEditor = __webpack_require__(13);
  *     "myString": {
  *         "label": "My string",
  *         "tabId": "content",
- *         "schemaId": "string"
+ *         "schemaId": "string",
+ *         "config": {
+ *             "isMultiLine": false
+ *         }
  *     }
  * }
  * </pre>
@@ -49511,6 +49519,31 @@ function (_FieldEditor) {
     return _this;
   }
   /**
+   * Renders the config editor
+   *
+   * @param {Object} config
+   *
+   * @returns {HTMLElement} Element
+   */
+
+
+  StringEditor.renderConfigEditor = function renderConfigEditor(config) {
+    return [_.div({
+      class: 'editor__field'
+    }, _.div({
+      class: 'editor__field__key'
+    }, 'Is multi-line'), _.div({
+      class: 'editor__field__value'
+    }, new HashBrown.Views.Widgets.Input({
+      type: 'checkbox',
+      tooltip: 'Whether or not this string uses line breaks',
+      value: config.isMultiLine || false,
+      onChange: function onChange(newValue) {
+        config.isMultiLine = newValue;
+      }
+    }).$element))];
+  };
+  /**
    * Render this editor
    */
 
@@ -49523,7 +49556,7 @@ function (_FieldEditor) {
     return _.div({
       class: 'editor__field__value'
     }, new HashBrown.Views.Widgets.Input({
-      type: 'text',
+      type: this.config.isMultiLine ? 'textarea' : 'text',
       value: this.value,
       tooltip: this.description || '',
       onChange: function onChange(newValue) {

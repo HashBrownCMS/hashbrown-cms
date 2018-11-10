@@ -1944,18 +1944,22 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 2rem; }
   .widget--input.tall {
     line-height: 3rem; }
-  .widget--input.text, .widget--input.password, .widget--input.number {
+  .widget--input.text, .widget--input.textarea, .widget--input.password, .widget--input.number {
     border-radius: 0.2rem;
     border: 2px solid #ffffff;
     padding: 0 0.5rem;
     height: 2rem;
-    width: 100%;
-    max-width: 20rem; }
-    .widget--input.text.expanded, .widget--input.password.expanded, .widget--input.number.expanded {
+    width: 100%; }
+    .widget--input.text.textarea, .widget--input.textarea.textarea, .widget--input.password.textarea, .widget--input.number.textarea {
+      resize: none;
+      min-height: 10rem; }
+    .widget--input.text:not(.textarea), .widget--input.textarea:not(.textarea), .widget--input.password:not(.textarea), .widget--input.number:not(.textarea) {
+      max-width: 20rem; }
+    .widget--input.text.expanded, .widget--input.textarea.expanded, .widget--input.password.expanded, .widget--input.number.expanded {
       max-width: 100%; }
-    .widget--input.text.tall, .widget--input.password.tall, .widget--input.number.tall {
+    .widget--input.text.tall, .widget--input.textarea.tall, .widget--input.password.tall, .widget--input.number.tall {
       height: 3rem; }
-    .widget--input.text:focus, .widget--input.password:focus, .widget--input.number:focus {
+    .widget--input.text:focus, .widget--input.textarea:focus, .widget--input.password:focus, .widget--input.number:focus {
       outline: none;
       border-color: #e70d3b; }
   .widget--input.file {

@@ -12,6 +12,7 @@
 
     // Text-like inputs
     &.text,
+    &.textarea,
     &.password,
     &.number {
         border-radius: 0.2rem;
@@ -19,7 +20,15 @@
         padding: 0 0.5rem;
         height: 2rem;
         width: 100%;
-        max-width: 20rem;
+
+        &.textarea {
+            resize: none;
+            min-height: 10rem;
+        }
+
+        &:not(.textarea) {
+            max-width: 20rem;
+        }
 
         // Expanded mode
         &.expanded {

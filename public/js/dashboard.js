@@ -26757,6 +26757,11 @@ function (_Widget) {
           _this.onSubmit(new FormData(e.currentTarget), input.files);
         });
 
+      case 'textarea':
+        return _.textarea(config).on('input', function (e) {
+          _this.onChangeInternal(e.currentTarget.value);
+        });
+
       default:
         return _.input(config).on('input', function (e) {
           _this.onChangeInternal(e.currentTarget.value);
