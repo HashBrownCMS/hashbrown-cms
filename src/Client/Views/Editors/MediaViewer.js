@@ -33,20 +33,7 @@ class MediaViewer extends Crisp.View {
      * Renders this editor
      */
     template() {
-        let mediaSrc = this.model.url;
-        
-        if(!mediaSrc) {
-            mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
-        }
-         
-        // Add timestamp
-        if(mediaSrc.indexOf('?') > -1) {
-            mediaSrc += '&';            
-        } else {
-            mediaSrc += '?';
-        }
-
-        mediaSrc += 't=' + Date.now();
+        let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800';
 
         return _.div({class: 'editor editor--media'},
             _.div({class: 'editor__header'},

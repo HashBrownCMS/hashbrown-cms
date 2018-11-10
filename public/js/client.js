@@ -42382,20 +42382,7 @@ function (_Crisp$View) {
 
 
   _proto.template = function template() {
-    var mediaSrc = this.model.url;
-
-    if (!mediaSrc) {
-      mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
-    } // Add timestamp
-
-
-    if (mediaSrc.indexOf('?') > -1) {
-      mediaSrc += '&';
-    } else {
-      mediaSrc += '?';
-    }
-
-    mediaSrc += 't=' + Date.now();
+    var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800';
     return _.div({
       class: 'editor editor--media'
     }, _.div({
@@ -48812,14 +48799,24 @@ function (_FieldEditor) {
         });
       }
 
-      return [_.if(media.isAudio(), _.div({
-        class: 'editor__field--media-reference__preview fa fa-file-audio-o'
-      })), _.if(media.isVideo(), _.div({
-        class: 'editor__field--media-reference__preview fa fa-file-video-o'
-      })), _.if(media.isImage(), _.img({
-        class: 'editor__field--media-reference__preview',
-        src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id
-      }))];
+      if (media.isAudio()) {
+        return _.div({
+          class: 'editor__field--media-reference__preview fa fa-file-audio-o'
+        });
+      }
+
+      if (media.isVideo()) {
+        return _.div({
+          class: 'editor__field--media-reference__preview fa fa-file-video-o'
+        });
+      }
+
+      if (media.isImage()) {
+        return _.img({
+          class: 'editor__field--media-reference__preview',
+          src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'
+        });
+      }
     })).click(function () {
       var mediaBrowser = new MediaBrowser({
         value: _this2.value

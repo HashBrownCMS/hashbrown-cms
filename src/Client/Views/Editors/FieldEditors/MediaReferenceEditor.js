@@ -41,17 +41,17 @@ class MediaReferenceEditor extends FieldEditor {
                 _.do(()=> {
                     if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }
             
-                    return [
-                        _.if(media.isAudio(),
-                            _.div({class: 'editor__field--media-reference__preview fa fa-file-audio-o'})
-                        ),
-                        _.if(media.isVideo(),
-                            _.div({class: 'editor__field--media-reference__preview fa fa-file-video-o'})
-                        ),
-                        _.if(media.isImage(),
-                            _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-                        )
-                    ];
+                    if(media.isAudio()) {
+                        return _.div({class: 'editor__field--media-reference__preview fa fa-file-audio-o'});
+                    }
+
+                    if(media.isVideo()) {
+                        return _.div({class: 'editor__field--media-reference__preview fa fa-file-video-o'});
+                    }
+
+                    if(media.isImage()) {
+                        return _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
+                    }
                 })
             ).click(() => {
                 let mediaBrowser = new MediaBrowser({

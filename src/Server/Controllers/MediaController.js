@@ -37,23 +37,18 @@ class MediaController extends require('./ApiController') {
             return connection.getMedia(id);
         })
         .then((media) => {
-            if(!media) {
+            if(!media || (!media.url && !media.path)) {
                 return res.status(404).send('Not found');
             }
 
-            // Serve local files directly
-            if(!media.url) {
-                res.sendFile(media.path);
-
-            // Serve remote files through redirection
-            // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server
-            // NOTE: The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
-            } else {
-                res.redirect(media.url);
-            }
+            return HashBrown.Helpers.MediaHelper.getCachedMedia(req.project, media, parseInt(req.query.width), parseInt(req.query.height))
+            .then((data) => {
+                res.writeHead(200, {'Content-Type': media.getContentTypeHeader()});
+                res.end(data);
+            });
         })
         .catch((e) => {
-            res.status(404).end(MediaController.printError(e, false));  
+            res.status(404).end(MediaController.printError(e, false)); 
         });
     }
     

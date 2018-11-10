@@ -7,9 +7,13 @@ const Multer = require('multer');
 
 const Media = require('Server/Models/Media');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
+const AppHelper = require('Server/Helpers/AppHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
+
+const WATCH_CACHE_INTERVAL = 1000 * 60; // One minute
+const MAX_CACHE_TIME = 1000 * 60 * 60 * 24 * 10 // 10 days
 
 /**
  * The helper class for Media
@@ -17,6 +21,17 @@ const MediaHelperCommon = require('Common/Helpers/MediaHelper');
  * @memberof HashBrown.Server.Helpers
  */
 class MediaHelper extends MediaHelperCommon {
+    /**
+     * Start watching cache
+     */
+    static startWatchingCache() {
+        setInterval(() => {
+            this.cleanCache();
+        }, WATCH_CACHE_INTERVAL);
+
+        this.cleanCache();
+    }
+    
     /**
      * Gets the upload handler
      *
@@ -316,6 +331,125 @@ class MediaHelper extends MediaHelperCommon {
         checkParam(project, 'project', String);
 
         return Path.join(APP_ROOT, 'storage', project, 'temp');
+    }
+
+    /**
+     * Cleans the media cache
+     */
+    static cleanCache() {
+        let storageFolder = Path.join(APP_ROOT, 'storage');
+       
+        if(!FileSystem.existsSync(storageFolder)) { return; }
+
+        FileSystem.readdir(storageFolder, (err, folders) => {
+            if(err) { return; }
+        
+            for(let folder of folders) { 
+                let cacheFolder = Path.join(storageFolder, folder, 'cache');
+
+                if(!FileSystem.existsSync(cacheFolder)) { continue; }
+
+                FileSystem.readdir(cacheFolder, (err, files) => {
+                    if(err) { return; }
+                    
+                    for(let file of files) {
+                        let cachedFile = Path.join(cacheFolder, file);
+
+                        FileSystem.stat(cachedFile, (err, stats) => {
+                            if(err) { return; }
+
+                            if(new Date().getTime() - new Date(stats.atime).getTime() > MAX_CACHE_TIME) {
+                                FileSystem.unlink(cachedFile, (err) => { // Done });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Gets a cached version of a media object
+     *
+     * @param {String} project
+     * @param {Media} media
+     * @param {Number} width
+     * @param {Number} height
+     *
+     * @returns {Promise} Media
+     */
+    static getCachedMedia(project, media, width = 0, height = 0) {
+        checkParam(project, 'project', String);
+        checkParam(media, 'media', Media);
+        checkParam(width, 'width', Number);
+        checkParam(height, 'height', Number);
+
+        let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
+        let cachedPath = Path.join(cacheFolder, media.id);
+        
+        if(width) {
+            cachedPath += '_' + width;
+        }
+        
+        if(height) {
+            cachedPath += 'x' + height;
+        }
+
+        // Check the cache folder
+        if(!FileSystem.existsSync(cacheFolder)) {
+            FileSystem.mkdirSync(cacheFolder);
+        }
+
+        // Read the file
+        let readFile = () => {
+            return new Promise((resolve, reject) => {
+                FileSystem.readFile(cachedPath, (err, data) => {
+                    if(err) { return reject(err); }
+
+                    resolve(data);
+                });
+            });
+        };
+
+        // Copy the file
+        let copyFile = () => {
+            // Download with web request
+            if(media.url) {
+                return HashBrown.Helpers.RequestHelper.download(media.url, path);
+            }
+
+            // Copy from file system
+            return new Promise((resolve, reject) => {
+                FileSystem.copyFile(media.path, cachedPath, (err) => {
+                    if(err) { return reject(err); }
+
+                    resolve();
+                });
+            });
+        };
+
+        // Resize the file
+        let resizeFile = () => {
+            if(!width || !media.isImage()) { 
+                return Promise.resolve();
+            }
+            
+            return HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
+        };
+
+        // Check the file
+        let checkFile = () => {
+            if(FileSystem.existsSync(cachedPath)) {
+                return Promise.resolve();
+
+            } else {
+                return copyFile()
+                .then(resizeFile);
+            }
+        };
+
+        return checkFile()
+        .then(readFile);
     }
 }
 

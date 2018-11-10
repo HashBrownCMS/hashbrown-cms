@@ -140,6 +140,9 @@ function ready(files) {
         // Start schedule helper
         HashBrown.Helpers.ScheduleHelper.startWatching();
         
+        // Start Media cache watcher
+        HashBrown.Helpers.MediaHelper.startWatchingCache();
+        
         // Watch the package.json for changes
         FileSystem.watchFile(APP_ROOT + '/package.json', () => {
             debug.log('package.json changed, reloading...', 'HashBrown');

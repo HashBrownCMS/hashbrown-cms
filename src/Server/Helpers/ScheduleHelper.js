@@ -2,8 +2,6 @@
 
 const Task = require('Server/Models/Task');
 
-let watchInterval;
-
 const WATCH_INTERVAL = 1000 * 60; // One minute
 
 /**
@@ -17,7 +15,7 @@ class ScheduleHelper {
      */
     static startWatching() {
         // Start the interval
-        watchInterval = setInterval(() => {
+        setInterval(() => {
             this.checkTasks();
         }, WATCH_INTERVAL);
 

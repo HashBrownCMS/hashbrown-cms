@@ -74,7 +74,7 @@ class RequestHelper {
             });
 
             stream.on('close', () => {
-                resolve();
+                resolve(data);
             });
         })
         .catch((e) => {
