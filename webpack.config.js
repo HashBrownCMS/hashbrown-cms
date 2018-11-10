@@ -6,17 +6,15 @@ const webpack = require('webpack');
 const exec = require('child_process').exec;
 
 // Watch SASS
-(() => {
-    let sass = exec('sass --sourcemap=none --watch ./src/Client/Style/client.scss:./public/css/client.css'); 
-    
-    sass.stdout.on('data', (data) => {
-        console.log(data); 
-    });
+let sass = exec('sass --sourcemap=none --watch ./src/Client/Style/client.scss:./public/css/client.css'); 
 
-    sass.stderr.on('data', (data) => {
-        console.log(data);
-    });    
-})();
+sass.stdout.on('data', (data) => {
+    console.log(data); 
+});
+
+sass.stderr.on('data', (data) => {
+    console.log(data);
+});    
 
 // Define settings
 module.exports = {
