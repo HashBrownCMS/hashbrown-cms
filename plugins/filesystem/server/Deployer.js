@@ -68,28 +68,22 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      * Gets a folder
      *
      * @param {String} path
-     * @param {Number} recursions
+     * @param {Number} levels
      *
      * @returns {Promise} Result
      */
-    getFolder(path, recursions = 0) {
-        path += '*';
+    getFolder(path, levels = 1) {
+        if(levels < 1) { levels = 1; }
 
-        if(recursions > 0) {
-            for(let i = 0; i < recursions || 0; i++) {
-                path += '/*';
-            }
+        for(let i = 0; i < levels; i++) {
+            path += (i > 0 ? '/' : '') + '*';
         }
 
         return new Promise((resolve, reject) => {
             Glob(path, (err, data) => {
-                if(err) {
-                    reject(err);
+                if(err) { return reject(err); }
                 
-                } else {
-                    resolve(data);
-
-                }
+                resolve(data);
             });
         });
     }

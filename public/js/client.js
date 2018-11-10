@@ -7496,37 +7496,87 @@ function (_Resource) {
 
 
   _proto.getContentTypeHeader = function getContentTypeHeader() {
-    var name = (this.name || '').toLowerCase(); // Image types
+    var name = (this.name || '').toLowerCase();
+    var extension = name.split('.');
 
-    if (name.match(/\.jpg/)) {
-      return 'image/jpeg';
-    } else if (name.match(/\.png/)) {
-      return 'image/png';
-    } else if (name.match(/\.gif/)) {
-      return 'image/gif';
-    } else if (name.match(/\.bmp/)) {
-      return 'image/bmp'; // Video types
-    } else if (name.match(/\.mp4/)) {
-      return 'video/mp4';
-    } else if (name.match(/\.avi/)) {
-      return 'video/avi';
-    } else if (name.match(/\.mov/)) {
-      return 'video/quicktime';
-    } else if (name.match(/\.bmp/)) {
-      return 'video/bmp';
-    } else if (name.match(/\.wmv/)) {
-      return 'video/x-ms-wmv';
-    } else if (name.match(/\.3gp/)) {
-      return 'video/3gpp';
-    } else if (name.match(/\.mkv/)) {
-      return 'video/x-matroska'; // SVG
-    } else if (name.match(/\.svg/)) {
-      return 'image/svg+xml'; // PDF
-    } else if (name.match(/\.pdf/)) {
-      return 'application/pdf'; // Everything else
-    } else {
-      return 'application/octet-stream';
+    if (extension && extension.length > 0) {
+      extension = extension[extension.length - 1];
     }
+
+    switch (extension) {
+      // Image types
+      case 'jpg':
+        return 'image/jpeg';
+
+      case 'png':
+        return 'image/png';
+
+      case 'gif':
+        return 'image/gif';
+
+      case 'bmp':
+        return 'image/bmp';
+      // Audio types
+
+      case 'm4a':
+        return 'audio/m4a';
+
+      case 'mp3':
+        return 'audio/mp3';
+
+      case 'ogg':
+        return 'audio/ogg';
+
+      case 'wav':
+        return 'audio/wav';
+      // Video types
+
+      case 'mp4':
+        return 'video/mp4';
+
+      case 'webm':
+        return 'video/webm';
+
+      case 'avi':
+        return 'video/avi';
+
+      case 'mov':
+        return 'video/quicktime';
+
+      case 'bmp':
+        return 'video/bmp';
+
+      case 'wmv':
+        return 'video/x-ms-wmv';
+
+      case '3gp':
+        return 'video/3gpp';
+
+      case 'mkv':
+        return 'video/x-matroska';
+      // SVG
+
+      case 'svg':
+        return 'image/svg+xml';
+      // PDF
+
+      case 'pdf':
+        return 'application/pdf';
+      // Everything else
+
+      default:
+        return 'application/octet-stream';
+    }
+  };
+  /**
+   * Gets whether this is audio
+   *
+   * @returns {Boolean} Is audio
+   */
+
+
+  _proto.isAudio = function isAudio() {
+    return this.getContentTypeHeader().indexOf('audio') > -1;
   };
   /**
    * Gets whether this is a video
@@ -42367,6 +42417,12 @@ function (_Crisp$View) {
     }, _.source({
       src: mediaSrc,
       type: this.model.getContentTypeHeader()
+    }))), _.if(this.model.isAudio(), _.audio({
+      class: 'editor--media__preview',
+      controls: true
+    }, _.source({
+      src: mediaSrc,
+      type: this.model.getContentTypeHeader()
     })))));
   };
 
@@ -48756,12 +48812,10 @@ function (_FieldEditor) {
         });
       }
 
-      return [_.if(media.isVideo(), _.video({
-        class: 'editor__field--media-reference__preview',
-        muted: true,
-        autoplay: true,
-        loop: true,
-        src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id
+      return [_.if(media.isAudio(), _.div({
+        class: 'editor__field--media-reference__preview fa fa-file-audio-o'
+      })), _.if(media.isVideo(), _.div({
+        class: 'editor__field--media-reference__preview fa fa-file-video-o'
       })), _.if(media.isImage(), _.img({
         class: 'editor__field--media-reference__preview',
         src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id

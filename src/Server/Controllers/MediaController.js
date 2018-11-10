@@ -123,7 +123,7 @@ class MediaController extends require('./ApiController') {
         })
         .then((result) => {
             media = result;
-
+            
             return HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
         })
         .then((result) => {

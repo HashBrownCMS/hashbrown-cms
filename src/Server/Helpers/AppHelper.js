@@ -1,6 +1,7 @@
 'use strict';
 
 const ChildProcess = require('child_process');
+const FileSystem = require('fs');
 
 /**
  * The main class for basic app operations

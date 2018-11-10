@@ -42,8 +42,11 @@ class MediaReferenceEditor extends FieldEditor {
                     if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }
             
                     return [
+                        _.if(media.isAudio(),
+                            _.div({class: 'editor__field--media-reference__preview fa fa-file-audio-o'})
+                        ),
                         _.if(media.isVideo(),
-                            _.video({class: 'editor__field--media-reference__preview', muted: true, autoplay: true, loop: true, src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+                            _.div({class: 'editor__field--media-reference__preview fa fa-file-video-o'})
                         ),
                         _.if(media.isImage(),
                             _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})

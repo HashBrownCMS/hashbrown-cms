@@ -66,6 +66,11 @@ class MediaViewer extends Crisp.View {
                     _.video({class: 'editor--media__preview', controls: true},
                         _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
                     )
+                ),
+                _.if(this.model.isAudio(),
+                    _.audio({class: 'editor--media__preview', controls: true},
+                        _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
+                    )
                 )
             )
         );

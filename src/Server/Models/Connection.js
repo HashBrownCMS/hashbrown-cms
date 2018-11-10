@@ -459,7 +459,7 @@ class Connection extends ConnectionCommon {
             return Promise.reject(new Error('This Connection has no deployer defined'));
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media', id), 1)
+        return this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1)
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
 

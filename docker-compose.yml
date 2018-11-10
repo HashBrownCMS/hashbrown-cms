@@ -19,6 +19,7 @@ services:
             - MONGODB_HOST=mongodb
         volumes:
             - "./:/opt/hashbrown-cms"
+            - "./remote:/remote"
             - "/etc/localtime:/etc/localtime:ro"
 
     mongodb:
