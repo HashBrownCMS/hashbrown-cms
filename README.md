@@ -9,11 +9,20 @@ First make sure you have these dependencies met:
 - node.js >= v6 
 - mongodb >= v3.2  
 
-Then checkout and run HashBrown:  
+Then checkout the code and install the dependencies:  
 ```
 git clone https://github.com/HashBrownCMS/hashbrown-cms.git -b stable --single-branch --recursive
 cd ./hashbrown-cms
 npm install --production
+```
+
+Running with docker:
+```
+docker-compose up --build -d
+```
+
+Running standalone:
+```
 node hashbrown.js
 ```
 
