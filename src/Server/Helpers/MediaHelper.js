@@ -359,7 +359,7 @@ class MediaHelper extends MediaHelperCommon {
                             if(err) { return; }
 
                             if(new Date().getTime() - new Date(stats.atime).getTime() > MAX_CACHE_TIME) {
-                                FileSystem.unlink(cachedFile, (err) => { // Done });
+                                FileSystem.unlink(cachedFile, (err) => { });
                             }
                         });
                     }

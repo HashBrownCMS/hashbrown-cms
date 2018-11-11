@@ -101,43 +101,63 @@ class DatabaseHelper {
      * @returns {Promise} Data string
      */
     static restore(databaseName, timestamp) {
-        return new Promise((resolve, reject) => {
-            let args = [];
-            let basePath = APP_ROOT + '/storage';
-            let projectPath = basePath + '/' + databaseName + '/dump';
-            let archivePath = projectPath + '/' + timestamp + '.hba';
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+        let collections = {};
 
-            // Drop existing
-            args.push('--drop');
+        let readArchive = () => {
+            return new Promise((resolve, reject) => {
+                let basePath = APP_ROOT + '/storage';
+                let projectPath = basePath + '/' + databaseName + '/dump';
+                let archivePath = projectPath + '/' + timestamp + '.hba';
 
-            // Archive
-            if(!FileSystem.existsSync(archivePath)) {
-                reject(new Error('Archive at "' + archivePath + '" could not be found'));
-            
-            } else {
-                args.push('--archive=' + archivePath);
-                args.push('--nsInclude ' + databaseName);
-
-                let mongorestore = Spawn('mongorestore', args);
-
-                mongorestore.stdout.on('data', (data) => {
-                    debug.log(data.toString(), this);
-                });
-
-                mongorestore.stderr.on('data', (data) => {
-                    debug.log(data.toString(), this);
-                });
+                // Archive
+                if(!FileSystem.existsSync(archivePath)) {
+                    reject(new Error('Archive at "' + archivePath + '" could not be found'));
                 
-                mongorestore.on('exit', (code) => {
-                    if(code != 0) {
-                        reject(new Error('mongorestore exited with status code ' + code));
-                    
-                    } else {
-                        resolve();
+                } else {
+                    FileSystem.readFile(archivePath, (err, content) => {
+                        if(err) { return reject(err); }
 
-                    }
+                        try {
+                            collections = JSON.parse(content);
+                            resolve();
+                        } catch(e) {
+                            reject(new Error('Archive is not valid JSON: ' + archivePath));
+                        }
+                    });
+                }
+            });
+        };
+
+        return readArchive()
+        .then(() => {
+            return this.dropDatabase(databaseName);
+        })
+        .then(() => {
+            let collectionNames = Object.keys(collections);
+           
+            let insertCollection = (index) => {
+                if(index >= collectionNames.length) { return Promise.resolve(); }
+            
+                let collectionName = collectionNames[index];
+                let documents = collections[collectionName];
+
+                let insertDocument = (index) => {
+                    if(index >= documents.length) { return Promise.resolve(); }
+
+                    return this.insertOne(databaseName, collectionName, documents[index])
+                    .then(() => {
+                        return insertDocument(index + 1);
+                    });
+                };
+
+                return insertDocument(0)
+                .then(() => {
+                    return insertCollection(index + 1);    
                 });
-            }
+            };
+
+            return insertCollection(0);
         });
     }
    
@@ -149,57 +169,66 @@ class DatabaseHelper {
      * @returns {Promise} Timestamp
      */
     static dump(databaseName) {
-        return new Promise((resolve, reject) => {
-            let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
-            let args = [];
-            let basePath = APP_ROOT + '/storage';
-            let projectPath = basePath + '/' + databaseName + '/';
-            let dumpPath = projectPath + 'dump/';
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+        let basePath = APP_ROOT + '/storage';
+        let projectPath = basePath + '/' + databaseName;
+        let dumpPath = projectPath + '/dump';
 
-            if(databaseName) {
-                args.push('--db');
-                args.push((config.prefix || DEFAULT_PREFIX) + databaseName);
-            }
+        // Archive
+        if(!FileSystem.existsSync(basePath)) {
+            FileSystem.mkdirSync(basePath);
+        }
+        
+        if(!FileSystem.existsSync(projectPath)) {
+            FileSystem.mkdirSync(projectPath);
+        }
+        
+        if(!FileSystem.existsSync(dumpPath)) {
+            FileSystem.mkdirSync(dumpPath);
+        }
 
-            // Archive
-            if(!FileSystem.existsSync(basePath)) {
-                FileSystem.mkdirSync(basePath);
-            }
-            
-            if(!FileSystem.existsSync(projectPath)) {
-                FileSystem.mkdirSync(projectPath);
-            }
-            
-            if(!FileSystem.existsSync(dumpPath)) {
-                FileSystem.mkdirSync(dumpPath);
-            }
+        let timestamp = Date.now();
 
-            let timestamp = Date.now()
+        let archivePath = dumpPath + '/' + timestamp + '.hba'; 
 
-            args.push('--archive=' + dumpPath + '/' + timestamp + '.hba');
+        debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '.hba...', this);
+    
+        let collections = {};
 
-            debug.log('Dumping database "' + databaseName + '" to ' + dumpPath + '/' + timestamp + '.hba...', this);
+        return this.listCollections(databaseName)
+        .then((collectionNames) => {
+            let getDocuments = (index) => {
+                if(index >= collectionNames.length) { return Promise.resolve(); }
 
-            let mongodump = Spawn('mongodump', args);
+                let collectionName = collectionNames[index].name;
 
-            mongodump.stdout.on('data', (data) => {
-                debug.log(data.toString(), this);
-            });
+                return this.find(databaseName, collectionName, {})
+                .then((documents) => {
+                    collections[collectionName] = documents;
 
-            mongodump.stderr.on('data', (data) => {
-                debug.log(data.toString(), this);
-            });
-            
-            mongodump.on('exit', (code) => {
-                if(code != 0) {
-                    debug.log('Dumping database failed!', this);
-                    reject(new Error('mongodump exited with status code ' + code));
+                    return getDocuments(index + 1);
+                });
+            };
+
+            return getDocuments(0); 
+        })
+        .then(() => {
+            return new Promise((resolve, reject) => {
+                let json = '{}';
                 
-                } else {
-                    debug.log('Dumping database succeeded!', this);
-                    resolve(timestamp);
-
+                try {
+                    json = JSON.stringify(collections);
+                } catch(e) {
+                    return reject(e);
                 }
+                
+                FileSystem.writeFile(archivePath, json, (err) => {
+                    if(err) { return reject(err); }
+
+                    resolve();
+
+                    debug.log('Database dumped successfully', this);
+                });
             });
         });
     }
