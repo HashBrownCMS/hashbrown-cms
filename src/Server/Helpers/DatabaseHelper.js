@@ -129,11 +129,11 @@ class DatabaseHelper {
             });
         };
 
-        return readArchive()
-        .then(() => {
+        let dropDatabase = () => {
             return this.dropDatabase(databaseName);
-        })
-        .then(() => {
+        };
+
+        let insertContent = () => {
             let collectionNames = Object.keys(collections);
            
             let insertCollection = (index) => {
@@ -158,7 +158,11 @@ class DatabaseHelper {
             };
 
             return insertCollection(0);
-        });
+        };
+
+        return readArchive()
+        .then(dropDatabase)
+        .then(insertContent);
     }
    
     /**
@@ -175,28 +179,22 @@ class DatabaseHelper {
         let dumpPath = projectPath + '/dump';
 
         // Archive
-        if(!FileSystem.existsSync(basePath)) {
-            FileSystem.mkdirSync(basePath);
-        }
-        
-        if(!FileSystem.existsSync(projectPath)) {
-            FileSystem.mkdirSync(projectPath);
-        }
-        
-        if(!FileSystem.existsSync(dumpPath)) {
-            FileSystem.mkdirSync(dumpPath);
-        }
+        if(!FileSystem.existsSync(basePath)) { FileSystem.mkdirSync(basePath); }
+        if(!FileSystem.existsSync(projectPath)) { FileSystem.mkdirSync(projectPath); }
+        if(!FileSystem.existsSync(dumpPath)) { FileSystem.mkdirSync(dumpPath); }
 
         let timestamp = Date.now();
-
         let archivePath = dumpPath + '/' + timestamp + '.hba'; 
 
         debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '.hba...', this);
     
         let collections = {};
 
-        return this.listCollections(databaseName)
-        .then((collectionNames) => {
+        let getCollections = () => {
+            return this.listCollections(databaseName)
+        };
+
+        let getDocuments = (collectionNames) => {
             let getDocuments = (index) => {
                 if(index >= collectionNames.length) { return Promise.resolve(); }
 
@@ -211,8 +209,9 @@ class DatabaseHelper {
             };
 
             return getDocuments(0); 
-        })
-        .then(() => {
+        };
+
+        let writeArchive = () => {
             return new Promise((resolve, reject) => {
                 let json = '{}';
                 
@@ -230,7 +229,11 @@ class DatabaseHelper {
                     debug.log('Database dumped successfully', this);
                 });
             });
-        });
+        };
+
+        return getCollections()
+        .then(getDocuments)
+        .then(writeArchive);
     }
 
     /**
