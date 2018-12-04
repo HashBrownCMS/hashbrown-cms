@@ -1941,7 +1941,7 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 3rem; }
   .widget--input.text, .widget--input.textarea, .widget--input.password, .widget--input.number {
     border-radius: 0.2rem;
-    border: 2px solid #ffffff;
+    border: 2px solid #eeeeee;
     padding: 0 0.5rem;
     height: 2rem;
     width: 100%; }
