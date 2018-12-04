@@ -20,7 +20,6 @@ services:
         volumes:
             - "./:/opt/hashbrown-cms"
             - "./remote:/remote"
-            - "/etc/localtime:/etc/localtime:ro"
 
     mongodb:
         image: mongo
@@ -30,4 +29,3 @@ services:
         restart: unless-stopped
         volumes:
             - "./db:/data/db"
-            - "/etc/localtime:/etc/localtime:ro"
