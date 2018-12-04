@@ -1,9 +1,17 @@
 window.Promise = require('bluebird');
 window.marked = require('marked');
-window.toMarkdown = require('to-markdown');
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const User = require('Common/Models/User');
+
+/**
+ * Converts a string from HTML to markdown
+ *
+ * @return {String} Markdown
+ */
+window.toMarkdown = function toMarkdown(html) {
+    return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
+}
 
 /**
  * Checks if the currently logged in user is admin
