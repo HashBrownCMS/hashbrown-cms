@@ -49196,6 +49196,31 @@ function (_FieldEditor) {
     return _this;
   }
   /**
+   * Renders the config editor
+   *
+   * @param {Object} config
+   *
+   * @returns {HTMLElement} Element
+   */
+
+
+  RichTextEditor.renderConfigEditor = function renderConfigEditor(config) {
+    return [_.div({
+      class: 'editor__field'
+    }, _.div({
+      class: 'editor__field__key'
+    }, 'Disable markdown'), _.div({
+      class: 'editor__field__value'
+    }, new HashBrown.Views.Widgets.Input({
+      type: 'checkbox',
+      tooltip: 'Hides the markdown tab if enabled',
+      value: config.isMarkdownDisabled || false,
+      onChange: function onChange(newValue) {
+        config.isMarkdownDisabled = newValue;
+      }
+    }).$element))];
+  };
+  /**
    * Event: Change input
    *
    * @param {String} value
