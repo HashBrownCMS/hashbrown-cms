@@ -18,6 +18,8 @@ sass.stderr.on('data', (data) => {
 
 // Define settings
 module.exports = {
+    mode: 'none',
+
     // Input .js
     entry: {
         client: './src/Client/client.js',
@@ -45,19 +47,13 @@ module.exports = {
                         ]
                     }
                 }
-            },
-
-            // JSON
-            {
-                test: /\.(json|schema)$/,
-                use: 'json-loader'
-            },
+            }
         ]
     },
 
     // Automatically accept these extensions
     resolve: {
         modules: [path.resolve(__dirname), path.resolve(__dirname, 'src'), 'node_modules'],
-        extensions: ['.js', '.json']
+        extensions: ['.js', '.json', '.schema']
     }
 };

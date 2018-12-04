@@ -39,6 +39,29 @@ class RichTextEditor extends FieldEditor {
         
         this.fetch();
     }
+    
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Disable markdown'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'checkbox',
+                        tooltip: 'Hides the markdown tab if enabled',
+                        value: config.isMarkdownDisabled || false,
+                        onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
+                    }).$element
+                )
+            )
+        ];
+    }
 
     /**
      * Event: Change input
