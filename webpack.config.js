@@ -29,9 +29,9 @@ module.exports = {
     
     // Output .js
     output: {
-        filename: './public/js/[name].js'
+        path: path.resolve(__dirname, 'public/js'),
+        filename: '[name].js'
     },
-
 
     // Define loaders
     module: {
