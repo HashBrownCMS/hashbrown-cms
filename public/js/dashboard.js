@@ -37764,7 +37764,7 @@ $('.page--dashboard__users__add').click(function () {
       if (existingUser) {
         UI.errorModal(new Error('User "' + username + '" already exists'));
         return;
-      } // An email was provided, send invitation    
+      } // An email was provided, send invitation
 
 
       if (isEmail) {

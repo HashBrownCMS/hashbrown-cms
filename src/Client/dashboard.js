@@ -15,7 +15,7 @@ HashBrown.Views.Modals = require('Client/Views/Modals');
 HashBrown.Views.Widgets = require('Client/Views/Widgets');
 
 // Helper functions
-require('Client/helpers');
+require('Client/utilities');
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -27,7 +27,7 @@ window.UI = HashBrown.Helpers.UIHelper;
 HashBrown.Helpers.RequestHelper.request('get', 'user')
 .then((user) => {
     const User = require('Common/Models/User');
-        
+
     User.current = new User(user);
 
     return HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
@@ -38,7 +38,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 // --------------------
 .then((projects) => {
     projects = projects || [];
-    
+
     const ProjectEditor = require('Client/Views/Dashboard/ProjectEditor');
 
     for(let projectId of projects) {
@@ -63,7 +63,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
     const User = require('Common/Models/User');
 
     for(let user of users || []) {
-        user = new User(user);        
+        user = new User(user);
 
         let $user;
         let $projectList;
@@ -74,10 +74,10 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
                     _.span({class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
                     (user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')
                 ).on('click', () => {
-                    let userEditor = new UserEditor({ model: user }); 
-                    
+                    let userEditor = new UserEditor({ model: user });
+
                     userEditor.on('save', () => {
-                        renderUser(); 
+                        renderUser();
                     });
                 }),
                 _.if(user.id !== User.current.id,
@@ -90,7 +90,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
                                 () => {
                                     HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
                                     .then(() => {
-                                        $user.remove(); 
+                                        $user.remove();
                                     })
                                     .catch(UI.errorModal);
                                 }
@@ -136,14 +136,14 @@ HashBrown.Helpers.RequestHelper.request('get', 'user')
 
         if(update.isBehind) {
             $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
-           
+
             $btnUpdate.click(() => {
                 UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
                 HashBrown.Helpers.RequestHelper.request('post', 'server/update/start')
                 .then(() => {
                     UI.messageModal('Success', 'HashBrown is restarting...', false);
-                    
+
                     HashBrown.Helpers.RequestHelper.listenForRestart();
                 })
                 .catch(UI.errorModal);
@@ -198,8 +198,8 @@ $('.page--dashboard__users__add').click(() => {
                 UI.errorModal(new Error('User "' + username + '" already exists'));
                 return;
             }
-        
-            // An email was provided, send invitation    
+
+            // An email was provided, send invitation
             if(isEmail) {
                 let modal = UI.confirmModal(
                     'invite',
@@ -219,7 +219,7 @@ $('.page--dashboard__users__add').click(() => {
 
                             UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', () => {
                                 location.reload();
-                            }); 
+                            });
                         })
                         .catch(UI.errorModal);
 
@@ -231,7 +231,7 @@ $('.page--dashboard__users__add').click(() => {
 
                 return;
             }
-           
+
             // User doesn't exist, create it
             let $passwd;
 
@@ -307,4 +307,3 @@ $('.page--dashboard__projects__add').click(() => {
         ]
     });
 });
-

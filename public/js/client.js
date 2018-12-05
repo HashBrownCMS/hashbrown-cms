@@ -127,7 +127,7 @@ HashBrown.Helpers = __webpack_require__(259); // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper; // Helper functions
 
-__webpack_require__(265); // Preload resources 
+__webpack_require__(265); // Preload resources
 
 
 document.addEventListener('DOMContentLoaded', function () {
