@@ -42,9 +42,9 @@ window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
 // Helper functions
-require('Client/helpers');
+require('Client/utilities');
 
-// Preload resources 
+// Preload resources
 document.addEventListener('DOMContentLoaded', () => {
     const SettingsHelper = HashBrown.Helpers.SettingsHelper;
     const LanguageHelper = HashBrown.Helpers.LanguageHelper;
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 HashBrown.Models.User.current = user;
             }
         }
-       
+
         new HashBrown.Views.Navigation.NavbarMain();
         new HashBrown.Views.Navigation.MainMenu();
 
