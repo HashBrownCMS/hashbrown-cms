@@ -207,104 +207,102 @@ class RichTextEditor extends FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        setTimeout(() => {
-            this.wysiwyg = CKEDITOR.replace(
-                this.getTabContent(),
-                {
-                    removePlugins: 'contextmenu,liststyle,tabletools',
-                    allowedContent: true,
-                    height: 400,
-                    toolbarGroups: [
-                        { name: 'styles' },
-                        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-                        { name: 'links' },
-                        { name: 'insert' },
-                        { name: 'forms' },
-                        { name: 'tools' },
-                        { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-                        { name: 'others' },
-                    ],
-               
-                    extraPlugins: 'justify,divarea',
+        this.wysiwyg = CKEDITOR.replace(
+            this.getTabContent(),
+            {
+                removePlugins: 'contextmenu,liststyle,tabletools',
+                allowedContent: true,
+                height: 400,
+                toolbarGroups: [
+                    { name: 'styles' },
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                    { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+                    { name: 'links' },
+                    { name: 'insert' },
+                    { name: 'forms' },
+                    { name: 'tools' },
+                    { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
+                    { name: 'others' },
+                ],
+           
+                extraPlugins: 'justify,divarea',
 
-                    removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-                    removeDialogTabs: 'image:advanced;link:advanced'
-                }
-            );
+                removeDialogTabs: 'image:advanced;link:advanced'
+            }
+        );
 
-            this.wysiwyg.on('change', () => {
-                this.onChange(this.wysiwyg.getData());
-            });
+        this.wysiwyg.on('change', () => {
+            this.onChange(this.wysiwyg.getData());
+        });
 
-            this.wysiwyg.on('instanceReady', () => {
-                // Strips the style information
-                let stripStyle = (element) => {
-                    delete element.attributes.style;
-                };
+        this.wysiwyg.on('instanceReady', () => {
+            // Strips the style information
+            let stripStyle = (element) => {
+                delete element.attributes.style;
+            };
 
-                // Filtering rules
-                this.wysiwyg.dataProcessor.dataFilter.addRules({
-                    elements: {
-                        // Strip styling from these elements
-                        p: stripStyle,
-                        h1: stripStyle,
-                        h2: stripStyle,
-                        h3: stripStyle,
-                        h4: stripStyle,
-                        h5: stripStyle,
-                        h6: stripStyle,
-                        span: stripStyle,
-                        div: stripStyle,
-                        section: stripStyle,
-                        hr: stripStyle,
-                        header: stripStyle,
-                        aside: stripStyle,
-                        footer: stripStyle,
-                        ul: stripStyle,
-                        li: stripStyle,
-                        blockquote: stripStyle,
+            // Filtering rules
+            this.wysiwyg.dataProcessor.dataFilter.addRules({
+                elements: {
+                    // Strip styling from these elements
+                    p: stripStyle,
+                    h1: stripStyle,
+                    h2: stripStyle,
+                    h3: stripStyle,
+                    h4: stripStyle,
+                    h5: stripStyle,
+                    h6: stripStyle,
+                    span: stripStyle,
+                    div: stripStyle,
+                    section: stripStyle,
+                    hr: stripStyle,
+                    header: stripStyle,
+                    aside: stripStyle,
+                    footer: stripStyle,
+                    ul: stripStyle,
+                    li: stripStyle,
+                    blockquote: stripStyle,
 
-                        // Refactor image src url to fit MediaController
-                        img: (element) => {
-                            stripStyle(element);
+                    // Refactor image src url to fit MediaController
+                    img: (element) => {
+                        stripStyle(element);
 
-                            // Fetch from data attribute
-                            if(element.attributes['data-id']) {
-                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                            
-                            // Failing that, use regex
-                            } else {
-                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                            
-                            }
-                            
-                        },
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
                         
-                        // Refactor video src url to fit MediaController
-                        video: (element) => {
-                            stripStyle(element);
-
-                            // Fetch from data attribute
-                            if(element.attributes['data-id']) {
-                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                            
-                            // Failing that, use regex
-                            } else {
-                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                            
-                            }
-                            
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                        
                         }
-                    }
-                });
+                        
+                    },
+                    
+                    // Refactor video src url to fit MediaController
+                    video: (element) => {
+                        stripStyle(element);
 
-                // Set value initially
-                this.silentChange = true;
-                this.wysiwyg.setData(this.value);
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                        
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                        
+                        }
+                        
+                    }
+                }
             });
-        }, 100);
+
+            // Set value initially
+            this.silentChange = true;
+            this.wysiwyg.setData(this.value);
+        });
     }
 
     /**

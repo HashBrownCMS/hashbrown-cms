@@ -127,7 +127,7 @@ HashBrown.Helpers = __webpack_require__(259); // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper; // Helper functions
 
-__webpack_require__(264); // Preload resources 
+__webpack_require__(265); // Preload resources 
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -37735,7 +37735,7 @@ function (_SchemaEditor) {
 
     return _.div({
       class: 'config'
-    }, editor.renderConfigEditor(this.model.config));
+    }, editor.renderConfigEditor(this.model.config, this.model.id));
   };
   /**
    * Renders the editor fields
@@ -38025,6 +38025,29 @@ function (_FieldEditor) {
     this.sanityCheck();
   };
   /**
+   * Gets the label of an item
+   *
+   * @param {Object} item
+   * @param {Schema} schema
+   *
+   * @return {String} Label
+   */
+
+
+  _proto.getItemLabel = function getItemLabel(item, schema) {
+    if (schema.config) {
+      if (schema.config.label && item.value && item.value[schema.config.label]) {
+        return item.value[schema.config.label];
+      }
+    }
+
+    if (item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
+      return item.value;
+    }
+
+    return schema.name;
+  };
+  /**
    * Renders this editor
    */
 
@@ -38110,7 +38133,7 @@ function (_FieldEditor) {
 
         _.append($field.empty(), _.div({
           class: 'editor__field__sort-key'
-        }, schema.name), editorInstance.$element, _.div({
+        }, _this4.getItemLabel(item, schema)), editorInstance.$element, _.div({
           class: 'editor__field__actions'
         }, _.button({
           class: 'editor__field__action editor__field__action--collapse',
@@ -39867,98 +39890,94 @@ function (_FieldEditor) {
   _proto.initWYSIWYGEditor = function initWYSIWYGEditor() {
     var _this5 = this;
 
-    setTimeout(function () {
-      _this5.wysiwyg = CKEDITOR.replace(_this5.getTabContent(), {
-        removePlugins: 'contextmenu,liststyle,tabletools',
-        allowedContent: true,
-        height: 400,
-        toolbarGroups: [{
-          name: 'styles'
-        }, {
-          name: 'basicstyles',
-          groups: ['basicstyles', 'cleanup']
-        }, {
-          name: 'paragraph',
-          groups: ['list', 'indent', 'blocks', 'align', 'bidi']
-        }, {
-          name: 'links'
-        }, {
-          name: 'insert'
-        }, {
-          name: 'forms'
-        }, {
-          name: 'tools'
-        }, {
-          name: 'document',
-          groups: ['mode', 'document', 'doctools']
-        }, {
-          name: 'others'
-        }],
-        extraPlugins: 'justify,divarea',
-        removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
-        removeDialogTabs: 'image:advanced;link:advanced'
-      });
-
-      _this5.wysiwyg.on('change', function () {
-        _this5.onChange(_this5.wysiwyg.getData());
-      });
-
-      _this5.wysiwyg.on('instanceReady', function () {
-        // Strips the style information
-        var stripStyle = function stripStyle(element) {
-          delete element.attributes.style;
-        }; // Filtering rules
+    this.wysiwyg = CKEDITOR.replace(this.getTabContent(), {
+      removePlugins: 'contextmenu,liststyle,tabletools',
+      allowedContent: true,
+      height: 400,
+      toolbarGroups: [{
+        name: 'styles'
+      }, {
+        name: 'basicstyles',
+        groups: ['basicstyles', 'cleanup']
+      }, {
+        name: 'paragraph',
+        groups: ['list', 'indent', 'blocks', 'align', 'bidi']
+      }, {
+        name: 'links'
+      }, {
+        name: 'insert'
+      }, {
+        name: 'forms'
+      }, {
+        name: 'tools'
+      }, {
+        name: 'document',
+        groups: ['mode', 'document', 'doctools']
+      }, {
+        name: 'others'
+      }],
+      extraPlugins: 'justify,divarea',
+      removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+      removeDialogTabs: 'image:advanced;link:advanced'
+    });
+    this.wysiwyg.on('change', function () {
+      _this5.onChange(_this5.wysiwyg.getData());
+    });
+    this.wysiwyg.on('instanceReady', function () {
+      // Strips the style information
+      var stripStyle = function stripStyle(element) {
+        delete element.attributes.style;
+      }; // Filtering rules
 
 
-        _this5.wysiwyg.dataProcessor.dataFilter.addRules({
-          elements: {
-            // Strip styling from these elements
-            p: stripStyle,
-            h1: stripStyle,
-            h2: stripStyle,
-            h3: stripStyle,
-            h4: stripStyle,
-            h5: stripStyle,
-            h6: stripStyle,
-            span: stripStyle,
-            div: stripStyle,
-            section: stripStyle,
-            hr: stripStyle,
-            header: stripStyle,
-            aside: stripStyle,
-            footer: stripStyle,
-            ul: stripStyle,
-            li: stripStyle,
-            blockquote: stripStyle,
-            // Refactor image src url to fit MediaController
-            img: function img(element) {
-              stripStyle(element); // Fetch from data attribute
+      _this5.wysiwyg.dataProcessor.dataFilter.addRules({
+        elements: {
+          // Strip styling from these elements
+          p: stripStyle,
+          h1: stripStyle,
+          h2: stripStyle,
+          h3: stripStyle,
+          h4: stripStyle,
+          h5: stripStyle,
+          h6: stripStyle,
+          span: stripStyle,
+          div: stripStyle,
+          section: stripStyle,
+          hr: stripStyle,
+          header: stripStyle,
+          aside: stripStyle,
+          footer: stripStyle,
+          ul: stripStyle,
+          li: stripStyle,
+          blockquote: stripStyle,
+          // Refactor image src url to fit MediaController
+          img: function img(element) {
+            stripStyle(element); // Fetch from data attribute
 
-              if (element.attributes['data-id']) {
-                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
-              } else {
-                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-              }
-            },
-            // Refactor video src url to fit MediaController
-            video: function video(element) {
-              stripStyle(element); // Fetch from data attribute
+            if (element.attributes['data-id']) {
+              element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
+            } else {
+              element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+            }
+          },
+          // Refactor video src url to fit MediaController
+          video: function video(element) {
+            stripStyle(element); // Fetch from data attribute
 
-              if (element.attributes['data-id']) {
-                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
-              } else {
-                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-              }
+            if (element.attributes['data-id']) {
+              element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
+            } else {
+              element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
             }
           }
-        }); // Set value initially
+        }
+      }); // Set value initially
 
 
-        _this5.silentChange = true;
+      _this5.silentChange = true;
 
-        _this5.wysiwyg.setData(_this5.value);
-      });
-    }, 100);
+      _this5.wysiwyg.setData(_this5.value);
+    });
   };
   /**
    * Prerender
@@ -40172,6 +40191,7 @@ var ContentEditor = __webpack_require__(235);
  *         "tabId": "content",
  *         "schemaId": "struct",
  *         "config": {
+ *             "label": "myString",
  *             "struct": {
  *                 "myString": {
  *                     "label": "My string",
@@ -40243,42 +40263,75 @@ function (_FieldEditor) {
    * Renders the config editor
    *
    * @param {Object} config
+   * @param {String} fieldSchemaId
    *
    * @returns {HTMLElement} Element
    */
 
 
-  StructEditor.renderConfigEditor = function renderConfigEditor(config) {
+  StructEditor.renderConfigEditor = function renderConfigEditor(config, fieldSchemaId) {
     config.struct = config.struct || {};
 
     var $element = _.div({
       class: 'editor--schema__struct'
     });
 
-    var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+    var compiledFieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldSchemaId);
 
-    var getParentStruct = function getParentStruct() {
-      var struct = {};
-      var schemaEditor = Crisp.View.get('FieldSchemaEditor');
+    var renderEditor = function renderEditor() {
+      // Get the parent struct fields
+      var parentStruct = {};
 
-      if (!schemaEditor || !schemaEditor.parentSchema || !schemaEditor.parentSchema.config || !schemaEditor.parentSchema.config.struct) {
-        return struct;
-      }
+      if (compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
+        for (var key in compiledFieldSchema.config.struct) {
+          // We only want parent struct values
+          if (config.struct[key]) {
+            continue;
+          }
 
-      for (var key in schemaEditor.parentSchema.config.struct) {
-        // We only want parent struct values
-        if (config.struct[key]) {
+          parentStruct[key] = compiledFieldSchema.config.struct[key];
+        }
+      } // Compile the label options
+
+
+      var labelOptions = {};
+
+      for (var _key in parentStruct) {
+        if (!parentStruct[_key]) {
           continue;
         }
 
-        struct[key] = schemaEditor.parentSchema.config.struct[key];
+        labelOptions[_key] = parentStruct[_key].label;
       }
 
-      return struct;
-    };
+      for (var _key2 in config.struct) {
+        if (!config.struct[_key2]) {
+          continue;
+        }
 
-    var renderEditor = function renderEditor() {
-      _.append($element.empty(), _.if(Object.keys(getParentStruct()).length > 0, _.div({
+        labelOptions[_key2] = config.struct[_key2].label;
+      } // Render everything
+
+
+      _.append($element.empty(), // Render the label picker
+      _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, _.div({
+        class: 'editor__field__key__label'
+      }, 'Label'), _.div({
+        class: 'editor__field__key__description'
+      }, 'The value of the field picked here will represent this struct when collapsed')), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        options: labelOptions,
+        value: config.label,
+        onChange: function onChange(newLabel) {
+          config.label = newLabel;
+        }
+      }))), // Render the parent struct
+      _.if(Object.keys(parentStruct).length > 0, _.div({
         class: 'editor__field'
       }, _.div({
         class: 'editor__field__key'
@@ -40286,9 +40339,9 @@ function (_FieldEditor) {
         class: 'editor__field__key__label'
       }, 'Parent struct'), _.div({
         class: 'editor__field__key__description'
-      }, 'Properties that are inherited and can be changed if you add them to this Schema')), _.div({
-        class: 'editor__field__value'
-      }, _.each(getParentStruct(), function (fieldKey, fieldValue) {
+      }, 'Properties that are inherited and can be changed if you add them to this struct')), _.div({
+        class: 'editor__field__value flex'
+      }, _.each(parentStruct, function (fieldKey, fieldValue) {
         return _.button({
           class: 'widget widget--button condensed',
           title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'
@@ -40298,14 +40351,15 @@ function (_FieldEditor) {
           var newProperties = {};
           newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
 
-          for (var key in config.struct) {
-            newProperties[key] = config.struct[key];
+          for (var _key3 in config.struct) {
+            newProperties[_key3] = config.struct[_key3];
           }
 
           config.struct = newProperties;
           renderEditor();
         });
-      })))), _.div({
+      })))), // Render this struct
+      _.div({
         class: 'editor__field'
       }, _.div({
         class: 'editor__field__key'
@@ -40351,11 +40405,11 @@ function (_FieldEditor) {
 
               var newStruct = {}; // Insert the changed key into the correct place in the struct
 
-              for (var key in config.struct) {
-                if (key === fieldKey) {
+              for (var _key4 in config.struct) {
+                if (_key4 === fieldKey) {
                   newStruct[newKey] = config.struct[fieldKey];
                 } else {
-                  newStruct[key] = config.struct[key];
+                  newStruct[_key4] = config.struct[_key4];
                 }
               } // Change internal reference to new key
 
@@ -40365,6 +40419,7 @@ function (_FieldEditor) {
               config.struct = newStruct; // Update the sort key
 
               $field.find('.editor__field__sort-key').html(fieldKey);
+              renderEditor();
             }
           }))), _.div({
             class: 'editor__field'
@@ -40460,7 +40515,7 @@ function (_FieldEditor) {
 
         config.struct.newField = {
           label: 'New field',
-          schemaId: 'array'
+          schemaId: 'string'
         };
         renderEditor();
       }))));
@@ -40477,10 +40532,11 @@ function (_FieldEditor) {
   _proto.template = function template() {
     var _this2 = this;
 
+    var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
     return _.div({
       class: 'editor__field__value field-editor--struct'
     }, // Loop through each key in the struct
-    _.each(this.config.struct, function (k, keySchema) {
+    _.each(compiledSchema.config.struct, function (k, keySchema) {
       var value = _this2.value[k];
 
       if (!keySchema.schemaId) {
@@ -41102,14 +41158,14 @@ module.exports = {
   ContentHelper: __webpack_require__(223),
   DebugHelper: __webpack_require__(260),
   LanguageHelper: __webpack_require__(248),
-  MarkdownHelper: __webpack_require__(267),
+  MarkdownHelper: __webpack_require__(262),
   MediaHelper: __webpack_require__(206),
   ProjectHelper: __webpack_require__(7),
   RequestHelper: __webpack_require__(3),
   SchemaHelper: __webpack_require__(172),
   SettingsHelper: __webpack_require__(208),
-  TemplateHelper: __webpack_require__(262),
-  UIHelper: __webpack_require__(263)
+  TemplateHelper: __webpack_require__(263),
+  UIHelper: __webpack_require__(264)
 };
 
 /***/ }),
@@ -41344,6 +41400,847 @@ module.exports = DebugHelper;
 "use strict";
 
 /**
+ * A helper class for handling markdown
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var MarkdownHelper =
+/*#__PURE__*/
+function () {
+  function MarkdownHelper() {}
+
+  /**
+   * Converts a string from HTML to markdown (based on "turndown")
+   *
+   * NOTE: This terrible approach had to be implemented since "to-markdown"
+   * became "turndown" and employed an ugly implementation that we're
+   * encapsulating here to prevent polluting the global namespace with libraries
+   *
+   * In the future, we should fork the project and integrate it more neatly
+   *
+   * @return {String} Markdown
+   */
+  MarkdownHelper.fromHtml = function fromHtml(html) {
+    var TurndownService = function () {
+      'use strict';
+
+      function extend(destination) {
+        for (var i = 1; i < arguments.length; i++) {
+          var source = arguments[i];
+
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) destination[key] = source[key];
+          }
+        }
+
+        return destination;
+      }
+
+      function repeat(character, count) {
+        return Array(count + 1).join(character);
+      }
+
+      var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
+
+      function isBlock(node) {
+        return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+      }
+
+      var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+      function isVoid(node) {
+        return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+      }
+
+      var voidSelector = voidElements.join();
+
+      function hasVoid(node) {
+        return node.querySelector && node.querySelector(voidSelector);
+      }
+
+      var rules = {};
+      rules.paragraph = {
+        filter: 'p',
+        replacement: function replacement(content) {
+          return '\n\n' + content + '\n\n';
+        }
+      };
+      rules.lineBreak = {
+        filter: 'br',
+        replacement: function replacement(content, node, options) {
+          return options.br + '\n';
+        }
+      };
+      rules.heading = {
+        filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        replacement: function replacement(content, node, options) {
+          var hLevel = Number(node.nodeName.charAt(1));
+
+          if (options.headingStyle === 'setext' && hLevel < 3) {
+            var underline = repeat(hLevel === 1 ? '=' : '-', content.length);
+            return '\n\n' + content + '\n' + underline + '\n\n';
+          } else {
+            return '\n\n' + repeat('#', hLevel) + ' ' + content + '\n\n';
+          }
+        }
+      };
+      rules.blockquote = {
+        filter: 'blockquote',
+        replacement: function replacement(content) {
+          content = content.replace(/^\n+|\n+$/g, '');
+          content = content.replace(/^/gm, '> ');
+          return '\n\n' + content + '\n\n';
+        }
+      };
+      rules.list = {
+        filter: ['ul', 'ol'],
+        replacement: function replacement(content, node) {
+          var parent = node.parentNode;
+
+          if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
+            return '\n' + content;
+          } else {
+            return '\n\n' + content + '\n\n';
+          }
+        }
+      };
+      rules.listItem = {
+        filter: 'li',
+        replacement: function replacement(content, node, options) {
+          content = content.replace(/^\n+/, '') // remove leading newlines
+          .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
+          .replace(/\n/gm, '\n    '); // indent
+
+          var prefix = options.bulletListMarker + '   ';
+          var parent = node.parentNode;
+
+          if (parent.nodeName === 'OL') {
+            var start = parent.getAttribute('start');
+            var index = Array.prototype.indexOf.call(parent.children, node);
+            prefix = (start ? Number(start) + index : index + 1) + '.  ';
+          }
+
+          return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
+        }
+      };
+      rules.indentedCodeBlock = {
+        filter: function filter(node, options) {
+          return options.codeBlockStyle === 'indented' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
+        },
+        replacement: function replacement(content, node, options) {
+          return '\n\n    ' + node.firstChild.textContent.replace(/\n/g, '\n    ') + '\n\n';
+        }
+      };
+      rules.fencedCodeBlock = {
+        filter: function filter(node, options) {
+          return options.codeBlockStyle === 'fenced' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
+        },
+        replacement: function replacement(content, node, options) {
+          var className = node.firstChild.className || '';
+          var language = (className.match(/language-(\S+)/) || [null, ''])[1];
+          return '\n\n' + options.fence + language + '\n' + node.firstChild.textContent + '\n' + options.fence + '\n\n';
+        }
+      };
+      rules.horizontalRule = {
+        filter: 'hr',
+        replacement: function replacement(content, node, options) {
+          return '\n\n' + options.hr + '\n\n';
+        }
+      };
+      rules.inlineLink = {
+        filter: function filter(node, options) {
+          return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
+        },
+        replacement: function replacement(content, node) {
+          var href = node.getAttribute('href');
+          var title = node.title ? ' "' + node.title + '"' : '';
+          return '[' + content + '](' + href + title + ')';
+        }
+      };
+      rules.referenceLink = {
+        filter: function filter(node, options) {
+          return options.linkStyle === 'referenced' && node.nodeName === 'A' && node.getAttribute('href');
+        },
+        replacement: function replacement(content, node, options) {
+          var href = node.getAttribute('href');
+          var title = node.title ? ' "' + node.title + '"' : '';
+          var replacement;
+          var reference;
+
+          switch (options.linkReferenceStyle) {
+            case 'collapsed':
+              replacement = '[' + content + '][]';
+              reference = '[' + content + ']: ' + href + title;
+              break;
+
+            case 'shortcut':
+              replacement = '[' + content + ']';
+              reference = '[' + content + ']: ' + href + title;
+              break;
+
+            default:
+              var id = this.references.length + 1;
+              replacement = '[' + content + '][' + id + ']';
+              reference = '[' + id + ']: ' + href + title;
+          }
+
+          this.references.push(reference);
+          return replacement;
+        },
+        references: [],
+        append: function append(options) {
+          var references = '';
+
+          if (this.references.length) {
+            references = '\n\n' + this.references.join('\n') + '\n\n';
+            this.references = []; // Reset references
+          }
+
+          return references;
+        }
+      };
+      rules.emphasis = {
+        filter: ['em', 'i'],
+        replacement: function replacement(content, node, options) {
+          if (!content.trim()) return '';
+          return options.emDelimiter + content + options.emDelimiter;
+        }
+      };
+      rules.strong = {
+        filter: ['strong', 'b'],
+        replacement: function replacement(content, node, options) {
+          if (!content.trim()) return '';
+          return options.strongDelimiter + content + options.strongDelimiter;
+        }
+      };
+      rules.code = {
+        filter: function filter(node) {
+          var hasSiblings = node.previousSibling || node.nextSibling;
+          var isCodeBlock = node.parentNode.nodeName === 'PRE' && !hasSiblings;
+          return node.nodeName === 'CODE' && !isCodeBlock;
+        },
+        replacement: function replacement(content) {
+          if (!content.trim()) return '';
+          var delimiter = '`';
+          var leadingSpace = '';
+          var trailingSpace = '';
+          var matches = content.match(/`+/gm);
+
+          if (matches) {
+            if (/^`/.test(content)) leadingSpace = ' ';
+            if (/`$/.test(content)) trailingSpace = ' ';
+
+            while (matches.indexOf(delimiter) !== -1) {
+              delimiter = delimiter + '`';
+            }
+          }
+
+          return delimiter + leadingSpace + content + trailingSpace + delimiter;
+        }
+      };
+      rules.image = {
+        filter: 'img',
+        replacement: function replacement(content, node) {
+          var alt = node.alt || '';
+          var src = node.getAttribute('src') || '';
+          var title = node.title || '';
+          var titlePart = title ? ' "' + title + '"' : '';
+          return src ? '![' + alt + '](' + src + titlePart + ')' : '';
+        }
+      };
+      /**
+      * Manages a collection of rules used to convert HTML to Markdown
+      */
+
+      function Rules(options) {
+        this.options = options;
+        this._keep = [];
+        this._remove = [];
+        this.blankRule = {
+          replacement: options.blankReplacement
+        };
+        this.keepReplacement = options.keepReplacement;
+        this.defaultRule = {
+          replacement: options.defaultReplacement
+        };
+        this.array = [];
+
+        for (var key in options.rules) {
+          this.array.push(options.rules[key]);
+        }
+      }
+
+      Rules.prototype = {
+        add: function add(key, rule) {
+          this.array.unshift(rule);
+        },
+        keep: function keep(filter) {
+          this._keep.unshift({
+            filter: filter,
+            replacement: this.keepReplacement
+          });
+        },
+        remove: function remove(filter) {
+          this._remove.unshift({
+            filter: filter,
+            replacement: function replacement() {
+              return '';
+            }
+          });
+        },
+        forNode: function forNode(node) {
+          if (node.isBlank) return this.blankRule;
+          var rule;
+          if (rule = findRule(this.array, node, this.options)) return rule;
+          if (rule = findRule(this._keep, node, this.options)) return rule;
+          if (rule = findRule(this._remove, node, this.options)) return rule;
+          return this.defaultRule;
+        },
+        forEach: function forEach(fn) {
+          for (var i = 0; i < this.array.length; i++) {
+            fn(this.array[i], i);
+          }
+        }
+      };
+
+      function findRule(rules, node, options) {
+        for (var i = 0; i < rules.length; i++) {
+          var rule = rules[i];
+          if (filterValue(rule, node, options)) return rule;
+        }
+
+        return void 0;
+      }
+
+      function filterValue(rule, node, options) {
+        var filter = rule.filter;
+
+        if (typeof filter === 'string') {
+          if (filter === node.nodeName.toLowerCase()) return true;
+        } else if (Array.isArray(filter)) {
+          if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
+        } else if (typeof filter === 'function') {
+          if (filter.call(rule, node, options)) return true;
+        } else {
+          throw new TypeError('`filter` needs to be a string, array, or function');
+        }
+      }
+      /**
+      * The collapseWhitespace function is adapted from collapse-whitespace
+      * by Luc Thevenard.
+      *
+      * The MIT License (MIT)
+      *
+      * Copyright (c) 2014 Luc Thevenard <lucthevenard@gmail.com>
+      *
+      * Permission is hereby granted, free of charge, to any person obtaining a copy
+      * of this software and associated documentation files (the "Software"), to deal
+      * in the Software without restriction, including without limitation the rights
+      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      * copies of the Software, and to permit persons to whom the Software is
+      * furnished to do so, subject to the following conditions:
+      *
+      * The above copyright notice and this permission notice shall be included in
+      * all copies or substantial portions of the Software.
+      *
+      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+      * THE SOFTWARE.
+      */
+
+      /**
+      * collapseWhitespace(options) removes extraneous whitespace from an the given element.
+      *
+      * @param {Object} options
+      */
+
+
+      function collapseWhitespace(options) {
+        var element = options.element;
+        var isBlock = options.isBlock;
+        var isVoid = options.isVoid;
+
+        var isPre = options.isPre || function (node) {
+          return node.nodeName === 'PRE';
+        };
+
+        if (!element.firstChild || isPre(element)) return;
+        var prevText = null;
+        var prevVoid = false;
+        var prev = null;
+        var node = next(prev, element, isPre);
+
+        while (node !== element) {
+          if (node.nodeType === 3 || node.nodeType === 4) {
+            // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
+            var text = node.data.replace(/[ \r\n\t]+/g, ' ');
+
+            if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
+              text = text.substr(1);
+            } // `text` might be empty at this point.
+
+
+            if (!text) {
+              node = remove(node);
+              continue;
+            }
+
+            node.data = text;
+            prevText = node;
+          } else if (node.nodeType === 1) {
+            // Node.ELEMENT_NODE
+            if (isBlock(node) || node.nodeName === 'BR') {
+              if (prevText) {
+                prevText.data = prevText.data.replace(/ $/, '');
+              }
+
+              prevText = null;
+              prevVoid = false;
+            } else if (isVoid(node)) {
+              // Avoid trimming space around non-block, non-BR void elements.
+              prevText = null;
+              prevVoid = true;
+            }
+          } else {
+            node = remove(node);
+            continue;
+          }
+
+          var nextNode = next(prev, node, isPre);
+          prev = node;
+          node = nextNode;
+        }
+
+        if (prevText) {
+          prevText.data = prevText.data.replace(/ $/, '');
+
+          if (!prevText.data) {
+            remove(prevText);
+          }
+        }
+      }
+      /**
+      * remove(node) removes the given node from the DOM and returns the
+      * next node in the sequence.
+      *
+      * @param {Node} node
+      * @return {Node} node
+      */
+
+
+      function remove(node) {
+        var next = node.nextSibling || node.parentNode;
+        node.parentNode.removeChild(node);
+        return next;
+      }
+      /**
+      * next(prev, current, isPre) returns the next node in the sequence, given the
+      * current and previous nodes.
+      *
+      * @param {Node} prev
+      * @param {Node} current
+      * @param {Function} isPre
+      * @return {Node}
+      */
+
+
+      function next(prev, current, isPre) {
+        if (prev && prev.parentNode === current || isPre(current)) {
+          return current.nextSibling || current.parentNode;
+        }
+
+        return current.firstChild || current.nextSibling || current.parentNode;
+      }
+      /*
+      * Set up window for Node.js
+      */
+
+
+      var root = typeof window !== 'undefined' ? window : {};
+      /*
+      * Parsing HTML strings
+      */
+
+      function canParseHTMLNatively() {
+        var Parser = root.DOMParser;
+        var canParse = false; // Adapted from https://gist.github.com/1129031 Firefox/Opera/IE throw errors on
+        // unsupported types
+
+        try {
+          // WebKit returns null on unsupported types
+          if (new Parser().parseFromString('', 'text/html')) {
+            canParse = true;
+          }
+        } catch (e) {}
+
+        return canParse;
+      }
+
+      function createHTMLParser() {
+        var Parser = function Parser() {};
+
+        {
+          if (shouldUseActiveX()) {
+            Parser.prototype.parseFromString = function (string) {
+              var doc = new window.ActiveXObject('htmlfile');
+              doc.designMode = 'on'; // disable on-page scripts
+
+              doc.open();
+              doc.write(string);
+              doc.close();
+              return doc;
+            };
+          } else {
+            Parser.prototype.parseFromString = function (string) {
+              var doc = document.implementation.createHTMLDocument('');
+              doc.open();
+              doc.write(string);
+              doc.close();
+              return doc;
+            };
+          }
+        }
+        return Parser;
+      }
+
+      function shouldUseActiveX() {
+        var useActiveX = false;
+
+        try {
+          document.implementation.createHTMLDocument('').open();
+        } catch (e) {
+          if (window.ActiveXObject) useActiveX = true;
+        }
+
+        return useActiveX;
+      }
+
+      var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
+
+      function RootNode(input) {
+        var root;
+
+        if (typeof input === 'string') {
+          var doc = htmlParser().parseFromString( // DOM parsers arrange elements in the <head> and <body>. Wrapping in a custom
+          // element ensures elements are reliably arranged in a single element.
+          '<x-turndown id="turndown-root">' + input + '</x-turndown>', 'text/html');
+          root = doc.getElementById('turndown-root');
+        } else {
+          root = input.cloneNode(true);
+        }
+
+        collapseWhitespace({
+          element: root,
+          isBlock: isBlock,
+          isVoid: isVoid
+        });
+        return root;
+      }
+
+      var _htmlParser;
+
+      function htmlParser() {
+        _htmlParser = _htmlParser || new HTMLParser();
+        return _htmlParser;
+      }
+
+      function Node(node) {
+        node.isBlock = isBlock(node);
+        node.isCode = node.nodeName.toLowerCase() === 'code' || node.parentNode.isCode;
+        node.isBlank = isBlank(node);
+        node.flankingWhitespace = flankingWhitespace(node);
+        return node;
+      }
+
+      function isBlank(node) {
+        return ['A', 'TH', 'TD', 'IFRAME', 'SCRIPT', 'AUDIO', 'VIDEO'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
+      }
+
+      function flankingWhitespace(node) {
+        var leading = '';
+        var trailing = '';
+
+        if (!node.isBlock) {
+          var hasLeading = /^[ \r\n\t]/.test(node.textContent);
+          var hasTrailing = /[ \r\n\t]$/.test(node.textContent);
+
+          if (hasLeading && !isFlankedByWhitespace('left', node)) {
+            leading = ' ';
+          }
+
+          if (hasTrailing && !isFlankedByWhitespace('right', node)) {
+            trailing = ' ';
+          }
+        }
+
+        return {
+          leading: leading,
+          trailing: trailing
+        };
+      }
+
+      function isFlankedByWhitespace(side, node) {
+        var sibling;
+        var regExp;
+        var isFlanked;
+
+        if (side === 'left') {
+          sibling = node.previousSibling;
+          regExp = / $/;
+        } else {
+          sibling = node.nextSibling;
+          regExp = /^ /;
+        }
+
+        if (sibling) {
+          if (sibling.nodeType === 3) {
+            isFlanked = regExp.test(sibling.nodeValue);
+          } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
+            isFlanked = regExp.test(sibling.textContent);
+          }
+        }
+
+        return isFlanked;
+      }
+
+      var reduce = Array.prototype.reduce;
+      var leadingNewLinesRegExp = /^\n*/;
+      var trailingNewLinesRegExp = /\n*$/;
+      var escapes = [[/\\/g, '\\\\'], [/\*/g, '\\*'], [/^-/g, '\\-'], [/^\+ /g, '\\+ '], [/^(=+)/g, '\\$1'], [/^(#{1,6}) /g, '\\$1 '], [/`/g, '\\`'], [/^~~~/g, '\\~~~'], [/\[/g, '\\['], [/\]/g, '\\]'], [/^>/g, '\\>'], [/_/g, '\\_'], [/^(\d+)\. /g, '$1\\. ']];
+
+      function TurndownService(options) {
+        if (!(this instanceof TurndownService)) return new TurndownService(options);
+        var defaults = {
+          rules: rules,
+          headingStyle: 'setext',
+          hr: '* * *',
+          bulletListMarker: '*',
+          codeBlockStyle: 'indented',
+          fence: '```',
+          emDelimiter: '_',
+          strongDelimiter: '**',
+          linkStyle: 'inlined',
+          linkReferenceStyle: 'full',
+          br: '  ',
+          blankReplacement: function blankReplacement(content, node) {
+            return node.isBlock ? '\n\n' : '';
+          },
+          keepReplacement: function keepReplacement(content, node) {
+            return node.isBlock ? '\n\n' + node.outerHTML + '\n\n' : node.outerHTML;
+          },
+          defaultReplacement: function defaultReplacement(content, node) {
+            return node.isBlock ? '\n\n' + content + '\n\n' : content;
+          }
+        };
+        this.options = extend({}, defaults, options);
+        this.rules = new Rules(this.options);
+      }
+
+      TurndownService.prototype = {
+        /**
+        * The entry point for converting a string or DOM node to Markdown
+        * @public
+        * @param {String|HTMLElement} input The string or DOM node to convert
+        * @returns A Markdown representation of the input
+        * @type String
+        */
+        turndown: function turndown(input) {
+          if (!canConvert(input)) {
+            throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
+          }
+
+          if (input === '') return '';
+          var output = process.call(this, new RootNode(input));
+          return postProcess.call(this, output);
+        },
+
+        /**
+        * Add one or more plugins
+        * @public
+        * @param {Function|Array} plugin The plugin or array of plugins to add
+        * @returns The Turndown instance for chaining
+        * @type Object
+        */
+        use: function use(plugin) {
+          if (Array.isArray(plugin)) {
+            for (var i = 0; i < plugin.length; i++) {
+              this.use(plugin[i]);
+            }
+          } else if (typeof plugin === 'function') {
+            plugin(this);
+          } else {
+            throw new TypeError('plugin must be a Function or an Array of Functions');
+          }
+
+          return this;
+        },
+
+        /**
+        * Adds a rule
+        * @public
+        * @param {String} key The unique key of the rule
+        * @param {Object} rule The rule
+        * @returns The Turndown instance for chaining
+        * @type Object
+        */
+        addRule: function addRule(key, rule) {
+          this.rules.add(key, rule);
+          return this;
+        },
+
+        /**
+        * Keep a node (as HTML) that matches the filter
+        * @public
+        * @param {String|Array|Function} filter The unique key of the rule
+        * @returns The Turndown instance for chaining
+        * @type Object
+        */
+        keep: function keep(filter) {
+          this.rules.keep(filter);
+          return this;
+        },
+
+        /**
+        * Remove a node that matches the filter
+        * @public
+        * @param {String|Array|Function} filter The unique key of the rule
+        * @returns The Turndown instance for chaining
+        * @type Object
+        */
+        remove: function remove(filter) {
+          this.rules.remove(filter);
+          return this;
+        },
+
+        /**
+        * Escapes Markdown syntax
+        * @public
+        * @param {String} string The string to escape
+        * @returns A string with Markdown syntax escaped
+        * @type String
+        */
+        escape: function escape(string) {
+          return escapes.reduce(function (accumulator, escape) {
+            return accumulator.replace(escape[0], escape[1]);
+          }, string);
+        }
+      };
+      /**
+      * Reduces a DOM node down to its Markdown string equivalent
+      * @private
+      * @param {HTMLElement} parentNode The node to convert
+      * @returns A Markdown representation of the node
+      * @type String
+      */
+
+      function process(parentNode) {
+        var self = this;
+        return reduce.call(parentNode.childNodes, function (output, node) {
+          node = new Node(node);
+          var replacement = '';
+
+          if (node.nodeType === 3) {
+            replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
+          } else if (node.nodeType === 1) {
+            replacement = replacementForNode.call(self, node);
+          }
+
+          return join(output, replacement);
+        }, '');
+      }
+      /**
+      * Appends strings as each rule requires and trims the output
+      * @private
+      * @param {String} output The conversion output
+      * @returns A trimmed version of the ouput
+      * @type String
+      */
+
+
+      function postProcess(output) {
+        var self = this;
+        this.rules.forEach(function (rule) {
+          if (typeof rule.append === 'function') {
+            output = join(output, rule.append(self.options));
+          }
+        });
+        return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '');
+      }
+      /**
+      * Converts an element node to its Markdown equivalent
+      * @private
+      * @param {HTMLElement} node The node to convert
+      * @returns A Markdown representation of the node
+      * @type String
+      */
+
+
+      function replacementForNode(node) {
+        var rule = this.rules.forNode(node);
+        var content = process.call(this, node);
+        var whitespace = node.flankingWhitespace;
+        if (whitespace.leading || whitespace.trailing) content = content.trim();
+        return whitespace.leading + rule.replacement(content, node, this.options) + whitespace.trailing;
+      }
+      /**
+      * Determines the new lines between the current output and the replacement
+      * @private
+      * @param {String} output The current conversion output
+      * @param {String} replacement The string to append to the output
+      * @returns The whitespace to separate the current output and the replacement
+      * @type String
+      */
+
+
+      function separatingNewlines(output, replacement) {
+        var newlines = [output.match(trailingNewLinesRegExp)[0], replacement.match(leadingNewLinesRegExp)[0]].sort();
+        var maxNewlines = newlines[newlines.length - 1];
+        return maxNewlines.length < 2 ? maxNewlines : '\n\n';
+      }
+
+      function join(string1, string2) {
+        var separator = separatingNewlines(string1, string2); // Remove trailing/leading newlines and replace with separator
+
+        string1 = string1.replace(trailingNewLinesRegExp, '');
+        string2 = string2.replace(leadingNewLinesRegExp, '');
+        return string1 + separator + string2;
+      }
+      /**
+      * Determines whether an input can be converted
+      * @private
+      * @param {String|HTMLElement} input Describe this parameter
+      * @returns Describe what it returns
+      * @type String|Object|Array|Boolean|Number
+      */
+
+
+      function canConvert(input) {
+        return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
+      }
+
+      return TurndownService;
+    }();
+
+    return new TurndownService().turndown(html);
+  };
+
+  return MarkdownHelper;
+}();
+
+module.exports = MarkdownHelper;
+
+/***/ }),
+/* 263 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * A helper class for Template resources
  *
  * @memberof HashBrown.Client.Helpers
@@ -41432,7 +42329,7 @@ function () {
 module.exports = TemplateHelper;
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42242,11 +43139,11 @@ function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(265);
-window.marked = __webpack_require__(266);
+window.Promise = __webpack_require__(266);
+window.marked = __webpack_require__(267);
 
 var ProjectHelper = __webpack_require__(7);
 
@@ -42351,12 +43248,12 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 }; // Get package file
 
 
-window.app = __webpack_require__(269); // Language
+window.app = __webpack_require__(268); // Language
 
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -48372,7 +49269,7 @@ if (typeof window !== 'undefined' && window !== null) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10), __webpack_require__(15), __webpack_require__(38).setImmediate))
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -49862,852 +50759,11 @@ if (typeof window !== 'undefined' && window !== null) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(15)))
 
 /***/ }),
-/* 267 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * A helper class for handling markdown
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var MarkdownHelper =
-/*#__PURE__*/
-function () {
-  function MarkdownHelper() {}
-
-  /**
-   * Converts a string from HTML to markdown (based on "turndown")
-   *
-   * NOTE: This terrible approach had to be implemented since "to-markdown"
-   * became "turndown" and employed an ugly implementation that we're
-   * encapsulating here to prevent polluting the global namespace with libraries
-   *
-   * In the future, we should fork the project and integrate it more neatly
-   *
-   * @return {String} Markdown
-   */
-  MarkdownHelper.fromHtml = function fromHtml(html) {
-    var TurndownService = function () {
-      'use strict';
-
-      function extend(destination) {
-        for (var i = 1; i < arguments.length; i++) {
-          var source = arguments[i];
-
-          for (var key in source) {
-            if (source.hasOwnProperty(key)) destination[key] = source[key];
-          }
-        }
-
-        return destination;
-      }
-
-      function repeat(character, count) {
-        return Array(count + 1).join(character);
-      }
-
-      var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
-      function isBlock(node) {
-        return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-      }
-
-      var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
-      function isVoid(node) {
-        return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-      }
-
-      var voidSelector = voidElements.join();
-
-      function hasVoid(node) {
-        return node.querySelector && node.querySelector(voidSelector);
-      }
-
-      var rules = {};
-      rules.paragraph = {
-        filter: 'p',
-        replacement: function replacement(content) {
-          return '\n\n' + content + '\n\n';
-        }
-      };
-      rules.lineBreak = {
-        filter: 'br',
-        replacement: function replacement(content, node, options) {
-          return options.br + '\n';
-        }
-      };
-      rules.heading = {
-        filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-        replacement: function replacement(content, node, options) {
-          var hLevel = Number(node.nodeName.charAt(1));
-
-          if (options.headingStyle === 'setext' && hLevel < 3) {
-            var underline = repeat(hLevel === 1 ? '=' : '-', content.length);
-            return '\n\n' + content + '\n' + underline + '\n\n';
-          } else {
-            return '\n\n' + repeat('#', hLevel) + ' ' + content + '\n\n';
-          }
-        }
-      };
-      rules.blockquote = {
-        filter: 'blockquote',
-        replacement: function replacement(content) {
-          content = content.replace(/^\n+|\n+$/g, '');
-          content = content.replace(/^/gm, '> ');
-          return '\n\n' + content + '\n\n';
-        }
-      };
-      rules.list = {
-        filter: ['ul', 'ol'],
-        replacement: function replacement(content, node) {
-          var parent = node.parentNode;
-
-          if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
-            return '\n' + content;
-          } else {
-            return '\n\n' + content + '\n\n';
-          }
-        }
-      };
-      rules.listItem = {
-        filter: 'li',
-        replacement: function replacement(content, node, options) {
-          content = content.replace(/^\n+/, '') // remove leading newlines
-          .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
-          .replace(/\n/gm, '\n    '); // indent
-
-          var prefix = options.bulletListMarker + '   ';
-          var parent = node.parentNode;
-
-          if (parent.nodeName === 'OL') {
-            var start = parent.getAttribute('start');
-            var index = Array.prototype.indexOf.call(parent.children, node);
-            prefix = (start ? Number(start) + index : index + 1) + '.  ';
-          }
-
-          return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
-        }
-      };
-      rules.indentedCodeBlock = {
-        filter: function filter(node, options) {
-          return options.codeBlockStyle === 'indented' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
-        },
-        replacement: function replacement(content, node, options) {
-          return '\n\n    ' + node.firstChild.textContent.replace(/\n/g, '\n    ') + '\n\n';
-        }
-      };
-      rules.fencedCodeBlock = {
-        filter: function filter(node, options) {
-          return options.codeBlockStyle === 'fenced' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
-        },
-        replacement: function replacement(content, node, options) {
-          var className = node.firstChild.className || '';
-          var language = (className.match(/language-(\S+)/) || [null, ''])[1];
-          return '\n\n' + options.fence + language + '\n' + node.firstChild.textContent + '\n' + options.fence + '\n\n';
-        }
-      };
-      rules.horizontalRule = {
-        filter: 'hr',
-        replacement: function replacement(content, node, options) {
-          return '\n\n' + options.hr + '\n\n';
-        }
-      };
-      rules.inlineLink = {
-        filter: function filter(node, options) {
-          return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
-        },
-        replacement: function replacement(content, node) {
-          var href = node.getAttribute('href');
-          var title = node.title ? ' "' + node.title + '"' : '';
-          return '[' + content + '](' + href + title + ')';
-        }
-      };
-      rules.referenceLink = {
-        filter: function filter(node, options) {
-          return options.linkStyle === 'referenced' && node.nodeName === 'A' && node.getAttribute('href');
-        },
-        replacement: function replacement(content, node, options) {
-          var href = node.getAttribute('href');
-          var title = node.title ? ' "' + node.title + '"' : '';
-          var replacement;
-          var reference;
-
-          switch (options.linkReferenceStyle) {
-            case 'collapsed':
-              replacement = '[' + content + '][]';
-              reference = '[' + content + ']: ' + href + title;
-              break;
-
-            case 'shortcut':
-              replacement = '[' + content + ']';
-              reference = '[' + content + ']: ' + href + title;
-              break;
-
-            default:
-              var id = this.references.length + 1;
-              replacement = '[' + content + '][' + id + ']';
-              reference = '[' + id + ']: ' + href + title;
-          }
-
-          this.references.push(reference);
-          return replacement;
-        },
-        references: [],
-        append: function append(options) {
-          var references = '';
-
-          if (this.references.length) {
-            references = '\n\n' + this.references.join('\n') + '\n\n';
-            this.references = []; // Reset references
-          }
-
-          return references;
-        }
-      };
-      rules.emphasis = {
-        filter: ['em', 'i'],
-        replacement: function replacement(content, node, options) {
-          if (!content.trim()) return '';
-          return options.emDelimiter + content + options.emDelimiter;
-        }
-      };
-      rules.strong = {
-        filter: ['strong', 'b'],
-        replacement: function replacement(content, node, options) {
-          if (!content.trim()) return '';
-          return options.strongDelimiter + content + options.strongDelimiter;
-        }
-      };
-      rules.code = {
-        filter: function filter(node) {
-          var hasSiblings = node.previousSibling || node.nextSibling;
-          var isCodeBlock = node.parentNode.nodeName === 'PRE' && !hasSiblings;
-          return node.nodeName === 'CODE' && !isCodeBlock;
-        },
-        replacement: function replacement(content) {
-          if (!content.trim()) return '';
-          var delimiter = '`';
-          var leadingSpace = '';
-          var trailingSpace = '';
-          var matches = content.match(/`+/gm);
-
-          if (matches) {
-            if (/^`/.test(content)) leadingSpace = ' ';
-            if (/`$/.test(content)) trailingSpace = ' ';
-
-            while (matches.indexOf(delimiter) !== -1) {
-              delimiter = delimiter + '`';
-            }
-          }
-
-          return delimiter + leadingSpace + content + trailingSpace + delimiter;
-        }
-      };
-      rules.image = {
-        filter: 'img',
-        replacement: function replacement(content, node) {
-          var alt = node.alt || '';
-          var src = node.getAttribute('src') || '';
-          var title = node.title || '';
-          var titlePart = title ? ' "' + title + '"' : '';
-          return src ? '![' + alt + '](' + src + titlePart + ')' : '';
-        }
-      };
-      /**
-      * Manages a collection of rules used to convert HTML to Markdown
-      */
-
-      function Rules(options) {
-        this.options = options;
-        this._keep = [];
-        this._remove = [];
-        this.blankRule = {
-          replacement: options.blankReplacement
-        };
-        this.keepReplacement = options.keepReplacement;
-        this.defaultRule = {
-          replacement: options.defaultReplacement
-        };
-        this.array = [];
-
-        for (var key in options.rules) {
-          this.array.push(options.rules[key]);
-        }
-      }
-
-      Rules.prototype = {
-        add: function add(key, rule) {
-          this.array.unshift(rule);
-        },
-        keep: function keep(filter) {
-          this._keep.unshift({
-            filter: filter,
-            replacement: this.keepReplacement
-          });
-        },
-        remove: function remove(filter) {
-          this._remove.unshift({
-            filter: filter,
-            replacement: function replacement() {
-              return '';
-            }
-          });
-        },
-        forNode: function forNode(node) {
-          if (node.isBlank) return this.blankRule;
-          var rule;
-          if (rule = findRule(this.array, node, this.options)) return rule;
-          if (rule = findRule(this._keep, node, this.options)) return rule;
-          if (rule = findRule(this._remove, node, this.options)) return rule;
-          return this.defaultRule;
-        },
-        forEach: function forEach(fn) {
-          for (var i = 0; i < this.array.length; i++) {
-            fn(this.array[i], i);
-          }
-        }
-      };
-
-      function findRule(rules, node, options) {
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i];
-          if (filterValue(rule, node, options)) return rule;
-        }
-
-        return void 0;
-      }
-
-      function filterValue(rule, node, options) {
-        var filter = rule.filter;
-
-        if (typeof filter === 'string') {
-          if (filter === node.nodeName.toLowerCase()) return true;
-        } else if (Array.isArray(filter)) {
-          if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
-        } else if (typeof filter === 'function') {
-          if (filter.call(rule, node, options)) return true;
-        } else {
-          throw new TypeError('`filter` needs to be a string, array, or function');
-        }
-      }
-      /**
-      * The collapseWhitespace function is adapted from collapse-whitespace
-      * by Luc Thevenard.
-      *
-      * The MIT License (MIT)
-      *
-      * Copyright (c) 2014 Luc Thevenard <lucthevenard@gmail.com>
-      *
-      * Permission is hereby granted, free of charge, to any person obtaining a copy
-      * of this software and associated documentation files (the "Software"), to deal
-      * in the Software without restriction, including without limitation the rights
-      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-      * copies of the Software, and to permit persons to whom the Software is
-      * furnished to do so, subject to the following conditions:
-      *
-      * The above copyright notice and this permission notice shall be included in
-      * all copies or substantial portions of the Software.
-      *
-      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-      * THE SOFTWARE.
-      */
-
-      /**
-      * collapseWhitespace(options) removes extraneous whitespace from an the given element.
-      *
-      * @param {Object} options
-      */
-
-
-      function collapseWhitespace(options) {
-        var element = options.element;
-        var isBlock = options.isBlock;
-        var isVoid = options.isVoid;
-
-        var isPre = options.isPre || function (node) {
-          return node.nodeName === 'PRE';
-        };
-
-        if (!element.firstChild || isPre(element)) return;
-        var prevText = null;
-        var prevVoid = false;
-        var prev = null;
-        var node = next(prev, element, isPre);
-
-        while (node !== element) {
-          if (node.nodeType === 3 || node.nodeType === 4) {
-            // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
-            var text = node.data.replace(/[ \r\n\t]+/g, ' ');
-
-            if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
-              text = text.substr(1);
-            } // `text` might be empty at this point.
-
-
-            if (!text) {
-              node = remove(node);
-              continue;
-            }
-
-            node.data = text;
-            prevText = node;
-          } else if (node.nodeType === 1) {
-            // Node.ELEMENT_NODE
-            if (isBlock(node) || node.nodeName === 'BR') {
-              if (prevText) {
-                prevText.data = prevText.data.replace(/ $/, '');
-              }
-
-              prevText = null;
-              prevVoid = false;
-            } else if (isVoid(node)) {
-              // Avoid trimming space around non-block, non-BR void elements.
-              prevText = null;
-              prevVoid = true;
-            }
-          } else {
-            node = remove(node);
-            continue;
-          }
-
-          var nextNode = next(prev, node, isPre);
-          prev = node;
-          node = nextNode;
-        }
-
-        if (prevText) {
-          prevText.data = prevText.data.replace(/ $/, '');
-
-          if (!prevText.data) {
-            remove(prevText);
-          }
-        }
-      }
-      /**
-      * remove(node) removes the given node from the DOM and returns the
-      * next node in the sequence.
-      *
-      * @param {Node} node
-      * @return {Node} node
-      */
-
-
-      function remove(node) {
-        var next = node.nextSibling || node.parentNode;
-        node.parentNode.removeChild(node);
-        return next;
-      }
-      /**
-      * next(prev, current, isPre) returns the next node in the sequence, given the
-      * current and previous nodes.
-      *
-      * @param {Node} prev
-      * @param {Node} current
-      * @param {Function} isPre
-      * @return {Node}
-      */
-
-
-      function next(prev, current, isPre) {
-        if (prev && prev.parentNode === current || isPre(current)) {
-          return current.nextSibling || current.parentNode;
-        }
-
-        return current.firstChild || current.nextSibling || current.parentNode;
-      }
-      /*
-      * Set up window for Node.js
-      */
-
-
-      var root = typeof window !== 'undefined' ? window : {};
-      /*
-      * Parsing HTML strings
-      */
-
-      function canParseHTMLNatively() {
-        var Parser = root.DOMParser;
-        var canParse = false; // Adapted from https://gist.github.com/1129031 Firefox/Opera/IE throw errors on
-        // unsupported types
-
-        try {
-          // WebKit returns null on unsupported types
-          if (new Parser().parseFromString('', 'text/html')) {
-            canParse = true;
-          }
-        } catch (e) {}
-
-        return canParse;
-      }
-
-      function createHTMLParser() {
-        var Parser = function Parser() {};
-
-        {
-          if (shouldUseActiveX()) {
-            Parser.prototype.parseFromString = function (string) {
-              var doc = new window.ActiveXObject('htmlfile');
-              doc.designMode = 'on'; // disable on-page scripts
-
-              doc.open();
-              doc.write(string);
-              doc.close();
-              return doc;
-            };
-          } else {
-            Parser.prototype.parseFromString = function (string) {
-              var doc = document.implementation.createHTMLDocument('');
-              doc.open();
-              doc.write(string);
-              doc.close();
-              return doc;
-            };
-          }
-        }
-        return Parser;
-      }
-
-      function shouldUseActiveX() {
-        var useActiveX = false;
-
-        try {
-          document.implementation.createHTMLDocument('').open();
-        } catch (e) {
-          if (window.ActiveXObject) useActiveX = true;
-        }
-
-        return useActiveX;
-      }
-
-      var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
-
-      function RootNode(input) {
-        var root;
-
-        if (typeof input === 'string') {
-          var doc = htmlParser().parseFromString( // DOM parsers arrange elements in the <head> and <body>. Wrapping in a custom
-          // element ensures elements are reliably arranged in a single element.
-          '<x-turndown id="turndown-root">' + input + '</x-turndown>', 'text/html');
-          root = doc.getElementById('turndown-root');
-        } else {
-          root = input.cloneNode(true);
-        }
-
-        collapseWhitespace({
-          element: root,
-          isBlock: isBlock,
-          isVoid: isVoid
-        });
-        return root;
-      }
-
-      var _htmlParser;
-
-      function htmlParser() {
-        _htmlParser = _htmlParser || new HTMLParser();
-        return _htmlParser;
-      }
-
-      function Node(node) {
-        node.isBlock = isBlock(node);
-        node.isCode = node.nodeName.toLowerCase() === 'code' || node.parentNode.isCode;
-        node.isBlank = isBlank(node);
-        node.flankingWhitespace = flankingWhitespace(node);
-        return node;
-      }
-
-      function isBlank(node) {
-        return ['A', 'TH', 'TD', 'IFRAME', 'SCRIPT', 'AUDIO', 'VIDEO'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
-      }
-
-      function flankingWhitespace(node) {
-        var leading = '';
-        var trailing = '';
-
-        if (!node.isBlock) {
-          var hasLeading = /^[ \r\n\t]/.test(node.textContent);
-          var hasTrailing = /[ \r\n\t]$/.test(node.textContent);
-
-          if (hasLeading && !isFlankedByWhitespace('left', node)) {
-            leading = ' ';
-          }
-
-          if (hasTrailing && !isFlankedByWhitespace('right', node)) {
-            trailing = ' ';
-          }
-        }
-
-        return {
-          leading: leading,
-          trailing: trailing
-        };
-      }
-
-      function isFlankedByWhitespace(side, node) {
-        var sibling;
-        var regExp;
-        var isFlanked;
-
-        if (side === 'left') {
-          sibling = node.previousSibling;
-          regExp = / $/;
-        } else {
-          sibling = node.nextSibling;
-          regExp = /^ /;
-        }
-
-        if (sibling) {
-          if (sibling.nodeType === 3) {
-            isFlanked = regExp.test(sibling.nodeValue);
-          } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
-            isFlanked = regExp.test(sibling.textContent);
-          }
-        }
-
-        return isFlanked;
-      }
-
-      var reduce = Array.prototype.reduce;
-      var leadingNewLinesRegExp = /^\n*/;
-      var trailingNewLinesRegExp = /\n*$/;
-      var escapes = [[/\\/g, '\\\\'], [/\*/g, '\\*'], [/^-/g, '\\-'], [/^\+ /g, '\\+ '], [/^(=+)/g, '\\$1'], [/^(#{1,6}) /g, '\\$1 '], [/`/g, '\\`'], [/^~~~/g, '\\~~~'], [/\[/g, '\\['], [/\]/g, '\\]'], [/^>/g, '\\>'], [/_/g, '\\_'], [/^(\d+)\. /g, '$1\\. ']];
-
-      function TurndownService(options) {
-        if (!(this instanceof TurndownService)) return new TurndownService(options);
-        var defaults = {
-          rules: rules,
-          headingStyle: 'setext',
-          hr: '* * *',
-          bulletListMarker: '*',
-          codeBlockStyle: 'indented',
-          fence: '```',
-          emDelimiter: '_',
-          strongDelimiter: '**',
-          linkStyle: 'inlined',
-          linkReferenceStyle: 'full',
-          br: '  ',
-          blankReplacement: function blankReplacement(content, node) {
-            return node.isBlock ? '\n\n' : '';
-          },
-          keepReplacement: function keepReplacement(content, node) {
-            return node.isBlock ? '\n\n' + node.outerHTML + '\n\n' : node.outerHTML;
-          },
-          defaultReplacement: function defaultReplacement(content, node) {
-            return node.isBlock ? '\n\n' + content + '\n\n' : content;
-          }
-        };
-        this.options = extend({}, defaults, options);
-        this.rules = new Rules(this.options);
-      }
-
-      TurndownService.prototype = {
-        /**
-        * The entry point for converting a string or DOM node to Markdown
-        * @public
-        * @param {String|HTMLElement} input The string or DOM node to convert
-        * @returns A Markdown representation of the input
-        * @type String
-        */
-        turndown: function turndown(input) {
-          if (!canConvert(input)) {
-            throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
-          }
-
-          if (input === '') return '';
-          var output = process.call(this, new RootNode(input));
-          return postProcess.call(this, output);
-        },
-
-        /**
-        * Add one or more plugins
-        * @public
-        * @param {Function|Array} plugin The plugin or array of plugins to add
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        use: function use(plugin) {
-          if (Array.isArray(plugin)) {
-            for (var i = 0; i < plugin.length; i++) {
-              this.use(plugin[i]);
-            }
-          } else if (typeof plugin === 'function') {
-            plugin(this);
-          } else {
-            throw new TypeError('plugin must be a Function or an Array of Functions');
-          }
-
-          return this;
-        },
-
-        /**
-        * Adds a rule
-        * @public
-        * @param {String} key The unique key of the rule
-        * @param {Object} rule The rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        addRule: function addRule(key, rule) {
-          this.rules.add(key, rule);
-          return this;
-        },
-
-        /**
-        * Keep a node (as HTML) that matches the filter
-        * @public
-        * @param {String|Array|Function} filter The unique key of the rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        keep: function keep(filter) {
-          this.rules.keep(filter);
-          return this;
-        },
-
-        /**
-        * Remove a node that matches the filter
-        * @public
-        * @param {String|Array|Function} filter The unique key of the rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        remove: function remove(filter) {
-          this.rules.remove(filter);
-          return this;
-        },
-
-        /**
-        * Escapes Markdown syntax
-        * @public
-        * @param {String} string The string to escape
-        * @returns A string with Markdown syntax escaped
-        * @type String
-        */
-        escape: function escape(string) {
-          return escapes.reduce(function (accumulator, escape) {
-            return accumulator.replace(escape[0], escape[1]);
-          }, string);
-        }
-      };
-      /**
-      * Reduces a DOM node down to its Markdown string equivalent
-      * @private
-      * @param {HTMLElement} parentNode The node to convert
-      * @returns A Markdown representation of the node
-      * @type String
-      */
-
-      function process(parentNode) {
-        var self = this;
-        return reduce.call(parentNode.childNodes, function (output, node) {
-          node = new Node(node);
-          var replacement = '';
-
-          if (node.nodeType === 3) {
-            replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
-          } else if (node.nodeType === 1) {
-            replacement = replacementForNode.call(self, node);
-          }
-
-          return join(output, replacement);
-        }, '');
-      }
-      /**
-      * Appends strings as each rule requires and trims the output
-      * @private
-      * @param {String} output The conversion output
-      * @returns A trimmed version of the ouput
-      * @type String
-      */
-
-
-      function postProcess(output) {
-        var self = this;
-        this.rules.forEach(function (rule) {
-          if (typeof rule.append === 'function') {
-            output = join(output, rule.append(self.options));
-          }
-        });
-        return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '');
-      }
-      /**
-      * Converts an element node to its Markdown equivalent
-      * @private
-      * @param {HTMLElement} node The node to convert
-      * @returns A Markdown representation of the node
-      * @type String
-      */
-
-
-      function replacementForNode(node) {
-        var rule = this.rules.forNode(node);
-        var content = process.call(this, node);
-        var whitespace = node.flankingWhitespace;
-        if (whitespace.leading || whitespace.trailing) content = content.trim();
-        return whitespace.leading + rule.replacement(content, node, this.options) + whitespace.trailing;
-      }
-      /**
-      * Determines the new lines between the current output and the replacement
-      * @private
-      * @param {String} output The current conversion output
-      * @param {String} replacement The string to append to the output
-      * @returns The whitespace to separate the current output and the replacement
-      * @type String
-      */
-
-
-      function separatingNewlines(output, replacement) {
-        var newlines = [output.match(trailingNewLinesRegExp)[0], replacement.match(leadingNewLinesRegExp)[0]].sort();
-        var maxNewlines = newlines[newlines.length - 1];
-        return maxNewlines.length < 2 ? maxNewlines : '\n\n';
-      }
-
-      function join(string1, string2) {
-        var separator = separatingNewlines(string1, string2); // Remove trailing/leading newlines and replace with separator
-
-        string1 = string1.replace(trailingNewLinesRegExp, '');
-        string2 = string2.replace(leadingNewLinesRegExp, '');
-        return string1 + separator + string2;
-      }
-      /**
-      * Determines whether an input can be converted
-      * @private
-      * @param {String|HTMLElement} input Describe this parameter
-      * @returns Describe what it returns
-      * @type String|Object|Array|Boolean|Number
-      */
-
-
-      function canConvert(input) {
-        return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
-      }
-
-      return TurndownService;
-    }();
-
-    return new TurndownService().turndown(html);
-  };
-
-  return MarkdownHelper;
-}();
-
-module.exports = MarkdownHelper;
-
-/***/ }),
-/* 268 */,
-/* 269 */
+/* 268 */
 /***/ (function(module) {
 
 module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"1.0.7","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.3.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","production":"0.0.2","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","webpack-cli":"^3.1.2"}};
 
 /***/ })
 /******/ ]);
+//# sourceMappingURL=client.js.map

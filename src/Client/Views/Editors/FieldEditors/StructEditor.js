@@ -16,6 +16,7 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
  *         "tabId": "content",
  *         "schemaId": "struct",
  *         "config": {
+ *             "label": "myString",
  *             "struct": {
  *                 "myString": {
  *                     "label": "My string",
@@ -77,48 +78,73 @@ class StructEditor extends FieldEditor {
      * Renders the config editor
      *
      * @param {Object} config
+     * @param {String} fieldSchemaId
      *
      * @returns {HTMLElement} Element
      */
-    static renderConfigEditor(config) {
+    static renderConfigEditor(config, fieldSchemaId) {
         config.struct = config.struct || {};
 
         let $element = _.div({class: 'editor--schema__struct'});
 
-        let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
-    
-        let getParentStruct = () => {
-            let struct = {};
+        let compiledFieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldSchemaId);
+        
+        let renderEditor = () => {
+            // Get the parent struct fields
+            let parentStruct = {};
 
-            let schemaEditor = Crisp.View.get('FieldSchemaEditor');
+            if(compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
+                for(let key in compiledFieldSchema.config.struct) {
+                    // We only want parent struct values
+                    if(config.struct[key]) { continue; }
 
-            if(
-                !schemaEditor ||
-                !schemaEditor.parentSchema ||
-                !schemaEditor.parentSchema.config ||
-                !schemaEditor.parentSchema.config.struct
-            ) { return struct; }
+                    parentStruct[key]  = compiledFieldSchema.config.struct[key];
+                }
+            }
+           
+            // Compile the label options
+            let labelOptions = {};
             
-            for(let key in schemaEditor.parentSchema.config.struct) {
-                // We only want parent struct values
-                if(config.struct[key]) { continue; }
+            for(let key in parentStruct) {
+                if(!parentStruct[key]) { continue; }
 
-                struct[key]  = schemaEditor.parentSchema.config.struct[key];
+                labelOptions[key] = parentStruct[key].label;
             }
 
-            return struct;
-        };
+            for(let key in config.struct) {
+                if(!config.struct[key]) { continue; }
 
-        let renderEditor = () => {
+                labelOptions[key] = config.struct[key].label;
+            }
+
+            // Render everything
             _.append($element.empty(),
-                _.if(Object.keys(getParentStruct()).length > 0,
+                // Render the label picker
+                _.div({class: 'editor__field'},
+                    _.div({class: 'editor__field__key'},
+                        _.div({class: 'editor__field__key__label'}, 'Label'),
+                        _.div({class: 'editor__field__key__description'}, 'The value of the field picked here will represent this struct when collapsed')
+                    ),
+                    _.div({class: 'editor__field__value'},
+                        new HashBrown.Views.Widgets.Dropdown({
+                            options: labelOptions,
+                            value: config.label,
+                            onChange: (newLabel) => {
+                                config.label = newLabel;
+                            }
+                        })
+                    )
+                ),
+
+                // Render the parent struct
+                _.if(Object.keys(parentStruct).length > 0,
                     _.div({class: 'editor__field'},
                         _.div({class: 'editor__field__key'},
                             _.div({class: 'editor__field__key__label'}, 'Parent struct'),
-                            _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this Schema')
+                            _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this struct')
                         ),
-                        _.div({class: 'editor__field__value'},
-                            _.each(getParentStruct(), (fieldKey, fieldValue) => {
+                        _.div({class: 'editor__field__value flex'},
+                            _.each(parentStruct, (fieldKey, fieldValue) => {
                                 return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
                                     .click(() => {
                                         let newProperties = {};
@@ -137,6 +163,8 @@ class StructEditor extends FieldEditor {
                         )
                     )
                 ),
+
+                // Render this struct
                 _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'},
                         'Struct',
@@ -199,6 +227,8 @@ class StructEditor extends FieldEditor {
                                                     
                                                         // Update the sort key
                                                         $field.find('.editor__field__sort-key').html(fieldKey);
+
+                                                        renderEditor();
                                                     }
                                                 })
                                             )
@@ -288,7 +318,7 @@ class StructEditor extends FieldEditor {
                             
                                 config.struct.newField = {
                                     label: 'New field',
-                                    schemaId: 'array'
+                                    schemaId: 'string'
                                 };
 
                                 renderEditor();
@@ -307,9 +337,11 @@ class StructEditor extends FieldEditor {
      * Renders this editor
      */
    template() {
+        let compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
+           
         return _.div({class: 'editor__field__value field-editor--struct'},
             // Loop through each key in the struct
-            _.each(this.config.struct, (k, keySchema) => {
+            _.each(compiledSchema.config.struct, (k, keySchema) => {
                 let value = this.value[k];
 
                 if(!keySchema.schemaId) {

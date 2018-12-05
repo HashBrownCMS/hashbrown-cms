@@ -965,6 +965,10 @@ h1, h2, h3, h4, h5, h6 {
               color: #e70d3b; }
           .editor__field__value.sorting .editor__field__collapse, .editor__field__value.sorting .editor__field__remove {
             display: none; }
+      .editor__field__value.flex {
+        display: flex; }
+        .editor__field__value.flex .widget {
+          margin: 0 0.5rem 0.5rem 0; }
       .editor__field__value__warning {
         background-color: #FFB300;
         color: #664800;
@@ -1589,6 +1593,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0 0 0 1rem;
     flex-grow: 0;
     width: 5rem;
+    max-width: 5rem;
     flex-basis: 5rem;
     text-align: center;
     font-size: 2rem;
@@ -2271,7 +2276,8 @@ h1, h2, h3, h4, h5, h6 {
     width: 16rem;
     position: absolute;
     z-index: 1200;
-    border: 0; }
+    border: 0;
+    background-color: transparent; }
     .widget--dropdown.context-menu .widget--dropdown__value {
       display: none; }
     .widget--dropdown.context-menu .widget--dropdown__options {

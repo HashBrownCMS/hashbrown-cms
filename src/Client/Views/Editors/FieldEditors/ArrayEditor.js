@@ -198,6 +198,28 @@ class ArrayEditor extends FieldEditor {
     }
 
     /**
+     * Gets the label of an item
+     *
+     * @param {Object} item
+     * @param {Schema} schema
+     *
+     * @return {String} Label
+     */
+    getItemLabel(item, schema) {
+        if(schema.config) {
+            if(schema.config.label && item.value && item.value[schema.config.label]) {
+                return item.value[schema.config.label];
+            }
+        }
+
+        if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
+            return item.value;
+        }
+
+        return schema.name;
+    }
+
+    /**
      * Renders this editor
      */
     template() {
@@ -283,7 +305,7 @@ class ArrayEditor extends FieldEditor {
                     }
                 
                     _.append($field.empty(),
-                        _.div({class: 'editor__field__sort-key'}, schema.name),
+                        _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
                         editorInstance.$element,
                         _.div({class: 'editor__field__actions'},
                             _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})

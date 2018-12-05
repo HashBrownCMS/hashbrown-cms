@@ -20,6 +20,8 @@ sass.stderr.on('data', (data) => {
 module.exports = {
     mode: 'none',
 
+    devtool: 'source-map',
+
     // Input .js
     entry: {
         client: './src/Client/client.js',

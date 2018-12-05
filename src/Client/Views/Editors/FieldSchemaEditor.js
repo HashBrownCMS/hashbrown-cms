@@ -28,7 +28,7 @@ class FieldSchemaEditor extends SchemaEditor {
         if(!editor) { return; }
 
         return _.div({class: 'config'},
-            editor.renderConfigEditor(this.model.config)
+            editor.renderConfigEditor(this.model.config, this.model.id)
         );
     }
 
