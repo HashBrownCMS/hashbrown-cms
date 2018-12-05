@@ -22,7 +22,6 @@
     "mongodb": "^2.1.7",
     "multer": "^1.1.0",
     "path-to-regexp": "^1.2.1",
-    "production": "0.0.2",
     "pug": "^2.0.0-beta11",
     "rimraf": "^2.5.2",
     "semver": "^5.4.1",
