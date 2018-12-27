@@ -41,6 +41,7 @@ class Media extends Resource {
         this.def(String, 'url');
         this.def(String, 'path');
         this.def(String, 'folder', '/');
+        this.def(Date, 'updateDate');
     }
 
     /**

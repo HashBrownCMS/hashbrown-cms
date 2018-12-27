@@ -544,6 +544,10 @@ h1, h2, h3, h4, h5, h6 {
     .navbar-main__pane.active {
       display: flex;
       flex-direction: column; }
+    .navbar-main__pane__filter-sort-bar {
+      margin: 0 !important;
+      padding: 0.5rem 0.5rem 0.5rem 0;
+      background-color: #21303b; }
     .navbar-main__pane__move-buttons {
       padding: 1rem;
       margin: 0 !important;
@@ -615,6 +619,9 @@ h1, h2, h3, h4, h5, h6 {
     .navbar-main__pane__item {
       position: relative;
       user-select: none; }
+      .navbar-main__pane__item.filter-not-matched {
+        opacity: 0.5;
+        pointer-events: none; }
       .navbar-main__pane__item.active:before {
         content: '';
         display: block;

@@ -786,6 +786,7 @@ function (_Resource) {
     this.def(String, 'url');
     this.def(String, 'path');
     this.def(String, 'folder', '/');
+    this.def(Date, 'updateDate');
   };
   /**
    * Read from file path
@@ -32830,15 +32831,15 @@ module.exports = ConnectionPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-var Pane =
+var NavbarPane =
 /*#__PURE__*/
 function () {
-  function Pane() {}
+  function NavbarPane() {}
 
   /**
    * Init
    */
-  Pane.init = function init() {
+  NavbarPane.init = function init() {
     HashBrown.Views.Navigation.NavbarMain.addTabButton('My pane', '/my-route', 'question');
   };
   /**
@@ -32846,7 +32847,7 @@ function () {
    */
 
 
-  Pane.onClickCopyItemId = function onClickCopyItemId() {
+  NavbarPane.onClickCopyItemId = function onClickCopyItemId() {
     var id = $('.context-menu-target').data('id');
     copyToClipboard(id);
   };
@@ -32855,7 +32856,7 @@ function () {
    */
 
 
-  Pane.onClickOpenInNewTab = function onClickOpenInNewTab() {
+  NavbarPane.onClickOpenInNewTab = function onClickOpenInNewTab() {
     var href = $('.context-menu-target').attr('href');
     window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
   };
@@ -32866,7 +32867,7 @@ function () {
    */
 
 
-  Pane.onClickRefreshResource = function onClickRefreshResource(resource) {
+  NavbarPane.onClickRefreshResource = function onClickRefreshResource(resource) {
     HashBrown.Helpers.RequestHelper.reloadResource(resource).then(function () {
       HashBrown.Views.Navigation.NavbarMain.reload();
     });
@@ -32879,7 +32880,7 @@ function () {
    */
 
 
-  Pane.onChangeDirectory = function onChangeDirectory(id, newParent) {};
+  NavbarPane.onChangeDirectory = function onChangeDirectory(id, newParent) {};
   /**
    * Event: Change sort index
    *
@@ -32889,13 +32890,13 @@ function () {
    */
 
 
-  Pane.onChangeSortIndex = function onChangeSortIndex(id, newIndex, newParent) {};
+  NavbarPane.onChangeSortIndex = function onChangeSortIndex(id, newIndex, newParent) {};
   /**
    * Event: Click move item
    */
 
 
-  Pane.onClickMoveItem = function onClickMoveItem() {
+  NavbarPane.onClickMoveItem = function onClickMoveItem() {
     var _this = this;
 
     var id = $('.context-menu-target').data('id');
@@ -32983,10 +32984,10 @@ function () {
     }
   };
 
-  return Pane;
+  return NavbarPane;
 }();
 
-module.exports = Pane;
+module.exports = NavbarPane;
 
 /***/ }),
 /* 220 */
@@ -33026,11 +33027,39 @@ function (_Crisp$View) {
     return _this;
   }
   /**
-   * Event: Error was returned
+   * Event: Change filter
+   *
+   * @param {HTMLElement} $pane
+   * @param {NavbarPane} pane
+   * @param {String} search
    */
 
 
   var _proto = NavbarMain.prototype;
+
+  _proto.onChangeFilter = function onChangeFilter($pane, pane, search) {
+    search = search.toLowerCase();
+    $pane.find('.navbar-main__pane__item').each(function (i, item) {
+      var label = item.querySelector('.navbar-main__pane__item__label').innerText.toLowerCase();
+      item.classList.toggle('filter-not-matched', label.indexOf(search) < 0);
+    });
+  };
+  /**
+   * Event: Change sorting
+   *
+   * @param {HTMLElement} $pane
+   * @param {NavbarPane} pane
+   * @param {String} sortingMethod
+   */
+
+
+  _proto.onChangeSorting = function onChangeSorting($pane, pane, sortingMethod) {
+    this.applySorting($pane, pane, sortingMethod);
+  };
+  /**
+   * Event: Error was returned
+   */
+
 
   _proto.onError = function onError(err) {
     UI.errorModal(err);
@@ -33337,21 +33366,35 @@ function (_Crisp$View) {
    *
    * @param {HTMLElement} $pane
    * @param {Object} pane
+   * @param {String} sortingMethod
    */
 
 
-  _proto.applySorting = function applySorting($pane, pane) {
-    $pane = $pane.children('.navbar-main__pane'); // Sort direct children
+  _proto.applySorting = function applySorting($pane, pane, sortingMethod) {
+    var performSort = function performSort(a, b) {
+      switch (sortingMethod) {
+        case 'alphaAsc':
+          return a.querySelector('.navbar-main__pane__item__label').innerText > b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
 
-    $pane.find('>.navbar-main__pane__item').sort(function (a, b) {
-      return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-    }).appendTo($pane); // Sort nested children
+        case 'alphaDesc':
+          return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
 
-    $pane.find('.navbar-main__pane__item .navbar-main__pane__item__children').each(function (i, children) {
-      var $children = $(children);
-      $children.find('>.navbar-main__pane__item').sort(function (a, b) {
-        return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-      }).appendTo($children);
+        case 'dateAsc':
+          return new Date(a.dataset.date) > new Date(b.dataset.date) ? 1 : -1;
+
+        case 'dateDesc':
+          return new Date(a.dataset.date) < new Date(b.dataset.date) ? 1 : -1;
+
+        default:
+          return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
+      }
+    }; // Sort direct and nested children
+
+
+    $pane.find('.navbar-main__pane__items, .navbar-main__pane__item .navbar-main__pane__item__children').each(function (i, container) {
+      var $nestedChildren = $(container).find('>.navbar-main__pane__item');
+      $nestedChildren.sort(performSort);
+      $nestedChildren.appendTo($(container));
     });
   };
   /**
@@ -33519,8 +33562,28 @@ module.exports = function () {
     var $pane = _.div({
       class: 'navbar-main__pane',
       'data-route': pane.route
-    }, // Toolbar
-    _.if(pane.settings.toolbar, pane.settings.toolbar), // Move buttons
+    }, // Filter/sort bar
+    _.div({
+      class: 'navbar-main__pane__filter-sort-bar widget-group'
+    }, new HashBrown.Views.Widgets.Input({
+      placeholder: 'Filter',
+      onChange: function onChange(newValue) {
+        _this.onChangeFilter($pane, pane, newValue);
+      },
+      type: 'text'
+    }), new HashBrown.Views.Widgets.Dropdown({
+      placeholder: 'Sort',
+      options: {
+        default: 'Default',
+        alphaAsc: 'A → Z',
+        alphaDesc: 'Z → A',
+        dateAsc: 'Old → new',
+        dateDesc: 'New → old'
+      },
+      onChange: function onChange(newValue) {
+        _this.onChangeSorting($pane, pane, newValue);
+      }
+    })), // Move buttons
     _.div({
       class: 'navbar-main__pane__move-buttons widget-group'
     }, _.button({
@@ -33552,7 +33615,8 @@ module.exports = function () {
         'data-remote': isRemote,
         'data-local': hasRemote,
         'data-is-directory': isDirectory,
-        'data-sort': item.sort || 0
+        'data-sort': item.sort || 0,
+        'data-update-date': item.updateDate || item.createDate
       }, _.a({
         'data-id': id,
         'data-name': name,

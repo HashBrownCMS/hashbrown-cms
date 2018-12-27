@@ -163,7 +163,14 @@
             display: flex;
             flex-direction: column;
         }
-       
+      
+        // Filter/sort bar
+        &__filter-sort-bar {
+            margin: 0 !important;
+            padding: 0.5rem 0.5rem 0.5rem 0;
+            background-color: $secondary;
+        }
+
         // Move buttons
         &__move-buttons {
             padding: 1rem;
@@ -263,6 +270,12 @@
         &__item {
             position: relative;
             user-select: none;
+
+            // Filter not matched
+            &.filter-not-matched {
+                opacity: 0.5;
+                pointer-events: none;
+            }   
 
             // Active state
             &.active:before { 

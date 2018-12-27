@@ -25,6 +25,34 @@ class NavbarMain extends Crisp.View {
     }
     
     /**
+     * Event: Change filter
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} search
+     */
+    onChangeFilter($pane, pane, search) {
+        search = search.toLowerCase();
+
+        $pane.find('.navbar-main__pane__item').each((i, item) => {
+            let label = item.querySelector('.navbar-main__pane__item__label').innerText.toLowerCase();
+
+            item.classList.toggle('filter-not-matched', label.indexOf(search) < 0);
+        });
+    }
+
+    /**
+     * Event: Change sorting
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} sortingMethod
+     */
+    onChangeSorting($pane, pane, sortingMethod) {
+        this.applySorting($pane, pane, sortingMethod);
+    }
+
+    /**
      * Event: Error was returned
      */
     onError(err) {
@@ -341,22 +369,33 @@ class NavbarMain extends Crisp.View {
      *
      * @param {HTMLElement} $pane
      * @param {Object} pane
+     * @param {String} sortingMethod
      */
-    applySorting($pane, pane) {
-        $pane = $pane.children('.navbar-main__pane');
+    applySorting($pane, pane, sortingMethod) {
+        let performSort = (a, b) => {
+            switch(sortingMethod) {
+                case 'alphaAsc':
+                    return a.querySelector('.navbar-main__pane__item__label').innerText > b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+                
+                case 'alphaDesc':
+                    return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+                
+                case 'dateAsc':
+                    return new Date(a.dataset.date) > new Date(b.dataset.date) ? 1 : -1;
+                
+                case 'dateDesc':
+                    return new Date(a.dataset.date) < new Date(b.dataset.date) ? 1 : -1;
 
-        // Sort direct children
-        $pane.find('>.navbar-main__pane__item').sort((a, b) => {
-            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-        }).appendTo($pane);
-        
-        // Sort nested children
-        $pane.find('.navbar-main__pane__item .navbar-main__pane__item__children').each((i, children) => {
-            let $children = $(children);
+                default:
+                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
+            }
+        };
 
-            $children.find('>.navbar-main__pane__item').sort((a, b) => {
-                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-            }).appendTo($children);
+        // Sort direct and nested children
+        $pane.find('.navbar-main__pane__items, .navbar-main__pane__item .navbar-main__pane__item__children').each((i, container) => {
+            let $nestedChildren = $(container).find('>.navbar-main__pane__item');
+            $nestedChildren.sort(performSort);
+            $nestedChildren.appendTo($(container));
         });
     }
 

@@ -435,6 +435,7 @@ function (_Resource) {
     this.def(String, 'url');
     this.def(String, 'path');
     this.def(String, 'folder', '/');
+    this.def(Date, 'updateDate');
   };
   /**
    * Read from file path

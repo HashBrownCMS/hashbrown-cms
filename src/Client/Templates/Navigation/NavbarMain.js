@@ -28,9 +28,24 @@ module.exports = function() {
                 let queue = [];
 
                 let $pane = _.div({class: 'navbar-main__pane', 'data-route': pane.route},
-                    // Toolbar
-                    _.if(pane.settings.toolbar,
-                        pane.settings.toolbar
+                    // Filter/sort bar
+                    _.div({class: 'navbar-main__pane__filter-sort-bar widget-group'},
+                        new HashBrown.Views.Widgets.Input({
+                            placeholder: 'Filter',
+                            onChange: (newValue) => { this.onChangeFilter($pane, pane, newValue); },
+                            type: 'text'
+                        }),
+                        new HashBrown.Views.Widgets.Dropdown({
+                            placeholder: 'Sort',
+                            options: {
+                                default: 'Default',
+                                alphaAsc: 'A → Z',
+                                alphaDesc: 'Z → A',
+                                dateAsc: 'Old → new',
+                                dateDesc: 'New → old'
+                            },
+                            onChange: (newValue) => { this.onChangeSorting($pane, pane, newValue); }
+                        })
                     ),
 
                     // Move buttons
@@ -59,7 +74,8 @@ module.exports = function() {
                                     'data-remote': isRemote,
                                     'data-local': hasRemote,
                                     'data-is-directory': isDirectory,
-                                    'data-sort': item.sort || 0
+                                    'data-sort': item.sort || 0,
+                                    'data-update-date': item.updateDate || item.createDate
                                 },
                                 _.a({
                                     'data-id': id,
