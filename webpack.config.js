@@ -6,15 +6,15 @@ const webpack = require('webpack');
 const exec = require('child_process').exec;
 
 // Watch SASS
-let sass = exec('sass --sourcemap=none --watch ./src/Client/Style/client.scss:./public/css/client.css'); 
+let sass = exec('sass --source-map --watch ./src/Client/Style/client.scss:./public/css/client.css'); 
 
 sass.stdout.on('data', (data) => {
-    console.log(data); 
+    console.log(data);
 });
 
 sass.stderr.on('data', (data) => {
     console.log(data);
-});    
+});
 
 // Define settings
 module.exports = {
@@ -28,7 +28,7 @@ module.exports = {
         dashboard: './src/Client/dashboard.js',
         demo: './src/Client/demo.js'
     },
-    
+
     // Output .js
     output: {
         path: path.resolve(__dirname, 'public/js'),
