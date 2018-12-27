@@ -134,9 +134,6 @@ class DemoApi {
      * Parses a resource url
      */
     static parseUrl(url) {
-        url = url.replace('templates/partial', 'templates');
-        url = url.replace('templates/page', 'templates');
-
         let query = {};
         let split = url.split('/');
 
@@ -239,8 +236,7 @@ class DemoApi {
                 return [
                     {
                         id: 'providers',
-                        media: '8c75aa0739cf66bcac269f01ab9007e666bd941b',
-                        template: '8c75aa0739cf66bcac269f01ab9007e666bd941b'
+                        media: '8c75aa0739cf66bcac269f01ab9007e666bd941b'
                     }
                 ];
 
@@ -256,67 +252,6 @@ class DemoApi {
                         title: 'My website',
                         url: 'example.com',
                         locked: true
-                    }
-                ];
-
-            case 'templates':
-                return [
-                    {
-                        'id': 'sectionPage',
-                        'parentId': '',
-                        'remote': true,
-                        'icon': 'code',
-                        'name': 'sectionPage.html',
-                        'type': 'page',
-                        'remotePath': '_layouts/sectionPage.html',
-                        'folder': '',
-                        'markup': '' + 
-                            '<!DOCTYPE html>\n' +
-                            '<html>\n' +
-                            '    {% include main/head.html %}\n' +
-                            '\n' +
-                            '    <body>\n' +
-                            '        {% for section in page.sections %}\n' +
-                            '            {% include hashbrown/render_section section = section %}\n' +
-                            '        {% endfor %}\n' +
-                            '\n' +
-                            '        {% include main/scripts.html %}\n' +
-                            '    </body>\n' +
-                            '</html>'
-                    },
-                    {
-                        'id': 'heroSection',
-                        'parentId': '',
-                        'remote': true,
-                        'icon': 'code',
-                        'name': 'heroSection.html',
-                        'type': 'partial',
-                        'remotePath': '_includes/partials/heroSection.html',
-                        'folder': '',
-                        'markup': '' +
-                            '<section class="section--hero" style="background-image: url({% include hashbrown/get_media_url_by_id id=include.section.text %})">\n' +
-                            '    <div class="container">\n' +
-                            '        {{ include.section.text }}\n' +
-                            '    </div>\n' +
-                            '</section>\n'
-                    },
-                    {
-                        'id': 'richTextSection',
-                        'parentId': '',
-                        'remote': true,
-                        'icon': 'code',
-                        'name': 'richTextSection.html',
-                        'type': 'partial',
-                        'remotePath': '_includes/partials/richTextSection.html',
-                        'folder': '',
-                        'markup': '' + 
-                            '<section class="section--rich-text">\n' +
-                            '    <div class="container">\n' + 
-                            '        {% if include.section.text %}\n' + 
-                            '            {{ include.section.text }}\n' + 
-                            '        {% endif %}\n' + 
-                            '    </div>\n' + 
-                            '</section>'
                     }
                 ];
 
@@ -341,11 +276,9 @@ class DemoApi {
                         "properties": {
                             "title": "HashBrown CMS",
                             "url": "/",
-                            "template": "sectionPage",
                             "sections": [
                                 {
                                     "value": {
-                                        "template": "heroSection",
                                         "image": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
                                         "text": "## HashBrown CMS\n\nCreate once. Publish anywhere." 
                                     },
@@ -353,7 +286,6 @@ class DemoApi {
                                 },
                                 {
                                     "value": {
-                                        "template": "richTextSection",
                                         "text": "## Why HashBrown?\n\n### Remote management\n\nSeparate your concerns with a truly modern approach to content management. Your websites won't know what hit them.\n\n### Multiple projects at once\n\nWhy worry about several CMS'es, when you only need one?\n\n### Several environments for each project\n\nWe get it. You need to test your content before you go live.\n\n### Multilingual\n\nRemember the last time you used a truly elegant localisation solution in a CMS? We don't either.\n\n### Plugin support\n\nIf your needs aren't met at the core level, you can add anything you can imagine.\n\n### Content format consistency\n\nWhen you are passing complex, format-agnostic data around, document databases are the way to go. HashBrown knows what's up.\n\n### Painless backups\n\nHashBrown has your back in seconds.\n\n### Small footprint\n\nYou could probably run HashBrown on your toaster at home."
                                     },
                                     "schemaId": "904e8e7570ddb37ea1f31d210db47cd15f92ff92"
@@ -389,7 +321,6 @@ class DemoApi {
                     'string': require('Common/Schemas/Field/string.json'),
                     'struct': require('Common/Schemas/Field/struct.json'),
                     'tags': require('Common/Schemas/Field/tags.json'),
-                    'templateReference': require('Common/Schemas/Field/templateReference.json'),
                     'url': require('Common/Schemas/Field/url.json'),
                 };
        
@@ -427,14 +358,6 @@ class DemoApi {
                     "tabs": {},
                     "fields": {
                         "properties": {
-                            "template": {
-                                "label": "Template",
-                                "schemaId": "templateReference",
-                                "config": {
-                                    "allowedTemplates": ["sectionPage"],
-                                    "type": "page"
-                                }
-                            },
                             "sections": {
                                 "label": "Sections",
                                 "tabId": "content",
@@ -464,15 +387,6 @@ class DemoApi {
                     "parentSchemaId": "struct",
                     "hiddenProperties": [],
                     "editorId": "struct",
-                    "config": {
-                        "template": {
-                            "label": "Template",
-                                "schemaId": "templateReference",
-                                "config": {
-                                    "type": "partial"
-                                }
-                        }
-                    },
                     "type": "field"
                 }));
 
@@ -491,14 +405,6 @@ class DemoApi {
                     "editorId": "struct",
                     "config": {
                         "struct": {
-                            "template": {
-                                "label": "Template",
-                                "schemaId": "templateReference",
-                                "config": {
-                                    "allowedTemplates": ["richTextSection"],
-                                    "type": "partial"
-                                }
-                            },
                             "text": {
                                 "label": "Text",
                                 "tabId": "content",
@@ -524,14 +430,6 @@ class DemoApi {
                     "editorId": "struct",
                     "config": {
                         "struct": {
-                            "template": {
-                                "label": "Template",
-                                    "schemaId": "templateReference",
-                                    "config": {
-                                        "allowedTemplates": ["heroSection"],
-                                        "type": "partial"
-                                    }
-                            },
                             "image": {
                                 "label": "Image",
                                 "schemaId": "mediaReference"
@@ -637,10 +535,6 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
     switch(name) {
         case 'content':
             model = HashBrown.Models.Content;
-            break;
-
-        case 'templates':
-            model = HashBrown.Models.Template;
             break;
 
         case 'users':

@@ -338,6 +338,7 @@
             border: 0 dashed transparent;
             border-radius: 0.2rem;
             transition: border 0.5s ease, padding 0.5s ease;
+            position: relative;
 
             // Segmented
             &.segmented > .editor__field {
@@ -416,6 +417,40 @@
 
                 .widget {
                     margin: 0 0.5rem 0.5rem 0;
+                }
+            }
+
+            // Lock
+            &__lock {
+                position: absolute;
+                top: 0;
+                right: 100%;
+                margin-right: 0.5rem;
+                background-size: 1.5rem;
+                opacity: 0.5;
+                background-image: url('data:image/svg+xml;utf8,<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1376 768q40 0 68 28t28 68v576q0 40-28 68t-68 28h-960q-40 0-68-28t-28-68v-576q0-40 28-68t68-28h32v-320q0-185 131.5-316.5t316.5-131.5 316.5 131.5 131.5 316.5q0 26-19 45t-45 19h-64q-26 0-45-19t-19-45q0-106-75-181t-181-75-181 75-75 181v320h736z"/></svg>');
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                -o-appearance: none;
+                display: block;
+                height: 2rem;
+                width: 2rem;
+                background-position: center;
+                background-repeat: no-repeat;
+                cursor: pointer;
+
+                &:focus {
+                    outline: none;
+                }
+
+                &:checked {
+                    background-image: url('data:image/svg+xml;utf8,<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M640 768h512v-192q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28h-960q-40 0-68-28t-28-68v-576q0-40 28-68t68-28h32v-192q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z"/></svg>');
+                    
+                    + * {
+                        opacity: 0.5;
+                        pointer-events: none;
+                    }
                 }
             }
 

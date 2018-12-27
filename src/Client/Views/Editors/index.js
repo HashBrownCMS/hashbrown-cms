@@ -12,6 +12,5 @@ module.exports = {
     JSONEditor: require('./JSONEditor'),
     MediaViewer: require('./MediaViewer'),
     SchemaEditor: require('./SchemaEditor'),
-    TemplateEditor: require('./TemplateEditor'),
     UserEditor: require('./UserEditor')
 };

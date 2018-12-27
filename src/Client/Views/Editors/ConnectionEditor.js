@@ -38,35 +38,6 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
-     * Renders the Template provider editor
-     */
-    renderTemplateProviderEditor() {
-        let input = new HashBrown.Views.Widgets.Input({
-            value: false,
-            type: 'checkbox',
-            onChange: (isProvider) => {
-                ConnectionHelper.setTemplateProvider(isProvider ? this.model.id : null)
-                .catch(UI.errorModal);
-            }
-        });
-
-        // Set the value
-        input.$element.toggleClass('working', true);
-
-        ConnectionHelper.getTemplateProvider()
-        .then((connection) => {
-            if(connection && connection.id === this.model.id) {
-                input.value = true;
-                input.fetch();
-            }
-        
-            input.$element.toggleClass('working', false);
-        });
-
-        return input.$element;
-    }
-    
-    /**
      * Renders the Media provider editor
      */
     renderMediaProviderEditor() {
@@ -224,28 +195,6 @@ class ConnectionEditor extends Crisp.View {
                                     }
                                 })
                             )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Page templates'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: this.model.deployer.paths.templates.page,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.templates.page = newValue;
-                                    }
-                                })
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Partial templates'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: this.model.deployer.paths.templates.partial,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.templates.partial = newValue;
-                                    }
-                                })
-                            )
                         )
                     )
                 );
@@ -272,12 +221,6 @@ class ConnectionEditor extends Crisp.View {
                 _.h4({class: 'editor__header__title'}, this.model.title)
             ),
             _.div({class: 'editor__body'},
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Is Template provider'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderTemplateProviderEditor()
-                    )
-                ),
                 _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'}, 'Is Media provider'),
                     _.div({class: 'editor__field__value'},

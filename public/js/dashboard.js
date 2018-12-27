@@ -277,10 +277,6 @@ function () {
             model = new HashBrown.Models.Content(object);
             break;
 
-          case 'templates':
-            model = new HashBrown.Models.Template(object);
-            break;
-
           case 'forms':
             model = new HashBrown.Models.Form(object);
             break;
@@ -321,7 +317,7 @@ function () {
    */
   RequestHelper.reloadAllResources = function reloadAllResources() {
     $('.page--environment__spinner__messages').empty();
-    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+    var queue = ['content', 'schemas', 'media', 'connections', 'forms', 'users'];
 
     for (var _i = 0; _i < queue.length; _i++) {
       var item = queue[_i];
@@ -22447,6 +22443,16 @@ function (_Resource) {
     this.def(Array, 'hiddenProperties', []);
   };
   /**
+   * Gets a URL safe name for this schema
+   *
+   * @return {String} URL safe name
+   */
+
+
+  _proto.getUrlSafeName = function getUrlSafeName() {
+    return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  };
+  /**
    * Checks whether a property is hidden
    *
    * @param {String} name
@@ -22823,7 +22829,6 @@ module.exports = {
   Processor: __webpack_require__(192),
   Project: __webpack_require__(195),
   Schema: __webpack_require__(174),
-  Template: __webpack_require__(196),
   User: __webpack_require__(197)
 };
 
@@ -23130,6 +23135,7 @@ function (_Resource) {
     return {
       id: this.id,
       parentId: this.parentId,
+      schemaId: this.schemaId,
       createDate: this.createDate,
       updateDate: this.updateDate,
       createdBy: this.createdBy,
@@ -23219,19 +23225,7 @@ function (_Resource) {
 
             target[key] = value[language]; // If not, recurse into the object
           } else {
-            // If this value was created with the ArrayEditor, filter out Schema ids
-            // by assigning the "value" of each item directly to the array
-            if (Array.isArray(value)) {
-              for (var i in value) {
-                if (!value[i].value) {
-                  continue;
-                }
-
-                value[i] = value[i].value;
-              }
-            } // Prepare target data type for either Object or Array
-
-
+            // Prepare target data type for either Object or Array
             if (Array.isArray(value)) {
               target[key] = [];
             } else {
@@ -23374,20 +23368,7 @@ function (_Resource) {
 
 
   Connection.paramsCheck = function paramsCheck(params) {
-    // Backwards compatibility: Convert from old structure
-    if (params.type || params.preset) {
-      params.settings = params.settings || {};
-      params.settings.url = params.settings.url || params.url;
-      var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
-      newParams.id = params.id;
-      newParams.title = params.title;
-      newParams.url = params.url;
-      newParams.isLocked = params.isLocked;
-      newParams.sync = params.sync;
-      params = newParams;
-    } // Deployer and processor
-
-
+    // Deployer and processor
     if (!params.processor) {
       params.processor = {};
     }
@@ -23400,84 +23381,7 @@ function (_Resource) {
       params.deployer.paths = {};
     }
 
-    if (!params.deployer.paths.templates) {
-      params.deployer.paths.templates = {};
-    }
-
     return _Resource.paramsCheck.call(this, params);
-  };
-  /**
-   * Gets preset settings
-   *
-   * @param {String} preset
-   * @param {Object} oldSettings
-   */
-
-
-  Connection.getPresetSettings = function getPresetSettings(preset, oldSettings) {
-    oldSettings = oldSettings || {};
-    var settings;
-
-    switch (preset) {
-      case 'GitHub Pages':
-        settings = {
-          processor: {
-            alias: 'jekyll',
-            fileExtension: '.md'
-          },
-          deployer: oldSettings.isLocal ? {
-            alias: 'filesystem',
-            rootPath: oldSettings.localPath,
-            paths: {
-              templates: {
-                partial: '/_includes/partials/',
-                page: '/_layouts/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          } : {
-            alias: 'github',
-            token: oldSettings.token || '',
-            org: oldSettings.org || '',
-            repo: oldSettings.repo || '',
-            branch: oldSettings.branch || '',
-            paths: {
-              templates: {
-                partial: '/_includes/partials/',
-                page: '/_layouts/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          }
-        };
-        break;
-
-      case 'HashBrown Driver':
-        settings = {
-          processor: {
-            alias: 'json',
-            fileExtension: ''
-          },
-          deployer: {
-            alias: 'api',
-            url: (oldSettings.url || 'https://example.com') + '/api/',
-            token: oldSettings.token || '',
-            paths: {
-              templates: {
-                partial: '/templates/partial/',
-                page: '/templates/page/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          }
-        };
-        break;
-    }
-
-    return settings;
   };
   /**
    * Creates a new Connection object
@@ -23658,10 +23562,6 @@ function (_Entity) {
       _this.paths = {};
     }
 
-    if (!_this.paths.templates) {
-      _this.paths.templates = {};
-    }
-
     return _this;
   }
   /**
@@ -23675,10 +23575,6 @@ function (_Entity) {
     this.def(String, 'name');
     this.def(String, 'alias');
     this.def(Object, 'paths', {
-      templates: {
-        page: '',
-        partial: ''
-      },
       media: '',
       content: ''
     });
@@ -24101,84 +23997,7 @@ function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 196 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
-var Resource = __webpack_require__(11);
-/**
- * The Template model
- *
- * @memberof HashBrown.Common.Models
- */
-
-
-var Template =
-/*#__PURE__*/
-function (_Resource) {
-  _inheritsLoose(Template, _Resource);
-
-  function Template(params) {
-    var _this;
-
-    _this = _Resource.call(this, params) || this;
-
-    _this.updateId();
-
-    return _this;
-  }
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  Template.paramsCheck = function paramsCheck(params) {
-    params = _Resource.paramsCheck.call(this, params);
-    delete params.remote;
-    delete params.sync;
-    delete params.isRemote;
-    return params;
-  };
-  /**
-   * Structure
-   */
-
-
-  var _proto = Template.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'parentId');
-    this.def(String, 'icon', 'code');
-    this.def(String, 'name');
-    this.def(String, 'type');
-    this.def(String, 'remotePath');
-    this.def(String, 'folder');
-    this.def(String, 'markup');
-  };
-  /**
-   * Updates id from name
-   */
-
-
-  _proto.updateId = function updateId() {
-    this.id = this.name.substring(0, this.name.lastIndexOf('.'));
-  };
-
-  return Template;
-}(Resource);
-
-module.exports = Template;
-
-/***/ }),
+/* 196 */,
 /* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27260,7 +27079,7 @@ function (_HashBrown$Views$Moda) {
       value: this.model.getScopes(project),
       useMultiple: true,
       placeholder: '(no scopes)',
-      options: ['connections', 'schemas', 'templates'],
+      options: ['connections', 'schemas'],
       onChange: function onChange(newValue) {
         _this4.model.scopes[project] = newValue;
 
@@ -27547,32 +27366,6 @@ function (_ConnectionHelperComm) {
   ConnectionHelper.getMediaProvider = function getMediaProvider() {
     return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
   };
-  /**
-   * Sets the Template provider
-   *
-   * @param {String} id
-   *
-   * @returns {Promise}
-   */
-
-
-  ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
-    return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-      return RequestHelper.reloadResource('templates');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    });
-  };
-  /**
-   * Gets the Template provider
-   *
-   * @returns {Promise} Connection
-   */
-
-
-  ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
-    return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-  };
 
   return ConnectionHelper;
 }(ConnectionHelperCommon);
@@ -27613,63 +27406,6 @@ function () {
     return Promise.resolve();
   };
   /**
-   * Sets the Template provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   *
-   * @return {Promise} Promise
-   */
-
-
-  ConnectionHelper.setTemplateProvider = function setTemplateProvider(project, environment, id) {
-    if (id === void 0) {
-      id = null;
-    }
-
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
-      providers = providers || {};
-      providers.template = id;
-      return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
-    });
-  };
-  /**
-   * Gets the Template provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @return {Promise} Connection object
-   */
-
-
-  ConnectionHelper.getTemplateProvider = function getTemplateProvider(project, environment) {
-    var _this = this;
-
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers') // Previously, providers were set project-wide, so retrieve automatically if needed
-    .then(function (providers) {
-      if (!providers) {
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
-      } else {
-        return Promise.resolve(providers);
-      }
-    }) // Return requested provider
-    .then(function (providers) {
-      providers = providers || {};
-
-      if (providers.template) {
-        return _this.getConnectionById(project, environment, providers.template);
-      } else {
-        return Promise.resolve(null);
-      }
-    });
-  };
-  /**
    * Sets the Media provider
    *
    * @param {String} project
@@ -27704,7 +27440,7 @@ function () {
 
 
   ConnectionHelper.getMediaProvider = function getMediaProvider(project, environment) {
-    var _this2 = this;
+    var _this = this;
 
     checkParam(project, 'project', String);
     checkParam(environment, 'environment', String);
@@ -27720,7 +27456,7 @@ function () {
       providers = providers || {};
 
       if (providers.media) {
-        return _this2.getConnectionById(project, environment, providers.media);
+        return _this.getConnectionById(project, environment, providers.media);
       } else {
         return Promise.resolve(null);
       }
@@ -27961,7 +27697,6 @@ module.exports = {
   RequestHelper: __webpack_require__(3),
   SchemaHelper: __webpack_require__(172),
   SettingsHelper: __webpack_require__(208),
-  TemplateHelper: __webpack_require__(263),
   UIHelper: __webpack_require__(264)
 };
 
@@ -29032,100 +28767,7 @@ function () {
 module.exports = MarkdownHelper;
 
 /***/ }),
-/* 263 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * A helper class for Template resources
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var TemplateHelper =
-/*#__PURE__*/
-function () {
-  function TemplateHelper() {}
-
-  /**
-   * Gets all templates
-   *
-   * @param {String} type
-   *
-   * @returns {Array} Templates
-   */
-  TemplateHelper.getAllTemplates = function getAllTemplates(type) {
-    if (!type) {
-      return resources.templates;
-    }
-
-    var templates = [];
-
-    for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var template = _ref;
-
-      if (template.type !== type) {
-        continue;
-      }
-
-      templates.push(template);
-    }
-
-    return templates;
-  };
-  /**
-   * Gets a template by id
-   *
-   * @param {String} type
-   * @param {String} id
-   *
-   * @returns {Template} Template
-   */
-
-
-  TemplateHelper.getTemplate = function getTemplate(type, id) {
-    for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var template = _ref2;
-
-      if (template.type !== type || template.id !== id) {
-        continue;
-      }
-
-      return template;
-    }
-
-    return null;
-  };
-
-  return TemplateHelper;
-}();
-
-module.exports = TemplateHelper;
-
-/***/ }),
+/* 263 */,
 /* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 

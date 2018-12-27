@@ -22,7 +22,6 @@ class Deployer extends Entity {
         this.alias = this.constructor.alias;
 
         if(!this.paths) { this.paths = {}; }
-        if(!this.paths.templates) { this.paths.templates = {}; }
     }
     
     /**
@@ -32,10 +31,6 @@ class Deployer extends Entity {
         this.def(String, 'name');
         this.def(String, 'alias');
         this.def(Object, 'paths', {
-            templates: {
-                page: '',
-                partial: ''
-            },
             media: '',
             content: ''
         });

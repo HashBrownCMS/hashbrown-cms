@@ -38,7 +38,7 @@ class SchemaEditor extends Crisp.View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        RequestHelper.request('post', 'schemas/' + this.model.id, this.model)
+        RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model)
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
         
@@ -46,8 +46,17 @@ class SchemaEditor extends Crisp.View {
         })
         .then(() => {
             Crisp.View.get('NavbarMain').reload();
+
+            // If id changed, change the hash
+            if(Crisp.Router.params.id != this.model.id) {
+                location.hash = '/schemas/' + this.model.id;
+            }
         })
-        .catch(UI.errorModal);
+        .catch((e) => {
+            UI.errorModal(e);
+        
+            this.$saveBtn.toggleClass('working', false);
+        });
     }
 
     /**
@@ -74,10 +83,11 @@ class SchemaEditor extends Crisp.View {
      * @param {String} label
      * @param {HTMLElement} content
      * @param {Boolean} isVertical
+     * @param {Boolean} isLocked
      *
      * @return {HTMLElement} Editor element
      */
-    renderField(label, $content, isVertical) {
+    renderField(label, $content, isVertical, isLocked) {
         if(!$content) { return; }
 
         return _.div({class: 'editor__field ' + (isVertical ? 'vertical' : '')},
@@ -85,6 +95,9 @@ class SchemaEditor extends Crisp.View {
                 label
             ),
             _.div({class: 'editor__field__value'},
+                _.if(isLocked,
+                    _.input({class: 'editor__field__value__lock', title: 'Only edit this field if you know what you\'re doing', type: 'checkbox', checked: true})
+                ),
                 $content
             )
         );
@@ -101,6 +114,11 @@ class SchemaEditor extends Crisp.View {
         let $element = _.div({class: 'editor__body'});
         
         $element.empty();
+        
+        $element.append(this.renderField('Id', new HashBrown.Views.Widgets.Input({
+            value: this.model.id,
+            onChange: (newValue) => { this.model.id = newValue; }
+        }).$element, false, true)); 
 
         $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
             value: this.model.name,

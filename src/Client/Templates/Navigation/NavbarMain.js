@@ -4,7 +4,6 @@ module.exports = function() {
 
     let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
     let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-    let hasTemplatesScope = currentUser.hasScope(currentProject, 'templates');
     let hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
      
     return _.nav({class: 'navbar-main'},
@@ -29,23 +28,25 @@ module.exports = function() {
 
                 let $pane = _.div({class: 'navbar-main__pane', 'data-route': pane.route},
                     // Filter/sort bar
-                    _.div({class: 'navbar-main__pane__filter-sort-bar widget-group'},
-                        new HashBrown.Views.Widgets.Input({
-                            placeholder: 'Filter',
-                            onChange: (newValue) => { this.onChangeFilter($pane, pane, newValue); },
-                            type: 'text'
-                        }),
-                        new HashBrown.Views.Widgets.Dropdown({
-                            placeholder: 'Sort',
-                            options: {
-                                default: 'Default',
-                                alphaAsc: 'A → Z',
-                                alphaDesc: 'Z → A',
-                                dateAsc: 'Old → new',
-                                dateDesc: 'New → old'
-                            },
-                            onChange: (newValue) => { this.onChangeSorting($pane, pane, newValue); }
-                        })
+                    _.div({class: 'navbar-main__pane__filter-sort-bar'},
+                        _.div({class: 'widget-group'},
+                            new HashBrown.Views.Widgets.Input({
+                                placeholder: 'Filter',
+                                onChange: (newValue) => { this.onChangeFilter($pane, pane, newValue); },
+                                type: 'text'
+                            }),
+                            new HashBrown.Views.Widgets.Dropdown({
+                                placeholder: 'Sort',
+                                options: {
+                                    default: 'Default',
+                                    alphaAsc: 'A → Z',
+                                    alphaDesc: 'Z → A',
+                                    dateAsc: 'Old → new',
+                                    dateDesc: 'New → old'
+                                },
+                                onChange: (newValue) => { this.onChangeSorting($pane, pane, newValue); }
+                            })
+                        )
                     ),
 
                     // Move buttons

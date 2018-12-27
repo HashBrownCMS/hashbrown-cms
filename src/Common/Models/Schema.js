@@ -25,6 +25,15 @@ class Schema extends Resource {
     }
 
     /**
+     * Gets a URL safe name for this schema
+     *
+     * @return {String} URL safe name
+     */
+    getUrlSafeName() {
+        return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    }
+
+    /**
      * Checks whether a property is hidden
      *
      * @param {String} name

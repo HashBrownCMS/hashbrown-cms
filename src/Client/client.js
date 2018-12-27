@@ -16,7 +16,6 @@ window.resources = {
     content: [],
     schemas: [],
     media: [],
-    templates: [],
     forms: [],
     users: []
 };

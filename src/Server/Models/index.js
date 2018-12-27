@@ -17,6 +17,5 @@ module.exports = {
     Resource: require('Common/Models/Resource'),
     Schema: require('Common/Models/Schema'),
     Task: require('./Task'),
-    Template: require('Common/Models/Template'),
     User: require('./User')
 };

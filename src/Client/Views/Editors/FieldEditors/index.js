@@ -19,6 +19,5 @@ module.exports = {
     StringEditor: require('./StringEditor'),
     StructEditor: require('./StructEditor'),
     TagsEditor: require('./TagsEditor'),
-    TemplateReferenceEditor: require('./TemplateReferenceEditor'),
     UrlEditor: require('./UrlEditor')
 };

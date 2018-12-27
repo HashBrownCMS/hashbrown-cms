@@ -106,7 +106,6 @@ window.resources = {
   content: [],
   schemas: [],
   media: [],
-  templates: [],
   forms: [],
   users: []
 }; // Namespaces
@@ -198,8 +197,6 @@ __webpack_require__(4);
 __webpack_require__(5);
 
 __webpack_require__(171);
-
-__webpack_require__(177);
 
 __webpack_require__(179);
 
@@ -460,10 +457,6 @@ function () {
             model = new HashBrown.Models.Content(object);
             break;
 
-          case 'templates':
-            model = new HashBrown.Models.Template(object);
-            break;
-
           case 'forms':
             model = new HashBrown.Models.Form(object);
             break;
@@ -504,7 +497,7 @@ function () {
    */
   RequestHelper.reloadAllResources = function reloadAllResources() {
     $('.page--environment__spinner__messages').empty();
-    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+    var queue = ['content', 'schemas', 'media', 'connections', 'forms', 'users'];
 
     for (var _i = 0; _i < queue.length; _i++) {
       var item = queue[_i];
@@ -22877,6 +22870,16 @@ function (_Resource) {
     this.def(Array, 'hiddenProperties', []);
   };
   /**
+   * Gets a URL safe name for this schema
+   *
+   * @return {String} URL safe name
+   */
+
+
+  _proto.getUrlSafeName = function getUrlSafeName() {
+    return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  };
+  /**
    * Checks whether a property is hidden
    *
    * @param {String} name
@@ -23149,197 +23152,8 @@ function () {
 module.exports = SchemaHelper;
 
 /***/ }),
-/* 177 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var TemplateEditor = __webpack_require__(178);
-
-var RequestHelper = __webpack_require__(3); // Templates
-
-
-Crisp.Router.route('/templates/', function () {
-  if (currentUserHasScope('templates')) {
-    Crisp.View.get('NavbarMain').showTab('/templates/');
-    UI.setEditorSpaceContent([_.h1('Templates'), _.p('Right click in the Templates pane to create a new Template.'), _.p('Click on a Template to edit it.')], 'text');
-  } else {
-    location.hash = '/';
-  }
-}); // Edit
-
-Crisp.Router.route('/templates/:type/:id', function () {
-  var template = HashBrown.Helpers.TemplateHelper.getTemplate(this.type, this.id);
-
-  if (!template) {
-    return UI.errorModal('Template by id "' + this.id + '" could not be found');
-  }
-
-  if (currentUserHasScope('templates')) {
-    Crisp.View.get('NavbarMain').highlightItem('/templates/', template.type + '/' + template.id);
-    var templateEditor = new TemplateEditor({
-      modelUrl: RequestHelper.environmentUrl('templates/' + template.type + '/' + template.name)
-    });
-    UI.setEditorSpaceContent(templateEditor.$element);
-  } else {
-    location.hash = '/';
-  }
-});
-
-/***/ }),
-/* 178 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
-var RequestHelper = __webpack_require__(3);
-/**
- * A Template editor
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-
-var TemplateEditor =
-/*#__PURE__*/
-function (_Crisp$View) {
-  _inheritsLoose(TemplateEditor, _Crisp$View);
-
-  /**
-   * Constructor
-   */
-  function TemplateEditor(params) {
-    var _this;
-
-    _this = _Crisp$View.call(this, params) || this;
-
-    _this.fetch();
-
-    return _this;
-  }
-  /**
-   * Event: Click save. Posts the model to the apiPath
-   */
-
-
-  var _proto = TemplateEditor.prototype;
-
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
-
-    this.$saveBtn.toggleClass('working', true);
-    RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.name, this.model).then(function () {
-      return RequestHelper.reloadResource('templates');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-
-      _this2.$saveBtn.toggleClass('working', false);
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Change text. Make sure the value is up to date
-   */
-
-
-  _proto.onChangeText = function onChangeText() {
-    this.model.markup = this.editor.getDoc().getValue();
-    this.trigger('change', this.model);
-  };
-  /**
-   * Gets the current highlight mode
-   *
-   * @returns {String} Mode
-   */
-
-
-  _proto.getMode = function getMode() {
-    if (this.model.name.indexOf('html') > -1) {
-      return 'xml';
-    }
-
-    if (this.model.name.indexOf('.js') > -1) {
-      return 'javascript';
-    }
-
-    if (this.model.name.indexOf('.pug') > -1 || this.model.name.indexOf('.jade') > -1) {
-      return 'pug';
-    }
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this3 = this;
-
-    return _.div({
-      class: 'editor editor--template'
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-code'
-    }), _.h4({
-      class: 'editor__header__title'
-    }, this.model.name)), _.div({
-      class: 'editor__body'
-    }, _.textarea()), _.if(!this.model.isLocked, _.div({
-      class: 'editor__footer'
-    }, _.div({
-      class: 'editor__footer__buttons'
-    }, // Save
-    this.$saveBtn = _.button({
-      class: 'widget widget--button'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save'), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving')).click(function () {
-      _this3.onClickSave();
-    })))));
-  };
-  /**
-   * Post render
-   */
-
-
-  _proto.postrender = function postrender() {
-    var _this4 = this;
-
-    setTimeout(function () {
-      _this4.editor = CodeMirror.fromTextArea(_this4.element.querySelector('textarea'), {
-        lineNumbers: true,
-        mode: {
-          name: _this4.getMode()
-        },
-        viewportMargin: _this4.embedded ? Infinity : 10,
-        tabSize: 4,
-        indentUnit: 4,
-        indentWithTabs: true,
-        theme: getCookie('cmtheme') || 'default',
-        value: _this4.model.markup
-      });
-
-      _this4.editor.getDoc().setValue(_this4.model.markup);
-
-      _this4.editor.on('change', function () {
-        _this4.onChangeText();
-      });
-
-      _this4.onChangeText();
-    }, 1);
-  };
-
-  return TemplateEditor;
-}(Crisp.View);
-
-module.exports = TemplateEditor;
-
-/***/ }),
+/* 177 */,
+/* 178 */,
 /* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23540,103 +23354,6 @@ function (_Crisp$View) {
               return 'Connection "' + invalidConnections[0] + '" not found';
             } else {
               return 'Connections "' + invalidConnections.join(', ') + '" not found';
-            }
-          }
-
-          break;
-
-        case 'template':
-          if (typeof v === 'string') {
-            for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-              var _ref;
-
-              if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-              } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-              }
-
-              var template = _ref;
-
-              if (template.id == v) {
-                return;
-              }
-            }
-
-            return 'Template "' + v + '" not found';
-          }
-
-          break;
-
-        case 'config':
-          // Backward compatibility adjustment for template configs
-          if (v.resource) {
-            switch (v.resource) {
-              case 'partialTemplates':
-              case 'sectionTemplates':
-                v.type = 'partial';
-                delete v.resource;
-                break;
-
-              case 'templates':
-                v.type = 'page';
-                delete v.resource;
-                break;
-            }
-          } // Allowed templates config
-
-
-          if (v.allowedTemplates) {
-            // Assume that all templates are invalid
-            var invalidTemplates = v.allowedTemplates.slice(0); // Backwards compatibility adjustment
-
-            if (v.resource) {
-              if (v.resource == 'partialTemplates' || v.resource == 'sectionTemplates') {
-                v.type = 'partial';
-              } else {
-                v.type = 'page';
-              }
-
-              delete v.resource;
-            } // Sanity check for type
-
-
-            if (!v.type) {
-              v.type = 'page';
-            } // Loop through all available templates
-
-
-            for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-              var _ref2;
-
-              if (_isArray2) {
-                if (_i2 >= _iterator2.length) break;
-                _ref2 = _iterator2[_i2++];
-              } else {
-                _i2 = _iterator2.next();
-                if (_i2.done) break;
-                _ref2 = _i2.value;
-              }
-
-              var existingTemplate = _ref2;
-
-              for (var a = invalidTemplates.length - 1; a >= 0; a--) {
-                // If a template was found, and it's of the correct type, remove it from the invalid templates array
-                if (existingTemplate.type == v.type && existingTemplate.id == invalidTemplates[a]) {
-                  invalidTemplates.splice(a, 1);
-                }
-              }
-            }
-
-            if (invalidTemplates.length > 0) {
-              if (invalidTemplates.length == 1) {
-                return 'Template "' + invalidTemplates[0] + '" of type "' + v.type + '" not found';
-              } else {
-                return 'Templates "' + invalidTemplates.join(', ') + '" of type "' + v.type + '" not found';
-              }
             }
           }
 
@@ -28619,7 +28336,6 @@ module.exports = {
   Processor: __webpack_require__(192),
   Project: __webpack_require__(195),
   Schema: __webpack_require__(174),
-  Template: __webpack_require__(196),
   User: __webpack_require__(197)
 };
 
@@ -28926,6 +28642,7 @@ function (_Resource) {
     return {
       id: this.id,
       parentId: this.parentId,
+      schemaId: this.schemaId,
       createDate: this.createDate,
       updateDate: this.updateDate,
       createdBy: this.createdBy,
@@ -29015,19 +28732,7 @@ function (_Resource) {
 
             target[key] = value[language]; // If not, recurse into the object
           } else {
-            // If this value was created with the ArrayEditor, filter out Schema ids
-            // by assigning the "value" of each item directly to the array
-            if (Array.isArray(value)) {
-              for (var i in value) {
-                if (!value[i].value) {
-                  continue;
-                }
-
-                value[i] = value[i].value;
-              }
-            } // Prepare target data type for either Object or Array
-
-
+            // Prepare target data type for either Object or Array
             if (Array.isArray(value)) {
               target[key] = [];
             } else {
@@ -29170,20 +28875,7 @@ function (_Resource) {
 
 
   Connection.paramsCheck = function paramsCheck(params) {
-    // Backwards compatibility: Convert from old structure
-    if (params.type || params.preset) {
-      params.settings = params.settings || {};
-      params.settings.url = params.settings.url || params.url;
-      var newParams = this.getPresetSettings(params.type || params.preset, params.settings);
-      newParams.id = params.id;
-      newParams.title = params.title;
-      newParams.url = params.url;
-      newParams.isLocked = params.isLocked;
-      newParams.sync = params.sync;
-      params = newParams;
-    } // Deployer and processor
-
-
+    // Deployer and processor
     if (!params.processor) {
       params.processor = {};
     }
@@ -29196,84 +28888,7 @@ function (_Resource) {
       params.deployer.paths = {};
     }
 
-    if (!params.deployer.paths.templates) {
-      params.deployer.paths.templates = {};
-    }
-
     return _Resource.paramsCheck.call(this, params);
-  };
-  /**
-   * Gets preset settings
-   *
-   * @param {String} preset
-   * @param {Object} oldSettings
-   */
-
-
-  Connection.getPresetSettings = function getPresetSettings(preset, oldSettings) {
-    oldSettings = oldSettings || {};
-    var settings;
-
-    switch (preset) {
-      case 'GitHub Pages':
-        settings = {
-          processor: {
-            alias: 'jekyll',
-            fileExtension: '.md'
-          },
-          deployer: oldSettings.isLocal ? {
-            alias: 'filesystem',
-            rootPath: oldSettings.localPath,
-            paths: {
-              templates: {
-                partial: '/_includes/partials/',
-                page: '/_layouts/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          } : {
-            alias: 'github',
-            token: oldSettings.token || '',
-            org: oldSettings.org || '',
-            repo: oldSettings.repo || '',
-            branch: oldSettings.branch || '',
-            paths: {
-              templates: {
-                partial: '/_includes/partials/',
-                page: '/_layouts/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          }
-        };
-        break;
-
-      case 'HashBrown Driver':
-        settings = {
-          processor: {
-            alias: 'json',
-            fileExtension: ''
-          },
-          deployer: {
-            alias: 'api',
-            url: (oldSettings.url || 'https://example.com') + '/api/',
-            token: oldSettings.token || '',
-            paths: {
-              templates: {
-                partial: '/templates/partial/',
-                page: '/templates/page/'
-              },
-              content: '/content/',
-              media: '/media/'
-            }
-          }
-        };
-        break;
-    }
-
-    return settings;
   };
   /**
    * Creates a new Connection object
@@ -29454,10 +29069,6 @@ function (_Entity) {
       _this.paths = {};
     }
 
-    if (!_this.paths.templates) {
-      _this.paths.templates = {};
-    }
-
     return _this;
   }
   /**
@@ -29471,10 +29082,6 @@ function (_Entity) {
     this.def(String, 'name');
     this.def(String, 'alias');
     this.def(Object, 'paths', {
-      templates: {
-        page: '',
-        partial: ''
-      },
       media: '',
       content: ''
     });
@@ -29897,84 +29504,7 @@ function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 196 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
-var Resource = __webpack_require__(11);
-/**
- * The Template model
- *
- * @memberof HashBrown.Common.Models
- */
-
-
-var Template =
-/*#__PURE__*/
-function (_Resource) {
-  _inheritsLoose(Template, _Resource);
-
-  function Template(params) {
-    var _this;
-
-    _this = _Resource.call(this, params) || this;
-
-    _this.updateId();
-
-    return _this;
-  }
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  Template.paramsCheck = function paramsCheck(params) {
-    params = _Resource.paramsCheck.call(this, params);
-    delete params.remote;
-    delete params.sync;
-    delete params.isRemote;
-    return params;
-  };
-  /**
-   * Structure
-   */
-
-
-  var _proto = Template.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'parentId');
-    this.def(String, 'icon', 'code');
-    this.def(String, 'name');
-    this.def(String, 'type');
-    this.def(String, 'remotePath');
-    this.def(String, 'folder');
-    this.def(String, 'markup');
-  };
-  /**
-   * Updates id from name
-   */
-
-
-  _proto.updateId = function updateId() {
-    this.id = this.name.substring(0, this.name.lastIndexOf('.'));
-  };
-
-  return Template;
-}(Resource);
-
-module.exports = Template;
-
-/***/ }),
+/* 196 */,
 /* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -32611,8 +32141,7 @@ module.exports = {
   MediaPane: __webpack_require__(228),
   NavbarMain: __webpack_require__(220),
   NavbarPane: __webpack_require__(219),
-  SchemaPane: __webpack_require__(229),
-  TemplatePane: __webpack_require__(230)
+  SchemaPane: __webpack_require__(229)
 };
 
 /***/ }),
@@ -33017,7 +32546,6 @@ function (_Crisp$View) {
     HashBrown.Views.Navigation.ContentPane.init();
     HashBrown.Views.Navigation.MediaPane.init();
     HashBrown.Views.Navigation.FormsPane.init();
-    HashBrown.Views.Navigation.TemplatePane.init();
     HashBrown.Views.Navigation.ConnectionPane.init();
     HashBrown.Views.Navigation.SchemaPane.init();
 
@@ -33519,7 +33047,6 @@ module.exports = function () {
   var currentProject = HashBrown.Helpers.ProjectHelper.currentProject;
   var hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
   var hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-  var hasTemplatesScope = currentUser.hasScope(currentProject, 'templates');
   var hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
   return _.nav({
     class: 'navbar-main'
@@ -33557,7 +33084,9 @@ module.exports = function () {
       'data-route': pane.route
     }, // Filter/sort bar
     _.div({
-      class: 'navbar-main__pane__filter-sort-bar widget-group'
+      class: 'navbar-main__pane__filter-sort-bar'
+    }, _.div({
+      class: 'widget-group'
     }, new HashBrown.Views.Widgets.Input({
       placeholder: 'Filter',
       onChange: function onChange(newValue) {
@@ -33576,7 +33105,7 @@ module.exports = function () {
       onChange: function onChange(newValue) {
         _this.onChangeSorting($pane, pane, newValue);
       }
-    })), // Move buttons
+    }))), // Move buttons
     _.div({
       class: 'navbar-main__pane__move-buttons widget-group'
     }, _.button({
@@ -34758,12 +34287,8 @@ function (_Crisp$View) {
         UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
         break;
 
-      case 'templates':
-        UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.p('Templates are served through the Connection assigned as the Template provider.')]);
-        break;
-
       case 'connections':
-        UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('They can also be set up to provide statically hosted media and serve rendering templates.')]);
+        UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('They can also be set up to provide statically hosted media.')]);
         break;
 
       case 'schemas':
@@ -34844,9 +34369,6 @@ function (_Crisp$View) {
         },
         'Schemas': function Schemas() {
           _this3.onClickQuestion('schemas');
-        },
-        'Templates': function Templates() {
-          _this3.onClickQuestion('templates');
         }
       }
     }));
@@ -34957,7 +34479,7 @@ function (_HashBrown$Views$Moda) {
       value: this.model.getScopes(project),
       useMultiple: true,
       placeholder: '(no scopes)',
-      options: ['connections', 'schemas', 'templates'],
+      options: ['connections', 'schemas'],
       onChange: function onChange(newValue) {
         _this4.model.scopes[project] = newValue;
 
@@ -35541,273 +35063,7 @@ function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 230 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
-var RequestHelper = __webpack_require__(3);
-
-var NavbarPane = __webpack_require__(219);
-
-var NavbarMain = __webpack_require__(220);
-/**
- * The Template navbar pane
- * 
- * @memberof HashBrown.Client.Views.Navigation
- */
-
-
-var TemplatePane =
-/*#__PURE__*/
-function (_NavbarPane) {
-  _inheritsLoose(TemplatePane, _NavbarPane);
-
-  function TemplatePane() {
-    return _NavbarPane.apply(this, arguments) || this;
-  }
-
-  /**
-   * Event: Click add Template
-   */
-  TemplatePane.onClickAddTemplate = function onClickAddTemplate() {
-    var newTemplate = new HashBrown.Models.Template({
-      type: 'page',
-      name: 'myTemplate.html'
-    });
-    UI.confirmModal('add', 'Add new template', [_.div({
-      class: 'widget-group'
-    }, _.label({
-      class: 'widget widget--label'
-    }, 'Type'), new HashBrown.Views.Widgets.Dropdown({
-      options: ['page', 'partial'],
-      value: newTemplate.type,
-      onChange: function onChange(newValue) {
-        newTemplate.type = newValue;
-      }
-    }).$element), _.div({
-      class: 'widget-group'
-    }, _.label({
-      class: 'widget widget--label'
-    }, 'Name'), new HashBrown.Views.Widgets.Input({
-      placeholder: 'Template name',
-      value: newTemplate.name,
-      type: 'text',
-      onChange: function onChange(newValue) {
-        newTemplate.name = newValue;
-      }
-    }).$element)], function () {
-      newTemplate.updateId(); // Sanity check
-
-      if (!newTemplate.type || !newTemplate.name || newTemplate.name.length < 2) {
-        return false;
-      } // Look for duplicate id
-
-
-      for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var template = _ref;
-
-        if (template.id == newTemplate.id && template.type == newTemplate.type) {
-          return UI.errorModal(new Error('A Template of type "' + template.type + '" and name "' + template.name + '" already exists'));
-        }
-      }
-
-      RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.name, newTemplate).then(function () {
-        return RequestHelper.reloadResource('templates');
-      }).then(function () {
-        NavbarMain.reload();
-        location.hash = '/templates/' + newTemplate.type + '/' + newTemplate.id;
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: On click remove Template
-   */
-
-
-  TemplatePane.onClickRemoveTemplate = function onClickRemoveTemplate() {
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
-    var model;
-
-    for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var template = _ref2;
-
-      if (template.id == id && template.type == type) {
-        model = template;
-      }
-    }
-
-    if (!model) {
-      return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-    }
-
-    UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', function () {
-      RequestHelper.request('delete', 'templates/' + model.type + '/' + model.name).then(function () {
-        $element.parent().remove();
-        return RequestHelper.reloadResource('templates');
-      }).then(function () {
-        NavbarMain.reload(); // Cancel the TemplateEditor view if it was displaying the deleted Template
-
-        if (location.hash == '#/templates/' + model.type + '/' + model.id) {
-          location.hash = '/templates/';
-        }
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: On click rename Template
-   */
-
-
-  TemplatePane.onClickRenameTemplate = function onClickRenameTemplate() {
-    var id = $('.context-menu-target').data('id');
-    var type = $('.context-menu-target').parent().data('routing-path').split('/')[0];
-    var model = HashBrown.Helpers.TemplateHelper.getTemplate(type, id);
-
-    if (!model) {
-      return UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
-    }
-
-    var oldName = model.name;
-    UI.confirmModal('rename', 'Rename "' + model.name + '"', _.div({
-      class: 'widget-group'
-    }, _.label({
-      class: 'widget widget--label'
-    }, 'New name'), new HashBrown.Views.Widgets.Input({
-      value: model.name,
-      placeholder: 'Enter Template name',
-      onChange: function onChange(newValue) {
-        model.name = newValue;
-      }
-    }).$element), function () {
-      RequestHelper.request('post', 'templates/' + type + '/' + model.name + (oldName ? '?oldName=' + oldName : ''), model).then(function (newTemplate) {
-        return RequestHelper.reloadResource('templates');
-      }).then(function () {
-        NavbarMain.reload(); // Go to new Template if TemplateEditor was showing the old one
-
-        var templateEditor = Crisp.View.get('TemplateEditor');
-
-        if (templateEditor && templateEditor.model.id == model.id) {
-          model.updateId();
-
-          if (model.id == templateEditor.model.id) {
-            templateEditor.model = null;
-            templateEditor.fetch();
-          } else {
-            location.hash = '/templates/' + model.type + '/' + model.id;
-          }
-        }
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Init
-   */
-
-
-  TemplatePane.init = function init() {
-    var _this = this;
-
-    if (!currentUserHasScope('templates')) {
-      return;
-    }
-
-    NavbarMain.addTabPane('/templates/', 'Templates', 'code', {
-      getItems: function getItems() {
-        return resources.templates;
-      },
-      // Item path
-      itemPath: function itemPath(item) {
-        return item.type + '/' + item.id;
-      },
-      // Hierarchy logic
-      hierarchy: function hierarchy(item, queueItem) {
-        queueItem.$element.attr('data-template-id', item.id);
-        queueItem.$element.attr('data-remote', true);
-        var rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
-        var parentDirName = item.parentId;
-
-        if (!item.parentId) {
-          queueItem.createDir = true;
-          parentDirName = item.folder ? rootDirName + '/' + item.folder : rootDirName;
-        }
-
-        queueItem.parentDirAttr = {
-          'data-template-id': parentDirName
-        };
-        queueItem.parentDirExtraAttr = {
-          'data-remote': true
-        };
-      },
-      // Item context menu
-      itemContextMenu: {
-        'This template': '---',
-        'Open in new tab': function OpenInNewTab() {
-          _this.onClickOpenInNewTab();
-        },
-        'Rename': function Rename() {
-          _this.onClickRenameTemplate();
-        },
-        'Remove': function Remove() {
-          _this.onClickRemoveTemplate();
-        },
-        'Copy id': function CopyId() {
-          _this.onClickCopyItemId();
-        },
-        'General': '---',
-        'Add template': function AddTemplate() {
-          _this.onClickAddTemplate();
-        },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('templates');
-        }
-      },
-      // General context menu
-      paneContextMenu: {
-        'Templates': '---',
-        'Add template': function AddTemplate() {
-          _this.onClickAddTemplate();
-        },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('templates');
-        }
-      }
-    });
-  };
-
-  return TemplatePane;
-}(NavbarPane);
-
-module.exports = TemplatePane;
-
-/***/ }),
+/* 230 */,
 /* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -35826,7 +35082,6 @@ module.exports = {
   JSONEditor: __webpack_require__(180),
   MediaViewer: __webpack_require__(6),
   SchemaEditor: __webpack_require__(237),
-  TemplateEditor: __webpack_require__(178),
   UserEditor: __webpack_require__(227)
 };
 
@@ -35889,51 +35144,24 @@ function (_Crisp$View) {
     }).catch(UI.errorModal);
   };
   /**
-   * Renders the Template provider editor
+   * Renders the Media provider editor
    */
 
 
-  _proto.renderTemplateProviderEditor = function renderTemplateProviderEditor() {
+  _proto.renderMediaProviderEditor = function renderMediaProviderEditor() {
     var _this3 = this;
 
     var input = new HashBrown.Views.Widgets.Input({
       value: false,
       type: 'checkbox',
       onChange: function onChange(isProvider) {
-        ConnectionHelper.setTemplateProvider(isProvider ? _this3.model.id : null).catch(UI.errorModal);
-      }
-    }); // Set the value
-
-    input.$element.toggleClass('working', true);
-    ConnectionHelper.getTemplateProvider().then(function (connection) {
-      if (connection && connection.id === _this3.model.id) {
-        input.value = true;
-        input.fetch();
-      }
-
-      input.$element.toggleClass('working', false);
-    });
-    return input.$element;
-  };
-  /**
-   * Renders the Media provider editor
-   */
-
-
-  _proto.renderMediaProviderEditor = function renderMediaProviderEditor() {
-    var _this4 = this;
-
-    var input = new HashBrown.Views.Widgets.Input({
-      value: false,
-      type: 'checkbox',
-      onChange: function onChange(isProvider) {
-        ConnectionHelper.setMediaProvider(isProvider ? _this4.model.id : null).catch(UI.errorModal);
+        ConnectionHelper.setMediaProvider(isProvider ? _this3.model.id : null).catch(UI.errorModal);
       }
     }); // Set the value
 
     input.$element.toggleClass('working', true);
     ConnectionHelper.getMediaProvider().then(function (connection) {
-      if (connection && connection.id === _this4.model.id) {
+      if (connection && connection.id === _this3.model.id) {
         input.value = true;
         input.fetch();
       }
@@ -35948,12 +35176,12 @@ function (_Crisp$View) {
 
 
   _proto.renderTitleEditor = function renderTitleEditor() {
-    var _this5 = this;
+    var _this4 = this;
 
     return new HashBrown.Views.Widgets.Input({
       value: this.model.title,
       onChange: function onChange(newValue) {
-        _this5.model.title = newValue;
+        _this4.model.title = newValue;
       }
     }).$element;
   };
@@ -35963,12 +35191,12 @@ function (_Crisp$View) {
 
 
   _proto.renderUrlEditor = function renderUrlEditor() {
-    var _this6 = this;
+    var _this5 = this;
 
     return new HashBrown.Views.Widgets.Input({
       value: this.model.url,
       onChange: function onChange(newValue) {
-        _this6.model.url = newValue;
+        _this5.model.url = newValue;
       }
     }).$element;
   };
@@ -35978,7 +35206,7 @@ function (_Crisp$View) {
 
 
   _proto.renderProcessorSettingsEditor = function renderProcessorSettingsEditor() {
-    var _this7 = this;
+    var _this6 = this;
 
     return [_.div({
       class: 'editor__field'
@@ -35993,9 +35221,9 @@ function (_Crisp$View) {
       labelKey: 'name',
       placeholder: 'Type',
       onChange: function onChange(newValue) {
-        _this7.model.processor.alias = newValue;
+        _this6.model.processor.alias = newValue;
 
-        _this7.fetch();
+        _this6.fetch();
       }
     }).$element)), _.div({
       class: 'editor__field'
@@ -36006,19 +35234,19 @@ function (_Crisp$View) {
     }, 'File extension'), _.div({
       class: 'editor__field__key__description'
     }, 'A file extension such as .json or .xml')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
-      if (editor.alias !== _this7.model.processor.alias) {
+      if (editor.alias !== _this6.model.processor.alias) {
         return;
       }
 
       return new editor({
-        model: _this7.model.processor
+        model: _this6.model.processor
       }).$element;
     }), _.div({
       class: 'editor__field__value'
     }, new HashBrown.Views.Widgets.Input({
       value: this.model.processor.fileExtension,
       onChange: function onChange(newValue) {
-        _this7.model.processor.fileExtension = newValue;
+        _this6.model.processor.fileExtension = newValue;
       }
     })))];
   };
@@ -36028,7 +35256,7 @@ function (_Crisp$View) {
 
 
   _proto.renderDeployerSettingsEditor = function renderDeployerSettingsEditor() {
-    var _this8 = this;
+    var _this7 = this;
 
     return [_.div({
       class: 'editor__field'
@@ -36043,20 +35271,20 @@ function (_Crisp$View) {
       labelKey: 'name',
       placeholder: 'Type',
       onChange: function onChange(newValue) {
-        _this8.model.deployer.alias = newValue;
+        _this7.model.deployer.alias = newValue;
 
-        _this8.fetch();
+        _this7.fetch();
       }
     }).$element)), _.each(HashBrown.Views.Editors.DeployerEditors, function (name, editor) {
-      if (editor.alias !== _this8.model.deployer.alias) {
+      if (editor.alias !== _this7.model.deployer.alias) {
         return;
       }
 
       return new editor({
-        model: _this8.model.deployer
+        model: _this7.model.deployer
       }).$element;
     }), _.do(function () {
-      if (!_this8.model.deployer || !_this8.model.deployer.paths) {
+      if (!_this7.model.deployer || !_this7.model.deployer.paths) {
         return;
       }
 
@@ -36077,9 +35305,9 @@ function (_Crisp$View) {
       }, 'Content'), _.div({
         class: 'editor__field__value'
       }, new HashBrown.Views.Widgets.Input({
-        value: _this8.model.deployer.paths.content,
+        value: _this7.model.deployer.paths.content,
         onChange: function onChange(newValue) {
-          _this8.model.deployer.paths.content = newValue;
+          _this7.model.deployer.paths.content = newValue;
         }
       }))), _.div({
         class: 'editor__field'
@@ -36088,31 +35316,9 @@ function (_Crisp$View) {
       }, 'Media'), _.div({
         class: 'editor__field__value'
       }, new HashBrown.Views.Widgets.Input({
-        value: _this8.model.deployer.paths.media,
+        value: _this7.model.deployer.paths.media,
         onChange: function onChange(newValue) {
-          _this8.model.deployer.paths.media = newValue;
-        }
-      }))), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Page templates'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        value: _this8.model.deployer.paths.templates.page,
-        onChange: function onChange(newValue) {
-          _this8.model.deployer.paths.templates.page = newValue;
-        }
-      }))), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Partial templates'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        value: _this8.model.deployer.paths.templates.partial,
-        onChange: function onChange(newValue) {
-          _this8.model.deployer.paths.templates.partial = newValue;
+          _this7.model.deployer.paths.media = newValue;
         }
       })))));
     })];
@@ -36133,7 +35339,7 @@ function (_Crisp$View) {
 
 
   _proto.template = function template() {
-    var _this9 = this;
+    var _this8 = this;
 
     return _.div({
       class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '')
@@ -36146,12 +35352,6 @@ function (_Crisp$View) {
     }, this.model.title)), _.div({
       class: 'editor__body'
     }, _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Is Template provider'), _.div({
-      class: 'editor__field__value'
-    }, this.renderTemplateProviderEditor())), _.div({
       class: 'editor__field'
     }, _.div({
       class: 'editor__field__key'
@@ -36196,7 +35396,7 @@ function (_Crisp$View) {
     }, _.button({
       class: 'widget widget--button embedded'
     }, 'Advanced').click(function () {
-      _this9.onClickAdvanced();
+      _this8.onClickAdvanced();
     }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
       class: 'widget widget--button editor__footer__buttons__save'
     }, _.span({
@@ -36204,7 +35404,7 @@ function (_Crisp$View) {
     }, 'Save '), _.span({
       class: 'widget--button__text-working'
     }, 'Saving ')).click(function () {
-      _this9.onClickSave();
+      _this8.onClickSave();
     })))));
   };
 
@@ -36325,32 +35525,6 @@ function (_ConnectionHelperComm) {
   ConnectionHelper.getMediaProvider = function getMediaProvider() {
     return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
   };
-  /**
-   * Sets the Template provider
-   *
-   * @param {String} id
-   *
-   * @returns {Promise}
-   */
-
-
-  ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
-    return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-      return RequestHelper.reloadResource('templates');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    });
-  };
-  /**
-   * Gets the Template provider
-   *
-   * @returns {Promise} Connection
-   */
-
-
-  ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
-    return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
-  };
 
   return ConnectionHelper;
 }(ConnectionHelperCommon);
@@ -36391,63 +35565,6 @@ function () {
     return Promise.resolve();
   };
   /**
-   * Sets the Template provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   *
-   * @return {Promise} Promise
-   */
-
-
-  ConnectionHelper.setTemplateProvider = function setTemplateProvider(project, environment, id) {
-    if (id === void 0) {
-      id = null;
-    }
-
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
-      providers = providers || {};
-      providers.template = id;
-      return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
-    });
-  };
-  /**
-   * Gets the Template provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @return {Promise} Connection object
-   */
-
-
-  ConnectionHelper.getTemplateProvider = function getTemplateProvider(project, environment) {
-    var _this = this;
-
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers') // Previously, providers were set project-wide, so retrieve automatically if needed
-    .then(function (providers) {
-      if (!providers) {
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
-      } else {
-        return Promise.resolve(providers);
-      }
-    }) // Return requested provider
-    .then(function (providers) {
-      providers = providers || {};
-
-      if (providers.template) {
-        return _this.getConnectionById(project, environment, providers.template);
-      } else {
-        return Promise.resolve(null);
-      }
-    });
-  };
-  /**
    * Sets the Media provider
    *
    * @param {String} project
@@ -36482,7 +35599,7 @@ function () {
 
 
   ConnectionHelper.getMediaProvider = function getMediaProvider(project, environment) {
-    var _this2 = this;
+    var _this = this;
 
     checkParam(project, 'project', String);
     checkParam(environment, 'environment', String);
@@ -36498,7 +35615,7 @@ function () {
       providers = providers || {};
 
       if (providers.media) {
-        return _this2.getConnectionById(project, environment, providers.media);
+        return _this.getConnectionById(project, environment, providers.media);
       } else {
         return Promise.resolve(null);
       }
@@ -37589,13 +36706,21 @@ function (_Crisp$View) {
     }
 
     this.$saveBtn.toggleClass('working', true);
-    RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
+    RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model).then(function () {
       _this2.$saveBtn.toggleClass('working', false);
 
       return RequestHelper.reloadResource('schemas');
     }).then(function () {
-      Crisp.View.get('NavbarMain').reload();
-    }).catch(UI.errorModal);
+      Crisp.View.get('NavbarMain').reload(); // If id changed, change the hash
+
+      if (Crisp.Router.params.id != _this2.model.id) {
+        location.hash = '/schemas/' + _this2.model.id;
+      }
+    }).catch(function (e) {
+      UI.errorModal(e);
+
+      _this2.$saveBtn.toggleClass('working', false);
+    });
   };
   /**
    * Renders the icon editor
@@ -37623,12 +36748,13 @@ function (_Crisp$View) {
    * @param {String} label
    * @param {HTMLElement} content
    * @param {Boolean} isVertical
+   * @param {Boolean} isLocked
    *
    * @return {HTMLElement} Editor element
    */
 
 
-  _proto.renderField = function renderField(label, $content, isVertical) {
+  _proto.renderField = function renderField(label, $content, isVertical, isLocked) {
     if (!$content) {
       return;
     }
@@ -37639,7 +36765,12 @@ function (_Crisp$View) {
       class: 'editor__field__key'
     }, label), _.div({
       class: 'editor__field__value'
-    }, $content));
+    }, _.if(isLocked, _.input({
+      class: 'editor__field__value__lock',
+      title: 'Only edit this field if you know what you\'re doing',
+      type: 'checkbox',
+      checked: true
+    })), $content));
   };
   /**
    * Renders all fields
@@ -37658,6 +36789,12 @@ function (_Crisp$View) {
     });
 
     $element.empty();
+    $element.append(this.renderField('Id', new HashBrown.Views.Widgets.Input({
+      value: this.model.id,
+      onChange: function onChange(newValue) {
+        _this4.model.id = newValue;
+      }
+    }).$element, false, true));
     $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
       value: this.model.name,
       onChange: function onChange(newValue) {
@@ -37851,7 +36988,6 @@ module.exports = {
   StringEditor: __webpack_require__(254),
   StructEditor: __webpack_require__(255),
   TagsEditor: __webpack_require__(256),
-  TemplateReferenceEditor: __webpack_require__(257),
   UrlEditor: __webpack_require__(258)
 };
 
@@ -40716,231 +39852,7 @@ function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 257 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
-var FieldEditor = __webpack_require__(241);
-/**
- * An editor for referencing templates
- *
- * @description Example:
- * <pre>
- * {
- *     "myTemplateReference": {
- *         "label": "My template reference",
- *         "tabId": "content",
- *         "schemaId": "templateReference",
- *         {
- *             "type": "page" || "partial",
- *             "allowedTemplates": [ "myPageTemplate", "myOtherPageTemplate" ]
- *         }
- *     }
- * }
- * </pre>
- *
- * @memberof HashBrown.Client.Views.Editors.FieldEditors
- */
-
-
-var TemplateReferenceEditor =
-/*#__PURE__*/
-function (_FieldEditor) {
-  _inheritsLoose(TemplateReferenceEditor, _FieldEditor);
-
-  /**
-   * Constructor
-   */
-  function TemplateReferenceEditor(params) {
-    var _this;
-
-    _this = _FieldEditor.call(this, params) || this;
-
-    _this.fetch();
-
-    return _this;
-  }
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
-
-
-  TemplateReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.type = config.type || 'page';
-    config.allowedTemplates = config.allowedTemplates || [];
-
-    var $element = _.div();
-
-    var render = function render() {
-      _.append($element.empty(), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Type'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Dropdown({
-        options: ['page', 'partial'],
-        value: config.type,
-        onChange: function onChange(newType) {
-          config.type = newType;
-          render();
-        }
-      }).$element)), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Allowed Templates'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Dropdown({
-        options: HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type),
-        value: config.allowedTemplates,
-        labelKey: 'name',
-        valueKey: 'id',
-        useMultiple: true,
-        useClearButton: true,
-        useTypeAhead: true,
-        onChange: function onChange(newValue) {
-          config.allowedTemplates = newValue;
-        }
-      }))));
-    };
-
-    render();
-    return $element;
-  };
-  /**
-   * Sanity check
-   */
-
-
-  var _proto = TemplateReferenceEditor.prototype;
-
-  _proto.sanityCheck = function sanityCheck() {
-    var _this2 = this;
-
-    // Sanity check for template type
-    this.config.type = this.config.type || 'page'; // Backwards compatibility check for template type
-
-    if (this.config.resource == 'partialTemplates' || this.config.resource == 'sectionTemplates') {
-      this.config.type = 'partial';
-    } // Sanity check for allowed templates
-
-
-    if (!this.config.allowedTemplates) {
-      this.config.allowedTemplates = [];
-    } // If no allowed template is set, apply the first of the allowed templates
-
-
-    if (!this.value || this.config.allowedTemplates.indexOf(this.value) < 0) {
-      // This will be null if no allwoed templates are set
-      this.value = this.config.allowedTemplates[0]; // Apply changes on next CPU cycle
-
-      setTimeout(function () {
-        _this2.trigger('silentchange', _this2.value);
-      }, 500);
-    }
-  };
-  /**
-   * Generates dropdown options
-   *
-   * @returns {Array} Options
-   */
-
-
-  _proto.getOptions = function getOptions() {
-    var dropdownOptions = [];
-
-    for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var template = _ref;
-      var isAllowed = this.config.type == template.type && this.config.allowedTemplates.indexOf(template.id) > -1;
-
-      if (!isAllowed) {
-        continue;
-      }
-
-      dropdownOptions[dropdownOptions.length] = template;
-    }
-
-    return dropdownOptions;
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    this.sanityCheck();
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this3 = this;
-
-    // If no templates are available, display a warning
-    if (resources.templates.length < 1) {
-      return _.div({
-        class: 'editor__field__value'
-      }, _.span({
-        class: 'editor__field__value__warning',
-        title: 'You need to set up your Connection to provide Templates before they can be used'
-      }, 'No templates available'));
-    } // If no allowed templates are configured, display a warning
-
-
-    if (this.config.allowedTemplates.length < 1) {
-      return _.div({
-        class: 'editor__field__value'
-      }, _.span({
-        class: 'editor__field__value__warning',
-        title: 'You need to add some allowed Templates to this Content Schema'
-      }, 'No allowed templates configured'));
-    }
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      useTypeAhead: true,
-      value: this.value,
-      tooltip: this.description || '',
-      options: this.getOptions(),
-      labelKey: 'name',
-      valueKey: 'id',
-      onChange: function onChange(newValue) {
-        _this3.value = newValue;
-
-        _this3.trigger('change', _this3.value);
-      }
-    }).$element);
-  };
-
-  return TemplateReferenceEditor;
-}(FieldEditor);
-
-module.exports = TemplateReferenceEditor;
-
-/***/ }),
+/* 257 */,
 /* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -41221,7 +40133,6 @@ module.exports = {
   RequestHelper: __webpack_require__(3),
   SchemaHelper: __webpack_require__(172),
   SettingsHelper: __webpack_require__(208),
-  TemplateHelper: __webpack_require__(263),
   UIHelper: __webpack_require__(264)
 };
 
@@ -42292,100 +41203,7 @@ function () {
 module.exports = MarkdownHelper;
 
 /***/ }),
-/* 263 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * A helper class for Template resources
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var TemplateHelper =
-/*#__PURE__*/
-function () {
-  function TemplateHelper() {}
-
-  /**
-   * Gets all templates
-   *
-   * @param {String} type
-   *
-   * @returns {Array} Templates
-   */
-  TemplateHelper.getAllTemplates = function getAllTemplates(type) {
-    if (!type) {
-      return resources.templates;
-    }
-
-    var templates = [];
-
-    for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var template = _ref;
-
-      if (template.type !== type) {
-        continue;
-      }
-
-      templates.push(template);
-    }
-
-    return templates;
-  };
-  /**
-   * Gets a template by id
-   *
-   * @param {String} type
-   * @param {String} id
-   *
-   * @returns {Template} Template
-   */
-
-
-  TemplateHelper.getTemplate = function getTemplate(type, id) {
-    for (var _iterator2 = resources.templates, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var template = _ref2;
-
-      if (template.type !== type || template.id !== id) {
-        continue;
-      }
-
-      return template;
-    }
-
-    return null;
-  };
-
-  return TemplateHelper;
-}();
-
-module.exports = TemplateHelper;
-
-/***/ }),
+/* 263 */,
 /* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 

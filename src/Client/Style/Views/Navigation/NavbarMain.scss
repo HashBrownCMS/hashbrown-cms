@@ -169,6 +169,11 @@
             margin: 0 !important;
             padding: 0.5rem 0.5rem 0.5rem 0;
             background-color: $secondary;
+
+            // Tablet mode
+            @media($sm) {
+                display: none;
+            }   
         }
 
         // Move buttons

@@ -22,14 +22,6 @@
                 "label": "URL",
                 "schemaId": "url",
                 "tabId": "content"
-            },
-            "template": {
-                "label": "Template",
-                "schemaId": "templateReference",
-                "tabId": "content",
-                "config": {
-                    "allowedTemplates": []
-                }
             }
         }
     }

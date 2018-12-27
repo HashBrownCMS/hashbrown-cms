@@ -11,6 +11,5 @@ module.exports = {
     MediaPane: require('./MediaPane'),
     NavbarMain: require('./NavbarMain'),
     NavbarPane: require('./NavbarPane'),
-    SchemaPane: require('./SchemaPane'),
-    TemplatePane: require('./TemplatePane')
+    SchemaPane: require('./SchemaPane')
 };

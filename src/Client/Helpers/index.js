@@ -14,6 +14,5 @@ module.exports = {
     RequestHelper: require('./RequestHelper'),
     SchemaHelper: require('./SchemaHelper'),
     SettingsHelper: require('./SettingsHelper'),
-    TemplateHelper: require('./TemplateHelper'),
     UIHelper: require('./UIHelper')
 };

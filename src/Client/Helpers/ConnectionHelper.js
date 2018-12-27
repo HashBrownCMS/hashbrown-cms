@@ -95,38 +95,6 @@ class ConnectionHelper extends ConnectionHelperCommon {
             ProjectHelper.currentEnvironment
         );
     }
-    
-    /**
-     * Sets the Template provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-    static setTemplateProvider(id) {
-        return super.setTemplateProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment,
-            id
-        ).then(() => {
-            return RequestHelper.reloadResource('templates');  
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();  
-        });
-    }
-    
-    /**
-     * Gets the Template provider
-     *
-     * @returns {Promise} Connection
-     */
-    static getTemplateProvider() {
-        return super.getTemplateProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment
-        );
-    }
 }
 
 module.exports = ConnectionHelper;

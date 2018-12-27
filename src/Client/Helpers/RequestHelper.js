@@ -189,10 +189,6 @@ class RequestHelper {
                         model = new HashBrown.Models.Content(object);
                         break;
 
-                    case 'templates':
-                        model = new HashBrown.Models.Template(object);
-                        break;
-                    
                     case 'forms':
                         model = new HashBrown.Models.Form(object);
                         break;
@@ -241,7 +237,6 @@ class RequestHelper {
             'schemas',
             'media',
             'connections',
-            'templates',
             'forms',
             'users'
         ];

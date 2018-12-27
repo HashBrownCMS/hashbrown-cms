@@ -80,8 +80,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             placeholder: '(no scopes)',
             options: [
                 'connections',
-                'schemas',
-                'templates'
+                'schemas'
             ],
             onChange: (newValue) => {
                 this.model.scopes[project] = newValue;

@@ -366,7 +366,34 @@ class SchemaHelper extends SchemaHelperCommon {
     }
     
     /**
-     * Sets a schema object by id
+     * Checks if a Schema is being updated with an id that already exists
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} oldId
+     * @param {String} newId
+     *
+     * @return {Promise} Check result
+     */
+    static duplicateIdCheck(project, environment, oldId, newId) { 
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(oldId, 'oldId', String);
+        checkParam(newId, 'newId', String);
+        
+        // If the id wasn't updated, skip the check{
+        if(oldId === newId) {
+            return Promise.resolve(false);
+        }
+
+        return this.getSchemaById(project, environment, newId)
+        .then((existingSchema) => {
+            return Promise.resolve(!!existingSchema);
+        });
+    }
+
+    /**
+     * Sets a Schema by id
      *
      * @param {String} project
      * @param {String} environment
@@ -395,17 +422,24 @@ class SchemaHelper extends SchemaHelperCommon {
             hasRemote: false
         };
 
-        return DatabaseHelper.updateOne(
-            project,
-            collection,
-            {
-                id: id
-            },
-            schema,
-            {
-                upsert: create // Creates a schema if none existed
-            }
-        ).then(() => {
+        return this.duplicateIdCheck(project, environment, id, schema.id)
+        .then((isDuplicate) => {
+            if(isDuplicate) {
+                return Promise.reject(new Error('The Schema id "' + schema.id + '" already exists.'));
+            }   
+
+            return DatabaseHelper.updateOne(
+                project,
+                collection,
+                {
+                    id: id
+                },
+                schema,
+                {
+                    upsert: create // Creates a schema if none existed
+                }
+            );
+        }).then(() => {
             return Promise.resolve(this.getModel(schema));
         });
     }

@@ -15,7 +15,6 @@ class NavbarMain extends Crisp.View {
         HashBrown.Views.Navigation.ContentPane.init();
         HashBrown.Views.Navigation.MediaPane.init();
         HashBrown.Views.Navigation.FormsPane.init();
-        HashBrown.Views.Navigation.TemplatePane.init();
         HashBrown.Views.Navigation.ConnectionPane.init();
         HashBrown.Views.Navigation.SchemaPane.init();
 

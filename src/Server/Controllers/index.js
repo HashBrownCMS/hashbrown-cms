@@ -18,7 +18,6 @@ module.exports = {
     ServerController: require('./ServerController'),
     SettingsController: require('./SettingsController'),
     SyncController: require('./SyncController'),
-    TemplateController: require('./TemplateController'),
     TestController: require('./TestController'),
     UserController: require('./UserController'),
     ViewController: require('./ViewController')
