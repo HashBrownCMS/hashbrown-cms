@@ -33079,15 +33079,8 @@ function (_Crisp$View) {
 
 
   _proto.onClickTab = function onClickTab(e) {
-    var route = e.currentTarget.dataset.route;
-    var $currentTab = this.$element.find('.navbar-main__pane.active');
-
-    if (route == $currentTab.attr('data-route')) {
-      location.hash = route;
-    } else {
-      this.showTab(route);
-    }
-
+    e.preventDefault();
+    location.hash = e.currentTarget.dataset.route;
     $('.page--environment__space--nav').toggleClass('expanded', true);
   };
   /**
@@ -33550,7 +33543,7 @@ module.exports = function () {
       class: 'navbar-main__tab__icon fa fa-' + pane.icon
     }), _.div({
       class: 'navbar-main__tab__label'
-    }, pane.label)).click(function (e) {
+    }, pane.label)).on('click', function (e) {
       _this.onClickTab(e);
     });
   })), // Panes

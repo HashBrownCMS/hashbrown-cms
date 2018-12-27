@@ -18,7 +18,7 @@ module.exports = function() {
                 return _.button({class: 'navbar-main__tab', 'data-route': pane.route, title: pane.label},
                     _.div({class: 'navbar-main__tab__icon fa fa-' + pane.icon}),
                     _.div({class: 'navbar-main__tab__label'}, pane.label)
-                ).click((e) => { this.onClickTab(e); });
+                ).on('click', (e) => { this.onClickTab(e); });
             })
         ),
 

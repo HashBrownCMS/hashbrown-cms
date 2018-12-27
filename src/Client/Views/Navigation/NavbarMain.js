@@ -72,16 +72,9 @@ class NavbarMain extends Crisp.View {
      * Event: Click tab
      */
     onClickTab(e) {
-        let route = e.currentTarget.dataset.route;
-        let $currentTab = this.$element.find('.navbar-main__pane.active');
-
-        if(route == $currentTab.attr('data-route')) {
-            location.hash = route;
+        e.preventDefault();
         
-        } else {
-            this.showTab(route);
-        
-        }
+        location.hash = e.currentTarget.dataset.route;
         
         $('.page--environment__space--nav').toggleClass('expanded', true);
     }
