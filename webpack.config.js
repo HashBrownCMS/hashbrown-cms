@@ -5,17 +5,6 @@ const path = require('path');
 const webpack = require('webpack');
 const exec = require('child_process').exec;
 
-// Watch SASS
-let sass = exec('sass --source-map --watch ./src/Client/Style/client.scss:./public/css/client.css'); 
-
-sass.stdout.on('data', (data) => {
-    console.log(data);
-});
-
-sass.stderr.on('data', (data) => {
-    console.log(data);
-});
-
 // Define settings
 module.exports = {
     mode: 'none',
@@ -59,3 +48,13 @@ module.exports = {
         extensions: ['.js', '.json', '.schema']
     }
 };
+
+// Watch SASS
+let sass = require('./node_modules/sass/sass.dart.js');
+   
+sass.run_([
+    '--watch',
+    '--source-map',
+    '--embed-sources',
+    './src/Client/Style/client.scss:./public/css/client.css'
+]);
