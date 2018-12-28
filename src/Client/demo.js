@@ -359,6 +359,7 @@ class DemoApi {
                     "fields": {
                         "properties": {
                             "sections": {
+                                "tabId": "content",
                                 "label": "Sections",
                                 "tabId": "content",
                                 "schemaId": "array",
@@ -475,7 +476,7 @@ debug.startSocket = () => {}
 // SchemaHelper
 // ----------
 HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
-    let schema = DemoApi.requestSync('get', 'schemas/' + id);
+    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
 
     if(schema.parentSchemaId) {
         return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId)
@@ -488,11 +489,9 @@ HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
                 }, 100);
             });
         });
+    } else {
+        return Promise.resolve(schema);
     }
-
-    schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
-
-    return Promise.resolve(schema);
 };
 
 // ----------

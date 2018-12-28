@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 269);
+/******/ 	return __webpack_require__(__webpack_require__.s = 263);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -22436,6 +22436,7 @@ function (_Resource) {
     this.def(String, 'id');
     this.def(String, 'name');
     this.def(String, 'icon');
+    this.def(String, 'type');
     this.def(String, 'parentSchemaId');
     this.def(Boolean, 'isLocked'); // Sync
 
@@ -22732,9 +22733,7 @@ module.exports = SchemaHelper;
 /* 181 */,
 /* 182 */,
 /* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22808,7 +22807,7 @@ base.checkParam = function (value, name, type) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(15)))
 
 /***/ }),
-/* 187 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22818,22 +22817,22 @@ base.checkParam = function (value, name, type) {
  */
 
 module.exports = {
-  Content: __webpack_require__(188),
-  Connection: __webpack_require__(190),
+  Content: __webpack_require__(186),
+  Connection: __webpack_require__(188),
   ContentSchema: __webpack_require__(173),
-  Deployer: __webpack_require__(193),
+  Deployer: __webpack_require__(191),
   Entity: __webpack_require__(12),
   FieldSchema: __webpack_require__(175),
-  Form: __webpack_require__(194),
+  Form: __webpack_require__(192),
   Media: __webpack_require__(8),
-  Processor: __webpack_require__(192),
-  Project: __webpack_require__(195),
+  Processor: __webpack_require__(190),
+  Project: __webpack_require__(193),
   Schema: __webpack_require__(174),
-  User: __webpack_require__(197)
+  User: __webpack_require__(194)
 };
 
 /***/ }),
-/* 188 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22841,7 +22840,7 @@ module.exports = {
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var ContentCommon = __webpack_require__(189);
+var ContentCommon = __webpack_require__(187);
 
 var ProjectHelper = __webpack_require__(7);
 /**
@@ -22906,7 +22905,7 @@ function (_ContentCommon) {
 module.exports = Content;
 
 /***/ }),
-/* 189 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23271,7 +23270,7 @@ function (_Resource) {
 module.exports = Content;
 
 /***/ }),
-/* 190 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23279,7 +23278,7 @@ module.exports = Content;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var ConnectionCommon = __webpack_require__(191);
+var ConnectionCommon = __webpack_require__(189);
 /**
  * The client side Connection class
  *
@@ -23314,7 +23313,7 @@ function (_ConnectionCommon) {
 module.exports = Connection;
 
 /***/ }),
-/* 191 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23324,9 +23323,9 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var Path = __webpack_require__(9);
 
-var Processor = __webpack_require__(192);
+var Processor = __webpack_require__(190);
 
-var Deployer = __webpack_require__(193);
+var Deployer = __webpack_require__(191);
 
 var Resource = __webpack_require__(11);
 /**
@@ -23427,7 +23426,7 @@ function (_Resource) {
 module.exports = Connection;
 
 /***/ }),
-/* 192 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23509,7 +23508,7 @@ function (_Entity) {
 module.exports = Processor;
 
 /***/ }),
-/* 193 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23712,7 +23711,7 @@ function (_Entity) {
 module.exports = Deployer;
 
 /***/ }),
-/* 194 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23863,7 +23862,7 @@ function (_Resource) {
 module.exports = Form;
 
 /***/ }),
-/* 195 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23873,7 +23872,7 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var Entity = __webpack_require__(12);
 
-var Connection = __webpack_require__(191);
+var Connection = __webpack_require__(189);
 /**
  * The Project class
  *
@@ -23997,8 +23996,7 @@ function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 196 */,
-/* 197 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24154,7 +24152,7 @@ function (_Entity) {
 module.exports = User;
 
 /***/ }),
-/* 198 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24164,13 +24162,13 @@ module.exports = User;
  */
 
 module.exports = {
-  Dropdown: __webpack_require__(199),
-  Chips: __webpack_require__(201),
-  Input: __webpack_require__(202)
+  Dropdown: __webpack_require__(196),
+  Chips: __webpack_require__(198),
+  Input: __webpack_require__(199)
 };
 
 /***/ }),
-/* 199 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24178,7 +24176,7 @@ module.exports = {
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Widget = __webpack_require__(200);
+var Widget = __webpack_require__(197);
 /**
  * A multi purpose dropdown
  *
@@ -24582,7 +24580,7 @@ function (_Widget) {
 module.exports = Dropdown;
 
 /***/ }),
-/* 200 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24651,7 +24649,7 @@ function (_Crisp$View) {
 module.exports = Widget;
 
 /***/ }),
-/* 201 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24659,7 +24657,7 @@ module.exports = Widget;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Widget = __webpack_require__(200);
+var Widget = __webpack_require__(197);
 /**
  * A group of chips
  *
@@ -24836,7 +24834,7 @@ function (_Widget) {
 module.exports = Chips;
 
 /***/ }),
-/* 202 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24844,7 +24842,7 @@ module.exports = Chips;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Widget = __webpack_require__(200);
+var Widget = __webpack_require__(197);
 /**
  * A versatile input widget
  *
@@ -25016,7 +25014,7 @@ function (_Widget) {
 module.exports = Input;
 
 /***/ }),
-/* 203 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25026,18 +25024,18 @@ module.exports = Input;
  */
 
 module.exports = {
-  Modal: __webpack_require__(204),
-  MediaUploader: __webpack_require__(205),
-  MediaBrowser: __webpack_require__(210),
-  IconModal: __webpack_require__(211),
-  ConfirmModal: __webpack_require__(213),
-  DateModal: __webpack_require__(214),
-  PublishingSettingsModal: __webpack_require__(215),
-  IframeModal: __webpack_require__(216)
+  Modal: __webpack_require__(201),
+  MediaUploader: __webpack_require__(202),
+  MediaBrowser: __webpack_require__(207),
+  IconModal: __webpack_require__(208),
+  ConfirmModal: __webpack_require__(210),
+  DateModal: __webpack_require__(211),
+  PublishingSettingsModal: __webpack_require__(212),
+  IframeModal: __webpack_require__(213)
 };
 
 /***/ }),
-/* 204 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25287,7 +25285,7 @@ document.addEventListener('keyup', function (e) {
 module.exports = Modal;
 
 /***/ }),
-/* 205 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25297,15 +25295,15 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var Media = __webpack_require__(8);
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 
-var MediaHelper = __webpack_require__(206);
+var MediaHelper = __webpack_require__(203);
 
 var RequestHelper = __webpack_require__(3);
 
 var ProjectHelper = __webpack_require__(7);
 
-var SettingsHelper = __webpack_require__(208);
+var SettingsHelper = __webpack_require__(205);
 /**
  * A modal for uploading Media objects
  *
@@ -25482,7 +25480,7 @@ function (_Modal) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 206 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25490,7 +25488,7 @@ module.exports = MediaUploader;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var MediaHelperCommon = __webpack_require__(207);
+var MediaHelperCommon = __webpack_require__(204);
 
 var RequestHelper = __webpack_require__(3);
 /**
@@ -25639,7 +25637,7 @@ function (_MediaHelperCommon) {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 207 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25714,7 +25712,7 @@ function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 208 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25724,7 +25722,7 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var RequestHelper = __webpack_require__(3);
 
-var SettingsHelperCommon = __webpack_require__(209);
+var SettingsHelperCommon = __webpack_require__(206);
 /**
  * The client side settings helper
  *
@@ -25963,7 +25961,7 @@ function (_SettingsHelperCommon) {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 209 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25979,7 +25977,7 @@ var SettingsHelper = function SettingsHelper() {};
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 210 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25989,15 +25987,15 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var Media = __webpack_require__(8);
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 
-var MediaHelper = __webpack_require__(206);
+var MediaHelper = __webpack_require__(203);
 
 var RequestHelper = __webpack_require__(3);
 
 var ProjectHelper = __webpack_require__(7);
 
-var SettingsHelper = __webpack_require__(208);
+var SettingsHelper = __webpack_require__(205);
 /**
  * A browser modal for Media objects
  *
@@ -26099,7 +26097,7 @@ function (_Modal) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 211 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26107,9 +26105,9 @@ module.exports = MediaBrowser;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var icons = __webpack_require__(212).icons;
+var icons = __webpack_require__(209).icons;
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 /**
  * A modal for picking icons
  *
@@ -26199,13 +26197,13 @@ function (_Modal) {
 module.exports = IconModal;
 
 /***/ }),
-/* 212 */
+/* 209 */
 /***/ (function(module) {
 
 module.exports = {"icons":["500px","adjust","adn","align-center","align-justify","align-left","align-right","amazon","ambulance","anchor","android","angellist","angle-double-down","angle-double-left","angle-double-right","angle-double-up","angle-down","angle-left","angle-right","angle-up","apple","archive","area-chart","arrow-circle-down","arrow-circle-left","arrow-circle-o-down","arrow-circle-o-left","arrow-circle-o-right","arrow-circle-o-up","arrow-circle-right","arrow-circle-up","arrow-down","arrow-left","arrow-right","arrow-up","arrows","arrows-alt","arrows-h","arrows-v","asterisk","at","automobile","backward","balance-scale","ban","bank","bar-chart","bar-chart-o","barcode","bars","battery-0","battery-1","battery-2","battery-3","battery-4","battery-empty","battery-full","battery-half","battery-quarter","battery-three-quarters","bed","beer","behance","behance-square","bell","bell-o","bell-slash","bell-slash-o","bicycle","binoculars","birthday-cake","bitbucket","bitbucket-square","bitcoin","black-tie","bluetooth","bluetooth-b","bold","bolt","bomb","book","bookmark","bookmark-o","briefcase","btc","bug","building","building-o","bullhorn","bullseye","bus","buysellads","cab","calculator","calendar","calendar-check-o","calendar-minus-o","calendar-o","calendar-plus-o","calendar-times-o","camera","camera-retro","car","caret-down","caret-left","caret-right","caret-square-o-down","caret-square-o-left","caret-square-o-right","caret-square-o-up","caret-up","cart-arrow-down","cart-plus","cc","cc-amex","cc-diners-club","cc-discover","cc-jcb","cc-mastercard","cc-paypal","cc-stripe","cc-visa","certificate","chain","chain-broken","check","check-circle","check-circle-o","check-square","check-square-o","chevron-circle-down","chevron-circle-left","chevron-circle-right","chevron-circle-up","chevron-down","chevron-left","chevron-right","chevron-up","child","chrome","circle","circle-o","circle-o-notch","circle-thin","clipboard","clock-o","clone","close","cloud","cloud-download","cloud-upload","cny","code","code-fork","codepen","codiepie","coffee","cog","cogs","columns","comment","comment-o","commenting","commenting-o","comments","comments-o","compass","compress","connectdevelop","contao","copy","copyright","creative-commons","credit-card","credit-card-alt","crop","crosshairs","css3","cube","cubes","cut","cutlery","dashboard","dashcube","database","dedent","delicious","desktop","deviantart","diamond","digg","dollar","dot-circle-o","download","dribbble","dropbox","drupal","edge","edit","eject","ellipsis-h","ellipsis-v","empire","envelope","envelope-o","envelope-square","eraser","eur","euro","exchange","exclamation","exclamation-circle","exclamation-triangle","expand","expeditedssl","external-link","external-link-square","eye","eye-slash","eyedropper","facebook","facebook-f","facebook-official","facebook-square","fast-backward","fast-forward","fax","feed","female","fighter-jet","file","file-archive-o","file-audio-o","file-code-o","file-excel-o","file-image-o","file-movie-o","file-o","file-pdf-o","file-photo-o","file-picture-o","file-powerpoint-o","file-sound-o","file-text","file-text-o","file-video-o","file-word-o","file-zip-o","files-o","film","filter","fire","fire-extinguisher","firefox","flag","flag-checkered","flag-o","flash","flask","flickr","floppy-o","folder","folder-o","folder-open","folder-open-o","font","fonticons","fort-awesome","forumbee","forward","foursquare","frown-o","futbol-o","gamepad","gavel","gbp","ge","gear","gears","genderless","get-pocket","gg","gg-circle","gift","git","git-square","github","github-alt","github-square","gittip","glass","globe","google","google-plus","google-plus-square","google-wallet","graduation-cap","gratipay","group","h-square","hacker-news","hand-grab-o","hand-lizard-o","hand-o-down","hand-o-left","hand-o-right","hand-o-up","hand-paper-o","hand-peace-o","hand-pointer-o","hand-rock-o","hand-scissors-o","hand-spock-o","hand-stop-o","hashtag","hdd-o","header","headphones","heart","heart-o","heartbeat","history","home","hospital-o","hotel","hourglass","hourglass-1","hourglass-2","hourglass-3","hourglass-end","hourglass-half","hourglass-o","hourglass-start","houzz","html5","i-cursor","ils","image","inbox","indent","industry","info","info-circle","inr","instagram","institution","internet-explorer","intersex","ioxhost","italic","joomla","jpy","jsfiddle","key","keyboard-o","krw","language","laptop","lastfm","lastfm-square","leaf","leanpub","legal","lemon-o","level-down","level-up","life-bouy","life-buoy","life-ring","life-saver","lightbulb-o","line-chart","link","linkedin","linkedin-square","linux","list","list-alt","list-ol","list-ul","location-arrow","lock","long-arrow-down","long-arrow-left","long-arrow-right","long-arrow-up","magic","magnet","mail-forward","mail-reply","mail-reply-all","male","map","map-marker","map-o","map-pin","map-signs","mars","mars-double","mars-stroke","mars-stroke-h","mars-stroke-v","maxcdn","meanpath","medium","medkit","meh-o","mercury","microphone","microphone-slash","minus","minus-circle","minus-square","minus-square-o","mixcloud","mobile","mobile-phone","modx","money","moon-o","mortar-board","motorcycle","mouse-pointer","music","navicon","neuter","newspaper-o","object-group","object-ungroup","odnoklassniki","odnoklassniki-square","opencart","openid","opera","optin-monster","outdent","pagelines","paint-brush","paper-plane","paper-plane-o","paperclip","paragraph","paste","pause","pause-circle","pause-circle-o","paw","paypal","pencil","pencil-square","pencil-square-o","percent","phone","phone-square","photo","picture-o","pie-chart","pied-piper","pied-piper-alt","pinterest","pinterest-p","pinterest-square","plane","play","play-circle","play-circle-o","plug","plus","plus-circle","plus-square","plus-square-o","power-off","print","product-hunt","puzzle-piece","qq","qrcode","question","question-circle","quote-left","quote-right","ra","random","rebel","recycle","reddit","reddit-alien","reddit-square","refresh","registered","remove","renren","reorder","repeat","reply","reply-all","retweet","rmb","road","rocket","rotate-left","rotate-right","rouble","rss","rss-square","rub","ruble","rupee","safari","save","scissors","scribd","search","search-minus","search-plus","sellsy","send","send-o","server","share","share-alt","share-alt-square","share-square","share-square-o","shekel","sheqel","shield","ship","shirtsinbulk","shopping-bag","shopping-basket","shopping-cart","sign-in","sign-out","signal","simplybuilt","sitemap","skyatlas","skype","slack","sliders","slideshare","smile-o","soccer-ball-o","sort","sort-alpha-asc","sort-alpha-desc","sort-amount-asc","sort-amount-desc","sort-asc","sort-desc","sort-down","sort-numeric-asc","sort-numeric-desc","sort-up","soundcloud","space-shuttle","spinner","spoon","spotify","square","square-o","stack-exchange","stack-overflow","star","star-half","star-half-empty","star-half-full","star-half-o","star-o","steam","steam-square","step-backward","step-forward","stethoscope","sticky-note","sticky-note-o","stop","stop-circle","stop-circle-o","street-view","strikethrough","stumbleupon","stumbleupon-circle","subscript","subway","suitcase","sun-o","superscript","support","table","tablet","tachometer","tag","tags","tasks","taxi","television","tencent-weibo","terminal","text-height","text-width","th","th-large","th-list","thumb-tack","thumbs-down","thumbs-o-down","thumbs-o-up","thumbs-up","ticket","times","times-circle","times-circle-o","tint","toggle-down","toggle-left","toggle-off","toggle-on","toggle-right","toggle-up","trademark","train","transgender","transgender-alt","trash","trash-o","tree","trello","tripadvisor","trophy","truck","try","tty","tumblr","tumblr-square","turkish-lira","tv","twitch","twitter","twitter-square","umbrella","underline","undo","university","unlink","unlock","unlock-alt","unsorted","upload","usb","usd","user","user-md","user-plus","user-secret","user-times","users","venus","venus-double","venus-mars","viacoin","video-camera","vimeo","vimeo-square","vine","vk","volume-down","volume-off","volume-up","warning","wechat","weibo","weixin","whatsapp","wheelchair","wifi","wikipedia-w","windows","won","wordpress","wrench","xing","xing-square","y-combinator","y-combinator-square","yahoo","yc","yc-square","yelp","yen","youtube","youtube-play","youtube-square"]};
 
 /***/ }),
-/* 213 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26213,7 +26211,7 @@ module.exports = {"icons":["500px","adjust","adn","align-center","align-justify"
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 /**
  * A modal for confirming actions
  *
@@ -26287,7 +26285,7 @@ function (_Modal) {
 module.exports = ConfirmModal;
 
 /***/ }),
-/* 214 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26295,7 +26293,7 @@ module.exports = ConfirmModal;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 /**
  * A modal for picking dates
  *
@@ -26474,7 +26472,7 @@ function (_Modal) {
 module.exports = DateModal;
 
 /***/ }),
-/* 215 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26482,7 +26480,7 @@ module.exports = DateModal;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 /**
  * A dialog for editing publishing settings for Content nodes
  *
@@ -26566,7 +26564,7 @@ function (_Modal) {
 module.exports = PublishingSettingsModal;
 
 /***/ }),
-/* 216 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26574,7 +26572,7 @@ module.exports = PublishingSettingsModal;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Modal = __webpack_require__(204);
+var Modal = __webpack_require__(201);
 /**
  * A modal for showng iframes
  *
@@ -26617,13 +26615,13 @@ function (_Modal) {
 module.exports = IframeModal;
 
 /***/ }),
+/* 214 */,
+/* 215 */,
+/* 216 */,
 /* 217 */,
 /* 218 */,
 /* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26633,9 +26631,9 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var RequestHelper = __webpack_require__(3);
 
-var ContentHelperCommon = __webpack_require__(224);
+var ContentHelperCommon = __webpack_require__(221);
 
-var Content = __webpack_require__(188);
+var Content = __webpack_require__(186);
 /**
  * The client side content helper
  *
@@ -26831,7 +26829,7 @@ function (_ContentHelperCommon) {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 224 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26978,9 +26976,9 @@ function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 225 */,
-/* 226 */,
-/* 227 */
+/* 222 */,
+/* 223 */,
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27250,12 +27248,11 @@ function (_HashBrown$Views$Moda) {
 module.exports = UserEditor;
 
 /***/ }),
+/* 225 */,
+/* 226 */,
+/* 227 */,
 /* 228 */,
-/* 229 */,
-/* 230 */,
-/* 231 */,
-/* 232 */,
-/* 233 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27263,9 +27260,9 @@ module.exports = UserEditor;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(234);
+var ConnectionHelperCommon = __webpack_require__(230);
 
-var Connection = __webpack_require__(190);
+var Connection = __webpack_require__(188);
 
 var ProjectHelper = __webpack_require__(7);
 
@@ -27373,13 +27370,13 @@ function (_ConnectionHelperComm) {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 234 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Connection = __webpack_require__(191);
+var Connection = __webpack_require__(189);
 /**
  * The helper class for Connections
  *
@@ -27469,6 +27466,10 @@ function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
 /* 235 */,
 /* 236 */,
 /* 237 */,
@@ -27478,11 +27479,7 @@ module.exports = ConnectionHelper;
 /* 241 */,
 /* 242 */,
 /* 243 */,
-/* 244 */,
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27490,11 +27487,11 @@ module.exports = ConnectionHelper;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var SettingsHelper = __webpack_require__(208);
+var SettingsHelper = __webpack_require__(205);
 
 var ProjectHelper = __webpack_require__(7);
 
-var LanguageHelperCommon = __webpack_require__(249);
+var LanguageHelperCommon = __webpack_require__(245);
 
 var selectedLanguages = {};
 /**
@@ -27571,7 +27568,7 @@ function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 249 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27668,16 +27665,15 @@ function () {
 module.exports = LanguageHelper;
 
 /***/ }),
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
 /* 250 */,
 /* 251 */,
 /* 252 */,
 /* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27687,21 +27683,21 @@ module.exports = LanguageHelper;
  */
 
 module.exports = {
-  ConnectionHelper: __webpack_require__(233),
-  ContentHelper: __webpack_require__(223),
-  DebugHelper: __webpack_require__(260),
-  LanguageHelper: __webpack_require__(248),
-  MarkdownHelper: __webpack_require__(262),
-  MediaHelper: __webpack_require__(206),
+  ConnectionHelper: __webpack_require__(229),
+  ContentHelper: __webpack_require__(220),
+  DebugHelper: __webpack_require__(255),
+  LanguageHelper: __webpack_require__(244),
+  MarkdownHelper: __webpack_require__(257),
+  MediaHelper: __webpack_require__(203),
   ProjectHelper: __webpack_require__(7),
   RequestHelper: __webpack_require__(3),
   SchemaHelper: __webpack_require__(172),
-  SettingsHelper: __webpack_require__(208),
-  UIHelper: __webpack_require__(264)
+  SettingsHelper: __webpack_require__(205),
+  UIHelper: __webpack_require__(258)
 };
 
 /***/ }),
-/* 260 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27709,7 +27705,7 @@ module.exports = {
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(261);
+var DebugHelperCommon = __webpack_require__(256);
 /**
  * The client side debug helper
  *
@@ -27771,7 +27767,7 @@ function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 261 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27926,7 +27922,7 @@ function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 262 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28767,8 +28763,7 @@ function () {
 module.exports = MarkdownHelper;
 
 /***/ }),
-/* 263 */,
-/* 264 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29578,15 +29573,15 @@ function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 265 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(266);
-window.marked = __webpack_require__(267);
+window.Promise = __webpack_require__(260);
+window.marked = __webpack_require__(261);
 
 var ProjectHelper = __webpack_require__(7);
 
-var User = __webpack_require__(197);
+var User = __webpack_require__(194);
 /**
  * Converts a string from HTML to markdown
  *
@@ -29687,12 +29682,12 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 }; // Get package file
 
 
-window.app = __webpack_require__(268); // Language
+window.app = __webpack_require__(262); // Language
 
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 266 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -35708,7 +35703,7 @@ if (typeof window !== 'undefined' && window !== null) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10), __webpack_require__(15), __webpack_require__(38).setImmediate))
 
 /***/ }),
-/* 267 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -37198,30 +37193,30 @@ if (typeof window !== 'undefined' && window !== null) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(15)))
 
 /***/ }),
-/* 268 */
+/* 262 */
 /***/ (function(module) {
 
 module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"1.0.7","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.3.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
 
 /***/ }),
-/* 269 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
  // Common
 
-__webpack_require__(186); // Namespaces
+__webpack_require__(184); // Namespaces
 
 
 window._ = Crisp.Elements;
 window.HashBrown = {};
-HashBrown.Helpers = __webpack_require__(259);
+HashBrown.Helpers = __webpack_require__(254);
 HashBrown.Views = {};
-HashBrown.Models = __webpack_require__(187);
-HashBrown.Views.Modals = __webpack_require__(203);
-HashBrown.Views.Widgets = __webpack_require__(198); // Helper functions
+HashBrown.Models = __webpack_require__(185);
+HashBrown.Views.Modals = __webpack_require__(200);
+HashBrown.Views.Widgets = __webpack_require__(195); // Helper functions
 
-__webpack_require__(265); // Helper shortcuts
+__webpack_require__(259); // Helper shortcuts
 
 
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -37230,7 +37225,7 @@ window.UI = HashBrown.Helpers.UIHelper; // --------------------
 // --------------------
 
 HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
-  var User = __webpack_require__(197);
+  var User = __webpack_require__(194);
 
   User.current = new User(user);
   return HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
@@ -37240,7 +37235,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 .then(function (projects) {
   projects = projects || [];
 
-  var ProjectEditor = __webpack_require__(270);
+  var ProjectEditor = __webpack_require__(264);
 
   for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
     var _ref;
@@ -37270,9 +37265,9 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
   return HashBrown.Helpers.RequestHelper.request('get', 'users');
 }).then(function (users) {
-  var UserEditor = __webpack_require__(227);
+  var UserEditor = __webpack_require__(224);
 
-  var User = __webpack_require__(197);
+  var User = __webpack_require__(194);
 
   var _loop = function _loop() {
     if (_isArray2) {
@@ -37505,7 +37500,7 @@ $('.page--dashboard__projects__add').click(function () {
 });
 
 /***/ }),
-/* 270 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37513,19 +37508,19 @@ $('.page--dashboard__projects__add').click(function () {
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var Project = __webpack_require__(195);
+var Project = __webpack_require__(193);
 
 var RequestHelper = __webpack_require__(3);
 
-var InfoEditor = __webpack_require__(271);
+var InfoEditor = __webpack_require__(265);
 
-var SyncEditor = __webpack_require__(272);
+var SyncEditor = __webpack_require__(266);
 
-var LanguageEditor = __webpack_require__(273);
+var LanguageEditor = __webpack_require__(267);
 
-var BackupEditor = __webpack_require__(274);
+var BackupEditor = __webpack_require__(268);
 
-var MigrationEditor = __webpack_require__(275);
+var MigrationEditor = __webpack_require__(269);
 /**
  * The editor for projects as seen on the dashboard
  *
@@ -37844,7 +37839,7 @@ function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 271 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37852,7 +37847,7 @@ module.exports = ProjectEditor;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var SettingsHelper = __webpack_require__(208);
+var SettingsHelper = __webpack_require__(205);
 /**
  * The info settings editor
  *
@@ -37932,7 +37927,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 272 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37942,7 +37937,7 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var RequestHelper = __webpack_require__(3);
 
-var SettingsHelper = __webpack_require__(208);
+var SettingsHelper = __webpack_require__(205);
 
 var ProjectHelper = __webpack_require__(7);
 /**
@@ -38158,7 +38153,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 273 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38166,7 +38161,7 @@ module.exports = SyncEditor;
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-var LanguageHelper = __webpack_require__(248);
+var LanguageHelper = __webpack_require__(244);
 /**
  * The language settings editor
  *
@@ -38245,7 +38240,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 274 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38462,7 +38457,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 275 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -15,6 +15,7 @@ class Schema extends Resource {
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
+        this.def(String, 'type');
         this.def(String, 'parentSchemaId');
         this.def(Boolean, 'isLocked');
 

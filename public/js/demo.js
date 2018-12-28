@@ -81,12 +81,12 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 276);
+/******/ 	return __webpack_require__(__webpack_require__.s = 270);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 276:
+/***/ 270:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -306,6 +306,8 @@ function () {
 
 
   DemoApi.getNativeResource = function getNativeResource(type) {
+    var _sections;
+
     switch (type) {
       case 'users':
         return [{
@@ -386,24 +388,24 @@ function () {
 
       case 'schemas':
         var schemas = {
-          'contentBase': __webpack_require__(277),
-          'page': __webpack_require__(278),
-          'array': __webpack_require__(279),
-          'boolean': __webpack_require__(280),
-          'contentReference': __webpack_require__(281),
-          'contentSchemaReference': __webpack_require__(282),
-          'date': __webpack_require__(283),
-          'dropdown': __webpack_require__(284),
-          'fieldBase': __webpack_require__(285),
-          'language': __webpack_require__(286),
-          'mediaReference': __webpack_require__(287),
-          'number': __webpack_require__(288),
-          'resourceReference': __webpack_require__(289),
-          'richText': __webpack_require__(290),
-          'string': __webpack_require__(291),
-          'struct': __webpack_require__(292),
-          'tags': __webpack_require__(293),
-          'url': __webpack_require__(295)
+          'contentBase': __webpack_require__(271),
+          'page': __webpack_require__(272),
+          'array': __webpack_require__(273),
+          'boolean': __webpack_require__(274),
+          'contentReference': __webpack_require__(275),
+          'contentSchemaReference': __webpack_require__(276),
+          'date': __webpack_require__(277),
+          'dropdown': __webpack_require__(278),
+          'fieldBase': __webpack_require__(279),
+          'language': __webpack_require__(280),
+          'mediaReference': __webpack_require__(281),
+          'number': __webpack_require__(282),
+          'resourceReference': __webpack_require__(283),
+          'richText': __webpack_require__(284),
+          'string': __webpack_require__(285),
+          'struct': __webpack_require__(286),
+          'tags': __webpack_require__(287),
+          'url': __webpack_require__(288)
         };
         var result = [];
 
@@ -439,14 +441,12 @@ function () {
           "tabs": {},
           "fields": {
             "properties": {
-              "sections": {
-                "label": "Sections",
+              "sections": (_sections = {
                 "tabId": "content",
-                "schemaId": "array",
-                "config": {
-                  "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
-                }
-              }
+                "label": "Sections"
+              }, _sections["tabId"] = "content", _sections["schemaId"] = "array", _sections["config"] = {
+                "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
+              }, _sections)
             }
           },
           "allowedChildSchemas": ["591a897ad572cadae5115ef05726d9ead2725dc5"],
@@ -550,7 +550,7 @@ debug.startSocket = function () {}; // ----------
 
 
 HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = function (id) {
-  var schema = DemoApi.requestSync('get', 'schemas/' + id);
+  var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
 
   if (schema.parentSchemaId) {
     return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId).then(function (parentSchema) {
@@ -561,10 +561,9 @@ HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = function (id) {
         }, 100);
       });
     });
+  } else {
+    return Promise.resolve(schema);
   }
-
-  schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
-  return Promise.resolve(schema);
 }; // ----------
 // Crisp UI
 // ----------
@@ -640,126 +639,126 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
-/***/ 277:
+/***/ 271:
 /***/ (function(module) {
 
 module.exports = {"defaultTabId":"meta","icon":"cogs","name":"Content Base","fields":{"createDate":{"disabled":"true","label":"Created at","schemaId":"date"},"updateDate":{"disabled":"true","label":"Updated at","schemaId":"date"},"createdBy":{"disabled":"true","label":"Created by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"updatedBy":{"disabled":"true","label":"Updated by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"publishOn":{"label":"Publish on","schemaId":"date"},"unpublishOn":{"label":"Unpublish on","schemaId":"date"},"schemaId":{"label":"Schema","schemaId":"contentSchemaReference","config":{"allowedSchemas":"fromParent"}},"properties":{"title":{"label":"Title","schemaId":"string"}}}};
 
 /***/ }),
 
-/***/ 278:
+/***/ 272:
 /***/ (function(module) {
 
 module.exports = {"icon":"file","name":"Page","parentSchemaId":"contentBase","tabs":{"content":"Content"},"defaultTabId":"content","fields":{"properties":{"title":{"label":"Title","schemaId":"string","tabId":"content"},"description":{"label":"Description","schemaId":"string","tabId":"content"},"url":{"label":"URL","schemaId":"url","tabId":"content"}}}};
 
 /***/ }),
 
-/***/ 279:
+/***/ 273:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ArrayEditor","icon":"list-ol","name":"Array"};
 
 /***/ }),
 
-/***/ 280:
+/***/ 274:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"BooleanEditor","icon":"toggle-on","name":"Boolean"};
 
 /***/ }),
 
-/***/ 281:
+/***/ 275:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentReferenceEditor","icon":"file","name":"Content Reference"};
 
 /***/ }),
 
-/***/ 282:
+/***/ 276:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentSchemaReferenceEditor","icon":"gears","name":"Content Schema Reference"};
 
 /***/ }),
 
-/***/ 283:
+/***/ 277:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"DateEditor","icon":"calendar","name":"Date"};
 
 /***/ }),
 
-/***/ 284:
+/***/ 278:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"DropdownEditor","icon":"list-alt","name":"Dropdown"};
 
 /***/ }),
 
-/***/ 285:
+/***/ 279:
 /***/ (function(module) {
 
 module.exports = {"name":"Field Base","icon":"cogs"};
 
 /***/ }),
 
-/***/ 286:
+/***/ 280:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"LanguageEditor","icon":"globe","name":"Language"};
 
 /***/ }),
 
-/***/ 287:
+/***/ 281:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"MediaReferenceEditor","icon":"file-image-o","name":"Media Reference"};
 
 /***/ }),
 
-/***/ 288:
+/***/ 282:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"NumberEditor","icon":"sort-numeric-asc","name":"Number"};
 
 /***/ }),
 
-/***/ 289:
+/***/ 283:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ResourceReferenceEditor","icon":"book","name":"Resource Reference"};
 
 /***/ }),
 
-/***/ 290:
+/***/ 284:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"RichTextEditor","icon":"font","name":"Rich Text"};
 
 /***/ }),
 
-/***/ 291:
+/***/ 285:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"StringEditor","icon":"font","name":"String"};
 
 /***/ }),
 
-/***/ 292:
+/***/ 286:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"StructEditor","icon":"cubes","name":"Struct"};
 
 /***/ }),
 
-/***/ 293:
+/***/ 287:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"TagsEditor","icon":"tag","name":"Tags"};
 
 /***/ }),
 
-/***/ 295:
+/***/ 288:
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"UrlEditor","icon":"link","name":"Url"};
