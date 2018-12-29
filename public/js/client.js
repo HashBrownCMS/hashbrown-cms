@@ -39609,7 +39609,6 @@ function (_FieldEditor) {
               config.struct = newStruct; // Update the sort key
 
               $field.find('.editor__field__sort-key').html(fieldKey);
-              renderEditor();
             }
           }))), _.div({
             class: 'editor__field'

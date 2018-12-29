@@ -227,8 +227,6 @@ class StructEditor extends FieldEditor {
                                                     
                                                         // Update the sort key
                                                         $field.find('.editor__field__sort-key').html(fieldKey);
-
-                                                        renderEditor();
                                                     }
                                                 })
                                             )
