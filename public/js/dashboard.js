@@ -24997,7 +24997,7 @@ function (_Widget) {
         });
 
       case 'textarea':
-        return _.textarea(config).on('input', function (e) {
+        return _.textarea(config, config.value).on('input', function (e) {
           _this.onChangeInternal(e.currentTarget.value);
         });
 

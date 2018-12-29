@@ -114,7 +114,7 @@ class Input extends Widget {
                 });
             
             case 'textarea':
-                return _.textarea(config)
+                return _.textarea(config, config.value)
                     .on('input', (e) => {
                         this.onChangeInternal(e.currentTarget.value);
                     });
