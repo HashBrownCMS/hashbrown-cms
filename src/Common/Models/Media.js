@@ -157,6 +157,15 @@ class Media extends Resource {
     isImage() {
         return this.getContentTypeHeader().indexOf('image') > -1;
     }
+    
+    /**
+     * Gets whether this is an SVG file
+     *
+     * @returns {Boolean} Is SVG file
+     */
+    isSvg() {
+        return this.getContentTypeHeader().indexOf('svg') > -1;
+    }
 
     /**
      * Gets whether this is a PDF

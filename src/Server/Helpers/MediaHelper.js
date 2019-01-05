@@ -430,7 +430,7 @@ class MediaHelper extends MediaHelperCommon {
 
         // Resize the file
         let resizeFile = () => {
-            if(!width || !media.isImage()) { 
+            if(!width || !media.isImage() || media.isSvg()) { 
                 return Promise.resolve();
             }
             
