@@ -563,6 +563,16 @@ function (_Resource) {
     return this.getContentTypeHeader().indexOf('image') > -1;
   };
   /**
+   * Gets whether this is an SVG file
+   *
+   * @returns {Boolean} Is SVG file
+   */
+
+
+  _proto.isSvg = function isSvg() {
+    return this.getContentTypeHeader().indexOf('svg') > -1;
+  };
+  /**
    * Gets whether this is a PDF
    *
    * @returns {Boolean} Is PDF
@@ -23138,7 +23148,8 @@ function (_Resource) {
       createDate: this.createDate,
       updateDate: this.updateDate,
       createdBy: this.createdBy,
-      updatedBy: this.updatedBy
+      updatedBy: this.updatedBy,
+      sort: this.sort
     };
   };
   /**

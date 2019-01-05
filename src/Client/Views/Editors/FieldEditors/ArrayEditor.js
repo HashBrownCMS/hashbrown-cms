@@ -223,7 +223,7 @@ class ArrayEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value segmented'},
+        return _.div({class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
                 // Render field
                 let $field = _.div({class: 'editor__field'});
@@ -293,7 +293,8 @@ class ArrayEditor extends FieldEditor {
                                         }),
                                         onChange: (newSchemaId) => {
                                             item.schemaId = newSchemaId;
-
+                                            item.value = null;
+                                            
                                             renderField();
 
                                             this.trigger('change', this.value);

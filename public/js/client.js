@@ -911,6 +911,16 @@ function (_Resource) {
     return this.getContentTypeHeader().indexOf('image') > -1;
   };
   /**
+   * Gets whether this is an SVG file
+   *
+   * @returns {Boolean} Is SVG file
+   */
+
+
+  _proto.isSvg = function isSvg() {
+    return this.getContentTypeHeader().indexOf('svg') > -1;
+  };
+  /**
    * Gets whether this is a PDF
    *
    * @returns {Boolean} Is PDF
@@ -28645,7 +28655,8 @@ function (_Resource) {
       createDate: this.createDate,
       updateDate: this.updateDate,
       createdBy: this.createdBy,
-      updatedBy: this.updatedBy
+      updatedBy: this.updatedBy,
+      sort: this.sort
     };
   };
   /**
@@ -37246,7 +37257,7 @@ function (_FieldEditor) {
     var _this4 = this;
 
     return _.div({
-      class: 'editor__field__value segmented'
+      class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')
     }, _.each(this.value, function (i, item) {
       // Render field
       var $field = _.div({
@@ -37314,6 +37325,7 @@ function (_FieldEditor) {
             }),
             onChange: function onChange(newSchemaId) {
               item.schemaId = newSchemaId;
+              item.value = null;
               renderField();
 
               _this4.trigger('change', _this4.value);

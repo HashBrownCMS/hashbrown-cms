@@ -1164,6 +1164,11 @@ h1, h2, h3, h4, h5, h6 {
 .editor__field__value.segmented > .editor__field:last-child {
   margin-bottom: 0;
 }
+.editor__field__value.grid > .editor__field {
+  float: left;
+  margin: 0.5rem;
+  width: calc(100% / 3 - 1rem);
+}
 .editor__field__value.segmented .editor__field__value.segmented {
   padding: 1rem;
   background-color: #eeeeee;
@@ -1296,6 +1301,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-grow: 1;
 }
 .editor__field__add {
+  clear: both;
   margin-top: 1rem;
   margin-left: auto;
 }
@@ -1606,6 +1612,13 @@ h1, h2, h3, h4, h5, h6 {
 /**
  * A Media picker
  */
+.editor__field--media-reference {
+  display: inline-block;
+  flex-grow: 0;
+}
+.editor__field--media-reference:hover .editor__field--media-reference__pick, .editor__field--media-reference:hover .editor__field--media-reference__name, .editor__field--media-reference:hover .editor__field--media-reference__remove {
+  border-color: #e70d3b;
+}
 .editor__field--media-reference__pick {
   border: 1px solid #dddddd;
   border-bottom: 0;
@@ -1619,10 +1632,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #e70d3b;
   transition: color 0.3s ease, background-color 0.3s ease;
   padding: 0;
-}
-.editor__field--media-reference__pick:hover {
-  color: #ffffff;
-  background-color: #e70d3b;
 }
 .editor__field--media-reference__empty {
   position: absolute;

@@ -2,6 +2,13 @@
  * A Media picker
  */
 .editor__field--media-reference {
+    display: inline-block;
+    flex-grow: 0;
+
+    &:hover &__pick, &:hover &__name, &:hover &__remove {
+        border-color: $primary;
+    }
+    
     &__pick {
         border: 1px solid $standard-darker;
         border-bottom: 0;
@@ -15,12 +22,6 @@
         color: $primary;
         transition: color 0.3s ease, background-color 0.3s ease;
         padding: 0;
-
-        &:hover {
-            color: $primary-text;
-            background-color: $primary;
-        }
-
     }
 
     &__empty {
