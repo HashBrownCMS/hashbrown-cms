@@ -219,7 +219,8 @@ class Content extends Resource {
             createDate: this.createDate,
             updateDate: this.updateDate,
             createdBy: this.createdBy,
-            updatedBy: this.updatedBy
+            updatedBy: this.updatedBy,
+            sort: this.sort
         };
     }
 
