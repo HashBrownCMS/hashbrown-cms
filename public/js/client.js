@@ -37069,7 +37069,7 @@ function (_FieldEditor) {
   _proto.renderKeyActions = function renderKeyActions() {
     var _this2 = this;
 
-    if (!this.value || this.value.length < 1) {
+    if (!this.value || this.value.length < 1 || this.config.useGrid) {
       return;
     }
 
@@ -37337,12 +37337,12 @@ function (_FieldEditor) {
           class: 'editor__field__sort-key'
         }, _this4.getItemLabel(item, schema)), editorInstance.$element, _.div({
           class: 'editor__field__actions'
-        }, _.button({
+        }, _.if(!_this4.config.useGrid, _.button({
           class: 'editor__field__action editor__field__action--collapse',
           title: 'Collapse/expand item'
         }).click(function () {
           $field.toggleClass('collapsed');
-        }), _.button({
+        })), _.button({
           class: 'editor__field__action editor__field__action--remove',
           title: 'Remove item'
         }).click(function () {

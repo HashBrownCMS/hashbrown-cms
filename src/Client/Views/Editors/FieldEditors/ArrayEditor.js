@@ -43,7 +43,7 @@ class ArrayEditor extends FieldEditor {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {
-        if(!this.value || this.value.length < 1) { return; }
+        if(!this.value || this.value.length < 1 || this.config.useGrid) { return; }
 
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
@@ -309,10 +309,12 @@ class ArrayEditor extends FieldEditor {
                         _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
                         editorInstance.$element,
                         _.div({class: 'editor__field__actions'},
-                            _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
-                                .click(() => {
-                                    $field.toggleClass('collapsed');
-                                }),
+                            _.if(!this.config.useGrid,
+                                _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
+                                    .click(() => {
+                                        $field.toggleClass('collapsed');
+                                    })
+                            ),
                             _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove item'})
                                 .click(() => {
                                     this.value.splice(i, 1);
