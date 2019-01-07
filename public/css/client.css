@@ -1128,6 +1128,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 2rem;
   width: 1rem;
   text-align: center;
+  margin-right: 0.5rem;
 }
 .editor__field__key__action--sort:after {
   content: "Sort items";
