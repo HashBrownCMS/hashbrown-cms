@@ -181,8 +181,7 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
-     * NOTE:
-     * This method, as opposed to most other resource methods, does not merge
+     * NOTE: This method, as opposed to most other resource methods, does not merge
      * local and remote resources since it would be too complicated in the end
      *
      * @param {String} project
@@ -339,34 +338,8 @@ class MediaHelper extends MediaHelperCommon {
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
         let cachedPath = Path.join(cacheFolder, id);
-      
-        return new Promise((resolve, reject) => {
-            Glob(cachedPath + '*', (err, files) => {
-                if(err) { return reject(err); }
-
-                resolve(files);
-            });
-        })
-        .then((files) => {
-            let unlinkNext = () => {
-                let file = files ? files.pop() : null;
-
-                if(!file) { return Promise.resolve(); }
-
-                return new Promise((resolve, reject) => {
-                    FileSystem.unlink(file, (err) => {
-                        if(err) { return reject(err); }
-
-                        resolve();
-                    });
-                })
-                .then(() => {
-                    return unlinkNext(); 
-                });
-            };
-
-            return unlinkNext();
-        });
+     
+        return HashBrown.Helpers.FileHelper.remove(cachedPath + '*');
     }
 
 
