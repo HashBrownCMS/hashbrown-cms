@@ -102,72 +102,28 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
-     * Sets a Media object
+     * Renames a Media object
      *
-     * @param {Number} id
-     * @param {Object} file
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} name
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
-    static setMediaData(id, file) {
-        checkParam(id, 'id', Number);
-        checkParam(file, 'file', Object);
+    static renameMedia(project, environment, id, name) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(name, 'name', String);
 
-        return new Promise((resolve, reject) => {
-            let oldPath = file.path;
-            let name = Path.basename(oldPath);
-            let newDir = this.getMediaPath() + id;
-            let newPath = newDir + '/' + name;
-
-            debug.log('Setting media data at "' + newPath + '"...', this);
-
-            // First check if the given directory exists
-            // If it doesn't, create it with parents recursively
-            if(!FileSystem.existsSync(newDir)){
-                this.mkdirRecursively(newDir, (err) => {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        // Move the temp file to the new path
-                        FileSystem.rename(oldPath, newPath, function(err) {
-                            if(err) {
-                                reject(new Error(err));
-                            
-                            } else {
-                                resolve();
-
-                            }
-                        });
-                    
-                    }
-                });
-
-            // If it does exist, remove the directory
-            } else {
-                RimRaf(newDir, (err) => {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        // Move the temp file to the new path
-                        FileSystem.rename(oldPath, newPath, function(err) {
-                            if(err) {
-                                reject(new Error(err));
-                            
-                            } else {
-                                resolve();
-
-                            }
-                        });
-                    
-                    }
-                });
-            }
-
+        // Get Media provider
+        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
+        .then((provider) => {
+            return provider.renameMedia(id, name);
         });
     }
-
+    
     /**
      * Uploads a file from temp storage
      *

@@ -120,28 +120,27 @@ class NavbarMain extends Crisp.View {
             buttons: {},
             panes: {},
             items: {},
-            scroll: $('.navbar-main__pane.active .navbar-main__pane').scrollTop() || 0
+            scroll: $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop() || 0
         };
         
         this.$element.find('.navbar-main__tab').each((i, element) => {
-            let $button = $(element);
-            let key = $button.data('route');
+            let key = element.dataset.route;
 
-            this.state.buttons[key] = $button[0].className;
+            if(!key) { return; }
+
+            this.state.buttons[key] = element.className;
         });
         
         this.$element.find('.navbar-main__pane').each((i, element) => {
-            let $pane = $(element);
-            let key = $pane.data('route');
+            let key = element.dataset.route;
 
-            this.state.panes[key] = $pane[0].className;
+            this.state.panes[key] = element.className;
         });
 
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let $item = $(element);
-            let key = $item.data('routing-path');
+            let key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-            this.state.items[key] = $item[0].className.replace('loading', '');
+            this.state.items[key] = element.className.replace('loading', '');
         });
     }
 
@@ -153,35 +152,33 @@ class NavbarMain extends Crisp.View {
 
         // Restore tab buttons
         this.$element.find('.navbar-main__tab').each((i, element) => {
-            let $button = $(element);
-            let key = $button.data('route');
+            let key = element.dataset.route;
 
-            if(this.state.buttons[key]) {
-                $button[0].className = this.state.buttons[key];
+            if(key && this.state.buttons[key]) {
+                element.className = this.state.buttons[key];
             }
         });
         
         // Restore pane containers
         this.$element.find('.navbar-main__pane').each((i, element) => {
-            let $pane = $(element);
-            let key = $pane.data('route');
+            let key = element.dataset.route;
 
-            if(this.state.panes[key]) {
-                $pane[0].className = this.state.panes[key];
+            if(key && this.state.panes[key]) {
+                element.className = this.state.panes[key];
             }
         });
 
         // Restore pane items
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let $item = $(element);
-            let key = $item.data('routing-path');
+            let key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-            if(this.state.items[key]) {
-                $item[0].className = this.state.items[key];
+            if(key && this.state.items[key]) {
+                element.className = this.state.items[key];
             }
         });
 
-        $('.navbar-main__pane.active .navbar-main__pane__content').scrollTop(this.state.scroll || 0);
+        // Restore scroll position
+        $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this.state.scroll || 0);
 
         this.state = null;
     }

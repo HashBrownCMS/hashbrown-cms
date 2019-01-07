@@ -351,6 +351,24 @@ class Connection extends ConnectionCommon {
     }
     
     /**
+     * Renames a Media node by id
+     *
+     * @param {String} id
+     * @param {String} name
+     *
+     * @returns {Promise} Media node
+     */
+    renameMedia(id, name) {
+        checkParam(id, 'id', String);
+        checkParam(name, 'name', String);
+        
+        return this.getMedia(id)
+        .then((media) => {
+            return this.deployer.renameFile(media.path, name);
+        });
+    }
+    
+    /**
      * Sets a Media node by id
      *
      * @param {String} id

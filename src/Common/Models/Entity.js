@@ -57,7 +57,7 @@ class Entity {
      * @returns {String} id
      */
     static createId(length) {
-        if(!length) { length = 20; }
+        if(!length) { length = 8; }
         if(length < 4) { length = 4; }
 
         return crypto.randomBytes(length).toString('hex');

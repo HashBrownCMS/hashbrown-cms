@@ -1205,7 +1205,7 @@ function () {
 
   Entity.createId = function createId(length) {
     if (!length) {
-      length = 20;
+      length = 8;
     }
 
     if (length < 4) {
@@ -23655,6 +23655,19 @@ function (_Entity) {
     return Promise.reject(new Error('The "test" method should be overridden.'));
   };
   /**
+   * Renames a file
+   *
+   * @param {String} path
+   * @param {String} name
+   *
+   * @returns {Promise} Result
+   */
+
+
+  _proto.renameFile = function renameFile(path, name) {
+    return Promise.reject(new Error('The "renameFile" method should be overridden.'));
+  };
+  /**
    * Sets a file
    *
    * @param {String} path
@@ -23992,7 +24005,7 @@ function (_Entity) {
 
   Project.create = function create(name) {
     var project = new Project({
-      id: Entity.createId(10)
+      id: Entity.createId()
     });
     project.settings.usedBy = 'project';
     project.settings.info = {

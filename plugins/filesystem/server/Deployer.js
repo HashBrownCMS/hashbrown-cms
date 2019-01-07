@@ -89,6 +89,29 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
     }
     
     /**
+     * Rename file
+     *
+     * @param {String} oldPath
+     * @param {String} name
+     *
+     * @return {Promise} Promise
+     */
+    renameFile(oldPath, name) {
+        let newPath = Path.join(Path.dirname(oldPath), name);
+        
+        return new Promise((resolve, reject) => {
+            FileSystem.rename(oldPath, newPath, (err) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    resolve();
+                    debug.log('Renamed file successfully to ' + newPath, this);
+                }
+            });
+        });
+    }
+    
+    /**
      * Set file
      *
      * @param {String} path

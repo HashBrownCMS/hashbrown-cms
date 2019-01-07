@@ -103,6 +103,18 @@ class Deployer extends Entity {
     test() {
         return Promise.reject(new Error('The "test" method should be overridden.'));
     }
+    
+    /**
+     * Renames a file
+     *
+     * @param {String} path
+     * @param {String} name
+     *
+     * @returns {Promise} Result
+     */
+    renameFile(path, name) {
+        return Promise.reject(new Error('The "renameFile" method should be overridden.'));
+    }
 
     /**
      * Sets a file

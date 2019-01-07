@@ -209,6 +209,32 @@ class GitDeployer extends HashBrown.Models.Deployer {
             return this.pushRepo();   
         });
     }
+    
+    /**
+     * Renames a file
+     *
+     * @param {String} oldPath
+     * @param {String} name
+     *
+     * @return {Promise} Promise
+     */
+    renameFile(oldPath, name) {
+        let newPath = Path.join(Path.dirname(oldPath), name);
+        
+        return this.pullRepo()
+        .then(() => {
+            return new Promise((resolve, reject) => {
+                FileSystem.rename(oldPath, newPath, (err) => {
+                    if(err) { reject(err); }
+
+                    resolve();
+                });
+            });
+        })
+        .then(() => {
+            return this.pushRepo();
+        });
+    }
    
     /**
      * Removes a file

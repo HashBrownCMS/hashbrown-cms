@@ -39,6 +39,44 @@ class MediaPane extends NavbarPane {
     }
 
     /**
+     * Event: Click rename media
+     */
+    static onClickRenameMedia() {
+        let $element = $('.context-menu-target'); 
+        let id = $element.data('id');
+        let name = $element.data('name');
+
+        let modal = UI.messageModal(
+            'Rename ' + name,
+            new HashBrown.Views.Widgets.Input({
+                type: 'text',
+                value: name,
+                onChange: (newValue) => { name = newValue; }
+            }),
+            () => {
+                RequestHelper.request('post', 'media/rename/' + id + '?name=' + name)
+                .then(() => {
+                    return RequestHelper.reloadResource('media');
+                })
+                .then(() => {
+                    NavbarMain.reload();
+
+                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+
+                    if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
+                        mediaViewer.model = null;
+
+                        mediaViewer.fetch();
+                    }
+                })
+                .catch(UI.errorModal);
+            }
+        );
+
+        modal.$element.find('input').focus();
+    }
+
+    /**
      * Event: Click remove media
      */
     static onClickRemoveMedia() {
@@ -139,6 +177,7 @@ class MediaPane extends NavbarPane {
                 'This media': '---',
                 'Open in new tab': () => { this.onClickOpenInNewTab(); },
                 'Move': () => { this.onClickMoveItem(); },
+                'Rename': () => { this.onClickRenameMedia(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
                 'Copy id': () => { this.onClickCopyItemId(); },

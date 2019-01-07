@@ -1553,7 +1553,7 @@ function () {
 
   Entity.createId = function createId(length) {
     if (!length) {
-      length = 20;
+      length = 8;
     }
 
     if (length < 4) {
@@ -29162,6 +29162,19 @@ function (_Entity) {
     return Promise.reject(new Error('The "test" method should be overridden.'));
   };
   /**
+   * Renames a file
+   *
+   * @param {String} path
+   * @param {String} name
+   *
+   * @returns {Promise} Result
+   */
+
+
+  _proto.renameFile = function renameFile(path, name) {
+    return Promise.reject(new Error('The "renameFile" method should be overridden.'));
+  };
+  /**
    * Sets a file
    *
    * @param {String} path
@@ -29499,7 +29512,7 @@ function (_Entity) {
 
   Project.create = function create(name) {
     var project = new Project({
-      id: Entity.createId(10)
+      id: Entity.createId()
     });
     project.settings.usedBy = 'project';
     project.settings.info = {
@@ -32667,22 +32680,24 @@ function (_Crisp$View) {
       buttons: {},
       panes: {},
       items: {},
-      scroll: $('.navbar-main__pane.active .navbar-main__pane').scrollTop() || 0
+      scroll: $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop() || 0
     };
     this.$element.find('.navbar-main__tab').each(function (i, element) {
-      var $button = $(element);
-      var key = $button.data('route');
-      _this2.state.buttons[key] = $button[0].className;
+      var key = element.dataset.route;
+
+      if (!key) {
+        return;
+      }
+
+      _this2.state.buttons[key] = element.className;
     });
     this.$element.find('.navbar-main__pane').each(function (i, element) {
-      var $pane = $(element);
-      var key = $pane.data('route');
-      _this2.state.panes[key] = $pane[0].className;
+      var key = element.dataset.route;
+      _this2.state.panes[key] = element.className;
     });
     this.$element.find('.navbar-main__pane__item').each(function (i, element) {
-      var $item = $(element);
-      var key = $item.data('routing-path');
-      _this2.state.items[key] = $item[0].className.replace('loading', '');
+      var key = element.dataset.routingPath || element.dataset.mediaFolder;
+      _this2.state.items[key] = element.className.replace('loading', '');
     });
   };
   /**
@@ -32699,32 +32714,30 @@ function (_Crisp$View) {
 
 
     this.$element.find('.navbar-main__tab').each(function (i, element) {
-      var $button = $(element);
-      var key = $button.data('route');
+      var key = element.dataset.route;
 
-      if (_this3.state.buttons[key]) {
-        $button[0].className = _this3.state.buttons[key];
+      if (key && _this3.state.buttons[key]) {
+        element.className = _this3.state.buttons[key];
       }
     }); // Restore pane containers
 
     this.$element.find('.navbar-main__pane').each(function (i, element) {
-      var $pane = $(element);
-      var key = $pane.data('route');
+      var key = element.dataset.route;
 
-      if (_this3.state.panes[key]) {
-        $pane[0].className = _this3.state.panes[key];
+      if (key && _this3.state.panes[key]) {
+        element.className = _this3.state.panes[key];
       }
     }); // Restore pane items
 
     this.$element.find('.navbar-main__pane__item').each(function (i, element) {
-      var $item = $(element);
-      var key = $item.data('routing-path');
+      var key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-      if (_this3.state.items[key]) {
-        $item[0].className = _this3.state.items[key];
+      if (key && _this3.state.items[key]) {
+        element.className = _this3.state.items[key];
       }
-    });
-    $('.navbar-main__pane.active .navbar-main__pane__content').scrollTop(this.state.scroll || 0);
+    }); // Restore scroll position
+
+    $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this.state.scroll || 0);
     this.state = null;
   };
   /**
@@ -34711,6 +34724,36 @@ function (_NavbarPane) {
     }).catch(UI.errorModal);
   };
   /**
+   * Event: Click rename media
+   */
+
+
+  MediaPane.onClickRenameMedia = function onClickRenameMedia() {
+    var $element = $('.context-menu-target');
+    var id = $element.data('id');
+    var name = $element.data('name');
+    var modal = UI.messageModal('Rename ' + name, new HashBrown.Views.Widgets.Input({
+      type: 'text',
+      value: name,
+      onChange: function onChange(newValue) {
+        name = newValue;
+      }
+    }), function () {
+      RequestHelper.request('post', 'media/rename/' + id + '?name=' + name).then(function () {
+        return RequestHelper.reloadResource('media');
+      }).then(function () {
+        NavbarMain.reload();
+        var mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+
+        if (mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
+          mediaViewer.model = null;
+          mediaViewer.fetch();
+        }
+      }).catch(UI.errorModal);
+    });
+    modal.$element.find('input').focus();
+  };
+  /**
    * Event: Click remove media
    */
 
@@ -34807,6 +34850,9 @@ function (_NavbarPane) {
         },
         'Move': function Move() {
           _this.onClickMoveItem();
+        },
+        'Rename': function Rename() {
+          _this.onClickRenameMedia();
         },
         'Remove': function Remove() {
           _this.onClickRemoveMedia();
