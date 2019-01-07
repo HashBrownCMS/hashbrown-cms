@@ -25639,10 +25639,11 @@ function (_MediaHelperCommon) {
 
 
     window.addEventListener('hashchange', function () {
-      var mediaMatch = location.hash.match(/#\/media\/([0-9a-z]{40})/);
+      var isMediaView = location.hash.indexOf('#/media/') === 0;
 
-      if (mediaMatch && mediaMatch.length > 1) {
-        onPickMedia(mediaMatch[1]);
+      if (isMediaView) {
+        var id = location.hash.replace('#/media/', '');
+        onPickMedia(id);
       }
     }); // Listen for resource change
 

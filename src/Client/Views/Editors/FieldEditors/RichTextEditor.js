@@ -275,7 +275,7 @@ class RichTextEditor extends FieldEditor {
                         
                         // Failing that, use regex
                         } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
                         
                         }
                         
@@ -291,7 +291,7 @@ class RichTextEditor extends FieldEditor {
                         
                         // Failing that, use regex
                         } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
                         
                         }
                         

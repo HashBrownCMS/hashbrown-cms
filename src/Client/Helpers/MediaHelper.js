@@ -115,10 +115,12 @@ class MediaHelper extends MediaHelperCommon {
 
         // Listen for picked Media
         window.addEventListener('hashchange', () => {
-            let mediaMatch = location.hash.match(/#\/media\/([0-9a-z]{40})/); 
+            let isMediaView = location.hash.indexOf('#/media/') === 0;
 
-            if(mediaMatch && mediaMatch.length > 1) {
-                onPickMedia(mediaMatch[1]);
+            if(isMediaView) {
+                let id = location.hash.replace('#/media/', '');
+
+                onPickMedia(id);
             }
         }); 
        
