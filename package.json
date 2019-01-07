@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "app-module-path": "^2.2.0",
-    "bluebird": "^3.3.3",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",

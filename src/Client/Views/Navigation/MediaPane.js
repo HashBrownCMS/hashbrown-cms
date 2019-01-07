@@ -130,7 +130,7 @@ class MediaPane extends NavbarPane {
                     location.hash = '/media/' + ids;
 
                 // We got several ids back
-                } else {
+                } else if(Array.isArray(ids)) {
                     location.hash = '/media/' + ids[0];
                 
                 }

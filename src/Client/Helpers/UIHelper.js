@@ -20,7 +20,7 @@ class UIHelper {
         if(element === false) {
             $('.widget--highlight').remove();
 
-            return Promise.resolve();
+            return;
         }
 
         if(typeof element === 'string') {
@@ -28,8 +28,6 @@ class UIHelper {
         }
 
         if(!element) { return Promise.resolve(); }
-
-        this.highlight(false);
 
         return new Promise((resolve) => {
             let dismiss = () => {

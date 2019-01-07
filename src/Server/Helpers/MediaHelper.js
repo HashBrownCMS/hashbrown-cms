@@ -4,6 +4,7 @@ const Path = require('path');
 const FileSystem = require('fs');
 const RimRaf = require('rimraf');
 const Multer = require('multer');
+const Glob = require('glob');
 
 const Media = require('Server/Models/Media');
 const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
@@ -290,7 +291,7 @@ class MediaHelper extends MediaHelperCommon {
     }
 
     /**
-     * Cleans the media cache
+     * Cleans the Media cache
      */
     static cleanCache() {
         let storageFolder = Path.join(APP_ROOT, 'storage');
@@ -325,7 +326,52 @@ class MediaHelper extends MediaHelperCommon {
     }
 
     /**
-     * Gets a cached version of a media object
+     * Removes a cached version of a Media object
+     *
+     * @param {String} project
+     * @param {String} id
+     * 
+     * @return {Promise} Result
+     */
+    static removeCachedMedia(project, id) {
+        checkParam(project, 'project', String);
+        checkParam(id, 'id', String);
+
+        let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
+        let cachedPath = Path.join(cacheFolder, id);
+      
+        return new Promise((resolve, reject) => {
+            Glob(cachedPath + '*', (err, files) => {
+                if(err) { return reject(err); }
+
+                resolve(files);
+            });
+        })
+        .then((files) => {
+            let unlinkNext = () => {
+                let file = files ? files.pop() : null;
+
+                if(!file) { return Promise.resolve(); }
+
+                return new Promise((resolve, reject) => {
+                    FileSystem.unlink(file, (err) => {
+                        if(err) { return reject(err); }
+
+                        resolve();
+                    });
+                })
+                .then(() => {
+                    return unlinkNext(); 
+                });
+            };
+
+            return unlinkNext();
+        });
+    }
+
+
+    /**
+     * Gets a cached version of a Media object
      *
      * @param {String} project
      * @param {Media} media

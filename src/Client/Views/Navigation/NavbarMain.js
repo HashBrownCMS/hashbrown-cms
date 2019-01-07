@@ -370,10 +370,10 @@ class NavbarMain extends Crisp.View {
                     return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
                 
                 case 'dateAsc':
-                    return new Date(a.dataset.date) > new Date(b.dataset.date) ? 1 : -1;
+                    return new Date(a.dataset.updateDate) > new Date(b.dataset.updateDate) ? 1 : -1;
                 
                 case 'dateDesc':
-                    return new Date(a.dataset.date) < new Date(b.dataset.date) ? 1 : -1;
+                    return new Date(a.dataset.updateDate) < new Date(b.dataset.updateDate) ? 1 : -1;
 
                 default:
                     return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;

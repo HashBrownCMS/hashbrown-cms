@@ -183,7 +183,10 @@ class MediaController extends require('./ApiController') {
     static deleteMedia(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
+        HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
+        .then(() => {
+            return HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
+        })
         .then((connection) => {
             return connection.removeMedia(id);
         })
@@ -209,7 +212,7 @@ class MediaController extends require('./ApiController') {
         let id = req.params.id;
         let name = req.query.name;
 
-        return HashBrown.Helpers.MediaHelper.renameMedia(req.project, req.environment, id, name)
+        HashBrown.Helpers.MediaHelper.renameMedia(req.project, req.environment, id, name)
         .then(() => {
             res.status(200).send(id);
         })            
@@ -239,41 +242,10 @@ class MediaController extends require('./ApiController') {
         }
 
         if(file) {
-            return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
+            HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
             .then(() => {
-                res.status(200).send(id);
-            })            
-            .catch((e) => {
-                res.status(400).send(MediaController.printError(e));
-            });            
-
-        } else {
-            res.status(400).send(MediaController.printError(new Error('File was null')));
-        }
-    }
-
-    /**
-     * @example GET /api/:project/:environment/media/:id
-     *
-     * @apiGroup Media
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @param {FileData} Binary Media data
-     */
-    static setMedia(req, res) {
-        let file = req.file;
-        let files = req.files;
-        let id = req.params.id;
-
-        if(!file && files && files.length > 0) {
-            file = files[0];
-        }
-
-        if(file) {
-            return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
+                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
+            })
             .then(() => {
                 res.status(200).send(id);
             })            

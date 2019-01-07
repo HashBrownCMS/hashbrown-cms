@@ -216,14 +216,16 @@ Crisp.Router.route('/', function () {
 
 Crisp.Router.route('/content/', function () {
   Crisp.View.get('NavbarMain').showTab('/content/');
-  UI.setEditorSpaceContent([_.h1('Content'), _.if(resources.content.length < 1, _.p('Click the button below to get some example content to work with.'), _.button({
+  UI.setEditorSpaceContent([_.h1('Content'), _.button({
+    class: 'widget widget--button'
+  }, 'Quick tour').click(HashBrown.Helpers.ContentHelper.startTour), _.if(resources.content.length < 1, _.p('Click the button below to get some example content to work with.'), _.button({
     class: 'widget widget--button condensed',
     title: 'Click here to get some example content'
   }, 'Get example content').click(function () {
     RequestHelper.request('post', 'content/example').then(function () {
       location.reload();
     }).catch(UI.errorModal);
-  })), _.if(resources.content.length > 0, _.p('Right click in the content pane to create new content.'), _.p('Click on a content node to edit it.'))], 'text');
+  }))], 'text');
 }); // Edit (JSON editor)
 
 Crisp.Router.route('/content/json/:id', function () {
@@ -666,7 +668,7 @@ function (_Crisp$View) {
 
 
   _proto.template = function template() {
-    var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800';
+    var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800&t=' + Date.now();
     return _.div({
       class: 'editor editor--media'
     }, _.div({
@@ -32924,10 +32926,10 @@ function (_Crisp$View) {
           return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
 
         case 'dateAsc':
-          return new Date(a.dataset.date) > new Date(b.dataset.date) ? 1 : -1;
+          return new Date(a.dataset.updateDate) > new Date(b.dataset.updateDate) ? 1 : -1;
 
         case 'dateDesc':
-          return new Date(a.dataset.date) < new Date(b.dataset.date) ? 1 : -1;
+          return new Date(a.dataset.updateDate) < new Date(b.dataset.updateDate) ? 1 : -1;
 
         default:
           return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
@@ -34797,7 +34799,7 @@ function (_NavbarPane) {
         // We got one id back
         if (typeof ids === 'string') {
           location.hash = '/media/' + ids; // We got several ids back
-        } else {
+        } else if (Array.isArray(ids)) {
           location.hash = '/media/' + ids[0];
         } // Refresh on replace
 
@@ -41291,7 +41293,7 @@ function () {
 
     if (element === false) {
       $('.widget--highlight').remove();
-      return Promise.resolve();
+      return;
     }
 
     if (typeof element === 'string') {
@@ -41302,7 +41304,6 @@ function () {
       return Promise.resolve();
     }
 
-    this.highlight(false);
     return new Promise(function (resolve) {
       var dismiss = function dismiss() {
         $highlight.remove();
@@ -42188,7 +42189,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
  * The MIT License (MIT)
  * 
- * Copyright (c) 2013-2017 Petka Antonov
+ * Copyright (c) 2013-2018 Petka Antonov
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42211,7 +42212,7 @@ window.language = localStorage.getItem('language') || 'en';
  */
 
 /**
- * bluebird build version 3.5.0
+ * bluebird build version 3.5.3
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function (e) {
@@ -42418,30 +42419,32 @@ window.language = localStorage.getItem('language') || 'en';
         };
       }
 
-      Async.prototype._drainQueue = function (queue) {
+      function _drainQueue(queue) {
         while (queue.length() > 0) {
-          var fn = queue.shift();
+          _drainQueueStep(queue);
+        }
+      }
 
-          if (typeof fn !== "function") {
-            fn._settlePromises();
+      function _drainQueueStep(queue) {
+        var fn = queue.shift();
 
-            continue;
-          }
-
+        if (typeof fn !== "function") {
+          fn._settlePromises();
+        } else {
           var receiver = queue.shift();
           var arg = queue.shift();
           fn.call(receiver, arg);
         }
-      };
+      }
 
       Async.prototype._drainQueues = function () {
-        this._drainQueue(this._normalQueue);
+        _drainQueue(this._normalQueue);
 
         this._reset();
 
         this._haveDrainedQueues = true;
 
-        this._drainQueue(this._lateQueue);
+        _drainQueue(this._lateQueue);
       };
 
       Async.prototype._queueTick = function () {
@@ -42949,6 +42952,8 @@ window.language = localStorage.getItem('language') || 'en';
 
         var util = _dereq_("./util");
 
+        var es5 = _dereq_("./es5");
+
         var canAttachTrace = util.canAttachTrace;
         var unhandledRejectionHandled;
         var possiblyUnhandledRejection;
@@ -42975,7 +42980,10 @@ window.language = localStorage.getItem('language') || 'en';
 
           this._setRejectionIsUnhandled();
 
-          async.invokeLater(this._notifyUnhandledRejection, this, undefined);
+          var self = this;
+          setTimeout(function () {
+            self._notifyUnhandledRejection();
+          }, 1);
         };
 
         Promise.prototype._notifyUnhandledRejectionIsHandled = function () {
@@ -43054,6 +43062,7 @@ window.language = localStorage.getItem('language') || 'en';
           if (!config.longStackTraces && longStackTracesIsSupported()) {
             var Promise_captureStackTrace = Promise.prototype._captureStackTrace;
             var Promise_attachExtraTrace = Promise.prototype._attachExtraTrace;
+            var Promise_dereferenceTrace = Promise.prototype._dereferenceTrace;
             config.longStackTraces = true;
 
             disableLongStackTraces = function disableLongStackTraces() {
@@ -43063,6 +43072,7 @@ window.language = localStorage.getItem('language') || 'en';
 
               Promise.prototype._captureStackTrace = Promise_captureStackTrace;
               Promise.prototype._attachExtraTrace = Promise_attachExtraTrace;
+              Promise.prototype._dereferenceTrace = Promise_dereferenceTrace;
               Context.deactivateLongStackTraces();
               async.enableTrampoline();
               config.longStackTraces = false;
@@ -43070,6 +43080,7 @@ window.language = localStorage.getItem('language') || 'en';
 
             Promise.prototype._captureStackTrace = longStackTracesCaptureStackTrace;
             Promise.prototype._attachExtraTrace = longStackTracesAttachExtraTrace;
+            Promise.prototype._dereferenceTrace = longStackTracesDereferenceTrace;
             Context.activateLongStackTraces();
             async.disableTrampolineIfNecessary();
           }
@@ -43085,10 +43096,17 @@ window.language = localStorage.getItem('language') || 'en';
               var event = new CustomEvent("CustomEvent");
               util.global.dispatchEvent(event);
               return function (name, event) {
-                var domEvent = new CustomEvent(name.toLowerCase(), {
+                var eventData = {
                   detail: event,
                   cancelable: true
+                };
+                es5.defineProperty(eventData, "promise", {
+                  value: event.promise
                 });
+                es5.defineProperty(eventData, "reason", {
+                  value: event.reason
+                });
+                var domEvent = new CustomEvent(name.toLowerCase(), eventData);
                 return !util.global.dispatchEvent(domEvent);
               };
             } else if (typeof Event === "function") {
@@ -43099,6 +43117,12 @@ window.language = localStorage.getItem('language') || 'en';
                   cancelable: true
                 });
                 domEvent.detail = event;
+                es5.defineProperty(domEvent, "promise", {
+                  value: event.promise
+                });
+                es5.defineProperty(domEvent, "reason", {
+                  value: event.reason
+                });
                 return !util.global.dispatchEvent(domEvent);
               };
             } else {
@@ -43273,6 +43297,8 @@ window.language = localStorage.getItem('language') || 'en';
 
         Promise.prototype._attachExtraTrace = function () {};
 
+        Promise.prototype._dereferenceTrace = function () {};
+
         Promise.prototype._clearCancellationData = function () {};
 
         Promise.prototype._propagateFrom = function (parent, flags) {
@@ -43386,6 +43412,10 @@ window.language = localStorage.getItem('language') || 'en';
               util.notEnumerableProp(error, "__stackCleaned__", true);
             }
           }
+        }
+
+        function longStackTracesDereferenceTrace() {
+          this._trace = undefined;
         }
 
         function checkForgottenReturns(returnValue, promiseCreated, name, promise, parent) {
@@ -43929,6 +43959,7 @@ window.language = localStorage.getItem('language') || 'en';
       };
     }, {
       "./errors": 12,
+      "./es5": 13,
       "./util": 36
     }],
     10: [function (_dereq_, module, exports) {
@@ -45823,6 +45854,8 @@ window.language = localStorage.getItem('language') || 'en';
             } else {
               async.settlePromises(this);
             }
+
+            this._dereferenceTrace();
           }
         };
 
@@ -45941,7 +45974,7 @@ window.language = localStorage.getItem('language') || 'en';
         _dereq_("./join")(Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
 
         Promise.Promise = Promise;
-        Promise.version = "3.5.0";
+        Promise.version = "3.5.3";
 
         _dereq_('./map.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 
@@ -47986,12 +48019,14 @@ window.language = localStorage.getItem('language') || 'en';
         function FakeConstructor() {}
 
         FakeConstructor.prototype = obj;
-        var l = 8;
+        var receiver = new FakeConstructor();
 
-        while (l--) {
-          new FakeConstructor();
+        function ic() {
+          return typeof receiver.foo;
         }
 
+        ic();
+        ic();
         return obj;
         eval(obj);
       }
@@ -48021,7 +48056,7 @@ window.language = localStorage.getItem('language') || 'en';
       }
 
       function isError(obj) {
-        return obj !== null && typeof obj === "object" && typeof obj.message === "string" && typeof obj.name === "string";
+        return obj instanceof Error || obj !== null && typeof obj === "object" && typeof obj.message === "string" && typeof obj.name === "string";
       }
 
       function markAsOriginatingFromRejection(e) {
@@ -49691,7 +49726,7 @@ if (typeof window !== 'undefined' && window !== null) {
 /* 262 */
 /***/ (function(module) {
 
-module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"1.0.7","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.3.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
+module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"1.0.7","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.5.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
 
 /***/ })
 /******/ ]);
