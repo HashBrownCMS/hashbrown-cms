@@ -113,6 +113,7 @@ class ArrayEditor extends FieldEditor {
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
                         useMultiple: true,
+                        useTypeAhead: true,
                         labelKey: 'name',
                         valueKey: 'id',
                         value: config.allowedSchemas,
