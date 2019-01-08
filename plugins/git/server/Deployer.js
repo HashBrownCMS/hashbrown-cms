@@ -169,8 +169,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
 
                         files.push({
                             name: Path.basename(relativePath),
-                            path: fullPath,
-                            url: '/storage/plugins/git/' + Buffer.from(this.repo + (this.branch || 'master')).toString('base64') + '/' + relativePath
+                            path: fullPath
                         });
                     }
 
