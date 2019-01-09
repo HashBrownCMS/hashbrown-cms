@@ -294,7 +294,7 @@
                 }
             }
 
-            &.active &__toggle-children {
+            &.active > &__content &__toggle-children {
                 color: $primary-text;
             }
 

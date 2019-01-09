@@ -8371,7 +8371,7 @@ function (_Crisp$View) {
     }
 
     this.$saveBtn.toggleClass('working', true);
-    HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model).then(function () {
+    HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model).then(function (schema) {
       _this2.$saveBtn.toggleClass('working', false);
 
       return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
