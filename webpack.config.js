@@ -4,6 +4,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const exec = require('child_process').exec;
+const sass = require('sass/sass.dart.js');
+
+let isWatching = Array.isArray(process.argv) ? process.argv.indexOf('--watch') > -1 : false;
 
 // Define settings
 module.exports = {
@@ -13,9 +16,17 @@ module.exports = {
 
     // Input .js
     entry: {
-        client: './src/Client/client.js',
         dashboard: './src/Client/dashboard.js',
-        demo: './src/Client/demo.js'
+        demo: './src/Client/demo.js',
+        environment: './src/Client/environment.js',
+        
+        routes: './src/Client/Routes',
+        
+        common: './src/Common',
+        helpers: './src/Client/Helpers',
+        models: './src/Client/Models',
+        utilities: './src/Client/utilities',
+        views: './src/Client/Views',
     },
 
     // Output .js
@@ -49,12 +60,16 @@ module.exports = {
     }
 };
 
-// Watch SASS
-let sass = require('./node_modules/sass/sass.dart.js');
-   
-sass.run_([
-    '--watch',
-    '--source-map',
-    '--embed-sources',
-    './src/Client/Style/client.scss:./public/css/client.css'
-]);
+// Compile SASS
+// NOTE: We're compiling SASS separately, since depending on the WebPack process is too slow
+let sassArgs = [];
+
+if(isWatching) { 
+    sassArgs.push('--watch');
+}
+
+sassArgs.push('--source-map');
+sassArgs.push('--embed-sources'),
+sassArgs.push('./src/Client/Style/client.scss:./public/css/client.css');
+
+sass.run_(sassArgs);

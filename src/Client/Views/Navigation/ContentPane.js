@@ -1,19 +1,11 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-
-const NavbarPane = require('./NavbarPane');
-const NavbarMain = require('./NavbarMain');
-
 /**
  * The Content navbar pane
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class ContentPane extends NavbarPane {
+class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Change parent
      */
@@ -23,23 +15,23 @@ class ContentPane extends NavbarPane {
         }
 
         // Get the Content model
-        ContentHelper.getContentById(id)
+        HashBrown.Helpers.ContentHelper.getContentById(id)
 
         // API call to apply changes to Content parent
         .then((content) => {
             content.parentId = parentId;
          
-            return RequestHelper.request('post', 'content/' + id, content);
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(() => {
-            return RequestHelper.reloadResource('content');
+            return HashBrown.Helpers.RequestHelper.reloadResource('content');
         })
 
         // Reload UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         })
         .catch(UI.errorModal);
     }
@@ -53,24 +45,24 @@ class ContentPane extends NavbarPane {
         }
         
         // Get the Content model
-        ContentHelper.getContentById(id)
+        HashBrown.Helpers.ContentHelper.getContentById(id)
 
         // API call to apply changes to Content parent
         .then((content) => {
             content.sort = newIndex;
             content.parentId = parentId;
          
-            return RequestHelper.request('post', 'content/' + id, content);
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(() => {
-            return RequestHelper.reloadResource('content');
+            return HashBrown.Helpers.RequestHelper.reloadResource('content');
         })
 
         // Reload UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         })
         .catch(UI.errorModal);
     }
@@ -83,16 +75,16 @@ class ContentPane extends NavbarPane {
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Content by id
-        RequestHelper.request('post', 'content/pull/' + pullId, {})
+        HashBrown.Helpers.RequestHelper.request('post', 'content/pull/' + pullId, {})
         
         // Upon success, reload all Content models    
         .then(() => {
-            return RequestHelper.reloadResource('content');
+            return HashBrown.Helpers.RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
 			location.hash = '/content/' + pullId;
 		
@@ -116,16 +108,16 @@ class ContentPane extends NavbarPane {
 		$element.parent().addClass('loading');
 
         // API call to push the Content by id
-        RequestHelper.request('post', 'content/push/' + pushId)
+        HashBrown.Helpers.RequestHelper.request('post', 'content/push/' + pushId)
 
         // Upon success, reload all Content models
         .then(() => {
-            return RequestHelper.reloadResource('content');
+            return HashBrown.Helpers.RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }
@@ -139,9 +131,9 @@ class ContentPane extends NavbarPane {
         // Try to get a parent Schema if it exists
         return function getParentSchema() {
             if(parentId) {
-                return ContentHelper.getContentById(parentId)
+                return HashBrown.Helpers.ContentHelper.getContentById(parentId)
                 .then((parentContent) => {
-                    return SchemaHelper.getSchemaById(parentContent.schemaId);
+                    return HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
                 });
             } else {
                 return Promise.resolve();
@@ -159,7 +151,7 @@ class ContentPane extends NavbarPane {
             // Some child Schemas were provided, or no restrictions were defined
             } else {
                 let schemaId;
-                let sortIndex = ContentHelper.getNewSortIndex(parentId);
+                let sortIndex = HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
               
                 // Instatiate a new Content Schema reference editor
                 let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
@@ -200,16 +192,16 @@ class ContentPane extends NavbarPane {
                         }
 
                         // API call to create new Content node
-                        RequestHelper.request('post', apiUrl)
+                        HashBrown.Helpers.RequestHelper.request('post', apiUrl)
                         
                         // Upon success, reload resource and UI elements    
                         .then((result) => {
                             newContent = result;
 
-                            return RequestHelper.reloadResource('content');
+                            return HashBrown.Helpers.RequestHelper.reloadResource('content');
                         })
                         .then(() => {
-                            NavbarMain.reload();
+                            HashBrown.Views.Navigation.NavbarMain.reload();
                             
                             location.hash = '/content/' + newContent.id;
                         })
@@ -238,11 +230,11 @@ class ContentPane extends NavbarPane {
             content.settings.publishing = newValue;
     
             // API call to save the Content model
-            RequestHelper.request('post', 'content/' + content.id, content)
+            HashBrown.Helpers.RequestHelper.request('post', 'content/' + content.id, content)
             
             // Upon success, reload the UI    
             .then(() => {
-                NavbarMain.reload();
+                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 if(Crisp.Router.params.id == content.id) {
                     let contentEditor = Crisp.View.get('ContentEditor');
@@ -266,7 +258,7 @@ class ContentPane extends NavbarPane {
         let id = $('.context-menu-target').data('id');
 
         // Get Content model
-        let content = ContentHelper.getContentByIdSync(id);
+        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
 
         this.renderPublishingModal(content);
     }
@@ -281,21 +273,21 @@ class ContentPane extends NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
     
-        ContentHelper.getContentById(id)
+        HashBrown.Helpers.ContentHelper.getContentById(id)
         .then((content) => {
             content.settingsSanityCheck('publishing');
 
             function unpublishConnection() {
-                return RequestHelper.request('post', 'content/unpublish', content)
+                return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content)
                 .then(() => {
                     return onSuccess();
                 });
             }
             
             function onSuccess() {
-                return RequestHelper.reloadResource('content')
+                return HashBrown.Helpers.RequestHelper.reloadResource('content')
                 .then(() => {
-                    NavbarMain.reload();
+                    HashBrown.Views.Navigation.NavbarMain.reload();
                             
                     let contentEditor = Crisp.View.get('ContentEditor');
                    
@@ -337,7 +329,7 @@ class ContentPane extends NavbarPane {
                 () => {
                     $element.parent().toggleClass('loading', true);
 
-                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
+                    HashBrown.Helpers.RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
                     .then(() => {
                         if(shouldUnpublish && content.getSettings('publishing').connectionId) {
                             return unpublishConnection();
@@ -375,7 +367,7 @@ class ContentPane extends NavbarPane {
             () => {
                 HashBrown.Helpers.ContentHelper.setContentById(id, content)
                 .then(() => {
-                    return RequestHelper.reloadResource('content');
+                    return HashBrown.Helpers.RequestHelper.reloadResource('content');
                 })
                 .then(() => {
                     HashBrown.Views.Navigation.NavbarMain.reload();
@@ -397,13 +389,13 @@ class ContentPane extends NavbarPane {
      * Init
      */
     static init() {
-        NavbarMain.addTabPane('/content/', 'Content', 'file', {
+        HashBrown.Views.Navigation.NavbarMain.addTabPane('/content/', 'Content', 'file', {
             getItems: () => { return resources.content; },
 
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This content'] = '---';
                 

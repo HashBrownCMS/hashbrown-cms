@@ -2,8 +2,6 @@
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The client side media helper
  *
@@ -16,7 +14,7 @@ class MediaHelper extends MediaHelperCommon {
      * @returns {Promise(Object)} tree
      */
     static getTree() {
-        return RequestHelper.request('get', 'media/tree');
+        return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
     }
 
     /**
@@ -92,7 +90,7 @@ class MediaHelper extends MediaHelperCommon {
      * @returns {Promise} promise
      */
     static setTreeItem(id, item) {
-        return RequestHelper.request('post', 'media/tree/' + id, item);
+        return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
     }
 
     /**

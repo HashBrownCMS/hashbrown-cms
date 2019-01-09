@@ -1,10 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-const ContentEditor = require('Client/Views/Editors/ContentEditor');
-
 /**
  * A struct editor for editing any arbitrary object value
  *
@@ -37,7 +32,7 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class StructEditor extends FieldEditor {
+class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -346,16 +341,16 @@ class StructEditor extends FieldEditor {
                     UI.errorModal(new Error('Schema id not set for key "' + k + '"'));
                 }
 
-                let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
+                let fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
 
                 if(!fieldSchema) {
                     UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
                 }
 
-                let fieldEditor = ContentEditor.getFieldEditor(fieldSchema.editorId);
+                let fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId);
 
                 // Sanity check
-                value = ContentHelper.fieldSanityCheck(value, keySchema);
+                value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keySchema);
                 this.value[k] = value;
 
                 // Init the field editor

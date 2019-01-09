@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * An editor for content URLs
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class UrlEditor extends FieldEditor {
+class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 

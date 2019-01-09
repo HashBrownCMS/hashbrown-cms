@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A CSV string editor
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class TagsEditor extends FieldEditor {
+class TagsEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Constructor
      */

@@ -1,10 +1,5 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A rich text editor
  *
@@ -21,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class RichTextEditor extends FieldEditor {
+class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -104,7 +99,7 @@ class RichTextEditor extends FieldEditor {
         let mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
         mediaBrowser.on('select', (id) => {
-            MediaHelper.getMediaById(id)
+            HashBrown.Helpers.MediaHelper.getMediaById(id)
             .then((media) => {
                 let html = '';
 
@@ -271,11 +266,11 @@ class RichTextEditor extends FieldEditor {
 
                         // Fetch from data attribute
                         if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
                         
                         // Failing that, use regex
                         } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
                         
                         }
                         
@@ -287,11 +282,11 @@ class RichTextEditor extends FieldEditor {
 
                         // Fetch from data attribute
                         if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
                         
                         // Failing that, use regex
                         } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
                         
                         }
                         

@@ -1,10 +1,6 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 const ContentHelperCommon = require('Common/Helpers/ContentHelper');
-
-const Content = require('Client/Models/Content');
 
 /**
  * The client side content helper
@@ -39,9 +35,9 @@ class ContentHelper extends ContentHelperCommon {
     static getContentById(id) {
         if(!id) { return Promise.resolve(null); }
 
-        return RequestHelper.request('get', 'content/' + id)
+        return HashBrown.Helpers.RequestHelper.request('get', 'content/' + id)
         .then((content) => {
-            return Promise.resolve(new Content(content));
+            return Promise.resolve(new HashBrown.Models.Content(content));
         });
     }
     
@@ -57,7 +53,7 @@ class ContentHelper extends ContentHelperCommon {
         checkParam(id, 'id', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
-        return RequestHelper.request('post', 'content/' + id, content.getObject())
+        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content.getObject())
         .then((content) => {
             return Promise.resolve(content);
         });

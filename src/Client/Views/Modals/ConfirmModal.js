@@ -1,13 +1,11 @@
 'use strict';
 
-const Modal = require('./Modal');
-
 /**
  * A modal for confirming actions
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class ConfirmModal extends Modal {
+class ConfirmModal extends HashBrown.Views.Modals.Modal {
     /**
      * Post render
      */

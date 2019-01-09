@@ -3,19 +3,18 @@
 /**
  * @namespace HashBrown.Server.Models
  */
-module.exports = {
-    Connection: require('./Connection'),
-    Content: require('./Content'),
-    ContentSchema: require('./ContentSchema'),
-    Deployer: require('Common/Models/Deployer'),
-    Entity: require('Common/Models/Entity'),
-    FieldSchema: require('./FieldSchema'),
-    Form: require('Common/Models/Form'),
-    Media: require('./Media'),
-    Processor: require('Common/Models/Processor'),
-    Project: require('Common/Models/Project'),
-    Resource: require('Common/Models/Resource'),
-    Schema: require('Common/Models/Schema'),
-    Task: require('./Task'),
-    User: require('./User')
-};
+namespace('Models')
+.add(require('./Connection'))
+.add(require('./Content'))
+.add(require('./ContentSchema'))
+.add(require('Common/Models/Deployer'))
+.add(require('Common/Models/Entity'))
+.add(require('./FieldSchema'))
+.add(require('Common/Models/Form'))
+.add(require('./Media'))
+.add(require('Common/Models/Processor'))
+.add(require('Common/Models/Project'))
+.add(require('Common/Models/Resource'))
+.add(require('Common/Models/Schema'))
+.add(require('./Task'))
+.add(require('./User'));

@@ -101,6 +101,11 @@
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 position: relative;
 
+                .widget--button {
+                    float: left;
+                    margin: 0 0.5rem 0.5rem 0;
+                }
+
                 // Tablet mode
                 @media($sm) {
                     display: block;

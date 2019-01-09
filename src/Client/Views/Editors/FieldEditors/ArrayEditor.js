@@ -1,11 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-const ContentEditor = require('Client/Views/Editors/ContentEditor');
-
 /**
  * An array editor for editing a list of other field values
  *
@@ -27,7 +21,7 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class ArrayEditor extends FieldEditor {
+class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Constructor
      */
@@ -48,7 +42,7 @@ class ArrayEditor extends FieldEditor {
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                 .click((e) => {
-                    HashBrown.Helpers.UIHelper.fieldSortableArray(
+                    HashBrown.Helpers.UHashBrown.Helpers.IHelper.fieldSortableArray(
                         this.value,
                         $(e.currentTarget).parents('.editor__field')[0],
                         (newArray) => {
@@ -259,7 +253,7 @@ class ArrayEditor extends FieldEditor {
                     }
                     
                     // Perform sanity check on item value
-                    item.value = ContentHelper.fieldSanityCheck(item.value, schema);
+                    item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema);
 
                     // Init the field editor
                     let editorInstance = new editorClass({

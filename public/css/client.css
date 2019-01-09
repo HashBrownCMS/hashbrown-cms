@@ -416,6 +416,10 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
   position: relative;
 }
+.page--environment__space--editor__text .widget--button {
+  float: left;
+  margin: 0 0.5rem 0.5rem 0;
+}
 @media (max-width: 991px) {
   .page--environment__space--editor__text {
     display: block;

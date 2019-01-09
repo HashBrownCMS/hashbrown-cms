@@ -75,6 +75,7 @@ class NavbarMain extends Crisp.View {
         
         location.hash = e.currentTarget.dataset.route;
         
+        $('.navbar-main__pane__item.active').toggleClass('active', false);
         $('.page--environment__space--nav').toggleClass('expanded', true);
     }
 

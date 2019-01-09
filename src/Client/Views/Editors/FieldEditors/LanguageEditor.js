@@ -1,9 +1,5 @@
 'use strict';
 
-const LanguageHelper = require('Client/Helpers/LanguageHelper');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A field editor for specifying one of the selected languages
  *
@@ -20,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class LanguageEditor extends FieldEditor {
+class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Constructor
      */
@@ -34,7 +30,7 @@ class LanguageEditor extends FieldEditor {
      * Prerender
      */
     prerender() {
-        let options = LanguageHelper.getLanguagesSync();
+        let options = HashBrown.Helpers.LanguageHelper.getLanguagesSync();
 
         if(!this.value || options.indexOf(this.value) < 0) {
             this.value = options[0];
@@ -48,7 +44,7 @@ class LanguageEditor extends FieldEditor {
         return _.div({class: 'editor__field__value'},
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
-                options: LanguageHelper.getLanguagesSync(),
+                options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
                 tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;

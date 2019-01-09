@@ -1,13 +1,11 @@
 'use strict';
 
-const Widget = require('./Widget');
-
 /**
  * A group of chips
  *
  * @memberof HashBrown.Client.Views.Widgets
  */
-class Chips extends Widget {
+class Chips extends HashBrown.Views.Widgets.Widget {
     /**
      * Event: Change
      */

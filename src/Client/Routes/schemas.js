@@ -1,8 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-
 // Dashboard
 Crisp.Router.route('/schemas/', function() {
     if(currentUserHasScope('schemas')) {
@@ -32,20 +29,20 @@ Crisp.Router.route('/schemas/:id', () => {
         Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
        
         // First get the Schema model
-        SchemaHelper.getSchemaById(Crisp.Router.params.id)
+        HashBrown.Helpers.SchemaHelper.getSchemaById(Crisp.Router.params.id)
         .then((result) => {
-            schema = SchemaHelper.getModel(result);
+            schema = HashBrown.Helpers.SchemaHelper.getModel(result);
 
             // Then get the parent Schema, if available
             if(schema.parentSchemaId) {
-                return SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId);
+                return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId);
             }
     
             return Promise.resolve(null);
         })
         .then((result) => {
             if(result) {
-                parentSchema = SchemaHelper.getModel(result);
+                parentSchema = HashBrown.Helpers.SchemaHelper.getModel(result);
             }
 
             let schemaEditor;
@@ -75,10 +72,10 @@ Crisp.Router.route('/schemas/:id', () => {
 Crisp.Router.route('/schemas/json/:id', function() {
     if(currentUserHasScope('schemas')) {
         let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
-            model: SchemaHelper.getSchemaByIdSync(this.id),
+            model: HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(this.id),
             apiPath: 'schemas/' + this.id,
             onSuccess: () => {
-                return RequestHelper.reloadResource('schemas')
+                return HashBrown.Helpers.RequestViewer.reloadResource('schemas')
                 .then(() => {
                     let navbar = Crisp.View.get('NavbarMain');
                     

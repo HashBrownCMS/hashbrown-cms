@@ -1,8 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-
 /**
  * The editor for Forms
  *
@@ -28,12 +25,12 @@ class FormEditor extends Crisp.View {
     onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        RequestHelper.request('post', 'forms/' + this.model.id, this.model)
+        HashBrown.Helpers.RequestHelper.request('post', 'forms/' + this.model.id, this.model)
         .then(() => {
             debug.log('Saved form "' + this.model.id + '"', this);
             this.$saveBtn.toggleClass('working', false);
         
-            return RequestHelper.reloadResource('forms');
+            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
         })
         .then(() => {
             let navbar = Crisp.View.get('NavbarMain');
@@ -267,7 +264,7 @@ class FormEditor extends Crisp.View {
             _.div({class: 'widget-group'},
                 _.button({class: 'widget widget--button low warning'}, 'Clear').click(() => {
                     UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
-                        RequestHelper.request('post', 'forms/clear/' + this.model.id)
+                        HashBrown.Helpers.RequestHelper.request('post', 'forms/clear/' + this.model.id)
                         .then(() => {
                             this.model.entries = [];
                         })
@@ -275,7 +272,7 @@ class FormEditor extends Crisp.View {
                     });
                 }),
                 _.button({class: 'widget widget--button low'}, 'Get .csv').click(() => {
-                    location = RequestHelper.environmentUrl('forms/' + this.model.id + '/entries');
+                    location = HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.model.id + '/entries');
                 })
             )
         );
@@ -302,7 +299,7 @@ class FormEditor extends Crisp.View {
      */
     renderFields() {
         let $element = _.div({class: 'editor__body'});
-        let postUrl = location.protocol + '//' + location.hostname + '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
+        let postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
         
         return _.div({class: 'editor__body'},
             _.div({class: 'editor__field'},

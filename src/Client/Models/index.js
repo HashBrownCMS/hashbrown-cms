@@ -3,7 +3,7 @@
 /**
  * @namespace HashBrown.Client.Models
  */
-module.exports = {
+HashBrown.Models = {
     Content: require('./Content'),
     Connection: require('./Connection'),
     ContentSchema: require('Common/Models/ContentSchema'),

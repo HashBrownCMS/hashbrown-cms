@@ -1,31 +1,25 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
-const NavbarPane = require('./NavbarPane');
-const NavbarMain = require('./NavbarMain');
-
 /**
  * The Connection navbar pane
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class ConnectionPane extends NavbarPane {
+class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click new connection
      */
     static onClickNewConnection() {
         let newConnection;
 
-        RequestHelper.request('post', 'connections/new')
+        HashBrown.Helpers.RequestHelper.request('post', 'connections/new')
         .then((connection) => {
             newConnection = connection;
 
-            return RequestHelper.reloadResource('connections');
+            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             location.hash = '/connections/' + newConnection.id;
         })
@@ -41,14 +35,14 @@ class ConnectionPane extends NavbarPane {
         let name = $element.data('name');
         
         new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', () => {
-            RequestHelper.request('delete', 'connections/' + id)
+            HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id)
             .then(() => {
                 debug.log('Removed connection with alias "' + id + '"', this); 
 
-                return RequestHelper.reloadResource('connections');
+                return HashBrown.Helpers.RequestHelper.reloadResource('connections');
             })
             .then(() => {
-                NavbarMain.reload();
+                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 // Cancel the ConnectionEditor view if it was displaying the deleted connection
                 if(location.hash == '#/connections/' + id) {
@@ -67,16 +61,16 @@ class ConnectionPane extends NavbarPane {
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Connection by id
-        RequestHelper.request('post', 'connections/pull/' + pullId, {})
+        HashBrown.Helpers.RequestHelper.request('post', 'connections/pull/' + pullId, {})
         
         // Upon success, reload all Connection models    
         .then(() => {
-            return RequestHelper.reloadResource('connections');
+            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
 			location.hash = '/connections/' + pullId;
 		
@@ -100,16 +94,16 @@ class ConnectionPane extends NavbarPane {
 		$element.parent().addClass('loading');
 
         // API call to push the Connection by id
-        RequestHelper.request('post', 'connections/push/' + pushId)
+        HashBrown.Helpers.RequestHelper.request('post', 'connections/push/' + pushId)
 
         // Upon success, reload all Connection models
         .then(() => {
-            return RequestHelper.reloadResource('connections');
+            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }
@@ -120,7 +114,7 @@ class ConnectionPane extends NavbarPane {
     static init() {
         if(!currentUserHasScope('connections')) { return; }
 
-        NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+        HashBrown.Views.Navigation.NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
             icon: 'exchange',
             
             getItems: () => { return resources.connections; },
@@ -128,7 +122,7 @@ class ConnectionPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This connection'] = '---';
 

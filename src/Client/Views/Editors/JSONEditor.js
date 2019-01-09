@@ -1,8 +1,6 @@
 'use strict';
 
 const beautify = require('js-beautify').js_beautify;
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * A basic JSON editor for any object
@@ -19,7 +17,7 @@ class JSONEditor extends Crisp.View {
         ).hide();
 
         if(!this.model && !this.modelUrl) {
-            this.modelUrl = RequestHelper.environmentUrl(this.apiPath);
+            this.modelUrl = HashBrown.Helpers.RequestHelper.environmentUrl(this.apiPath);
         }
 
         this.fetch();
@@ -47,7 +45,7 @@ class JSONEditor extends Crisp.View {
         this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
-            RequestHelper.request('post', this.apiPath, this.model)
+            HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model)
             .then(() => {
                 this.$saveBtn.toggleClass('working', false);
             })
@@ -89,7 +87,7 @@ class JSONEditor extends Crisp.View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
-                    if(SchemaHelper.getSchemaByIdSync(v)) {
+                    if(HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
                         return;
                     }
 

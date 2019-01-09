@@ -3,13 +3,12 @@
 /**
  * @namespace HashBrown.Client.Views.Modals
  */
-module.exports = {
-    Modal: require('./Modal'),
-    MediaUploader: require('./MediaUploader'),
-    MediaBrowser: require('./MediaBrowser'),
-    IconModal: require('./IconModal'),
-    ConfirmModal: require('./ConfirmModal'),
-    DateModal: require('./DateModal'),
-    PublishingSettingsModal: require('./PublishingSettingsModal'),
-    IframeModal: require('./IframeModal')
-};
+namespace('Views.Modals')
+.add(require('./Modal'))
+.add(require('./ConfirmModal'))
+.add(require('./DateModal'))
+.add(require('./IconModal'))
+.add(require('./IframeModal'))
+.add(require('./MediaBrowser'))
+.add(require('./MediaUploader'))
+.add(require('./PublishingSettingsModal'));

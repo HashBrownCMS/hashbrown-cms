@@ -1,7 +1,5 @@
 'use strict';
 
-const SettingsHelper = require('Client/Helpers/SettingsHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
 
 let selectedLanguages = {};
@@ -20,9 +18,9 @@ class LanguageHelper extends LanguageHelperCommon {
      * @returns {Array} List of language names
      */
     static getLanguages(project) {
-        project = project || ProjectHelper.currentProject;
+        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
 
-        return SettingsHelper.getSettings(project, null, 'languages')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages')
         .then((selected) => {
             if(!selected || !Array.isArray(selected)) {
                 selected = ['en'];
@@ -44,7 +42,7 @@ class LanguageHelper extends LanguageHelperCommon {
      * @returns {Array} List of language names
      */
     static getLanguagesSync(project) {
-        project = project || ProjectHelper.currentProject;
+        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
 
         return selectedLanguages[project] || ['en'];
     }
@@ -65,7 +63,7 @@ class LanguageHelper extends LanguageHelperCommon {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
         }
 
-        return SettingsHelper.setSettings(project, null, 'languages', languages);
+        return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
     }
 }
 

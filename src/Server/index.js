@@ -3,13 +3,7 @@
 /**
  * @namespace HashBrown.Server
  */
-
-// Common
-require('Common/common');
-
-// ----------
 // Libs
-// ----------
 const HTTP = require('http');
 const Express = require('express');
 const BodyParser = require('body-parser');
@@ -17,44 +11,34 @@ const CookieParser = require('cookie-parser');
 const ExpressWebSockets = require('express-ws');
 const FileSystem = require('fs');
 
-// ----------
 // Express app
-// ----------
 const app = Express();
 
 app.set('view engine', 'pug');
 app.set('views', APP_ROOT + '/src/Server/Views');
 
-// ----------
 // App middlewares
-// ----------
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
 app.use(Express.static(APP_ROOT + '/public'));
 app.use('/storage/plugins', Express.static(APP_ROOT + '/storage/plugins'));
 
-// ----------
-// Namespaces
-// ----------
-global.HashBrown = {};
-HashBrown.Helpers = require('Server/Helpers');
-HashBrown.Models = require('Server/Models');
-HashBrown.Controllers = require('Server/Controllers');
+// Dependencies
+require('Common');
+require('Server/Helpers');
+require('Server/Models');
+require('Server/Controllers');
 
 global.debug = HashBrown.Helpers.DebugHelper;
 
-// ----------
 // Init
-// ----------
 HashBrown.Helpers.PluginHelper.init(app)
 .then(ready)
 .catch((e) => {
     throw e;
 });
 
-// ----------
 // Check args
-// ----------
 function checkArgs() {
     let cmd = process.argv[2];
     let args = {};
@@ -106,9 +90,7 @@ function checkArgs() {
     }
 }
 
-// ----------
 // Ready callback
-// ----------
 function ready(files) {
     // Check for args, and close the app if any were run
     checkArgs()

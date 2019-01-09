@@ -1,26 +1,20 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
-const NavbarPane = require('./NavbarPane');
-const NavbarMain = require('./NavbarMain');
-
 /**
  * The Forms navbar pane
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class FormsPane extends NavbarPane {
+class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click create new form
      */
     static onClickNewForm() {
-        RequestHelper.request('post', 'forms/new')
+        HashBrown.Helpers.RequestHelper.request('post', 'forms/new')
         .then((newFormId) => {
-            return RequestHelper.reloadResource('forms')
+            return HashBrown.Helpers.RequestHelper.reloadResource('forms')
             .then(() => {
-                NavbarMain.reload();
+                HashBrown.Views.Navigation.NavbarMain.reload();
                 
                 location.hash = '/forms/' + newFormId;
             });
@@ -42,14 +36,14 @@ class FormsPane extends NavbarPane {
             'Delete form',
             'Are you sure you want to delete the form "' + form.title + '"?',
             () => {
-                RequestHelper.request('delete', 'forms/' + form.id)
+                HashBrown.Helpers.RequestHelper.request('delete', 'forms/' + form.id)
                 .then(() => {
                     debug.log('Removed Form with id "' + form.id + '"', view); 
 
-                    return RequestHelper.reloadResource('forms');
+                    return HashBrown.Helpers.RequestHelper.reloadResource('forms');
                 })
                 .then(() => {
-                    NavbarMain.reload();
+                    HashBrown.Views.Navigation.NavbarMain.reload();
 
                     // Cancel the FormEditor view
                     location.hash = '/forms/';
@@ -66,16 +60,16 @@ class FormsPane extends NavbarPane {
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Form by id
-        RequestHelper.request('post', 'forms/pull/' + pullId, {})
+        HashBrown.Helpers.RequestHelper.request('post', 'forms/pull/' + pullId, {})
         
         // Upon success, reload all Form models    
         .then(() => {
-            return RequestHelper.reloadResource('forms');
+            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
         })
 
         // Reload the UI
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
 			location.hash = '/forms/' + pullId;
 		
@@ -98,12 +92,12 @@ class FormsPane extends NavbarPane {
 
 		$element.parent().addClass('loading');
 
-        RequestHelper.request('post', 'forms/push/' + pushId)
+        HashBrown.Helpers.RequestHelper.request('post', 'forms/push/' + pushId)
         .then(() => {
-            return RequestHelper.reloadResource('forms');
+            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }
@@ -112,7 +106,7 @@ class FormsPane extends NavbarPane {
      * Init
      */
     static init() {
-        NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+        HashBrown.Views.Navigation.NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
             icon: 'wpforms',
             
             getItems: () => { return resources.forms; },
@@ -130,7 +124,7 @@ class FormsPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This form'] = '---';
 

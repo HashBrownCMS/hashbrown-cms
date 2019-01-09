@@ -1,7 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 // Dashboard
 Crisp.Router.route('/connections/', function() {
     if(currentUserHasScope('connections')) {
@@ -11,7 +9,9 @@ Crisp.Router.route('/connections/', function() {
             [
                 _.h1('Connections'),
                 _.p('Right click in the Connections pane to create a new Connection.'),
-                _.p('Click on a Connection to edit it.')
+                _.p('Click on a Connection to edit it.'),
+                _.button({class: 'widget widget--button'}, 'New Connection')
+                    .click(() => { HashBrown.Views.Navigation.ConnectionPane.onClickNewConnection(); }),
             ],
             'text'
         );
@@ -26,7 +26,7 @@ Crisp.Router.route('/connections/', function() {
 Crisp.Router.route('/connections/:id', function() {
     if(currentUserHasScope('connections')) {
         let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-            modelUrl: RequestHelper.environmentUrl('connections/' + this.id)
+            modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + this.id)
         });
        
         Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);

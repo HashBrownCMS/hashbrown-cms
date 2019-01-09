@@ -1,7 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The project backup editor
  *
@@ -20,9 +18,9 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                 onSubmit: (formData) => {
                     let apiPath = 'server/backups/' + this.model.id + '/upload';
 
-                    // TODO: Use the RequestHelper for this
+                    // TODO: Use the HashBrown.Helpers.ReqestHelper for this
                     $.ajax({
-                        url: RequestHelper.environmentUrl(apiPath),
+                        url: HashBrown.Helpers.RequestHelper.environmentUrl(apiPath),
                         type: 'POST',
                         data: formData,
                         processData: false,
@@ -55,7 +53,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
     onClickCreateBackup() {
         if(!currentUserIsAdmin()) { return; }
 
-        RequestHelper.request('post', 'server/backups/' + this.model.id + '/new')
+        HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + this.model.id + '/new')
         .then((data) => {
             this.model = null;
             this.fetch();
@@ -79,7 +77,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
         }
                             
         let modal = UI.confirmModal('restore', 'Restore backup', 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.', () => {
-            RequestHelper.request('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
+            HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
             .then(() => {
                 modal.close();
                 
@@ -105,7 +103,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
         }
         
         let modal = UI.confirmModal('delete', 'Delete backup', 'Are you sure you want to delete the backup "' + label + '"?', () => {
-            RequestHelper.request('delete', 'server/backups/' + this.model.id + '/' + timestamp)
+            HashBrown.Helpers.RequestHelper.request('delete', 'server/backups/' + this.model.id + '/' + timestamp)
             .then(() => {
                 modal.close();
 
@@ -145,7 +143,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                         reverseKeys: true,
                         options: {
                             'Restore': () => { this.onClickRestoreBackup(backup); },
-                            'Download': () => { location = RequestHelper.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba') },
+                            'Download': () => { location = HashBrown.Helpers.ReqestHelper.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba') },
                             'Delete': () => { this.onClickDeleteBackup(backup); }
                         }
                     }).$element

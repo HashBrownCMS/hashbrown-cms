@@ -398,7 +398,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {String} project
      * @param {String} environment
      * @param {Number} id
-     * @param {Object} schema
+     * @param {Schema} schema
      * @param {Boolean} create
      *
      * @return {Promise} Resulting Schema

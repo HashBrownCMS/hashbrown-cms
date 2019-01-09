@@ -1,8 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
-
 /**
  * The editor for Connections
  *
@@ -28,7 +25,7 @@ class ConnectionEditor extends Crisp.View {
     onClickSave() {
         this.$saveBtn.toggleClass('saving', true);
 
-        RequestHelper.request('post', 'connections/' + this.model.id, this.model)
+        HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
         .then(() => {
             this.$saveBtn.toggleClass('saving', false);
        
@@ -45,7 +42,7 @@ class ConnectionEditor extends Crisp.View {
             value: false,
             type: 'checkbox',
             onChange: (isProvider) => {
-                ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
+                HashBrown.Helpers.ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
                 .catch(UI.errorModal);
             }
         });
@@ -53,7 +50,7 @@ class ConnectionEditor extends Crisp.View {
         // Set the value
         input.$element.toggleClass('working', true);
 
-        ConnectionHelper.getMediaProvider()
+        HashBrown.Helpers.ConnectionHelper.getMediaProvider()
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
                 input.value = true;

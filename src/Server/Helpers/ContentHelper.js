@@ -341,7 +341,7 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @returns {Promise} Result
      */
-    static createExampleContent(project, environment, user = requieredParam('user')) {
+    static createExampleContent(project, environment, user = requiredParam('user')) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 

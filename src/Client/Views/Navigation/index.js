@@ -3,13 +3,12 @@
 /**
  * @namespace HashBrown.Client.Views.Navigation
  */
-module.exports = {
-    ConnectionPane: require('./ConnectionPane'),
-    ContentPane: require('./ContentPane'),
-    FormsPane: require('./FormsPane'),
-    MainMenu: require('./MainMenu'),
-    MediaPane: require('./MediaPane'),
-    NavbarMain: require('./NavbarMain'),
-    NavbarPane: require('./NavbarPane'),
-    SchemaPane: require('./SchemaPane')
-};
+namespace('Views.Navigation')
+.add(require('./NavbarMain'))
+.add(require('./MainMenu'))
+.add(require('./NavbarPane'))
+.add(require('./ConnectionPane'))
+.add(require('./ContentPane'))
+.add(require('./FormsPane'))
+.add(require('./MediaPane'))
+.add(require('./SchemaPane'));

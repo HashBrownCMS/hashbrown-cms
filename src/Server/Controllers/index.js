@@ -3,22 +3,21 @@
 /**
  * @namespace HashBrown.Server.Controllers
  */
-module.exports = {
-    ApiController: require('./ApiController'),
-    ConfigController: require('./ConfigController'),
-    ConnectionController: require('./ConnectionController'),
-    ContentController: require('./ContentController'),
-    Controller: require('./Controller'),
-    DebugController: require('./DebugController'),
-    FormsController: require('./FormsController'),
-    MediaController: require('./MediaController'),
-    PluginController: require('./PluginController'),
-    ScheduleController: require('./ScheduleController'),
-    SchemaController: require('./SchemaController'),
-    ServerController: require('./ServerController'),
-    SettingsController: require('./SettingsController'),
-    SyncController: require('./SyncController'),
-    TestController: require('./TestController'),
-    UserController: require('./UserController'),
-    ViewController: require('./ViewController')
-};
+namespace('Controllers')
+.add(require('./ApiController'))
+.add(require('./ConfigController'))
+.add(require('./ConnectionController'))
+.add(require('./ContentController'))
+.add(require('./Controller'))
+.add(require('./DebugController'))
+.add(require('./FormsController'))
+.add(require('./MediaController'))
+.add(require('./PluginController'))
+.add(require('./ScheduleController'))
+.add(require('./SchemaController'))
+.add(require('./ServerController'))
+.add(require('./SettingsController'))
+.add(require('./SyncController'))
+.add(require('./TestController'))
+.add(require('./UserController'))
+.add(require('./ViewController'));

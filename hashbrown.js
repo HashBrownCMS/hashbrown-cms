@@ -26,4 +26,4 @@ Promise.onPossiblyUnhandledRejection((error, promise) => {
 });
 
 // Include main server module
-require(APP_ROOT + '/src/Server/server.js');
+require(APP_ROOT + '/src/Server');

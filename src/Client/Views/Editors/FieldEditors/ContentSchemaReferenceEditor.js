@@ -1,10 +1,5 @@
 'use strict';
 
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * An editor for referencing Content Schemas
  *
@@ -24,7 +19,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class ContentSchemaReferenceEditor extends FieldEditor {
+class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
        
@@ -60,7 +55,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
         // Fetch parent Content
         if(!thisContent.parentId) { return null; }
         
-        let parentContent = ContentHelper.getContentByIdSync(thisContent.parentId);
+        let parentContent = HashBrown.Helpers.ContentHelper.getContentByIdSync(thisContent.parentId);
 
         if(!parentContent) {
             UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
@@ -68,7 +63,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
         }
 
         // Fetch parent Schema
-        let parentSchema = SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
+        let parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
             
         if(!parentSchema) {
             UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));

@@ -1,12 +1,5 @@
 'use strict';
 
-const Content = require('Client/Models/Content'); 
-
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The editor view for Content objects
  *
@@ -75,21 +68,21 @@ class ContentEditor extends Crisp.View {
             if(this.model.getSettings('publishing').connectionId) {
                 // Unpublish
                 if(saveAction === 'unpublish') {
-                    return RequestHelper.request('post', 'content/unpublish', this.model);
+                    return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
 
                 // Publish
                 } else if(saveAction === 'publish') {
-                    return RequestHelper.request('post', 'content/publish', this.model);
+                    return HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
                 
                 // Preview
                 } else if(saveAction === 'preview') {
-                    return RequestHelper.request('post', 'content/preview', this.model);
+                    return HashBrown.Helpers.RequestHelper.request('post', 'content/preview', this.model);
 
                 }
             }
 
             // Just save normally
-            return RequestHelper.request('post', 'content/' + this.model.id, this.model);
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + this.model.id, this.model);
         }
 
         this.$saveBtn.toggleClass('working', true);
@@ -99,7 +92,7 @@ class ContentEditor extends Crisp.View {
         .then((url) => {
             postSaveUrl = url;
             
-            return RequestHelper.reloadResource('content');
+            return HashBrown.Helpers.RequestHelper.reloadResource('content');
         })
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
@@ -216,7 +209,7 @@ class ContentEditor extends Crisp.View {
      * @return {Object} element
      */
     renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
-        let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
+        let compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
         if(!compiledSchema) {
             return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
@@ -326,7 +319,7 @@ class ContentEditor extends Crisp.View {
         // Render all fields
         return _.each(tabFieldDefinitions, (key, fieldDefinition) => {
             // Field value sanity check
-            fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
+            fieldValues[key] = HashBrown.Helpers.ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
             // Render the field actions container
             let $keyActions;
@@ -442,7 +435,7 @@ class ContentEditor extends Crisp.View {
         let contentUrl = this.model.properties.url;
 
         if(connectionId) {
-            connection = ConnectionHelper.getConnectionByIdSync(connectionId);
+            connection = HashBrown.Helpers.ConnectionHelper.getConnectionByIdSync(connectionId);
                 
             if(connection && connection.url && contentUrl) {
                 // Language versioning
@@ -538,7 +531,7 @@ class ContentEditor extends Crisp.View {
         // Fetch information
         let contentSchema;
 
-        return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
+        return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
 

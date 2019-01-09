@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple list picker
  *
@@ -30,7 +28,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class DropdownEditor extends FieldEditor {
+class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 

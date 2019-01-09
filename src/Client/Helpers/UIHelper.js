@@ -557,12 +557,14 @@ class UIHelper {
                 error = new Error(error.responseText);
             }
         
-        } else if(error instanceof Error == false) {
+        } else if(error instanceof Error === false) {
             error = new Error(error.toString());
 
         }
-
-        console.log(error.stack);
+        
+        setTimeout(() => {
+            throw error;
+        }, 100);
         
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }

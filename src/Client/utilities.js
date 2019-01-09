@@ -1,9 +1,3 @@
-window.Promise = require('bluebird');
-window.marked = require('marked');
-
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const User = require('Common/Models/User');
-
 /**
  * Converts a string from HTML to markdown
  *
@@ -19,7 +13,7 @@ window.toMarkdown = function toMarkdown(html) {
  * @returns {Boolean} Is admin
  */
 window.currentUserIsAdmin = function isCurrentUserAdmin() {
-    return User.current.isAdmin;
+    return HashBrown.Models.User.current.isAdmin;
 }
 
 /**
@@ -30,7 +24,7 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  * @returns {Boolean} Has scope
  */
 window.currentUserHasScope = function currentUsr(scope) {
-    return User.current.hasScope(ProjectHelper.currentProject, scope);
+    return HashBrown.Models.User.current.hasScope(HashBrown.Helpers.ProjectHelper.currentProject, scope);
 }
 
 /**
@@ -98,9 +92,3 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
         $workspace.addClass(classes);
     }
 };
-
-// Get package file
-window.app = require('package.json');
-
-// Language
-window.language = localStorage.getItem('language') || 'en';

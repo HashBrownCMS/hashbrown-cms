@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple boolean editor
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class BooleanEditor extends FieldEditor {
+class BooleanEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Constructor
      */

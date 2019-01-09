@@ -1,13 +1,11 @@
 'use strict';
 
-const Modal = require('./Modal');
-
 /**
  * A modal for showng iframes
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class IframeModal extends Modal {
+class IframeModal extends HashBrown.Views.Modals.Modal {
     /**
      * Post render
      */

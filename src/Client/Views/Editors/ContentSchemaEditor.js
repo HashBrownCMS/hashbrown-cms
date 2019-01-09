@@ -1,13 +1,11 @@
 'use strict';
 
-const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
-
 /**
  * The editor for Content Schemas
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ContentSchemaEditor extends SchemaEditor {
+class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
     /**
      * Gets parent tabs
      *

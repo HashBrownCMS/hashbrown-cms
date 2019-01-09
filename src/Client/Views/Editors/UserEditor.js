@@ -1,7 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * An editor for Users
  *
@@ -24,7 +22,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
 
         super(params);
 
-        RequestHelper.customRequest('get', '/api/server/projects')
+        HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects')
         .then((projects) => {
             this.projects = projects;
 
@@ -42,7 +40,7 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             newUserObject.password = this.newPassword;
         }
 
-        RequestHelper.request('post', 'user/' + this.model.id, newUserObject)
+        HashBrown.Helpers.RequestHelper.request('post', 'user/' + this.model.id, newUserObject)
         .then(() => {
             this.close();
 

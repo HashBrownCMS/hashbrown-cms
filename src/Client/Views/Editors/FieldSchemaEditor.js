@@ -1,13 +1,11 @@
 'use strict';
 
-const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
-
 /**
  * The editor for field Schemas
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class FieldSchemaEditor extends SchemaEditor {
+class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
     /**
      * Pre render
      */

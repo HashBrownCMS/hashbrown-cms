@@ -3,12 +3,6 @@
 // Icons
 let icons = require('../../icons.json').icons;
 
-const Schema = require('Common/Models/Schema');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const ContentHelper = require('Client/Helpers/ContentHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const JSONEditor = require('Client/Views/Editors/JSONEditor');
-
 /**
  * The editor for schemas
  *
@@ -38,11 +32,11 @@ class SchemaEditor extends Crisp.View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model)
+        HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model)
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
         
-            return RequestHelper.reloadResource('schemas');
+            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
         })
         .then(() => {
             Crisp.View.get('NavbarMain').reload();

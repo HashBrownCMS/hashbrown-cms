@@ -1,13 +1,11 @@
 'use strict';
 
-const Widget = require('./Widget');
-
 /**
  * A versatile input widget
  *
  * @memberof HashBrown.Client.Views.Widgets
  */
-class Input extends Widget {
+class Input extends HashBrown.Views.Widgets.Widget {
     /**
      * Event: Change value
      *

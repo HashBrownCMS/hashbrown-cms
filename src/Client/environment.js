@@ -3,57 +3,38 @@
 /**
  * @namespace HashBrown.Client
  */
-
-// Get routes
-require('Client/Routes');
-
-// Common
-require('Common/common');
-
-// Resource cache
-window.resources = {
-    connections: [],
-    content: [],
-    schemas: [],
-    media: [],
-    forms: [],
-    users: []
-};
-
-// Namespaces
-window._ = Crisp.Elements;
-
-window.HashBrown = {};
-
-HashBrown.Models = require('Client/Models');
-HashBrown.Views = {};
-HashBrown.Views.Widgets = require('Client/Views/Widgets');
-HashBrown.Views.Modals = require('Client/Views/Modals');
-HashBrown.Views.Navigation = require('Client/Views/Navigation');
-HashBrown.Views.Editors = require('Client/Views/Editors');
-HashBrown.Views.Editors.DeployerEditors = {};
-HashBrown.Views.Editors.ProcessorEditors = {};
-HashBrown.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditors');
-HashBrown.Helpers = require('Client/Helpers');
-
-// Helper shortcuts
-window.debug = HashBrown.Helpers.DebugHelper;
-window.UI = HashBrown.Helpers.UIHelper;
-
-// Helper functions
-require('Client/utilities');
-
-// Preload resources
 document.addEventListener('DOMContentLoaded', () => {
-    const SettingsHelper = HashBrown.Helpers.SettingsHelper;
-    const LanguageHelper = HashBrown.Helpers.LanguageHelper;
-    const ProjectHelper = HashBrown.Helpers.ProjectHelper;
+    // Resource cache
+    window.resources = {
+        connections: [],
+        content: [],
+        schemas: [],
+        media: [],
+        forms: [],
+        users: []
+    };
 
+    // Libraries
+    window._ = Crisp.Elements;
+    window.Promise = require('bluebird');
+    window.marked = require('marked');
+
+    // Helper shortcuts
+    window.debug = HashBrown.Helpers.DebugHelper;
+    window.UI = HashBrown.Helpers.UIHelper;
+
+    // Get package file
+    window.app = require('package.json');
+
+    // Language
+    window.language = localStorage.getItem('language') || 'en';
+
+    // Preload resources
     $('.page--environment__spinner').toggleClass('hidden', false);
 
-    SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
+    HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync')
     .then(() => {
-        return LanguageHelper.getLanguages(ProjectHelper.currentProject);
+        return HashBrown.Helpers.LanguageHelper.getLanguages(HashBrown.Helpers.ProjectHelper.currentProject);
     })
     .then(() => {
         return HashBrown.Helpers.RequestHelper.reloadAllResources();

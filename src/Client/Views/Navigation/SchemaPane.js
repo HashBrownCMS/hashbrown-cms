@@ -1,25 +1,18 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-
-const NavbarPane = require('./NavbarPane');
-const NavbarMain = require('./NavbarMain');
-
 /**
  * The Schema navbar pane
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class SchemaPane extends NavbarPane {
+class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click remove schema
      */
     static onClickRemoveSchema() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let schema = SchemaHelper.getSchemaByIdSync(id);
+        let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
         
         if(!schema.isLocked) {
             UI.confirmModal(
@@ -27,14 +20,14 @@ class SchemaPane extends NavbarPane {
                 'Delete schema',
                 'Are you sure you want to delete the schema "' + schema.name + '"?',
                 () => {
-                    RequestHelper.request('delete', 'schemas/' + id)
+                    HashBrown.Helpers.RequestHelper.request('delete', 'schemas/' + id)
                     .then(() => {
                         debug.log('Removed schema with id "' + id + '"', this); 
 
-                        return RequestHelper.reloadResource('schemas');
+                        return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
                     })
                     .then(() => {
-                        NavbarMain.reload();
+                        HashBrown.Views.Navigation.NavbarMain.reload();
 
                         // Cancel the SchemaEditor view if it was displaying the deleted content
                         if(location.hash == '#/schemas/' + id) {
@@ -53,17 +46,17 @@ class SchemaPane extends NavbarPane {
     }
 
     /**
-     * Event: Click new schema
+     * Event: Click new Schema
      */
     static onClickNewSchema() {
         let parentId = $('.context-menu-target').data('id');
-        let parentSchema = SchemaHelper.getSchemaByIdSync(parentId);
+        let parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentId);
 
-        RequestHelper.request('post', 'schemas/new', parentSchema)
+        HashBrown.Helpers.RequestHelper.request('post', 'schemas/new', parentSchema)
         .then((newSchema) => {
-            return RequestHelper.reloadResource('schemas')
+            return HashBrown.Helpers.RequestHelper.reloadResource('schemas')
             .then(() => {
-                NavbarMain.reload();
+                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 location.hash = '/schemas/' + newSchema.id;
             });
@@ -78,12 +71,12 @@ class SchemaPane extends NavbarPane {
         let schemaEditor = Crisp.View.get('SchemaEditor');
         let pullId = $('.context-menu-target').data('id');
 
-        RequestHelper.request('post', 'schemas/pull/' + pullId, {})
+        HashBrown.Helpers.RequestHelper.request('post', 'schemas/pull/' + pullId, {})
         .then(() => {
-            return RequestHelper.reloadResource('schemas');
+            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
            
 			location.hash = '/schemas/' + pullId;
 		
@@ -106,12 +99,12 @@ class SchemaPane extends NavbarPane {
 
 		$element.parent().addClass('loading');
 
-        RequestHelper.request('post', 'schemas/push/' + pushId)
+        HashBrown.Helpers.RequestHelper.request('post', 'schemas/push/' + pushId)
         .then(() => {
-            return RequestHelper.reloadResource('schemas');
+            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }
@@ -122,13 +115,13 @@ class SchemaPane extends NavbarPane {
     static init() {
         if(!currentUserHasScope('schemas')) { return; }
 
-        NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
+        HashBrown.Views.Navigation.NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
             getItems: () => { return resources.schemas; },
 
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
 
                 menu['This schema'] = '---';
                 

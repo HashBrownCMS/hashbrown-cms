@@ -13,6 +13,33 @@ if(!base) {
 }
 
 /**
+ * Handles namespace creation
+ *
+ * @param {String} query
+ *
+ * @return {Function} Chain
+ */
+base.namespace = function namespace(query) {
+    if(!base.HashBrown) { base.HashBrown = {}; }
+    
+    let current = HashBrown;
+
+    query.split('.').forEach((ns) => {
+        if(!current[ns]) { current[ns] = {}; }
+        
+        current = current[ns];
+    });
+
+    let add = (module) => {
+        current[module.name] = module;
+        
+        return { add: add };
+    };
+
+    return { add: add };
+}
+
+/**
  * Throws an error if parameter was null (used as a default param hack)
  *
  * @param {String} name

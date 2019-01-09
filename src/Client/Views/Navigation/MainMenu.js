@@ -1,9 +1,5 @@
 'use strict';
 
-const User = require('Common/Models/User');
-const UserEditor = require('Client/Views/Editors/UserEditor');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The main menu
  * 
@@ -28,7 +24,7 @@ class MainMenu extends Crisp.View {
 
         window.language = newLanguage;
 
-        RequestHelper.reloadResource('content')
+        HashBrown.Helpers.RequestHelper.reloadResource('content')
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -114,11 +110,11 @@ class MainMenu extends Crisp.View {
 
             // User dropdown
             this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
-                tooltip: 'Logged in as "' + (User.current.fullName || User.current.username) + '"',
+                tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
                 options: {
-                    'User settings': () => { new UserEditor({ hidePermissions: true, model: User.current }); },
+                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Models.User.current }); },
                     'Log out': () => {
                         HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout')
                         .then(() => {

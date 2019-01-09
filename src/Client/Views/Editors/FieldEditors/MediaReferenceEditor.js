@@ -1,12 +1,5 @@
 'use strict';
 
-const Media = require('Common/Models/Media');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A picker for referencing Media 
  *
@@ -23,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class MediaReferenceEditor extends FieldEditor {
+class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -34,7 +27,7 @@ class MediaReferenceEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        let media = MediaHelper.getMediaByIdSync(this.value);
+        let media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
 
         return _.div({class: 'editor__field__value editor__field--media-reference', title: this.description || ''},
             _.button({class: 'editor__field--media-reference__pick'},
@@ -50,15 +43,14 @@ class MediaReferenceEditor extends FieldEditor {
                     }
 
                     if(media.isImage()) {
-                        return _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
+                        return _.img({class: 'editor__field--media-reference__preview', src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
                     }
                 })
             ).click(() => {
-                let mediaBrowser = new MediaBrowser({
+                new HashBrown.Views.Modals.MediaBrowser({
                     value: this.value
-                });
-
-                mediaBrowser.on('select', (id) => {
+                })
+                .on('select', (id) => {
                     this.value = id;
 
                     this.trigger('change', this.value);

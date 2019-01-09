@@ -1,9 +1,5 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-
-const Media = require('Common/Models/Media');
-
 /**
  * An editor for displaying Media objects
  *
@@ -23,8 +19,8 @@ class MediaViewer extends Crisp.View {
      * Pre render
      */
     prerender() {
-        if(this.model instanceof Media === false) {
-            this.model = new Media(this.model);        
+        if(this.model instanceof HashBrown.Models.Media === false) {
+            this.model = new HashBrown.Models.Media(this.model);        
         }
 
     }
@@ -33,7 +29,7 @@ class MediaViewer extends Crisp.View {
      * Renders this editor
      */
     template() {
-        let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800&t=' + Date.now();
+        let mediaSrc = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800&t=' + Date.now();
 
         return _.div({class: 'editor editor--media'},
             _.div({class: 'editor__header'},
