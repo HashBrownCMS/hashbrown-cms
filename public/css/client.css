@@ -767,21 +767,10 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.5;
   pointer-events: none;
 }
-.navbar-main__pane__item.active:before {
-  content: "";
-  display: block;
-  height: 4rem;
-  width: 100%;
-  background-color: #e70d3b;
-  position: absolute;
-  left: 0;
-}
 .navbar-main__pane__item.active > .navbar-main__pane__item__content {
   font-weight: 700;
   color: #ffffff;
-}
-.navbar-main__pane__item.active > .navbar-main__pane__item__content:hover {
-  background-color: transparent;
+  background-color: #e70d3b;
 }
 .navbar-main__pane__item.active > .navbar-main__pane__item__content:after {
   color: #ffffff !important;

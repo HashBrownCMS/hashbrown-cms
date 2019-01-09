@@ -283,23 +283,10 @@
             }   
 
             // Active state
-            &.active:before { 
-                content: '';
-                display: block;
-                height: 4rem;
-                width: 100%;
-                background-color: $primary;
-                position: absolute;
-                left: 0;
-            }
-
             &.active > &__content {
                 font-weight: 700;
                 color: $primary-text;
-
-                &:hover {
-                    background-color: transparent;
-                }
+                background-color: $primary;
 
                 &:after {
                     color: $primary-text !important;

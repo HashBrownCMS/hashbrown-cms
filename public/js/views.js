@@ -12489,6 +12489,16 @@ module.exports = function () {
     class: 'navbar-main__panes'
   }, _.each(this.tabPanes, function (i, pane) {
     var queue = [];
+    var sortingOptions = {
+      default: 'Default',
+      alphaAsc: 'A → Z',
+      alphaDesc: 'Z → A'
+    };
+
+    if (pane.label === 'Content') {
+      sortingOptions.dateAsc = 'Old → new';
+      sortingOptions.dateDesc = 'New → old';
+    }
 
     var $pane = _.div({
       class: 'navbar-main__pane',
@@ -12506,13 +12516,7 @@ module.exports = function () {
       type: 'text'
     }), new HashBrown.Views.Widgets.Dropdown({
       placeholder: 'Sort',
-      options: {
-        default: 'Default',
-        alphaAsc: 'A → Z',
-        alphaDesc: 'Z → A',
-        dateAsc: 'Old → new',
-        dateDesc: 'New → old'
-      },
+      options: sortingOptions,
       onChange: function onChange(newValue) {
         _this.onChangeSorting($pane, pane, newValue);
       }
