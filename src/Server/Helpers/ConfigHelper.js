@@ -165,4 +165,3 @@ class ConfigHelper {
 }
 
 module.exports = ConfigHelper;
-

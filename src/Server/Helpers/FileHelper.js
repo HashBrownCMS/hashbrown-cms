@@ -3,6 +3,7 @@
 const FileSystem = require('fs');
 const RimRaf = require('rimraf');
 const Glob = require('glob');
+const Path = require('path');
 
 /**
  * A helper class for handling file system operations
@@ -22,7 +23,6 @@ class FileHelper {
         checkParam(path, 'path', String);
         checkParam(position, 'position', Number);
 
-        let position = 0;
         let parts = Path.normalize(path).split(Path.sep);
         
         if(position >= parts.length) {   
@@ -32,8 +32,8 @@ class FileHelper {
         let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
         
         return new Promise((resolve, reject) => {
-            if(!currentDirPath || !FileSystem.existsSync(currentDirPath)) { return resolve(); }
-        
+            if(!currentDirPath || FileSystem.existsSync(currentDirPath)) { return resolve(); }
+       
             FileSystem.mkdir(currentDirPath, (err) => {
                 if(err) { return reject(err); }
 
@@ -86,10 +86,11 @@ class FileHelper {
      * Reads a file or files in a folder
      *
      * @param {String} path
+     * @param {String} encoding
      *
      * @return {Promise} Buffer or array of buffers
      */
-    static read(path) {
+    static read(path, encoding) {
         checkParam(path, 'path', String);
 
         return this.list(path)
@@ -97,11 +98,11 @@ class FileHelper {
             let buffers = [];
 
             let readNext = () => {
+                let file = files.pop();
+
+                if(!file) { return Promise.resolve(buffers); }
+
                 return new Promise((resolve, reject) => {
-                    let file = files.pop();
-
-                    if(!file) { return Promise.resolve(buffers); }
-
                     FileSystem.readFile(file, (err, buffer) => {
                         if(err) { return reject(err); }
 
@@ -109,6 +110,10 @@ class FileHelper {
                     });
                 })
                 .then((buffer) => {
+                    if(encoding) {
+                        buffer = buffer.toString(encoding);
+                    }
+
                     buffers.push(buffer);
 
                     return readNext();
@@ -140,6 +145,32 @@ class FileHelper {
         
         return new Promise((resolve, reject) => {
             RimRaf(path, (err) => {
+                if(err) { return reject(err); }
+
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * Writes a file
+     *
+     * @param {String|Object} content
+     * @param {String} path
+     *
+     * @return {Promise} Result
+     */
+    static write(content, path) {
+        if(!content) { return Promise.resolve(); }
+
+        checkParam(path, 'path', String);
+
+        return new Promise((resolve, reject) => {
+            if(typeof content === 'object') {
+                content = JSON.stringify(content);
+            }
+
+            FileSystem.writeFile(path, content, (err) => {
                 if(err) { return reject(err); }
 
                 resolve();

@@ -97,29 +97,16 @@ class Controller {
      * @param {Object} req
      */
     static setProjectVariables(req) {
-        let keys = [];
-        let re = PathToRegexp('/:root/:project/:environment/*', keys);
-        let values = re.exec(req.originalUrl);
+        let values = req.originalUrl.split('/');
         let project = null;
         let environment = null;
 
         if(values) {
-            // The first array item is the entire url, so remove it
-            values.shift();
+            if(!values[0]) { values.shift(); }
+            if(values[0] === 'api') { values.shift(); }
 
-            for(let i in keys) {
-                let key = keys[i];
-
-                switch(key.name) {
-                    case 'project':
-                        req.project = values[i];
-                        break;
-
-                    case 'environment':
-                        req.environment = values[i];
-                        break;
-                }
-            }
+            req.project = values[0];
+            req.environment = values[1];
         }
         
         // Environment sanity check

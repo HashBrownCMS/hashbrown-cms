@@ -303,6 +303,8 @@ process.umask = function () {
 /* 3 */
 /***/ (function(module, exports) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var g; // This works in non-strict mode
 
 g = function () {
@@ -314,7 +316,7 @@ try {
   g = g || new Function("return this")();
 } catch (e) {
   // This works if the window reference is available
-  if (typeof window === "object") g = window;
+  if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
 } // g can still be undefined, but nothing to do about it...
 // We return undefined, instead of nothing here, so it's
 // easier to handle this case. if(!global) { ...}
@@ -641,7 +643,27 @@ namespace('Helpers').add(__webpack_require__(36)).add(__webpack_require__(199)).
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ConnectionHelperCommon = __webpack_require__(37);
 /**
@@ -654,92 +676,102 @@ var ConnectionHelperCommon = __webpack_require__(37);
 var ConnectionHelper =
 /*#__PURE__*/
 function (_ConnectionHelperComm) {
-  _inheritsLoose(ConnectionHelper, _ConnectionHelperComm);
+  _inherits(ConnectionHelper, _ConnectionHelperComm);
 
   function ConnectionHelper() {
-    return _ConnectionHelperComm.apply(this, arguments) || this;
+    _classCallCheck(this, ConnectionHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ConnectionHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets all connections
-   *
-   * @return {Promise} Array of Connections
-   */
-  ConnectionHelper.getAllConnections = function getAllConnections() {
-    return Promise.resolve(resources.connections);
-  };
-  /**
-   * Gets a Connection by id (sync)
-   *
-   * @param {string} id
-   *
-   * @return {Promise} Connection
-   */
+  _createClass(ConnectionHelper, null, [{
+    key: "getAllConnections",
 
+    /**
+     * Gets all connections
+     *
+     * @return {Promise} Array of Connections
+     */
+    value: function getAllConnections() {
+      return Promise.resolve(resources.connections);
+    }
+    /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
 
-  ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync(id) {
-    checkParam(id, 'id', String);
+  }, {
+    key: "getConnectionByIdSync",
+    value: function getConnectionByIdSync(id) {
+      checkParam(id, 'id', String);
 
-    for (var i in resources.connections) {
-      var connection = resources.connections[i];
+      for (var i in resources.connections) {
+        var connection = resources.connections[i];
 
-      if (connection.id == id) {
-        return connection;
+        if (connection.id == id) {
+          return connection;
+        }
       }
     }
-  };
-  /**
-   * Gets a Connection by id
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   *
-   * @return {Promise} Connection
-   */
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Connection
+     */
 
+  }, {
+    key: "getConnectionById",
+    value: function getConnectionById(project, environment, id) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      checkParam(id, 'id', String);
 
-  ConnectionHelper.getConnectionById = function getConnectionById(project, environment, id) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    checkParam(id, 'id', String);
+      for (var i in resources.connections) {
+        var connection = resources.connections[i];
 
-    for (var i in resources.connections) {
-      var connection = resources.connections[i];
-
-      if (connection.id == id) {
-        return Promise.resolve(connection);
+        if (connection.id == id) {
+          return Promise.resolve(connection);
+        }
       }
+
+      return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
     }
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
 
-    return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
-  };
-  /**
-   * Sets the Media provider
-   *
-   * @param {String} id
-   *
-   * @returns {Promise}
-   */
+  }, {
+    key: "setMediaProvider",
+    value: function setMediaProvider(id) {
+      return _get(_getPrototypeOf(ConnectionHelper), "setMediaProvider", this).call(this, HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, id).then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('media');
+      }).then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      });
+    }
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
 
-
-  ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
-    return _ConnectionHelperComm.setMediaProvider.call(this, HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, id).then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('media');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    });
-  };
-  /**
-   * Gets the Media provider
-   *
-   * @returns {Promise} Connection
-   */
-
-
-  ConnectionHelper.getMediaProvider = function getMediaProvider() {
-    return _ConnectionHelperComm.getMediaProvider.call(this, HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment);
-  };
+  }, {
+    key: "getMediaProvider",
+    value: function getMediaProvider() {
+      return _get(_getPrototypeOf(ConnectionHelper), "getMediaProvider", this).call(this, HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment);
+    }
+  }]);
 
   return ConnectionHelper;
 }(ConnectionHelperCommon);
@@ -753,6 +785,12 @@ module.exports = ConnectionHelper;
 "use strict";
 
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var Connection = __webpack_require__(38);
 /**
  * The helper class for Connections
@@ -764,78 +802,83 @@ var Connection = __webpack_require__(38);
 var ConnectionHelper =
 /*#__PURE__*/
 function () {
-  function ConnectionHelper() {}
+  function ConnectionHelper() {
+    _classCallCheck(this, ConnectionHelper);
+  }
 
-  /**
-   * Gets all connections
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @returns {Promise(Array)} connections
-   */
-  ConnectionHelper.getAllConnections = function getAllConnections(project, environment) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return Promise.resolve();
-  };
-  /**
-   * Sets the Media provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   *
-   * @return {Promise} Promise
-   */
+  _createClass(ConnectionHelper, null, [{
+    key: "getAllConnections",
 
-
-  ConnectionHelper.setMediaProvider = function setMediaProvider(project, environment, id) {
-    if (id === void 0) {
-      id = null;
+    /**
+     * Gets all connections
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise(Array)} connections
+     */
+    value: function getAllConnections(project, environment) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      return Promise.resolve();
     }
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
 
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
-      providers = providers || {};
-      providers.media = id;
-      return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
-    });
-  };
-  /**
-   * Gets the Media provider
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @return {Promise} Connection object
-   */
+  }, {
+    key: "setMediaProvider",
+    value: function setMediaProvider(project, environment) {
+      var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
+        providers = providers || {};
+        providers.media = id;
+        return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
+      });
+    }
+    /**
+     * Gets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
 
+  }, {
+    key: "getMediaProvider",
+    value: function getMediaProvider(project, environment) {
+      var _this = this;
 
-  ConnectionHelper.getMediaProvider = function getMediaProvider(project, environment) {
-    var _this = this;
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers') // Previously, providers were set project-wide, so retrieve automatically if needed
+      .then(function (providers) {
+        if (!providers) {
+          return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
+        } else {
+          return Promise.resolve(providers);
+        }
+      }) // Return requested provider
+      .then(function (providers) {
+        providers = providers || {};
 
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers') // Previously, providers were set project-wide, so retrieve automatically if needed
-    .then(function (providers) {
-      if (!providers) {
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
-      } else {
-        return Promise.resolve(providers);
-      }
-    }) // Return requested provider
-    .then(function (providers) {
-      providers = providers || {};
-
-      if (providers.media) {
-        return _this.getConnectionById(project, environment, providers.media);
-      } else {
-        return Promise.resolve(null);
-      }
-    });
-  };
+        if (providers.media) {
+          return _this.getConnectionById(project, environment, providers.media);
+        } else {
+          return Promise.resolve(null);
+        }
+      });
+    }
+  }]);
 
   return ConnectionHelper;
 }();
@@ -849,7 +892,27 @@ module.exports = ConnectionHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Path = __webpack_require__(39);
 
@@ -868,87 +931,91 @@ var Resource = __webpack_require__(198);
 var Connection =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Connection, _Resource);
+  _inherits(Connection, _Resource);
 
   function Connection() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Connection);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Connection).apply(this, arguments));
   }
 
-  var _proto = Connection.prototype;
+  _createClass(Connection, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'title');
-    this.def(String, 'url');
-    this.def(Boolean, 'isLocked'); // Sync
+    /**
+     * Structure
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(String, 'title');
+      this.def(String, 'url');
+      this.def(Boolean, 'isLocked'); // Sync
 
-    this.def(Object, 'sync');
-  };
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  Connection.paramsCheck = function paramsCheck(params) {
-    // Deployer and processor
-    if (!params.processor) {
-      params.processor = {};
+      this.def(Object, 'sync');
     }
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-    if (!params.deployer) {
-      params.deployer = {};
+  }, {
+    key: "getRemoteUrl",
+
+    /**
+     * Gets the remote URL
+     *
+     * @param {Boolean} withSlash
+     *
+     * @returns {String} URL
+     */
+    value: function getRemoteUrl() {
+      var withSlash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var url = this.url;
+
+      if (!withSlash && url[url.length - 1] == '/') {
+        url = url.substring(0, url.length - 1);
+      } else if (withSlash && url[url.length - 1] != '/') {
+        url += '/';
+      }
+
+      return url;
     }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      // Deployer and processor
+      if (!params.processor) {
+        params.processor = {};
+      }
 
-    if (!params.deployer.paths) {
-      params.deployer.paths = {};
+      if (!params.deployer) {
+        params.deployer = {};
+      }
+
+      if (!params.deployer.paths) {
+        params.deployer.paths = {};
+      }
+
+      return _get(_getPrototypeOf(Connection), "paramsCheck", this).call(this, params);
     }
+    /**
+     * Creates a new Connection object
+     *
+     * @return {Connection} connection
+     */
 
-    return _Resource.paramsCheck.call(this, params);
-  };
-  /**
-   * Creates a new Connection object
-   *
-   * @return {Connection} connection
-   */
-
-
-  Connection.create = function create() {
-    return new Connection({
-      id: Connection.createId(),
-      title: 'New connection'
-    });
-  };
-  /**
-   * Gets the remote URL
-   *
-   * @param {Boolean} withSlash
-   *
-   * @returns {String} URL
-   */
-
-
-  _proto.getRemoteUrl = function getRemoteUrl(withSlash) {
-    if (withSlash === void 0) {
-      withSlash = false;
+  }, {
+    key: "create",
+    value: function create() {
+      return new Connection({
+        id: Connection.createId(),
+        title: 'New connection'
+      });
     }
-
-    var url = this.url;
-
-    if (!withSlash && url[url.length - 1] == '/') {
-      url = url.substring(0, url.length - 1);
-    } else if (withSlash && url[url.length - 1] != '/') {
-      url += '/';
-    }
-
-    return url;
-  };
+  }]);
 
   return Connection;
 }(Resource);
@@ -1192,11 +1259,23 @@ var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -1209,7 +1288,7 @@ var Entity = __webpack_require__(41);
 var Processor =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Processor, _Entity);
+  _inherits(Processor, _Entity);
 
   _createClass(Processor, null, [{
     key: "name",
@@ -1232,7 +1311,9 @@ function (_Entity) {
   function Processor(params) {
     var _this;
 
-    _this = _Entity.call(this, params) || this;
+    _classCallCheck(this, Processor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Processor).call(this, params));
     _this.name = _this.constructor.name;
     _this.alias = _this.constructor.alias;
     return _this;
@@ -1242,25 +1323,27 @@ function (_Entity) {
    */
 
 
-  var _proto = Processor.prototype;
+  _createClass(Processor, [{
+    key: "structure",
+    value: function structure() {
+      this.def(String, 'name');
+      this.def(String, 'alias');
+      this.def(String, 'fileExtension');
+    }
+    /**
+     * Processes a Content node
+     *
+     * @param {Content} content
+     *
+     * @returns {Object} Output
+     */
 
-  _proto.structure = function structure() {
-    this.def(String, 'name');
-    this.def(String, 'alias');
-    this.def(String, 'fileExtension');
-  };
-  /**
-   * Processes a Content node
-   *
-   * @param {Content} content
-   *
-   * @returns {Object} Output
-   */
-
-
-  _proto.process = function process(content) {
-    return null;
-  };
+  }, {
+    key: "process",
+    value: function process(content) {
+      return null;
+    }
+  }]);
 
   return Processor;
 }(Entity);
@@ -1273,6 +1356,14 @@ module.exports = Processor;
 
 "use strict";
 
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var crypto = __webpack_require__(42);
 /**
@@ -1291,6 +1382,8 @@ function () {
    * @param {Object} params
    */
   function Entity(params) {
+    _classCallCheck(this, Entity);
+
     this.structure();
     params = this.constructor.paramsCheck(params);
     Object.seal(this);
@@ -1310,153 +1403,158 @@ function () {
    */
 
 
-  var _proto = Entity.prototype;
+  _createClass(Entity, [{
+    key: "structure",
+    value: function structure() {}
+    /**
+     * Checks the parameters berfore they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-  _proto.structure = function structure() {};
-  /**
-   * Checks the parameters berfore they're committed
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
+  }, {
+    key: "getObject",
 
-
-  Entity.paramsCheck = function paramsCheck(params) {
-    return params;
-  };
-  /**
-   * Generates a new random id
-   *
-   * @param {Number} length
-   *
-   * @returns {String} id
-   */
-
-
-  Entity.createId = function createId(length) {
-    if (!length) {
-      length = 8;
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    value: function getObject() {
+      return JSON.parse(JSON.stringify(this));
     }
+    /**
+     * Defines a type safe member variable
+     *
+     * @param {String} type
+     * @param {String} name
+     * @param {Anything} defaultValue
+     */
 
-    if (length < 4) {
-      length = 4;
-    }
+  }, {
+    key: "def",
+    value: function def(type, name, defaultValue) {
+      var _this = this;
 
-    return crypto.randomBytes(length).toString('hex');
-  };
-  /**
-   * Gets a copy of every field in this object as a mutable object
-   *
-   * @returns {Object} object
-   */
-
-
-  _proto.getObject = function getObject() {
-    return JSON.parse(JSON.stringify(this));
-  };
-  /**
-   * Defines a type safe member variable
-   *
-   * @param {String} type
-   * @param {String} name
-   * @param {Anything} defaultValue
-   */
-
-
-  _proto.def = function def(type, name, defaultValue) {
-    var _this = this;
-
-    if (typeof type !== 'function') {
-      throw new TypeError('Parameter \'type\' cannot be of type \'' + typeof type + '\'.');
-    }
-
-    if (typeof name !== 'string') {
-      throw new TypeError('Parameter \'name\' cannot be of type \'' + typeof name + '\'.');
-    }
-
-    if (typeof defaultValue === 'undefined') {
-      switch (type) {
-        case String:
-          defaultValue = '';
-          break;
-
-        case Number:
-          defaultValue = 0;
-          break;
-
-        case Date:
-          defaultValue = null;
-          break;
-
-        case Boolean:
-          defaultValue = false;
-          break;
-
-        default:
-          defaultValue = null;
-          break;
+      if (typeof type !== 'function') {
+        throw new TypeError('Parameter \'type\' cannot be of type \'' + _typeof(type) + '\'.');
       }
-    }
 
-    var thisValue = defaultValue;
-    var thisType = type;
-    Object.defineProperty(this, name, {
-      enumerable: true,
-      get: function get() {
-        return thisValue;
-      },
-      set: function set(thatValue) {
-        // Auto cast for Booleans
-        if (thisType == Boolean) {
-          if (!thatValue) {
-            thatValue = false;
-          } else if (typeof thatValue === 'string') {
-            if (thatValue === 'false') {
+      if (typeof name !== 'string') {
+        throw new TypeError('Parameter \'name\' cannot be of type \'' + _typeof(name) + '\'.');
+      }
+
+      if (typeof defaultValue === 'undefined') {
+        switch (type) {
+          case String:
+            defaultValue = '';
+            break;
+
+          case Number:
+            defaultValue = 0;
+            break;
+
+          case Date:
+            defaultValue = null;
+            break;
+
+          case Boolean:
+            defaultValue = false;
+            break;
+
+          default:
+            defaultValue = null;
+            break;
+        }
+      }
+
+      var thisValue = defaultValue;
+      var thisType = type;
+      Object.defineProperty(this, name, {
+        enumerable: true,
+        get: function get() {
+          return thisValue;
+        },
+        set: function set(thatValue) {
+          // Auto cast for Booleans
+          if (thisType == Boolean) {
+            if (!thatValue) {
               thatValue = false;
-            } else if (thatValue === 'true') {
-              thatValue = true;
+            } else if (typeof thatValue === 'string') {
+              if (thatValue === 'false') {
+                thatValue = false;
+              } else if (thatValue === 'true') {
+                thatValue = true;
+              }
+            }
+          } // Auto cast for numbers
+
+
+          if (thisType == Number) {
+            if (!thatValue) {
+              thatValue = 0;
+            } else if (thatValue.constructor == String && !isNaN(thatValue)) {
+              thatValue = parseFloat(thatValue);
+            }
+          } // Auto cast for dates
+
+
+          if (thisType == Date) {
+            if (!thatValue) {
+              thatValue = null;
+            } else if (thatValue.constructor == String || thatValue.constructor == Number) {
+              thatValue = new Date(thatValue);
             }
           }
-        } // Auto cast for numbers
 
+          if (typeof thatValue !== 'undefined') {
+            if (thatValue == null) {
+              thisValue = thatValue;
+              return;
+            }
 
-        if (thisType == Number) {
-          if (!thatValue) {
-            thatValue = 0;
-          } else if (thatValue.constructor == String && !isNaN(thatValue)) {
-            thatValue = parseFloat(thatValue);
-          }
-        } // Auto cast for dates
+            var thatType = thatValue.constructor;
 
-
-        if (thisType == Date) {
-          if (!thatValue) {
-            thatValue = null;
-          } else if (thatValue.constructor == String || thatValue.constructor == Number) {
-            thatValue = new Date(thatValue);
-          }
-        }
-
-        if (typeof thatValue !== 'undefined') {
-          if (thatValue == null) {
-            thisValue = thatValue;
-            return;
-          }
-
-          var thatType = thatValue.constructor;
-
-          if (thisType.name !== thatType.name && thatValue instanceof thisType === false) {
-            throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+            if (thisType.name !== thatType.name && thatValue instanceof thisType === false) {
+              throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+            } else {
+              thisValue = thatValue;
+            }
           } else {
-            thisValue = thatValue;
+            thisValue = defaultValue;
           }
-        } else {
-          thisValue = defaultValue;
         }
+      });
+    }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      return params;
+    }
+    /**
+     * Generates a new random id
+     *
+     * @param {Number} length
+     *
+     * @returns {String} id
+     */
+
+  }, {
+    key: "createId",
+    value: function createId(length) {
+      if (!length) {
+        length = 8;
       }
-    });
-  };
+
+      if (length < 4) {
+        length = 4;
+      }
+
+      return crypto.randomBytes(length).toString('hex');
+    }
+  }]);
 
   return Entity;
 }();
@@ -4232,6 +4330,8 @@ Stream.prototype.pipe = function (dest, options) {
 /* 54 */
 /***/ (function(module, exports) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4480,7 +4580,7 @@ function isNumber(arg) {
 }
 
 function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
+  return _typeof(arg) === 'object' && arg !== null;
 }
 
 function isUndefined(arg) {
@@ -5614,7 +5714,9 @@ module.exports = __webpack_require__(54).EventEmitter;
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {// Copyright Joyent, Inc. and other Node contributors.
+/* WEBPACK VAR INJECTION */(function(Buffer) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -5677,7 +5779,7 @@ function isString(arg) {
 exports.isString = isString;
 
 function isSymbol(arg) {
-  return typeof arg === 'symbol';
+  return _typeof(arg) === 'symbol';
 }
 
 exports.isSymbol = isSymbol;
@@ -5695,7 +5797,7 @@ function isRegExp(re) {
 exports.isRegExp = isRegExp;
 
 function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
+  return _typeof(arg) === 'object' && arg !== null;
 }
 
 exports.isObject = isObject;
@@ -5719,7 +5821,7 @@ function isFunction(arg) {
 exports.isFunction = isFunction;
 
 function isPrimitive(arg) {
-  return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || typeof arg === 'symbol' || // ES6 symbol
+  return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || _typeof(arg) === 'symbol' || // ES6 symbol
   typeof arg === 'undefined';
 }
 
@@ -11038,7 +11140,9 @@ function findPrime(bits, gen) {
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {(function (module, exports) {
+/* WEBPACK VAR INJECTION */(function(module) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+(function (module, exports) {
   'use strict'; // Utils
 
   function assert(val, msg) {
@@ -11079,7 +11183,7 @@ function findPrime(bits, gen) {
     }
   }
 
-  if (typeof module === 'object') {
+  if (_typeof(module) === 'object') {
     module.exports = BN;
   } else {
     exports.BN = BN;
@@ -11098,7 +11202,7 @@ function findPrime(bits, gen) {
       return true;
     }
 
-    return num !== null && typeof num === 'object' && num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
+    return num !== null && _typeof(num) === 'object' && num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
   };
 
   BN.max = function max(left, right) {
@@ -11116,7 +11220,7 @@ function findPrime(bits, gen) {
       return this._initNumber(number, base, endian);
     }
 
-    if (typeof number === 'object') {
+    if (_typeof(number) === 'object') {
       return this._initArray(number, base, endian);
     }
 
@@ -14640,6 +14744,8 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var r;
 
 module.exports = function rand(len) {
@@ -14669,7 +14775,7 @@ Rand.prototype._rand = function _rand(n) {
   return res;
 };
 
-if (typeof self === 'object') {
+if ((typeof self === "undefined" ? "undefined" : _typeof(self)) === 'object') {
   if (self.crypto && self.crypto.getRandomValues) {
     // Modern browsers
     Rand.prototype._rand = function _rand(n) {
@@ -14685,7 +14791,7 @@ if (typeof self === 'object') {
       return arr;
     }; // Safari's WebWorkers do not have `crypto`
 
-  } else if (typeof window === 'object') {
+  } else if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object') {
     // Old junk
     Rand.prototype._rand = function () {
       throw new Error('Not implemented yet');
@@ -18512,6 +18618,8 @@ module.exports = {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var BN = __webpack_require__(125);
 
 var HmacDRBG = __webpack_require__(160);
@@ -18591,7 +18699,7 @@ EC.prototype._truncateToN = function truncateToN(msg, truncOnly) {
 };
 
 EC.prototype.sign = function sign(msg, key, enc, options) {
-  if (typeof enc === 'object') {
+  if (_typeof(enc) === 'object') {
     options = enc;
     enc = null;
   }
@@ -19327,6 +19435,8 @@ module.exports = KeyPair;
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var BN = __webpack_require__(125);
 
 var elliptic = __webpack_require__(136);
@@ -19346,7 +19456,7 @@ var parseBytes = utils.parseBytes;
 
 function Signature(eddsa, sig) {
   this.eddsa = eddsa;
-  if (typeof sig !== 'object') sig = parseBytes(sig);
+  if (_typeof(sig) !== 'object') sig = parseBytes(sig);
 
   if (Array.isArray(sig)) {
     sig = {
@@ -19389,7 +19499,9 @@ module.exports = Signature;
 /* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var asn1 = __webpack_require__(167);
+/* WEBPACK VAR INJECTION */(function(Buffer) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var asn1 = __webpack_require__(167);
 
 var aesid = __webpack_require__(185);
 
@@ -19404,7 +19516,7 @@ module.exports = parseKeys;
 function parseKeys(buffer) {
   var password;
 
-  if (typeof buffer === 'object' && !Buffer.isBuffer(buffer)) {
+  if (_typeof(buffer) === 'object' && !Buffer.isBuffer(buffer)) {
     password = buffer.passphrase;
     buffer = buffer.key;
   }
@@ -19666,6 +19778,8 @@ reporter) {
 /* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var indexOf = __webpack_require__(171);
 
 var Object_keys = function Object_keys(obj) {
@@ -19788,7 +19902,7 @@ exports.createScript = function (code) {
 exports.createContext = Script.createContext = function (context) {
   var copy = new Context();
 
-  if (typeof context === 'object') {
+  if (_typeof(context) === 'object') {
     forEach(Object_keys(context), function (key) {
       copy[key] = context[key];
     });
@@ -19946,6 +20060,8 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
 /* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var inherits = __webpack_require__(50);
 
 var Reporter = __webpack_require__(172).Reporter;
@@ -20027,7 +20143,7 @@ function EncoderBuffer(value, reporter) {
     this.value = value;
     this.length = value.length;
   } else {
-    return reporter.error('Unsupported type: ' + typeof value);
+    return reporter.error('Unsupported type: ' + _typeof(value));
   }
 }
 
@@ -20054,6 +20170,8 @@ EncoderBuffer.prototype.join = function join(out, offset) {
 /***/ }),
 /* 175 */
 /***/ (function(module, exports, __webpack_require__) {
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var Reporter = __webpack_require__(172).Reporter;
 
@@ -20158,7 +20276,7 @@ Node.prototype._useArgs = function useArgs(args) {
     assert(state.args === null);
     state.args = args;
     state.reverseArgs = args.map(function (arg) {
-      if (typeof arg !== 'object' || arg.constructor !== Object) return arg;
+      if (_typeof(arg) !== 'object' || arg.constructor !== Object) return arg;
       var res = {};
       Object.keys(arg).forEach(function (key) {
         if (key == (key | 0)) key |= 0;
@@ -20459,7 +20577,7 @@ Node.prototype._encodeValue = function encode(data, reporter, parent) {
       if (child._baseState.tag === 'null_') return child._encode(null, reporter, data);
       if (child._baseState.key === null) return reporter.error('Child should have a key');
       var prevKey = reporter.enterKey(child._baseState.key);
-      if (typeof data !== 'object') return reporter.error('Child expected, but input is not object');
+      if (_typeof(data) !== 'object') return reporter.error('Child expected, but input is not object');
 
       var res = child._encode(data[child._baseState.key], reporter, data);
 
@@ -22038,11 +22156,23 @@ function randomFillSync(buf, offset, size) {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -22055,7 +22185,7 @@ var Entity = __webpack_require__(41);
 var Deployer =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Deployer, _Entity);
+  _inherits(Deployer, _Entity);
 
   _createClass(Deployer, null, [{
     key: "name",
@@ -22077,7 +22207,9 @@ function (_Entity) {
   function Deployer(params) {
     var _this;
 
-    _this = _Entity.call(this, params) || this;
+    _classCallCheck(this, Deployer);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Deployer).call(this, params));
     _this.name = _this.constructor.name;
     _this.alias = _this.constructor.alias;
 
@@ -22092,155 +22224,165 @@ function (_Entity) {
    */
 
 
-  var _proto = Deployer.prototype;
+  _createClass(Deployer, [{
+    key: "structure",
+    value: function structure() {
+      this.def(String, 'name');
+      this.def(String, 'alias');
+      this.def(Object, 'paths', {
+        media: '',
+        content: ''
+      });
+    }
+    /**
+     * Gets the root path
+     *
+     * @returns {String} Root
+     */
 
-  _proto.structure = function structure() {
-    this.def(String, 'name');
-    this.def(String, 'alias');
-    this.def(Object, 'paths', {
-      media: '',
-      content: ''
-    });
-  };
-  /**
-   * Gets the root path
-   *
-   * @returns {String} Root
-   */
+  }, {
+    key: "getRootPath",
+    value: function getRootPath() {
+      throw new Error('The method "getRootPath" must be overridden');
+    }
+    /**
+     * Gets a deployment path
+     *
+     * @param {String} query
+     * @param {String} filename
+     *
+     * @returns {String} Path
+     */
 
+  }, {
+    key: "getPath",
+    value: function getPath(query, filename) {
+      // The "query" variable is a syntax for getting the paths defined in the config
+      var lvl1 = query ? query.split('/')[0] : null;
+      var lvl2 = query ? query.split('/')[1] : null; // Start with the root path
 
-  _proto.getRootPath = function getRootPath() {
-    throw new Error('The method "getRootPath" must be overridden');
-  };
-  /**
-   * Gets a deployment path
-   *
-   * @param {String} query
-   * @param {String} filename
-   *
-   * @returns {String} Path
-   */
+      var path = this.getRootPath(); // Add slash if needed
 
-
-  _proto.getPath = function getPath(query, filename) {
-    // The "query" variable is a syntax for getting the paths defined in the config
-    var lvl1 = query ? query.split('/')[0] : null;
-    var lvl2 = query ? query.split('/')[1] : null; // Start with the root path
-
-    var path = this.getRootPath(); // Add slash if needed
-
-    if (path.lastIndexOf('/') !== path.length - 1) {
-      path += '/';
-    } // Add level 2 path if it exists
-
-
-    if (lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
-      path += this.paths[lvl1][lvl2];
-    } // Add level 1 path if it exists
-    else if (lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
-        path += this.paths[lvl1];
-      } // Add slash if needed
+      if (path.lastIndexOf('/') !== path.length - 1) {
+        path += '/';
+      } // Add level 2 path if it exists
 
 
-    if (path.lastIndexOf('/') !== path.length - 1) {
-      path += '/';
-    } // Add filename if needed
+      if (lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
+        path += this.paths[lvl1][lvl2];
+      } // Add level 1 path if it exists
+      else if (lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
+          path += this.paths[lvl1];
+        } // Add slash if needed
 
 
-    if (filename) {
-      path += filename;
-    } // Remove any unwanted double slashes
+      if (path.lastIndexOf('/') !== path.length - 1) {
+        path += '/';
+      } // Add filename if needed
 
 
-    path = path.replace(/\/\//g, '/'); // Add back double slashes for protocols
-
-    path = path.replace(':/', '://');
-    return path;
-  };
-  /**
-   * Tests this deployment
-   *
-   * @returns {Promise} Result
-   */
+      if (filename) {
+        path += filename;
+      } // Remove any unwanted double slashes
 
 
-  _proto.test = function test() {
-    return Promise.reject(new Error('The "test" method should be overridden.'));
-  };
-  /**
-   * Renames a file
-   *
-   * @param {String} path
-   * @param {String} name
-   *
-   * @returns {Promise} Result
-   */
+      path = path.replace(/\/\//g, '/'); // Add back double slashes for protocols
 
+      path = path.replace(':/', '://');
+      return path;
+    }
+    /**
+     * Tests this deployment
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.renameFile = function renameFile(path, name) {
-    return Promise.reject(new Error('The "renameFile" method should be overridden.'));
-  };
-  /**
-   * Sets a file
-   *
-   * @param {String} path
-   * @param {String} base64
-   *
-   * @returns {Promise} Result
-   */
+  }, {
+    key: "test",
+    value: function test() {
+      return Promise.reject(new Error('The "test" method should be overridden.'));
+    }
+    /**
+     * Renames a file
+     *
+     * @param {String} path
+     * @param {String} name
+     *
+     * @returns {Promise} Result
+     */
 
+  }, {
+    key: "renameFile",
+    value: function renameFile(path, name) {
+      return Promise.reject(new Error('The "renameFile" method should be overridden.'));
+    }
+    /**
+     * Sets a file
+     *
+     * @param {String} path
+     * @param {String} base64
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.setFile = function setFile(path, content) {
-    return Promise.reject(new Error('The "setFile" method should be overridden.'));
-  };
-  /**
-   * Gets a file
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} File
-   */
+  }, {
+    key: "setFile",
+    value: function setFile(path, content) {
+      return Promise.reject(new Error('The "setFile" method should be overridden.'));
+    }
+    /**
+     * Gets a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} File
+     */
 
+  }, {
+    key: "getFile",
+    value: function getFile(path) {
+      return Promise.reject(new Error('The "getFile" method should be overridden.'));
+    }
+    /**
+     * Removes a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.getFile = function getFile(path) {
-    return Promise.reject(new Error('The "getFile" method should be overridden.'));
-  };
-  /**
-   * Removes a file
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Result
-   */
+  }, {
+    key: "removeFile",
+    value: function removeFile(path) {
+      return Promise.reject(new Error('The "removeFile" method should be overridden.'));
+    }
+    /**
+     * Gets a list of files
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Files
+     */
 
+  }, {
+    key: "getFolder",
+    value: function getFolder(path) {
+      return Promise.reject(new Error('The "getFolder" method should be overridden.'));
+    }
+    /**
+     * Removes a folder
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.removeFile = function removeFile(path) {
-    return Promise.reject(new Error('The "removeFile" method should be overridden.'));
-  };
-  /**
-   * Gets a list of files
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Files
-   */
-
-
-  _proto.getFolder = function getFolder(path) {
-    return Promise.reject(new Error('The "getFolder" method should be overridden.'));
-  };
-  /**
-   * Removes a folder
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Result
-   */
-
-
-  _proto.removeFolder = function removeFolder(path) {
-    return Promise.reject(new Error('The "removeFolder" method should be overridden.'));
-  };
+  }, {
+    key: "removeFolder",
+    value: function removeFolder(path) {
+      return Promise.reject(new Error('The "removeFolder" method should be overridden.'));
+    }
+  }]);
 
   return Deployer;
 }(Entity);
@@ -22254,7 +22396,23 @@ module.exports = Deployer;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -22267,51 +22425,57 @@ var Entity = __webpack_require__(41);
 var Resource =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Resource, _Entity);
+  _inherits(Resource, _Entity);
 
   function Resource() {
-    return _Entity.apply(this, arguments) || this;
+    _classCallCheck(this, Resource);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Resource).apply(this, arguments));
   }
 
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-  Resource.paramsCheck = function paramsCheck(params) {
-    params = params || {}; // Convert from old sync variables
+  _createClass(Resource, null, [{
+    key: "paramsCheck",
 
-    params.sync = params.sync || {};
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    value: function paramsCheck(params) {
+      params = params || {}; // Convert from old sync variables
 
-    if (typeof params.local !== 'undefined') {
-      if (typeof params.sync.isRemote === 'undefined') {
-        params.sync.hasRemote = params.local;
+      params.sync = params.sync || {};
+
+      if (typeof params.local !== 'undefined') {
+        if (typeof params.sync.isRemote === 'undefined') {
+          params.sync.hasRemote = params.local;
+        }
+
+        delete params.local;
       }
 
-      delete params.local;
+      if (typeof params.remote !== 'undefined') {
+        if (typeof params.sync.isRemote === 'undefined') {
+          params.sync.isRemote = params.remote;
+        }
+
+        delete params.remote;
+      } // Convert from old "locked" state
+
+
+      if (typeof params.locked !== 'undefined') {
+        if (typeof params.isLocked === 'undefined') {
+          params.isLocked = params.locked;
+        }
+
+        delete params.locked;
+      }
+
+      return params;
     }
-
-    if (typeof params.remote !== 'undefined') {
-      if (typeof params.sync.isRemote === 'undefined') {
-        params.sync.isRemote = params.remote;
-      }
-
-      delete params.remote;
-    } // Convert from old "locked" state
-
-
-    if (typeof params.locked !== 'undefined') {
-      if (typeof params.isLocked === 'undefined') {
-        params.isLocked = params.locked;
-      }
-
-      delete params.locked;
-    }
-
-    return params;
-  };
+  }]);
 
   return Resource;
 }(Entity);
@@ -22325,7 +22489,23 @@ module.exports = Resource;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentHelperCommon = __webpack_require__(200);
 /**
@@ -22338,184 +22518,210 @@ var ContentHelperCommon = __webpack_require__(200);
 var ContentHelper =
 /*#__PURE__*/
 function (_ContentHelperCommon) {
-  _inheritsLoose(ContentHelper, _ContentHelperCommon);
+  _inherits(ContentHelper, _ContentHelperCommon);
 
   function ContentHelper() {
-    return _ContentHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, ContentHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContentHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets Content by id
-   *
-   * @param {String} id
-   *
-   * @returns {Content} Content node
-   */
-  ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
-    if (!id) {
-      return null;
-    }
+  _createClass(ContentHelper, null, [{
+    key: "getContentByIdSync",
 
-    for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Content} Content node
+     */
+    value: function getContentByIdSync(id) {
+      if (!id) {
+        return null;
       }
 
-      var content = _ref;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-      if (content.id === id) {
-        return content;
+      try {
+        for (var _iterator = resources.content[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var content = _step.value;
+
+          if (content.id === id) {
+            return content;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
       }
     }
-  };
-  /**
-   * Gets Content by id
-   *
-   * @param {String} id
-   *
-   * @returns {Promise} Content node
-   */
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Content node
+     */
 
-
-  ContentHelper.getContentById = function getContentById(id) {
-    if (!id) {
-      return Promise.resolve(null);
-    }
-
-    return HashBrown.Helpers.RequestHelper.request('get', 'content/' + id).then(function (content) {
-      return Promise.resolve(new HashBrown.Models.Content(content));
-    });
-  };
-  /**
-   * Sets Content by id
-   *
-   * @param {String} id
-   * @param {Content} content
-   *
-   * @returns {Promise} Content node
-   */
-
-
-  ContentHelper.setContentById = function setContentById(id, content) {
-    checkParam(id, 'id', String);
-    checkParam(content, 'content', HashBrown.Models.Content);
-    return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content.getObject()).then(function (content) {
-      return Promise.resolve(content);
-    });
-  };
-  /**
-   * A sanity check for fields
-   *
-   * @param {Object} value
-   * @param {Schema} schema
-   */
-
-
-  ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
-    // If the schema value is set to multilingual, but the value isn't an object, convert it
-    if (schema.multilingual && (!value || typeof value !== 'object')) {
-      var oldValue = value;
-      value = {};
-      value[window.language] = oldValue;
-    } // If the schema value is not set to multilingual, but the value is an object
-    // containing the _multilingual flag, convert it
-
-
-    if (!schema.multilingual && value && typeof value === 'object' && value._multilingual) {
-      value = value[window.language];
-    } // Update the _multilingual flag
-
-
-    if (schema.multilingual && value && !value._multilingual) {
-      value._multilingual = true;
-    } else if (!schema.multilingual && value && value._multilingual) {
-      delete value._multilingual;
-    }
-
-    return value;
-  };
-  /**
-   * Get new sort index
-   *
-   * @param {String} parentId
-   * @param {String} aboveId
-   * @param {String} belowId
-   */
-
-
-  ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
-    if (aboveId) {
-      return this.getContentByIdSync(aboveId).sort + 1;
-    }
-
-    if (belowId) {
-      return this.getContentByIdSync(belowId).sort - 1;
-    } // Filter out content that doesn't have the same parent
-
-
-    var nodes = resources.content.filter(function (x) {
-      return x.parentId == parentId || !x.parentId && !parentId;
-    }); // Find new index
-    // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-
-    var newIndex = 10000;
-
-    for (var _iterator2 = nodes, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
+  }, {
+    key: "getContentById",
+    value: function getContentById(id) {
+      if (!id) {
+        return Promise.resolve(null);
       }
 
-      var content = _ref2;
-
-      if (newIndex - 10000 <= content.sort) {
-        newIndex = content.sort + 10000;
-      }
+      return HashBrown.Helpers.RequestHelper.request('get', 'content/' + id).then(function (content) {
+        return Promise.resolve(new HashBrown.Models.Content(content));
+      });
     }
+    /**
+     * Sets Content by id
+     *
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @returns {Promise} Content node
+     */
 
-    return newIndex;
-  };
-  /**
-   * Starts a tour of the Content section
-   */
-
-
-  ContentHelper.startTour = function startTour() {
-    if (location.hash.indexOf('content/') < 0) {
-      location.hash = '/content/';
+  }, {
+    key: "setContentById",
+    value: function setContentById(id, content) {
+      checkParam(id, 'id', String);
+      checkParam(content, 'content', HashBrown.Models.Content);
+      return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content.getObject()).then(function (content) {
+        return Promise.resolve(content);
+      });
     }
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Schema} schema
+     */
 
-    return new Promise(function (resolve) {
-      setTimeout(function () {
-        resolve();
-      }, 500);
-    }).then(function () {
-      return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
-    }).then(function () {
-      return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
-    }).then(function () {
-      var editor = document.querySelector('.editor--content');
+  }, {
+    key: "fieldSanityCheck",
+    value: function fieldSanityCheck(value, schema) {
+      // If the schema value is set to multilingual, but the value isn't an object, convert it
+      if (schema.multilingual && (!value || _typeof(value) !== 'object')) {
+        var oldValue = value;
+        value = {};
+        value[window.language] = oldValue;
+      } // If the schema value is not set to multilingual, but the value is an object
+      // containing the _multilingual flag, convert it
 
-      if (!editor) {
-        return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+
+      if (!schema.multilingual && value && _typeof(value) === 'object' && value._multilingual) {
+        value = value[window.language];
+      } // Update the _multilingual flag
+
+
+      if (schema.multilingual && value && !value._multilingual) {
+        value._multilingual = true;
+      } else if (!schema.multilingual && value && value._multilingual) {
+        delete value._multilingual;
       }
 
-      return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
-    });
-  };
+      return value;
+    }
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
+     */
+
+  }, {
+    key: "getNewSortIndex",
+    value: function getNewSortIndex(parentId, aboveId, belowId) {
+      if (aboveId) {
+        return this.getContentByIdSync(aboveId).sort + 1;
+      }
+
+      if (belowId) {
+        return this.getContentByIdSync(belowId).sort - 1;
+      } // Filter out content that doesn't have the same parent
+
+
+      var nodes = resources.content.filter(function (x) {
+        return x.parentId == parentId || !x.parentId && !parentId;
+      }); // Find new index
+      // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+
+      var newIndex = 10000;
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var content = _step2.value;
+
+          if (newIndex - 10000 <= content.sort) {
+            newIndex = content.sort + 10000;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return newIndex;
+    }
+    /**
+     * Starts a tour of the Content section
+     */
+
+  }, {
+    key: "startTour",
+    value: function startTour() {
+      if (location.hash.indexOf('content/') < 0) {
+        location.hash = '/content/';
+      }
+
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve();
+        }, 500);
+      }).then(function () {
+        return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
+      }).then(function () {
+        return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+      }).then(function () {
+        var editor = document.querySelector('.editor--content');
+
+        if (!editor) {
+          return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+        }
+
+        return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+      });
+    }
+  }]);
 
   return ContentHelper;
 }(ContentHelperCommon);
@@ -22534,135 +22740,153 @@ module.exports = ContentHelper;
  * @memberof HashBrown.Common.Helpers
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var ContentHelper =
 /*#__PURE__*/
 function () {
-  function ContentHelper() {}
+  function ContentHelper() {
+    _classCallCheck(this, ContentHelper);
+  }
 
-  /**
-   * Gets all Content objects
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @return {Promise} promise
-   */
-  ContentHelper.getAllContents = function getAllContents(project, environment) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    return Promise.resolve();
-  };
-  /**
-   * Gets a URL-friendly version of a string
-   *
-   * @param {String} string
-   *
-   * @param {String} slug
-   */
+  _createClass(ContentHelper, null, [{
+    key: "getAllContents",
 
-
-  ContentHelper.getSlug = function getSlug(string) {
-    return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-  };
-  /**
-   * Gets a Content object by id
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   *
-   * @return {Promise} promise
-   */
-
-
-  ContentHelper.getContentById = function getContentById(project, environment, id) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    checkParam(id, 'id', String);
-    return Promise.resolve();
-  };
-  /**
-   * Sets a Content object by id
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} id
-   * @param {Content} content
-   *
-   * @return {Promise} promise
-   */
-
-
-  ContentHelper.setContentById = function setContentById(project, environment, id, content) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    checkParam(id, 'id', String);
-    checkParam(content, 'content', HashBrown.Models.Content);
-    return new Promise(function (resolve, reject) {
-      resolve();
-    });
-  };
-  /**
-   * Checks if a Schema type is allowed as a child of a Content object
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} parentId
-   * @param {String} childSchemaId
-   *
-   * @returns {Promise} Is the Content node allowed as a child
-   */
-
-
-  ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    checkParam(parentId, 'parentId', String);
-    checkParam(childSchemaId, 'childSchemaId', String); // No parent ID means root, and all Schemas are allowed there
-
-    if (!parentId) {
+    /**
+     * Gets all Content objects
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} promise
+     */
+    value: function getAllContents(project, environment) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
       return Promise.resolve();
-    } else {
-      return this.getContentById(project, environment, parentId).then(function (parentContent) {
-        return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
-      }).then(function (parentSchema) {
-        // The Schema was not an allowed child
-        if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-          return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
-            return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
-          }); // The Schema was an allowed child, resolve
-        } else {
-          return Promise.resolve();
-        }
+    }
+    /**
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
+     */
+
+  }, {
+    key: "getSlug",
+    value: function getSlug(string) {
+      return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    }
+    /**
+     * Gets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} promise
+     */
+
+  }, {
+    key: "getContentById",
+    value: function getContentById(project, environment, id) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      checkParam(id, 'id', String);
+      return Promise.resolve();
+    }
+    /**
+     * Sets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @return {Promise} promise
+     */
+
+  }, {
+    key: "setContentById",
+    value: function setContentById(project, environment, id, content) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      checkParam(id, 'id', String);
+      checkParam(content, 'content', HashBrown.Models.Content);
+      return new Promise(function (resolve, reject) {
+        resolve();
       });
     }
-  };
-  /**
-   * Creates a new content object
-   *
-   * @return {Promise} promise
-   */
+    /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
 
+  }, {
+    key: "isSchemaAllowedAsChild",
+    value: function isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      checkParam(parentId, 'parentId', String);
+      checkParam(childSchemaId, 'childSchemaId', String); // No parent ID means root, and all Schemas are allowed there
 
-  ContentHelper.createContent = function createContent() {
-    return new Promise(function (resolve, reject) {
-      resolve();
-    });
-  };
-  /**
-   * Removes a content object
-   *
-   * @param {Number} id
-   *
-   * @return {Promise} promise
-   */
+      if (!parentId) {
+        return Promise.resolve();
+      } else {
+        return this.getContentById(project, environment, parentId).then(function (parentContent) {
+          return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+        }).then(function (parentSchema) {
+          // The Schema was not an allowed child
+          if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+            return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
+              return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+            }); // The Schema was an allowed child, resolve
+          } else {
+            return Promise.resolve();
+          }
+        });
+      }
+    }
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
 
+  }, {
+    key: "createContent",
+    value: function createContent() {
+      return new Promise(function (resolve, reject) {
+        resolve();
+      });
+    }
+    /**
+     * Removes a content object
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
 
-  ContentHelper.removeContentById = function removeContentById(id) {
-    return new Promise(function (resolve, reject) {
-      resolve();
-    });
-  };
+  }, {
+    key: "removeContentById",
+    value: function removeContentById(id) {
+      return new Promise(function (resolve, reject) {
+        resolve();
+      });
+    }
+  }]);
 
   return ContentHelper;
 }();
@@ -22676,7 +22900,23 @@ module.exports = ContentHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var DebugHelperCommon = __webpack_require__(202);
 /**
@@ -22689,50 +22929,57 @@ var DebugHelperCommon = __webpack_require__(202);
 var DebugHelper =
 /*#__PURE__*/
 function (_DebugHelperCommon) {
-  _inheritsLoose(DebugHelper, _DebugHelperCommon);
+  _inherits(DebugHelper, _DebugHelperCommon);
 
   function DebugHelper() {
-    return _DebugHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, DebugHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DebugHelper).apply(this, arguments));
   }
 
-  /**
-   * Start the debug socket
-   */
-  DebugHelper.startSocket = function startSocket() {
-    var _this = this;
+  _createClass(DebugHelper, null, [{
+    key: "startSocket",
 
-    var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
+    /**
+     * Start the debug socket
+     */
+    value: function startSocket() {
+      var _this = this;
 
-    debugSocket.onopen = function (ev) {
-      debug.log('Debug socket open', 'HashBrown');
-    };
+      var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
 
-    debugSocket.onmessage = function (ev) {
-      _this.onSocketMessage(ev);
-    };
-  };
-  /**
-   * Event: On debug socket message
-   */
+      debugSocket.onopen = function (ev) {
+        debug.log('Debug socket open', 'HashBrown');
+      };
 
-
-  DebugHelper.onSocketMessage = function onSocketMessage(ev) {
-    try {
-      var data = JSON.parse(ev.data);
-
-      switch (data.type) {
-        case 'error':
-          UI.errorModal(new Error(data.sender + ': ' + data.message));
-          break;
-
-        case 'warning':
-          UI.errorModal(new Error(data.sender + ': ' + data.message));
-          break;
-      }
-    } catch (e) {
-      UI.errorModal(ev);
+      debugSocket.onmessage = function (ev) {
+        _this.onSocketMessage(ev);
+      };
     }
-  };
+    /**
+     * Event: On debug socket message
+     */
+
+  }, {
+    key: "onSocketMessage",
+    value: function onSocketMessage(ev) {
+      try {
+        var data = JSON.parse(ev.data);
+
+        switch (data.type) {
+          case 'error':
+            UI.errorModal(new Error(data.sender + ': ' + data.message));
+            break;
+
+          case 'warning':
+            UI.errorModal(new Error(data.sender + ': ' + data.message));
+            break;
+        }
+      } catch (e) {
+        UI.errorModal(ev);
+      }
+    }
+  }]);
 
   return DebugHelper;
 }(DebugHelperCommon);
@@ -22746,6 +22993,12 @@ module.exports = DebugHelper;
 "use strict";
 
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var VERBOSITY = 2;
 /**
  * A helper for debugging
@@ -22756,138 +23009,147 @@ var VERBOSITY = 2;
 var DebugHelper =
 /*#__PURE__*/
 function () {
-  function DebugHelper() {}
+  function DebugHelper() {
+    _classCallCheck(this, DebugHelper);
+  }
 
-  /**
-   * Event: Log
-   *
-   * @param {String} dateString
-   * @param {String} senderString
-   * @param {String} message
-   * @param {String} type
-   */
-  DebugHelper.onLog = function onLog(dateString, senderString, message, type) {
-    if (type) {
-      message = '[' + type.toUpperCase() + '] ' + message;
+  _createClass(DebugHelper, null, [{
+    key: "onLog",
+
+    /**
+     * Event: Log
+     *
+     * @param {String} dateString
+     * @param {String} senderString
+     * @param {String} message
+     * @param {String} type
+     */
+    value: function onLog(dateString, senderString, message, type) {
+      if (type) {
+        message = '[' + type.toUpperCase() + '] ' + message;
+      }
+
+      console.log(dateString + ' | ' + senderString + ' | ' + message);
     }
+    /**
+     * Gets the date string
+     *
+     * @returns {String} date
+     */
 
-    console.log(dateString + ' | ' + senderString + ' | ' + message);
-  };
-  /**
-   * Gets the date string
-   *
-   * @returns {String} date
-   */
+  }, {
+    key: "getDateString",
+    value: function getDateString() {
+      var date = new Date();
+      var monthString = date.getMonth() + 1;
 
+      if (monthString < 10) {
+        monthString = '0' + monthString;
+      }
 
-  DebugHelper.getDateString = function getDateString() {
-    var date = new Date();
-    var monthString = date.getMonth() + 1;
+      var dateString = date.getDate();
 
-    if (monthString < 10) {
-      monthString = '0' + monthString;
+      if (dateString < 10) {
+        dateString = '0' + dateString;
+      }
+
+      var hoursString = date.getHours();
+
+      if (hoursString < 10) {
+        hoursString = '0' + hoursString;
+      }
+
+      var minutesString = date.getMinutes();
+
+      if (minutesString < 10) {
+        minutesString = '0' + minutesString;
+      }
+
+      var secondsString = date.getSeconds();
+
+      if (secondsString < 10) {
+        secondsString = '0' + secondsString;
+      }
+
+      var output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString;
+      return output;
     }
+    /**
+     * Parse sender
+     *
+     * @param {Object} sender
+     *
+     * @returns {String} name
+     */
 
-    var dateString = date.getDate();
+  }, {
+    key: "parseSender",
+    value: function parseSender(sender, ignoreLast) {
+      var senderName = '';
 
-    if (dateString < 10) {
-      dateString = '0' + dateString;
+      if (sender) {
+        if (typeof sender === 'string') {
+          senderName = sender;
+        } else if (typeof sender === 'function') {
+          senderName = sender.name;
+        } else if (sender.constructor) {
+          senderName = sender.constructor.name;
+        } else {
+          senderName = sender.toString();
+        }
+      }
+
+      return senderName;
     }
+    /**
+     * Logs a message
+     *
+     * @param {String} message
+     * @param {Object} sender
+     * @param {Number} verbosity
+     */
 
-    var hoursString = date.getHours();
+  }, {
+    key: "log",
+    value: function log(message, sender) {
+      var verbosity = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    if (hoursString < 10) {
-      hoursString = '0' + hoursString;
-    }
+      if (verbosity == 0) {
+        this.error('Verbosity cannot be set to 0', this);
+      } else if (!verbosity) {
+        verbosity = 1;
+      }
 
-    var minutesString = date.getMinutes();
-
-    if (minutesString < 10) {
-      minutesString = '0' + minutesString;
-    }
-
-    var secondsString = date.getSeconds();
-
-    if (secondsString < 10) {
-      secondsString = '0' + secondsString;
-    }
-
-    var output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString;
-    return output;
-  };
-  /**
-   * Parse sender
-   *
-   * @param {Object} sender
-   *
-   * @returns {String} name
-   */
-
-
-  DebugHelper.parseSender = function parseSender(sender, ignoreLast) {
-    var senderName = '';
-
-    if (sender) {
-      if (typeof sender === 'string') {
-        senderName = sender;
-      } else if (typeof sender === 'function') {
-        senderName = sender.name;
-      } else if (sender.constructor) {
-        senderName = sender.constructor.name;
-      } else {
-        senderName = sender.toString();
+      if (VERBOSITY >= verbosity) {
+        this.onLog(this.getDateString(), this.parseSender(sender), message);
       }
     }
+    /**
+     * Shows an error
+     *
+     * @param {String} message
+     * @param {Object} sender
+     */
 
-    return senderName;
-  };
-  /**
-   * Logs a message
-   *
-   * @param {String} message
-   * @param {Object} sender
-   * @param {Number} verbosity
-   */
+  }, {
+    key: "error",
+    value: function error(message, sender) {
+      if (message instanceof Error) {
+        message = message.message || message.trace;
+      }
 
-
-  DebugHelper.log = function log(message, sender, verbosity) {
-    if (verbosity === void 0) {
-      verbosity = 1;
+      this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
     }
+    /**
+     * Shows a warning
+     */
 
-    if (verbosity == 0) {
-      this.error('Verbosity cannot be set to 0', this);
-    } else if (!verbosity) {
-      verbosity = 1;
+  }, {
+    key: "warning",
+    value: function warning(message, sender) {
+      this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
     }
-
-    if (VERBOSITY >= verbosity) {
-      this.onLog(this.getDateString(), this.parseSender(sender), message);
-    }
-  };
-  /**
-   * Shows an error
-   *
-   * @param {String} message
-   * @param {Object} sender
-   */
-
-
-  DebugHelper.error = function error(message, sender) {
-    if (message instanceof Error) {
-      message = message.message || message.trace;
-    }
-
-    this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
-  };
-  /**
-   * Shows a warning
-   */
-
-
-  DebugHelper.warning = function warning(message, sender) {
-    this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
-  };
+  }]);
 
   return DebugHelper;
 }();
@@ -22901,7 +23163,23 @@ module.exports = DebugHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var LanguageHelperCommon = __webpack_require__(204);
 
@@ -22915,64 +23193,72 @@ var selectedLanguages = {};
 var LanguageHelper =
 /*#__PURE__*/
 function (_LanguageHelperCommon) {
-  _inheritsLoose(LanguageHelper, _LanguageHelperCommon);
+  _inherits(LanguageHelper, _LanguageHelperCommon);
 
   function LanguageHelper() {
-    return _LanguageHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, LanguageHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(LanguageHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets all selected languages
-   *
-   * @param {String} project
-   *
-   * @returns {Array} List of language names
-   */
-  LanguageHelper.getLanguages = function getLanguages(project) {
-    project = project || HashBrown.Helpers.ProjectHelper.currentProject;
-    return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
-      if (!selected || !Array.isArray(selected)) {
-        selected = ['en'];
+  _createClass(LanguageHelper, null, [{
+    key: "getLanguages",
+
+    /**
+     * Gets all selected languages
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+    value: function getLanguages(project) {
+      project = project || HashBrown.Helpers.ProjectHelper.currentProject;
+      return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
+        if (!selected || !Array.isArray(selected)) {
+          selected = ['en'];
+        }
+
+        selected.sort();
+        selectedLanguages[project] = selected;
+        return Promise.resolve(selected);
+      });
+    }
+    /**
+     * Gets all selected languages (sync)
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+
+  }, {
+    key: "getLanguagesSync",
+    value: function getLanguagesSync(project) {
+      project = project || HashBrown.Helpers.ProjectHelper.currentProject;
+      return selectedLanguages[project] || ['en'];
+    }
+    /**
+     * Sets all languages
+     *
+     * @param {String} project
+     * @param {Array} languages
+     *
+     * @returns {Promise} promise
+     */
+
+  }, {
+    key: "setLanguages",
+    value: function setLanguages(project, languages) {
+      checkParam(project, 'project', String);
+      checkParam(languages, 'languages', Array);
+
+      if (!Array.isArray(languages)) {
+        return Promise.reject(new Error('Language array cannot be of type "' + _typeof(languages) + '"'));
       }
 
-      selected.sort();
-      selectedLanguages[project] = selected;
-      return Promise.resolve(selected);
-    });
-  };
-  /**
-   * Gets all selected languages (sync)
-   *
-   * @param {String} project
-   *
-   * @returns {Array} List of language names
-   */
-
-
-  LanguageHelper.getLanguagesSync = function getLanguagesSync(project) {
-    project = project || HashBrown.Helpers.ProjectHelper.currentProject;
-    return selectedLanguages[project] || ['en'];
-  };
-  /**
-   * Sets all languages
-   *
-   * @param {String} project
-   * @param {Array} languages
-   *
-   * @returns {Promise} promise
-   */
-
-
-  LanguageHelper.setLanguages = function setLanguages(project, languages) {
-    checkParam(project, 'project', String);
-    checkParam(languages, 'languages', Array);
-
-    if (!Array.isArray(languages)) {
-      return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
+      return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
     }
-
-    return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
-  };
+  }]);
 
   return LanguageHelper;
 }(LanguageHelperCommon);
@@ -22991,85 +23277,107 @@ module.exports = LanguageHelper;
  * @memberof HashBrown.Common.Helpers
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var LanguageHelper =
 /*#__PURE__*/
 function () {
-  function LanguageHelper() {}
+  function LanguageHelper() {
+    _classCallCheck(this, LanguageHelper);
+  }
 
-  /**
-   * Gets all selected languages
-   *
-   * @param {String} project
-   *
-   * @returns {Array} List of language names
-   */
-  LanguageHelper.getLanguages = function getLanguages(project) {
-    checkParam(project, 'project', String);
-    return Promise.resolve([]);
-  };
-  /**
-   * Sets all languages
-   *
-   * @param {String} project
-   * @param {Array} languages
-   *
-   * @returns {Promise} Promise
-   */
+  _createClass(LanguageHelper, null, [{
+    key: "getLanguages",
 
+    /**
+     * Gets all selected languages
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+    value: function getLanguages(project) {
+      checkParam(project, 'project', String);
+      return Promise.resolve([]);
+    }
+    /**
+     * Sets all languages
+     *
+     * @param {String} project
+     * @param {Array} languages
+     *
+     * @returns {Promise} Promise
+     */
 
-  LanguageHelper.setLanguages = function setLanguages(project, languages) {
-    checkParam(project, 'project', String);
-    checkParam(languages, 'languages', Array);
-    return Promise.resolve();
-  };
-  /**
-   * Gets localised sets of properties for a Content object
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {Content} content
-   *
-   * @return {Promise} Properties
-   */
+  }, {
+    key: "setLanguages",
+    value: function setLanguages(project, languages) {
+      checkParam(project, 'project', String);
+      checkParam(languages, 'languages', Array);
+      return Promise.resolve();
+    }
+    /**
+     * Gets localised sets of properties for a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     *
+     * @return {Promise} Properties
+     */
 
+  }, {
+    key: "getAllLocalizedPropertySets",
+    value: function getAllLocalizedPropertySets(project, environment, content) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      checkParam(content, 'content', HashBrown.Models.Content);
+      return this.getLanguages(project).then(function (languages) {
+        var sets = {};
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
 
-  LanguageHelper.getAllLocalizedPropertySets = function getAllLocalizedPropertySets(project, environment, content) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    checkParam(content, 'content', HashBrown.Models.Content);
-    return this.getLanguages(project).then(function (languages) {
-      var sets = {};
-
-      for (var _iterator = languages, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
+        try {
+          for (var _iterator = languages[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var language = _step.value;
+            var properties = content.getLocalizedProperties(language);
+            sets[language] = properties;
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
         }
 
-        var language = _ref;
-        var properties = content.getLocalizedProperties(language);
-        sets[language] = properties;
-      }
+        return Promise.resolve(sets);
+      });
+    }
+    /**
+     * Gets all languages
+     *
+     * @returns {Array} List of language names
+     */
 
-      return Promise.resolve(sets);
-    });
-  };
-  /**
-   * Gets all languages
-   *
-   * @returns {Array} List of language names
-   */
-
-
-  LanguageHelper.getLanguageOptions = function getLanguageOptions() {
-    return ["aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rc", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"];
-  };
+  }, {
+    key: "getLanguageOptions",
+    value: function getLanguageOptions() {
+      return ["aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rc", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"];
+    }
+  }]);
 
   return LanguageHelper;
 }();
@@ -23088,829 +23396,841 @@ module.exports = LanguageHelper;
  * @memberof HashBrown.Client.Helpers
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var MarkdownHelper =
 /*#__PURE__*/
 function () {
-  function MarkdownHelper() {}
+  function MarkdownHelper() {
+    _classCallCheck(this, MarkdownHelper);
+  }
 
-  /**
-   * Converts a string from HTML to markdown (based on "turndown")
-   *
-   * NOTE: This terrible approach had to be implemented since "to-markdown"
-   * became "turndown" and employed an ugly implementation that we're
-   * encapsulating here to prevent polluting the global namespace with libraries
-   *
-   * In the future, we should fork the project and integrate it more neatly
-   *
-   * @return {String} Markdown
-   */
-  MarkdownHelper.fromHtml = function fromHtml(html) {
-    var TurndownService = function () {
-      'use strict';
+  _createClass(MarkdownHelper, null, [{
+    key: "fromHtml",
 
-      function extend(destination) {
-        for (var i = 1; i < arguments.length; i++) {
-          var source = arguments[i];
+    /**
+     * Converts a string from HTML to markdown (based on "turndown")
+     *
+     * NOTE: This terrible approach had to be implemented since "to-markdown"
+     * became "turndown" and employed an ugly implementation that we're
+     * encapsulating here to prevent polluting the global namespace with libraries
+     *
+     * In the future, we should fork the project and integrate it more neatly
+     *
+     * @return {String} Markdown
+     */
+    value: function fromHtml(html) {
+      var TurndownService = function () {
+        'use strict';
 
-          for (var key in source) {
-            if (source.hasOwnProperty(key)) destination[key] = source[key];
+        function extend(destination) {
+          for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i];
+
+            for (var key in source) {
+              if (source.hasOwnProperty(key)) destination[key] = source[key];
+            }
           }
+
+          return destination;
         }
 
-        return destination;
-      }
-
-      function repeat(character, count) {
-        return Array(count + 1).join(character);
-      }
-
-      var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
-      function isBlock(node) {
-        return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-      }
-
-      var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
-      function isVoid(node) {
-        return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-      }
-
-      var voidSelector = voidElements.join();
-
-      function hasVoid(node) {
-        return node.querySelector && node.querySelector(voidSelector);
-      }
-
-      var rules = {};
-      rules.paragraph = {
-        filter: 'p',
-        replacement: function replacement(content) {
-          return '\n\n' + content + '\n\n';
+        function repeat(character, count) {
+          return Array(count + 1).join(character);
         }
-      };
-      rules.lineBreak = {
-        filter: 'br',
-        replacement: function replacement(content, node, options) {
-          return options.br + '\n';
-        }
-      };
-      rules.heading = {
-        filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-        replacement: function replacement(content, node, options) {
-          var hLevel = Number(node.nodeName.charAt(1));
 
-          if (options.headingStyle === 'setext' && hLevel < 3) {
-            var underline = repeat(hLevel === 1 ? '=' : '-', content.length);
-            return '\n\n' + content + '\n' + underline + '\n\n';
-          } else {
-            return '\n\n' + repeat('#', hLevel) + ' ' + content + '\n\n';
-          }
-        }
-      };
-      rules.blockquote = {
-        filter: 'blockquote',
-        replacement: function replacement(content) {
-          content = content.replace(/^\n+|\n+$/g, '');
-          content = content.replace(/^/gm, '> ');
-          return '\n\n' + content + '\n\n';
-        }
-      };
-      rules.list = {
-        filter: ['ul', 'ol'],
-        replacement: function replacement(content, node) {
-          var parent = node.parentNode;
+        var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
 
-          if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
-            return '\n' + content;
-          } else {
+        function isBlock(node) {
+          return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+        }
+
+        var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+        function isVoid(node) {
+          return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+        }
+
+        var voidSelector = voidElements.join();
+
+        function hasVoid(node) {
+          return node.querySelector && node.querySelector(voidSelector);
+        }
+
+        var rules = {};
+        rules.paragraph = {
+          filter: 'p',
+          replacement: function replacement(content) {
             return '\n\n' + content + '\n\n';
           }
-        }
-      };
-      rules.listItem = {
-        filter: 'li',
-        replacement: function replacement(content, node, options) {
-          content = content.replace(/^\n+/, '') // remove leading newlines
-          .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
-          .replace(/\n/gm, '\n    '); // indent
-
-          var prefix = options.bulletListMarker + '   ';
-          var parent = node.parentNode;
-
-          if (parent.nodeName === 'OL') {
-            var start = parent.getAttribute('start');
-            var index = Array.prototype.indexOf.call(parent.children, node);
-            prefix = (start ? Number(start) + index : index + 1) + '.  ';
+        };
+        rules.lineBreak = {
+          filter: 'br',
+          replacement: function replacement(content, node, options) {
+            return options.br + '\n';
           }
+        };
+        rules.heading = {
+          filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+          replacement: function replacement(content, node, options) {
+            var hLevel = Number(node.nodeName.charAt(1));
 
-          return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
-        }
-      };
-      rules.indentedCodeBlock = {
-        filter: function filter(node, options) {
-          return options.codeBlockStyle === 'indented' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
-        },
-        replacement: function replacement(content, node, options) {
-          return '\n\n    ' + node.firstChild.textContent.replace(/\n/g, '\n    ') + '\n\n';
-        }
-      };
-      rules.fencedCodeBlock = {
-        filter: function filter(node, options) {
-          return options.codeBlockStyle === 'fenced' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
-        },
-        replacement: function replacement(content, node, options) {
-          var className = node.firstChild.className || '';
-          var language = (className.match(/language-(\S+)/) || [null, ''])[1];
-          return '\n\n' + options.fence + language + '\n' + node.firstChild.textContent + '\n' + options.fence + '\n\n';
-        }
-      };
-      rules.horizontalRule = {
-        filter: 'hr',
-        replacement: function replacement(content, node, options) {
-          return '\n\n' + options.hr + '\n\n';
-        }
-      };
-      rules.inlineLink = {
-        filter: function filter(node, options) {
-          return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
-        },
-        replacement: function replacement(content, node) {
-          var href = node.getAttribute('href');
-          var title = node.title ? ' "' + node.title + '"' : '';
-          return '[' + content + '](' + href + title + ')';
-        }
-      };
-      rules.referenceLink = {
-        filter: function filter(node, options) {
-          return options.linkStyle === 'referenced' && node.nodeName === 'A' && node.getAttribute('href');
-        },
-        replacement: function replacement(content, node, options) {
-          var href = node.getAttribute('href');
-          var title = node.title ? ' "' + node.title + '"' : '';
-          var replacement;
-          var reference;
-
-          switch (options.linkReferenceStyle) {
-            case 'collapsed':
-              replacement = '[' + content + '][]';
-              reference = '[' + content + ']: ' + href + title;
-              break;
-
-            case 'shortcut':
-              replacement = '[' + content + ']';
-              reference = '[' + content + ']: ' + href + title;
-              break;
-
-            default:
-              var id = this.references.length + 1;
-              replacement = '[' + content + '][' + id + ']';
-              reference = '[' + id + ']: ' + href + title;
-          }
-
-          this.references.push(reference);
-          return replacement;
-        },
-        references: [],
-        append: function append(options) {
-          var references = '';
-
-          if (this.references.length) {
-            references = '\n\n' + this.references.join('\n') + '\n\n';
-            this.references = []; // Reset references
-          }
-
-          return references;
-        }
-      };
-      rules.emphasis = {
-        filter: ['em', 'i'],
-        replacement: function replacement(content, node, options) {
-          if (!content.trim()) return '';
-          return options.emDelimiter + content + options.emDelimiter;
-        }
-      };
-      rules.strong = {
-        filter: ['strong', 'b'],
-        replacement: function replacement(content, node, options) {
-          if (!content.trim()) return '';
-          return options.strongDelimiter + content + options.strongDelimiter;
-        }
-      };
-      rules.code = {
-        filter: function filter(node) {
-          var hasSiblings = node.previousSibling || node.nextSibling;
-          var isCodeBlock = node.parentNode.nodeName === 'PRE' && !hasSiblings;
-          return node.nodeName === 'CODE' && !isCodeBlock;
-        },
-        replacement: function replacement(content) {
-          if (!content.trim()) return '';
-          var delimiter = '`';
-          var leadingSpace = '';
-          var trailingSpace = '';
-          var matches = content.match(/`+/gm);
-
-          if (matches) {
-            if (/^`/.test(content)) leadingSpace = ' ';
-            if (/`$/.test(content)) trailingSpace = ' ';
-
-            while (matches.indexOf(delimiter) !== -1) {
-              delimiter = delimiter + '`';
+            if (options.headingStyle === 'setext' && hLevel < 3) {
+              var underline = repeat(hLevel === 1 ? '=' : '-', content.length);
+              return '\n\n' + content + '\n' + underline + '\n\n';
+            } else {
+              return '\n\n' + repeat('#', hLevel) + ' ' + content + '\n\n';
             }
           }
-
-          return delimiter + leadingSpace + content + trailingSpace + delimiter;
-        }
-      };
-      rules.image = {
-        filter: 'img',
-        replacement: function replacement(content, node) {
-          var alt = node.alt || '';
-          var src = node.getAttribute('src') || '';
-          var title = node.title || '';
-          var titlePart = title ? ' "' + title + '"' : '';
-          return src ? '![' + alt + '](' + src + titlePart + ')' : '';
-        }
-      };
-      /**
-      * Manages a collection of rules used to convert HTML to Markdown
-      */
-
-      function Rules(options) {
-        this.options = options;
-        this._keep = [];
-        this._remove = [];
-        this.blankRule = {
-          replacement: options.blankReplacement
         };
-        this.keepReplacement = options.keepReplacement;
-        this.defaultRule = {
-          replacement: options.defaultReplacement
+        rules.blockquote = {
+          filter: 'blockquote',
+          replacement: function replacement(content) {
+            content = content.replace(/^\n+|\n+$/g, '');
+            content = content.replace(/^/gm, '> ');
+            return '\n\n' + content + '\n\n';
+          }
         };
-        this.array = [];
+        rules.list = {
+          filter: ['ul', 'ol'],
+          replacement: function replacement(content, node) {
+            var parent = node.parentNode;
 
-        for (var key in options.rules) {
-          this.array.push(options.rules[key]);
-        }
-      }
-
-      Rules.prototype = {
-        add: function add(key, rule) {
-          this.array.unshift(rule);
-        },
-        keep: function keep(filter) {
-          this._keep.unshift({
-            filter: filter,
-            replacement: this.keepReplacement
-          });
-        },
-        remove: function remove(filter) {
-          this._remove.unshift({
-            filter: filter,
-            replacement: function replacement() {
-              return '';
+            if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
+              return '\n' + content;
+            } else {
+              return '\n\n' + content + '\n\n';
             }
-          });
-        },
-        forNode: function forNode(node) {
-          if (node.isBlank) return this.blankRule;
-          var rule;
-          if (rule = findRule(this.array, node, this.options)) return rule;
-          if (rule = findRule(this._keep, node, this.options)) return rule;
-          if (rule = findRule(this._remove, node, this.options)) return rule;
-          return this.defaultRule;
-        },
-        forEach: function forEach(fn) {
-          for (var i = 0; i < this.array.length; i++) {
-            fn(this.array[i], i);
+          }
+        };
+        rules.listItem = {
+          filter: 'li',
+          replacement: function replacement(content, node, options) {
+            content = content.replace(/^\n+/, '') // remove leading newlines
+            .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
+            .replace(/\n/gm, '\n    '); // indent
+
+            var prefix = options.bulletListMarker + '   ';
+            var parent = node.parentNode;
+
+            if (parent.nodeName === 'OL') {
+              var start = parent.getAttribute('start');
+              var index = Array.prototype.indexOf.call(parent.children, node);
+              prefix = (start ? Number(start) + index : index + 1) + '.  ';
+            }
+
+            return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
+          }
+        };
+        rules.indentedCodeBlock = {
+          filter: function filter(node, options) {
+            return options.codeBlockStyle === 'indented' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
+          },
+          replacement: function replacement(content, node, options) {
+            return '\n\n    ' + node.firstChild.textContent.replace(/\n/g, '\n    ') + '\n\n';
+          }
+        };
+        rules.fencedCodeBlock = {
+          filter: function filter(node, options) {
+            return options.codeBlockStyle === 'fenced' && node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
+          },
+          replacement: function replacement(content, node, options) {
+            var className = node.firstChild.className || '';
+            var language = (className.match(/language-(\S+)/) || [null, ''])[1];
+            return '\n\n' + options.fence + language + '\n' + node.firstChild.textContent + '\n' + options.fence + '\n\n';
+          }
+        };
+        rules.horizontalRule = {
+          filter: 'hr',
+          replacement: function replacement(content, node, options) {
+            return '\n\n' + options.hr + '\n\n';
+          }
+        };
+        rules.inlineLink = {
+          filter: function filter(node, options) {
+            return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
+          },
+          replacement: function replacement(content, node) {
+            var href = node.getAttribute('href');
+            var title = node.title ? ' "' + node.title + '"' : '';
+            return '[' + content + '](' + href + title + ')';
+          }
+        };
+        rules.referenceLink = {
+          filter: function filter(node, options) {
+            return options.linkStyle === 'referenced' && node.nodeName === 'A' && node.getAttribute('href');
+          },
+          replacement: function replacement(content, node, options) {
+            var href = node.getAttribute('href');
+            var title = node.title ? ' "' + node.title + '"' : '';
+            var replacement;
+            var reference;
+
+            switch (options.linkReferenceStyle) {
+              case 'collapsed':
+                replacement = '[' + content + '][]';
+                reference = '[' + content + ']: ' + href + title;
+                break;
+
+              case 'shortcut':
+                replacement = '[' + content + ']';
+                reference = '[' + content + ']: ' + href + title;
+                break;
+
+              default:
+                var id = this.references.length + 1;
+                replacement = '[' + content + '][' + id + ']';
+                reference = '[' + id + ']: ' + href + title;
+            }
+
+            this.references.push(reference);
+            return replacement;
+          },
+          references: [],
+          append: function append(options) {
+            var references = '';
+
+            if (this.references.length) {
+              references = '\n\n' + this.references.join('\n') + '\n\n';
+              this.references = []; // Reset references
+            }
+
+            return references;
+          }
+        };
+        rules.emphasis = {
+          filter: ['em', 'i'],
+          replacement: function replacement(content, node, options) {
+            if (!content.trim()) return '';
+            return options.emDelimiter + content + options.emDelimiter;
+          }
+        };
+        rules.strong = {
+          filter: ['strong', 'b'],
+          replacement: function replacement(content, node, options) {
+            if (!content.trim()) return '';
+            return options.strongDelimiter + content + options.strongDelimiter;
+          }
+        };
+        rules.code = {
+          filter: function filter(node) {
+            var hasSiblings = node.previousSibling || node.nextSibling;
+            var isCodeBlock = node.parentNode.nodeName === 'PRE' && !hasSiblings;
+            return node.nodeName === 'CODE' && !isCodeBlock;
+          },
+          replacement: function replacement(content) {
+            if (!content.trim()) return '';
+            var delimiter = '`';
+            var leadingSpace = '';
+            var trailingSpace = '';
+            var matches = content.match(/`+/gm);
+
+            if (matches) {
+              if (/^`/.test(content)) leadingSpace = ' ';
+              if (/`$/.test(content)) trailingSpace = ' ';
+
+              while (matches.indexOf(delimiter) !== -1) {
+                delimiter = delimiter + '`';
+              }
+            }
+
+            return delimiter + leadingSpace + content + trailingSpace + delimiter;
+          }
+        };
+        rules.image = {
+          filter: 'img',
+          replacement: function replacement(content, node) {
+            var alt = node.alt || '';
+            var src = node.getAttribute('src') || '';
+            var title = node.title || '';
+            var titlePart = title ? ' "' + title + '"' : '';
+            return src ? '![' + alt + '](' + src + titlePart + ')' : '';
+          }
+        };
+        /**
+        * Manages a collection of rules used to convert HTML to Markdown
+        */
+
+        function Rules(options) {
+          this.options = options;
+          this._keep = [];
+          this._remove = [];
+          this.blankRule = {
+            replacement: options.blankReplacement
+          };
+          this.keepReplacement = options.keepReplacement;
+          this.defaultRule = {
+            replacement: options.defaultReplacement
+          };
+          this.array = [];
+
+          for (var key in options.rules) {
+            this.array.push(options.rules[key]);
           }
         }
-      };
 
-      function findRule(rules, node, options) {
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i];
-          if (filterValue(rule, node, options)) return rule;
-        }
-
-        return void 0;
-      }
-
-      function filterValue(rule, node, options) {
-        var filter = rule.filter;
-
-        if (typeof filter === 'string') {
-          if (filter === node.nodeName.toLowerCase()) return true;
-        } else if (Array.isArray(filter)) {
-          if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
-        } else if (typeof filter === 'function') {
-          if (filter.call(rule, node, options)) return true;
-        } else {
-          throw new TypeError('`filter` needs to be a string, array, or function');
-        }
-      }
-      /**
-      * The collapseWhitespace function is adapted from collapse-whitespace
-      * by Luc Thevenard.
-      *
-      * The MIT License (MIT)
-      *
-      * Copyright (c) 2014 Luc Thevenard <lucthevenard@gmail.com>
-      *
-      * Permission is hereby granted, free of charge, to any person obtaining a copy
-      * of this software and associated documentation files (the "Software"), to deal
-      * in the Software without restriction, including without limitation the rights
-      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-      * copies of the Software, and to permit persons to whom the Software is
-      * furnished to do so, subject to the following conditions:
-      *
-      * The above copyright notice and this permission notice shall be included in
-      * all copies or substantial portions of the Software.
-      *
-      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-      * THE SOFTWARE.
-      */
-
-      /**
-      * collapseWhitespace(options) removes extraneous whitespace from an the given element.
-      *
-      * @param {Object} options
-      */
-
-
-      function collapseWhitespace(options) {
-        var element = options.element;
-        var isBlock = options.isBlock;
-        var isVoid = options.isVoid;
-
-        var isPre = options.isPre || function (node) {
-          return node.nodeName === 'PRE';
+        Rules.prototype = {
+          add: function add(key, rule) {
+            this.array.unshift(rule);
+          },
+          keep: function keep(filter) {
+            this._keep.unshift({
+              filter: filter,
+              replacement: this.keepReplacement
+            });
+          },
+          remove: function remove(filter) {
+            this._remove.unshift({
+              filter: filter,
+              replacement: function replacement() {
+                return '';
+              }
+            });
+          },
+          forNode: function forNode(node) {
+            if (node.isBlank) return this.blankRule;
+            var rule;
+            if (rule = findRule(this.array, node, this.options)) return rule;
+            if (rule = findRule(this._keep, node, this.options)) return rule;
+            if (rule = findRule(this._remove, node, this.options)) return rule;
+            return this.defaultRule;
+          },
+          forEach: function forEach(fn) {
+            for (var i = 0; i < this.array.length; i++) {
+              fn(this.array[i], i);
+            }
+          }
         };
 
-        if (!element.firstChild || isPre(element)) return;
-        var prevText = null;
-        var prevVoid = false;
-        var prev = null;
-        var node = next(prev, element, isPre);
+        function findRule(rules, node, options) {
+          for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (filterValue(rule, node, options)) return rule;
+          }
 
-        while (node !== element) {
-          if (node.nodeType === 3 || node.nodeType === 4) {
-            // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
-            var text = node.data.replace(/[ \r\n\t]+/g, ' ');
+          return void 0;
+        }
 
-            if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
-              text = text.substr(1);
-            } // `text` might be empty at this point.
+        function filterValue(rule, node, options) {
+          var filter = rule.filter;
+
+          if (typeof filter === 'string') {
+            if (filter === node.nodeName.toLowerCase()) return true;
+          } else if (Array.isArray(filter)) {
+            if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
+          } else if (typeof filter === 'function') {
+            if (filter.call(rule, node, options)) return true;
+          } else {
+            throw new TypeError('`filter` needs to be a string, array, or function');
+          }
+        }
+        /**
+        * The collapseWhitespace function is adapted from collapse-whitespace
+        * by Luc Thevenard.
+        *
+        * The MIT License (MIT)
+        *
+        * Copyright (c) 2014 Luc Thevenard <lucthevenard@gmail.com>
+        *
+        * Permission is hereby granted, free of charge, to any person obtaining a copy
+        * of this software and associated documentation files (the "Software"), to deal
+        * in the Software without restriction, including without limitation the rights
+        * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        * copies of the Software, and to permit persons to whom the Software is
+        * furnished to do so, subject to the following conditions:
+        *
+        * The above copyright notice and this permission notice shall be included in
+        * all copies or substantial portions of the Software.
+        *
+        * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        * THE SOFTWARE.
+        */
+
+        /**
+        * collapseWhitespace(options) removes extraneous whitespace from an the given element.
+        *
+        * @param {Object} options
+        */
 
 
-            if (!text) {
+        function collapseWhitespace(options) {
+          var element = options.element;
+          var isBlock = options.isBlock;
+          var isVoid = options.isVoid;
+
+          var isPre = options.isPre || function (node) {
+            return node.nodeName === 'PRE';
+          };
+
+          if (!element.firstChild || isPre(element)) return;
+          var prevText = null;
+          var prevVoid = false;
+          var prev = null;
+          var node = next(prev, element, isPre);
+
+          while (node !== element) {
+            if (node.nodeType === 3 || node.nodeType === 4) {
+              // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
+              var text = node.data.replace(/[ \r\n\t]+/g, ' ');
+
+              if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
+                text = text.substr(1);
+              } // `text` might be empty at this point.
+
+
+              if (!text) {
+                node = remove(node);
+                continue;
+              }
+
+              node.data = text;
+              prevText = node;
+            } else if (node.nodeType === 1) {
+              // Node.ELEMENT_NODE
+              if (isBlock(node) || node.nodeName === 'BR') {
+                if (prevText) {
+                  prevText.data = prevText.data.replace(/ $/, '');
+                }
+
+                prevText = null;
+                prevVoid = false;
+              } else if (isVoid(node)) {
+                // Avoid trimming space around non-block, non-BR void elements.
+                prevText = null;
+                prevVoid = true;
+              }
+            } else {
               node = remove(node);
               continue;
             }
 
-            node.data = text;
-            prevText = node;
-          } else if (node.nodeType === 1) {
-            // Node.ELEMENT_NODE
-            if (isBlock(node) || node.nodeName === 'BR') {
-              if (prevText) {
-                prevText.data = prevText.data.replace(/ $/, '');
+            var nextNode = next(prev, node, isPre);
+            prev = node;
+            node = nextNode;
+          }
+
+          if (prevText) {
+            prevText.data = prevText.data.replace(/ $/, '');
+
+            if (!prevText.data) {
+              remove(prevText);
+            }
+          }
+        }
+        /**
+        * remove(node) removes the given node from the DOM and returns the
+        * next node in the sequence.
+        *
+        * @param {Node} node
+        * @return {Node} node
+        */
+
+
+        function remove(node) {
+          var next = node.nextSibling || node.parentNode;
+          node.parentNode.removeChild(node);
+          return next;
+        }
+        /**
+        * next(prev, current, isPre) returns the next node in the sequence, given the
+        * current and previous nodes.
+        *
+        * @param {Node} prev
+        * @param {Node} current
+        * @param {Function} isPre
+        * @return {Node}
+        */
+
+
+        function next(prev, current, isPre) {
+          if (prev && prev.parentNode === current || isPre(current)) {
+            return current.nextSibling || current.parentNode;
+          }
+
+          return current.firstChild || current.nextSibling || current.parentNode;
+        }
+        /*
+        * Set up window for Node.js
+        */
+
+
+        var root = typeof window !== 'undefined' ? window : {};
+        /*
+        * Parsing HTML strings
+        */
+
+        function canParseHTMLNatively() {
+          var Parser = root.DOMParser;
+          var canParse = false; // Adapted from https://gist.github.com/1129031 Firefox/Opera/IE throw errors on
+          // unsupported types
+
+          try {
+            // WebKit returns null on unsupported types
+            if (new Parser().parseFromString('', 'text/html')) {
+              canParse = true;
+            }
+          } catch (e) {}
+
+          return canParse;
+        }
+
+        function createHTMLParser() {
+          var Parser = function Parser() {};
+
+          {
+            if (shouldUseActiveX()) {
+              Parser.prototype.parseFromString = function (string) {
+                var doc = new window.ActiveXObject('htmlfile');
+                doc.designMode = 'on'; // disable on-page scripts
+
+                doc.open();
+                doc.write(string);
+                doc.close();
+                return doc;
+              };
+            } else {
+              Parser.prototype.parseFromString = function (string) {
+                var doc = document.implementation.createHTMLDocument('');
+                doc.open();
+                doc.write(string);
+                doc.close();
+                return doc;
+              };
+            }
+          }
+          return Parser;
+        }
+
+        function shouldUseActiveX() {
+          var useActiveX = false;
+
+          try {
+            document.implementation.createHTMLDocument('').open();
+          } catch (e) {
+            if (window.ActiveXObject) useActiveX = true;
+          }
+
+          return useActiveX;
+        }
+
+        var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
+
+        function RootNode(input) {
+          var root;
+
+          if (typeof input === 'string') {
+            var doc = htmlParser().parseFromString( // DOM parsers arrange elements in the <head> and <body>. Wrapping in a custom
+            // element ensures elements are reliably arranged in a single element.
+            '<x-turndown id="turndown-root">' + input + '</x-turndown>', 'text/html');
+            root = doc.getElementById('turndown-root');
+          } else {
+            root = input.cloneNode(true);
+          }
+
+          collapseWhitespace({
+            element: root,
+            isBlock: isBlock,
+            isVoid: isVoid
+          });
+          return root;
+        }
+
+        var _htmlParser;
+
+        function htmlParser() {
+          _htmlParser = _htmlParser || new HTMLParser();
+          return _htmlParser;
+        }
+
+        function Node(node) {
+          node.isBlock = isBlock(node);
+          node.isCode = node.nodeName.toLowerCase() === 'code' || node.parentNode.isCode;
+          node.isBlank = isBlank(node);
+          node.flankingWhitespace = flankingWhitespace(node);
+          return node;
+        }
+
+        function isBlank(node) {
+          return ['A', 'TH', 'TD', 'IFRAME', 'SCRIPT', 'AUDIO', 'VIDEO'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
+        }
+
+        function flankingWhitespace(node) {
+          var leading = '';
+          var trailing = '';
+
+          if (!node.isBlock) {
+            var hasLeading = /^[ \r\n\t]/.test(node.textContent);
+            var hasTrailing = /[ \r\n\t]$/.test(node.textContent);
+
+            if (hasLeading && !isFlankedByWhitespace('left', node)) {
+              leading = ' ';
+            }
+
+            if (hasTrailing && !isFlankedByWhitespace('right', node)) {
+              trailing = ' ';
+            }
+          }
+
+          return {
+            leading: leading,
+            trailing: trailing
+          };
+        }
+
+        function isFlankedByWhitespace(side, node) {
+          var sibling;
+          var regExp;
+          var isFlanked;
+
+          if (side === 'left') {
+            sibling = node.previousSibling;
+            regExp = / $/;
+          } else {
+            sibling = node.nextSibling;
+            regExp = /^ /;
+          }
+
+          if (sibling) {
+            if (sibling.nodeType === 3) {
+              isFlanked = regExp.test(sibling.nodeValue);
+            } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
+              isFlanked = regExp.test(sibling.textContent);
+            }
+          }
+
+          return isFlanked;
+        }
+
+        var reduce = Array.prototype.reduce;
+        var leadingNewLinesRegExp = /^\n*/;
+        var trailingNewLinesRegExp = /\n*$/;
+        var escapes = [[/\\/g, '\\\\'], [/\*/g, '\\*'], [/^-/g, '\\-'], [/^\+ /g, '\\+ '], [/^(=+)/g, '\\$1'], [/^(#{1,6}) /g, '\\$1 '], [/`/g, '\\`'], [/^~~~/g, '\\~~~'], [/\[/g, '\\['], [/\]/g, '\\]'], [/^>/g, '\\>'], [/_/g, '\\_'], [/^(\d+)\. /g, '$1\\. ']];
+
+        function TurndownService(options) {
+          if (!(this instanceof TurndownService)) return new TurndownService(options);
+          var defaults = {
+            rules: rules,
+            headingStyle: 'setext',
+            hr: '* * *',
+            bulletListMarker: '*',
+            codeBlockStyle: 'indented',
+            fence: '```',
+            emDelimiter: '_',
+            strongDelimiter: '**',
+            linkStyle: 'inlined',
+            linkReferenceStyle: 'full',
+            br: '  ',
+            blankReplacement: function blankReplacement(content, node) {
+              return node.isBlock ? '\n\n' : '';
+            },
+            keepReplacement: function keepReplacement(content, node) {
+              return node.isBlock ? '\n\n' + node.outerHTML + '\n\n' : node.outerHTML;
+            },
+            defaultReplacement: function defaultReplacement(content, node) {
+              return node.isBlock ? '\n\n' + content + '\n\n' : content;
+            }
+          };
+          this.options = extend({}, defaults, options);
+          this.rules = new Rules(this.options);
+        }
+
+        TurndownService.prototype = {
+          /**
+          * The entry point for converting a string or DOM node to Markdown
+          * @public
+          * @param {String|HTMLElement} input The string or DOM node to convert
+          * @returns A Markdown representation of the input
+          * @type String
+          */
+          turndown: function turndown(input) {
+            if (!canConvert(input)) {
+              throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
+            }
+
+            if (input === '') return '';
+            var output = process.call(this, new RootNode(input));
+            return postProcess.call(this, output);
+          },
+
+          /**
+          * Add one or more plugins
+          * @public
+          * @param {Function|Array} plugin The plugin or array of plugins to add
+          * @returns The Turndown instance for chaining
+          * @type Object
+          */
+          use: function use(plugin) {
+            if (Array.isArray(plugin)) {
+              for (var i = 0; i < plugin.length; i++) {
+                this.use(plugin[i]);
               }
-
-              prevText = null;
-              prevVoid = false;
-            } else if (isVoid(node)) {
-              // Avoid trimming space around non-block, non-BR void elements.
-              prevText = null;
-              prevVoid = true;
+            } else if (typeof plugin === 'function') {
+              plugin(this);
+            } else {
+              throw new TypeError('plugin must be a Function or an Array of Functions');
             }
-          } else {
-            node = remove(node);
-            continue;
-          }
 
-          var nextNode = next(prev, node, isPre);
-          prev = node;
-          node = nextNode;
-        }
-
-        if (prevText) {
-          prevText.data = prevText.data.replace(/ $/, '');
-
-          if (!prevText.data) {
-            remove(prevText);
-          }
-        }
-      }
-      /**
-      * remove(node) removes the given node from the DOM and returns the
-      * next node in the sequence.
-      *
-      * @param {Node} node
-      * @return {Node} node
-      */
-
-
-      function remove(node) {
-        var next = node.nextSibling || node.parentNode;
-        node.parentNode.removeChild(node);
-        return next;
-      }
-      /**
-      * next(prev, current, isPre) returns the next node in the sequence, given the
-      * current and previous nodes.
-      *
-      * @param {Node} prev
-      * @param {Node} current
-      * @param {Function} isPre
-      * @return {Node}
-      */
-
-
-      function next(prev, current, isPre) {
-        if (prev && prev.parentNode === current || isPre(current)) {
-          return current.nextSibling || current.parentNode;
-        }
-
-        return current.firstChild || current.nextSibling || current.parentNode;
-      }
-      /*
-      * Set up window for Node.js
-      */
-
-
-      var root = typeof window !== 'undefined' ? window : {};
-      /*
-      * Parsing HTML strings
-      */
-
-      function canParseHTMLNatively() {
-        var Parser = root.DOMParser;
-        var canParse = false; // Adapted from https://gist.github.com/1129031 Firefox/Opera/IE throw errors on
-        // unsupported types
-
-        try {
-          // WebKit returns null on unsupported types
-          if (new Parser().parseFromString('', 'text/html')) {
-            canParse = true;
-          }
-        } catch (e) {}
-
-        return canParse;
-      }
-
-      function createHTMLParser() {
-        var Parser = function Parser() {};
-
-        {
-          if (shouldUseActiveX()) {
-            Parser.prototype.parseFromString = function (string) {
-              var doc = new window.ActiveXObject('htmlfile');
-              doc.designMode = 'on'; // disable on-page scripts
-
-              doc.open();
-              doc.write(string);
-              doc.close();
-              return doc;
-            };
-          } else {
-            Parser.prototype.parseFromString = function (string) {
-              var doc = document.implementation.createHTMLDocument('');
-              doc.open();
-              doc.write(string);
-              doc.close();
-              return doc;
-            };
-          }
-        }
-        return Parser;
-      }
-
-      function shouldUseActiveX() {
-        var useActiveX = false;
-
-        try {
-          document.implementation.createHTMLDocument('').open();
-        } catch (e) {
-          if (window.ActiveXObject) useActiveX = true;
-        }
-
-        return useActiveX;
-      }
-
-      var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
-
-      function RootNode(input) {
-        var root;
-
-        if (typeof input === 'string') {
-          var doc = htmlParser().parseFromString( // DOM parsers arrange elements in the <head> and <body>. Wrapping in a custom
-          // element ensures elements are reliably arranged in a single element.
-          '<x-turndown id="turndown-root">' + input + '</x-turndown>', 'text/html');
-          root = doc.getElementById('turndown-root');
-        } else {
-          root = input.cloneNode(true);
-        }
-
-        collapseWhitespace({
-          element: root,
-          isBlock: isBlock,
-          isVoid: isVoid
-        });
-        return root;
-      }
-
-      var _htmlParser;
-
-      function htmlParser() {
-        _htmlParser = _htmlParser || new HTMLParser();
-        return _htmlParser;
-      }
-
-      function Node(node) {
-        node.isBlock = isBlock(node);
-        node.isCode = node.nodeName.toLowerCase() === 'code' || node.parentNode.isCode;
-        node.isBlank = isBlank(node);
-        node.flankingWhitespace = flankingWhitespace(node);
-        return node;
-      }
-
-      function isBlank(node) {
-        return ['A', 'TH', 'TD', 'IFRAME', 'SCRIPT', 'AUDIO', 'VIDEO'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
-      }
-
-      function flankingWhitespace(node) {
-        var leading = '';
-        var trailing = '';
-
-        if (!node.isBlock) {
-          var hasLeading = /^[ \r\n\t]/.test(node.textContent);
-          var hasTrailing = /[ \r\n\t]$/.test(node.textContent);
-
-          if (hasLeading && !isFlankedByWhitespace('left', node)) {
-            leading = ' ';
-          }
-
-          if (hasTrailing && !isFlankedByWhitespace('right', node)) {
-            trailing = ' ';
-          }
-        }
-
-        return {
-          leading: leading,
-          trailing: trailing
-        };
-      }
-
-      function isFlankedByWhitespace(side, node) {
-        var sibling;
-        var regExp;
-        var isFlanked;
-
-        if (side === 'left') {
-          sibling = node.previousSibling;
-          regExp = / $/;
-        } else {
-          sibling = node.nextSibling;
-          regExp = /^ /;
-        }
-
-        if (sibling) {
-          if (sibling.nodeType === 3) {
-            isFlanked = regExp.test(sibling.nodeValue);
-          } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
-            isFlanked = regExp.test(sibling.textContent);
-          }
-        }
-
-        return isFlanked;
-      }
-
-      var reduce = Array.prototype.reduce;
-      var leadingNewLinesRegExp = /^\n*/;
-      var trailingNewLinesRegExp = /\n*$/;
-      var escapes = [[/\\/g, '\\\\'], [/\*/g, '\\*'], [/^-/g, '\\-'], [/^\+ /g, '\\+ '], [/^(=+)/g, '\\$1'], [/^(#{1,6}) /g, '\\$1 '], [/`/g, '\\`'], [/^~~~/g, '\\~~~'], [/\[/g, '\\['], [/\]/g, '\\]'], [/^>/g, '\\>'], [/_/g, '\\_'], [/^(\d+)\. /g, '$1\\. ']];
-
-      function TurndownService(options) {
-        if (!(this instanceof TurndownService)) return new TurndownService(options);
-        var defaults = {
-          rules: rules,
-          headingStyle: 'setext',
-          hr: '* * *',
-          bulletListMarker: '*',
-          codeBlockStyle: 'indented',
-          fence: '```',
-          emDelimiter: '_',
-          strongDelimiter: '**',
-          linkStyle: 'inlined',
-          linkReferenceStyle: 'full',
-          br: '  ',
-          blankReplacement: function blankReplacement(content, node) {
-            return node.isBlock ? '\n\n' : '';
+            return this;
           },
-          keepReplacement: function keepReplacement(content, node) {
-            return node.isBlock ? '\n\n' + node.outerHTML + '\n\n' : node.outerHTML;
+
+          /**
+          * Adds a rule
+          * @public
+          * @param {String} key The unique key of the rule
+          * @param {Object} rule The rule
+          * @returns The Turndown instance for chaining
+          * @type Object
+          */
+          addRule: function addRule(key, rule) {
+            this.rules.add(key, rule);
+            return this;
           },
-          defaultReplacement: function defaultReplacement(content, node) {
-            return node.isBlock ? '\n\n' + content + '\n\n' : content;
+
+          /**
+          * Keep a node (as HTML) that matches the filter
+          * @public
+          * @param {String|Array|Function} filter The unique key of the rule
+          * @returns The Turndown instance for chaining
+          * @type Object
+          */
+          keep: function keep(filter) {
+            this.rules.keep(filter);
+            return this;
+          },
+
+          /**
+          * Remove a node that matches the filter
+          * @public
+          * @param {String|Array|Function} filter The unique key of the rule
+          * @returns The Turndown instance for chaining
+          * @type Object
+          */
+          remove: function remove(filter) {
+            this.rules.remove(filter);
+            return this;
+          },
+
+          /**
+          * Escapes Markdown syntax
+          * @public
+          * @param {String} string The string to escape
+          * @returns A string with Markdown syntax escaped
+          * @type String
+          */
+          escape: function escape(string) {
+            return escapes.reduce(function (accumulator, escape) {
+              return accumulator.replace(escape[0], escape[1]);
+            }, string);
           }
         };
-        this.options = extend({}, defaults, options);
-        this.rules = new Rules(this.options);
-      }
-
-      TurndownService.prototype = {
         /**
-        * The entry point for converting a string or DOM node to Markdown
-        * @public
-        * @param {String|HTMLElement} input The string or DOM node to convert
-        * @returns A Markdown representation of the input
+        * Reduces a DOM node down to its Markdown string equivalent
+        * @private
+        * @param {HTMLElement} parentNode The node to convert
+        * @returns A Markdown representation of the node
         * @type String
         */
-        turndown: function turndown(input) {
-          if (!canConvert(input)) {
-            throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
-          }
 
-          if (input === '') return '';
-          var output = process.call(this, new RootNode(input));
-          return postProcess.call(this, output);
-        },
+        function process(parentNode) {
+          var self = this;
+          return reduce.call(parentNode.childNodes, function (output, node) {
+            node = new Node(node);
+            var replacement = '';
 
-        /**
-        * Add one or more plugins
-        * @public
-        * @param {Function|Array} plugin The plugin or array of plugins to add
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        use: function use(plugin) {
-          if (Array.isArray(plugin)) {
-            for (var i = 0; i < plugin.length; i++) {
-              this.use(plugin[i]);
+            if (node.nodeType === 3) {
+              replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
+            } else if (node.nodeType === 1) {
+              replacement = replacementForNode.call(self, node);
             }
-          } else if (typeof plugin === 'function') {
-            plugin(this);
-          } else {
-            throw new TypeError('plugin must be a Function or an Array of Functions');
-          }
 
-          return this;
-        },
-
+            return join(output, replacement);
+          }, '');
+        }
         /**
-        * Adds a rule
-        * @public
-        * @param {String} key The unique key of the rule
-        * @param {Object} rule The rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        addRule: function addRule(key, rule) {
-          this.rules.add(key, rule);
-          return this;
-        },
-
-        /**
-        * Keep a node (as HTML) that matches the filter
-        * @public
-        * @param {String|Array|Function} filter The unique key of the rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        keep: function keep(filter) {
-          this.rules.keep(filter);
-          return this;
-        },
-
-        /**
-        * Remove a node that matches the filter
-        * @public
-        * @param {String|Array|Function} filter The unique key of the rule
-        * @returns The Turndown instance for chaining
-        * @type Object
-        */
-        remove: function remove(filter) {
-          this.rules.remove(filter);
-          return this;
-        },
-
-        /**
-        * Escapes Markdown syntax
-        * @public
-        * @param {String} string The string to escape
-        * @returns A string with Markdown syntax escaped
+        * Appends strings as each rule requires and trims the output
+        * @private
+        * @param {String} output The conversion output
+        * @returns A trimmed version of the ouput
         * @type String
         */
-        escape: function escape(string) {
-          return escapes.reduce(function (accumulator, escape) {
-            return accumulator.replace(escape[0], escape[1]);
-          }, string);
+
+
+        function postProcess(output) {
+          var self = this;
+          this.rules.forEach(function (rule) {
+            if (typeof rule.append === 'function') {
+              output = join(output, rule.append(self.options));
+            }
+          });
+          return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '');
         }
-      };
-      /**
-      * Reduces a DOM node down to its Markdown string equivalent
-      * @private
-      * @param {HTMLElement} parentNode The node to convert
-      * @returns A Markdown representation of the node
-      * @type String
-      */
-
-      function process(parentNode) {
-        var self = this;
-        return reduce.call(parentNode.childNodes, function (output, node) {
-          node = new Node(node);
-          var replacement = '';
-
-          if (node.nodeType === 3) {
-            replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
-          } else if (node.nodeType === 1) {
-            replacement = replacementForNode.call(self, node);
-          }
-
-          return join(output, replacement);
-        }, '');
-      }
-      /**
-      * Appends strings as each rule requires and trims the output
-      * @private
-      * @param {String} output The conversion output
-      * @returns A trimmed version of the ouput
-      * @type String
-      */
+        /**
+        * Converts an element node to its Markdown equivalent
+        * @private
+        * @param {HTMLElement} node The node to convert
+        * @returns A Markdown representation of the node
+        * @type String
+        */
 
 
-      function postProcess(output) {
-        var self = this;
-        this.rules.forEach(function (rule) {
-          if (typeof rule.append === 'function') {
-            output = join(output, rule.append(self.options));
-          }
-        });
-        return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '');
-      }
-      /**
-      * Converts an element node to its Markdown equivalent
-      * @private
-      * @param {HTMLElement} node The node to convert
-      * @returns A Markdown representation of the node
-      * @type String
-      */
+        function replacementForNode(node) {
+          var rule = this.rules.forNode(node);
+          var content = process.call(this, node);
+          var whitespace = node.flankingWhitespace;
+          if (whitespace.leading || whitespace.trailing) content = content.trim();
+          return whitespace.leading + rule.replacement(content, node, this.options) + whitespace.trailing;
+        }
+        /**
+        * Determines the new lines between the current output and the replacement
+        * @private
+        * @param {String} output The current conversion output
+        * @param {String} replacement The string to append to the output
+        * @returns The whitespace to separate the current output and the replacement
+        * @type String
+        */
 
 
-      function replacementForNode(node) {
-        var rule = this.rules.forNode(node);
-        var content = process.call(this, node);
-        var whitespace = node.flankingWhitespace;
-        if (whitespace.leading || whitespace.trailing) content = content.trim();
-        return whitespace.leading + rule.replacement(content, node, this.options) + whitespace.trailing;
-      }
-      /**
-      * Determines the new lines between the current output and the replacement
-      * @private
-      * @param {String} output The current conversion output
-      * @param {String} replacement The string to append to the output
-      * @returns The whitespace to separate the current output and the replacement
-      * @type String
-      */
+        function separatingNewlines(output, replacement) {
+          var newlines = [output.match(trailingNewLinesRegExp)[0], replacement.match(leadingNewLinesRegExp)[0]].sort();
+          var maxNewlines = newlines[newlines.length - 1];
+          return maxNewlines.length < 2 ? maxNewlines : '\n\n';
+        }
+
+        function join(string1, string2) {
+          var separator = separatingNewlines(string1, string2); // Remove trailing/leading newlines and replace with separator
+
+          string1 = string1.replace(trailingNewLinesRegExp, '');
+          string2 = string2.replace(leadingNewLinesRegExp, '');
+          return string1 + separator + string2;
+        }
+        /**
+        * Determines whether an input can be converted
+        * @private
+        * @param {String|HTMLElement} input Describe this parameter
+        * @returns Describe what it returns
+        * @type String|Object|Array|Boolean|Number
+        */
 
 
-      function separatingNewlines(output, replacement) {
-        var newlines = [output.match(trailingNewLinesRegExp)[0], replacement.match(leadingNewLinesRegExp)[0]].sort();
-        var maxNewlines = newlines[newlines.length - 1];
-        return maxNewlines.length < 2 ? maxNewlines : '\n\n';
-      }
+        function canConvert(input) {
+          return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
+        }
 
-      function join(string1, string2) {
-        var separator = separatingNewlines(string1, string2); // Remove trailing/leading newlines and replace with separator
+        return TurndownService;
+      }();
 
-        string1 = string1.replace(trailingNewLinesRegExp, '');
-        string2 = string2.replace(leadingNewLinesRegExp, '');
-        return string1 + separator + string2;
-      }
-      /**
-      * Determines whether an input can be converted
-      * @private
-      * @param {String|HTMLElement} input Describe this parameter
-      * @returns Describe what it returns
-      * @type String|Object|Array|Boolean|Number
-      */
-
-
-      function canConvert(input) {
-        return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
-      }
-
-      return TurndownService;
-    }();
-
-    return new TurndownService().turndown(html);
-  };
+      return new TurndownService().turndown(html);
+    }
+  }]);
 
   return MarkdownHelper;
 }();
@@ -23924,7 +24244,23 @@ module.exports = MarkdownHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaHelperCommon = __webpack_require__(207);
 /**
@@ -23937,136 +24273,148 @@ var MediaHelperCommon = __webpack_require__(207);
 var MediaHelper =
 /*#__PURE__*/
 function (_MediaHelperCommon) {
-  _inheritsLoose(MediaHelper, _MediaHelperCommon);
+  _inherits(MediaHelper, _MediaHelperCommon);
 
   function MediaHelper() {
-    return _MediaHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, MediaHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(MediaHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets the Media tree
-   *
-   * @returns {Promise(Object)} tree
-   */
-  MediaHelper.getTree = function getTree() {
-    return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
-  };
-  /**
-   * Gets whether the Media provider exists
-   *
-   * @returns {Promise} Promise
-   */
+  _createClass(MediaHelper, null, [{
+    key: "getTree",
 
-
-  MediaHelper.checkMediaProvider = function checkMediaProvider() {
-    return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers').then(function (result) {
-      if (!result || !result.media) {
-        return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
-      }
-
-      return Promise.resolve();
-    });
-  };
-  /**
-   * Gets Media object by id synchronously
-   *
-   * @param {String} id
-   *
-   * @return {Media} Media object
-   */
-
-
-  MediaHelper.getMediaByIdSync = function getMediaByIdSync(id) {
-    for (var i = 0; i < resources.media.length; i++) {
-      var media = resources.media[i];
-
-      if (media.id == id) {
-        return media;
-      }
+    /**
+     * Gets the Media tree
+     *
+     * @returns {Promise(Object)} tree
+     */
+    value: function getTree() {
+      return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
     }
+    /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
 
-    return null;
-  };
-  /**
-   * Gets the Media Url
-   */
+  }, {
+    key: "checkMediaProvider",
+    value: function checkMediaProvider() {
+      return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+        if (!result || !result.media) {
+          return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
+        }
 
+        return Promise.resolve();
+      });
+    }
+    /**
+     * Gets Media object by id synchronously
+     *
+     * @param {String} id
+     *
+     * @return {Media} Media object
+     */
 
-  MediaHelper.getMediaUrl = function getMediaUrl(id) {
-    return '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
-  };
-  /**
-   * Gets Media object by id
-   *
-   * @param {String} id
-   *
-   * @return {Promise} Media object
-   */
-
-
-  MediaHelper.getMediaById = function getMediaById(id) {
-    return new Promise(function (resolve, reject) {
+  }, {
+    key: "getMediaByIdSync",
+    value: function getMediaByIdSync(id) {
       for (var i = 0; i < resources.media.length; i++) {
         var media = resources.media[i];
 
         if (media.id == id) {
-          resolve(media);
-          return;
+          return media;
         }
       }
 
-      reject(new Error('Media with id "' + id + '" not found'));
-    });
-  };
-  /**
-   * Sets a Media tree item
-   *
-   * @param {String} id
-   * @param {Object} item
-   *
-   * @returns {Promise} promise
-   */
+      return null;
+    }
+    /**
+     * Gets the Media Url
+     */
+
+  }, {
+    key: "getMediaUrl",
+    value: function getMediaUrl(id) {
+      return '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+    }
+    /**
+     * Gets Media object by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Media object
+     */
+
+  }, {
+    key: "getMediaById",
+    value: function getMediaById(id) {
+      return new Promise(function (resolve, reject) {
+        for (var i = 0; i < resources.media.length; i++) {
+          var media = resources.media[i];
+
+          if (media.id == id) {
+            resolve(media);
+            return;
+          }
+        }
+
+        reject(new Error('Media with id "' + id + '" not found'));
+      });
+    }
+    /**
+     * Sets a Media tree item
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @returns {Promise} promise
+     */
+
+  }, {
+    key: "setTreeItem",
+    value: function setTreeItem(id, item) {
+      return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
+    }
+    /**
+     * Initialises the media picker mode
+     *
+     * @param {Function} onPickMedia
+     * @param {Function} onChangeResource
+     * @param {Object} allResources
+     */
+
+  }, {
+    key: "initMediaPickerMode",
+    value: function initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+      // Claim debug messages
+      UI.errorModal = onError; // Use the provided resources instead of reloading them
+
+      HashBrown.Helpers.RequestHelper.reloadAllResources = function () {
+        resources = allResources;
+        return Promise.resolve();
+      }; // Listen for picked Media
 
 
-  MediaHelper.setTreeItem = function setTreeItem(id, item) {
-    return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
-  };
-  /**
-   * Initialises the media picker mode
-   *
-   * @param {Function} onPickMedia
-   * @param {Function} onChangeResource
-   * @param {Object} allResources
-   */
+      window.addEventListener('hashchange', function () {
+        var isMediaView = location.hash.indexOf('#/media/') === 0;
+
+        if (isMediaView) {
+          var id = location.hash.replace('#/media/', '');
+          onPickMedia(id);
+        }
+      }); // Listen for resource change
+
+      HashBrown.Views.Navigation.NavbarMain.reload = function () {
+        Crisp.View.get('NavbarMain').reload();
+        onChangeResource();
+      }; // Set visual fixes for media picker mode
 
 
-  MediaHelper.initMediaPickerMode = function initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
-    // Claim debug messages
-    UI.errorModal = onError; // Use the provided resources instead of reloading them
-
-    HashBrown.Helpers.RequestHelper.reloadAllResources = function () {
-      resources = allResources;
-      return Promise.resolve();
-    }; // Listen for picked Media
-
-
-    window.addEventListener('hashchange', function () {
-      var isMediaView = location.hash.indexOf('#/media/') === 0;
-
-      if (isMediaView) {
-        var id = location.hash.replace('#/media/', '');
-        onPickMedia(id);
-      }
-    }); // Listen for resource change
-
-    HashBrown.Views.Navigation.NavbarMain.reload = function () {
-      Crisp.View.get('NavbarMain').reload();
-      onChangeResource();
-    }; // Set visual fixes for media picker mode
-
-
-    $('.page--environment').addClass('media-picker');
-  };
+      $('.page--environment').addClass('media-picker');
+    }
+  }]);
 
   return MediaHelper;
 }(MediaHelperCommon);
@@ -24080,6 +24428,12 @@ module.exports = MediaHelper;
 "use strict";
  // Models
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var Media = __webpack_require__(208);
 /**
  * A helper for Media objects
@@ -24091,57 +24445,66 @@ var Media = __webpack_require__(208);
 var MediaHelper =
 /*#__PURE__*/
 function () {
-  function MediaHelper() {}
+  function MediaHelper() {
+    _classCallCheck(this, MediaHelper);
+  }
 
-  /**
-   * Gets the media root path
-   *
-   * @returns {Promise} Path
-   */
-  MediaHelper.getRootPath = function getRootPath() {
-    return ConnectionHelper.getMediaProvider().then(function (connection) {
-      resolve(connection.getMediaPath());
-    }).catch(function () {
-      resolve('');
-    });
-  };
-  /**
-   * Gets the Media tree
-   *
-   * @returns {Promise(Object)} tree
-   */
+  _createClass(MediaHelper, null, [{
+    key: "getRootPath",
 
+    /**
+     * Gets the media root path
+     *
+     * @returns {Promise} Path
+     */
+    value: function getRootPath() {
+      return ConnectionHelper.getMediaProvider().then(function (connection) {
+        resolve(connection.getMediaPath());
+      }).catch(function () {
+        resolve('');
+      });
+    }
+    /**
+     * Gets the Media tree
+     *
+     * @returns {Promise(Object)} tree
+     */
 
-  MediaHelper.getTree = function getTree() {
-    return Promise.resolve({});
-  };
-  /**
-   * Sets a Media tree item
-   *
-   * @param {String} id
-   * @param {Object} item
-   *
-   * @returns {Promise} promise
-   */
+  }, {
+    key: "getTree",
+    value: function getTree() {
+      return Promise.resolve({});
+    }
+    /**
+     * Sets a Media tree item
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @returns {Promise} promise
+     */
 
+  }, {
+    key: "setTreeItem",
+    value: function setTreeItem(id, item) {
+      return Promise.resolve();
+    }
+    /**
+     * Gets the media temp path
+     *
+     * @param {String} project
+     *
+     * @returns {String} Path
+     */
 
-  MediaHelper.setTreeItem = function setTreeItem(id, item) {
-    return Promise.resolve();
-  };
-  /**
-   * Gets the media temp path
-   *
-   * @param {String} project
-   *
-   * @returns {String} Path
-   */
-
-
-  MediaHelper.getTempPath = function getTempPath(project) {
-    checkParam(project, 'project', String);
-    var path = '/storage/' + ProjectHelper.currentProject + '/temp';
-    return path;
-  };
+  }, {
+    key: "getTempPath",
+    value: function getTempPath(project) {
+      checkParam(project, 'project', String);
+      var path = '/storage/' + ProjectHelper.currentProject + '/temp';
+      return path;
+    }
+  }]);
 
   return MediaHelper;
 }();
@@ -24155,7 +24518,27 @@ module.exports = MediaHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Path = __webpack_require__(39);
 
@@ -24170,230 +24553,244 @@ var Resource = __webpack_require__(198);
 var Media =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Media, _Resource);
+  _inherits(Media, _Resource);
 
   function Media() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Media);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Media).apply(this, arguments));
   }
 
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-  Media.paramsCheck = function paramsCheck(params) {
-    params = _Resource.paramsCheck.call(this, params);
-    delete params.remote;
-    delete params.sync;
-    delete params.isRemote;
+  _createClass(Media, [{
+    key: "structure",
 
-    if (!params.folder) {
-      params.folder = '/';
+    /**
+     * Structure
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(String, 'icon', 'file-image-o');
+      this.def(String, 'name');
+      this.def(String, 'url');
+      this.def(String, 'path');
+      this.def(String, 'folder', '/');
+      this.def(Date, 'updateDate');
     }
+    /**
+     * Read from file path
+     *
+     * @param {String} filePath
+     */
 
-    return params;
-  };
-  /**
-   * Structure
-   */
+  }, {
+    key: "readFromFilePath",
+    value: function readFromFilePath(filePath) {
+      var name = Path.basename(filePath);
+      var id = filePath; // Trim file path for id 
 
+      id = id.replace('/' + name, '');
+      id = id.substring(id.lastIndexOf('/') + 1); // Remove file extension
 
-  var _proto = Media.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'icon', 'file-image-o');
-    this.def(String, 'name');
-    this.def(String, 'url');
-    this.def(String, 'path');
-    this.def(String, 'folder', '/');
-    this.def(Date, 'updateDate');
-  };
-  /**
-   * Read from file path
-   *
-   * @param {String} filePath
-   */
-
-
-  _proto.readFromFilePath = function readFromFilePath(filePath) {
-    var name = Path.basename(filePath);
-    var id = filePath; // Trim file path for id 
-
-    id = id.replace('/' + name, '');
-    id = id.substring(id.lastIndexOf('/') + 1); // Remove file extension
-
-    name = name.replace(/\.[^/.]+$/, '');
-    this.id = id;
-    this.name = name;
-    this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
-  };
-  /**
-   * Gets the content type header
-   *
-   * @returns {String} Content-Type header
-   */
-
-
-  _proto.getContentTypeHeader = function getContentTypeHeader() {
-    var name = (this.name || '').toLowerCase();
-    var extension = name.split('.');
-
-    if (extension && extension.length > 0) {
-      extension = extension[extension.length - 1];
+      name = name.replace(/\.[^/.]+$/, '');
+      this.id = id;
+      this.name = name;
+      this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
     }
+    /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
 
-    switch (extension) {
-      // Image types
-      case 'jpg':
-        return 'image/jpeg';
+  }, {
+    key: "getContentTypeHeader",
+    value: function getContentTypeHeader() {
+      var name = (this.name || '').toLowerCase();
+      var extension = name.split('.');
 
-      case 'png':
-        return 'image/png';
+      if (extension && extension.length > 0) {
+        extension = extension[extension.length - 1];
+      }
 
-      case 'gif':
-        return 'image/gif';
+      switch (extension) {
+        // Image types
+        case 'jpg':
+          return 'image/jpeg';
 
-      case 'bmp':
-        return 'image/bmp';
-      // Audio types
+        case 'png':
+          return 'image/png';
 
-      case 'm4a':
-        return 'audio/m4a';
+        case 'gif':
+          return 'image/gif';
 
-      case 'mp3':
-        return 'audio/mp3';
+        case 'bmp':
+          return 'image/bmp';
+        // Audio types
 
-      case 'ogg':
-        return 'audio/ogg';
+        case 'm4a':
+          return 'audio/m4a';
 
-      case 'wav':
-        return 'audio/wav';
-      // Video types
+        case 'mp3':
+          return 'audio/mp3';
 
-      case 'mp4':
-        return 'video/mp4';
+        case 'ogg':
+          return 'audio/ogg';
 
-      case 'webm':
-        return 'video/webm';
+        case 'wav':
+          return 'audio/wav';
+        // Video types
 
-      case 'avi':
-        return 'video/avi';
+        case 'mp4':
+          return 'video/mp4';
 
-      case 'mov':
-        return 'video/quicktime';
+        case 'webm':
+          return 'video/webm';
 
-      case 'bmp':
-        return 'video/bmp';
+        case 'avi':
+          return 'video/avi';
 
-      case 'wmv':
-        return 'video/x-ms-wmv';
+        case 'mov':
+          return 'video/quicktime';
 
-      case '3gp':
-        return 'video/3gpp';
+        case 'bmp':
+          return 'video/bmp';
 
-      case 'mkv':
-        return 'video/x-matroska';
-      // SVG
+        case 'wmv':
+          return 'video/x-ms-wmv';
 
-      case 'svg':
-        return 'image/svg+xml';
-      // PDF
+        case '3gp':
+          return 'video/3gpp';
 
-      case 'pdf':
-        return 'application/pdf';
-      // Everything else
+        case 'mkv':
+          return 'video/x-matroska';
+        // SVG
 
-      default:
-        return 'application/octet-stream';
+        case 'svg':
+          return 'image/svg+xml';
+        // PDF
+
+        case 'pdf':
+          return 'application/pdf';
+        // Everything else
+
+        default:
+          return 'application/octet-stream';
+      }
     }
-  };
-  /**
-   * Gets whether this is audio
-   *
-   * @returns {Boolean} Is audio
-   */
+    /**
+     * Gets whether this is audio
+     *
+     * @returns {Boolean} Is audio
+     */
 
+  }, {
+    key: "isAudio",
+    value: function isAudio() {
+      return this.getContentTypeHeader().indexOf('audio') > -1;
+    }
+    /**
+     * Gets whether this is a video
+     *
+     * @returns {Boolean} Is video
+     */
 
-  _proto.isAudio = function isAudio() {
-    return this.getContentTypeHeader().indexOf('audio') > -1;
-  };
-  /**
-   * Gets whether this is a video
-   *
-   * @returns {Boolean} Is video
-   */
+  }, {
+    key: "isVideo",
+    value: function isVideo() {
+      return this.getContentTypeHeader().indexOf('video') > -1;
+    }
+    /**
+     * Gets whether this is an image
+     *
+     * @returns {Boolean} Is image
+     */
 
+  }, {
+    key: "isImage",
+    value: function isImage() {
+      return this.getContentTypeHeader().indexOf('image') > -1;
+    }
+    /**
+     * Gets whether this is an SVG file
+     *
+     * @returns {Boolean} Is SVG file
+     */
 
-  _proto.isVideo = function isVideo() {
-    return this.getContentTypeHeader().indexOf('video') > -1;
-  };
-  /**
-   * Gets whether this is an image
-   *
-   * @returns {Boolean} Is image
-   */
+  }, {
+    key: "isSvg",
+    value: function isSvg() {
+      return this.getContentTypeHeader().indexOf('svg') > -1;
+    }
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
 
+  }, {
+    key: "isPdf",
+    value: function isPdf() {
+      return this.getContentTypeHeader().indexOf('pdf') > -1;
+    }
+    /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */
 
-  _proto.isImage = function isImage() {
-    return this.getContentTypeHeader().indexOf('image') > -1;
-  };
-  /**
-   * Gets whether this is an SVG file
-   *
-   * @returns {Boolean} Is SVG file
-   */
+  }, {
+    key: "applyFolderFromTree",
+    value: function applyFolderFromTree(tree) {
+      if (tree) {
+        for (var i in tree) {
+          var item = tree[i];
 
-
-  _proto.isSvg = function isSvg() {
-    return this.getContentTypeHeader().indexOf('svg') > -1;
-  };
-  /**
-   * Gets whether this is a PDF
-   *
-   * @returns {Boolean} Is PDF
-   */
-
-
-  _proto.isPdf = function isPdf() {
-    return this.getContentTypeHeader().indexOf('pdf') > -1;
-  };
-  /**
-   * Applies folder string from tree
-   *
-   * @param {Object} tree
-   */
-
-
-  _proto.applyFolderFromTree = function applyFolderFromTree(tree) {
-    if (tree) {
-      for (var i in tree) {
-        var item = tree[i];
-
-        if (item.id == this.id) {
-          this.folder = item.folder;
-          break;
+          if (item.id == this.id) {
+            this.folder = item.folder;
+            break;
+          }
         }
       }
     }
-  };
-  /**
-   * Creates a new Media object
-   *
-   * @param {Object} file
-   *
-   * @return {Media} media
-   */
+    /**
+     * Creates a new Media object
+     *
+     * @param {Object} file
+     *
+     * @return {Media} media
+     */
 
+  }], [{
+    key: "paramsCheck",
 
-  Media.create = function create(file) {
-    var media = new Media({
-      id: Media.createId()
-    });
-    return media;
-  };
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    value: function paramsCheck(params) {
+      params = _get(_getPrototypeOf(Media), "paramsCheck", this).call(this, params);
+      delete params.remote;
+      delete params.sync;
+      delete params.isRemote;
+
+      if (!params.folder) {
+        params.folder = '/';
+      }
+
+      return params;
+    }
+  }, {
+    key: "create",
+    value: function create(file) {
+      var media = new Media({
+        id: Media.createId()
+      });
+      return media;
+    }
+  }]);
 
   return Media;
 }(Resource);
@@ -24412,6 +24809,8 @@ module.exports = Media;
  * @memberof HashBrown.Client.Helpers
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
@@ -24419,7 +24818,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var ProjectHelper =
 /*#__PURE__*/
 function () {
-  function ProjectHelper() {}
+  function ProjectHelper() {
+    _classCallCheck(this, ProjectHelper);
+  }
 
   _createClass(ProjectHelper, null, [{
     key: "currentProject",
@@ -24474,252 +24875,274 @@ module.exports = ProjectHelper;
  * @memberof HashBrown.Client.Helpers
  */
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var RequestHelper =
 /*#__PURE__*/
 function () {
-  function RequestHelper() {}
+  function RequestHelper() {
+    _classCallCheck(this, RequestHelper);
+  }
 
-  /**
-   * An environment specific request
-   *
-   * @param {String} method
-   * @param {String} url
-   * @param {Object} data
-   *
-   * @returns {Promise} Response
-   */
-  RequestHelper.request = function request(method, url, data) {
-    return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
-  };
-  /**
-   * Uploads a file
-   *
-   * @param {String} url
-   * @param {String} type
-   * @param {FormData} data
-   *
-   * @returns {Promise} Response
-   */
+  _createClass(RequestHelper, null, [{
+    key: "request",
 
+    /**
+     * An environment specific request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
+    value: function request(method, url, data) {
+      return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
+    }
+    /**
+     * Uploads a file
+     *
+     * @param {String} url
+     * @param {String} type
+     * @param {FormData} data
+     *
+     * @returns {Promise} Response
+     */
 
-  RequestHelper.uploadFile = function uploadFile(url, type, data) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({
-        url: RequestHelper.environmentUrl(url),
-        type: 'POST',
-        data: data,
-        processData: false,
-        contentType: false,
-        success: function success(response) {
-          resolve(response);
-        },
-        error: function error(e) {
-          reject(e);
-        }
-      });
-    }); //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
-  };
-  /**
-   * An environment-independent request
-   *
-   * @param {String} method
-   * @param {String} url
-   * @param {Object} data
-   * @param {Object} headers
-   *
-   * @returns {Promise} Response
-   */
-
-
-  RequestHelper.customRequest = function customRequest(method, url, data, headers) {
-    headers = headers || {
-      'Content-Type': 'application/json; charset=utf-8'
-    };
-    return new Promise(function (resolve, reject) {
-      var xhr = new XMLHttpRequest();
-      xhr.open(method.toUpperCase(), url);
-
-      for (var k in headers) {
-        xhr.setRequestHeader(k, headers[k]);
-      }
-
-      if (data) {
-        if (typeof data === 'object' && data instanceof FormData === false) {
-          data = JSON.stringify(data);
-        }
-
-        xhr.send(data);
-      } else {
-        xhr.send();
-      }
-
-      xhr.onreadystatechange = function () {
-        var DONE = 4;
-        var OK = 200;
-        var NOT_MODIFIED = 304;
-        var UNAUTHORIZED = 403;
-
-        if (xhr.readyState === DONE) {
-          if (xhr.status === UNAUTHORIZED) {
-            location = '/login/?path=' + location.pathname + location.hash;
-            reject(new Error('User is not logged in'));
-          } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
-            var response = xhr.responseText;
-
-            if (response && response != 'OK') {
-              try {
-                response = JSON.parse(response);
-              } catch (e) {// If the response isn't JSON, then so be it
-              }
-            }
-
-            if (response === '') {
-              response = null;
-            }
-
+  }, {
+    key: "uploadFile",
+    value: function uploadFile(url, type, data) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({
+          url: RequestHelper.environmentUrl(url),
+          type: 'POST',
+          data: data,
+          processData: false,
+          contentType: false,
+          success: function success(response) {
             resolve(response);
-          } else {
-            var error = new Error(xhr.responseText);
-            error.statusCode = xhr.status;
-            reject(error);
+          },
+          error: function error(e) {
+            reject(e);
           }
-        }
+        });
+      }); //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
+    }
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     * @param {Object} headers
+     *
+     * @returns {Promise} Response
+     */
+
+  }, {
+    key: "customRequest",
+    value: function customRequest(method, url, data, headers) {
+      headers = headers || {
+        'Content-Type': 'application/json; charset=utf-8'
       };
-    });
-  };
-  /**
-   * Wraps a URL to include environment
-   *
-   * @param {String} url
-   */
+      return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method.toUpperCase(), url);
 
-
-  RequestHelper.environmentUrl = function environmentUrl(url) {
-    var newUrl = '/api/';
-
-    if (HashBrown.Helpers.ProjectHelper.currentProject) {
-      newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
-    }
-
-    if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
-      newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
-    }
-
-    newUrl += url;
-    return newUrl;
-  };
-  /**
-   * Listens for server restart
-   */
-
-
-  RequestHelper.listenForRestart = function listenForRestart() {
-    UI.messageModal('Restart', 'HashBrown is restarting...', false);
-
-    function poke() {
-      $.ajax({
-        type: 'get',
-        url: '/',
-        success: function success() {
-          location.reload();
-        },
-        error: function error() {
-          poke();
-        }
-      });
-    }
-
-    poke();
-  };
-
-  /**
-   * Reloads a resource
-   */
-  RequestHelper.reloadResource = function reloadResource(name) {
-    return RequestHelper.request('get', name).then(function (result) {
-      window.resources[name] = result; // Apply correct model
-
-      for (var i in window.resources[name]) {
-        var object = window.resources[name][i];
-        var model = null;
-
-        switch (name) {
-          case 'connections':
-            model = new HashBrown.Models.Connection(object);
-            break;
-
-          case 'content':
-            model = new HashBrown.Models.Content(object);
-            break;
-
-          case 'forms':
-            model = new HashBrown.Models.Form(object);
-            break;
-
-          case 'users':
-            model = new HashBrown.Models.User(object);
-            break;
-
-          case 'media':
-            model = new HashBrown.Models.Media(object);
-            break;
-
-          case 'schemas':
-            model = HashBrown.Helpers.SchemaHelper.getModel(object);
-            break;
-
-          default:
-            return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
+        for (var k in headers) {
+          xhr.setRequestHeader(k, headers[k]);
         }
 
-        window.resources[name][i] = model;
-      }
+        if (data) {
+          if (_typeof(data) === 'object' && data instanceof FormData === false) {
+            data = JSON.stringify(data);
+          }
 
-      return Promise.resolve(result);
-    }).catch(function (e) {
-      // If the error is a 404, it's an intended response from the controller
-      if (e.statusCode !== 404) {
-        UI.errorModal(e);
-      }
-
-      window.resources[name] = [];
-      return Promise.resolve([]);
-    });
-  };
-
-  /**
-   * Reloads all resources
-   */
-  RequestHelper.reloadAllResources = function reloadAllResources() {
-    $('.page--environment__spinner__messages').empty();
-    var queue = ['content', 'schemas', 'media', 'connections', 'forms', 'users'];
-
-    for (var _i = 0; _i < queue.length; _i++) {
-      var item = queue[_i];
-
-      var $msg = _.div({
-        class: 'widget--spinner__message',
-        'data-name': item
-      }, item);
-
-      $('.page--environment__spinner__messages').append($msg);
-    }
-
-    var processQueue = function processQueue() {
-      var name = queue.shift();
-      return RequestHelper.reloadResource(name).then(function () {
-        $('.page--environment__spinner__messages [data-name="' + name + '"]').toggleClass('loaded', true);
-
-        if (queue.length < 1) {
-          return Promise.resolve();
+          xhr.send(data);
         } else {
-          return processQueue();
+          xhr.send();
         }
-      });
-    };
 
-    return processQueue();
-  };
+        xhr.onreadystatechange = function () {
+          var DONE = 4;
+          var OK = 200;
+          var NOT_MODIFIED = 304;
+          var UNAUTHORIZED = 403;
+
+          if (xhr.readyState === DONE) {
+            if (xhr.status === UNAUTHORIZED) {
+              location = '/login/?path=' + location.pathname + location.hash;
+              reject(new Error('User is not logged in'));
+            } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
+              var response = xhr.responseText;
+
+              if (response && response != 'OK') {
+                try {
+                  response = JSON.parse(response);
+                } catch (e) {// If the response isn't JSON, then so be it
+                }
+              }
+
+              if (response === '') {
+                response = null;
+              }
+
+              resolve(response);
+            } else {
+              var error = new Error(xhr.responseText);
+              error.statusCode = xhr.status;
+              reject(error);
+            }
+          }
+        };
+      });
+    }
+    /**
+     * Wraps a URL to include environment
+     *
+     * @param {String} url
+     */
+
+  }, {
+    key: "environmentUrl",
+    value: function environmentUrl(url) {
+      var newUrl = '/api/';
+
+      if (HashBrown.Helpers.ProjectHelper.currentProject) {
+        newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+      }
+
+      if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+        newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+      }
+
+      newUrl += url;
+      return newUrl;
+    }
+    /**
+     * Listens for server restart
+     */
+
+  }, {
+    key: "listenForRestart",
+    value: function listenForRestart() {
+      UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+      function poke() {
+        $.ajax({
+          type: 'get',
+          url: '/',
+          success: function success() {
+            location.reload();
+          },
+          error: function error() {
+            poke();
+          }
+        });
+      }
+
+      poke();
+    }
+  }, {
+    key: "reloadResource",
+
+    /**
+     * Reloads a resource
+     */
+    value: function reloadResource(name) {
+      return RequestHelper.request('get', name).then(function (result) {
+        window.resources[name] = result; // Apply correct model
+
+        for (var i in window.resources[name]) {
+          var object = window.resources[name][i];
+          var model = null;
+
+          switch (name) {
+            case 'connections':
+              model = new HashBrown.Models.Connection(object);
+              break;
+
+            case 'content':
+              model = new HashBrown.Models.Content(object);
+              break;
+
+            case 'forms':
+              model = new HashBrown.Models.Form(object);
+              break;
+
+            case 'users':
+              model = new HashBrown.Models.User(object);
+              break;
+
+            case 'media':
+              model = new HashBrown.Models.Media(object);
+              break;
+
+            case 'schemas':
+              model = HashBrown.Helpers.SchemaHelper.getModel(object);
+              break;
+
+            default:
+              return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
+          }
+
+          window.resources[name][i] = model;
+        }
+
+        return Promise.resolve(result);
+      }).catch(function (e) {
+        // If the error is a 404, it's an intended response from the controller
+        if (e.statusCode !== 404) {
+          UI.errorModal(e);
+        }
+
+        window.resources[name] = [];
+        return Promise.resolve([]);
+      });
+    }
+  }, {
+    key: "reloadAllResources",
+
+    /**
+     * Reloads all resources
+     */
+    value: function reloadAllResources() {
+      $('.page--environment__spinner__messages').empty();
+      var queue = ['content', 'schemas', 'media', 'connections', 'forms', 'users'];
+
+      for (var _i = 0; _i < queue.length; _i++) {
+        var item = queue[_i];
+
+        var $msg = _.div({
+          class: 'widget--spinner__message',
+          'data-name': item
+        }, item);
+
+        $('.page--environment__spinner__messages').append($msg);
+      }
+
+      var processQueue = function processQueue() {
+        var name = queue.shift();
+        return RequestHelper.reloadResource(name).then(function () {
+          $('.page--environment__spinner__messages [data-name="' + name + '"]').toggleClass('loaded', true);
+
+          if (queue.length < 1) {
+            return Promise.resolve();
+          } else {
+            return processQueue();
+          }
+        });
+      };
+
+      return processQueue();
+    }
+  }]);
 
   return RequestHelper;
 }();
@@ -24733,7 +25156,23 @@ module.exports = RequestHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var SchemaHelperCommon = __webpack_require__(212);
 /**
@@ -24746,112 +25185,122 @@ var SchemaHelperCommon = __webpack_require__(212);
 var SchemaHelper =
 /*#__PURE__*/
 function (_SchemaHelperCommon) {
-  _inheritsLoose(SchemaHelper, _SchemaHelperCommon);
+  _inherits(SchemaHelper, _SchemaHelperCommon);
 
   function SchemaHelper() {
-    return _SchemaHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, SchemaHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SchemaHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets a Schema with all parent fields
-   *
-   * @param {String} id
-   *
-   * @returns {Promise} Schema with parent fields
-   */
-  SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
-    if (!id) {
-      return Promise.resolve(null);
-    }
+  _createClass(SchemaHelper, null, [{
+    key: "getSchemaWithParentFields",
 
-    return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
-      return Promise.resolve(SchemaHelper.getModel(schema));
-    });
-  };
-  /**
-   * Gets a FieldSchema with all parent configs
-   *
-   * @param {String} id
-   *
-   * @returns {FieldSchema} Compiled FieldSchema
-   */
-
-
-  SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
-    var fieldSchema = this.getSchemaByIdSync(id);
-
-    if (fieldSchema) {
-      var nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
-      var compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
-
-      while (nextSchema) {
-        compiledSchema.appendConfig(nextSchema.config);
-        nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
+    /**
+     * Gets a Schema with all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Schema with parent fields
+     */
+    value: function getSchemaWithParentFields(id) {
+      if (!id) {
+        return Promise.resolve(null);
       }
 
-      return compiledSchema;
+      return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
+        return Promise.resolve(SchemaHelper.getModel(schema));
+      });
     }
-  };
-  /**
-   * Gets a Schema by id
-   *
-   * @param {String} id
-   *
-   * @return {Promise} Promise
-   */
+    /**
+     * Gets a FieldSchema with all parent configs
+     *
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
+     */
 
+  }, {
+    key: "getFieldSchemaWithParentConfigs",
+    value: function getFieldSchemaWithParentConfigs(id) {
+      var fieldSchema = this.getSchemaByIdSync(id);
 
-  SchemaHelper.getSchemaById = function getSchemaById(id) {
-    var _this = this;
+      if (fieldSchema) {
+        var nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
+        var compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
 
-    return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
-      return Promise.resolve(_this.getModel(schema));
-    });
-  };
-  /**
-   * Gets all Schemas by type (sync)
-   *
-   * @param {String} type
-   *
-   * @returns {Array} All Schemas
-   */
-
-
-  SchemaHelper.getAllSchemasSync = function getAllSchemasSync(type) {
-    if (!type) {
-      return resources.schemas;
-    }
-
-    return resources.schemas.filter(function (schema) {
-      if (schema.id == type + 'Base') {
-        return false;
-      }
-
-      return schema.type === type;
-    });
-  };
-  /**
-   * Gets a Schema by id (sync)
-   *
-   * @param {String} id
-   *
-   * @return {Promise} Promise
-   */
-
-
-  SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
-    for (var i in resources.schemas) {
-      var schema = resources.schemas[i];
-
-      if (schema.id == id) {
-        if (schema instanceof HashBrown.Models.ContentSchema || schema instanceof HashBrown.Models.FieldSchema) {
-          return schema;
+        while (nextSchema) {
+          compiledSchema.appendConfig(nextSchema.config);
+          nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
         }
 
-        return this.getModel(schema);
+        return compiledSchema;
       }
     }
-  };
+    /**
+     * Gets a Schema by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+  }, {
+    key: "getSchemaById",
+    value: function getSchemaById(id) {
+      var _this = this;
+
+      return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
+        return Promise.resolve(_this.getModel(schema));
+      });
+    }
+    /**
+     * Gets all Schemas by type (sync)
+     *
+     * @param {String} type
+     *
+     * @returns {Array} All Schemas
+     */
+
+  }, {
+    key: "getAllSchemasSync",
+    value: function getAllSchemasSync(type) {
+      if (!type) {
+        return resources.schemas;
+      }
+
+      return resources.schemas.filter(function (schema) {
+        if (schema.id == type + 'Base') {
+          return false;
+        }
+
+        return schema.type === type;
+      });
+    }
+    /**
+     * Gets a Schema by id (sync)
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+  }, {
+    key: "getSchemaByIdSync",
+    value: function getSchemaByIdSync(id) {
+      for (var i in resources.schemas) {
+        var schema = resources.schemas[i];
+
+        if (schema.id == id) {
+          if (schema instanceof HashBrown.Models.ContentSchema || schema instanceof HashBrown.Models.FieldSchema) {
+            return schema;
+          }
+
+          return this.getModel(schema);
+        }
+      }
+    }
+  }]);
 
   return SchemaHelper;
 }(SchemaHelperCommon);
@@ -24870,139 +25319,155 @@ module.exports = SchemaHelper;
  * @memberof HashBrown.Common.Helpers
  */
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var SchemaHelper =
 /*#__PURE__*/
 function () {
-  function SchemaHelper() {}
+  function SchemaHelper() {
+    _classCallCheck(this, SchemaHelper);
+  }
 
-  /**
-   * Gets all parent fields
-   *
-   * @param {String} id
-   *
-   * @returns {Promise(Schema)} schema
-   */
-  SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
-    return new Promise(function (callback) {
-      callback();
-    });
-  };
-  /**
-   * Gets the appropriate model
-   *
-   * @param {Object} properties
-   *
-   * @return {Schema} Schema
-   */
+  _createClass(SchemaHelper, null, [{
+    key: "getSchemaWithParentFields",
 
-
-  SchemaHelper.getModel = function getModel(properties) {
-    if (!properties) {
-      return null;
-    } // If the properties object is already a recognised model, return it
-
-
-    if (properties instanceof HashBrown.Models.ContentSchema || properties instanceof HashBrown.Models.FieldSchema) {
-      return properties;
-    } // If the properties object is using an unrecognised model, serialise it
-
-
-    if (typeof properties.getObject === 'function') {
-      properties = properties.getObject();
+    /**
+     * Gets all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Schema)} schema
+     */
+    value: function getSchemaWithParentFields(id) {
+      return new Promise(function (callback) {
+        callback();
+      });
     }
+    /**
+     * Gets the appropriate model
+     *
+     * @param {Object} properties
+     *
+     * @return {Schema} Schema
+     */
 
-    if (properties.type === 'content') {
-      return new HashBrown.Models.ContentSchema(properties);
-    } else if (properties.type === 'field') {
-      return new HashBrown.Models.FieldSchema(properties);
-    }
-
-    throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
-  };
-  /**
-   * Merges two Schemas
-   *
-   * @param Schema childSchema
-   * @param Schema parentSchema
-   *
-   * @returns {Schema} Merged Schema
-   */
+  }, {
+    key: "getModel",
+    value: function getModel(properties) {
+      if (!properties) {
+        return null;
+      } // If the properties object is already a recognised model, return it
 
 
-  SchemaHelper.mergeSchemas = function mergeSchemas(childSchema, parentSchema) {
-    checkParam(childSchema, 'childSchema', HashBrown.Models.Schema);
-    checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
-    childSchema = childSchema.getObject();
-    parentSchema = parentSchema.getObject();
-    var mergedSchema = parentSchema; // Recursive merge
+      if (properties instanceof HashBrown.Models.ContentSchema || properties instanceof HashBrown.Models.FieldSchema) {
+        return properties;
+      } // If the properties object is using an unrecognised model, serialise it
 
-    function merge(parentValues, childValues) {
-      for (var k in childValues) {
-        if (typeof parentValues[k] === 'object' && typeof childValues[k] === 'object') {
-          merge(parentValues[k], childValues[k]);
-        } else if (childValues[k]) {
-          parentValues[k] = childValues[k];
-        }
+
+      if (typeof properties.getObject === 'function') {
+        properties = properties.getObject();
       }
-    } // Overwrite native values 
 
+      if (properties.type === 'content') {
+        return new HashBrown.Models.ContentSchema(properties);
+      } else if (properties.type === 'field') {
+        return new HashBrown.Models.FieldSchema(properties);
+      }
 
-    mergedSchema.id = childSchema.id;
-    mergedSchema.name = childSchema.name;
-    mergedSchema.parentSchemaId = childSchema.parentSchemaId;
-    mergedSchema.icon = childSchema.icon || mergedSchema.icon; // Specific values for schema types
-
-    switch (mergedSchema.type) {
-      case 'field':
-        mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId; // Merge config
-
-        if (!mergedSchema.config) {
-          mergedSchema.config = {};
-        }
-
-        if (!parentSchema.config) {
-          parentSchema.config = {};
-        }
-
-        merge(mergedSchema.config, childSchema.config);
-        break;
-
-      case 'content':
-        // Merge tabs
-        if (!mergedSchema.tabs) {
-          mergedSchema.tabs = {};
-        }
-
-        if (!childSchema.tabs) {
-          childSchema.tabs = {};
-        }
-
-        merge(mergedSchema.tabs, childSchema.tabs); // Merge fields
-
-        if (!mergedSchema.fields) {
-          mergedSchema.fields = {};
-        }
-
-        if (!mergedSchema.fields.properties) {
-          mergedSchema.fields.properties = {};
-        }
-
-        if (!childSchema.fields) {
-          childSchema.fields = {};
-        }
-
-        if (!childSchema.fields.properties) {
-          childSchema.fields.properties = {};
-        }
-
-        merge(mergedSchema.fields, childSchema.fields); // Set default tab id
-
-        mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
-        break;
+      throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
     }
+    /**
+     * Merges two Schemas
+     *
+     * @param Schema childSchema
+     * @param Schema parentSchema
+     *
+     * @returns {Schema} Merged Schema
+     */
 
-    return this.getModel(mergedSchema);
-  };
+  }, {
+    key: "mergeSchemas",
+    value: function mergeSchemas(childSchema, parentSchema) {
+      checkParam(childSchema, 'childSchema', HashBrown.Models.Schema);
+      checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+      childSchema = childSchema.getObject();
+      parentSchema = parentSchema.getObject();
+      var mergedSchema = parentSchema; // Recursive merge
+
+      function merge(parentValues, childValues) {
+        for (var k in childValues) {
+          if (_typeof(parentValues[k]) === 'object' && _typeof(childValues[k]) === 'object') {
+            merge(parentValues[k], childValues[k]);
+          } else if (childValues[k]) {
+            parentValues[k] = childValues[k];
+          }
+        }
+      } // Overwrite native values 
+
+
+      mergedSchema.id = childSchema.id;
+      mergedSchema.name = childSchema.name;
+      mergedSchema.parentSchemaId = childSchema.parentSchemaId;
+      mergedSchema.icon = childSchema.icon || mergedSchema.icon; // Specific values for schema types
+
+      switch (mergedSchema.type) {
+        case 'field':
+          mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId; // Merge config
+
+          if (!mergedSchema.config) {
+            mergedSchema.config = {};
+          }
+
+          if (!parentSchema.config) {
+            parentSchema.config = {};
+          }
+
+          merge(mergedSchema.config, childSchema.config);
+          break;
+
+        case 'content':
+          // Merge tabs
+          if (!mergedSchema.tabs) {
+            mergedSchema.tabs = {};
+          }
+
+          if (!childSchema.tabs) {
+            childSchema.tabs = {};
+          }
+
+          merge(mergedSchema.tabs, childSchema.tabs); // Merge fields
+
+          if (!mergedSchema.fields) {
+            mergedSchema.fields = {};
+          }
+
+          if (!mergedSchema.fields.properties) {
+            mergedSchema.fields.properties = {};
+          }
+
+          if (!childSchema.fields) {
+            childSchema.fields = {};
+          }
+
+          if (!childSchema.fields.properties) {
+            childSchema.fields.properties = {};
+          }
+
+          merge(mergedSchema.fields, childSchema.fields); // Set default tab id
+
+          mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
+          break;
+      }
+
+      return this.getModel(mergedSchema);
+    }
+  }]);
 
   return SchemaHelper;
 }();
@@ -25016,7 +25481,23 @@ module.exports = SchemaHelper;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var SettingsHelperCommon = __webpack_require__(214);
 /**
@@ -25029,227 +25510,209 @@ var SettingsHelperCommon = __webpack_require__(214);
 var SettingsHelper =
 /*#__PURE__*/
 function (_SettingsHelperCommon) {
-  _inheritsLoose(SettingsHelper, _SettingsHelperCommon);
+  _inherits(SettingsHelper, _SettingsHelperCommon);
 
   function SettingsHelper() {
-    return _SettingsHelperCommon.apply(this, arguments) || this;
+    _classCallCheck(this, SettingsHelper);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SettingsHelper).apply(this, arguments));
   }
 
-  /**
-   * Gets all settings
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} section
-   *
-   * @return {Promise(Object)}  settings
-   */
-  SettingsHelper.getSettings = function getSettings(project, environment, section) {
-    var _this = this;
+  _createClass(SettingsHelper, null, [{
+    key: "getSettings",
 
-    if (environment === void 0) {
-      environment = null;
-    }
+    /**
+     * Gets all settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @return {Promise(Object)}  settings
+     */
+    value: function getSettings(project) {
+      var _this = this;
 
-    if (section === void 0) {
-      section = null;
-    }
+      var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      checkParam(project, 'project', String);
 
-    checkParam(project, 'project', String);
-
-    if (environment === '*') {
-      environment = null;
-    }
-
-    var apiUrl = '/api/' + project + '/';
-
-    if (environment) {
-      apiUrl += environment + '/';
-    }
-
-    apiUrl += 'settings';
-
-    if (section) {
-      apiUrl += '/' + section;
-    }
-
-    return HashBrown.Helpers.RequestHelper.customRequest('get', apiUrl) // Cache settings client-side
-    .then(function (settings) {
-      _this.updateCache(project, environment, section, settings);
-
-      return Promise.resolve(settings || {});
-    });
-  };
-  /**
-   * Cache update
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} section
-   */
-
-
-  SettingsHelper.cacheSanityCheck = function cacheSanityCheck(project, environment, section) {
-    if (environment === void 0) {
-      environment = null;
-    }
-
-    if (section === void 0) {
-      section = null;
-    }
-
-    checkParam(project, 'project', String);
-
-    if (environment === '*') {
-      environment = null;
-    }
-
-    this.cache = this.cache || {};
-    this.cache[project] = this.cache[project] || {};
-
-    if (environment) {
-      this.cache[project][environment] = this.cache[project][environment] || {};
-
-      if (section) {
-        this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-      }
-    } else if (section) {
-      this.cache[project][section] = this.cache[project][section] || {};
-    }
-  };
-  /**
-   * Cache update
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} section
-   * @param {Object} settings
-   */
-
-
-  SettingsHelper.updateCache = function updateCache(project, environment, section, settings) {
-    if (environment === void 0) {
-      environment = null;
-    }
-
-    if (section === void 0) {
-      section = null;
-    }
-
-    checkParam(project, 'project', String);
-    checkParam(settings, 'settings', Object);
-
-    if (environment === '*') {
-      environment = null;
-    }
-
-    this.cacheSanityCheck(project, environment, section);
-
-    if (environment && !section) {
-      return this.cache[project][environment] = settings;
-    }
-
-    if (!environment && section) {
-      return this.cache[project][section] = settings;
-    }
-
-    if (environment && section) {
-      return this.cache[project][environment][section] = settings;
-    }
-
-    return this.cache[project] = settings;
-  };
-  /**
-   * Gets cached settings
-   *
-   * @param {String} section
-   *
-   * @returns {Object} Settings
-   */
-
-
-  SettingsHelper.getCachedSettings = function getCachedSettings(project, environment, section) {
-    if (environment === void 0) {
-      environment = null;
-    }
-
-    if (section === void 0) {
-      section = null;
-    }
-
-    checkParam(project, 'project', String);
-
-    if (environment === '*') {
-      environment = null;
-    }
-
-    this.cacheSanityCheck(project, environment, section);
-
-    if (environment) {
-      if (section) {
-        return this.cache[project][environment][section];
+      if (environment === '*') {
+        environment = null;
       }
 
-      return this.cache[project][environment];
+      var apiUrl = '/api/' + project + '/';
+
+      if (environment) {
+        apiUrl += environment + '/';
+      }
+
+      apiUrl += 'settings';
+
+      if (section) {
+        apiUrl += '/' + section;
+      }
+
+      return HashBrown.Helpers.RequestHelper.customRequest('get', apiUrl) // Cache settings client-side
+      .then(function (settings) {
+        _this.updateCache(project, environment, section, settings);
+
+        return Promise.resolve(settings || {});
+      });
     }
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     */
 
-    if (section) {
-      return this.cache[project][section];
+  }, {
+    key: "cacheSanityCheck",
+    value: function cacheSanityCheck(project) {
+      var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      checkParam(project, 'project', String);
+
+      if (environment === '*') {
+        environment = null;
+      }
+
+      this.cache = this.cache || {};
+      this.cache[project] = this.cache[project] || {};
+
+      if (environment) {
+        this.cache[project][environment] = this.cache[project][environment] || {};
+
+        if (section) {
+          this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+        }
+      } else if (section) {
+        this.cache[project][section] = this.cache[project][section] || {};
+      }
     }
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     */
 
-    return this.cache[project];
-  };
-  /**
-   * Sets all settings
-   *
-   * @param {String} project
-   * @param {String} environment
-   * @param {String} section
-   * @param {Object} settings
-   *
-   * @return {Promise} promise
-   */
+  }, {
+    key: "updateCache",
+    value: function updateCache(project) {
+      var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var settings = arguments.length > 3 ? arguments[3] : undefined;
+      checkParam(project, 'project', String);
+      checkParam(settings, 'settings', Object);
 
+      if (environment === '*') {
+        environment = null;
+      }
 
-  SettingsHelper.setSettings = function setSettings(project, environment, section, settings) {
-    var _this2 = this;
+      this.cacheSanityCheck(project, environment, section);
 
-    if (environment === void 0) {
-      environment = null;
+      if (environment && !section) {
+        return this.cache[project][environment] = settings;
+      }
+
+      if (!environment && section) {
+        return this.cache[project][section] = settings;
+      }
+
+      if (environment && section) {
+        return this.cache[project][environment][section] = settings;
+      }
+
+      return this.cache[project] = settings;
     }
+    /**
+     * Gets cached settings
+     *
+     * @param {String} section
+     *
+     * @returns {Object} Settings
+     */
 
-    if (section === void 0) {
-      section = null;
+  }, {
+    key: "getCachedSettings",
+    value: function getCachedSettings(project) {
+      var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      checkParam(project, 'project', String);
+
+      if (environment === '*') {
+        environment = null;
+      }
+
+      this.cacheSanityCheck(project, environment, section);
+
+      if (environment) {
+        if (section) {
+          return this.cache[project][environment][section];
+        }
+
+        return this.cache[project][environment];
+      }
+
+      if (section) {
+        return this.cache[project][section];
+      }
+
+      return this.cache[project];
     }
+    /**
+     * Sets all settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     *
+     * @return {Promise} promise
+     */
 
-    checkParam(project, 'project', String);
-    checkParam(settings, 'settings', Object);
+  }, {
+    key: "setSettings",
+    value: function setSettings(project) {
+      var _this2 = this;
 
-    if (environment === '*') {
-      environment = null;
+      var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var settings = arguments.length > 3 ? arguments[3] : undefined;
+      checkParam(project, 'project', String);
+      checkParam(settings, 'settings', Object);
+
+      if (environment === '*') {
+        environment = null;
+      }
+
+      var apiUrl = '/api/' + project + '/';
+      settings.usedBy = 'project';
+
+      if (environment) {
+        apiUrl += environment + '/';
+        settings.usedBy = environment;
+      }
+
+      apiUrl += 'settings';
+
+      if (section) {
+        apiUrl += '/' + section;
+      }
+
+      return HashBrown.Helpers.RequestHelper.customRequest('post', apiUrl, settings) // Cache new settings
+      .then(function () {
+        _this2.updateCache(project, environment, section, settings);
+
+        return Promise.resolve();
+      });
     }
-
-    var apiUrl = '/api/' + project + '/';
-    settings.usedBy = 'project';
-
-    if (environment) {
-      apiUrl += environment + '/';
-      settings.usedBy = environment;
-    }
-
-    apiUrl += 'settings';
-
-    if (section) {
-      apiUrl += '/' + section;
-    }
-
-    return HashBrown.Helpers.RequestHelper.customRequest('post', apiUrl, settings) // Cache new settings
-    .then(function () {
-      _this2.updateCache(project, environment, section, settings);
-
-      return Promise.resolve();
-    });
-  };
+  }]);
 
   return SettingsHelper;
 }(SettingsHelperCommon);
@@ -25268,7 +25731,11 @@ module.exports = SettingsHelper;
  * @memberof HashBrown.Common.Helpers
  */
 
-var SettingsHelper = function SettingsHelper() {};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SettingsHelper = function SettingsHelper() {
+  _classCallCheck(this, SettingsHelper);
+};
 
 module.exports = SettingsHelper;
 
@@ -25284,799 +25751,855 @@ module.exports = SettingsHelper;
  * @memberof HashBrown.Client.Helpers
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var UIHelper =
 /*#__PURE__*/
 function () {
-  function UIHelper() {}
+  function UIHelper() {
+    _classCallCheck(this, UIHelper);
+  }
 
-  /**
-   * Highlights an element with an optional label
-   *
-   * @param {Boolean|HTMLElement} element
-   * @param {String} label
-   * @param {String} direction
-   * @param {String} buttonLabel
-   *
-   * @return {Promise} Callback on dismiss
-   */
-  UIHelper.highlight = function highlight(element, label, direction, buttonLabel) {
-    if (direction === void 0) {
-      direction = 'right';
-    }
+  _createClass(UIHelper, null, [{
+    key: "highlight",
 
-    if (element === false) {
-      $('.widget--highlight').remove();
-      return;
-    }
+    /**
+     * Highlights an element with an optional label
+     *
+     * @param {Boolean|HTMLElement} element
+     * @param {String} label
+     * @param {String} direction
+     * @param {String} buttonLabel
+     *
+     * @return {Promise} Callback on dismiss
+     */
+    value: function highlight(element, label) {
+      var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'right';
+      var buttonLabel = arguments.length > 3 ? arguments[3] : undefined;
 
-    if (typeof element === 'string') {
-      element = document.querySelector(element);
-    }
-
-    if (!element) {
-      return Promise.resolve();
-    }
-
-    return new Promise(function (resolve) {
-      var dismiss = function dismiss() {
-        $highlight.remove();
-        resolve(element);
-      };
-
-      var $highlight = _.div({
-        class: 'widget--highlight' + (label ? ' ' + direction : ''),
-        style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;'
-      }, _.div({
-        class: 'widget--highlight__backdrop'
-      }), _.div({
-        class: 'widget--highlight__frame',
-        style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;'
-      }), _.if(label, _.div({
-        class: 'widget--highlight__label'
-      }, _.div({
-        class: 'widget--highlight__label__text'
-      }, label), _.if(buttonLabel, _.button({
-        class: 'widget widget--button widget--highlight__button condensed'
-      }, buttonLabel).click(function () {
-        dismiss();
-      }))))).click(function () {
-        if (buttonLabel) {
-          return;
-        }
-
-        dismiss();
-      });
-
-      _.append(element.parentElement, $highlight);
-    });
-  };
-  /**
-   * Sets the content of the editor space
-   *
-   * @param {Array|HTMLElement} content
-   * @param {String} className
-   */
-
-
-  UIHelper.setEditorSpaceContent = function setEditorSpaceContent(content, className) {
-    var $space = $('.page--environment__space--editor');
-
-    if (className) {
-      content = _.div({
-        class: 'page--environment__space--editor__' + className
-      }, content);
-    }
-
-    _.append($space.empty(), content);
-  };
-  /**
-   * Creates a sortable context specific to arrays using editor fields
-   *
-   * @param {Array} array
-   * @param {HTMLElement} field
-   * @param {Function} onChange
-   */
-
-
-  UIHelper.fieldSortableArray = function fieldSortableArray(array, field, onChange) {
-    array = array || []; // Set indices on all elements
-
-    var items = field.querySelector('.editor__field__value').children;
-
-    for (var i = 0; i < items.length; i++) {
-      if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
-        continue;
-      }
-
-      items[i].dataset.index = i;
-    } // Init the sortable context
-
-
-    this.fieldSortable(field, function (element) {
-      if (!element) {
+      if (element === false) {
+        $('.widget--highlight').remove();
         return;
       }
 
-      var oldIndex = element.dataset.index;
-      var newIndex = 0; // Discover new index
-
-      var items = field.querySelector('.editor__field__value').children;
-
-      for (var _i = 0; _i < items.length; _i++) {
-        if (items[_i] === element) {
-          newIndex = _i;
-          break;
-        }
-      } // Swap indices
-
-
-      array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
-      onChange(array);
-    });
-  };
-  /**
-   * Creates a sortable context specific to objects using editor fields
-   *
-   * @param {Object} object
-   * @param {HTMLElement} field
-   * @param {Function} onChange
-   */
-
-
-  UIHelper.fieldSortableObject = function fieldSortableObject(object, field, onChange) {
-    object = object || {};
-    this.fieldSortable(field, function (element) {
-      if (!element) {
-        return;
+      if (typeof element === 'string') {
+        element = document.querySelector(element);
       }
 
-      var itemSortKeyElement = element.querySelector('.editor__field__sort-key');
-      var itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
-      var itemValue = object[itemKey]; // Try to get the next key
+      if (!element) {
+        return Promise.resolve();
+      }
 
-      var nextKey = '';
-      var nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
+      return new Promise(function (resolve) {
+        var dismiss = function dismiss() {
+          $highlight.remove();
+          resolve(element);
+        };
 
-      if (nextSortKeyElement) {
-        nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
-      } // Construct a new object based on the old one
-
-
-      var newObject = {};
-
-      for (var fieldKey in object) {
-        // Omit existing key
-        if (fieldKey === itemKey) {
-          continue;
-        }
-
-        var fieldValue = object[fieldKey]; // If there is a next key, and it's the same as this field key,
-        // the sorted item should be inserted just before it
-
-        if (nextKey === fieldKey) {
-          newObject[itemKey] = itemValue;
-        }
-
-        newObject[fieldKey] = fieldValue;
-      } // If the item wasn't reinserted, insert it now
-
-
-      if (!newObject[itemKey]) {
-        newObject[itemKey] = itemValue;
-      } // Assign the new object to the old one
-
-
-      object = newObject; // Fire the change event
-
-      onChange(newObject);
-    });
-  };
-  /**
-   * Creates a sortable context specific to fields
-   *
-   * @param {HTMLElement} field
-   * @param {Function} onChange
-   */
-
-
-  UIHelper.fieldSortable = function fieldSortable(field, onChange) {
-    var btnSort = field.querySelector('.editor__field__key__action--sort');
-    var divValue = field.querySelector('.editor__field__value');
-    var isSorting = !divValue.classList.contains('sorting');
-
-    if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
-      btnSort.classList.toggle('sorting', isSorting);
-      divValue.classList.toggle('sorting', isSorting);
-    }
-  };
-  /**
-   * Creates a sortable context
-   *
-   * @param {HTMLElement} parentElement
-   * @param {String} sortableClassName
-   * @param {Boolean} isActive
-   * @param {Function} onChange
-   *
-   * @returns {Boolean} Whether or not sorting was initialised
-   */
-
-
-  UIHelper.sortable = function sortable(parentElement, sortableClassName, isActive, onChange) {
-    var children = Array.prototype.slice.call(parentElement.children || []);
-    var canSort = true;
-    var currentDraggedChild;
-    children = children.filter(function (child) {
-      return child instanceof HTMLElement && child.classList.contains(sortableClassName);
-    });
-
-    if (!children || children.length < 1) {
-      return false;
-    }
-
-    if (typeof isActive === 'undefined') {
-      isActive = !parentElement.classList.contains('sorting');
-    }
-
-    if (isActive) {
-      parentElement.ondragover = function (e) {
-        if (!canSort || !currentDraggedChild) {
-          return;
-        }
-
-        var bodyRect = document.body.getBoundingClientRect();
-
-        _.each(children, function (i, sibling) {
-          if (sibling === currentDraggedChild || !canSort || e.pageY < 1) {
+        var $highlight = _.div({
+          class: 'widget--highlight' + (label ? ' ' + direction : ''),
+          style: 'top: ' + element.offsetTop + 'px; left: ' + element.offsetLeft + 'px;'
+        }, _.div({
+          class: 'widget--highlight__backdrop'
+        }), _.div({
+          class: 'widget--highlight__frame',
+          style: 'width: ' + element.offsetWidth + 'px; height: ' + element.offsetHeight + 'px;'
+        }), _.if(label, _.div({
+          class: 'widget--highlight__label'
+        }, _.div({
+          class: 'widget--highlight__label__text'
+        }, label), _.if(buttonLabel, _.button({
+          class: 'widget widget--button widget--highlight__button condensed'
+        }, buttonLabel).click(function () {
+          dismiss();
+        }))))).click(function () {
+          if (buttonLabel) {
             return;
           }
 
-          var cursorY = e.pageY;
-          var childY = currentDraggedChild.getBoundingClientRect().y - bodyRect.y;
-          var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
-          var hasMoved = false; // Dragging above a sibling
-
-          if (cursorY < siblingY && childY > siblingY) {
-            sibling.parentElement.insertBefore(currentDraggedChild, sibling);
-            hasMoved = true;
-          } // Dragging below a sibling
-
-
-          if (cursorY > siblingY && childY < siblingY) {
-            sibling.parentElement.insertBefore(currentDraggedChild, sibling.nextElementSibling);
-            hasMoved = true;
-          } // Init transition
-
-
-          if (hasMoved) {
-            canSort = false;
-            var newChildY = currentDraggedChild.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-            var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
-            currentDraggedChild.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
-            sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
-            setTimeout(function () {
-              currentDraggedChild.removeAttribute('style');
-              sibling.removeAttribute('style');
-              canSort = true;
-            }, 100);
-          }
+          dismiss();
         });
-      };
-    } else {
-      parentElement.ondragover = null;
-    }
 
-    _.each(children, function (i, child) {
-      child.draggable = isActive;
+        _.append(element.parentElement, $highlight);
+      });
+    }
+    /**
+     * Sets the content of the editor space
+     *
+     * @param {Array|HTMLElement} content
+     * @param {String} className
+     */
+
+  }, {
+    key: "setEditorSpaceContent",
+    value: function setEditorSpaceContent(content, className) {
+      var $space = $('.page--environment__space--editor');
+
+      if (className) {
+        content = _.div({
+          class: 'page--environment__space--editor__' + className
+        }, content);
+      }
+
+      _.append($space.empty(), content);
+    }
+    /**
+     * Creates a sortable context specific to arrays using editor fields
+     *
+     * @param {Array} array
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+  }, {
+    key: "fieldSortableArray",
+    value: function fieldSortableArray(array, field, onChange) {
+      array = array || []; // Set indices on all elements
+
+      var items = field.querySelector('.editor__field__value').children;
+
+      for (var i = 0; i < items.length; i++) {
+        if (items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) {
+          continue;
+        }
+
+        items[i].dataset.index = i;
+      } // Init the sortable context
+
+
+      this.fieldSortable(field, function (element) {
+        if (!element) {
+          return;
+        }
+
+        var oldIndex = element.dataset.index;
+        var newIndex = 0; // Discover new index
+
+        var items = field.querySelector('.editor__field__value').children;
+
+        for (var _i = 0; _i < items.length; _i++) {
+          if (items[_i] === element) {
+            newIndex = _i;
+            break;
+          }
+        } // Swap indices
+
+
+        array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+        onChange(array);
+      });
+    }
+    /**
+     * Creates a sortable context specific to objects using editor fields
+     *
+     * @param {Object} object
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+  }, {
+    key: "fieldSortableObject",
+    value: function fieldSortableObject(object, field, onChange) {
+      object = object || {};
+      this.fieldSortable(field, function (element) {
+        if (!element) {
+          return;
+        }
+
+        var itemSortKeyElement = element.querySelector('.editor__field__sort-key');
+        var itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
+        var itemValue = object[itemKey]; // Try to get the next key
+
+        var nextKey = '';
+        var nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
+
+        if (nextSortKeyElement) {
+          nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
+        } // Construct a new object based on the old one
+
+
+        var newObject = {};
+
+        for (var fieldKey in object) {
+          // Omit existing key
+          if (fieldKey === itemKey) {
+            continue;
+          }
+
+          var fieldValue = object[fieldKey]; // If there is a next key, and it's the same as this field key,
+          // the sorted item should be inserted just before it
+
+          if (nextKey === fieldKey) {
+            newObject[itemKey] = itemValue;
+          }
+
+          newObject[fieldKey] = fieldValue;
+        } // If the item wasn't reinserted, insert it now
+
+
+        if (!newObject[itemKey]) {
+          newObject[itemKey] = itemValue;
+        } // Assign the new object to the old one
+
+
+        object = newObject; // Fire the change event
+
+        onChange(newObject);
+      });
+    }
+    /**
+     * Creates a sortable context specific to fields
+     *
+     * @param {HTMLElement} field
+     * @param {Function} onChange
+     */
+
+  }, {
+    key: "fieldSortable",
+    value: function fieldSortable(field, onChange) {
+      var btnSort = field.querySelector('.editor__field__key__action--sort');
+      var divValue = field.querySelector('.editor__field__value');
+      var isSorting = !divValue.classList.contains('sorting');
+
+      if (this.sortable(divValue, 'editor__field', isSorting, onChange)) {
+        btnSort.classList.toggle('sorting', isSorting);
+        divValue.classList.toggle('sorting', isSorting);
+      }
+    }
+    /**
+     * Creates a sortable context
+     *
+     * @param {HTMLElement} parentElement
+     * @param {String} sortableClassName
+     * @param {Boolean} isActive
+     * @param {Function} onChange
+     *
+     * @returns {Boolean} Whether or not sorting was initialised
+     */
+
+  }, {
+    key: "sortable",
+    value: function sortable(parentElement, sortableClassName, isActive, onChange) {
+      var children = Array.prototype.slice.call(parentElement.children || []);
+      var canSort = true;
+      var currentDraggedChild;
+      children = children.filter(function (child) {
+        return child instanceof HTMLElement && child.classList.contains(sortableClassName);
+      });
+
+      if (!children || children.length < 1) {
+        return false;
+      }
+
+      if (typeof isActive === 'undefined') {
+        isActive = !parentElement.classList.contains('sorting');
+      }
 
       if (isActive) {
-        child.ondragstart = function (e) {
-          e.dataTransfer.setData('text/plain', '');
-          child.classList.toggle('dragging', true);
-          currentDraggedChild = child;
-        };
+        parentElement.ondragover = function (e) {
+          if (!canSort || !currentDraggedChild) {
+            return;
+          }
 
-        child.ondragend = function (e) {
-          onChange(child);
-          currentDraggedChild = null;
-          child.classList.toggle('dragging', false);
-        };
+          var bodyRect = document.body.getBoundingClientRect();
 
-        child.ondragcancel = function (e) {
-          onChange(child);
-          currentDraggedChild = null;
-          child.classList.toggle('dragging', false);
+          _.each(children, function (i, sibling) {
+            if (sibling === currentDraggedChild || !canSort || e.pageY < 1) {
+              return;
+            }
+
+            var cursorY = e.pageY;
+            var childY = currentDraggedChild.getBoundingClientRect().y - bodyRect.y;
+            var siblingY = sibling.getBoundingClientRect().y - bodyRect.y;
+            var hasMoved = false; // Dragging above a sibling
+
+            if (cursorY < siblingY && childY > siblingY) {
+              sibling.parentElement.insertBefore(currentDraggedChild, sibling);
+              hasMoved = true;
+            } // Dragging below a sibling
+
+
+            if (cursorY > siblingY && childY < siblingY) {
+              sibling.parentElement.insertBefore(currentDraggedChild, sibling.nextElementSibling);
+              hasMoved = true;
+            } // Init transition
+
+
+            if (hasMoved) {
+              canSort = false;
+              var newChildY = currentDraggedChild.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+              var newSiblingY = sibling.getBoundingClientRect().y - document.body.getBoundingClientRect().y;
+              currentDraggedChild.style.transform = 'translateY(' + (childY - newChildY) + 'px)';
+              sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
+              setTimeout(function () {
+                currentDraggedChild.removeAttribute('style');
+                sibling.removeAttribute('style');
+                canSort = true;
+              }, 100);
+            }
+          });
         };
       } else {
-        child.classList.toggle('dragging', false);
-        child.ondragstart = null;
-        child.ondrag = null;
-        child.ondragstop = null;
-        child.ondragcancel = null;
-        currentDraggedChild = null;
+        parentElement.ondragover = null;
       }
-    });
 
-    parentElement.classList.toggle('sorting', isActive);
-    return true;
-  };
-  /**
-   * Creates a switch
-   *
-   * @param {Boolean} initialValue
-   * @param {Function} onChange
-   *
-   * @returns {HTMLElement} Switch element
-   */
+      _.each(children, function (i, child) {
+        child.draggable = isActive;
 
+        if (isActive) {
+          child.ondragstart = function (e) {
+            e.dataTransfer.setData('text/plain', '');
+            child.classList.toggle('dragging', true);
+            currentDraggedChild = child;
+          };
 
-  UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
-    var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
-    var $input;
+          child.ondragend = function (e) {
+            onChange(child);
+            currentDraggedChild = null;
+            child.classList.toggle('dragging', false);
+          };
 
-    var $element = _.div({
-      class: 'switch',
-      'data-checked': initialValue
-    }, $input = _.input({
-      id: id,
-      class: 'form-control switch',
-      type: 'checkbox'
-    }).change(function () {
-      this.parentElement.dataset.checked = this.checked;
+          child.ondragcancel = function (e) {
+            onChange(child);
+            currentDraggedChild = null;
+            child.classList.toggle('dragging', false);
+          };
+        } else {
+          child.classList.toggle('dragging', false);
+          child.ondragstart = null;
+          child.ondrag = null;
+          child.ondragstop = null;
+          child.ondragcancel = null;
+          currentDraggedChild = null;
+        }
+      });
 
-      if (onChange) {
-        onChange(this.checked);
+      parentElement.classList.toggle('sorting', isActive);
+      return true;
+    }
+    /**
+     * Creates a switch
+     *
+     * @param {Boolean} initialValue
+     * @param {Function} onChange
+     *
+     * @returns {HTMLElement} Switch element
+     */
+
+  }, {
+    key: "inputSwitch",
+    value: function inputSwitch(initialValue, onChange) {
+      var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
+      var $input;
+
+      var $element = _.div({
+        class: 'switch',
+        'data-checked': initialValue
+      }, $input = _.input({
+        id: id,
+        class: 'form-control switch',
+        type: 'checkbox'
+      }).change(function () {
+        this.parentElement.dataset.checked = this.checked;
+
+        if (onChange) {
+          onChange(this.checked);
+        }
+      }), _.label({
+        for: id
+      }));
+
+      $element.on('set', function (e, newValue) {
+        $input[0].checked = newValue;
+      });
+
+      if (initialValue) {
+        $input.attr('checked', true);
       }
-    }), _.label({
-      for: id
-    }));
 
-    $element.on('set', function (e, newValue) {
-      $input[0].checked = newValue;
-    });
-
-    if (initialValue) {
-      $input.attr('checked', true);
+      return $element;
     }
+    /**
+     * Creates a group of chips
+     *
+     * @param {Array} items
+     * @param {Array} dropdownItems
+     * @param {Function} onChange
+     * @param {Boolean} isDropdownUnique
+     *
+     * @returns {HtmlElement} Chip group element
+     */
 
-    return $element;
-  };
-  /**
-   * Creates a group of chips
-   *
-   * @param {Array} items
-   * @param {Array} dropdownItems
-   * @param {Function} onChange
-   * @param {Boolean} isDropdownUnique
-   *
-   * @returns {HtmlElement} Chip group element
-   */
+  }, {
+    key: "inputChipGroup",
+    value: function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
+      var $element = _.div({
+        class: 'chip-group'
+      });
 
+      if (!items) {
+        items = [];
+      }
 
-  UIHelper.inputChipGroup = function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
-    var $element = _.div({
-      class: 'chip-group'
-    });
+      function render() {
+        _.append($element.empty(), // Render individual chips
+        _.each(items, function (itemIndex, item) {
+          var label = item.label || item.name || item.title;
 
-    if (!items) {
-      items = [];
-    }
+          if (!label) {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
-    function render() {
-      _.append($element.empty(), // Render individual chips
-      _.each(items, function (itemIndex, item) {
-        var label = item.label || item.name || item.title;
+            try {
+              for (var _iterator = dropdownItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var dropdownItem = _step.value;
+                var value = dropdownItem.id || dropdownItem.value || dropdownItem;
 
-        if (!label) {
-          for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-              if (_i2 >= _iterator.length) break;
-              _ref = _iterator[_i2++];
-            } else {
-              _i2 = _iterator.next();
-              if (_i2.done) break;
-              _ref = _i2.value;
-            }
-
-            var dropdownItem = _ref;
-            var value = dropdownItem.id || dropdownItem.value || dropdownItem;
-
-            if (value === item) {
-              label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
-            }
-          }
-        }
-
-        if (!label) {
-          label = item;
-        }
-
-        var $chip = _.div({
-          class: 'chip'
-        }, // Dropdown
-        _.if(Array.isArray(dropdownItems), _.div({
-          class: 'chip-label dropdown'
-        }, _.button({
-          class: 'dropdown-toggle',
-          'data-toggle': 'dropdown'
-        }, label), _.if(onChange, _.ul({
-          class: 'dropdown-menu'
-        }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
-          // Look for unique dropdown items
-          if (isDropdownUnique) {
-            for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-              var _ref2;
-
-              if (_isArray2) {
-                if (_i3 >= _iterator2.length) break;
-                _ref2 = _iterator2[_i3++];
-              } else {
-                _i3 = _iterator2.next();
-                if (_i3.done) break;
-                _ref2 = _i3.value;
+                if (value === item) {
+                  label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                }
               }
-
-              var _item = _ref2;
-
-              if (_item == dropdownItem) {
-                return;
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
               }
             }
           }
 
-          return _.li(_.a({
-            href: '#'
-          }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
-            e.preventDefault();
-            items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
+          if (!label) {
+            label = item;
+          }
+
+          var $chip = _.div({
+            class: 'chip'
+          }, // Dropdown
+          _.if(Array.isArray(dropdownItems), _.div({
+            class: 'chip-label dropdown'
+          }, _.button({
+            class: 'dropdown-toggle',
+            'data-toggle': 'dropdown'
+          }, label), _.if(onChange, _.ul({
+            class: 'dropdown-menu'
+          }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+            // Look for unique dropdown items
+            if (isDropdownUnique) {
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = items[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var _item = _step2.value;
+
+                  if (_item == dropdownItem) {
+                    return;
+                  }
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                    _iterator2.return();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+            }
+
+            return _.li(_.a({
+              href: '#'
+            }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
+              e.preventDefault();
+              items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
+              render();
+
+              if (typeof onChange === 'function') {
+                onChange(items);
+              }
+            }));
+          }))))), // Regular string
+          _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({
+            class: 'chip-label'
+          }, item)), _.if(onChange, _.input({
+            type: 'text',
+            class: 'chip-label',
+            value: item
+          }).change(function (e) {
+            items[itemIndex] = e.target.value;
+          }))), // Remove button
+          _.if(onChange, _.button({
+            class: 'btn chip-remove'
+          }, _.span({
+            class: 'fa fa-remove'
+          })).click(function () {
+            items.splice(itemIndex, 1);
             render();
 
             if (typeof onChange === 'function') {
               onChange(items);
             }
-          }));
-        }))))), // Regular string
-        _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({
-          class: 'chip-label'
-        }, item)), _.if(onChange, _.input({
-          type: 'text',
-          class: 'chip-label',
-          value: item
-        }).change(function (e) {
-          items[itemIndex] = e.target.value;
-        }))), // Remove button
+          })));
+
+          return $chip;
+        }), // Add button
         _.if(onChange, _.button({
-          class: 'btn chip-remove'
+          class: 'btn chip-add'
         }, _.span({
-          class: 'fa fa-remove'
+          class: 'fa fa-plus'
         })).click(function () {
-          items.splice(itemIndex, 1);
+          if (Array.isArray(dropdownItems)) {
+            if (isDropdownUnique) {
+              var _iteratorNormalCompletion3 = true;
+              var _didIteratorError3 = false;
+              var _iteratorError3 = undefined;
+
+              try {
+                for (var _iterator3 = dropdownItems[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                  var dropdownItem = _step3.value;
+                  var isSelected = false;
+                  var _iteratorNormalCompletion4 = true;
+                  var _didIteratorError4 = false;
+                  var _iteratorError4 = undefined;
+
+                  try {
+                    for (var _iterator4 = items[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                      var item = _step4.value;
+
+                      if (item == dropdownItem) {
+                        isSelected = true;
+                        break;
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                        _iterator4.return();
+                      }
+                    } finally {
+                      if (_didIteratorError4) {
+                        throw _iteratorError4;
+                      }
+                    }
+                  }
+
+                  if (!isSelected) {
+                    items.push(dropdownItem.value || dropdownItem);
+                    break;
+                  }
+                }
+              } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                    _iterator3.return();
+                  }
+                } finally {
+                  if (_didIteratorError3) {
+                    throw _iteratorError3;
+                  }
+                }
+              }
+            } else {
+              items.push(dropdownItems[0].value || dropdownItems[0]);
+            }
+          } else if (typeof dropdownItems === 'string') {
+            items.push(dropdownItems);
+          } else {
+            items.push('New item');
+          }
+
           render();
 
           if (typeof onChange === 'function') {
             onChange(items);
           }
         })));
-
-        return $chip;
-      }), // Add button
-      _.if(onChange, _.button({
-        class: 'btn chip-add'
-      }, _.span({
-        class: 'fa fa-plus'
-      })).click(function () {
-        if (Array.isArray(dropdownItems)) {
-          if (isDropdownUnique) {
-            for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-              var _ref3;
-
-              if (_isArray3) {
-                if (_i4 >= _iterator3.length) break;
-                _ref3 = _iterator3[_i4++];
-              } else {
-                _i4 = _iterator3.next();
-                if (_i4.done) break;
-                _ref3 = _i4.value;
-              }
-
-              var dropdownItem = _ref3;
-              var isSelected = false;
-
-              for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
-
-                if (_isArray4) {
-                  if (_i5 >= _iterator4.length) break;
-                  _ref4 = _iterator4[_i5++];
-                } else {
-                  _i5 = _iterator4.next();
-                  if (_i5.done) break;
-                  _ref4 = _i5.value;
-                }
-
-                var item = _ref4;
-
-                if (item == dropdownItem) {
-                  isSelected = true;
-                  break;
-                }
-              }
-
-              if (!isSelected) {
-                items.push(dropdownItem.value || dropdownItem);
-                break;
-              }
-            }
-          } else {
-            items.push(dropdownItems[0].value || dropdownItems[0]);
-          }
-        } else if (typeof dropdownItems === 'string') {
-          items.push(dropdownItems);
-        } else {
-          items.push('New item');
-        }
-
-        render();
-
-        if (typeof onChange === 'function') {
-          onChange(items);
-        }
-      })));
-    }
-
-    ;
-    render();
-    return $element;
-  };
-  /**
-   * Renders a carousel
-   *
-   * @param {Array} items
-   * @param {Boolean} useIndicators
-   * @param {Boolean} useControls
-   * @param {String} height
-   *
-   * @returns {HtmlElement} Carousel element
-   */
-
-
-  UIHelper.carousel = function carousel(items, useIndicators, useControls, height) {
-    var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
-    return _.div({
-      class: 'carousel slide',
-      id: id,
-      'data-ride': 'carousel',
-      'data-interval': 0
-    }, _.if(useIndicators, _.ol({
-      class: 'carousel-indicators'
-    }, _.each(items, function (i, item) {
-      return _.li({
-        'data-target': '#' + id,
-        'data-slide-to': i,
-        class: i == 0 ? 'active' : ''
-      });
-    }))), _.div({
-      class: 'carousel-inner',
-      role: 'listbox'
-    }, _.each(items, function (i, item) {
-      return _.div({
-        class: 'item' + (i == 0 ? ' active' : ''),
-        style: 'height:' + (height || '500px')
-      }, item);
-    })), _.if(useControls, _.a({
-      href: '#' + id,
-      role: 'button',
-      class: 'left carousel-control',
-      'data-slide': 'prev'
-    }, _.span({
-      class: 'fa fa-arrow-left'
-    })), _.a({
-      href: '#' + id,
-      role: 'button',
-      class: 'right carousel-control',
-      'data-slide': 'next'
-    }, _.span({
-      class: 'fa fa-arrow-right'
-    }))));
-  };
-  /**
-   * Brings up an error modal
-   *
-   * @param {String|Error} error
-   * @param {Function} onClickOK
-   */
-
-
-  UIHelper.errorModal = function errorModal(error, onClickOK) {
-    if (!error) {
-      return;
-    }
-
-    if (error instanceof String) {
-      error = new Error(error);
-    } else if (error instanceof Object) {
-      if (error.responseText) {
-        error = new Error(error.responseText);
       }
-    } else if (error instanceof Error === false) {
-      error = new Error(error.toString());
+
+      ;
+      render();
+      return $element;
     }
+    /**
+     * Renders a carousel
+     *
+     * @param {Array} items
+     * @param {Boolean} useIndicators
+     * @param {Boolean} useControls
+     * @param {String} height
+     *
+     * @returns {HtmlElement} Carousel element
+     */
 
-    setTimeout(function () {
-      throw error;
-    }, 100);
-    return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
-  };
-  /**
-   * Brings up a warning modal
-   *
-   * @param {String} warning
-   * @param {Function} onClickOK
-   */
-
-
-  UIHelper.warningModal = function warningModal(warning, onClickOK) {
-    if (!warning) {
-      return;
+  }, {
+    key: "carousel",
+    value: function carousel(items, useIndicators, useControls, height) {
+      var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
+      return _.div({
+        class: 'carousel slide',
+        id: id,
+        'data-ride': 'carousel',
+        'data-interval': 0
+      }, _.if(useIndicators, _.ol({
+        class: 'carousel-indicators'
+      }, _.each(items, function (i, item) {
+        return _.li({
+          'data-target': '#' + id,
+          'data-slide-to': i,
+          class: i == 0 ? 'active' : ''
+        });
+      }))), _.div({
+        class: 'carousel-inner',
+        role: 'listbox'
+      }, _.each(items, function (i, item) {
+        return _.div({
+          class: 'item' + (i == 0 ? ' active' : ''),
+          style: 'height:' + (height || '500px')
+        }, item);
+      })), _.if(useControls, _.a({
+        href: '#' + id,
+        role: 'button',
+        class: 'left carousel-control',
+        'data-slide': 'prev'
+      }, _.span({
+        class: 'fa fa-arrow-left'
+      })), _.a({
+        href: '#' + id,
+        role: 'button',
+        class: 'right carousel-control',
+        'data-slide': 'next'
+      }, _.span({
+        class: 'fa fa-arrow-right'
+      }))));
     }
+    /**
+     * Brings up an error modal
+     *
+     * @param {String|Error} error
+     * @param {Function} onClickOK
+     */
 
-    return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
-  };
-  /**
-   * Brings up a message modal
-   *
-   * @param {String} title
-   * @param {String} body
-   * @param {Function} onClickOK
-   * @param {String} group
-   */
+  }, {
+    key: "errorModal",
+    value: function errorModal(error, onClickOK) {
+      if (!error) {
+        return;
+      }
 
-
-  UIHelper.messageModal = function messageModal(title, body, onClickOK, group) {
-    var modal = new HashBrown.Views.Modals.Modal({
-      isBlocking: onClickOK === false,
-      title: title,
-      group: group,
-      body: body
-    });
-
-    if (onClickOK) {
-      modal.on('ok', onClickOK);
-    }
-
-    return modal;
-  };
-  /**
-   * Brings up an iframe modal
-   *
-   * @param {String} title
-   * @param {String} url
-   * @param {Function} onSubmit
-   * @param {Function} onCancel
-   */
-
-
-  UIHelper.iframeModal = function iframeModal(title, url, onSubmit, onCancel) {
-    var modal = new HashBrown.Views.Modals.IframeModal({
-      title: title,
-      url: url
-    });
-
-    if (typeof onSubmit === 'function') {
-      modal.on('ok', onSubmit);
-    }
-
-    if (typeof onCancel === 'function') {
-      modal.on('cancel', onCancel);
-    }
-
-    return modal;
-  };
-  /**
-   * Brings up a confirm modal
-   *
-   * @param {String} type
-   * @param {String} title
-   * @param {String} body
-   * @param {Function} onSubmit
-   */
-
-
-  UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
-    var modal = new HashBrown.Views.Modals.ConfirmModal({
-      type: type ? type.toLowerCase() : null,
-      title: title,
-      body: body
-    });
-    modal.on('cancel', onCancel);
-    modal.on('ok', onSubmit);
-    return modal;
-  };
-  /**
-   * Creates a context menu
-   */
-
-
-  UIHelper.context = function context(element, items) {
-    var openContextMenu = function openContextMenu(e) {
-      // Find any existing context menu targets and remove their classes
-      var clearTargets = function clearTargets() {
-        var targets = document.querySelectorAll('.context-menu-target');
-
-        if (targets) {
-          for (var i = 0; i < targets.length; i++) {
-            targets[i].classList.remove('context-menu-target');
-          }
+      if (error instanceof String) {
+        error = new Error(error);
+      } else if (error instanceof Object) {
+        if (error.responseText) {
+          error = new Error(error.responseText);
         }
+      } else if (error instanceof Error === false) {
+        error = new Error(error.toString());
+      }
+
+      setTimeout(function () {
+        throw error;
+      }, 100);
+      return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
+    }
+    /**
+     * Brings up a warning modal
+     *
+     * @param {String} warning
+     * @param {Function} onClickOK
+     */
+
+  }, {
+    key: "warningModal",
+    value: function warningModal(warning, onClickOK) {
+      if (!warning) {
+        return;
+      }
+
+      return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
+    }
+    /**
+     * Brings up a message modal
+     *
+     * @param {String} title
+     * @param {String} body
+     * @param {Function} onClickOK
+     * @param {String} group
+     */
+
+  }, {
+    key: "messageModal",
+    value: function messageModal(title, body, onClickOK, group) {
+      var modal = new HashBrown.Views.Modals.Modal({
+        isBlocking: onClickOK === false,
+        title: title,
+        group: group,
+        body: body
+      });
+
+      if (onClickOK) {
+        modal.on('ok', onClickOK);
+      }
+
+      return modal;
+    }
+    /**
+     * Brings up an iframe modal
+     *
+     * @param {String} title
+     * @param {String} url
+     * @param {Function} onSubmit
+     * @param {Function} onCancel
+     */
+
+  }, {
+    key: "iframeModal",
+    value: function iframeModal(title, url, onSubmit, onCancel) {
+      var modal = new HashBrown.Views.Modals.IframeModal({
+        title: title,
+        url: url
+      });
+
+      if (typeof onSubmit === 'function') {
+        modal.on('ok', onSubmit);
+      }
+
+      if (typeof onCancel === 'function') {
+        modal.on('cancel', onCancel);
+      }
+
+      return modal;
+    }
+    /**
+     * Brings up a confirm modal
+     *
+     * @param {String} type
+     * @param {String} title
+     * @param {String} body
+     * @param {Function} onSubmit
+     */
+
+  }, {
+    key: "confirmModal",
+    value: function confirmModal(type, title, body, onSubmit, onCancel) {
+      var modal = new HashBrown.Views.Modals.ConfirmModal({
+        type: type ? type.toLowerCase() : null,
+        title: title,
+        body: body
+      });
+      modal.on('cancel', onCancel);
+      modal.on('ok', onSubmit);
+      return modal;
+    }
+    /**
+     * Creates a context menu
+     */
+
+  }, {
+    key: "context",
+    value: function context(element, items) {
+      var openContextMenu = function openContextMenu(e) {
+        // Find any existing context menu targets and remove their classes
+        var clearTargets = function clearTargets() {
+          var targets = document.querySelectorAll('.context-menu-target');
+
+          if (targets) {
+            for (var i = 0; i < targets.length; i++) {
+              targets[i].classList.remove('context-menu-target');
+            }
+          }
+        };
+
+        clearTargets(); // Set new target
+
+        element.classList.toggle('context-menu-target', true); // Remove existing dropdowns
+
+        var existingMenu = _.find('.widget--dropdown.context-menu');
+
+        if (existingMenu) {
+          existingMenu.remove();
+        } // Init new dropdown
+
+
+        var dropdown = new HashBrown.Views.Widgets.Dropdown({
+          options: items,
+          reverseKeys: true,
+          onChange: function onChange(pickedItem) {
+            if (typeof pickedItem !== 'function') {
+              return;
+            }
+
+            pickedItem();
+          }
+        }); // Prevent the toggle button from blocking new context menu events
+
+        var toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
+        toggle.addEventListener('contextmenu', function (e) {
+          e.preventDefault();
+          dropdown.toggle(false);
+        }); // Set cancel event
+
+        dropdown.on('cancel', function () {
+          dropdown.remove(); // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+
+          setTimeout(function () {
+            clearTargets();
+          }, 100);
+        }); // Set styles
+
+        dropdown.element.classList.toggle('context-menu', true);
+        dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
+        dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX; // Open it
+
+        dropdown.toggle(true); // Append to body
+
+        document.body.appendChild(dropdown.element);
       };
 
-      clearTargets(); // Set new target
-
-      element.classList.toggle('context-menu-target', true); // Remove existing dropdowns
-
-      var existingMenu = _.find('.widget--dropdown.context-menu');
-
-      if (existingMenu) {
-        existingMenu.remove();
-      } // Init new dropdown
-
-
-      var dropdown = new HashBrown.Views.Widgets.Dropdown({
-        options: items,
-        reverseKeys: true,
-        onChange: function onChange(pickedItem) {
-          if (typeof pickedItem !== 'function') {
-            return;
-          }
-
-          pickedItem();
+      element.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openContextMenu(e);
+      });
+      element.addEventListener('click', function (e) {
+        if (e.which === 3 || e.ctrlKey) {
+          e.preventDefault();
+          e.stopPropagation();
+          openContextMenu(e);
         }
-      }); // Prevent the toggle button from blocking new context menu events
-
-      var toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
-      toggle.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-        dropdown.toggle(false);
-      }); // Set cancel event
-
-      dropdown.on('cancel', function () {
-        dropdown.remove(); // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
-
-        setTimeout(function () {
-          clearTargets();
-        }, 100);
-      }); // Set styles
-
-      dropdown.element.classList.toggle('context-menu', true);
-      dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
-      dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX; // Open it
-
-      dropdown.toggle(true); // Append to body
-
-      document.body.appendChild(dropdown.element);
-    };
-
-    element.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openContextMenu(e);
-    });
-    element.addEventListener('click', function (e) {
-      if (e.which === 3 || e.ctrlKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        openContextMenu(e);
-      }
-    });
-    element.addEventListener('touchstart', function (e) {
-      if (e.touchTargets && e.touchTargets.length > 1) {
-        e.preventDefault();
-        e.stopPropagation();
-        openContextMenu(e);
-      }
-    });
-  };
+      });
+      element.addEventListener('touchstart', function (e) {
+        if (e.touchTargets && e.touchTargets.length > 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          openContextMenu(e);
+        }
+      });
+    }
+  }]);
 
   return UIHelper;
 }();

@@ -303,6 +303,8 @@ process.umask = function () {
 /* 3 */
 /***/ (function(module, exports) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var g; // This works in non-strict mode
 
 g = function () {
@@ -314,7 +316,7 @@ try {
   g = g || new Function("return this")();
 } catch (e) {
   // This works if the window reference is available
-  if (typeof window === "object") g = window;
+  if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
 } // g can still be undefined, but nothing to do about it...
 // We return undefined, instead of nothing here, so it's
 // easier to handle this case. if(!global) { ...}
@@ -632,7 +634,27 @@ exports.clearImmediate = typeof self !== "undefined" && self.clearImmediate || t
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Path = __webpack_require__(39);
 
@@ -651,87 +673,91 @@ var Resource = __webpack_require__(198);
 var Connection =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Connection, _Resource);
+  _inherits(Connection, _Resource);
 
   function Connection() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Connection);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Connection).apply(this, arguments));
   }
 
-  var _proto = Connection.prototype;
+  _createClass(Connection, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'title');
-    this.def(String, 'url');
-    this.def(Boolean, 'isLocked'); // Sync
+    /**
+     * Structure
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(String, 'title');
+      this.def(String, 'url');
+      this.def(Boolean, 'isLocked'); // Sync
 
-    this.def(Object, 'sync');
-  };
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  Connection.paramsCheck = function paramsCheck(params) {
-    // Deployer and processor
-    if (!params.processor) {
-      params.processor = {};
+      this.def(Object, 'sync');
     }
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-    if (!params.deployer) {
-      params.deployer = {};
+  }, {
+    key: "getRemoteUrl",
+
+    /**
+     * Gets the remote URL
+     *
+     * @param {Boolean} withSlash
+     *
+     * @returns {String} URL
+     */
+    value: function getRemoteUrl() {
+      var withSlash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var url = this.url;
+
+      if (!withSlash && url[url.length - 1] == '/') {
+        url = url.substring(0, url.length - 1);
+      } else if (withSlash && url[url.length - 1] != '/') {
+        url += '/';
+      }
+
+      return url;
     }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      // Deployer and processor
+      if (!params.processor) {
+        params.processor = {};
+      }
 
-    if (!params.deployer.paths) {
-      params.deployer.paths = {};
+      if (!params.deployer) {
+        params.deployer = {};
+      }
+
+      if (!params.deployer.paths) {
+        params.deployer.paths = {};
+      }
+
+      return _get(_getPrototypeOf(Connection), "paramsCheck", this).call(this, params);
     }
+    /**
+     * Creates a new Connection object
+     *
+     * @return {Connection} connection
+     */
 
-    return _Resource.paramsCheck.call(this, params);
-  };
-  /**
-   * Creates a new Connection object
-   *
-   * @return {Connection} connection
-   */
-
-
-  Connection.create = function create() {
-    return new Connection({
-      id: Connection.createId(),
-      title: 'New connection'
-    });
-  };
-  /**
-   * Gets the remote URL
-   *
-   * @param {Boolean} withSlash
-   *
-   * @returns {String} URL
-   */
-
-
-  _proto.getRemoteUrl = function getRemoteUrl(withSlash) {
-    if (withSlash === void 0) {
-      withSlash = false;
+  }, {
+    key: "create",
+    value: function create() {
+      return new Connection({
+        id: Connection.createId(),
+        title: 'New connection'
+      });
     }
-
-    var url = this.url;
-
-    if (!withSlash && url[url.length - 1] == '/') {
-      url = url.substring(0, url.length - 1);
-    } else if (withSlash && url[url.length - 1] != '/') {
-      url += '/';
-    }
-
-    return url;
-  };
+  }]);
 
   return Connection;
 }(Resource);
@@ -975,11 +1001,23 @@ var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -992,7 +1030,7 @@ var Entity = __webpack_require__(41);
 var Processor =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Processor, _Entity);
+  _inherits(Processor, _Entity);
 
   _createClass(Processor, null, [{
     key: "name",
@@ -1015,7 +1053,9 @@ function (_Entity) {
   function Processor(params) {
     var _this;
 
-    _this = _Entity.call(this, params) || this;
+    _classCallCheck(this, Processor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Processor).call(this, params));
     _this.name = _this.constructor.name;
     _this.alias = _this.constructor.alias;
     return _this;
@@ -1025,25 +1065,27 @@ function (_Entity) {
    */
 
 
-  var _proto = Processor.prototype;
+  _createClass(Processor, [{
+    key: "structure",
+    value: function structure() {
+      this.def(String, 'name');
+      this.def(String, 'alias');
+      this.def(String, 'fileExtension');
+    }
+    /**
+     * Processes a Content node
+     *
+     * @param {Content} content
+     *
+     * @returns {Object} Output
+     */
 
-  _proto.structure = function structure() {
-    this.def(String, 'name');
-    this.def(String, 'alias');
-    this.def(String, 'fileExtension');
-  };
-  /**
-   * Processes a Content node
-   *
-   * @param {Content} content
-   *
-   * @returns {Object} Output
-   */
-
-
-  _proto.process = function process(content) {
-    return null;
-  };
+  }, {
+    key: "process",
+    value: function process(content) {
+      return null;
+    }
+  }]);
 
   return Processor;
 }(Entity);
@@ -1056,6 +1098,14 @@ module.exports = Processor;
 
 "use strict";
 
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var crypto = __webpack_require__(42);
 /**
@@ -1074,6 +1124,8 @@ function () {
    * @param {Object} params
    */
   function Entity(params) {
+    _classCallCheck(this, Entity);
+
     this.structure();
     params = this.constructor.paramsCheck(params);
     Object.seal(this);
@@ -1093,153 +1145,158 @@ function () {
    */
 
 
-  var _proto = Entity.prototype;
+  _createClass(Entity, [{
+    key: "structure",
+    value: function structure() {}
+    /**
+     * Checks the parameters berfore they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-  _proto.structure = function structure() {};
-  /**
-   * Checks the parameters berfore they're committed
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
+  }, {
+    key: "getObject",
 
-
-  Entity.paramsCheck = function paramsCheck(params) {
-    return params;
-  };
-  /**
-   * Generates a new random id
-   *
-   * @param {Number} length
-   *
-   * @returns {String} id
-   */
-
-
-  Entity.createId = function createId(length) {
-    if (!length) {
-      length = 8;
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    value: function getObject() {
+      return JSON.parse(JSON.stringify(this));
     }
+    /**
+     * Defines a type safe member variable
+     *
+     * @param {String} type
+     * @param {String} name
+     * @param {Anything} defaultValue
+     */
 
-    if (length < 4) {
-      length = 4;
-    }
+  }, {
+    key: "def",
+    value: function def(type, name, defaultValue) {
+      var _this = this;
 
-    return crypto.randomBytes(length).toString('hex');
-  };
-  /**
-   * Gets a copy of every field in this object as a mutable object
-   *
-   * @returns {Object} object
-   */
-
-
-  _proto.getObject = function getObject() {
-    return JSON.parse(JSON.stringify(this));
-  };
-  /**
-   * Defines a type safe member variable
-   *
-   * @param {String} type
-   * @param {String} name
-   * @param {Anything} defaultValue
-   */
-
-
-  _proto.def = function def(type, name, defaultValue) {
-    var _this = this;
-
-    if (typeof type !== 'function') {
-      throw new TypeError('Parameter \'type\' cannot be of type \'' + typeof type + '\'.');
-    }
-
-    if (typeof name !== 'string') {
-      throw new TypeError('Parameter \'name\' cannot be of type \'' + typeof name + '\'.');
-    }
-
-    if (typeof defaultValue === 'undefined') {
-      switch (type) {
-        case String:
-          defaultValue = '';
-          break;
-
-        case Number:
-          defaultValue = 0;
-          break;
-
-        case Date:
-          defaultValue = null;
-          break;
-
-        case Boolean:
-          defaultValue = false;
-          break;
-
-        default:
-          defaultValue = null;
-          break;
+      if (typeof type !== 'function') {
+        throw new TypeError('Parameter \'type\' cannot be of type \'' + _typeof(type) + '\'.');
       }
-    }
 
-    var thisValue = defaultValue;
-    var thisType = type;
-    Object.defineProperty(this, name, {
-      enumerable: true,
-      get: function get() {
-        return thisValue;
-      },
-      set: function set(thatValue) {
-        // Auto cast for Booleans
-        if (thisType == Boolean) {
-          if (!thatValue) {
-            thatValue = false;
-          } else if (typeof thatValue === 'string') {
-            if (thatValue === 'false') {
+      if (typeof name !== 'string') {
+        throw new TypeError('Parameter \'name\' cannot be of type \'' + _typeof(name) + '\'.');
+      }
+
+      if (typeof defaultValue === 'undefined') {
+        switch (type) {
+          case String:
+            defaultValue = '';
+            break;
+
+          case Number:
+            defaultValue = 0;
+            break;
+
+          case Date:
+            defaultValue = null;
+            break;
+
+          case Boolean:
+            defaultValue = false;
+            break;
+
+          default:
+            defaultValue = null;
+            break;
+        }
+      }
+
+      var thisValue = defaultValue;
+      var thisType = type;
+      Object.defineProperty(this, name, {
+        enumerable: true,
+        get: function get() {
+          return thisValue;
+        },
+        set: function set(thatValue) {
+          // Auto cast for Booleans
+          if (thisType == Boolean) {
+            if (!thatValue) {
               thatValue = false;
-            } else if (thatValue === 'true') {
-              thatValue = true;
+            } else if (typeof thatValue === 'string') {
+              if (thatValue === 'false') {
+                thatValue = false;
+              } else if (thatValue === 'true') {
+                thatValue = true;
+              }
+            }
+          } // Auto cast for numbers
+
+
+          if (thisType == Number) {
+            if (!thatValue) {
+              thatValue = 0;
+            } else if (thatValue.constructor == String && !isNaN(thatValue)) {
+              thatValue = parseFloat(thatValue);
+            }
+          } // Auto cast for dates
+
+
+          if (thisType == Date) {
+            if (!thatValue) {
+              thatValue = null;
+            } else if (thatValue.constructor == String || thatValue.constructor == Number) {
+              thatValue = new Date(thatValue);
             }
           }
-        } // Auto cast for numbers
 
+          if (typeof thatValue !== 'undefined') {
+            if (thatValue == null) {
+              thisValue = thatValue;
+              return;
+            }
 
-        if (thisType == Number) {
-          if (!thatValue) {
-            thatValue = 0;
-          } else if (thatValue.constructor == String && !isNaN(thatValue)) {
-            thatValue = parseFloat(thatValue);
-          }
-        } // Auto cast for dates
+            var thatType = thatValue.constructor;
 
-
-        if (thisType == Date) {
-          if (!thatValue) {
-            thatValue = null;
-          } else if (thatValue.constructor == String || thatValue.constructor == Number) {
-            thatValue = new Date(thatValue);
-          }
-        }
-
-        if (typeof thatValue !== 'undefined') {
-          if (thatValue == null) {
-            thisValue = thatValue;
-            return;
-          }
-
-          var thatType = thatValue.constructor;
-
-          if (thisType.name !== thatType.name && thatValue instanceof thisType === false) {
-            throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+            if (thisType.name !== thatType.name && thatValue instanceof thisType === false) {
+              throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+            } else {
+              thisValue = thatValue;
+            }
           } else {
-            thisValue = thatValue;
+            thisValue = defaultValue;
           }
-        } else {
-          thisValue = defaultValue;
         }
+      });
+    }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      return params;
+    }
+    /**
+     * Generates a new random id
+     *
+     * @param {Number} length
+     *
+     * @returns {String} id
+     */
+
+  }, {
+    key: "createId",
+    value: function createId(length) {
+      if (!length) {
+        length = 8;
       }
-    });
-  };
+
+      if (length < 4) {
+        length = 4;
+      }
+
+      return crypto.randomBytes(length).toString('hex');
+    }
+  }]);
 
   return Entity;
 }();
@@ -4015,6 +4072,8 @@ Stream.prototype.pipe = function (dest, options) {
 /* 54 */
 /***/ (function(module, exports) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4263,7 +4322,7 @@ function isNumber(arg) {
 }
 
 function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
+  return _typeof(arg) === 'object' && arg !== null;
 }
 
 function isUndefined(arg) {
@@ -5397,7 +5456,9 @@ module.exports = __webpack_require__(54).EventEmitter;
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {// Copyright Joyent, Inc. and other Node contributors.
+/* WEBPACK VAR INJECTION */(function(Buffer) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -5460,7 +5521,7 @@ function isString(arg) {
 exports.isString = isString;
 
 function isSymbol(arg) {
-  return typeof arg === 'symbol';
+  return _typeof(arg) === 'symbol';
 }
 
 exports.isSymbol = isSymbol;
@@ -5478,7 +5539,7 @@ function isRegExp(re) {
 exports.isRegExp = isRegExp;
 
 function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
+  return _typeof(arg) === 'object' && arg !== null;
 }
 
 exports.isObject = isObject;
@@ -5502,7 +5563,7 @@ function isFunction(arg) {
 exports.isFunction = isFunction;
 
 function isPrimitive(arg) {
-  return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || typeof arg === 'symbol' || // ES6 symbol
+  return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || _typeof(arg) === 'symbol' || // ES6 symbol
   typeof arg === 'undefined';
 }
 
@@ -10821,7 +10882,9 @@ function findPrime(bits, gen) {
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {(function (module, exports) {
+/* WEBPACK VAR INJECTION */(function(module) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+(function (module, exports) {
   'use strict'; // Utils
 
   function assert(val, msg) {
@@ -10862,7 +10925,7 @@ function findPrime(bits, gen) {
     }
   }
 
-  if (typeof module === 'object') {
+  if (_typeof(module) === 'object') {
     module.exports = BN;
   } else {
     exports.BN = BN;
@@ -10881,7 +10944,7 @@ function findPrime(bits, gen) {
       return true;
     }
 
-    return num !== null && typeof num === 'object' && num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
+    return num !== null && _typeof(num) === 'object' && num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
   };
 
   BN.max = function max(left, right) {
@@ -10899,7 +10962,7 @@ function findPrime(bits, gen) {
       return this._initNumber(number, base, endian);
     }
 
-    if (typeof number === 'object') {
+    if (_typeof(number) === 'object') {
       return this._initArray(number, base, endian);
     }
 
@@ -14423,6 +14486,8 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var r;
 
 module.exports = function rand(len) {
@@ -14452,7 +14517,7 @@ Rand.prototype._rand = function _rand(n) {
   return res;
 };
 
-if (typeof self === 'object') {
+if ((typeof self === "undefined" ? "undefined" : _typeof(self)) === 'object') {
   if (self.crypto && self.crypto.getRandomValues) {
     // Modern browsers
     Rand.prototype._rand = function _rand(n) {
@@ -14468,7 +14533,7 @@ if (typeof self === 'object') {
       return arr;
     }; // Safari's WebWorkers do not have `crypto`
 
-  } else if (typeof window === 'object') {
+  } else if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object') {
     // Old junk
     Rand.prototype._rand = function () {
       throw new Error('Not implemented yet');
@@ -18295,6 +18360,8 @@ module.exports = {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var BN = __webpack_require__(125);
 
 var HmacDRBG = __webpack_require__(160);
@@ -18374,7 +18441,7 @@ EC.prototype._truncateToN = function truncateToN(msg, truncOnly) {
 };
 
 EC.prototype.sign = function sign(msg, key, enc, options) {
-  if (typeof enc === 'object') {
+  if (_typeof(enc) === 'object') {
     options = enc;
     enc = null;
   }
@@ -19110,6 +19177,8 @@ module.exports = KeyPair;
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var BN = __webpack_require__(125);
 
 var elliptic = __webpack_require__(136);
@@ -19129,7 +19198,7 @@ var parseBytes = utils.parseBytes;
 
 function Signature(eddsa, sig) {
   this.eddsa = eddsa;
-  if (typeof sig !== 'object') sig = parseBytes(sig);
+  if (_typeof(sig) !== 'object') sig = parseBytes(sig);
 
   if (Array.isArray(sig)) {
     sig = {
@@ -19172,7 +19241,9 @@ module.exports = Signature;
 /* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var asn1 = __webpack_require__(167);
+/* WEBPACK VAR INJECTION */(function(Buffer) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var asn1 = __webpack_require__(167);
 
 var aesid = __webpack_require__(185);
 
@@ -19187,7 +19258,7 @@ module.exports = parseKeys;
 function parseKeys(buffer) {
   var password;
 
-  if (typeof buffer === 'object' && !Buffer.isBuffer(buffer)) {
+  if (_typeof(buffer) === 'object' && !Buffer.isBuffer(buffer)) {
     password = buffer.passphrase;
     buffer = buffer.key;
   }
@@ -19449,6 +19520,8 @@ reporter) {
 /* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var indexOf = __webpack_require__(171);
 
 var Object_keys = function Object_keys(obj) {
@@ -19571,7 +19644,7 @@ exports.createScript = function (code) {
 exports.createContext = Script.createContext = function (context) {
   var copy = new Context();
 
-  if (typeof context === 'object') {
+  if (_typeof(context) === 'object') {
     forEach(Object_keys(context), function (key) {
       copy[key] = context[key];
     });
@@ -19729,6 +19802,8 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
 /* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var inherits = __webpack_require__(50);
 
 var Reporter = __webpack_require__(172).Reporter;
@@ -19810,7 +19885,7 @@ function EncoderBuffer(value, reporter) {
     this.value = value;
     this.length = value.length;
   } else {
-    return reporter.error('Unsupported type: ' + typeof value);
+    return reporter.error('Unsupported type: ' + _typeof(value));
   }
 }
 
@@ -19837,6 +19912,8 @@ EncoderBuffer.prototype.join = function join(out, offset) {
 /***/ }),
 /* 175 */
 /***/ (function(module, exports, __webpack_require__) {
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var Reporter = __webpack_require__(172).Reporter;
 
@@ -19941,7 +20018,7 @@ Node.prototype._useArgs = function useArgs(args) {
     assert(state.args === null);
     state.args = args;
     state.reverseArgs = args.map(function (arg) {
-      if (typeof arg !== 'object' || arg.constructor !== Object) return arg;
+      if (_typeof(arg) !== 'object' || arg.constructor !== Object) return arg;
       var res = {};
       Object.keys(arg).forEach(function (key) {
         if (key == (key | 0)) key |= 0;
@@ -20242,7 +20319,7 @@ Node.prototype._encodeValue = function encode(data, reporter, parent) {
       if (child._baseState.tag === 'null_') return child._encode(null, reporter, data);
       if (child._baseState.key === null) return reporter.error('Child should have a key');
       var prevKey = reporter.enterKey(child._baseState.key);
-      if (typeof data !== 'object') return reporter.error('Child expected, but input is not object');
+      if (_typeof(data) !== 'object') return reporter.error('Child expected, but input is not object');
 
       var res = child._encode(data[child._baseState.key], reporter, data);
 
@@ -21821,11 +21898,23 @@ function randomFillSync(buf, offset, size) {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -21838,7 +21927,7 @@ var Entity = __webpack_require__(41);
 var Deployer =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Deployer, _Entity);
+  _inherits(Deployer, _Entity);
 
   _createClass(Deployer, null, [{
     key: "name",
@@ -21860,7 +21949,9 @@ function (_Entity) {
   function Deployer(params) {
     var _this;
 
-    _this = _Entity.call(this, params) || this;
+    _classCallCheck(this, Deployer);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Deployer).call(this, params));
     _this.name = _this.constructor.name;
     _this.alias = _this.constructor.alias;
 
@@ -21875,155 +21966,165 @@ function (_Entity) {
    */
 
 
-  var _proto = Deployer.prototype;
+  _createClass(Deployer, [{
+    key: "structure",
+    value: function structure() {
+      this.def(String, 'name');
+      this.def(String, 'alias');
+      this.def(Object, 'paths', {
+        media: '',
+        content: ''
+      });
+    }
+    /**
+     * Gets the root path
+     *
+     * @returns {String} Root
+     */
 
-  _proto.structure = function structure() {
-    this.def(String, 'name');
-    this.def(String, 'alias');
-    this.def(Object, 'paths', {
-      media: '',
-      content: ''
-    });
-  };
-  /**
-   * Gets the root path
-   *
-   * @returns {String} Root
-   */
+  }, {
+    key: "getRootPath",
+    value: function getRootPath() {
+      throw new Error('The method "getRootPath" must be overridden');
+    }
+    /**
+     * Gets a deployment path
+     *
+     * @param {String} query
+     * @param {String} filename
+     *
+     * @returns {String} Path
+     */
 
+  }, {
+    key: "getPath",
+    value: function getPath(query, filename) {
+      // The "query" variable is a syntax for getting the paths defined in the config
+      var lvl1 = query ? query.split('/')[0] : null;
+      var lvl2 = query ? query.split('/')[1] : null; // Start with the root path
 
-  _proto.getRootPath = function getRootPath() {
-    throw new Error('The method "getRootPath" must be overridden');
-  };
-  /**
-   * Gets a deployment path
-   *
-   * @param {String} query
-   * @param {String} filename
-   *
-   * @returns {String} Path
-   */
+      var path = this.getRootPath(); // Add slash if needed
 
-
-  _proto.getPath = function getPath(query, filename) {
-    // The "query" variable is a syntax for getting the paths defined in the config
-    var lvl1 = query ? query.split('/')[0] : null;
-    var lvl2 = query ? query.split('/')[1] : null; // Start with the root path
-
-    var path = this.getRootPath(); // Add slash if needed
-
-    if (path.lastIndexOf('/') !== path.length - 1) {
-      path += '/';
-    } // Add level 2 path if it exists
-
-
-    if (lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
-      path += this.paths[lvl1][lvl2];
-    } // Add level 1 path if it exists
-    else if (lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
-        path += this.paths[lvl1];
-      } // Add slash if needed
+      if (path.lastIndexOf('/') !== path.length - 1) {
+        path += '/';
+      } // Add level 2 path if it exists
 
 
-    if (path.lastIndexOf('/') !== path.length - 1) {
-      path += '/';
-    } // Add filename if needed
+      if (lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
+        path += this.paths[lvl1][lvl2];
+      } // Add level 1 path if it exists
+      else if (lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
+          path += this.paths[lvl1];
+        } // Add slash if needed
 
 
-    if (filename) {
-      path += filename;
-    } // Remove any unwanted double slashes
+      if (path.lastIndexOf('/') !== path.length - 1) {
+        path += '/';
+      } // Add filename if needed
 
 
-    path = path.replace(/\/\//g, '/'); // Add back double slashes for protocols
-
-    path = path.replace(':/', '://');
-    return path;
-  };
-  /**
-   * Tests this deployment
-   *
-   * @returns {Promise} Result
-   */
+      if (filename) {
+        path += filename;
+      } // Remove any unwanted double slashes
 
 
-  _proto.test = function test() {
-    return Promise.reject(new Error('The "test" method should be overridden.'));
-  };
-  /**
-   * Renames a file
-   *
-   * @param {String} path
-   * @param {String} name
-   *
-   * @returns {Promise} Result
-   */
+      path = path.replace(/\/\//g, '/'); // Add back double slashes for protocols
 
+      path = path.replace(':/', '://');
+      return path;
+    }
+    /**
+     * Tests this deployment
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.renameFile = function renameFile(path, name) {
-    return Promise.reject(new Error('The "renameFile" method should be overridden.'));
-  };
-  /**
-   * Sets a file
-   *
-   * @param {String} path
-   * @param {String} base64
-   *
-   * @returns {Promise} Result
-   */
+  }, {
+    key: "test",
+    value: function test() {
+      return Promise.reject(new Error('The "test" method should be overridden.'));
+    }
+    /**
+     * Renames a file
+     *
+     * @param {String} path
+     * @param {String} name
+     *
+     * @returns {Promise} Result
+     */
 
+  }, {
+    key: "renameFile",
+    value: function renameFile(path, name) {
+      return Promise.reject(new Error('The "renameFile" method should be overridden.'));
+    }
+    /**
+     * Sets a file
+     *
+     * @param {String} path
+     * @param {String} base64
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.setFile = function setFile(path, content) {
-    return Promise.reject(new Error('The "setFile" method should be overridden.'));
-  };
-  /**
-   * Gets a file
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} File
-   */
+  }, {
+    key: "setFile",
+    value: function setFile(path, content) {
+      return Promise.reject(new Error('The "setFile" method should be overridden.'));
+    }
+    /**
+     * Gets a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} File
+     */
 
+  }, {
+    key: "getFile",
+    value: function getFile(path) {
+      return Promise.reject(new Error('The "getFile" method should be overridden.'));
+    }
+    /**
+     * Removes a file
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.getFile = function getFile(path) {
-    return Promise.reject(new Error('The "getFile" method should be overridden.'));
-  };
-  /**
-   * Removes a file
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Result
-   */
+  }, {
+    key: "removeFile",
+    value: function removeFile(path) {
+      return Promise.reject(new Error('The "removeFile" method should be overridden.'));
+    }
+    /**
+     * Gets a list of files
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Files
+     */
 
+  }, {
+    key: "getFolder",
+    value: function getFolder(path) {
+      return Promise.reject(new Error('The "getFolder" method should be overridden.'));
+    }
+    /**
+     * Removes a folder
+     *
+     * @param {String} path
+     *
+     * @returns {Promise} Result
+     */
 
-  _proto.removeFile = function removeFile(path) {
-    return Promise.reject(new Error('The "removeFile" method should be overridden.'));
-  };
-  /**
-   * Gets a list of files
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Files
-   */
-
-
-  _proto.getFolder = function getFolder(path) {
-    return Promise.reject(new Error('The "getFolder" method should be overridden.'));
-  };
-  /**
-   * Removes a folder
-   *
-   * @param {String} path
-   *
-   * @returns {Promise} Result
-   */
-
-
-  _proto.removeFolder = function removeFolder(path) {
-    return Promise.reject(new Error('The "removeFolder" method should be overridden.'));
-  };
+  }, {
+    key: "removeFolder",
+    value: function removeFolder(path) {
+      return Promise.reject(new Error('The "removeFolder" method should be overridden.'));
+    }
+  }]);
 
   return Deployer;
 }(Entity);
@@ -22037,7 +22138,23 @@ module.exports = Deployer;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -22050,51 +22167,57 @@ var Entity = __webpack_require__(41);
 var Resource =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Resource, _Entity);
+  _inherits(Resource, _Entity);
 
   function Resource() {
-    return _Entity.apply(this, arguments) || this;
+    _classCallCheck(this, Resource);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Resource).apply(this, arguments));
   }
 
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-  Resource.paramsCheck = function paramsCheck(params) {
-    params = params || {}; // Convert from old sync variables
+  _createClass(Resource, null, [{
+    key: "paramsCheck",
 
-    params.sync = params.sync || {};
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    value: function paramsCheck(params) {
+      params = params || {}; // Convert from old sync variables
 
-    if (typeof params.local !== 'undefined') {
-      if (typeof params.sync.isRemote === 'undefined') {
-        params.sync.hasRemote = params.local;
+      params.sync = params.sync || {};
+
+      if (typeof params.local !== 'undefined') {
+        if (typeof params.sync.isRemote === 'undefined') {
+          params.sync.hasRemote = params.local;
+        }
+
+        delete params.local;
       }
 
-      delete params.local;
+      if (typeof params.remote !== 'undefined') {
+        if (typeof params.sync.isRemote === 'undefined') {
+          params.sync.isRemote = params.remote;
+        }
+
+        delete params.remote;
+      } // Convert from old "locked" state
+
+
+      if (typeof params.locked !== 'undefined') {
+        if (typeof params.isLocked === 'undefined') {
+          params.isLocked = params.locked;
+        }
+
+        delete params.locked;
+      }
+
+      return params;
     }
-
-    if (typeof params.remote !== 'undefined') {
-      if (typeof params.sync.isRemote === 'undefined') {
-        params.sync.isRemote = params.remote;
-      }
-
-      delete params.remote;
-    } // Convert from old "locked" state
-
-
-    if (typeof params.locked !== 'undefined') {
-      if (typeof params.isLocked === 'undefined') {
-        params.isLocked = params.locked;
-      }
-
-      delete params.locked;
-    }
-
-    return params;
-  };
+  }]);
 
   return Resource;
 }(Entity);
@@ -22117,7 +22240,27 @@ module.exports = Resource;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Path = __webpack_require__(39);
 
@@ -22132,230 +22275,244 @@ var Resource = __webpack_require__(198);
 var Media =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Media, _Resource);
+  _inherits(Media, _Resource);
 
   function Media() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Media);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Media).apply(this, arguments));
   }
 
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-  Media.paramsCheck = function paramsCheck(params) {
-    params = _Resource.paramsCheck.call(this, params);
-    delete params.remote;
-    delete params.sync;
-    delete params.isRemote;
+  _createClass(Media, [{
+    key: "structure",
 
-    if (!params.folder) {
-      params.folder = '/';
+    /**
+     * Structure
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(String, 'icon', 'file-image-o');
+      this.def(String, 'name');
+      this.def(String, 'url');
+      this.def(String, 'path');
+      this.def(String, 'folder', '/');
+      this.def(Date, 'updateDate');
     }
+    /**
+     * Read from file path
+     *
+     * @param {String} filePath
+     */
 
-    return params;
-  };
-  /**
-   * Structure
-   */
+  }, {
+    key: "readFromFilePath",
+    value: function readFromFilePath(filePath) {
+      var name = Path.basename(filePath);
+      var id = filePath; // Trim file path for id 
 
+      id = id.replace('/' + name, '');
+      id = id.substring(id.lastIndexOf('/') + 1); // Remove file extension
 
-  var _proto = Media.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'icon', 'file-image-o');
-    this.def(String, 'name');
-    this.def(String, 'url');
-    this.def(String, 'path');
-    this.def(String, 'folder', '/');
-    this.def(Date, 'updateDate');
-  };
-  /**
-   * Read from file path
-   *
-   * @param {String} filePath
-   */
-
-
-  _proto.readFromFilePath = function readFromFilePath(filePath) {
-    var name = Path.basename(filePath);
-    var id = filePath; // Trim file path for id 
-
-    id = id.replace('/' + name, '');
-    id = id.substring(id.lastIndexOf('/') + 1); // Remove file extension
-
-    name = name.replace(/\.[^/.]+$/, '');
-    this.id = id;
-    this.name = name;
-    this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
-  };
-  /**
-   * Gets the content type header
-   *
-   * @returns {String} Content-Type header
-   */
-
-
-  _proto.getContentTypeHeader = function getContentTypeHeader() {
-    var name = (this.name || '').toLowerCase();
-    var extension = name.split('.');
-
-    if (extension && extension.length > 0) {
-      extension = extension[extension.length - 1];
+      name = name.replace(/\.[^/.]+$/, '');
+      this.id = id;
+      this.name = name;
+      this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
     }
+    /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
 
-    switch (extension) {
-      // Image types
-      case 'jpg':
-        return 'image/jpeg';
+  }, {
+    key: "getContentTypeHeader",
+    value: function getContentTypeHeader() {
+      var name = (this.name || '').toLowerCase();
+      var extension = name.split('.');
 
-      case 'png':
-        return 'image/png';
+      if (extension && extension.length > 0) {
+        extension = extension[extension.length - 1];
+      }
 
-      case 'gif':
-        return 'image/gif';
+      switch (extension) {
+        // Image types
+        case 'jpg':
+          return 'image/jpeg';
 
-      case 'bmp':
-        return 'image/bmp';
-      // Audio types
+        case 'png':
+          return 'image/png';
 
-      case 'm4a':
-        return 'audio/m4a';
+        case 'gif':
+          return 'image/gif';
 
-      case 'mp3':
-        return 'audio/mp3';
+        case 'bmp':
+          return 'image/bmp';
+        // Audio types
 
-      case 'ogg':
-        return 'audio/ogg';
+        case 'm4a':
+          return 'audio/m4a';
 
-      case 'wav':
-        return 'audio/wav';
-      // Video types
+        case 'mp3':
+          return 'audio/mp3';
 
-      case 'mp4':
-        return 'video/mp4';
+        case 'ogg':
+          return 'audio/ogg';
 
-      case 'webm':
-        return 'video/webm';
+        case 'wav':
+          return 'audio/wav';
+        // Video types
 
-      case 'avi':
-        return 'video/avi';
+        case 'mp4':
+          return 'video/mp4';
 
-      case 'mov':
-        return 'video/quicktime';
+        case 'webm':
+          return 'video/webm';
 
-      case 'bmp':
-        return 'video/bmp';
+        case 'avi':
+          return 'video/avi';
 
-      case 'wmv':
-        return 'video/x-ms-wmv';
+        case 'mov':
+          return 'video/quicktime';
 
-      case '3gp':
-        return 'video/3gpp';
+        case 'bmp':
+          return 'video/bmp';
 
-      case 'mkv':
-        return 'video/x-matroska';
-      // SVG
+        case 'wmv':
+          return 'video/x-ms-wmv';
 
-      case 'svg':
-        return 'image/svg+xml';
-      // PDF
+        case '3gp':
+          return 'video/3gpp';
 
-      case 'pdf':
-        return 'application/pdf';
-      // Everything else
+        case 'mkv':
+          return 'video/x-matroska';
+        // SVG
 
-      default:
-        return 'application/octet-stream';
+        case 'svg':
+          return 'image/svg+xml';
+        // PDF
+
+        case 'pdf':
+          return 'application/pdf';
+        // Everything else
+
+        default:
+          return 'application/octet-stream';
+      }
     }
-  };
-  /**
-   * Gets whether this is audio
-   *
-   * @returns {Boolean} Is audio
-   */
+    /**
+     * Gets whether this is audio
+     *
+     * @returns {Boolean} Is audio
+     */
 
+  }, {
+    key: "isAudio",
+    value: function isAudio() {
+      return this.getContentTypeHeader().indexOf('audio') > -1;
+    }
+    /**
+     * Gets whether this is a video
+     *
+     * @returns {Boolean} Is video
+     */
 
-  _proto.isAudio = function isAudio() {
-    return this.getContentTypeHeader().indexOf('audio') > -1;
-  };
-  /**
-   * Gets whether this is a video
-   *
-   * @returns {Boolean} Is video
-   */
+  }, {
+    key: "isVideo",
+    value: function isVideo() {
+      return this.getContentTypeHeader().indexOf('video') > -1;
+    }
+    /**
+     * Gets whether this is an image
+     *
+     * @returns {Boolean} Is image
+     */
 
+  }, {
+    key: "isImage",
+    value: function isImage() {
+      return this.getContentTypeHeader().indexOf('image') > -1;
+    }
+    /**
+     * Gets whether this is an SVG file
+     *
+     * @returns {Boolean} Is SVG file
+     */
 
-  _proto.isVideo = function isVideo() {
-    return this.getContentTypeHeader().indexOf('video') > -1;
-  };
-  /**
-   * Gets whether this is an image
-   *
-   * @returns {Boolean} Is image
-   */
+  }, {
+    key: "isSvg",
+    value: function isSvg() {
+      return this.getContentTypeHeader().indexOf('svg') > -1;
+    }
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
 
+  }, {
+    key: "isPdf",
+    value: function isPdf() {
+      return this.getContentTypeHeader().indexOf('pdf') > -1;
+    }
+    /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */
 
-  _proto.isImage = function isImage() {
-    return this.getContentTypeHeader().indexOf('image') > -1;
-  };
-  /**
-   * Gets whether this is an SVG file
-   *
-   * @returns {Boolean} Is SVG file
-   */
+  }, {
+    key: "applyFolderFromTree",
+    value: function applyFolderFromTree(tree) {
+      if (tree) {
+        for (var i in tree) {
+          var item = tree[i];
 
-
-  _proto.isSvg = function isSvg() {
-    return this.getContentTypeHeader().indexOf('svg') > -1;
-  };
-  /**
-   * Gets whether this is a PDF
-   *
-   * @returns {Boolean} Is PDF
-   */
-
-
-  _proto.isPdf = function isPdf() {
-    return this.getContentTypeHeader().indexOf('pdf') > -1;
-  };
-  /**
-   * Applies folder string from tree
-   *
-   * @param {Object} tree
-   */
-
-
-  _proto.applyFolderFromTree = function applyFolderFromTree(tree) {
-    if (tree) {
-      for (var i in tree) {
-        var item = tree[i];
-
-        if (item.id == this.id) {
-          this.folder = item.folder;
-          break;
+          if (item.id == this.id) {
+            this.folder = item.folder;
+            break;
+          }
         }
       }
     }
-  };
-  /**
-   * Creates a new Media object
-   *
-   * @param {Object} file
-   *
-   * @return {Media} media
-   */
+    /**
+     * Creates a new Media object
+     *
+     * @param {Object} file
+     *
+     * @return {Media} media
+     */
 
+  }], [{
+    key: "paramsCheck",
 
-  Media.create = function create(file) {
-    var media = new Media({
-      id: Media.createId()
-    });
-    return media;
-  };
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    value: function paramsCheck(params) {
+      params = _get(_getPrototypeOf(Media), "paramsCheck", this).call(this, params);
+      delete params.remote;
+      delete params.sync;
+      delete params.isRemote;
+
+      if (!params.folder) {
+        params.folder = '/';
+      }
+
+      return params;
+    }
+  }, {
+    key: "create",
+    value: function create(file) {
+      var media = new Media({
+        id: Media.createId()
+      });
+      return media;
+    }
+  }]);
 
   return Media;
 }(Resource);
@@ -22401,7 +22558,23 @@ HashBrown.Models = {
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentCommon = __webpack_require__(218);
 /**
@@ -22414,51 +22587,56 @@ var ContentCommon = __webpack_require__(218);
 var Content =
 /*#__PURE__*/
 function (_ContentCommon) {
-  _inheritsLoose(Content, _ContentCommon);
+  _inherits(Content, _ContentCommon);
 
   function Content() {
-    return _ContentCommon.apply(this, arguments) || this;
+    _classCallCheck(this, Content);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Content).apply(this, arguments));
   }
 
-  var _proto = Content.prototype;
+  _createClass(Content, [{
+    key: "getSettings",
 
-  /**
-   * Gets settings
-   *
-   * @param {String} key
-   *
-   * @returns {Object} Settings
-   */
-  _proto.getSettings = function getSettings(key) {
-    var parentContent = this.getParent(); // Loop through parents to find governing setting
+    /**
+     * Gets settings
+     *
+     * @param {String} key
+     *
+     * @returns {Object} Settings
+     */
+    value: function getSettings(key) {
+      var parentContent = this.getParent(); // Loop through parents to find governing setting
 
-    while (parentContent != null) {
-      parentContent.settingsSanityCheck(key); // We found a governing parent, return those settings
+      while (parentContent != null) {
+        parentContent.settingsSanityCheck(key); // We found a governing parent, return those settings
 
-      if (parentContent.settings[key].applyToChildren) {
-        var settings = parentContent.settings; // Make clone as to avoid interference with inherent values
+        if (parentContent.settings[key].applyToChildren) {
+          var settings = parentContent.settings; // Make clone as to avoid interference with inherent values
 
-        settings = JSON.parse(JSON.stringify(settings));
-        settings[key].governedBy = parentContent.id;
-        return settings[key];
+          settings = JSON.parse(JSON.stringify(settings));
+          settings[key].governedBy = parentContent.id;
+          return settings[key];
+        }
+
+        parentContent = parentContent.getParent();
       }
 
-      parentContent = parentContent.getParent();
+      this.settingsSanityCheck(key);
+      return this.settings[key];
     }
+    /**
+     * Gets parent Content
+     *
+     * @returns {Content} Parent
+     */
 
-    this.settingsSanityCheck(key);
-    return this.settings[key];
-  };
-  /**
-   * Gets parent Content
-   *
-   * @returns {Content} Parent
-   */
-
-
-  _proto.getParent = function getParent() {
-    return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
-  };
+  }, {
+    key: "getParent",
+    value: function getParent() {
+      return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
+    }
+  }]);
 
   return Content;
 }(ContentCommon);
@@ -22472,7 +22650,27 @@ module.exports = Content;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Resource = __webpack_require__(198);
 /**
@@ -22485,346 +22683,363 @@ var Resource = __webpack_require__(198);
 var Content =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Content, _Resource);
+  _inherits(Content, _Resource);
 
   function Content() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Content);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Content).apply(this, arguments));
   }
 
-  var _proto = Content.prototype;
+  _createClass(Content, [{
+    key: "structure",
+    value: function structure() {
+      // Fundamental fields
+      this.def(String, 'id');
+      this.def(String, 'parentId');
+      this.def(String, 'createdBy');
+      this.def(String, 'updatedBy');
+      this.def(Date, 'createDate');
+      this.def(Date, 'updateDate');
+      this.def(String, 'schemaId');
+      this.def(Number, 'sort', -1);
+      this.def(Boolean, 'isLocked'); // Publishing
 
-  _proto.structure = function structure() {
-    // Fundamental fields
-    this.def(String, 'id');
-    this.def(String, 'parentId');
-    this.def(String, 'createdBy');
-    this.def(String, 'updatedBy');
-    this.def(Date, 'createDate');
-    this.def(Date, 'updateDate');
-    this.def(String, 'schemaId');
-    this.def(Number, 'sort', -1);
-    this.def(Boolean, 'isLocked'); // Publishing
+      this.def(Date, 'publishOn');
+      this.def(Date, 'unpublishOn');
+      this.def(Boolean, 'isPublished');
+      this.def(Boolean, 'hasPreview'); // Sync
 
-    this.def(Date, 'publishOn');
-    this.def(Date, 'unpublishOn');
-    this.def(Boolean, 'isPublished');
-    this.def(Boolean, 'hasPreview'); // Sync
+      this.def(Object, 'sync'); // Extensible properties
 
-    this.def(Object, 'sync'); // Extensible properties
+      this.def(Object, 'properties', {}); // Settings
 
-    this.def(Object, 'properties', {}); // Settings
-
-    this.def(Object, 'settings', {
-      publishing: {
-        connectionId: ''
-      }
-    });
-  };
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  Content.paramsCheck = function paramsCheck(params) {
-    params = _Resource.paramsCheck.call(this, params); // Ensure correct type for dates
-
-    function parseDate(input) {
-      var result;
-
-      if (typeof input === 'string' && !isNaN(input)) {
-        result = new Date(parseInt(input));
-      } else {
-        result = new Date(input);
-      }
-
-      return result;
-    }
-
-    params.createDate = parseDate(params.createDate);
-    params.updateDate = parseDate(params.updateDate);
-    return params;
-  };
-  /**
-   * Creates a new Content object
-   *
-   * @param {String} schemaId
-   * @param {Object} properties
-   *
-   * @returns {Content} New Content object
-   */
-
-
-  Content.create = function create(schemaId, properties) {
-    if (typeof schemaId !== 'string') {
-      throw new Error('Schema ID was not provided');
-    }
-
-    var defaultProperties = {
-      title: 'New content'
-    };
-    var content = new Content({
-      id: Content.createId(),
-      createDate: new Date(),
-      updateDate: new Date(),
-      schemaId: schemaId,
-      properties: properties || defaultProperties
-    });
-    return content;
-  };
-  /**
-   * Adopts a list of tasks, turning them into un/publish dates
-   *
-   * @param {Array} tasks
-   */
-
-
-  _proto.adoptTasks = function adoptTasks(tasks) {
-    if (!tasks) {
-      return;
-    }
-
-    for (var i in tasks) {
-      switch (tasks[i].type) {
-        case 'publish':
-          this.publishOn = tasks[i].date;
-          break;
-
-        case 'unpublish':
-          this.unpublishOn = tasks[i].date;
-          break;
-      }
-    }
-  };
-  /**
-   * Gets parent Content
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @returns {Promise} Parent
-   */
-
-
-  _proto.getParent = function getParent(project, environment) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-
-    if (!this.parentId) {
-      return Promise.resolve(null);
-    }
-
-    return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
-      return Promise.resolve(parentContent);
-    }).catch(function (e) {
-      return Promise.resolve(null);
-    });
-  };
-  /**
-   * Gets all parents
-   *
-   * @param {String} project
-   * @param {String} environment
-   *
-   * @returns {Promise} parents
-   */
-
-
-  _proto.getParents = function getParents(project, environment) {
-    checkParam(project, 'project', String);
-    checkParam(environment, 'environment', String);
-    var parents = [];
-
-    var getNextParent = function getNextParent(content) {
-      return content.getParent(project, environment).then(function (parentContent) {
-        if (parentContent) {
-          parents.push(parentContent);
-          return getNextParent(parentContent);
-        } else {
-          return Promise.resolve(parents);
+      this.def(Object, 'settings', {
+        publishing: {
+          connectionId: ''
         }
       });
-    };
-
-    return getNextParent(this);
-  };
-  /**
-   * Settings sanity check
-   *
-   * @param {String} key
-   */
-
-
-  _proto.settingsSanityCheck = function settingsSanityCheck(key) {
-    this.settings = this.settings || {};
-
-    if (key) {
-      this.settings[key] = this.settings[key] || {};
     }
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-    this.settings.publishing = this.settings.publishing || {};
+  }, {
+    key: "adoptTasks",
 
-    if (Array.isArray(this.settings.publishing.connections)) {
-      this.settings.publishing.connectionId = this.settings.publishing.connections[0];
-      delete this.settings.publishing.connections;
-    }
-  };
-  /**
-   * Gets settings
-   *
-   * @param {String} key
-   *
-   * @returns {Promise} Settings
-   */
+    /**
+     * Adopts a list of tasks, turning them into un/publish dates
+     *
+     * @param {Array} tasks
+     */
+    value: function adoptTasks(tasks) {
+      if (!tasks) {
+        return;
+      }
 
+      for (var i in tasks) {
+        switch (tasks[i].type) {
+          case 'publish':
+            this.publishOn = tasks[i].date;
+            break;
 
-  _proto.getSettings = function getSettings(key) {
-    return Promise.resolve({});
-  };
-  /**
-   * Gets all meta fields
-   *
-   * @returns {Object} Meta
-   */
-
-
-  _proto.getMeta = function getMeta() {
-    return {
-      id: this.id,
-      parentId: this.parentId,
-      schemaId: this.schemaId,
-      createDate: this.createDate,
-      updateDate: this.updateDate,
-      createdBy: this.createdBy,
-      updatedBy: this.updatedBy,
-      sort: this.sort
-    };
-  };
-  /**
-   * Shorthand to get property value
-   *
-   * @param {String} key
-   * @param {String} language
-   *
-   * @returns {Object} value
-   */
-
-
-  _proto.prop = function prop(key, language) {
-    return this.getPropertyValue(key, language);
-  };
-  /**
-   * Gets a property value
-   *
-   * @param {String} key
-   * @param {String} language
-   *
-   * @returns {Object} value
-   */
-
-
-  _proto.getPropertyValue = function getPropertyValue(key, language) {
-    if (!this.properties) {
-      this.properties = {};
-    }
-
-    if (language && typeof this.properties[key] === 'object') {
-      return this.properties[key][language];
-    } else {
-      return this.properties[key];
-    }
-  };
-  /**
-   * Sets a property value
-   *
-   * @param {String} key
-   * @param {String|Number|Object} value
-   * @param {String} language
-   */
-
-
-  _proto.setPropertyValue = function setPropertyValue(key, value, language) {
-    if (!this.properties) {
-      this.properties = {};
-    }
-
-    if (language && typeof this.properties[key] === 'object') {
-      this.properties[key][language] = value;
-    } else {
-      this.properties[key] = value;
-    }
-  };
-  /**
-   * Returns all properties in a given language
-   *
-   * @param {String} language
-   *
-   * @returns {Object} properties
-   */
-
-
-  _proto.getLocalizedProperties = function getLocalizedProperties(language) {
-    // Create references
-    // NOTE: We're cloning the "properties" value to avoid destroying the structure
-    var localizedProperties = {};
-    var allProperties = JSON.parse(JSON.stringify(this.properties)); // Flatten properties recursively
-
-    function flattenRecursively(source, target) {
-      // Loop through all keys
-      for (var key in source) {
-        var value = source[key]; // If the value is an object type, examine it further
-
-        if (value && typeof value === 'object') {
-          // If multilingual flag is set, assign value directly
-          if (value._multilingual) {
-            if (typeof value[language] === 'undefined') {
-              value[language] = null;
-            }
-
-            target[key] = value[language]; // If not, recurse into the object
-          } else {
-            // Prepare target data type for either Object or Array
-            if (Array.isArray(value)) {
-              target[key] = [];
-            } else {
-              target[key] = {};
-            }
-
-            flattenRecursively(value, target[key]);
-          } // If not, just return the localised value
-
-        } else {
-          target[key] = value;
+          case 'unpublish':
+            this.unpublishOn = tasks[i].date;
+            break;
         }
       }
     }
+    /**
+     * Gets parent Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Parent
+     */
 
-    flattenRecursively(allProperties, localizedProperties);
-    return localizedProperties;
-  };
-  /**
-   * Gets the content type
-   *
-   * @returns {String} type
-   */
+  }, {
+    key: "getParent",
+    value: function getParent(project, environment) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
 
+      if (!this.parentId) {
+        return Promise.resolve(null);
+      }
 
-  _proto.getType = function getType() {
-    return this.constructor.name;
-  };
-  /**
-   * Gets the schema information
-   *
-   * @returns {Promise} Schema
-   */
+      return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
+        return Promise.resolve(parentContent);
+      }).catch(function (e) {
+        return Promise.resolve(null);
+      });
+    }
+    /**
+     * Gets all parents
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} parents
+     */
 
+  }, {
+    key: "getParents",
+    value: function getParents(project, environment) {
+      checkParam(project, 'project', String);
+      checkParam(environment, 'environment', String);
+      var parents = [];
 
-  _proto.getSchema = function getSchema() {
-    return Promise.resolve();
-  };
+      var getNextParent = function getNextParent(content) {
+        return content.getParent(project, environment).then(function (parentContent) {
+          if (parentContent) {
+            parents.push(parentContent);
+            return getNextParent(parentContent);
+          } else {
+            return Promise.resolve(parents);
+          }
+        });
+      };
+
+      return getNextParent(this);
+    }
+    /**
+     * Settings sanity check
+     *
+     * @param {String} key
+     */
+
+  }, {
+    key: "settingsSanityCheck",
+    value: function settingsSanityCheck(key) {
+      this.settings = this.settings || {};
+
+      if (key) {
+        this.settings[key] = this.settings[key] || {};
+      }
+
+      this.settings.publishing = this.settings.publishing || {};
+
+      if (Array.isArray(this.settings.publishing.connections)) {
+        this.settings.publishing.connectionId = this.settings.publishing.connections[0];
+        delete this.settings.publishing.connections;
+      }
+    }
+    /**
+     * Gets settings
+     *
+     * @param {String} key
+     *
+     * @returns {Promise} Settings
+     */
+
+  }, {
+    key: "getSettings",
+    value: function getSettings(key) {
+      return Promise.resolve({});
+    }
+    /**
+     * Gets all meta fields
+     *
+     * @returns {Object} Meta
+     */
+
+  }, {
+    key: "getMeta",
+    value: function getMeta() {
+      return {
+        id: this.id,
+        parentId: this.parentId,
+        schemaId: this.schemaId,
+        createDate: this.createDate,
+        updateDate: this.updateDate,
+        createdBy: this.createdBy,
+        updatedBy: this.updatedBy,
+        sort: this.sort
+      };
+    }
+    /**
+     * Shorthand to get property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @returns {Object} value
+     */
+
+  }, {
+    key: "prop",
+    value: function prop(key, language) {
+      return this.getPropertyValue(key, language);
+    }
+    /**
+     * Gets a property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @returns {Object} value
+     */
+
+  }, {
+    key: "getPropertyValue",
+    value: function getPropertyValue(key, language) {
+      if (!this.properties) {
+        this.properties = {};
+      }
+
+      if (language && _typeof(this.properties[key]) === 'object') {
+        return this.properties[key][language];
+      } else {
+        return this.properties[key];
+      }
+    }
+    /**
+     * Sets a property value
+     *
+     * @param {String} key
+     * @param {String|Number|Object} value
+     * @param {String} language
+     */
+
+  }, {
+    key: "setPropertyValue",
+    value: function setPropertyValue(key, value, language) {
+      if (!this.properties) {
+        this.properties = {};
+      }
+
+      if (language && _typeof(this.properties[key]) === 'object') {
+        this.properties[key][language] = value;
+      } else {
+        this.properties[key] = value;
+      }
+    }
+    /**
+     * Returns all properties in a given language
+     *
+     * @param {String} language
+     *
+     * @returns {Object} properties
+     */
+
+  }, {
+    key: "getLocalizedProperties",
+    value: function getLocalizedProperties(language) {
+      // Create references
+      // NOTE: We're cloning the "properties" value to avoid destroying the structure
+      var localizedProperties = {};
+      var allProperties = JSON.parse(JSON.stringify(this.properties)); // Flatten properties recursively
+
+      function flattenRecursively(source, target) {
+        // Loop through all keys
+        for (var key in source) {
+          var value = source[key]; // If the value is an object type, examine it further
+
+          if (value && _typeof(value) === 'object') {
+            // If multilingual flag is set, assign value directly
+            if (value._multilingual) {
+              if (typeof value[language] === 'undefined') {
+                value[language] = null;
+              }
+
+              target[key] = value[language]; // If not, recurse into the object
+            } else {
+              // Prepare target data type for either Object or Array
+              if (Array.isArray(value)) {
+                target[key] = [];
+              } else {
+                target[key] = {};
+              }
+
+              flattenRecursively(value, target[key]);
+            } // If not, just return the localised value
+
+          } else {
+            target[key] = value;
+          }
+        }
+      }
+
+      flattenRecursively(allProperties, localizedProperties);
+      return localizedProperties;
+    }
+    /**
+     * Gets the content type
+     *
+     * @returns {String} type
+     */
+
+  }, {
+    key: "getType",
+    value: function getType() {
+      return this.constructor.name;
+    }
+    /**
+     * Gets the schema information
+     *
+     * @returns {Promise} Schema
+     */
+
+  }, {
+    key: "getSchema",
+    value: function getSchema() {
+      return Promise.resolve();
+    }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      params = _get(_getPrototypeOf(Content), "paramsCheck", this).call(this, params); // Ensure correct type for dates
+
+      function parseDate(input) {
+        var result;
+
+        if (typeof input === 'string' && !isNaN(input)) {
+          result = new Date(parseInt(input));
+        } else {
+          result = new Date(input);
+        }
+
+        return result;
+      }
+
+      params.createDate = parseDate(params.createDate);
+      params.updateDate = parseDate(params.updateDate);
+      return params;
+    }
+    /**
+     * Creates a new Content object
+     *
+     * @param {String} schemaId
+     * @param {Object} properties
+     *
+     * @returns {Content} New Content object
+     */
+
+  }, {
+    key: "create",
+    value: function create(schemaId, properties) {
+      if (typeof schemaId !== 'string') {
+        throw new Error('Schema ID was not provided');
+      }
+
+      var defaultProperties = {
+        title: 'New content'
+      };
+      var content = new Content({
+        id: Content.createId(),
+        createDate: new Date(),
+        updateDate: new Date(),
+        schemaId: schemaId,
+        properties: properties || defaultProperties
+      });
+      return content;
+    }
+  }]);
 
   return Content;
 }(Resource);
@@ -22838,7 +23053,27 @@ module.exports = Content;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ConnectionCommon = __webpack_require__(38);
 /**
@@ -22851,23 +23086,27 @@ var ConnectionCommon = __webpack_require__(38);
 var Connection =
 /*#__PURE__*/
 function (_ConnectionCommon) {
-  _inheritsLoose(Connection, _ConnectionCommon);
+  _inherits(Connection, _ConnectionCommon);
 
   function Connection() {
-    return _ConnectionCommon.apply(this, arguments) || this;
+    _classCallCheck(this, Connection);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Connection).apply(this, arguments));
   }
 
-  var _proto = Connection.prototype;
+  _createClass(Connection, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    _ConnectionCommon.prototype.structure.call(this);
+    /**
+     * Structure
+     */
+    value: function structure() {
+      _get(_getPrototypeOf(Connection.prototype), "structure", this).call(this);
 
-    this.def(Object, 'processor', {});
-    this.def(Object, 'deployer', {});
-  };
+      this.def(Object, 'processor', {});
+      this.def(Object, 'deployer', {});
+    }
+  }]);
 
   return Connection;
 }(ConnectionCommon);
@@ -22881,7 +23120,27 @@ module.exports = Connection;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Schema = __webpack_require__(221);
 /**
@@ -22894,58 +23153,63 @@ var Schema = __webpack_require__(221);
 var ContentSchema =
 /*#__PURE__*/
 function (_Schema) {
-  _inheritsLoose(ContentSchema, _Schema);
+  _inherits(ContentSchema, _Schema);
 
   function ContentSchema(properties) {
-    return _Schema.call(this, ContentSchema.paramsCheck(properties)) || this;
+    _classCallCheck(this, ContentSchema);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContentSchema).call(this, ContentSchema.paramsCheck(properties)));
   }
 
-  var _proto = ContentSchema.prototype;
+  _createClass(ContentSchema, [{
+    key: "structure",
+    value: function structure() {
+      _get(_getPrototypeOf(ContentSchema.prototype), "structure", this).call(this);
 
-  _proto.structure = function structure() {
-    _Schema.prototype.structure.call(this);
-
-    this.def(String, 'defaultTabId');
-    this.def(Object, 'tabs', {});
-    this.def(Object, 'fields', {
-      properties: {}
-    });
-    this.def(Array, 'allowedChildSchemas', []);
-    this.name = 'New content schema';
-    this.type = 'content';
-  };
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  ContentSchema.paramsCheck = function paramsCheck(params) {
-    if (!params.fields) {
-      params.fields = {};
+      this.def(String, 'defaultTabId');
+      this.def(Object, 'tabs', {});
+      this.def(Object, 'fields', {
+        properties: {}
+      });
+      this.def(Array, 'allowedChildSchemas', []);
+      this.name = 'New content schema';
+      this.type = 'content';
     }
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-    if (!params.fields.properties) {
-      params.fields.properties = {};
+  }, {
+    key: "isDefaultTab",
+
+    /**
+     * Checks whether a tab is the default one
+     *
+     * @param {String} tabId
+     *
+     * @returns {Boolean} Is the tab default
+     */
+    value: function isDefaultTab(tabId) {
+      return !this.defaultTabId && tabId === 'meta' || this.defaultTabId === tabId;
     }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      if (!params.fields) {
+        params.fields = {};
+      }
 
-    return _Schema.paramsCheck.call(this, params);
-  };
-  /**
-   * Checks whether a tab is the default one
-   *
-   * @param {String} tabId
-   *
-   * @returns {Boolean} Is the tab default
-   */
+      if (!params.fields.properties) {
+        params.fields.properties = {};
+      }
 
-
-  _proto.isDefaultTab = function isDefaultTab(tabId) {
-    return !this.defaultTabId && tabId === 'meta' || this.defaultTabId === tabId;
-  };
+      return _get(_getPrototypeOf(ContentSchema), "paramsCheck", this).call(this, params);
+    }
+  }]);
 
   return ContentSchema;
 }(Schema);
@@ -22959,7 +23223,23 @@ module.exports = ContentSchema;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Resource = __webpack_require__(198);
 /**
@@ -22972,69 +23252,76 @@ var Resource = __webpack_require__(198);
 var Schema =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Schema, _Resource);
+  _inherits(Schema, _Resource);
 
   function Schema() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Schema);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Schema).apply(this, arguments));
   }
 
-  var _proto = Schema.prototype;
+  _createClass(Schema, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(String, 'name');
-    this.def(String, 'icon');
-    this.def(String, 'type');
-    this.def(String, 'parentSchemaId');
-    this.def(Boolean, 'isLocked'); // Sync
+    /**
+     * Structure
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(String, 'name');
+      this.def(String, 'icon');
+      this.def(String, 'type');
+      this.def(String, 'parentSchemaId');
+      this.def(Boolean, 'isLocked'); // Sync
 
-    this.def(Object, 'sync');
-    this.def(Array, 'hiddenProperties', []);
-  };
-  /**
-   * Gets a URL safe name for this schema
-   *
-   * @return {String} URL safe name
-   */
+      this.def(Object, 'sync');
+      this.def(Array, 'hiddenProperties', []);
+    }
+    /**
+     * Gets a URL safe name for this schema
+     *
+     * @return {String} URL safe name
+     */
 
+  }, {
+    key: "getUrlSafeName",
+    value: function getUrlSafeName() {
+      return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    }
+    /**
+     * Checks whether a property is hidden
+     *
+     * @param {String} name
+     *
+     * @returns {Boolean} Is hidden
+     */
 
-  _proto.getUrlSafeName = function getUrlSafeName() {
-    return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  };
-  /**
-   * Checks whether a property is hidden
-   *
-   * @param {String} name
-   *
-   * @returns {Boolean} Is hidden
-   */
+  }, {
+    key: "isPropertyHidden",
+    value: function isPropertyHidden(name) {
+      return this.hiddenProperties.indexOf(name) > -1;
+    }
+    /**
+     * Creates a new schema
+     *
+     * @param {Schema} parentSchema
+     *
+     * @returns {Schema} schema
+     */
 
-
-  _proto.isPropertyHidden = function isPropertyHidden(name) {
-    return this.hiddenProperties.indexOf(name) > -1;
-  };
-  /**
-   * Creates a new schema
-   *
-   * @param {Schema} parentSchema
-   *
-   * @returns {Schema} schema
-   */
-
-
-  Schema.create = function create(parentSchema) {
-    checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
-    return HashBrown.Helpers.SchemaHelper.getModel({
-      id: Schema.createId(),
-      icon: parentSchema.icon || 'file',
-      type: parentSchema.type,
-      editorId: parentSchema.editorId,
-      parentSchemaId: parentSchema.id
-    });
-  };
+  }], [{
+    key: "create",
+    value: function create(parentSchema) {
+      checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+      return HashBrown.Helpers.SchemaHelper.getModel({
+        id: Schema.createId(),
+        icon: parentSchema.icon || 'file',
+        type: parentSchema.type,
+        editorId: parentSchema.editorId,
+        parentSchemaId: parentSchema.id
+      });
+    }
+  }]);
 
   return Schema;
 }(Resource);
@@ -23048,7 +23335,27 @@ module.exports = Schema;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Schema = __webpack_require__(221);
 /**
@@ -23061,64 +23368,70 @@ var Schema = __webpack_require__(221);
 var FieldSchema =
 /*#__PURE__*/
 function (_Schema) {
-  _inheritsLoose(FieldSchema, _Schema);
+  _inherits(FieldSchema, _Schema);
 
   function FieldSchema() {
-    return _Schema.apply(this, arguments) || this;
+    _classCallCheck(this, FieldSchema);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(FieldSchema).apply(this, arguments));
   }
 
-  var _proto = FieldSchema.prototype;
+  _createClass(FieldSchema, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    _Schema.prototype.structure.call(this);
+    /**
+     * Structure
+     */
+    value: function structure() {
+      _get(_getPrototypeOf(FieldSchema.prototype), "structure", this).call(this);
 
-    this.def(String, 'editorId');
-    this.def(Object, 'config', {});
-    this.name = 'New field schema';
-    this.type = 'field';
-  };
-  /**
-   * Checks the format of the params
-   *
-   * @params {Object} params
-   *
-   * @returns {Object} Params
-   */
-
-
-  FieldSchema.paramsCheck = function paramsCheck(params) {
-    params = _Schema.paramsCheck.call(this, params); // Backwards compatible editor names
-
-    if (params.editorId && params.editorId.indexOf('Editor') < 0) {
-      params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
+      this.def(String, 'editorId');
+      this.def(Object, 'config', {});
+      this.name = 'New field schema';
+      this.type = 'field';
     }
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
 
-    return params;
-  };
-  /**
-   * Appends properties to this config
-   *
-   * @param {Object} config
-   */
+  }, {
+    key: "appendConfig",
 
-
-  _proto.appendConfig = function appendConfig(config) {
-    function recurse(source, target) {
-      for (var k in source) {
-        // If key doesn't exist, append immediately
-        if (!target[k]) {
-          target[k] = source[k];
-        } else if (target[k] instanceof Object && source[k] instanceof Object || target[k] instanceof Array && source[k] instanceof Array) {
-          recurse(source[k], target[k]);
+    /**
+     * Appends properties to this config
+     *
+     * @param {Object} config
+     */
+    value: function appendConfig(config) {
+      function recurse(source, target) {
+        for (var k in source) {
+          // If key doesn't exist, append immediately
+          if (!target[k]) {
+            target[k] = source[k];
+          } else if (target[k] instanceof Object && source[k] instanceof Object || target[k] instanceof Array && source[k] instanceof Array) {
+            recurse(source[k], target[k]);
+          }
         }
       }
-    }
 
-    recurse(config, this.config);
-  };
+      recurse(config, this.config);
+    }
+  }], [{
+    key: "paramsCheck",
+    value: function paramsCheck(params) {
+      params = _get(_getPrototypeOf(FieldSchema), "paramsCheck", this).call(this, params); // Backwards compatible editor names
+
+      if (params.editorId && params.editorId.indexOf('Editor') < 0) {
+        params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
+      }
+
+      return params;
+    }
+  }]);
 
   return FieldSchema;
 }(Schema);
@@ -23132,7 +23445,31 @@ module.exports = FieldSchema;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Resource = __webpack_require__(198);
 /**
@@ -23145,131 +23482,147 @@ var Resource = __webpack_require__(198);
 var Form =
 /*#__PURE__*/
 function (_Resource) {
-  _inheritsLoose(Form, _Resource);
+  _inherits(Form, _Resource);
 
   function Form() {
-    return _Resource.apply(this, arguments) || this;
+    _classCallCheck(this, Form);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Form).apply(this, arguments));
   }
 
-  var _proto = Form.prototype;
+  _createClass(Form, [{
+    key: "structure",
 
-  /**
-   * Structure
-   */
-  _proto.structure = function structure() {
-    // Fundamental fields
-    this.def(String, 'id');
-    this.def(String, 'title');
-    this.def(String, 'allowedOrigin');
-    this.def(String, 'redirect');
-    this.def(Boolean, 'appendRedirect');
-    this.def(Boolean, 'isLocked'); // Sync
+    /**
+     * Structure
+     */
+    value: function structure() {
+      // Fundamental fields
+      this.def(String, 'id');
+      this.def(String, 'title');
+      this.def(String, 'allowedOrigin');
+      this.def(String, 'redirect');
+      this.def(Boolean, 'appendRedirect');
+      this.def(Boolean, 'isLocked'); // Sync
 
-    this.def(Object, 'sync'); // Mutable fields
+      this.def(Object, 'sync'); // Mutable fields
 
-    this.def(Object, 'inputs', {});
-    this.def(Array, 'entries', []);
-  };
-  /**
-   * Creates a new Form object
-   *
-   * @return {Form} form
-   */
-
-
-  Form.create = function create() {
-    var form = new Form({
-      id: Form.createId(),
-      title: 'New form',
-      inputs: {},
-      entries: []
-    });
-    return form;
-  };
-  /**
-   * Clears all entries
-   */
-
-
-  _proto.clearAllEntries = function clearAllEntries() {
-    this.entries = [];
-  };
-  /**
-   * Adds an entry
-   *
-   * @param {Object} entry
-   */
-
-
-  _proto.addEntry = function addEntry(entry) {
-    if (!entry) {
-      return;
+      this.def(Object, 'inputs', {});
+      this.def(Array, 'entries', []);
     }
+    /**
+     * Creates a new Form object
+     *
+     * @return {Form} form
+     */
 
-    var filteredEntry = {};
-    var duplicateChecks = {}; // Only accept values as defined by the "inputs" variable
+  }, {
+    key: "clearAllEntries",
 
-    for (var k in this.inputs) {
-      // Register fields to check for duplicates
-      if (this.inputs[k].checkDuplicates) {
-        duplicateChecks[k] = {};
-      } // Apply regex pattern
+    /**
+     * Clears all entries
+     */
+    value: function clearAllEntries() {
+      this.entries = [];
+    }
+    /**
+     * Adds an entry
+     *
+     * @param {Object} entry
+     */
 
-
-      if (this.inputs[k].pattern) {
-        var regexp = new RegExp(this.inputs[k].pattern);
-
-        if (!regexp.test(entry[k])) {
-          throw new Error('Field "' + k + '" is incorrectly formatted');
-        }
-      } // Check if a required field is missing
-
-
-      if (this.inputs[k].required == true && !entry[k]) {
-        throw new Error('Field "' + k + '" is required');
+  }, {
+    key: "addEntry",
+    value: function addEntry(entry) {
+      if (!entry) {
+        return;
       }
 
-      filteredEntry[k] = entry[k];
-    } // Copy to new entries array to avoid changing original before duplicate check
+      var filteredEntry = {};
+      var duplicateChecks = {}; // Only accept values as defined by the "inputs" variable
+
+      for (var k in this.inputs) {
+        // Register fields to check for duplicates
+        if (this.inputs[k].checkDuplicates) {
+          duplicateChecks[k] = {};
+        } // Apply regex pattern
 
 
-    var newEntries = (this.entries || []).concat(); // Add timestamp
+        if (this.inputs[k].pattern) {
+          var regexp = new RegExp(this.inputs[k].pattern);
 
-    filteredEntry.time = new Date().toISOString();
-    newEntries.push(filteredEntry); // Look for duplicates
+          if (!regexp.test(entry[k])) {
+            throw new Error('Field "' + k + '" is incorrectly formatted');
+          }
+        } // Check if a required field is missing
 
-    for (var duplicateKey in duplicateChecks) {
-      for (var _iterator = newEntries, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
 
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
+        if (this.inputs[k].required == true && !entry[k]) {
+          throw new Error('Field "' + k + '" is required');
         }
 
-        var _entry = _ref;
-
-        // Does this entry have the field we're checking for?
-        if (!_entry[duplicateKey]) {
-          continue;
-        } // Does this entry have a field value that already exists?
+        filteredEntry[k] = entry[k];
+      } // Copy to new entries array to avoid changing original before duplicate check
 
 
-        if (duplicateChecks[duplicateKey][_entry[duplicateKey]]) {
-          throw new Error('Field "' + duplicateKey + '" is a duplicate');
+      var newEntries = _toConsumableArray(this.entries || []); // Add timestamp
+
+
+      filteredEntry.time = new Date().toISOString();
+      newEntries.push(filteredEntry); // Look for duplicates
+
+      for (var duplicateKey in duplicateChecks) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = newEntries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var _entry = _step.value;
+
+            // Does this entry have the field we're checking for?
+            if (!_entry[duplicateKey]) {
+              continue;
+            } // Does this entry have a field value that already exists?
+
+
+            if (duplicateChecks[duplicateKey][_entry[duplicateKey]]) {
+              throw new Error('Field "' + duplicateKey + '" is a duplicate');
+            }
+
+            duplicateChecks[duplicateKey][_entry[duplicateKey]] = true;
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
         }
-
-        duplicateChecks[duplicateKey][_entry[duplicateKey]] = true;
-      }
-    } // Assign new entries array to original variable
+      } // Assign new entries array to original variable
 
 
-    this.entries = newEntries;
-  };
+      this.entries = newEntries;
+    }
+  }], [{
+    key: "create",
+    value: function create() {
+      var form = new Form({
+        id: Form.createId(),
+        title: 'New form',
+        inputs: {},
+        entries: []
+      });
+      return form;
+    }
+  }]);
 
   return Form;
 }(Resource);
@@ -23283,7 +23636,23 @@ module.exports = Form;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 
@@ -23298,10 +23667,12 @@ var Connection = __webpack_require__(38);
 var Project =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(Project, _Entity);
+  _inherits(Project, _Entity);
 
   function Project(params) {
-    return _Entity.call(this, Project.checkParams(params)) || this;
+    _classCallCheck(this, Project);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Project).call(this, Project.checkParams(params)));
   }
   /**
    * Performs a sanity check of the params
@@ -23312,98 +23683,102 @@ function (_Entity) {
    */
 
 
-  Project.checkParams = function checkParams(params) {
-    params = params || {};
+  _createClass(Project, [{
+    key: "structure",
 
-    if (!params.id) {
-      throw new Error('No id was provided for the Project constructor');
+    /**
+     * Defines the structure of this project
+     */
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(Array, 'users', []);
+      this.def(Object, 'settings', {});
+      this.def(Array, 'environments', []);
+      this.def(Array, 'backups', []);
     }
+    /**
+     * Creates a database safe name
+     *
+     * @param {String} name
+     *
+     * @returns {String} Safe name
+     */
 
-    if (!params.settings) {
-      params.settings = {};
-    }
+  }], [{
+    key: "checkParams",
+    value: function checkParams(params) {
+      params = params || {};
 
-    if (!params.settings.info) {
-      params.settings.info = {};
-    }
-
-    if (!params.settings.info.name) {
-      params.settings.info.name = params.id;
-    }
-
-    if (!params.settings.languages) {
-      params.settings.languages = ['en'];
-    }
-
-    if (!params.settings.sync) {
-      params.settings.sync = {};
-    } // Delete old flags
-
-
-    delete params.useAutoBackup;
-    delete params.backupStorage; // Restore from old languages structure
-
-    if (!Array.isArray(params.settings.languages)) {
-      var languages = [];
-
-      for (var key in params.settings.languages) {
-        if (key === 'section') {
-          continue;
-        }
-
-        languages.push(params.settings.languages[key]);
+      if (!params.id) {
+        throw new Error('No id was provided for the Project constructor');
       }
 
-      params.settings.languages = languages;
+      if (!params.settings) {
+        params.settings = {};
+      }
+
+      if (!params.settings.info) {
+        params.settings.info = {};
+      }
+
+      if (!params.settings.info.name) {
+        params.settings.info.name = params.id;
+      }
+
+      if (!params.settings.languages) {
+        params.settings.languages = ['en'];
+      }
+
+      if (!params.settings.sync) {
+        params.settings.sync = {};
+      } // Delete old flags
+
+
+      delete params.useAutoBackup;
+      delete params.backupStorage; // Restore from old languages structure
+
+      if (!Array.isArray(params.settings.languages)) {
+        var languages = [];
+
+        for (var key in params.settings.languages) {
+          if (key === 'section') {
+            continue;
+          }
+
+          languages.push(params.settings.languages[key]);
+        }
+
+        params.settings.languages = languages;
+      }
+
+      return params;
     }
+  }, {
+    key: "safeName",
+    value: function safeName(name) {
+      return name.toLowerCase().replace('.', '_').replace(/[^a-z_]/g, '');
+    }
+    /**
+     * Creates a new project
+     *
+     * @param {String} name
+     *
+     * @returns {Project} New Project
+     */
 
-    return params;
-  };
-  /**
-   * Defines the structure of this project
-   */
-
-
-  var _proto = Project.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(Array, 'users', []);
-    this.def(Object, 'settings', {});
-    this.def(Array, 'environments', []);
-    this.def(Array, 'backups', []);
-  };
-  /**
-   * Creates a database safe name
-   *
-   * @param {String} name
-   *
-   * @returns {String} Safe name
-   */
-
-
-  Project.safeName = function safeName(name) {
-    return name.toLowerCase().replace('.', '_').replace(/[^a-z_]/g, '');
-  };
-  /**
-   * Creates a new project
-   *
-   * @param {String} name
-   *
-   * @returns {Project} New Project
-   */
-
-
-  Project.create = function create(name) {
-    var project = new Project({
-      id: Entity.createId()
-    });
-    project.settings.usedBy = 'project';
-    project.settings.info = {
-      name: name
-    };
-    return project;
-  };
+  }, {
+    key: "create",
+    value: function create(name) {
+      var project = new Project({
+        id: Entity.createId()
+      });
+      project.settings.usedBy = 'project';
+      project.settings.info = {
+        name: name
+      };
+      return project;
+    }
+  }]);
 
   return Project;
 }(Entity);
@@ -23417,7 +23792,23 @@ module.exports = Project;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Entity = __webpack_require__(41);
 /**
@@ -23430,136 +23821,143 @@ var Entity = __webpack_require__(41);
 var User =
 /*#__PURE__*/
 function (_Entity) {
-  _inheritsLoose(User, _Entity);
+  _inherits(User, _Entity);
 
   function User(params) {
-    return _Entity.call(this, params) || this;
+    _classCallCheck(this, User);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(User).call(this, params));
   }
 
-  var _proto = User.prototype;
-
-  _proto.structure = function structure() {
-    this.def(String, 'id');
-    this.def(Boolean, 'isAdmin', false);
-    this.def(Boolean, 'isCurrent', false);
-    this.def(String, 'username');
-    this.def(String, 'fullName');
-    this.def(String, 'email');
-    this.def(Object, 'scopes', {});
-  };
-  /**
-   * Gets all project scopes
-   *
-   * @param {String} project
-   * @param {Boolean} upsert
-   *
-   * @returns {Array} scopes
-   */
-
-
-  _proto.getScopes = function getScopes(project, upsert) {
-    if (!this.scopes) {
-      this.scopes = {};
+  _createClass(User, [{
+    key: "structure",
+    value: function structure() {
+      this.def(String, 'id');
+      this.def(Boolean, 'isAdmin', false);
+      this.def(Boolean, 'isCurrent', false);
+      this.def(String, 'username');
+      this.def(String, 'fullName');
+      this.def(String, 'email');
+      this.def(Object, 'scopes', {});
     }
+    /**
+     * Gets all project scopes
+     *
+     * @param {String} project
+     * @param {Boolean} upsert
+     *
+     * @returns {Array} scopes
+     */
 
-    if (!this.scopes[project] && upsert) {
-      this.scopes[project] = [];
+  }, {
+    key: "getScopes",
+    value: function getScopes(project, upsert) {
+      if (!this.scopes) {
+        this.scopes = {};
+      }
+
+      if (!this.scopes[project] && upsert) {
+        this.scopes[project] = [];
+      }
+
+      return this.scopes[project];
     }
+    /**
+     * Checks if a user has a project scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     *
+     * @returns {Boolean} hasScope
+     */
 
-    return this.scopes[project];
-  };
-  /**
-   * Checks if a user has a project scope
-   *
-   * @param {String} project
-   * @param {String} scope
-   *
-   * @returns {Boolean} hasScope
-   */
+  }, {
+    key: "hasScope",
+    value: function hasScope(project, scope) {
+      if (this.isAdmin) {
+        return true;
+      }
 
+      if (!project) {
+        return false;
+      }
 
-  _proto.hasScope = function hasScope(project, scope) {
-    if (this.isAdmin) {
-      return true;
+      if (!scope && !this.scopes[project]) {
+        return false;
+      }
+
+      if (!Array.isArray(this.scopes[project])) {
+        this.scopes[project] = [];
+      }
+
+      if (!scope) {
+        return true;
+      }
+
+      return this.scopes[project].indexOf(scope) > -1;
     }
+    /**
+     * Removes a scope
+     *
+     * @param {String} project
+     * @param {String|Boolean} scope
+     */
 
-    if (!project) {
-      return false;
+  }, {
+    key: "removeScope",
+    value: function removeScope(project, scope) {
+      if (!project) {
+        return;
+      }
+
+      if (!this.scopes) {
+        return;
+      }
+
+      if (!this.scopes[project]) {
+        return;
+      }
+
+      if (scope) {
+        var scopeIndex = this.scopes[project].indexOf(scope);
+        this.scopes[project].splice(scopeIndex, 1);
+      } else {
+        delete this.scopes[project];
+      }
     }
+    /**
+     * Grants a user a scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     */
 
-    if (!scope && !this.scopes[project]) {
-      return false;
+  }, {
+    key: "giveScope",
+    value: function giveScope(project, scope) {
+      if (!project) {
+        return;
+      }
+
+      if (!this.scopes) {
+        this.scopes = {};
+      }
+
+      if (!this.scopes[project]) {
+        this.scopes[project] = [];
+      }
+
+      if (!scope) {
+        return;
+      }
+
+      if (this.scopes[project].indexOf(scope) > -1) {
+        return;
+      }
+
+      this.scopes[project].push(scope);
     }
-
-    if (!Array.isArray(this.scopes[project])) {
-      this.scopes[project] = [];
-    }
-
-    if (!scope) {
-      return true;
-    }
-
-    return this.scopes[project].indexOf(scope) > -1;
-  };
-  /**
-   * Removes a scope
-   *
-   * @param {String} project
-   * @param {String|Boolean} scope
-   */
-
-
-  _proto.removeScope = function removeScope(project, scope) {
-    if (!project) {
-      return;
-    }
-
-    if (!this.scopes) {
-      return;
-    }
-
-    if (!this.scopes[project]) {
-      return;
-    }
-
-    if (scope) {
-      var scopeIndex = this.scopes[project].indexOf(scope);
-      this.scopes[project].splice(scopeIndex, 1);
-    } else {
-      delete this.scopes[project];
-    }
-  };
-  /**
-   * Grants a user a scope
-   *
-   * @param {String} project
-   * @param {String} scope
-   */
-
-
-  _proto.giveScope = function giveScope(project, scope) {
-    if (!project) {
-      return;
-    }
-
-    if (!this.scopes) {
-      this.scopes = {};
-    }
-
-    if (!this.scopes[project]) {
-      this.scopes[project] = [];
-    }
-
-    if (!scope) {
-      return;
-    }
-
-    if (this.scopes[project].indexOf(scope) > -1) {
-      return;
-    }
-
-    this.scopes[project].push(scope);
-  };
+  }]);
 
   return User;
 }(Entity);

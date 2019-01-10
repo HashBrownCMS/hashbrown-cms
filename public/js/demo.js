@@ -102,435 +102,458 @@
  * @memberof HashBrown.Client
  */
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var DemoApi =
 /*#__PURE__*/
 function () {
-  function DemoApi() {}
+  function DemoApi() {
+    _classCallCheck(this, DemoApi);
+  }
 
-  /**
-   * Clears the cache
-   */
-  DemoApi.reset = function reset() {
-    localStorage.setItem('demo', null);
-    location.hash = '/content/';
-    location.reload();
-  };
-  /**
-   * Gets the fake API cache
-   */
+  _createClass(DemoApi, null, [{
+    key: "reset",
 
-
-  DemoApi.getCache = function getCache(resource, id) {
-    var cache = this.cache;
-
-    if (!cache) {
-      try {
-        cache = localStorage.getItem('demo') || '{}';
-        cache = JSON.parse(cache);
-      } catch (e) {
-        cache = {};
-      }
-
-      cache = cache || {};
+    /**
+     * Clears the cache
+     */
+    value: function reset() {
+      localStorage.setItem('demo', null);
+      location.hash = '/content/';
+      location.reload();
     }
+    /**
+     * Gets the fake API cache
+     */
 
-    this.cache = cache;
+  }, {
+    key: "getCache",
+    value: function getCache(resource, id) {
+      var cache = this.cache;
 
-    if (!resource) {
-      return cache;
-    }
-
-    if (!cache[resource] || !Array.isArray(cache[resource])) {
-      cache[resource] = DemoApi.getNativeResource(resource) || [];
-    }
-
-    if (!id) {
-      return cache[resource];
-    }
-
-    for (var i in cache[resource]) {
-      if (cache[resource][i].id === id || cache[resource][i].name === id) {
-        return cache[resource][i];
-      }
-    }
-
-    return null;
-  };
-  /**
-   * Sets the fake API
-   */
-
-
-  DemoApi.setCache = function setCache(resource, id, data) {
-    var cache = DemoApi.getCache();
-
-    if (!cache[resource] || !Array.isArray(cache[resource])) {
-      cache[resource] = DemoApi.getNativeResource(resource) || [];
-    }
-
-    var foundExisting = false;
-
-    for (var i in cache[resource]) {
-      if (cache[resource][i].id == id) {
-        // Update data
-        if (data) {
-          cache[resource][i] = data; // Delete data
-        } else {
-          cache[resource].splice(i, 1);
+      if (!cache) {
+        try {
+          cache = localStorage.getItem('demo') || '{}';
+          cache = JSON.parse(cache);
+        } catch (e) {
+          cache = {};
         }
 
-        foundExisting = true;
-        break;
-      }
-    }
-
-    if (!foundExisting && data) {
-      cache[resource].push(data);
-    }
-
-    localStorage.setItem('demo', JSON.stringify(cache));
-    return data;
-  };
-  /**
-   * Request
-   */
-
-
-  DemoApi.request = function request(method, url, data) {
-    url = url.replace('/api/demo/live/', '');
-    method = method.toUpperCase();
-    debug.log(method + ' ' + url, DemoApi);
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        resolve(DemoApi.requestSync(method, url, data));
-      }, 100);
-    });
-  };
-
-  DemoApi.requestSync = function requestSync(method, url, data) {
-    url = url.replace('/api/demo/live/', '');
-    method = method.toUpperCase();
-    debug.log(method + ' ' + url, DemoApi);
-
-    switch (method) {
-      case 'GET':
-        return DemoApi.get(url);
-
-      case 'POST':
-        return DemoApi.post(url, data);
-
-      case 'DELETE':
-        return DemoApi.delete(url);
-    }
-
-    return data;
-  };
-  /**
-   * Parses a resource url
-   */
-
-
-  DemoApi.parseUrl = function parseUrl(url) {
-    var query = {};
-    var split = url.split('/');
-    query.resource = split[0];
-    query.params = url.split('?')[1];
-
-    if (split.length > 1) {
-      query.id = split[1].replace('?' + query.params, '');
-    }
-
-    return query;
-  };
-  /**
-   * Delete
-   */
-
-
-  DemoApi.delete = function _delete(url) {
-    var query = DemoApi.parseUrl(url);
-    return DemoApi.setCache(query.resource, query.id, null);
-  };
-  /**
-   * Get
-   */
-
-
-  DemoApi.get = function get(url) {
-    var query = DemoApi.parseUrl(url);
-    return DemoApi.getCache(query.resource, query.id);
-  };
-  /**
-   * Post
-   */
-
-
-  DemoApi.post = function post(url, data) {
-    var query = DemoApi.parseUrl(url); // Publish
-
-    if (url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
-      return Promise.resolve();
-    } // Create new
-
-
-    if (url.indexOf('content/new') > -1) {
-      var schemaId = url.match(/content\/new\/([a-zA-Z0-9]+)/);
-
-      if (!schemaId) {
-        throw new Error('No Schema id specified');
+        cache = cache || {};
       }
 
-      schemaId = schemaId[1];
-      var sort = url.match(/\?sort=([0-9]*)/);
+      this.cache = cache;
 
-      if (sort) {
-        sort = sort[2];
+      if (!resource) {
+        return cache;
       }
 
-      var parentId = url.match(/\&parent=([0-9a-z]*)/);
-
-      if (parentId) {
-        parentId = parentId[1];
+      if (!cache[resource] || !Array.isArray(cache[resource])) {
+        cache[resource] = DemoApi.getNativeResource(resource) || [];
       }
 
-      data = HashBrown.Models.Content.create(schemaId);
-      data.parentId = parentId;
-      data.sort = sort;
-      query = {
-        resource: 'content',
-        id: data.id
-      };
+      if (!id) {
+        return cache[resource];
+      }
+
+      for (var i in cache[resource]) {
+        if (cache[resource][i].id === id || cache[resource][i].name === id) {
+          return cache[resource][i];
+        }
+      }
+
+      return null;
     }
+    /**
+     * Sets the fake API
+     */
 
-    console.log('--- POST data:', data);
-    return DemoApi.setCache(query.resource, query.id, data);
-  };
-  /**
-   * Gets a native resource
-   */
+  }, {
+    key: "setCache",
+    value: function setCache(resource, id, data) {
+      var cache = DemoApi.getCache();
 
+      if (!cache[resource] || !Array.isArray(cache[resource])) {
+        cache[resource] = DemoApi.getNativeResource(resource) || [];
+      }
 
-  DemoApi.getNativeResource = function getNativeResource(type) {
-    var _sections;
+      var foundExisting = false;
 
-    switch (type) {
-      case 'users':
-        return [{
-          id: '4173f094621d4a882f912ccaf1cc6613a386519e',
-          isAdmin: true,
-          isCurrent: true,
-          username: 'demouser',
-          fullName: 'Demo User',
-          email: 'demo@user.com',
-          scopes: {}
-        }];
-
-      case 'settings':
-        return [{
-          id: 'providers',
-          media: '8c75aa0739cf66bcac269f01ab9007e666bd941b'
-        }];
-
-      case 'media':
-        return [{
-          "id": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
-          "remote": true,
-          "icon": "file-image-o",
-          "name": "banner.jpg",
-          "url": "media/50d05eee9088c589bfd5a5a3a3043c0ebcc4972b/banner-flat-pink.jpg",
-          "folder": "banners"
-        }];
-
-      case 'connections':
-        return [{
-          id: '8c75aa0739cf66bcac269f01ab9007e666bd941b',
-          title: 'My website',
-          url: 'example.com',
-          locked: true
-        }];
-
-      case 'content':
-        return [{
-          "locked": false,
-          "local": false,
-          "remote": false,
-          "id": "91f1ec2b984f291377c2dc488be2ebbefb46dd9a",
-          "parentId": "",
-          "createdBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
-          "updatedBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
-          "createDate": "2016-09-05T06:52:17.646Z",
-          "updateDate": "2017-08-03T15:55:10.590Z",
-          "publishOn": null,
-          "unpublishOn": null,
-          "schemaId": "591a897ad572cadae5115ef05726d9ead2725dc5",
-          "isPublished": true,
-          "hasPreview": false,
-          "sort": -1,
-          "properties": {
-            "title": "HashBrown CMS",
-            "url": "/",
-            "sections": [{
-              "value": {
-                "image": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
-                "text": "## HashBrown CMS\n\nCreate once. Publish anywhere."
-              },
-              "schemaId": "f5c4cf4dffb088a2753760ad1da9cd64ff781003"
-            }, {
-              "value": {
-                "text": "## Why HashBrown?\n\n### Remote management\n\nSeparate your concerns with a truly modern approach to content management. Your websites won't know what hit them.\n\n### Multiple projects at once\n\nWhy worry about several CMS'es, when you only need one?\n\n### Several environments for each project\n\nWe get it. You need to test your content before you go live.\n\n### Multilingual\n\nRemember the last time you used a truly elegant localisation solution in a CMS? We don't either.\n\n### Plugin support\n\nIf your needs aren't met at the core level, you can add anything you can imagine.\n\n### Content format consistency\n\nWhen you are passing complex, format-agnostic data around, document databases are the way to go. HashBrown knows what's up.\n\n### Painless backups\n\nHashBrown has your back in seconds.\n\n### Small footprint\n\nYou could probably run HashBrown on your toaster at home."
-              },
-              "schemaId": "904e8e7570ddb37ea1f31d210db47cd15f92ff92"
-            }],
-            "description": "Create once. Publish anywhere."
-          },
-          "settings": {
-            "publishing": {
-              "connectionId": "8c75aa0739cf66bcac269f01ab9007e666bd941b",
-              "applyToChildren": true
-            }
-          }
-        }];
-
-      case 'schemas':
-        var schemas = {
-          'contentBase': __webpack_require__(7),
-          'page': __webpack_require__(8),
-          'array': __webpack_require__(9),
-          'boolean': __webpack_require__(10),
-          'contentReference': __webpack_require__(11),
-          'contentSchemaReference': __webpack_require__(12),
-          'date': __webpack_require__(13),
-          'dropdown': __webpack_require__(14),
-          'fieldBase': __webpack_require__(15),
-          'language': __webpack_require__(16),
-          'mediaReference': __webpack_require__(17),
-          'number': __webpack_require__(18),
-          'resourceReference': __webpack_require__(19),
-          'richText': __webpack_require__(20),
-          'string': __webpack_require__(21),
-          'struct': __webpack_require__(22),
-          'tags': __webpack_require__(23),
-          'url': __webpack_require__(24)
-        };
-        var result = [];
-
-        for (var k in schemas) {
-          schemas[k].id = k;
-
-          if (k === 'contentBase' || k === 'page' || schemas[k].type == 'content') {
-            schemas[k].type = 'content';
+      for (var i in cache[resource]) {
+        if (cache[resource][i].id == id) {
+          // Update data
+          if (data) {
+            cache[resource][i] = data; // Delete data
           } else {
-            schemas[k].type = 'field';
+            cache[resource].splice(i, 1);
           }
 
-          if (schemas[k].isLocked !== false) {
-            schemas[k].isLocked = true;
-          }
+          foundExisting = true;
+          break;
+        }
+      }
 
-          result.push(HashBrown.Helpers.SchemaHelper.getModel(schemas[k]));
-        } // Section page
+      if (!foundExisting && data) {
+        cache[resource].push(data);
+      }
 
-
-        result.push(new HashBrown.Models.ContentSchema({
-          "isLocked": false,
-          "sync": {
-            "hasRemote": false,
-            "isRemote": false
-          },
-          "id": "591a897ad572cadae5115ef05726d9ead2725dc5",
-          "name": "Section Page",
-          "icon": "file",
-          "parentSchemaId": "page",
-          "hiddenProperties": [],
-          "defaultTabId": "content",
-          "tabs": {},
-          "fields": {
-            "properties": {
-              "sections": (_sections = {
-                "tabId": "content",
-                "label": "Sections"
-              }, _sections["tabId"] = "content", _sections["schemaId"] = "array", _sections["config"] = {
-                "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
-              }, _sections)
-            }
-          },
-          "allowedChildSchemas": ["591a897ad572cadae5115ef05726d9ead2725dc5"],
-          "type": "content"
-        })); // Section
-
-        result.push(new HashBrown.Models.FieldSchema({
-          "isLocked": false,
-          "sync": {
-            "hasRemote": false,
-            "isRemote": false
-          },
-          "local": false,
-          "remote": false,
-          "id": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
-          "name": "Section",
-          "icon": "file",
-          "parentSchemaId": "struct",
-          "hiddenProperties": [],
-          "editorId": "struct",
-          "type": "field"
-        })); // Rich text section
-
-        result.push(new HashBrown.Models.FieldSchema({
-          "isLocked": false,
-          "sync": {
-            "hasRemote": false,
-            "isRemote": false
-          },
-          "id": "904e8e7570ddb37ea1f31d210db47cd15f92ff92",
-          "name": "Rich Text Section",
-          "icon": "file-text-o",
-          "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
-          "hiddenProperties": [],
-          "editorId": "struct",
-          "config": {
-            "struct": {
-              "text": {
-                "label": "Text",
-                "tabId": "content",
-                "schemaId": "richText"
-              }
-            }
-          },
-          "type": "field"
-        })); // Hero
-
-        result.push(new HashBrown.Models.FieldSchema({
-          "isLocked": false,
-          "sync": {
-            "hasRemote": false,
-            "isRemote": false
-          },
-          "id": "f5c4cf4dffb088a2753760ad1da9cd64ff781003",
-          "name": "Hero Section",
-          "icon": "image",
-          "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
-          "hiddenProperties": [],
-          "editorId": "struct",
-          "config": {
-            "struct": {
-              "image": {
-                "label": "Image",
-                "schemaId": "mediaReference"
-              },
-              "text": {
-                "label": "Text",
-                "schemaId": "richText"
-              }
-            }
-          },
-          "type": "field"
-        }));
-        return result;
-
-      default:
-        return [];
+      localStorage.setItem('demo', JSON.stringify(cache));
+      return data;
     }
-  };
+    /**
+     * Request
+     */
+
+  }, {
+    key: "request",
+    value: function request(method, url, data) {
+      url = url.replace('/api/demo/live/', '');
+      method = method.toUpperCase();
+      debug.log(method + ' ' + url, DemoApi);
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          resolve(DemoApi.requestSync(method, url, data));
+        }, 100);
+      });
+    }
+  }, {
+    key: "requestSync",
+    value: function requestSync(method, url, data) {
+      url = url.replace('/api/demo/live/', '');
+      method = method.toUpperCase();
+      debug.log(method + ' ' + url, DemoApi);
+
+      switch (method) {
+        case 'GET':
+          return DemoApi.get(url);
+
+        case 'POST':
+          return DemoApi.post(url, data);
+
+        case 'DELETE':
+          return DemoApi.delete(url);
+      }
+
+      return data;
+    }
+    /**
+     * Parses a resource url
+     */
+
+  }, {
+    key: "parseUrl",
+    value: function parseUrl(url) {
+      var query = {};
+      var split = url.split('/');
+      query.resource = split[0];
+      query.params = url.split('?')[1];
+
+      if (split.length > 1) {
+        query.id = split[1].replace('?' + query.params, '');
+      }
+
+      return query;
+    }
+    /**
+     * Delete
+     */
+
+  }, {
+    key: "delete",
+    value: function _delete(url) {
+      var query = DemoApi.parseUrl(url);
+      return DemoApi.setCache(query.resource, query.id, null);
+    }
+    /**
+     * Get
+     */
+
+  }, {
+    key: "get",
+    value: function get(url) {
+      var query = DemoApi.parseUrl(url);
+      return DemoApi.getCache(query.resource, query.id);
+    }
+    /**
+     * Post
+     */
+
+  }, {
+    key: "post",
+    value: function post(url, data) {
+      var query = DemoApi.parseUrl(url); // Publish
+
+      if (url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
+        return Promise.resolve();
+      } // Create new
+
+
+      if (url.indexOf('content/new') > -1) {
+        var schemaId = url.match(/content\/new\/([a-zA-Z0-9]+)/);
+
+        if (!schemaId) {
+          throw new Error('No Schema id specified');
+        }
+
+        schemaId = schemaId[1];
+        var sort = url.match(/\?sort=([0-9]*)/);
+
+        if (sort) {
+          sort = sort[2];
+        }
+
+        var parentId = url.match(/\&parent=([0-9a-z]*)/);
+
+        if (parentId) {
+          parentId = parentId[1];
+        }
+
+        data = HashBrown.Models.Content.create(schemaId);
+        data.parentId = parentId;
+        data.sort = sort;
+        query = {
+          resource: 'content',
+          id: data.id
+        };
+      }
+
+      console.log('--- POST data:', data);
+      return DemoApi.setCache(query.resource, query.id, data);
+    }
+    /**
+     * Gets a native resource
+     */
+
+  }, {
+    key: "getNativeResource",
+    value: function getNativeResource(type) {
+      var _sections;
+
+      switch (type) {
+        case 'users':
+          return [{
+            id: '4173f094621d4a882f912ccaf1cc6613a386519e',
+            isAdmin: true,
+            isCurrent: true,
+            username: 'demouser',
+            fullName: 'Demo User',
+            email: 'demo@user.com',
+            scopes: {}
+          }];
+
+        case 'settings':
+          return [{
+            id: 'providers',
+            media: '8c75aa0739cf66bcac269f01ab9007e666bd941b'
+          }];
+
+        case 'media':
+          return [{
+            "id": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
+            "remote": true,
+            "icon": "file-image-o",
+            "name": "banner.jpg",
+            "url": "media/50d05eee9088c589bfd5a5a3a3043c0ebcc4972b/banner-flat-pink.jpg",
+            "folder": "banners"
+          }];
+
+        case 'connections':
+          return [{
+            id: '8c75aa0739cf66bcac269f01ab9007e666bd941b',
+            title: 'My website',
+            url: 'example.com',
+            locked: true
+          }];
+
+        case 'content':
+          return [{
+            "locked": false,
+            "local": false,
+            "remote": false,
+            "id": "91f1ec2b984f291377c2dc488be2ebbefb46dd9a",
+            "parentId": "",
+            "createdBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
+            "updatedBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
+            "createDate": "2016-09-05T06:52:17.646Z",
+            "updateDate": "2017-08-03T15:55:10.590Z",
+            "publishOn": null,
+            "unpublishOn": null,
+            "schemaId": "591a897ad572cadae5115ef05726d9ead2725dc5",
+            "isPublished": true,
+            "hasPreview": false,
+            "sort": -1,
+            "properties": {
+              "title": "HashBrown CMS",
+              "url": "/",
+              "sections": [{
+                "value": {
+                  "image": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
+                  "text": "## HashBrown CMS\n\nCreate once. Publish anywhere."
+                },
+                "schemaId": "f5c4cf4dffb088a2753760ad1da9cd64ff781003"
+              }, {
+                "value": {
+                  "text": "## Why HashBrown?\n\n### Remote management\n\nSeparate your concerns with a truly modern approach to content management. Your websites won't know what hit them.\n\n### Multiple projects at once\n\nWhy worry about several CMS'es, when you only need one?\n\n### Several environments for each project\n\nWe get it. You need to test your content before you go live.\n\n### Multilingual\n\nRemember the last time you used a truly elegant localisation solution in a CMS? We don't either.\n\n### Plugin support\n\nIf your needs aren't met at the core level, you can add anything you can imagine.\n\n### Content format consistency\n\nWhen you are passing complex, format-agnostic data around, document databases are the way to go. HashBrown knows what's up.\n\n### Painless backups\n\nHashBrown has your back in seconds.\n\n### Small footprint\n\nYou could probably run HashBrown on your toaster at home."
+                },
+                "schemaId": "904e8e7570ddb37ea1f31d210db47cd15f92ff92"
+              }],
+              "description": "Create once. Publish anywhere."
+            },
+            "settings": {
+              "publishing": {
+                "connectionId": "8c75aa0739cf66bcac269f01ab9007e666bd941b",
+                "applyToChildren": true
+              }
+            }
+          }];
+
+        case 'schemas':
+          var schemas = {
+            'contentBase': __webpack_require__(7),
+            'page': __webpack_require__(8),
+            'array': __webpack_require__(9),
+            'boolean': __webpack_require__(10),
+            'contentReference': __webpack_require__(11),
+            'contentSchemaReference': __webpack_require__(12),
+            'date': __webpack_require__(13),
+            'dropdown': __webpack_require__(14),
+            'fieldBase': __webpack_require__(15),
+            'language': __webpack_require__(16),
+            'mediaReference': __webpack_require__(17),
+            'number': __webpack_require__(18),
+            'resourceReference': __webpack_require__(19),
+            'richText': __webpack_require__(20),
+            'string': __webpack_require__(21),
+            'struct': __webpack_require__(22),
+            'tags': __webpack_require__(23),
+            'url': __webpack_require__(24)
+          };
+          var result = [];
+
+          for (var k in schemas) {
+            schemas[k].id = k;
+
+            if (k === 'contentBase' || k === 'page' || schemas[k].type == 'content') {
+              schemas[k].type = 'content';
+            } else {
+              schemas[k].type = 'field';
+            }
+
+            if (schemas[k].isLocked !== false) {
+              schemas[k].isLocked = true;
+            }
+
+            result.push(HashBrown.Helpers.SchemaHelper.getModel(schemas[k]));
+          } // Section page
+
+
+          result.push(new HashBrown.Models.ContentSchema({
+            "isLocked": false,
+            "sync": {
+              "hasRemote": false,
+              "isRemote": false
+            },
+            "id": "591a897ad572cadae5115ef05726d9ead2725dc5",
+            "name": "Section Page",
+            "icon": "file",
+            "parentSchemaId": "page",
+            "hiddenProperties": [],
+            "defaultTabId": "content",
+            "tabs": {},
+            "fields": {
+              "properties": {
+                "sections": (_sections = {
+                  "tabId": "content",
+                  "label": "Sections"
+                }, _defineProperty(_sections, "tabId", "content"), _defineProperty(_sections, "schemaId", "array"), _defineProperty(_sections, "config", {
+                  "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
+                }), _sections)
+              }
+            },
+            "allowedChildSchemas": ["591a897ad572cadae5115ef05726d9ead2725dc5"],
+            "type": "content"
+          })); // Section
+
+          result.push(new HashBrown.Models.FieldSchema({
+            "isLocked": false,
+            "sync": {
+              "hasRemote": false,
+              "isRemote": false
+            },
+            "local": false,
+            "remote": false,
+            "id": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+            "name": "Section",
+            "icon": "file",
+            "parentSchemaId": "struct",
+            "hiddenProperties": [],
+            "editorId": "struct",
+            "type": "field"
+          })); // Rich text section
+
+          result.push(new HashBrown.Models.FieldSchema({
+            "isLocked": false,
+            "sync": {
+              "hasRemote": false,
+              "isRemote": false
+            },
+            "id": "904e8e7570ddb37ea1f31d210db47cd15f92ff92",
+            "name": "Rich Text Section",
+            "icon": "file-text-o",
+            "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+            "hiddenProperties": [],
+            "editorId": "struct",
+            "config": {
+              "struct": {
+                "text": {
+                  "label": "Text",
+                  "tabId": "content",
+                  "schemaId": "richText"
+                }
+              }
+            },
+            "type": "field"
+          })); // Hero
+
+          result.push(new HashBrown.Models.FieldSchema({
+            "isLocked": false,
+            "sync": {
+              "hasRemote": false,
+              "isRemote": false
+            },
+            "id": "f5c4cf4dffb088a2753760ad1da9cd64ff781003",
+            "name": "Hero Section",
+            "icon": "image",
+            "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+            "hiddenProperties": [],
+            "editorId": "struct",
+            "config": {
+              "struct": {
+                "image": {
+                  "label": "Image",
+                  "schemaId": "mediaReference"
+                },
+                "text": {
+                  "label": "Text",
+                  "schemaId": "richText"
+                }
+              }
+            },
+            "type": "field"
+          }));
+          return result;
+
+        default:
+          return [];
+      }
+    }
+  }]);
 
   return DemoApi;
 }();

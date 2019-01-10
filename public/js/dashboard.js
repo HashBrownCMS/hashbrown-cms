@@ -105,24 +105,31 @@ document.addEventListener('DOMContentLoaded', function () {
   }) // Get projects
   .then(function (projects) {
     projects = projects || [];
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-    for (var _iterator = projects, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+    try {
+      for (var _iterator = projects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var projectId = _step.value;
+        var projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
+          modelUrl: '/api/server/projects/' + projectId
+        });
+        $('.page--dashboard__projects__list').append(projectEditor.$element);
       }
-
-      var projectId = _ref;
-      var projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
-        modelUrl: '/api/server/projects/' + projectId
-      });
-      $('.page--dashboard__projects__list').append(projectEditor.$element);
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
     }
   }) // Get users
   .then(function () {
@@ -132,58 +139,64 @@ document.addEventListener('DOMContentLoaded', function () {
 
     return HashBrown.Helpers.RequestHelper.request('get', 'users');
   }).then(function (users) {
-    var _loop = function _loop() {
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) return "break";
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) return "break";
-        _ref2 = _i2.value;
-      }
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
 
-      var user = _ref2;
-      user = new HashBrown.Models.User(user);
-      var $user = void 0;
-      var $projectList = void 0;
+    try {
+      var _loop = function _loop() {
+        var user = _step2.value;
+        user = new HashBrown.Models.User(user);
+        var $user = void 0;
+        var $projectList = void 0;
 
-      var renderUser = function renderUser() {
-        _.append($user.empty(), _.button({
-          class: 'widget widget--button expanded low list-item',
-          title: 'Edit user'
-        }, _.span({
-          class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')
-        }), (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')).on('click', function () {
-          var userEditor = new HashBrown.Views.Editors.UserEditor({
-            model: user
-          });
-          userEditor.on('save', function () {
-            renderUser();
-          });
-        }), _.if(user.id !== HashBrown.Models.User.current.id, _.button({
-          class: 'widget widget--button small fa fa-remove',
-          title: 'Remove user'
-        }).on('click', function () {
-          UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"', 'Are you sure you want to remove this user?', function () {
-            HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id).then(function () {
-              $user.remove();
-            }).catch(UI.errorModal);
-          });
-        })));
+        var renderUser = function renderUser() {
+          _.append($user.empty(), _.button({
+            class: 'widget widget--button expanded low list-item',
+            title: 'Edit user'
+          }, _.span({
+            class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')
+          }), (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')).on('click', function () {
+            var userEditor = new HashBrown.Views.Editors.UserEditor({
+              model: user
+            });
+            userEditor.on('save', function () {
+              renderUser();
+            });
+          }), _.if(user.id !== HashBrown.Models.User.current.id, _.button({
+            class: 'widget widget--button small fa fa-remove',
+            title: 'Remove user'
+          }).on('click', function () {
+            UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"', 'Are you sure you want to remove this user?', function () {
+              HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id).then(function () {
+                $user.remove();
+              }).catch(UI.errorModal);
+            });
+          })));
+        };
+
+        $('.page--dashboard__users__list').append($user = _.div({
+          class: 'widget-group page--dashboard__users__list__user'
+        }));
+        renderUser();
       };
 
-      $('.page--dashboard__users__list').append($user = _.div({
-        class: 'widget-group page--dashboard__users__list__user'
-      }));
-      renderUser();
-    };
-
-    for (var _iterator2 = users || [], _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      var _ret = _loop();
-
-      if (_ret === "break") break;
+      for (var _iterator2 = (users || [])[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        _loop();
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
     }
   }) // Check for updates
   .then(function () {
@@ -367,7 +380,9 @@ document.addEventListener('DOMContentLoaded', function () {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
+/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/* @preserve
  * The MIT License (MIT)
  * 
  * Copyright (c) 2013-2018 Petka Antonov
@@ -397,7 +412,10 @@ document.addEventListener('DOMContentLoaded', function () {
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function (e) {
-  if (true) module.exports = e();else { var f; }
+  if ("object" == ( false ? undefined : _typeof(exports)) && "undefined" != typeof module) module.exports = e();else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (e),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else { var f; }
 }(function () {
   var define, module, exports;
   return function e(t, n, r) {
@@ -1786,7 +1804,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (typeof printWarning === "function") {
               printWarning(message, isSoft);
-            } else if (typeof console.log === "function" || typeof console.log === "object") {
+            } else if (typeof console.log === "function" || _typeof(console.log) === "object") {
               console.log(message);
             }
           }
@@ -2076,7 +2094,7 @@ document.addEventListener('DOMContentLoaded', function () {
           formatStack = function formatStack(stack, error) {
             if (typeof stack === "string") return stack;
 
-            if ((typeof error === "object" || typeof error === "function") && error.name !== undefined && error.message !== undefined) {
+            if ((_typeof(error) === "object" || typeof error === "function") && error.name !== undefined && error.message !== undefined) {
               return error.toString();
             }
 
@@ -3065,7 +3083,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var limit = 0;
 
           if (options !== undefined) {
-            if (typeof options === "object" && options !== null) {
+            if (_typeof(options) === "object" && options !== null) {
               if (typeof options.concurrency !== "number") {
                 return Promise.reject(new TypeError("'concurrency' must be a number but it is " + util.classString(options.concurrency)));
               }
@@ -4634,7 +4652,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         Promise.promisifyAll = function (target, options) {
-          if (typeof target !== "function" && typeof target !== "object") {
+          if (typeof target !== "function" && _typeof(target) !== "object") {
             throw new TypeError("the target of promisifyAll must be an object or a function\n\n    See http://goo.gl/MqrFmX\n");
           }
 
@@ -6055,7 +6073,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       function isObject(value) {
-        return typeof value === "function" || typeof value === "object" && value !== null;
+        return typeof value === "function" || _typeof(value) === "object" && value !== null;
       }
 
       function maybeWrapAsError(maybeError) {
@@ -6203,7 +6221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var receiver = new FakeConstructor();
 
         function ic() {
-          return typeof receiver.foo;
+          return _typeof(receiver.foo);
         }
 
         ic();
@@ -6237,7 +6255,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       function isError(obj) {
-        return obj instanceof Error || obj !== null && typeof obj === "object" && typeof obj.message === "string" && typeof obj.name === "string";
+        return obj instanceof Error || obj !== null && _typeof(obj) === "object" && typeof obj.message === "string" && typeof obj.name === "string";
       }
 
       function markAsOriginatingFromRejection(e) {
@@ -6630,6 +6648,8 @@ process.umask = function () {
 /* 3 */
 /***/ (function(module, exports) {
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var g; // This works in non-strict mode
 
 g = function () {
@@ -6641,7 +6661,7 @@ try {
   g = g || new Function("return this")();
 } catch (e) {
   // This works if the window reference is available
-  if (typeof window === "object") g = window;
+  if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
 } // g can still be undefined, but nothing to do about it...
 // We return undefined, instead of nothing here, so it's
 // easier to handle this case. if(!global) { ...}

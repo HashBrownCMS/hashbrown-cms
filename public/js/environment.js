@@ -89,7 +89,9 @@
 /***/ 1:
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
+/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/* @preserve
  * The MIT License (MIT)
  * 
  * Copyright (c) 2013-2018 Petka Antonov
@@ -119,7 +121,10 @@
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function (e) {
-  if (true) module.exports = e();else { var f; }
+  if ("object" == ( false ? undefined : _typeof(exports)) && "undefined" != typeof module) module.exports = e();else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (e),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else { var f; }
 }(function () {
   var define, module, exports;
   return function e(t, n, r) {
@@ -1508,7 +1513,7 @@
 
             if (typeof printWarning === "function") {
               printWarning(message, isSoft);
-            } else if (typeof console.log === "function" || typeof console.log === "object") {
+            } else if (typeof console.log === "function" || _typeof(console.log) === "object") {
               console.log(message);
             }
           }
@@ -1798,7 +1803,7 @@
           formatStack = function formatStack(stack, error) {
             if (typeof stack === "string") return stack;
 
-            if ((typeof error === "object" || typeof error === "function") && error.name !== undefined && error.message !== undefined) {
+            if ((_typeof(error) === "object" || typeof error === "function") && error.name !== undefined && error.message !== undefined) {
               return error.toString();
             }
 
@@ -2787,7 +2792,7 @@
           var limit = 0;
 
           if (options !== undefined) {
-            if (typeof options === "object" && options !== null) {
+            if (_typeof(options) === "object" && options !== null) {
               if (typeof options.concurrency !== "number") {
                 return Promise.reject(new TypeError("'concurrency' must be a number but it is " + util.classString(options.concurrency)));
               }
@@ -4356,7 +4361,7 @@
         };
 
         Promise.promisifyAll = function (target, options) {
-          if (typeof target !== "function" && typeof target !== "object") {
+          if (typeof target !== "function" && _typeof(target) !== "object") {
             throw new TypeError("the target of promisifyAll must be an object or a function\n\n    See http://goo.gl/MqrFmX\n");
           }
 
@@ -5777,7 +5782,7 @@
       }
 
       function isObject(value) {
-        return typeof value === "function" || typeof value === "object" && value !== null;
+        return typeof value === "function" || _typeof(value) === "object" && value !== null;
       }
 
       function maybeWrapAsError(maybeError) {
@@ -5925,7 +5930,7 @@
         var receiver = new FakeConstructor();
 
         function ic() {
-          return typeof receiver.foo;
+          return _typeof(receiver.foo);
         }
 
         ic();
@@ -5959,7 +5964,7 @@
       }
 
       function isError(obj) {
-        return obj instanceof Error || obj !== null && typeof obj === "object" && typeof obj.message === "string" && typeof obj.name === "string";
+        return obj instanceof Error || obj !== null && _typeof(obj) === "object" && typeof obj.message === "string" && typeof obj.name === "string";
       }
 
       function markAsOriginatingFromRejection(e) {
@@ -6388,22 +6393,30 @@ document.addEventListener('DOMContentLoaded', function () {
   }).then(function () {
     return HashBrown.Helpers.RequestHelper.reloadAllResources();
   }).then(function () {
-    for (var _iterator = resources.users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+    try {
+      for (var _iterator = resources.users[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var user = _step.value;
+
+        if (user.isCurrent) {
+          HashBrown.Models.User.current = user;
+        }
       }
-
-      var user = _ref;
-
-      if (user.isCurrent) {
-        HashBrown.Models.User.current = user;
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
       }
     }
 
@@ -6437,7 +6450,9 @@ document.addEventListener('DOMContentLoaded', function () {
 /***/ 26:
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {/**
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/**
  * marked - a markdown parser
  * Copyright (c) 2011-2018, Christopher Jeffrey. (MIT Licensed)
  * https://github.com/markedjs/marked
@@ -7917,8 +7932,13 @@ document.addEventListener('DOMContentLoaded', function () {
   marked.inlineLexer = InlineLexer.output;
   marked.parse = marked;
 
-  if (true) {
+  if ( true && ( false ? undefined : _typeof(exports)) === 'object') {
     module.exports = marked;
+  } else if (true) {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+      return marked;
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   } else {}
 })(this || (typeof window !== 'undefined' ? window : global));
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
@@ -7928,12 +7948,14 @@ document.addEventListener('DOMContentLoaded', function () {
 /***/ 27:
 /***/ (function(module) {
 
-module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"1.0.7","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.5.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
+module.exports = {"name":"hashbrown-cms","repository":"https://github.com/HashBrownCMS/hashbrown-cms.git","version":"1.1.0","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.5.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
 
 /***/ }),
 
 /***/ 3:
 /***/ (function(module, exports) {
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var g; // This works in non-strict mode
 
@@ -7946,7 +7968,7 @@ try {
   g = g || new Function("return this")();
 } catch (e) {
   // This works if the window reference is available
-  if (typeof window === "object") g = window;
+  if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
 } // g can still be undefined, but nothing to do about it...
 // We return undefined, instead of nothing here, so it's
 // easier to handle this case. if(!global) { ...}

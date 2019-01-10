@@ -128,12 +128,28 @@ namespace('Views.Widgets').add(__webpack_require__(229)).add(__webpack_require__
  * @memberof HashBrown.Client.Views.Widgets
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Widget =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(Widget, _Crisp$View);
+  _inherits(Widget, _Crisp$View);
 
   /**
    * Constructor
@@ -141,7 +157,9 @@ function (_Crisp$View) {
   function Widget(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, Widget);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Widget).call(this, params));
 
     if (!params.isAsync) {
       _this.fetch();
@@ -156,29 +174,30 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = Widget.prototype;
+  _createClass(Widget, [{
+    key: "notify",
+    value: function notify(message) {
+      var notifier = this.element.querySelector('.widget__notifier');
 
-  _proto.notify = function notify(message) {
-    var notifier = this.element.querySelector('.widget__notifier');
+      if (!message) {
+        if (notifier) {
+          notifier.parentElement.removeChild(notifier);
+        }
 
-    if (!message) {
-      if (notifier) {
-        notifier.parentElement.removeChild(notifier);
+        return;
       }
 
-      return;
+      if (!notifier) {
+        notifier = _.div({
+          class: 'widget__notifier'
+        }, message);
+
+        _.append(this.element, notifier);
+      }
+
+      notifier.innerHTML = message;
     }
-
-    if (!notifier) {
-      notifier = _.div({
-        class: 'widget__notifier'
-      }, message);
-
-      _.append(this.element, notifier);
-    }
-
-    notifier.innerHTML = message;
-  };
+  }]);
 
   return Widget;
 }(Crisp.View);
@@ -197,18 +216,36 @@ module.exports = Widget;
  * @memberof HashBrown.Client.Views.Widgets
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Dropdown =
 /*#__PURE__*/
 function (_HashBrown$Views$Widg) {
-  _inheritsLoose(Dropdown, _HashBrown$Views$Widg);
+  _inherits(Dropdown, _HashBrown$Views$Widg);
 
   /**
    * Constructor
    */
   function Dropdown(params) {
     var _this;
+
+    _classCallCheck(this, Dropdown);
 
     if (params.optionsUrl) {
       params.isAsync = true;
@@ -219,7 +256,7 @@ function (_HashBrown$Views$Widg) {
       });
     }
 
-    _this = _HashBrown$Views$Widg.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Dropdown).call(this, params));
     _this.optionIcons = {};
     return _this;
   }
@@ -232,362 +269,379 @@ function (_HashBrown$Views$Widg) {
    */
 
 
-  var _proto = Dropdown.prototype;
+  _createClass(Dropdown, [{
+    key: "getOptionIcon",
+    value: function getOptionIcon(label) {
+      if (!this.iconKey || !this.labelKey || !this.options) {
+        return '';
+      }
 
-  _proto.getOptionIcon = function getOptionIcon(label) {
-    if (!this.iconKey || !this.labelKey || !this.options) {
+      for (var key in this.options) {
+        var value = this.options[key];
+        var optionLabel = this.labelKey ? value[this.labelKey] : value;
+
+        if (typeof optionLabel !== 'string') {
+          optionLabel = optionLabel ? optionLabel.toString() : '';
+        }
+
+        if (optionLabel === label) {
+          return value[this.iconKey] || '';
+        }
+      }
+
       return '';
     }
+    /**
+     * Converts options into a flattened structure
+     *
+     * @returns {Object} Options
+     */
 
-    for (var key in this.options) {
-      var value = this.options[key];
-      var optionLabel = this.labelKey ? value[this.labelKey] : value;
-
-      if (typeof optionLabel !== 'string') {
-        optionLabel = optionLabel ? optionLabel.toString() : '';
+  }, {
+    key: "getFlattenedOptions",
+    value: function getFlattenedOptions() {
+      if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
+        return this.options;
       }
 
-      if (optionLabel === label) {
-        return value[this.iconKey] || '';
-      }
-    }
+      var options = {};
 
-    return '';
-  };
-  /**
-   * Converts options into a flattened structure
-   *
-   * @returns {Object} Options
-   */
+      for (var key in this.options) {
+        var value = this.options[key];
+        var optionLabel = this.labelKey ? value[this.labelKey] : value;
+        var optionValue = this.valueKey ? value[this.valueKey] : value;
 
+        if (typeof optionValue !== 'string') {
+          optionValue = optionValue ? optionValue.toString() : '';
+        }
 
-  _proto.getFlattenedOptions = function getFlattenedOptions() {
-    if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
-      return this.options;
-    }
-
-    var options = {};
-
-    for (var key in this.options) {
-      var value = this.options[key];
-      var optionLabel = this.labelKey ? value[this.labelKey] : value;
-      var optionValue = this.valueKey ? value[this.valueKey] : value;
-
-      if (typeof optionValue !== 'string') {
-        optionValue = optionValue ? optionValue.toString() : '';
-      }
-
-      if (typeof optionLabel !== 'string') {
-        optionLabel = optionLabel ? optionLabel.toString() : '';
-      } // Check for disabled options
+        if (typeof optionLabel !== 'string') {
+          optionLabel = optionLabel ? optionLabel.toString() : '';
+        } // Check for disabled options
 
 
-      var isDisabled = false;
+        var isDisabled = false;
 
-      if (this.disabledOptions && Array.isArray(this.disabledOptions)) {
-        for (var disabledKey in this.disabledOptions) {
-          var disabledValue = this.disabledOptions[disabledKey];
-          var disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
+        if (this.disabledOptions && Array.isArray(this.disabledOptions)) {
+          for (var disabledKey in this.disabledOptions) {
+            var disabledValue = this.disabledOptions[disabledKey];
+            var disabledOptionValue = this.valueKey ? disabledValue[this.valueKey] : disabledValue;
 
-          if (typeof disabledOptionValue !== 'string') {
-            disabledOptionValue = disabledOptionValue.toString();
+            if (typeof disabledOptionValue !== 'string') {
+              disabledOptionValue = disabledOptionValue.toString();
+            }
+
+            if (optionValue === disabledOptionValue) {
+              isDisabled = true;
+              break;
+            }
           }
+        }
 
-          if (optionValue === disabledOptionValue) {
-            isDisabled = true;
+        if (isDisabled) {
+          continue;
+        }
+
+        options[optionLabel] = optionValue;
+      } // Sort options alphabetically
+
+
+      var sortedOptions = {};
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = Object.keys(options).sort()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var label = _step.value;
+          sortedOptions[options[label]] = label;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return sortedOptions;
+    }
+    /**
+     * Gets the current value label
+     *
+     * @returns {String} Value label
+     */
+
+  }, {
+    key: "getValueLabel",
+    value: function getValueLabel() {
+      this.sanityCheck();
+
+      if (this.icon) {
+        return '<span class="widget--dropdown__value__tool-icon fa fa-' + this.icon + '"></span>';
+      }
+
+      var label = this.placeholder || '(none)';
+      var options = this.getFlattenedOptions();
+
+      if (this.useMultiple) {
+        var labels = [];
+
+        for (var key in options) {
+          var value = options[key];
+
+          if (value && this.value.indexOf(key) > -1) {
+            labels.push(value);
+          }
+        }
+
+        label = labels.join(', ');
+      } else {
+        label = options[this.value] === 0 ? '0' : options[this.value] || label;
+      }
+
+      return label;
+    }
+    /**
+     * Performs a sanity check of the value
+     */
+
+  }, {
+    key: "sanityCheck",
+    value: function sanityCheck() {
+      if (this.useMultiple && !Array.isArray(this.value)) {
+        this.value = [];
+      } else if (!this.useMultiple && Array.isArray(this.value)) {
+        this.value = null;
+      }
+    }
+    /**
+     * Updates all selected classes
+     */
+
+  }, {
+    key: "updateSelectedClasses",
+    value: function updateSelectedClasses() {
+      var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+      if (!btnOptions) {
+        return;
+      }
+
+      for (var i = 0; i < btnOptions.length; i++) {
+        var value = btnOptions[i].dataset.value;
+        var hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
+        btnOptions[i].classList.toggle('selected', hasValue);
+      }
+    }
+    /**
+     * Updates all position classes
+     */
+
+  }, {
+    key: "updatePositionClasses",
+    value: function updatePositionClasses() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        var toggle = _this2.element.querySelector('.widget--dropdown__toggle');
+
+        var isChecked = toggle.checked;
+        toggle.checked = true;
+
+        var bounds = _this2.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
+
+        toggle.checked = isChecked;
+        var isAtRight = bounds.right >= window.innerWidth - 10;
+        var isAtBottom = bounds.bottom >= window.innerHeight - 10;
+
+        _this2.element.classList.toggle('right', isAtRight);
+
+        _this2.element.classList.toggle('bottom', isAtBottom);
+      }, 1);
+    }
+    /**
+     * Event: Change value
+     *
+     * @param {Object} newValue
+     */
+
+  }, {
+    key: "onChangeInternal",
+    value: function onChangeInternal(newValue) {
+      this.sanityCheck(); // Change multiple value
+
+      if (this.useMultiple) {
+        // First check if value was already selected, remove if found
+        var foundValue = false;
+
+        for (var i in this.value) {
+          if (this.value[i] === newValue) {
+            this.value.splice(i, 1);
+            foundValue = true;
             break;
           }
-        }
-      }
-
-      if (isDisabled) {
-        continue;
-      }
-
-      options[optionLabel] = optionValue;
-    } // Sort options alphabetically
+        } // If value was not selected, add it
 
 
-    var sortedOptions = {};
+        if (!foundValue) {
+          if (!newValue) {
+            this.value = [];
+          } else {
+            this.value.push(newValue);
+          }
+        } // Change single value
 
-    for (var _iterator = Object.keys(options).sort(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
       } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+        this.value = newValue;
+      } // Update classes
+
+
+      this.updateSelectedClasses(); // Update value label
+
+      var divValue = this.element.querySelector('.widget--dropdown__value');
+
+      if (divValue) {
+        divValue.innerHTML = this.getValueLabel();
+      } // Cancel
+
+
+      this.toggle(false); // The value is a function, execute it and return
+
+      if (typeof this.value === 'function') {
+        this.value();
+        return;
+      } // Change event
+
+
+      if (typeof this.onChange === 'function') {
+        this.onChange(this.value);
+      }
+    }
+    /**
+     * Event: Typeahead
+     *
+     * @param {String} query
+     */
+
+  }, {
+    key: "onTypeahead",
+    value: function onTypeahead(query) {
+      var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+      if (!btnOptions) {
+        return;
       }
 
-      var label = _ref;
-      sortedOptions[options[label]] = label;
+      query = (query || '').toLowerCase();
+
+      for (var i = 0; i < btnOptions.length; i++) {
+        var value = btnOptions[i].innerHTML.toLowerCase();
+        var isMatch = query.length < 2 || value.indexOf(query) > -1;
+        btnOptions[i].classList.toggle('hidden', !isMatch);
+      }
     }
+    /**
+     * Toggles open/closed
+     *
+     * @param {Boolean} isOpen
+     */
 
-    return sortedOptions;
-  };
-  /**
-   * Gets the current value label
-   *
-   * @returns {String} Value label
-   */
+  }, {
+    key: "toggle",
+    value: function toggle(isOpen) {
+      var toggle = this.element.querySelector('.widget--dropdown__toggle');
 
+      if (typeof isOpen === 'undefined') {
+        isOpen = !toggle.checked;
+      }
 
-  _proto.getValueLabel = function getValueLabel() {
-    this.sanityCheck();
+      toggle.checked = isOpen;
 
-    if (this.icon) {
-      return '<span class="widget--dropdown__value__tool-icon fa fa-' + this.icon + '"></span>';
-    }
-
-    var label = this.placeholder || '(none)';
-    var options = this.getFlattenedOptions();
-
-    if (this.useMultiple) {
-      var labels = [];
-
-      for (var key in options) {
-        var value = options[key];
-
-        if (value && this.value.indexOf(key) > -1) {
-          labels.push(value);
+      if (!isOpen) {
+        this.trigger('cancel');
+      } else {
+        if (this.useTypeAhead) {
+          this.element.querySelector('.widget--dropdown__typeahead').focus();
         }
       }
 
-      label = labels.join(', ');
-    } else {
-      label = options[this.value] === 0 ? '0' : options[this.value] || label;
+      this.updatePositionClasses();
+      this.updateSelectedClasses();
     }
+    /**
+     * Template
+     */
 
-    return label;
-  };
-  /**
-   * Performs a sanity check of the value
-   */
+  }, {
+    key: "template",
+    value: function template() {
+      var _this3 = this;
 
-
-  _proto.sanityCheck = function sanityCheck() {
-    if (this.useMultiple && !Array.isArray(this.value)) {
-      this.value = [];
-    } else if (!this.useMultiple && Array.isArray(this.value)) {
-      this.value = null;
-    }
-  };
-  /**
-   * Updates all selected classes
-   */
-
-
-  _proto.updateSelectedClasses = function updateSelectedClasses() {
-    var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
-
-    if (!btnOptions) {
-      return;
-    }
-
-    for (var i = 0; i < btnOptions.length; i++) {
-      var value = btnOptions[i].dataset.value;
-      var hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
-      btnOptions[i].classList.toggle('selected', hasValue);
-    }
-  };
-  /**
-   * Updates all position classes
-   */
+      return _.div({
+        title: this.tooltip,
+        class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '')
+      }, // Value
+      _.div({
+        class: 'widget--dropdown__value'
+      }, this.getValueLabel()), // Toggle
+      _.input({
+        class: 'widget--dropdown__toggle',
+        type: 'checkbox'
+      }).click(function (e) {
+        _this3.toggle(e.currentTarget.checked);
+      }), // Typeahead input
+      _.if(this.useTypeAhead, _.span({
+        class: 'widget--dropdown__typeahead__icon fa fa-search'
+      }), _.input({
+        class: 'widget--dropdown__typeahead',
+        type: 'text'
+      }).on('input', function (e) {
+        _this3.onTypeahead(e.currentTarget.value);
+      })), // Dropdown options
+      _.div({
+        class: 'widget--dropdown__options'
+      }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+        var optionIcon = _this3.getOptionIcon(optionLabel); // Reverse keys option
 
 
-  _proto.updatePositionClasses = function updatePositionClasses() {
-    var _this2 = this;
-
-    setTimeout(function () {
-      var toggle = _this2.element.querySelector('.widget--dropdown__toggle');
-
-      var isChecked = toggle.checked;
-      toggle.checked = true;
-
-      var bounds = _this2.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
-
-      toggle.checked = isChecked;
-      var isAtRight = bounds.right >= window.innerWidth - 10;
-      var isAtBottom = bounds.bottom >= window.innerHeight - 10;
-
-      _this2.element.classList.toggle('right', isAtRight);
-
-      _this2.element.classList.toggle('bottom', isAtBottom);
-    }, 1);
-  };
-  /**
-   * Event: Change value
-   *
-   * @param {Object} newValue
-   */
-
-
-  _proto.onChangeInternal = function onChangeInternal(newValue) {
-    this.sanityCheck(); // Change multiple value
-
-    if (this.useMultiple) {
-      // First check if value was already selected, remove if found
-      var foundValue = false;
-
-      for (var i in this.value) {
-        if (this.value[i] === newValue) {
-          this.value.splice(i, 1);
-          foundValue = true;
-          break;
+        if (_this3.reverseKeys) {
+          var key = optionLabel;
+          var value = optionValue;
+          optionValue = key;
+          optionLabel = value;
         }
-      } // If value was not selected, add it
 
-
-      if (!foundValue) {
-        if (!newValue) {
-          this.value = [];
-        } else {
-          this.value.push(newValue);
+        if (!optionValue || optionValue === '---') {
+          return _.div({
+            class: 'widget--dropdown__separator'
+          }, optionLabel);
         }
-      } // Change single value
 
-    } else {
-      this.value = newValue;
-    } // Update classes
-
-
-    this.updateSelectedClasses(); // Update value label
-
-    var divValue = this.element.querySelector('.widget--dropdown__value');
-
-    if (divValue) {
-      divValue.innerHTML = this.getValueLabel();
-    } // Cancel
-
-
-    this.toggle(false); // The value is a function, execute it and return
-
-    if (typeof this.value === 'function') {
-      this.value();
-      return;
-    } // Change event
-
-
-    if (typeof this.onChange === 'function') {
-      this.onChange(this.value);
+        return _.button({
+          class: 'widget--dropdown__option',
+          'data-value': optionValue
+        }, _.if(optionIcon, _.span({
+          class: 'widget--dropdown__option__icon fa fa-' + optionIcon
+        })), optionLabel).click(function (e) {
+          _this3.onChangeInternal(optionValue);
+        });
+      })), // Clear button
+      _.if(this.useClearButton, _.button({
+        class: 'widget--dropdown__clear fa fa-remove',
+        title: 'Clear selection'
+      }).click(function (e) {
+        _this3.onChangeInternal(null);
+      })));
     }
-  };
-  /**
-   * Event: Typeahead
-   *
-   * @param {String} query
-   */
-
-
-  _proto.onTypeahead = function onTypeahead(query) {
-    var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
-
-    if (!btnOptions) {
-      return;
-    }
-
-    query = (query || '').toLowerCase();
-
-    for (var i = 0; i < btnOptions.length; i++) {
-      var value = btnOptions[i].innerHTML.toLowerCase();
-      var isMatch = query.length < 2 || value.indexOf(query) > -1;
-      btnOptions[i].classList.toggle('hidden', !isMatch);
-    }
-  };
-  /**
-   * Toggles open/closed
-   *
-   * @param {Boolean} isOpen
-   */
-
-
-  _proto.toggle = function toggle(isOpen) {
-    var toggle = this.element.querySelector('.widget--dropdown__toggle');
-
-    if (typeof isOpen === 'undefined') {
-      isOpen = !toggle.checked;
-    }
-
-    toggle.checked = isOpen;
-
-    if (!isOpen) {
-      this.trigger('cancel');
-    } else {
-      if (this.useTypeAhead) {
-        this.element.querySelector('.widget--dropdown__typeahead').focus();
-      }
-    }
-
-    this.updatePositionClasses();
-    this.updateSelectedClasses();
-  };
-  /**
-   * Template
-   */
-
-
-  _proto.template = function template() {
-    var _this3 = this;
-
-    return _.div({
-      title: this.tooltip,
-      class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '')
-    }, // Value
-    _.div({
-      class: 'widget--dropdown__value'
-    }, this.getValueLabel()), // Toggle
-    _.input({
-      class: 'widget--dropdown__toggle',
-      type: 'checkbox'
-    }).click(function (e) {
-      _this3.toggle(e.currentTarget.checked);
-    }), // Typeahead input
-    _.if(this.useTypeAhead, _.span({
-      class: 'widget--dropdown__typeahead__icon fa fa-search'
-    }), _.input({
-      class: 'widget--dropdown__typeahead',
-      type: 'text'
-    }).on('input', function (e) {
-      _this3.onTypeahead(e.currentTarget.value);
-    })), // Dropdown options
-    _.div({
-      class: 'widget--dropdown__options'
-    }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
-      var optionIcon = _this3.getOptionIcon(optionLabel); // Reverse keys option
-
-
-      if (_this3.reverseKeys) {
-        var key = optionLabel;
-        var value = optionValue;
-        optionValue = key;
-        optionLabel = value;
-      }
-
-      if (!optionValue || optionValue === '---') {
-        return _.div({
-          class: 'widget--dropdown__separator'
-        }, optionLabel);
-      }
-
-      return _.button({
-        class: 'widget--dropdown__option',
-        'data-value': optionValue
-      }, _.if(optionIcon, _.span({
-        class: 'widget--dropdown__option__icon fa fa-' + optionIcon
-      })), optionLabel).click(function (e) {
-        _this3.onChangeInternal(optionValue);
-      });
-    })), // Clear button
-    _.if(this.useClearButton, _.button({
-      class: 'widget--dropdown__clear fa fa-remove',
-      title: 'Clear selection'
-    }).click(function (e) {
-      _this3.onChangeInternal(null);
-    })));
-  };
+  }]);
 
   return Dropdown;
 }(HashBrown.Views.Widgets.Widget);
@@ -606,170 +660,192 @@ module.exports = Dropdown;
  * @memberof HashBrown.Client.Views.Widgets
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Chips =
 /*#__PURE__*/
 function (_HashBrown$Views$Widg) {
-  _inheritsLoose(Chips, _HashBrown$Views$Widg);
+  _inherits(Chips, _HashBrown$Views$Widg);
 
   function Chips() {
-    return _HashBrown$Views$Widg.apply(this, arguments) || this;
+    _classCallCheck(this, Chips);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Chips).apply(this, arguments));
   }
 
-  var _proto = Chips.prototype;
+  _createClass(Chips, [{
+    key: "onChangeInternal",
 
-  /**
-   * Event: Change
-   */
-  _proto.onChangeInternal = function onChangeInternal() {
-    if (typeof this.onChange !== 'function') {
-      return;
+    /**
+     * Event: Change
+     */
+    value: function onChangeInternal() {
+      if (typeof this.onChange !== 'function') {
+        return;
+      }
+
+      this.onChange(this.value);
     }
+    /**
+     * Pre render
+     */
 
-    this.onChange(this.value);
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    // Array check
-    // NOTE: Array is the default mode for this widget
-    if (this.useArray === true || typeof this.useArray === 'undefined') {
-      // Check format
-      if (!this.value || !Array.isArray(this.value)) {
-        this.value = [];
-      }
-
-      if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
-        this.disabledValue = [];
-      } // Check empty values
-
-
-      for (var i = this.value.length - 1; i >= 0; i--) {
-        if (!this.value[i]) {
-          this.value.splice(i, 1);
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      // Array check
+      // NOTE: Array is the default mode for this widget
+      if (this.useArray === true || typeof this.useArray === 'undefined') {
+        // Check format
+        if (!this.value || !Array.isArray(this.value)) {
+          this.value = [];
         }
-      } // Check for empty values or duplicates in disabled value
+
+        if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
+          this.disabledValue = [];
+        } // Check empty values
 
 
-      for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
-        if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
-          this.disabledValue.splice(_i, 1);
+        for (var i = this.value.length - 1; i >= 0; i--) {
+          if (!this.value[i]) {
+            this.value.splice(i, 1);
+          }
+        } // Check for empty values or duplicates in disabled value
+
+
+        for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
+          if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
+            this.disabledValue.splice(_i, 1);
+          }
+        } // Object check
+
+      } else if (this.useArray === false || this.useObject === true) {
+        // Check format
+        if (!this.value || Array.isArray(this.value) || _typeof(this.value) !== 'object') {
+          this.value = {};
         }
-      } // Object check
 
-    } else if (this.useArray === false || this.useObject === true) {
-      // Check format
-      if (!this.value || Array.isArray(this.value) || typeof this.value !== 'object') {
-        this.value = {};
-      }
-
-      if (!this.disabledValue || Array.isArray(this.disabledValue) || typeof this.disabledValue !== 'object') {
-        this.disabledValue = {};
-      } // Check empty values
+        if (!this.disabledValue || Array.isArray(this.disabledValue) || _typeof(this.disabledValue) !== 'object') {
+          this.disabledValue = {};
+        } // Check empty values
 
 
-      for (var k in this.value) {
-        if (!k || !this.value[k]) {
-          delete this.value[k];
-        }
-      } // Check for empty values or duplicates in disabled value
+        for (var k in this.value) {
+          if (!k || !this.value[k]) {
+            delete this.value[k];
+          }
+        } // Check for empty values or duplicates in disabled value
 
 
-      for (var _k in this.disabledValue) {
-        if (!_k || !this.disabledValue[_k] || this.value[_k]) {
-          delete this.value[_k];
+        for (var _k in this.disabledValue) {
+          if (!_k || !this.disabledValue[_k] || this.value[_k]) {
+            delete this.value[_k];
+          }
         }
       }
     }
-  };
-  /**
-   * Template
-   */
+    /**
+     * Template
+     */
 
+  }, {
+    key: "template",
+    value: function template() {
+      var _this = this;
 
-  _proto.template = function template() {
-    var _this = this;
-
-    return _.div({
-      class: 'widget widget--chips'
-    }, _.each(this.disabledValue, function (i, item) {
       return _.div({
-        class: 'widget--chips__chip'
-      }, _.input({
-        class: 'widget--chips__chip__input',
-        disabled: true,
-        value: item
-      }));
-    }), _.each(this.value, function (i, item) {
-      return _.div({
-        class: 'widget--chips__chip'
-      }, _.if(_this.useObject === true || _this.useArray === false || _this.valueKey, _.input({
-        class: 'widget--chips__chip__input',
-        title: 'The key',
-        type: 'text',
-        value: item[_this.valueKey] || i,
-        pattern: '.{1,}'
-      }).on('change', function (e) {
-        if (_this.valueKey) {
-          item[_this.valueKey] = e.currentTarget.value || '';
-        } else {
-          i = e.currentTarget.value || '';
-          _this.value[i] = item;
-        }
+        class: 'widget widget--chips'
+      }, _.each(this.disabledValue, function (i, item) {
+        return _.div({
+          class: 'widget--chips__chip'
+        }, _.input({
+          class: 'widget--chips__chip__input',
+          disabled: true,
+          value: item
+        }));
+      }), _.each(this.value, function (i, item) {
+        return _.div({
+          class: 'widget--chips__chip'
+        }, _.if(_this.useObject === true || _this.useArray === false || _this.valueKey, _.input({
+          class: 'widget--chips__chip__input',
+          title: 'The key',
+          type: 'text',
+          value: item[_this.valueKey] || i,
+          pattern: '.{1,}'
+        }).on('change', function (e) {
+          if (_this.valueKey) {
+            item[_this.valueKey] = e.currentTarget.value || '';
+          } else {
+            i = e.currentTarget.value || '';
+            _this.value[i] = item;
+          }
 
-        _this.onChangeInternal();
-      })), _.input({
-        class: 'widget--chips__chip__input',
-        title: 'The label',
-        type: 'text',
-        value: _this.labelKey ? item[_this.labelKey] : item,
-        pattern: '.{1,}'
-      }).on('change', function (e) {
-        if (_this.labelKey) {
-          item[_this.labelKey] = e.currentTarget.value || '';
-        } else {
-          _this.value[i] = e.currentTarget.value || '';
-        }
+          _this.onChangeInternal();
+        })), _.input({
+          class: 'widget--chips__chip__input',
+          title: 'The label',
+          type: 'text',
+          value: _this.labelKey ? item[_this.labelKey] : item,
+          pattern: '.{1,}'
+        }).on('change', function (e) {
+          if (_this.labelKey) {
+            item[_this.labelKey] = e.currentTarget.value || '';
+          } else {
+            _this.value[i] = e.currentTarget.value || '';
+          }
 
-        _this.onChangeInternal();
+          _this.onChangeInternal();
+        }), _.button({
+          class: 'widget--chips__chip__remove fa fa-remove',
+          title: 'Remove item'
+        }).click(function () {
+          _this.value.splice(i, 1);
+
+          _this.onChangeInternal();
+
+          _this.fetch();
+        }));
       }), _.button({
-        class: 'widget--chips__chip__remove fa fa-remove',
-        title: 'Remove item'
+        class: 'widget widget--button round widget--chips__add fa fa-plus',
+        title: 'Add item'
       }).click(function () {
-        _this.value.splice(i, 1);
+        var newValue = _this.placeholder || 'New item';
+        var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
+
+        if (_this.useObject === true || _this.useArray === false) {
+          _this.value[newKey] = newValue;
+        } else if (_this.valueKey && _this.labelKey) {
+          var newObject = {};
+          newObject[_this.valueKey] = newKey;
+          newObject[_this.labelKey] = newValue;
+
+          _this.value.push(newObject);
+        } else {
+          _this.value.push(newValue);
+        }
 
         _this.onChangeInternal();
 
         _this.fetch();
       }));
-    }), _.button({
-      class: 'widget widget--button round widget--chips__add fa fa-plus',
-      title: 'Add item'
-    }).click(function () {
-      var newValue = _this.placeholder || 'New item';
-      var newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');
-
-      if (_this.useObject === true || _this.useArray === false) {
-        _this.value[newKey] = newValue;
-      } else if (_this.valueKey && _this.labelKey) {
-        var newObject = {};
-        newObject[_this.valueKey] = newKey;
-        newObject[_this.labelKey] = newValue;
-
-        _this.value.push(newObject);
-      } else {
-        _this.value.push(newValue);
-      }
-
-      _this.onChangeInternal();
-
-      _this.fetch();
-    }));
-  };
+    }
+  }]);
 
   return Chips;
 }(HashBrown.Views.Widgets.Widget);
@@ -788,165 +864,186 @@ module.exports = Chips;
  * @memberof HashBrown.Client.Views.Widgets
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var Input =
 /*#__PURE__*/
 function (_HashBrown$Views$Widg) {
-  _inheritsLoose(Input, _HashBrown$Views$Widg);
+  _inherits(Input, _HashBrown$Views$Widg);
 
   function Input() {
-    return _HashBrown$Views$Widg.apply(this, arguments) || this;
+    _classCallCheck(this, Input);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Input).apply(this, arguments));
   }
 
-  var _proto = Input.prototype;
+  _createClass(Input, [{
+    key: "onChangeInternal",
 
-  /**
-   * Event: Change value
-   *
-   * @param {Anything} newValue
-   */
-  _proto.onChangeInternal = function onChangeInternal(newValue) {
-    this.value = newValue;
+    /**
+     * Event: Change value
+     *
+     * @param {Anything} newValue
+     */
+    value: function onChangeInternal(newValue) {
+      this.value = newValue;
 
-    if (typeof this.onChange !== 'function') {
-      return;
+      if (typeof this.onChange !== 'function') {
+        return;
+      }
+
+      this.onChange(this.value);
     }
+    /**
+     * Template
+     */
 
-    this.onChange(this.value);
-  };
-  /**
-   * Template
-   */
+  }, {
+    key: "template",
+    value: function template() {
+      var _this = this;
 
+      var config = {
+        placeholder: this.placeholder,
+        title: this.tooltip,
+        type: this.type || 'text',
+        class: 'widget widget--input ' + (this.type || 'text'),
+        value: this.value,
+        name: this.name
+      };
 
-  _proto.template = function template() {
-    var _this = this;
+      if (this.type === 'number' || this.type === 'range') {
+        config.step = this.step || 'any';
+        config.min = this.min;
+        config.max = this.max;
+      }
 
-    var config = {
-      placeholder: this.placeholder,
-      title: this.tooltip,
-      type: this.type || 'text',
-      class: 'widget widget--input ' + (this.type || 'text'),
-      value: this.value,
-      name: this.name
-    };
+      switch (this.type) {
+        case 'range':
+          return _.div({
+            class: config.class,
+            title: config.title
+          }, _.input({
+            class: 'widget--input__range-input',
+            type: 'range',
+            value: this.value,
+            min: config.min,
+            max: config.max,
+            step: config.step
+          }).on('input', function (e) {
+            _this.onChangeInternal(e.currentTarget.value);
 
-    if (this.type === 'number' || this.type === 'range') {
-      config.step = this.step || 'any';
-      config.min = this.min;
-      config.max = this.max;
-    }
+            e.currentTarget.nextElementSibling.innerHTML = e.currentTarget.value;
+          }), _.div({
+            class: 'widget--input__range-extra'
+          }, this.value));
 
-    switch (this.type) {
-      case 'range':
-        return _.div({
-          class: config.class,
-          title: config.title
-        }, _.input({
-          class: 'widget--input__range-input',
-          type: 'range',
-          value: this.value,
-          min: config.min,
-          max: config.max,
-          step: config.step
-        }).on('input', function (e) {
-          _this.onChangeInternal(e.currentTarget.value);
+        case 'checkbox':
+          return _.div({
+            class: config.class,
+            title: config.title
+          }, _.if(config.placeholder, _.label({
+            for: 'checkbox-' + this.guid,
+            class: 'widget--input__checkbox-label'
+          }, config.placeholder)), _.input({
+            id: 'checkbox-' + this.guid,
+            class: 'widget--input__checkbox-input',
+            type: 'checkbox',
+            checked: this.value
+          }).on('change', function (e) {
+            _this.onChangeInternal(e.currentTarget.checked);
+          }), _.div({
+            class: 'widget--input__checkbox-background'
+          }), _.div({
+            class: 'widget--input__checkbox-switch'
+          }));
 
-          e.currentTarget.nextElementSibling.innerHTML = e.currentTarget.value;
-        }), _.div({
-          class: 'widget--input__range-extra'
-        }, this.value));
+        case 'file':
+          return _.form({
+            class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''),
+            title: config.title
+          }, _.label({
+            for: 'file-' + this.guid,
+            class: 'widget--input__file-browse widget widget--button expanded'
+          }, this.placeholder || 'Browse...'), _.input({
+            id: 'file-' + this.guid,
+            class: 'widget--input__file-input',
+            type: 'file',
+            name: this.name || 'file',
+            multiple: this.useMultiple,
+            directory: this.useDirectory
+          }).on('change', function (e) {
+            var names = [];
+            var files = e.currentTarget.files;
+            var btnBrowse = e.currentTarget.parentElement.querySelector('.widget--input__file-browse');
+            var btnSubmit = e.currentTarget.parentElement.querySelector('.widget--input__file-submit');
 
-      case 'checkbox':
-        return _.div({
-          class: config.class,
-          title: config.title
-        }, _.if(config.placeholder, _.label({
-          for: 'checkbox-' + this.guid,
-          class: 'widget--input__checkbox-label'
-        }, config.placeholder)), _.input({
-          id: 'checkbox-' + this.guid,
-          class: 'widget--input__checkbox-input',
-          type: 'checkbox',
-          checked: this.value
-        }).on('change', function (e) {
-          _this.onChangeInternal(e.currentTarget.checked);
-        }), _.div({
-          class: 'widget--input__checkbox-background'
-        }), _.div({
-          class: 'widget--input__checkbox-switch'
-        }));
-
-      case 'file':
-        return _.form({
-          class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''),
-          title: config.title
-        }, _.label({
-          for: 'file-' + this.guid,
-          class: 'widget--input__file-browse widget widget--button expanded'
-        }, this.placeholder || 'Browse...'), _.input({
-          id: 'file-' + this.guid,
-          class: 'widget--input__file-input',
-          type: 'file',
-          name: this.name || 'file',
-          multiple: this.useMultiple,
-          directory: this.useDirectory
-        }).on('change', function (e) {
-          var names = [];
-          var files = e.currentTarget.files;
-          var btnBrowse = e.currentTarget.parentElement.querySelector('.widget--input__file-browse');
-          var btnSubmit = e.currentTarget.parentElement.querySelector('.widget--input__file-submit');
-
-          if (btnSubmit) {
-            btnSubmit.classList.toggle('disabled', !files || files.length < 1);
-          }
-
-          _this.onChangeInternal(files);
-
-          if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-              names.push(files[i].name + ' (' + Math.round(files[i].size / 1000) + 'kb)');
+            if (btnSubmit) {
+              btnSubmit.classList.toggle('disabled', !files || files.length < 1);
             }
-          }
 
-          if (names.length > 0) {
-            btnBrowse.innerHTML = names.join(', ');
-          } else {
-            btnBrowse.innerHTML = _this.placeholder || 'Browse...';
-          }
-        }), _.if(typeof this.onSubmit === 'function', _.button({
-          class: 'widget widget--button widget--input__file-submit disabled',
-          type: 'submit',
-          title: 'Upload file'
-        }, _.span({
-          class: 'fa fa-upload'
-        }), 'Upload'))).on('submit', function (e) {
-          e.preventDefault();
-          var input = e.currentTarget.querySelector('.widget--input__file-input');
+            _this.onChangeInternal(files);
 
-          if (!input || !input.files || input.files.length < 1) {
-            return;
-          }
+            if (files && files.length > 0) {
+              for (var i = 0; i < files.length; i++) {
+                names.push(files[i].name + ' (' + Math.round(files[i].size / 1000) + 'kb)');
+              }
+            }
 
-          if (typeof _this.onSubmit !== 'function') {
-            return;
-          }
+            if (names.length > 0) {
+              btnBrowse.innerHTML = names.join(', ');
+            } else {
+              btnBrowse.innerHTML = _this.placeholder || 'Browse...';
+            }
+          }), _.if(typeof this.onSubmit === 'function', _.button({
+            class: 'widget widget--button widget--input__file-submit disabled',
+            type: 'submit',
+            title: 'Upload file'
+          }, _.span({
+            class: 'fa fa-upload'
+          }), 'Upload'))).on('submit', function (e) {
+            e.preventDefault();
+            var input = e.currentTarget.querySelector('.widget--input__file-input');
 
-          _this.onSubmit(new FormData(e.currentTarget), input.files);
-        });
+            if (!input || !input.files || input.files.length < 1) {
+              return;
+            }
 
-      case 'textarea':
-        return _.textarea(config, config.value).on('input', function (e) {
-          _this.onChangeInternal(e.currentTarget.value);
-        });
+            if (typeof _this.onSubmit !== 'function') {
+              return;
+            }
 
-      default:
-        return _.input(config).on('input', function (e) {
-          _this.onChangeInternal(e.currentTarget.value);
-        });
+            _this.onSubmit(new FormData(e.currentTarget), input.files);
+          });
+
+        case 'textarea':
+          return _.textarea(config, config.value).on('input', function (e) {
+            _this.onChangeInternal(e.currentTarget.value);
+          });
+
+        default:
+          return _.input(config).on('input', function (e) {
+            _this.onChangeInternal(e.currentTarget.value);
+          });
+      }
     }
-  };
+  }]);
 
   return Input;
 }(HashBrown.Views.Widgets.Widget);
@@ -977,14 +1074,28 @@ namespace('Views.Modals').add(__webpack_require__(234)).add(__webpack_require__(
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var Modal =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(Modal, _Crisp$View);
+  _inherits(Modal, _Crisp$View);
 
   /**
    * Constructor
@@ -992,38 +1103,48 @@ function (_Crisp$View) {
   function Modal(params) {
     var _this;
 
+    _classCallCheck(this, Modal);
+
     params = params || {};
 
     if (typeof params.actions === 'undefined') {
       params.actions = [];
     }
 
-    _this = _Crisp$View.call(this, params) || this; // If this belongs to a group, find existing modals and append instead
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Modal).call(this, params)); // If this belongs to a group, find existing modals and append instead
 
     if (_this.group) {
-      for (var _iterator = Crisp.View.getAll('Modal'), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
+      try {
+        for (var _iterator = Crisp.View.getAll('Modal')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var modal = _step.value;
+
+          if (modal.group !== _this.group || modal === _assertThisInitialized(_assertThisInitialized(_this))) {
+            continue;
+          }
+
+          modal.append(_assertThisInitialized(_assertThisInitialized(_this)));
+
+          _this.remove();
+
+          break;
         }
-
-        var modal = _ref;
-
-        if (modal.group !== _this.group || modal === _assertThisInitialized(_assertThisInitialized(_this))) {
-          continue;
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
-
-        modal.append(_assertThisInitialized(_assertThisInitialized(_this)));
-
-        _this.remove();
-
-        break;
       }
     }
 
@@ -1041,144 +1162,151 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = Modal.prototype;
-
-  _proto.setLoading = function setLoading(isActive) {
-    var spinner = this.element.querySelector('.widget--spinner');
-    spinner.classList.toggle('hidden', !isActive);
-  };
-  /**
-   * Close this modal
-   *
-   */
-
-
-  _proto.close = function close() {
-    var _this2 = this;
-
-    this.element.classList.toggle('in', false);
-    setTimeout(function () {
-      _this2.remove();
-    }, 500);
-  };
-  /**
-   * Renders the modal body
-   *
-   * @returns {HTMLElement} Body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    return this.body;
-  };
-  /**
-   * Renders the modal footer
-   *
-   * @returns {HTMLElement} Footer
-   */
-
-
-  _proto.renderFooter = function renderFooter() {
-    var _this3 = this;
-
-    if (this.actions === false) {
-      return;
+  _createClass(Modal, [{
+    key: "setLoading",
+    value: function setLoading(isActive) {
+      var spinner = this.element.querySelector('.widget--spinner');
+      spinner.classList.toggle('hidden', !isActive);
     }
+    /**
+     * Close this modal
+     *
+     */
 
-    if (this.actions && this.actions.length > 0) {
-      return _.each(this.actions, function (i, action) {
-        return _.button({
-          class: 'widget widget--button ' + (action.class || '')
-        }, action.label).click(function () {
-          if (typeof action.onClick !== 'function') {
-            return _this3.close();
-          }
+  }, {
+    key: "close",
+    value: function close() {
+      var _this2 = this;
 
-          if (action.onClick() !== false) {
-            _this3.close();
-          }
+      this.element.classList.toggle('in', false);
+      setTimeout(function () {
+        _this2.remove();
+      }, 500);
+    }
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      return this.body;
+    }
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
+
+  }, {
+    key: "renderFooter",
+    value: function renderFooter() {
+      var _this3 = this;
+
+      if (this.actions === false) {
+        return;
+      }
+
+      if (this.actions && this.actions.length > 0) {
+        return _.each(this.actions, function (i, action) {
+          return _.button({
+            class: 'widget widget--button ' + (action.class || '')
+          }, action.label).click(function () {
+            if (typeof action.onClick !== 'function') {
+              return _this3.close();
+            }
+
+            if (action.onClick() !== false) {
+              _this3.close();
+            }
+          });
         });
+      }
+
+      return _.button({
+        class: 'widget widget--button'
+      }, 'OK').click(function () {
+        _this3.close();
+
+        _this3.trigger('ok');
       });
     }
+    /**
+     * Renders the modal header
+     *
+     * @returns {HTMLElement} Header
+     */
 
-    return _.button({
-      class: 'widget widget--button'
-    }, 'OK').click(function () {
-      _this3.close();
+  }, {
+    key: "renderHeader",
+    value: function renderHeader() {
+      var _this4 = this;
 
-      _this3.trigger('ok');
-    });
-  };
-  /**
-   * Renders the modal header
-   *
-   * @returns {HTMLElement} Header
-   */
+      if (!this.title) {
+        return;
+      }
 
-
-  _proto.renderHeader = function renderHeader() {
-    var _this4 = this;
-
-    if (!this.title) {
-      return;
+      return [_.h4({
+        class: 'modal__title'
+      }, this.title), _.if(!this.isBlocking, _.button({
+        class: 'modal__close fa fa-close'
+      }).click(function () {
+        _this4.close();
+      }))];
     }
+    /**
+     * Renders this modal
+     */
 
-    return [_.h4({
-      class: 'modal__title'
-    }, this.title), _.if(!this.isBlocking, _.button({
-      class: 'modal__close fa fa-close'
-    }).click(function () {
-      _this4.close();
-    }))];
-  };
-  /**
-   * Renders this modal
-   */
+  }, {
+    key: "template",
+    value: function template() {
+      var _this5 = this;
 
+      var header = this.renderHeader();
+      var body = this.renderBody();
+      var footer = this.renderFooter();
 
-  _proto.template = function template() {
-    var _this5 = this;
+      if (!this.hasTransitionedIn) {
+        setTimeout(function () {
+          _this5.hasTransitionedIn = true;
 
-    var header = this.renderHeader();
-    var body = this.renderBody();
-    var footer = this.renderFooter();
+          _this5.element.classList.toggle('in', true);
+        }, 50);
+      }
 
-    if (!this.hasTransitionedIn) {
-      setTimeout(function () {
-        _this5.hasTransitionedIn = true;
-
-        _this5.element.classList.toggle('in', true);
-      }, 50);
+      return _.div({
+        class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '')
+      }, _.div({
+        class: 'modal__dialog'
+      }, _.div({
+        class: 'widget--spinner embedded hidden'
+      }, _.div({
+        class: 'widget--spinner__image fa fa-refresh'
+      })), _.if(header, _.div({
+        class: 'modal__header'
+      }, header)), _.if(body, _.div({
+        class: 'modal__body'
+      }, body)), _.if(footer && !this.isBlocking, _.div({
+        class: 'modal__footer'
+      }, footer))));
     }
+    /**
+     * Appends another modal to this modal
+     *
+     * @param {Modal} modal
+     */
 
-    return _.div({
-      class: 'modal' + (this.hasTransitionedIn ? ' in' : '') + (this.group ? ' ' + this.group : '') + (this.className ? ' modal--' + this.className : '')
-    }, _.div({
-      class: 'modal__dialog'
-    }, _.div({
-      class: 'widget--spinner embedded hidden'
-    }, _.div({
-      class: 'widget--spinner__image fa fa-refresh'
-    })), _.if(header, _.div({
-      class: 'modal__header'
-    }, header)), _.if(body, _.div({
-      class: 'modal__body'
-    }, body)), _.if(footer && !this.isBlocking, _.div({
-      class: 'modal__footer'
-    }, footer))));
-  };
-  /**
-   * Appends another modal to this modal
-   *
-   * @param {Modal} modal
-   */
-
-
-  _proto.append = function append(modal) {
-    this.$element.find('.modal__footer').before(_.div({
-      class: 'modal__body'
-    }, modal.renderBody()));
-  };
+  }, {
+    key: "append",
+    value: function append(modal) {
+      this.$element.find('.modal__footer').before(_.div({
+        class: 'modal__body'
+      }, modal.renderBody()));
+    }
+  }]);
 
   return Modal;
 }(Crisp.View); // Modal key events
@@ -1227,67 +1355,90 @@ module.exports = Modal;
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ConfirmModal =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(ConfirmModal, _HashBrown$Views$Moda);
+  _inherits(ConfirmModal, _HashBrown$Views$Moda);
 
   function ConfirmModal() {
-    return _HashBrown$Views$Moda.apply(this, arguments) || this;
+    _classCallCheck(this, ConfirmModal);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ConfirmModal).apply(this, arguments));
   }
 
-  var _proto = ConfirmModal.prototype;
+  _createClass(ConfirmModal, [{
+    key: "postrender",
 
-  /**
-   * Post render
-   */
-  _proto.postrender = function postrender() {
-    this.element.classList.toggle('modal--confirm', true);
-  };
-  /**
-   * Render header
-   */
+    /**
+     * Post render
+     */
+    value: function postrender() {
+      this.element.classList.toggle('modal--confirm', true);
+    }
+    /**
+     * Render header
+     */
 
+  }, {
+    key: "renderHeader",
+    value: function renderHeader() {
+      return _.h4({
+        class: 'modal--date__header__title'
+      }, this.title);
+    }
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
 
-  _proto.renderHeader = function renderHeader() {
-    return _.h4({
-      class: 'modal--date__header__title'
-    }, this.title);
-  };
-  /**
-   * Renders the modal footer
-   *
-   * @returns {HTMLElement} Footer
-   */
+  }, {
+    key: "renderFooter",
+    value: function renderFooter() {
+      var _this = this;
 
+      return [_.button({
+        class: 'widget widget--button standard'
+      }, 'Cancel').click(function () {
+        _this.trigger('cancel');
 
-  _proto.renderFooter = function renderFooter() {
-    var _this = this;
+        _this.close();
+      }), _.button({
+        class: 'widget widget--button warning'
+      }, this.type || 'OK').click(function () {
+        _this.trigger('ok');
 
-    return [_.button({
-      class: 'widget widget--button standard'
-    }, 'Cancel').click(function () {
-      _this.trigger('cancel');
+        _this.close();
+      })];
+    }
+    /**
+     * Render body
+     */
 
-      _this.close();
-    }), _.button({
-      class: 'widget widget--button warning'
-    }, this.type || 'OK').click(function () {
-      _this.trigger('ok');
-
-      _this.close();
-    })];
-  };
-  /**
-   * Render body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    return this.body;
-  };
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      return this.body;
+    }
+  }]);
 
   return ConfirmModal;
 }(HashBrown.Views.Modals.Modal);
@@ -1306,172 +1457,195 @@ module.exports = ConfirmModal;
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var DateModal =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(DateModal, _HashBrown$Views$Moda);
+  _inherits(DateModal, _HashBrown$Views$Moda);
 
   /**
    * Constructor
    */
   function DateModal(params) {
+    _classCallCheck(this, DateModal);
+
     params.className = 'date';
-    return _HashBrown$Views$Moda.call(this, params) || this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(DateModal).call(this, params));
   }
   /**
    * Pre render
    */
 
 
-  var _proto = DateModal.prototype;
+  _createClass(DateModal, [{
+    key: "prerender",
+    value: function prerender() {
+      this.days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      this.hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+      this.minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']; // Sanity check
 
-  _proto.prerender = function prerender() {
-    this.days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    this.hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
-    this.minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']; // Sanity check
+      this.value = this.value ? new Date(this.value) : new Date();
 
-    this.value = this.value ? new Date(this.value) : new Date();
-
-    if (isNaN(this.value.getDate())) {
-      this.value = new Date();
+      if (isNaN(this.value.getDate())) {
+        this.value = new Date();
+      }
     }
-  };
-  /**
-   * Gets days in current month and year
-   *
-   * @param {Number} year
-   * @param {Number} month
-   *
-   * @returns {Array} Days
-   */
+    /**
+     * Gets days in current month and year
+     *
+     * @param {Number} year
+     * @param {Number} month
+     *
+     * @returns {Array} Days
+     */
 
+  }, {
+    key: "getDays",
+    value: function getDays(year, month) {
+      var max = new Date(year, month, 0).getDate();
+      var days = [];
 
-  _proto.getDays = function getDays(year, month) {
-    var max = new Date(year, month, 0).getDate();
-    var days = [];
+      while (days.length < max) {
+        days[days.length] = days.length + 1;
+      }
 
-    while (days.length < max) {
-      days[days.length] = days.length + 1;
+      return days;
     }
+    /**
+     * Render header
+     */
 
-    return days;
-  };
-  /**
-   * Render header
-   */
+  }, {
+    key: "renderHeader",
+    value: function renderHeader() {
+      var _this = this;
 
+      return [_.div({
+        class: 'modal--date__header__year'
+      }, this.value.getFullYear().toString()), _.div({
+        class: 'modal--date__header__day'
+      }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({
+        class: 'modal__close fa fa-close'
+      }).click(function () {
+        _this.close();
+      })];
+    }
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
 
-  _proto.renderHeader = function renderHeader() {
-    var _this = this;
+  }, {
+    key: "renderFooter",
+    value: function renderFooter() {
+      var _this2 = this;
 
-    return [_.div({
-      class: 'modal--date__header__year'
-    }, this.value.getFullYear().toString()), _.div({
-      class: 'modal--date__header__day'
-    }, this.days[this.value.getDay()] + ', ' + this.months[this.value.getMonth()] + ' ' + this.value.getDate()), _.button({
-      class: 'modal__close fa fa-close'
-    }).click(function () {
-      _this.close();
-    })];
-  };
-  /**
-   * Renders the modal footer
-   *
-   * @returns {HTMLElement} Footer
-   */
-
-
-  _proto.renderFooter = function renderFooter() {
-    var _this2 = this;
-
-    return _.button({
-      class: 'widget widget--button'
-    }, 'OK').click(function () {
-      _this2.trigger('change', _this2.value);
-
-      _this2.close();
-    });
-  };
-  /**
-   * Render body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    var _this3 = this;
-
-    return [_.div({
-      class: 'modal--date__body__nav'
-    }, _.button({
-      class: 'modal--date__body__nav__left fa fa-arrow-left'
-    }).click(function () {
-      _this3.value.setMonth(_this3.value.getMonth() - 1);
-
-      _this3.fetch();
-    }), _.div({
-      class: 'modal--date__body__nav__month-year'
-    }, this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()), _.button({
-      class: 'modal--date__body__nav__left fa fa-arrow-right'
-    }).click(function () {
-      _this3.value.setMonth(_this3.value.getMonth() + 1);
-
-      _this3.fetch();
-    })), _.div({
-      class: 'modal--date__body__weekdays'
-    }, _.span({
-      class: 'modal--date__body__weekday'
-    }, 'M'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'T'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'W'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'T'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'F'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'S'), _.span({
-      class: 'modal--date__body__weekday'
-    }, 'S')), _.div({
-      class: 'modal--date__body__days'
-    }, _.each(this.getDays(this.value.getFullYear(), this.value.getMonth() + 1), function (i, day) {
-      var thisDate = new Date(_this3.value.getTime());
-      var now = new Date();
-      var isCurrent = now.getFullYear() == _this3.value.getFullYear() && now.getMonth() == _this3.value.getMonth() && now.getDate() == day;
-      var isActive = _this3.value.getDate() == day;
-      thisDate.setDate(day);
       return _.button({
-        class: 'modal--date__body__day' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '')
-      }, day).click(function () {
-        _this3.value.setDate(day);
+        class: 'widget widget--button'
+      }, 'OK').click(function () {
+        _this2.trigger('change', _this2.value);
+
+        _this2.close();
+      });
+    }
+    /**
+     * Render body
+     */
+
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this3 = this;
+
+      return [_.div({
+        class: 'modal--date__body__nav'
+      }, _.button({
+        class: 'modal--date__body__nav__left fa fa-arrow-left'
+      }).click(function () {
+        _this3.value.setMonth(_this3.value.getMonth() - 1);
 
         _this3.fetch();
-      });
-    })), _.div({
-      class: 'modal--date__body__time'
-    }, _.input({
-      class: 'modal--date__body__time__number',
-      type: 'number',
-      min: 0,
-      max: 23,
-      value: this.value.getHours()
-    }).on('change', function (e) {
-      _this3.value.setHours(e.currentTarget.value);
-    }), _.div({
-      class: 'modal--date__body__time__separator'
-    }, ':'), _.input({
-      class: 'modal--date__body__time__number',
-      type: 'number',
-      min: 0,
-      max: 59,
-      value: this.value.getMinutes()
-    }).on('change', function (e) {
-      _this3.value.setMinutes(e.currentTarget.value);
-    }))];
-  };
+      }), _.div({
+        class: 'modal--date__body__nav__month-year'
+      }, this.months[this.value.getMonth()] + ' ' + this.value.getFullYear()), _.button({
+        class: 'modal--date__body__nav__left fa fa-arrow-right'
+      }).click(function () {
+        _this3.value.setMonth(_this3.value.getMonth() + 1);
+
+        _this3.fetch();
+      })), _.div({
+        class: 'modal--date__body__weekdays'
+      }, _.span({
+        class: 'modal--date__body__weekday'
+      }, 'M'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'T'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'W'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'T'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'F'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'S'), _.span({
+        class: 'modal--date__body__weekday'
+      }, 'S')), _.div({
+        class: 'modal--date__body__days'
+      }, _.each(this.getDays(this.value.getFullYear(), this.value.getMonth() + 1), function (i, day) {
+        var thisDate = new Date(_this3.value.getTime());
+        var now = new Date();
+        var isCurrent = now.getFullYear() == _this3.value.getFullYear() && now.getMonth() == _this3.value.getMonth() && now.getDate() == day;
+        var isActive = _this3.value.getDate() == day;
+        thisDate.setDate(day);
+        return _.button({
+          class: 'modal--date__body__day' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '')
+        }, day).click(function () {
+          _this3.value.setDate(day);
+
+          _this3.fetch();
+        });
+      })), _.div({
+        class: 'modal--date__body__time'
+      }, _.input({
+        class: 'modal--date__body__time__number',
+        type: 'number',
+        min: 0,
+        max: 23,
+        value: this.value.getHours()
+      }).on('change', function (e) {
+        _this3.value.setHours(e.currentTarget.value);
+      }), _.div({
+        class: 'modal--date__body__time__separator'
+      }, ':'), _.input({
+        class: 'modal--date__body__time__number',
+        type: 'number',
+        min: 0,
+        max: 59,
+        value: this.value.getMinutes()
+      }).on('change', function (e) {
+        _this3.value.setMinutes(e.currentTarget.value);
+      }))];
+    }
+  }]);
 
   return DateModal;
 }(HashBrown.Views.Modals.Modal);
@@ -1485,7 +1659,23 @@ module.exports = DateModal;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var icons = __webpack_require__(238).icons;
 /**
@@ -1498,78 +1688,83 @@ var icons = __webpack_require__(238).icons;
 var IconModal =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(IconModal, _HashBrown$Views$Moda);
+  _inherits(IconModal, _HashBrown$Views$Moda);
 
   /**
    * Constructor
    */
   function IconModal(params) {
+    _classCallCheck(this, IconModal);
+
     params = params || {};
     params.title = params.title || 'Pick an icon';
     params.actions = false;
-    return _HashBrown$Views$Moda.call(this, params) || this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(IconModal).call(this, params));
   }
   /**
    * Post render
    */
 
 
-  var _proto = IconModal.prototype;
-
-  _proto.postrender = function postrender() {
-    this.element.classList.toggle('modal--icon', true);
-  };
-  /**
-   * Event: Search
-   *
-   * @param {String} query
-   */
-
-
-  _proto.onSearch = function onSearch(query) {
-    var icons = this.element.querySelectorAll('.modal--icon__icon');
-
-    if (!icons) {
-      return;
+  _createClass(IconModal, [{
+    key: "postrender",
+    value: function postrender() {
+      this.element.classList.toggle('modal--icon', true);
     }
+    /**
+     * Event: Search
+     *
+     * @param {String} query
+     */
 
-    for (var i = 0; i < icons.length; i++) {
-      if (query.length < 3 || icons[i].title.indexOf(query) > -1) {
-        icons[i].style.display = 'block';
-      } else {
-        icons[i].style.display = 'none';
+  }, {
+    key: "onSearch",
+    value: function onSearch(query) {
+      var icons = this.element.querySelectorAll('.modal--icon__icon');
+
+      if (!icons) {
+        return;
+      }
+
+      for (var i = 0; i < icons.length; i++) {
+        if (query.length < 3 || icons[i].title.indexOf(query) > -1) {
+          icons[i].style.display = 'block';
+        } else {
+          icons[i].style.display = 'none';
+        }
       }
     }
-  };
-  /**
-   * Renders the modal body
-   *
-   * @returns {HTMLElement} Body
-   */
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
 
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this = this;
 
-  _proto.renderBody = function renderBody() {
-    var _this = this;
+      return [_.input({
+        type: 'text',
+        class: 'widget widget--input text modal--icon__search',
+        placeholder: 'Search for icons'
+      }).on('input', function (e) {
+        _this.onSearch(e.currentTarget.value);
+      }), _.div({
+        class: 'modal--icon__icons'
+      }, _.each(icons, function (i, icon) {
+        return _.button({
+          class: 'modal--icon__icon widget widget--button fa fa-' + icon,
+          title: icon
+        }).click(function () {
+          _this.trigger('change', icon);
 
-    return [_.input({
-      type: 'text',
-      class: 'widget widget--input text modal--icon__search',
-      placeholder: 'Search for icons'
-    }).on('input', function (e) {
-      _this.onSearch(e.currentTarget.value);
-    }), _.div({
-      class: 'modal--icon__icons'
-    }, _.each(icons, function (i, icon) {
-      return _.button({
-        class: 'modal--icon__icon widget widget--button fa fa-' + icon,
-        title: icon
-      }).click(function () {
-        _this.trigger('change', icon);
-
-        _this.close();
-      });
-    }))];
-  };
+          _this.close();
+        });
+      }))];
+    }
+  }]);
 
   return IconModal;
 }(HashBrown.Views.Modals.Modal);
@@ -1594,36 +1789,57 @@ module.exports = {"icons":["500px","adjust","adn","align-center","align-justify"
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var IframeModal =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(IframeModal, _HashBrown$Views$Moda);
+  _inherits(IframeModal, _HashBrown$Views$Moda);
 
   function IframeModal() {
-    return _HashBrown$Views$Moda.apply(this, arguments) || this;
+    _classCallCheck(this, IframeModal);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(IframeModal).apply(this, arguments));
   }
 
-  var _proto = IframeModal.prototype;
+  _createClass(IframeModal, [{
+    key: "postrender",
 
-  /**
-   * Post render
-   */
-  _proto.postrender = function postrender() {
-    this.element.classList.toggle('modal--iframe', true);
-  };
-  /**
-   * Render body
-   */
+    /**
+     * Post render
+     */
+    value: function postrender() {
+      this.element.classList.toggle('modal--iframe', true);
+    }
+    /**
+     * Render body
+     */
 
-
-  _proto.renderBody = function renderBody() {
-    return _.iframe({
-      class: 'modal--iframe__iframe',
-      src: this.url
-    });
-  };
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      return _.iframe({
+        class: 'modal--iframe__iframe',
+        src: this.url
+      });
+    }
+  }]);
 
   return IframeModal;
 }(HashBrown.Views.Modals.Modal);
@@ -1642,15 +1858,33 @@ module.exports = IframeModal;
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaBrowser =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(MediaBrowser, _HashBrown$Views$Moda);
+  _inherits(MediaBrowser, _HashBrown$Views$Moda);
 
   function MediaBrowser(params) {
     var _this;
+
+    _classCallCheck(this, MediaBrowser);
 
     params = params || {};
     params.className = 'media-browser';
@@ -1661,7 +1895,7 @@ function (_HashBrown$Views$Moda) {
         _this.onClickOK();
       }
     }];
-    _this = _HashBrown$Views$Moda.call(this, params) || this; // Init the media picker mode inside the iframe
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MediaBrowser).call(this, params)); // Init the media picker mode inside the iframe
 
     var iframe = _this.$element.find('iframe')[0];
 
@@ -1684,53 +1918,58 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = MediaBrowser.prototype;
-
-  _proto.onPickMedia = function onPickMedia(id) {
-    this.value = id;
-  };
-  /** 
-   * Event: Click OK
-   */
-
-
-  _proto.onClickOK = function onClickOK() {
-    if (this.value) {
-      this.trigger('select', this.value);
+  _createClass(MediaBrowser, [{
+    key: "onPickMedia",
+    value: function onPickMedia(id) {
+      this.value = id;
     }
+    /** 
+     * Event: Click OK
+     */
 
-    this.close();
-  };
-  /** 
-   * Event: Click cancel
-   */
+  }, {
+    key: "onClickOK",
+    value: function onClickOK() {
+      if (this.value) {
+        this.trigger('select', this.value);
+      }
 
+      this.close();
+    }
+    /** 
+     * Event: Click cancel
+     */
 
-  _proto.onClickCancel = function onClickCancel() {
-    this.close();
-  };
-  /**
-   * Event: Change resource
-   */
+  }, {
+    key: "onClickCancel",
+    value: function onClickCancel() {
+      this.close();
+    }
+    /**
+     * Event: Change resource
+     */
 
+  }, {
+    key: "onChangeResource",
+    value: function onChangeResource() {
+      HashBrown.Helpers.RequestHelper.reloadResource('media').then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      });
+    }
+    /**
+     * Render body
+     *
+     * @returns {HTMLElement} Body
+     */
 
-  _proto.onChangeResource = function onChangeResource() {
-    HashBrown.Helpers.RequestHelper.reloadResource('media').then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    });
-  };
-  /**
-   * Render body
-   *
-   * @returns {HTMLElement} Body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    return _.iframe({
-      src: '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')
-    });
-  };
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      return _.iframe({
+        src: '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')
+      });
+    }
+  }]);
 
   return MediaBrowser;
 }(HashBrown.Views.Modals.Modal);
@@ -1749,12 +1988,28 @@ module.exports = MediaBrowser;
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaUploader =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(MediaUploader, _HashBrown$Views$Moda);
+  _inherits(MediaUploader, _HashBrown$Views$Moda);
 
   /**
    * Constructor
@@ -1762,10 +2017,12 @@ function (_HashBrown$Views$Moda) {
   function MediaUploader(params) {
     var _this;
 
+    _classCallCheck(this, MediaUploader);
+
     params.className = 'media-uploader';
     params.title = 'Upload a file';
     params.actions = false;
-    _this = _HashBrown$Views$Moda.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MediaUploader).call(this, params));
     HashBrown.Helpers.MediaHelper.checkMediaProvider().catch(function (e) {
       UI.errorModal(e);
 
@@ -1778,141 +2035,144 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = MediaUploader.prototype;
+  _createClass(MediaUploader, [{
+    key: "onChangeFile",
+    value: function onChangeFile(files) {
+      var _this2 = this;
 
-  _proto.onChangeFile = function onChangeFile(files) {
-    var _this2 = this;
+      var numFiles = files ? files.length : 1; // In the case of a single file selected 
 
-    var numFiles = files ? files.length : 1; // In the case of a single file selected 
+      if (numFiles == 1) {
+        var file = files[0];
+        var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+        var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
 
-    if (numFiles == 1) {
-      var file = files[0];
-      var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
-      var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+        if (isImage) {
+          var reader = new FileReader();
+          this.setLoading(true);
 
-      if (isImage) {
-        var reader = new FileReader();
-        this.setLoading(true);
+          reader.onload = function (e) {
+            _this2.$element.find('.modal--media-uploader__preview').html(_.img({
+              src: e.target.result
+            }));
 
-        reader.onload = function (e) {
-          _this2.$element.find('.modal--media-uploader__preview').html(_.img({
-            src: e.target.result
+            _this2.setLoading(false);
+          };
+
+          reader.readAsDataURL(file);
+        }
+
+        if (isVideo) {
+          this.$element.find('.modal--media-uploader__preview').html(_.video({
+            src: window.URL.createObjectURL(file),
+            controls: 'controls'
           }));
+        }
 
-          _this2.setLoading(false);
-        };
-
-        reader.readAsDataURL(file);
+        debug.log('Previewing data of file type ' + file.type + '...', this); // Multiple files selected
+      } else if (numFiles > 1) {
+        this.$element.find('.media-preview').html('(Multiple files selected)'); // No files selected
+      } else if (numFiles == 0) {
+        this.$element.find('.media-preview').html('(No files selected)');
       }
-
-      if (isVideo) {
-        this.$element.find('.modal--media-uploader__preview').html(_.video({
-          src: window.URL.createObjectURL(file),
-          controls: 'controls'
-        }));
-      }
-
-      debug.log('Previewing data of file type ' + file.type + '...', this); // Multiple files selected
-    } else if (numFiles > 1) {
-      this.$element.find('.media-preview').html('(Multiple files selected)'); // No files selected
-    } else if (numFiles == 0) {
-      this.$element.find('.media-preview').html('(No files selected)');
     }
-  };
-  /**
-   * Event: Submit
-   *
-   * @param {FormData} content
-   * @param {Array} files
-   */
+    /**
+     * Event: Submit
+     *
+     * @param {FormData} content
+     * @param {Array} files
+     */
 
+  }, {
+    key: "onSubmit",
+    value: function onSubmit(content, files) {
+      var _this3 = this;
 
-  _proto.onSubmit = function onSubmit(content, files) {
-    var _this3 = this;
-
-    if (!content || !files || files.length < 1) {
-      return;
-    }
-
-    this.setLoading(true);
-    var type = files[0].type;
-    var apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
-    var uploadedIds = []; // First upload the Media files
-
-    return HashBrown.Helpers.RequestHelper.uploadFile(apiPath, type, content) // Then update the Media tree
-    .then(function (ids) {
-      uploadedIds = ids;
-
-      if (!uploadedIds || uploadedIds.length < 1) {
-        return Promise.reject(new Error('File upload failed'));
+      if (!content || !files || files.length < 1) {
+        return;
       }
 
-      if (!_this3.folder || _this3.folder === '/') {
-        return Promise.resolve();
-      }
+      this.setLoading(true);
+      var type = files[0].type;
+      var apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+      var uploadedIds = []; // First upload the Media files
 
-      var queue = uploadedIds.slice(0);
+      return HashBrown.Helpers.RequestHelper.uploadFile(apiPath, type, content) // Then update the Media tree
+      .then(function (ids) {
+        uploadedIds = ids;
 
-      var putNextMediaIntoTree = function putNextMediaIntoTree() {
-        var id = queue.pop();
+        if (!uploadedIds || uploadedIds.length < 1) {
+          return Promise.reject(new Error('File upload failed'));
+        }
 
-        if (!id) {
+        if (!_this3.folder || _this3.folder === '/') {
           return Promise.resolve();
         }
 
-        return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, {
-          id: id,
-          folder: _this3.folder
-        }).then(function () {
-          return putNextMediaIntoTree();
-        });
-      };
+        var queue = uploadedIds.slice(0);
 
-      return putNextMediaIntoTree();
-    }) // Then reload the Media resource
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('media');
-    }) // Then update the UI and trigger the success callback
-    .then(function () {
-      _this3.setLoading(false);
+        var putNextMediaIntoTree = function putNextMediaIntoTree() {
+          var id = queue.pop();
 
-      HashBrown.Views.Navigation.NavbarMain.reload();
+          if (!id) {
+            return Promise.resolve();
+          }
 
-      if (typeof _this3.onSuccess === 'function') {
-        _this3.onSuccess(uploadedIds);
-      }
+          return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, {
+            id: id,
+            folder: _this3.folder
+          }).then(function () {
+            return putNextMediaIntoTree();
+          });
+        };
 
-      _this3.close();
-    }).catch(function (e) {
-      UI.errorModal(e);
+        return putNextMediaIntoTree();
+      }) // Then reload the Media resource
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('media');
+      }) // Then update the UI and trigger the success callback
+      .then(function () {
+        _this3.setLoading(false);
 
-      _this3.setLoading(false);
-    });
-  };
-  /**
-   * Render body
-   *
-   * @returns {HTMLElement} Body
-   */
+        HashBrown.Views.Navigation.NavbarMain.reload();
 
+        if (typeof _this3.onSuccess === 'function') {
+          _this3.onSuccess(uploadedIds);
+        }
 
-  _proto.renderBody = function renderBody() {
-    var _this4 = this;
+        _this3.close();
+      }).catch(function (e) {
+        UI.errorModal(e);
 
-    return [_.div({
-      class: 'modal--media-uploader__preview'
-    }), new HashBrown.Views.Widgets.Input({
-      type: 'file',
-      name: 'media',
-      useMultiple: !this.replaceId,
-      onChange: function onChange(newValue) {
-        _this4.onChangeFile(newValue);
-      },
-      onSubmit: function onSubmit(newValue, newFiles) {
-        _this4.onSubmit(newValue, newFiles);
-      }
-    }).$element];
-  };
+        _this3.setLoading(false);
+      });
+    }
+    /**
+     * Render body
+     *
+     * @returns {HTMLElement} Body
+     */
+
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this4 = this;
+
+      return [_.div({
+        class: 'modal--media-uploader__preview'
+      }), new HashBrown.Views.Widgets.Input({
+        type: 'file',
+        name: 'media',
+        useMultiple: !this.replaceId,
+        onChange: function onChange(newValue) {
+          _this4.onChangeFile(newValue);
+        },
+        onSubmit: function onSubmit(newValue, newFiles) {
+          _this4.onSubmit(newValue, newFiles);
+        }
+      }).$element];
+    }
+  }]);
 
   return MediaUploader;
 }(HashBrown.Views.Modals.Modal);
@@ -1931,18 +2191,36 @@ module.exports = MediaUploader;
  * @memberof HashBrown.Client.Views.Modals
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var PublishingSettingsModal =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(PublishingSettingsModal, _HashBrown$Views$Moda);
+  _inherits(PublishingSettingsModal, _HashBrown$Views$Moda);
 
   /**
    * Constructor
    */
   function PublishingSettingsModal(params) {
     var _this;
+
+    _classCallCheck(this, PublishingSettingsModal);
 
     params.title = 'Publishing settings for "' + params.model.prop('title', window.language) + '"';
     params.actions = [{
@@ -1952,7 +2230,7 @@ function (_HashBrown$Views$Moda) {
       }
     }];
     params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
-    return _this = _HashBrown$Views$Moda.call(this, params) || this;
+    return _this = _possibleConstructorReturn(this, _getPrototypeOf(PublishingSettingsModal).call(this, params));
   }
   /**
    * Renders the body
@@ -1961,47 +2239,48 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = PublishingSettingsModal.prototype;
+  _createClass(PublishingSettingsModal, [{
+    key: "renderBody",
+    value: function renderBody() {
+      var _this2 = this;
 
-  _proto.renderBody = function renderBody() {
-    var _this2 = this;
-
-    if (this.value.governedBy) {
-      var governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
-      return _.div({
-        class: 'widget widget--label'
-      }, '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)');
-    } else {
-      return _.div({
-        class: 'settings-publishing'
-      }, // Apply to children switch
-      _.div({
-        class: 'widget-group'
-      }, _.label({
-        class: 'widget widget--label'
-      }, 'Apply to children'), new HashBrown.Views.Widgets.Input({
-        type: 'checkbox',
-        value: this.value.applyToChildren === true,
-        onChange: function onChange(newValue) {
-          _this2.value.applyToChildren = newValue;
-        }
-      }).$element), // Connection picker
-      _.div({
-        class: 'widget-group'
-      }, _.label({
-        class: 'widget widget--label'
-      }, 'Connection'), new HashBrown.Views.Widgets.Dropdown({
-        options: resources.connections,
-        value: this.value.connectionId,
-        valueKey: 'id',
-        labelKey: 'title',
-        useClearButton: true,
-        onChange: function onChange(newValue) {
-          _this2.value.connectionId = newValue;
-        }
-      }).$element));
+      if (this.value.governedBy) {
+        var governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
+        return _.div({
+          class: 'widget widget--label'
+        }, '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)');
+      } else {
+        return _.div({
+          class: 'settings-publishing'
+        }, // Apply to children switch
+        _.div({
+          class: 'widget-group'
+        }, _.label({
+          class: 'widget widget--label'
+        }, 'Apply to children'), new HashBrown.Views.Widgets.Input({
+          type: 'checkbox',
+          value: this.value.applyToChildren === true,
+          onChange: function onChange(newValue) {
+            _this2.value.applyToChildren = newValue;
+          }
+        }).$element), // Connection picker
+        _.div({
+          class: 'widget-group'
+        }, _.label({
+          class: 'widget widget--label'
+        }, 'Connection'), new HashBrown.Views.Widgets.Dropdown({
+          options: resources.connections,
+          value: this.value.connectionId,
+          valueKey: 'id',
+          labelKey: 'title',
+          useClearButton: true,
+          onChange: function onChange(newValue) {
+            _this2.value.connectionId = newValue;
+          }
+        }).$element));
+      }
     }
-  };
+  }]);
 
   return PublishingSettingsModal;
 }(HashBrown.Views.Modals.Modal);
@@ -2036,17 +2315,35 @@ __webpack_require__(257);
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ConnectionEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(ConnectionEditor, _Crisp$View);
+  _inherits(ConnectionEditor, _Crisp$View);
 
   function ConnectionEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, ConnectionEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ConnectionEditor).call(this, params));
 
     _this.fetch();
 
@@ -2057,290 +2354,299 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = ConnectionEditor.prototype;
+  _createClass(ConnectionEditor, [{
+    key: "onClickAdvanced",
+    value: function onClickAdvanced() {
+      location.hash = '/connections/json/' + this.model.id;
+    }
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
 
-  _proto.onClickAdvanced = function onClickAdvanced() {
-    location.hash = '/connections/json/' + this.model.id;
-  };
-  /**
-   * Event: Click save. Posts the model to the modelUrl
-   */
+  }, {
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
+      this.$saveBtn.toggleClass('saving', true);
+      HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model).then(function () {
+        _this2.$saveBtn.toggleClass('saving', false);
 
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
+        location.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Renders the Media provider editor
+     */
 
-    this.$saveBtn.toggleClass('saving', true);
-    HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model).then(function () {
-      _this2.$saveBtn.toggleClass('saving', false);
+  }, {
+    key: "renderMediaProviderEditor",
+    value: function renderMediaProviderEditor() {
+      var _this3 = this;
 
-      location.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Renders the Media provider editor
-   */
+      var input = new HashBrown.Views.Widgets.Input({
+        value: false,
+        type: 'checkbox',
+        onChange: function onChange(isProvider) {
+          HashBrown.Helpers.ConnectionHelper.setMediaProvider(isProvider ? _this3.model.id : null).catch(UI.errorModal);
+        }
+      }); // Set the value
 
+      input.$element.toggleClass('working', true);
+      HashBrown.Helpers.ConnectionHelper.getMediaProvider().then(function (connection) {
+        if (connection && connection.id === _this3.model.id) {
+          input.value = true;
+          input.fetch();
+        }
 
-  _proto.renderMediaProviderEditor = function renderMediaProviderEditor() {
-    var _this3 = this;
+        input.$element.toggleClass('working', false);
+      });
+      return input.$element;
+    }
+    /**
+     * Renders the title editor
+     */
 
-    var input = new HashBrown.Views.Widgets.Input({
-      value: false,
-      type: 'checkbox',
-      onChange: function onChange(isProvider) {
-        HashBrown.Helpers.ConnectionHelper.setMediaProvider(isProvider ? _this3.model.id : null).catch(UI.errorModal);
-      }
-    }); // Set the value
+  }, {
+    key: "renderTitleEditor",
+    value: function renderTitleEditor() {
+      var _this4 = this;
 
-    input.$element.toggleClass('working', true);
-    HashBrown.Helpers.ConnectionHelper.getMediaProvider().then(function (connection) {
-      if (connection && connection.id === _this3.model.id) {
-        input.value = true;
-        input.fetch();
-      }
-
-      input.$element.toggleClass('working', false);
-    });
-    return input.$element;
-  };
-  /**
-   * Renders the title editor
-   */
-
-
-  _proto.renderTitleEditor = function renderTitleEditor() {
-    var _this4 = this;
-
-    return new HashBrown.Views.Widgets.Input({
-      value: this.model.title,
-      onChange: function onChange(newValue) {
-        _this4.model.title = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the URL editor
-   */
-
-
-  _proto.renderUrlEditor = function renderUrlEditor() {
-    var _this5 = this;
-
-    return new HashBrown.Views.Widgets.Input({
-      value: this.model.url,
-      onChange: function onChange(newValue) {
-        _this5.model.url = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the processing settings editor
-   */
-
-
-  _proto.renderProcessorSettingsEditor = function renderProcessorSettingsEditor() {
-    var _this6 = this;
-
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Type'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: this.model.processor.alias,
-      optionsUrl: 'connections/processors',
-      valueKey: 'alias',
-      labelKey: 'name',
-      placeholder: 'Type',
-      onChange: function onChange(newValue) {
-        _this6.model.processor.alias = newValue;
-
-        _this6.fetch();
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, _.div({
-      class: 'editor__field__key__label'
-    }, 'File extension'), _.div({
-      class: 'editor__field__key__description'
-    }, 'A file extension such as .json or .xml')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
-      if (editor.alias !== _this6.model.processor.alias) {
-        return;
-      }
-
-      return new editor({
-        model: _this6.model.processor
+      return new HashBrown.Views.Widgets.Input({
+        value: this.model.title,
+        onChange: function onChange(newValue) {
+          _this4.model.title = newValue;
+        }
       }).$element;
-    }), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      value: this.model.processor.fileExtension,
-      onChange: function onChange(newValue) {
-        _this6.model.processor.fileExtension = newValue;
-      }
-    })))];
-  };
-  /**
-   * Renders the deployment settings editor
-   */
+    }
+    /**
+     * Renders the URL editor
+     */
 
+  }, {
+    key: "renderUrlEditor",
+    value: function renderUrlEditor() {
+      var _this5 = this;
 
-  _proto.renderDeployerSettingsEditor = function renderDeployerSettingsEditor() {
-    var _this7 = this;
-
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Type'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: this.model.deployer.alias,
-      optionsUrl: 'connections/deployers',
-      valueKey: 'alias',
-      labelKey: 'name',
-      placeholder: 'Type',
-      onChange: function onChange(newValue) {
-        _this7.model.deployer.alias = newValue;
-
-        _this7.fetch();
-      }
-    }).$element)), _.each(HashBrown.Views.Editors.DeployerEditors, function (name, editor) {
-      if (editor.alias !== _this7.model.deployer.alias) {
-        return;
-      }
-
-      return new editor({
-        model: _this7.model.deployer
+      return new HashBrown.Views.Widgets.Input({
+        value: this.model.url,
+        onChange: function onChange(newValue) {
+          _this5.model.url = newValue;
+        }
       }).$element;
-    }), _.do(function () {
-      if (!_this7.model.deployer || !_this7.model.deployer.paths) {
-        return;
-      }
+    }
+    /**
+     * Renders the processing settings editor
+     */
 
-      return _.div({
+  }, {
+    key: "renderProcessorSettingsEditor",
+    value: function renderProcessorSettingsEditor() {
+      var _this6 = this;
+
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Type'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: this.model.processor.alias,
+        optionsUrl: 'connections/processors',
+        valueKey: 'alias',
+        labelKey: 'name',
+        placeholder: 'Type',
+        onChange: function onChange(newValue) {
+          _this6.model.processor.alias = newValue;
+
+          _this6.fetch();
+        }
+      }).$element)), _.div({
         class: 'editor__field'
       }, _.div({
         class: 'editor__field__key'
       }, _.div({
         class: 'editor__field__key__label'
-      }, 'Paths'), _.div({
+      }, 'File extension'), _.div({
         class: 'editor__field__key__description'
-      }, 'Where to send the individual resources')), _.div({
-        class: 'editor__field__value'
-      }, _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Content'), _.div({
+      }, 'A file extension such as .json or .xml')), _.each(HashBrown.Views.Editors.ProcessorEditors, function (name, editor) {
+        if (editor.alias !== _this6.model.processor.alias) {
+          return;
+        }
+
+        return new editor({
+          model: _this6.model.processor
+        }).$element;
+      }), _.div({
         class: 'editor__field__value'
       }, new HashBrown.Views.Widgets.Input({
-        value: _this7.model.deployer.paths.content,
+        value: this.model.processor.fileExtension,
         onChange: function onChange(newValue) {
-          _this7.model.deployer.paths.content = newValue;
+          _this6.model.processor.fileExtension = newValue;
         }
-      }))), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Media'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        value: _this7.model.deployer.paths.media,
-        onChange: function onChange(newValue) {
-          _this7.model.deployer.paths.media = newValue;
-        }
-      })))));
-    })];
-  };
-  /**
-   * Prerender
-   */
-
-
-  _proto.prerender = function prerender() {
-    if (this.model instanceof HashBrown.Models.Connection === false) {
-      this.model = new HashBrown.Models.Connection(this.model);
+      })))];
     }
-  };
-  /**
-   * Renders this editor
-   */
+    /**
+     * Renders the deployment settings editor
+     */
 
+  }, {
+    key: "renderDeployerSettingsEditor",
+    value: function renderDeployerSettingsEditor() {
+      var _this7 = this;
 
-  _proto.template = function template() {
-    var _this8 = this;
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Type'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: this.model.deployer.alias,
+        optionsUrl: 'connections/deployers',
+        valueKey: 'alias',
+        labelKey: 'name',
+        placeholder: 'Type',
+        onChange: function onChange(newValue) {
+          _this7.model.deployer.alias = newValue;
 
-    return _.div({
-      class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '')
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-exchange'
-    }), _.h4({
-      class: 'editor__header__title'
-    }, this.model.title)), _.div({
-      class: 'editor__body'
-    }, _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Is Media provider'), _.div({
-      class: 'editor__field__value'
-    }, this.renderMediaProviderEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Title'), _.div({
-      class: 'editor__field__value'
-    }, this.renderTitleEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'URL'), _.div({
-      class: 'editor__field__value'
-    }, this.renderUrlEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, _.div({
-      class: 'editor__field__key__label'
-    }, 'Processor'), _.div({
-      class: 'editor__field__key__description'
-    }, 'Which format to deploy Content in')), _.div({
-      class: 'editor__field__value'
-    }, this.renderProcessorSettingsEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, _.div({
-      class: 'editor__field__key__label'
-    }, 'Deployer'), _.div({
-      class: 'editor__field__key__description'
-    }, 'How to transfer data to and from the website\'s server')), _.div({
-      class: 'editor__field__value'
-    }, this.renderDeployerSettingsEditor()))), _.div({
-      class: 'editor__footer'
-    }, _.div({
-      class: 'editor__footer__buttons'
-    }, _.button({
-      class: 'widget widget--button embedded'
-    }, 'Advanced').click(function () {
-      _this8.onClickAdvanced();
-    }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
-      class: 'widget widget--button editor__footer__buttons__save'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save '), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving ')).click(function () {
-      _this8.onClickSave();
-    })))));
-  };
+          _this7.fetch();
+        }
+      }).$element)), _.each(HashBrown.Views.Editors.DeployerEditors, function (name, editor) {
+        if (editor.alias !== _this7.model.deployer.alias) {
+          return;
+        }
+
+        return new editor({
+          model: _this7.model.deployer
+        }).$element;
+      }), _.do(function () {
+        if (!_this7.model.deployer || !_this7.model.deployer.paths) {
+          return;
+        }
+
+        return _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, 'Paths'), _.div({
+          class: 'editor__field__key__description'
+        }, 'Where to send the individual resources')), _.div({
+          class: 'editor__field__value'
+        }, _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Content'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          value: _this7.model.deployer.paths.content,
+          onChange: function onChange(newValue) {
+            _this7.model.deployer.paths.content = newValue;
+          }
+        }))), _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Media'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          value: _this7.model.deployer.paths.media,
+          onChange: function onChange(newValue) {
+            _this7.model.deployer.paths.media = newValue;
+          }
+        })))));
+      })];
+    }
+    /**
+     * Prerender
+     */
+
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      if (this.model instanceof HashBrown.Models.Connection === false) {
+        this.model = new HashBrown.Models.Connection(this.model);
+      }
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this8 = this;
+
+      return _.div({
+        class: 'editor editor--connection' + (this.model.isLocked ? ' locked' : '')
+      }, _.div({
+        class: 'editor__header'
+      }, _.span({
+        class: 'editor__header__icon fa fa-exchange'
+      }), _.h4({
+        class: 'editor__header__title'
+      }, this.model.title)), _.div({
+        class: 'editor__body'
+      }, _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Is Media provider'), _.div({
+        class: 'editor__field__value'
+      }, this.renderMediaProviderEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Title'), _.div({
+        class: 'editor__field__value'
+      }, this.renderTitleEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'URL'), _.div({
+        class: 'editor__field__value'
+      }, this.renderUrlEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, _.div({
+        class: 'editor__field__key__label'
+      }, 'Processor'), _.div({
+        class: 'editor__field__key__description'
+      }, 'Which format to deploy Content in')), _.div({
+        class: 'editor__field__value'
+      }, this.renderProcessorSettingsEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, _.div({
+        class: 'editor__field__key__label'
+      }, 'Deployer'), _.div({
+        class: 'editor__field__key__description'
+      }, 'How to transfer data to and from the website\'s server')), _.div({
+        class: 'editor__field__value'
+      }, this.renderDeployerSettingsEditor()))), _.div({
+        class: 'editor__footer'
+      }, _.div({
+        class: 'editor__footer__buttons'
+      }, _.button({
+        class: 'widget widget--button embedded'
+      }, 'Advanced').click(function () {
+        _this8.onClickAdvanced();
+      }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
+        class: 'widget widget--button editor__footer__buttons__save'
+      }, _.span({
+        class: 'widget--button__text-default'
+      }, 'Save '), _.span({
+        class: 'widget--button__text-working'
+      }, 'Saving ')).click(function () {
+        _this8.onClickSave();
+      })))));
+    }
+  }]);
 
   return ConnectionEditor;
 }(Crisp.View);
@@ -2359,17 +2665,35 @@ module.exports = ConnectionEditor;
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(ContentEditor, _Crisp$View);
+  _inherits(ContentEditor, _Crisp$View);
 
   function ContentEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, ContentEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ContentEditor).call(this, params));
     _this.dirty = false;
 
     _this.fetch();
@@ -2381,542 +2705,566 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = ContentEditor.prototype;
+  _createClass(ContentEditor, [{
+    key: "onScroll",
+    value: function onScroll(e) {
+      var followingField; // Look for field labels that are close to the top of the viewport and make them follow
 
-  _proto.onScroll = function onScroll(e) {
-    var followingField; // Look for field labels that are close to the top of the viewport and make them follow
+      this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each(function (i, field) {
+        field.classList.remove('following');
+        var rect = field.getBoundingClientRect();
+        var actions = field.querySelector('.editor__field__key__actions');
+        var actionRect;
 
-    this.$element.find('.editor__body__tab.active > .editor__field > .editor__field__key').each(function (i, field) {
-      field.classList.remove('following');
-      var rect = field.getBoundingClientRect();
-      var actions = field.querySelector('.editor__field__key__actions');
-      var actionRect;
-
-      if (actions) {
-        actionRect = actions.getBoundingClientRect();
-      }
-
-      if (rect.top <= 40 && actionRect && rect.bottom >= actionRect.height + 60 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
-        followingField = field;
-      }
-    });
-
-    if (followingField) {
-      followingField.classList.add('following');
-    } // Cache the last scroll position
-
-
-    this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
-  };
-  /**
-   * Event: Click advanced. Routes to the JSON editor
-   */
-
-
-  _proto.onClickAdvanced = function onClickAdvanced() {
-    location.hash = '/content/json/' + this.model.id;
-  };
-  /**
-   * Event: Click save. Posts the model to the modelUrl
-   */
-
-
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
-
-    var saveAction = this.$element.find('.editor__footer__buttons select').val();
-    var postSaveUrl;
-
-    var setContent = function setContent() {
-      // Use publishing API
-      if (_this2.model.getSettings('publishing').connectionId) {
-        // Unpublish
-        if (saveAction === 'unpublish') {
-          return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', _this2.model); // Publish
-        } else if (saveAction === 'publish') {
-          return HashBrown.Helpers.RequestHelper.request('post', 'content/publish', _this2.model); // Preview
-        } else if (saveAction === 'preview') {
-          return HashBrown.Helpers.RequestHelper.request('post', 'content/preview', _this2.model);
-        }
-      } // Just save normally
-
-
-      return HashBrown.Helpers.RequestHelper.request('post', 'content/' + _this2.model.id, _this2.model);
-    };
-
-    this.$saveBtn.toggleClass('working', true); // Save content to database
-
-    setContent().then(function (url) {
-      postSaveUrl = url;
-      return HashBrown.Helpers.RequestHelper.reloadResource('content');
-    }).then(function () {
-      _this2.$saveBtn.toggleClass('working', false);
-
-      _this2.reload();
-
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      _this2.dirty = false;
-
-      if (saveAction === 'preview') {
-        UI.iframeModal('Preview', postSaveUrl);
-      }
-    }).catch(function (e) {
-      _this2.$saveBtn.toggleClass('working', false);
-
-      UI.errorModal(e);
-    });
-  };
-  /**
-   * Reload this view
-   */
-
-
-  _proto.reload = function reload() {
-    this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
-    this.model = null;
-    this.fetch();
-  };
-  /**
-   * Binds event to fire when field editors are ready
-   * Or fires them if no callback was passed
-   *
-   * @param {Function} callback
-   */
-
-
-  _proto.onFieldEditorsReady = function onFieldEditorsReady(callback) {
-    if (!this.fieldEditorReadyCallbacks) {
-      this.fieldEditorReadyCallbacks = [];
-    }
-
-    if (callback) {
-      this.fieldEditorReadyCallbacks.push(callback);
-    } else {
-      for (var _iterator = this.fieldEditorReadyCallbacks, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
+        if (actions) {
+          actionRect = actions.getBoundingClientRect();
         }
 
-        var registeredCallback = _ref;
-        registeredCallback();
-      }
-
-      this.fieldEditorReadyCallbacks = [];
-    }
-
-    this.restoreScrollPos();
-  };
-  /**
-   * Restores the scroll position
-   *
-   * @param {Number} delay
-   */
-
-
-  _proto.restoreScrollPos = function restoreScrollPos(delay) {
-    var _this3 = this;
-
-    var newScrollPos = this.lastScrollPos || 0;
-    setTimeout(function () {
-      _this3.$element.find('.editor__body')[0].scrollTop = newScrollPos;
-    }, delay || 0);
-  };
-  /**
-   * Static version of the restore scroll position method
-   *
-   * @param {Number} delay
-   */
-
-
-  ContentEditor.restoreScrollPos = function restoreScrollPos(delay) {
-    var editor = Crisp.View.get('ContentEditor');
-
-    if (editor) {
-      editor.restoreScrollPos(delay);
-    }
-  };
-  /**
-   * Gets a field editor for a Schema
-   *
-   * @param {string} editorId
-   *
-   * @returns {View} Field editor
-   */
-
-
-  ContentEditor.getFieldEditor = function getFieldEditor(editorId) {
-    if (!editorId) {
-      return;
-    } // Backwards compatible check
-
-
-    editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
-
-    if (editorId.indexOf('Editor') < 0) {
-      editorId += 'Editor';
-    }
-
-    return HashBrown.Views.Editors.FieldEditors[editorId];
-  };
-  /**
-   * Renders a field view
-   *
-   * @param {Object} fieldValue The field value to inject into the field editor
-   * @param {FieldSchema} fieldDefinition The field definition
-   * @param {Function} onChange The change event
-   * @param {HTMLElement} keyActions The key content container
-   *
-   * @return {Object} element
-   */
-
-
-  _proto.renderField = function renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
-    var _this4 = this;
-
-    var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
-
-    if (!compiledSchema) {
-      return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
-    }
-
-    var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
-
-    if (!fieldEditor) {
-      return debug.log('No field editor by id "' + fieldSchema.editorId + '" found', this);
-    } // Get the config
-
-
-    var config; // If the field has a config, check recursively if it's empty
-    // If it isn't, use this config
-
-    if (fieldDefinition.config) {
-      var isEmpty = true;
-
-      var checkRecursive = function checkRecursive(object) {
-        if (!object) {
-          return;
-        } // We consider a config not empty, if it has a value that is not an object
-        // Remember, null is of type 'object' too
-
-
-        if (typeof object !== 'object') {
-          return isEmpty = false;
+        if (rect.top <= 40 && actionRect && rect.bottom >= actionRect.height + 60 && (!followingField || followingField.getBoundingClientRect().top < rect.top)) {
+          followingField = field;
         }
+      });
 
-        for (var k in object) {
-          checkRecursive(object[k]);
-        }
+      if (followingField) {
+        followingField.classList.add('following');
+      } // Cache the last scroll position
+
+
+      this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
+    }
+    /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+
+  }, {
+    key: "onClickAdvanced",
+    value: function onClickAdvanced() {
+      location.hash = '/content/json/' + this.model.id;
+    }
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+
+  }, {
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
+
+      var saveAction = this.$element.find('.editor__footer__buttons select').val();
+      var postSaveUrl;
+
+      var setContent = function setContent() {
+        // Use publishing API
+        if (_this2.model.getSettings('publishing').connectionId) {
+          // Unpublish
+          if (saveAction === 'unpublish') {
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', _this2.model); // Publish
+          } else if (saveAction === 'publish') {
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/publish', _this2.model); // Preview
+          } else if (saveAction === 'preview') {
+            return HashBrown.Helpers.RequestHelper.request('post', 'content/preview', _this2.model);
+          }
+        } // Just save normally
+
+
+        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + _this2.model.id, _this2.model);
       };
 
-      checkRecursive(fieldDefinition.config);
+      this.$saveBtn.toggleClass('working', true); // Save content to database
 
-      if (!isEmpty) {
-        config = fieldDefinition.config;
-      }
-    } // If no config was found, and the Schema has one, use it
+      setContent().then(function (url) {
+        postSaveUrl = url;
+        return HashBrown.Helpers.RequestHelper.reloadResource('content');
+      }).then(function () {
+        _this2.$saveBtn.toggleClass('working', false);
 
+        _this2.reload();
 
-    if (!config && compiledSchema.config) {
-      config = compiledSchema.config;
-    } // If still no config was found, assign a placeholder
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        _this2.dirty = false;
 
-
-    if (!config) {
-      config = {};
-    } // Instantiate the field editor
-
-
-    var fieldEditorInstance = new fieldEditor({
-      value: fieldValue,
-      disabled: fieldDefinition.disabled || false,
-      config: config,
-      description: fieldDefinition.description || '',
-      schema: compiledSchema.getObject(),
-      multilingual: fieldDefinition.multilingual === true,
-      $keyActions: $keyActions
-    });
-    fieldEditorInstance.on('change', function (newValue) {
-      if (_this4.model.isLocked) {
-        return;
-      }
-
-      _this4.dirty = true;
-      onChange(newValue);
-    });
-    fieldEditorInstance.on('silentchange', function (newValue) {
-      if (_this4.model.isLocked) {
-        return;
-      }
-
-      onChange(newValue);
-    });
-    return fieldEditorInstance.$element;
-  };
-  /**
-   * Renders fields
-   *
-   * @param {String} tabId The tab for which to render the fields
-   * @param {Object} fieldDefinitions The set of field definitions to render
-   * @param {Object} fieldValues The set of field values to inject into the field editor
-   *
-   * @returns {Array} A list of HTMLElements to render
-   */
-
-
-  _proto.renderFields = function renderFields(tabId, fieldDefinitions, fieldValues) {
-    var _this5 = this;
-
-    var tabFieldDefinitions = {}; // Map out field definitions to render
-    // This is necessary because we're only rendering the fields for the specified tab
-
-    for (var key in fieldDefinitions) {
-      var fieldDefinition = fieldDefinitions[key];
-      var noTabAssigned = !this.schema.tabs[fieldDefinition.tabId];
-      var isMetaTab = tabId === 'meta';
-      var thisTabAssigned = fieldDefinition.tabId === tabId; // Don't include "properties" field, if this is the meta tab
-
-      if (isMetaTab && key === 'properties') {
-        continue;
-      }
-
-      if (noTabAssigned && isMetaTab || thisTabAssigned) {
-        tabFieldDefinitions[key] = fieldDefinition;
-      }
-    } // Render all fields
-
-
-    return _.each(tabFieldDefinitions, function (key, fieldDefinition) {
-      // Field value sanity check
-      fieldValues[key] = HashBrown.Helpers.ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition); // Render the field actions container
-
-      var $keyActions;
-      return _.div({
-        class: 'editor__field',
-        'data-key': key
-      }, // Render the label and icon
-      _.div({
-        class: 'editor__field__key',
-        title: fieldDefinition.description || ''
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, fieldDefinition.label || key), _.if(fieldDefinition.description, _.div({
-        class: 'editor__field__key__description'
-      }, fieldDefinition.description)), $keyActions = _.div({
-        class: 'editor__field__key__actions'
-      })), // Render the field editor
-      _this5.renderField( // If the field definition is set to multilingual, pass value from object
-      fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key], // Pass the field definition
-      fieldDefinition, // On change function
-      function (newValue) {
-        // If field definition is set to multilingual, assign flag and value onto object...
-        if (fieldDefinition.multilingual) {
-          fieldValues[key]._multilingual = true;
-          fieldValues[key][window.language] = newValue; // ...if not, assign the value directly
-        } else {
-          fieldValues[key] = newValue;
+        if (saveAction === 'preview') {
+          UI.iframeModal('Preview', postSaveUrl);
         }
-      }, // Pass the key actions container, so the field editor can populate it
-      $keyActions));
-    });
-  };
-  /**
-   * Event: Click tab
-   *
-   * @param {String} tab
-   */
+      }).catch(function (e) {
+        _this2.$saveBtn.toggleClass('working', false);
+
+        UI.errorModal(e);
+      });
+    }
+    /**
+     * Reload this view
+     */
+
+  }, {
+    key: "reload",
+    value: function reload() {
+      this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop;
+      this.model = null;
+      this.fetch();
+    }
+    /**
+     * Binds event to fire when field editors are ready
+     * Or fires them if no callback was passed
+     *
+     * @param {Function} callback
+     */
+
+  }, {
+    key: "onFieldEditorsReady",
+    value: function onFieldEditorsReady(callback) {
+      if (!this.fieldEditorReadyCallbacks) {
+        this.fieldEditorReadyCallbacks = [];
+      }
+
+      if (callback) {
+        this.fieldEditorReadyCallbacks.push(callback);
+      } else {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.fieldEditorReadyCallbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var registeredCallback = _step.value;
+            registeredCallback();
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        this.fieldEditorReadyCallbacks = [];
+      }
+
+      this.restoreScrollPos();
+    }
+    /**
+     * Restores the scroll position
+     *
+     * @param {Number} delay
+     */
+
+  }, {
+    key: "restoreScrollPos",
+    value: function restoreScrollPos(delay) {
+      var _this3 = this;
+
+      var newScrollPos = this.lastScrollPos || 0;
+      setTimeout(function () {
+        _this3.$element.find('.editor__body')[0].scrollTop = newScrollPos;
+      }, delay || 0);
+    }
+    /**
+     * Static version of the restore scroll position method
+     *
+     * @param {Number} delay
+     */
+
+  }, {
+    key: "renderField",
+
+    /**
+     * Renders a field view
+     *
+     * @param {Object} fieldValue The field value to inject into the field editor
+     * @param {FieldSchema} fieldDefinition The field definition
+     * @param {Function} onChange The change event
+     * @param {HTMLElement} keyActions The key content container
+     *
+     * @return {Object} element
+     */
+    value: function renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
+      var _this4 = this;
+
+      var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
+
+      if (!compiledSchema) {
+        return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
+      }
+
+      var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+
+      if (!fieldEditor) {
+        return debug.log('No field editor by id "' + fieldSchema.editorId + '" found', this);
+      } // Get the config
 
 
-  _proto.onClickTab = function onClickTab(tab) {};
-  /**
-   * Renders the editor
-   *
-   * @param {Content} content
-   * @param {ContentSchema} schema
-   *
-   * @return {Object} element
-   */
+      var config; // If the field has a config, check recursively if it's empty
+      // If it isn't, use this config
+
+      if (fieldDefinition.config) {
+        var isEmpty = true;
+
+        var checkRecursive = function checkRecursive(object) {
+          if (!object) {
+            return;
+          } // We consider a config not empty, if it has a value that is not an object
+          // Remember, null is of type 'object' too
 
 
-  _proto.renderEditor = function renderEditor(content, schema) {
-    var _this6 = this;
+          if (_typeof(object) !== 'object') {
+            return isEmpty = false;
+          }
 
-    var activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta'; // Render editor
+          for (var k in object) {
+            checkRecursive(object[k]);
+          }
+        };
 
-    return [_.div({
-      class: 'editor__header'
-    }, _.each(schema.tabs, function (tabId, tabName) {
-      return _.button({
-        class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')
-      }, tabName).click(function () {
-        location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
+        checkRecursive(fieldDefinition.config);
+
+        if (!isEmpty) {
+          config = fieldDefinition.config;
+        }
+      } // If no config was found, and the Schema has one, use it
+
+
+      if (!config && compiledSchema.config) {
+        config = compiledSchema.config;
+      } // If still no config was found, assign a placeholder
+
+
+      if (!config) {
+        config = {};
+      } // Instantiate the field editor
+
+
+      var fieldEditorInstance = new fieldEditor({
+        value: fieldValue,
+        disabled: fieldDefinition.disabled || false,
+        config: config,
+        description: fieldDefinition.description || '',
+        schema: compiledSchema.getObject(),
+        multilingual: fieldDefinition.multilingual === true,
+        $keyActions: $keyActions
+      });
+      fieldEditorInstance.on('change', function (newValue) {
+        if (_this4.model.isLocked) {
+          return;
+        }
+
+        _this4.dirty = true;
+        onChange(newValue);
+      });
+      fieldEditorInstance.on('silentchange', function (newValue) {
+        if (_this4.model.isLocked) {
+          return;
+        }
+
+        onChange(newValue);
+      });
+      return fieldEditorInstance.$element;
+    }
+    /**
+     * Renders fields
+     *
+     * @param {String} tabId The tab for which to render the fields
+     * @param {Object} fieldDefinitions The set of field definitions to render
+     * @param {Object} fieldValues The set of field values to inject into the field editor
+     *
+     * @returns {Array} A list of HTMLElements to render
+     */
+
+  }, {
+    key: "renderFields",
+    value: function renderFields(tabId, fieldDefinitions, fieldValues) {
+      var _this5 = this;
+
+      var tabFieldDefinitions = {}; // Map out field definitions to render
+      // This is necessary because we're only rendering the fields for the specified tab
+
+      for (var key in fieldDefinitions) {
+        var fieldDefinition = fieldDefinitions[key];
+        var noTabAssigned = !this.schema.tabs[fieldDefinition.tabId];
+        var isMetaTab = tabId === 'meta';
+        var thisTabAssigned = fieldDefinition.tabId === tabId; // Don't include "properties" field, if this is the meta tab
+
+        if (isMetaTab && key === 'properties') {
+          continue;
+        }
+
+        if (noTabAssigned && isMetaTab || thisTabAssigned) {
+          tabFieldDefinitions[key] = fieldDefinition;
+        }
+      } // Render all fields
+
+
+      return _.each(tabFieldDefinitions, function (key, fieldDefinition) {
+        // Field value sanity check
+        fieldValues[key] = HashBrown.Helpers.ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition); // Render the field actions container
+
+        var $keyActions;
+        return _.div({
+          class: 'editor__field',
+          'data-key': key
+        }, // Render the label and icon
+        _.div({
+          class: 'editor__field__key',
+          title: fieldDefinition.description || ''
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, fieldDefinition.label || key), _.if(fieldDefinition.description, _.div({
+          class: 'editor__field__key__description'
+        }, fieldDefinition.description)), $keyActions = _.div({
+          class: 'editor__field__key__actions'
+        })), // Render the field editor
+        _this5.renderField( // If the field definition is set to multilingual, pass value from object
+        fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key], // Pass the field definition
+        fieldDefinition, // On change function
+        function (newValue) {
+          // If field definition is set to multilingual, assign flag and value onto object...
+          if (fieldDefinition.multilingual) {
+            fieldValues[key]._multilingual = true;
+            fieldValues[key][window.language] = newValue; // ...if not, assign the value directly
+          } else {
+            fieldValues[key] = newValue;
+          }
+        }, // Pass the key actions container, so the field editor can populate it
+        $keyActions));
+      });
+    }
+    /**
+     * Event: Click tab
+     *
+     * @param {String} tab
+     */
+
+  }, {
+    key: "onClickTab",
+    value: function onClickTab(tab) {}
+    /**
+     * Renders the editor
+     *
+     * @param {Content} content
+     * @param {ContentSchema} schema
+     *
+     * @return {Object} element
+     */
+
+  }, {
+    key: "renderEditor",
+    value: function renderEditor(content, schema) {
+      var _this6 = this;
+
+      var activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta'; // Render editor
+
+      return [_.div({
+        class: 'editor__header'
+      }, _.each(schema.tabs, function (tabId, tabName) {
+        return _.button({
+          class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')
+        }, tabName).click(function () {
+          location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
+
+          _this6.fetch();
+        });
+      }), _.button({
+        'data-id': 'meta',
+        class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')
+      }, 'Meta').click(function () {
+        location.hash = '/content/' + Crisp.Router.params.id + '/meta';
 
         _this6.fetch();
-      });
-    }), _.button({
-      'data-id': 'meta',
-      class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')
-    }, 'Meta').click(function () {
-      location.hash = '/content/' + Crisp.Router.params.id + '/meta';
+      })), _.div({
+        class: 'editor__body'
+      }, // Render content properties
+      _.each(schema.tabs, function (tabId, tabName) {
+        if (tabId !== activeTab) {
+          return;
+        }
 
-      _this6.fetch();
-    })), _.div({
-      class: 'editor__body'
-    }, // Render content properties
-    _.each(schema.tabs, function (tabId, tabName) {
-      if (tabId !== activeTab) {
-        return;
-      }
+        return _.div({
+          class: 'editor__body__tab active'
+        }, _this6.renderFields(tabId, schema.fields.properties, content.properties));
+      }), // Render meta properties
+      _.if(activeTab === 'meta', _.div({
+        class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''),
+        'data-id': 'meta'
+      }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties)))).on('scroll', function (e) {
+        _this6.onScroll(e);
+      }), _.div({
+        class: 'editor__footer'
+      })];
+    }
+    /**
+     * Renders the action buttons
+     */
 
-      return _.div({
-        class: 'editor__body__tab active'
-      }, _this6.renderFields(tabId, schema.fields.properties, content.properties));
-    }), // Render meta properties
-    _.if(activeTab === 'meta', _.div({
-      class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''),
-      'data-id': 'meta'
-    }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties)))).on('scroll', function (e) {
-      _this6.onScroll(e);
-    }), _.div({
-      class: 'editor__footer'
-    })];
-  };
-  /**
-   * Renders the action buttons
-   */
+  }, {
+    key: "renderButtons",
+    value: function renderButtons() {
+      var _this7 = this;
 
+      var remoteUrl;
+      var connectionId = this.model.getSettings('publishing').connectionId;
+      var connection; // Construct the remote URL, if a Connection is set up for publishing
 
-  _proto.renderButtons = function renderButtons() {
-    var _this7 = this;
+      var contentUrl = this.model.properties.url;
 
-    var remoteUrl;
-    var connectionId = this.model.getSettings('publishing').connectionId;
-    var connection; // Construct the remote URL, if a Connection is set up for publishing
+      if (connectionId) {
+        connection = HashBrown.Helpers.ConnectionHelper.getConnectionByIdSync(connectionId);
 
-    var contentUrl = this.model.properties.url;
-
-    if (connectionId) {
-      connection = HashBrown.Helpers.ConnectionHelper.getConnectionByIdSync(connectionId);
-
-      if (connection && connection.url && contentUrl) {
-        // Language versioning
-        if (contentUrl instanceof Object) {
-          contentUrl = contentUrl[window.language];
-        } // Construct remote URL
+        if (connection && connection.url && contentUrl) {
+          // Language versioning
+          if (contentUrl instanceof Object) {
+            contentUrl = contentUrl[window.language];
+          } // Construct remote URL
 
 
-        if (contentUrl && contentUrl !== '//') {
-          remoteUrl = connection.url + contentUrl;
-          remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
-        } else {
-          contentUrl = null;
+          if (contentUrl && contentUrl !== '//') {
+            remoteUrl = connection.url + contentUrl;
+            remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
+          } else {
+            contentUrl = null;
+          }
         }
       }
+
+      _.append($('.editor__footer').empty(), _.div({
+        class: 'editor__footer__message'
+      }, _.do(function () {
+        if (!connection) {
+          return 'No Connection is assigned for publishing';
+        }
+
+        if (connection && !connection.url) {
+          return 'No remote URL is defined in the <a href="#/connections/' + connection.id + '">"' + connection.title + '"</a> Connection';
+        }
+
+        if (connection && connection.url && !contentUrl) {
+          return 'Content without a URL may not be visible after publishing';
+        }
+      })), _.div({
+        class: 'editor__footer__buttons'
+      }, // JSON editor
+      _.button({
+        class: 'widget widget--button condensed embedded'
+      }, 'Advanced').click(function () {
+        _this7.onClickAdvanced();
+      }), // View remote
+      _.if(this.model.isPublished && remoteUrl, _.a({
+        target: '_blank',
+        href: remoteUrl,
+        class: 'widget widget--button condensed embedded'
+      }, 'View')), _.if(!this.model.isLocked, // Save & publish
+      _.div({
+        class: 'widget widget-group'
+      }, this.$saveBtn = _.button({
+        class: 'widget widget--button'
+      }, _.span({
+        class: 'widget--button__text-default'
+      }, 'Save'), _.span({
+        class: 'widget--button__text-working'
+      }, 'Saving')).click(function () {
+        _this7.onClickSave();
+      }), _.if(connection, _.span({
+        class: 'widget widget--button widget-group__separator'
+      }, '&'), _.select({
+        class: 'widget widget--select'
+      }, _.option({
+        value: 'publish'
+      }, 'Publish'), _.option({
+        value: 'preview'
+      }, 'Preview'), _.if(this.model.isPublished, _.option({
+        value: 'unpublish'
+      }, 'Unpublish')), _.option({
+        value: ''
+      }, '(No action)')).val('publish'))))));
     }
+    /**
+     * Pre render
+     */
 
-    _.append($('.editor__footer').empty(), _.div({
-      class: 'editor__footer__message'
-    }, _.do(function () {
-      if (!connection) {
-        return 'No Connection is assigned for publishing';
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      // Make sure the model data is using the Content model
+      if (this.model instanceof HashBrown.Models.Content === false) {
+        this.model = new HashBrown.Models.Content(this.model);
       }
-
-      if (connection && !connection.url) {
-        return 'No remote URL is defined in the <a href="#/connections/' + connection.id + '">"' + connection.title + '"</a> Connection';
-      }
-
-      if (connection && connection.url && !contentUrl) {
-        return 'Content without a URL may not be visible after publishing';
-      }
-    })), _.div({
-      class: 'editor__footer__buttons'
-    }, // JSON editor
-    _.button({
-      class: 'widget widget--button condensed embedded'
-    }, 'Advanced').click(function () {
-      _this7.onClickAdvanced();
-    }), // View remote
-    _.if(this.model.isPublished && remoteUrl, _.a({
-      target: '_blank',
-      href: remoteUrl,
-      class: 'widget widget--button condensed embedded'
-    }, 'View')), _.if(!this.model.isLocked, // Save & publish
-    _.div({
-      class: 'widget widget-group'
-    }, this.$saveBtn = _.button({
-      class: 'widget widget--button'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save'), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving')).click(function () {
-      _this7.onClickSave();
-    }), _.if(connection, _.span({
-      class: 'widget widget--button widget-group__separator'
-    }, '&'), _.select({
-      class: 'widget widget--select'
-    }, _.option({
-      value: 'publish'
-    }, 'Publish'), _.option({
-      value: 'preview'
-    }, 'Preview'), _.if(this.model.isPublished, _.option({
-      value: 'unpublish'
-    }, 'Unpublish')), _.option({
-      value: ''
-    }, '(No action)')).val('publish'))))));
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    // Make sure the model data is using the Content model
-    if (this.model instanceof HashBrown.Models.Content === false) {
-      this.model = new HashBrown.Models.Content(this.model);
     }
-  };
-  /**
-   * Render this editor
-   */
+    /**
+     * Render this editor
+     */
 
-
-  _proto.template = function template() {
-    return _.div({
-      class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')
-    });
-  };
-  /**
-   * Post render
-   */
-
-
-  _proto.postrender = function postrender() {
-    var _this8 = this;
-
-    // Fetch information
-    var contentSchema;
-    return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
-      contentSchema = schema;
-      _this8.schema = contentSchema;
-
-      _this8.$element.html(_this8.renderEditor(_this8.model, contentSchema));
-
-      _this8.renderButtons();
-
-      _this8.onFieldEditorsReady();
-    }).catch(function (e) {
-      UI.errorModal(e, function () {
-        location.hash = '/content/json/' + _this8.model.id;
+  }, {
+    key: "template",
+    value: function template() {
+      return _.div({
+        class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')
       });
-    });
-  };
+    }
+    /**
+     * Post render
+     */
+
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      var _this8 = this;
+
+      // Fetch information
+      var contentSchema;
+      return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
+        contentSchema = schema;
+        _this8.schema = contentSchema;
+
+        _this8.$element.html(_this8.renderEditor(_this8.model, contentSchema));
+
+        _this8.renderButtons();
+
+        _this8.onFieldEditorsReady();
+      }).catch(function (e) {
+        UI.errorModal(e, function () {
+          location.hash = '/content/json/' + _this8.model.id;
+        });
+      });
+    }
+  }], [{
+    key: "restoreScrollPos",
+    value: function restoreScrollPos(delay) {
+      var editor = Crisp.View.get('ContentEditor');
+
+      if (editor) {
+        editor.restoreScrollPos(delay);
+      }
+    }
+    /**
+     * Gets a field editor for a Schema
+     *
+     * @param {string} editorId
+     *
+     * @returns {View} Field editor
+     */
+
+  }, {
+    key: "getFieldEditor",
+    value: function getFieldEditor(editorId) {
+      if (!editorId) {
+        return;
+      } // Backwards compatible check
+
+
+      editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+
+      if (editorId.indexOf('Editor') < 0) {
+        editorId += 'Editor';
+      }
+
+      return HashBrown.Views.Editors.FieldEditors[editorId];
+    }
+  }]);
 
   return ContentEditor;
 }(Crisp.View);
@@ -2935,17 +3283,35 @@ module.exports = ContentEditor;
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var FormEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(FormEditor, _Crisp$View);
+  _inherits(FormEditor, _Crisp$View);
 
   function FormEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, FormEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(FormEditor).call(this, params));
 
     _this.fetch();
 
@@ -2956,418 +3322,432 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = FormEditor.prototype;
-
-  _proto.onClickAdvanced = function onClickAdvanced() {
-    location.hash = location.hash.replace('/forms/', '/forms/json/');
-  };
-  /**
-   * Event: Click save. Posts the model to the modelUrl
-   */
-
-
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
-
-    this.$saveBtn.toggleClass('working', true);
-    HashBrown.Helpers.RequestHelper.request('post', 'forms/' + this.model.id, this.model).then(function () {
-      debug.log('Saved form "' + _this2.model.id + '"', _this2);
-
-      _this2.$saveBtn.toggleClass('working', false);
-
-      return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-    }).then(function () {
-      var navbar = Crisp.View.get('NavbarMain');
-      navbar.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click add input
-   */
-
-
-  _proto.onClickAddInput = function onClickAddInput() {
-    if (!this.model.inputs['newinput']) {
-      this.model.inputs['newinput'] = {
-        type: 'text'
-      };
+  _createClass(FormEditor, [{
+    key: "onClickAdvanced",
+    value: function onClickAdvanced() {
+      location.hash = location.hash.replace('/forms/', '/forms/json/');
     }
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
 
-    this.fetch();
-  };
-  /**
-   * Event: Click remove input
-   *
-   * @param {String} key
-   */
+  }, {
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
+      this.$saveBtn.toggleClass('working', true);
+      HashBrown.Helpers.RequestHelper.request('post', 'forms/' + this.model.id, this.model).then(function () {
+        debug.log('Saved form "' + _this2.model.id + '"', _this2);
 
-  _proto.onClickRemoveInput = function onClickRemoveInput(key) {
-    delete this.model.inputs[key];
-    this.fetch();
-  };
-  /**
-   * Renders the allowed origin editor
-   *
-   * @return {Object} element
-   */
+        _this2.$saveBtn.toggleClass('working', false);
 
+        return HashBrown.Helpers.RequestHelper.reloadResource('forms');
+      }).then(function () {
+        var navbar = Crisp.View.get('NavbarMain');
+        navbar.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click add input
+     */
 
-  _proto.renderAllowedOriginEditor = function renderAllowedOriginEditor() {
-    var _this3 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      value: this.model.allowedOrigin,
-      tooltip: 'The allowed origin from which entries to this form can be posted',
-      onChange: function onChange(newOrigin) {
-        _this3.model.allowedOrigin = newOrigin;
+  }, {
+    key: "onClickAddInput",
+    value: function onClickAddInput() {
+      if (!this.model.inputs['newinput']) {
+        this.model.inputs['newinput'] = {
+          type: 'text'
+        };
       }
-    }).$element);
-  };
-  /**
-   * Renders the title editor
-   *
-   * @return {Object} element
-   */
 
+      this.fetch();
+    }
+    /**
+     * Event: Click remove input
+     *
+     * @param {String} key
+     */
 
-  _proto.renderTitleEditor = function renderTitleEditor() {
-    var _this4 = this;
+  }, {
+    key: "onClickRemoveInput",
+    value: function onClickRemoveInput(key) {
+      delete this.model.inputs[key];
+      this.fetch();
+    }
+    /**
+     * Renders the allowed origin editor
+     *
+     * @return {Object} element
+     */
 
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      value: this.model.title,
-      tooltip: 'The title of the form',
-      onChange: function onChange(newTitle) {
-        _this4.model.title = newTitle;
-      }
-    }).$element);
-  };
-  /**
-   * Renders the redirect editor
-   *
-   * @return {Object} element
-   */
+  }, {
+    key: "renderAllowedOriginEditor",
+    value: function renderAllowedOriginEditor() {
+      var _this3 = this;
 
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        value: this.model.allowedOrigin,
+        tooltip: 'The allowed origin from which entries to this form can be posted',
+        onChange: function onChange(newOrigin) {
+          _this3.model.allowedOrigin = newOrigin;
+        }
+      }).$element);
+    }
+    /**
+     * Renders the title editor
+     *
+     * @return {Object} element
+     */
 
-  _proto.renderRedirectEditor = function renderRedirectEditor() {
-    var _this5 = this;
+  }, {
+    key: "renderTitleEditor",
+    value: function renderTitleEditor() {
+      var _this4 = this;
 
-    return _.div({
-      class: 'editor__field__value'
-    }, _.div({
-      class: 'widget-group'
-    }, new HashBrown.Views.Widgets.Input({
-      value: this.model.redirect,
-      tooltip: 'The URL that the user will be redirected to after submitting the form entry',
-      onChange: function onChange(newUrl) {
-        _this5.model.redirect = newUrl;
-      }
-    }).$element, new HashBrown.Views.Widgets.Input({
-      value: this.model.appendRedirect,
-      placeholder: 'Append',
-      type: 'checkbox',
-      tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
-      onChange: function onChange(newValue) {
-        _this5.model.appendRedirect = newValue;
-      }
-    }).$element));
-  };
-  /**
-   * Renders the inputs editor
-   *
-   * @return {Object} element
-   */
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        value: this.model.title,
+        tooltip: 'The title of the form',
+        onChange: function onChange(newTitle) {
+          _this4.model.title = newTitle;
+        }
+      }).$element);
+    }
+    /**
+     * Renders the redirect editor
+     *
+     * @return {Object} element
+     */
 
+  }, {
+    key: "renderRedirectEditor",
+    value: function renderRedirectEditor() {
+      var _this5 = this;
 
-  _proto.renderInputsEditor = function renderInputsEditor() {
-    var _this6 = this;
+      return _.div({
+        class: 'editor__field__value'
+      }, _.div({
+        class: 'widget-group'
+      }, new HashBrown.Views.Widgets.Input({
+        value: this.model.redirect,
+        tooltip: 'The URL that the user will be redirected to after submitting the form entry',
+        onChange: function onChange(newUrl) {
+          _this5.model.redirect = newUrl;
+        }
+      }).$element, new HashBrown.Views.Widgets.Input({
+        value: this.model.appendRedirect,
+        placeholder: 'Append',
+        type: 'checkbox',
+        tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
+        onChange: function onChange(newValue) {
+          _this5.model.appendRedirect = newValue;
+        }
+      }).$element));
+    }
+    /**
+     * Renders the inputs editor
+     *
+     * @return {Object} element
+     */
 
-    var types = ['checkbox', 'hidden', 'number', 'select', 'text'];
-    return _.div({
-      class: 'editor__field__value segmented'
-    }, _.each(this.model.inputs, function (key, input) {
+  }, {
+    key: "renderInputsEditor",
+    value: function renderInputsEditor() {
+      var _this6 = this;
+
+      var types = ['checkbox', 'hidden', 'number', 'select', 'text'];
+      return _.div({
+        class: 'editor__field__value segmented'
+      }, _.each(this.model.inputs, function (key, input) {
+        return _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__actions'
+        }, _.button({
+          class: 'editor__field__action editor__field__action--remove',
+          title: 'Remove field'
+        }).click(function () {
+          view.onClickRemoveInput(key);
+        })), _.div({
+          class: 'editor__field__value'
+        }, _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Name'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          value: key,
+          onChange: function onChange(newValue) {
+            delete _this6.model.inputs[key];
+            key = newValue;
+            _this6.model.inputs[key] = input;
+          }
+        }).$element)), _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Type'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Dropdown({
+          value: input.type,
+          options: types,
+          onChange: function onChange(newValue) {
+            input.type = newValue;
+
+            _this6.fetch();
+          }
+        }).$element)), _.if(input.type == 'select', _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Select options'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Chips({
+          value: input.options || [],
+          onChange: function onChange(newValue) {
+            input.options = newValue;
+
+            _this6.renderPreview();
+          }
+        }).$element))), _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Required'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          type: 'checkbox',
+          value: input.required === true,
+          onChange: function onChange(newValue) {
+            input.required = newValue;
+          }
+        }).$element)), _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Check duplicates'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          type: 'checkbox',
+          value: input.checkDuplicates === true,
+          onChange: function onChange(newValue) {
+            input.checkDuplicates = newValue;
+          }
+        }).$element)), _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Pattern'), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Input({
+          value: input.pattern,
+          onChange: function onChange(newValue) {
+            input.pattern = newValue;
+          }
+        }).$element))));
+      }), _.button({
+        class: 'widget widget--button round editor__field__add fa fa-plus',
+        title: 'Add an input'
+      }).on('click', function () {
+        _this6.onClickAddInput();
+      }));
+    }
+    /**
+     * Renders a preview
+     *
+     * @return {Object} element
+     */
+
+  }, {
+    key: "renderPreview",
+    value: function renderPreview() {
+      var $preview = this.$element.find('.editor--form__preview');
+
+      _.append($preview.empty(), _.each(this.model.inputs, function (key, input) {
+        if (input.type === 'select') {
+          return new HashBrown.Views.Widgets.Dropdown({
+            options: input.options || []
+          }).$element;
+        } else {
+          return _.input({
+            class: 'widget widget--input ' + (input.type || 'text'),
+            placeholder: key,
+            type: input.type,
+            name: key,
+            pattern: input.pattern,
+            required: input.required === true
+          });
+        }
+      }));
+    }
+    /**
+     * Renders all entries
+     *
+     * @return {Object} element
+     */
+
+  }, {
+    key: "renderEntries",
+    value: function renderEntries() {
+      var _this7 = this;
+
+      return _.div({
+        class: 'editor__field__value'
+      }, _.div({
+        class: 'widget-group'
+      }, _.button({
+        class: 'widget widget--button low warning'
+      }, 'Clear').click(function () {
+        UI.confirmModal('Clear', 'Clear "' + _this7.model.title + '"', 'Are you sure you want to clear all entries?', function () {
+          HashBrown.Helpers.RequestHelper.request('post', 'forms/clear/' + _this7.model.id).then(function () {
+            _this7.model.entries = [];
+          }).catch(UI.errorModal);
+        });
+      }), _.button({
+        class: 'widget widget--button low'
+      }, 'Get .csv').click(function () {
+        location = HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + _this7.model.id + '/entries');
+      })));
+    }
+    /**
+     * Renders a single field
+     *
+     * @return {HTMLElement} Element
+     */
+
+  }, {
+    key: "renderField",
+    value: function renderField(label, $content, className) {
       return _.div({
         class: 'editor__field'
       }, _.div({
-        class: 'editor__field__actions'
-      }, _.button({
-        class: 'editor__field__action editor__field__action--remove',
-        title: 'Remove field'
-      }).click(function () {
-        view.onClickRemoveInput(key);
-      })), _.div({
-        class: 'editor__field__value'
-      }, _.div({
-        class: 'editor__field'
-      }, _.div({
         class: 'editor__field__key'
-      }, 'Name'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        value: key,
-        onChange: function onChange(newValue) {
-          delete _this6.model.inputs[key];
-          key = newValue;
-          _this6.model.inputs[key] = input;
-        }
-      }).$element)), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Type'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Dropdown({
-        value: input.type,
-        options: types,
-        onChange: function onChange(newValue) {
-          input.type = newValue;
+      }, label), $content);
+    }
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
 
-          _this6.fetch();
-        }
-      }).$element)), _.if(input.type == 'select', _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Select options'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Chips({
-        value: input.options || [],
-        onChange: function onChange(newValue) {
-          input.options = newValue;
-
-          _this6.renderPreview();
-        }
-      }).$element))), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Required'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        type: 'checkbox',
-        value: input.required === true,
-        onChange: function onChange(newValue) {
-          input.required = newValue;
-        }
-      }).$element)), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Check duplicates'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        type: 'checkbox',
-        value: input.checkDuplicates === true,
-        onChange: function onChange(newValue) {
-          input.checkDuplicates = newValue;
-        }
-      }).$element)), _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Pattern'), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Input({
-        value: input.pattern,
-        onChange: function onChange(newValue) {
-          input.pattern = newValue;
-        }
-      }).$element))));
-    }), _.button({
-      class: 'widget widget--button round editor__field__add fa fa-plus',
-      title: 'Add an input'
-    }).on('click', function () {
-      _this6.onClickAddInput();
-    }));
-  };
-  /**
-   * Renders a preview
-   *
-   * @return {Object} element
-   */
-
-
-  _proto.renderPreview = function renderPreview() {
-    var $preview = this.$element.find('.editor--form__preview');
-
-    _.append($preview.empty(), _.each(this.model.inputs, function (key, input) {
-      if (input.type === 'select') {
-        return new HashBrown.Views.Widgets.Dropdown({
-          options: input.options || []
-        }).$element;
-      } else {
-        return _.input({
-          class: 'widget widget--input ' + (input.type || 'text'),
-          placeholder: key,
-          type: input.type,
-          name: key,
-          pattern: input.pattern,
-          required: input.required === true
-        });
-      }
-    }));
-  };
-  /**
-   * Renders all entries
-   *
-   * @return {Object} element
-   */
-
-
-  _proto.renderEntries = function renderEntries() {
-    var _this7 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, _.div({
-      class: 'widget-group'
-    }, _.button({
-      class: 'widget widget--button low warning'
-    }, 'Clear').click(function () {
-      UI.confirmModal('Clear', 'Clear "' + _this7.model.title + '"', 'Are you sure you want to clear all entries?', function () {
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/clear/' + _this7.model.id).then(function () {
-          _this7.model.entries = [];
-        }).catch(UI.errorModal);
+  }, {
+    key: "renderFields",
+    value: function renderFields() {
+      var $element = _.div({
+        class: 'editor__body'
       });
-    }), _.button({
-      class: 'widget widget--button low'
-    }, 'Get .csv').click(function () {
-      location = HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + _this7.model.id + '/entries');
-    })));
-  };
-  /**
-   * Renders a single field
-   *
-   * @return {HTMLElement} Element
-   */
 
+      var postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
+      return _.div({
+        class: 'editor__body'
+      }, _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Entries (' + this.model.entries.length + ')'), _.div({
+        class: 'editor__field__value'
+      }, this.renderEntries())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'POST URL'), _.div({
+        class: 'editor__field__value'
+      }, _.div({
+        class: 'widget-group'
+      }, _.input({
+        readonly: 'readonly',
+        class: 'widget widget--input text',
+        type: 'text',
+        value: postUrl
+      }), _.button({
+        class: 'widget widget--button small fa fa-copy',
+        title: 'Copy POST URL'
+      }).click(function (e) {
+        copyToClipboard(e.currentTarget.previousElementSibling.value);
+      })))), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Title'), _.div({
+        class: 'editor__field__value'
+      }, this.renderTitleEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Allowed origin'), _.div({
+        class: 'editor__field__value'
+      }, this.renderAllowedOriginEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Redirect URL'), _.div({
+        class: 'editor__field__value'
+      }, this.renderRedirectEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Inputs'), _.div({
+        class: 'editor__field__value'
+      }, this.renderInputsEditor())), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Preview'), _.div({
+        class: 'editor__field__value'
+      }, _.div({
+        class: 'editor--form__preview'
+      }))));
+    }
+    /**
+     * Post render
+     */
 
-  _proto.renderField = function renderField(label, $content, className) {
-    return _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, label), $content);
-  };
-  /**
-   * Renders all fields
-   *
-   * @return {Object} element
-   */
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      this.renderPreview();
+    }
+    /**
+     * Renders this editor
+     */
 
+  }, {
+    key: "template",
+    value: function template() {
+      var _this8 = this;
 
-  _proto.renderFields = function renderFields() {
-    var $element = _.div({
-      class: 'editor__body'
-    });
-
-    var postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
-    return _.div({
-      class: 'editor__body'
-    }, _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Entries (' + this.model.entries.length + ')'), _.div({
-      class: 'editor__field__value'
-    }, this.renderEntries())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'POST URL'), _.div({
-      class: 'editor__field__value'
-    }, _.div({
-      class: 'widget-group'
-    }, _.input({
-      readonly: 'readonly',
-      class: 'widget widget--input text',
-      type: 'text',
-      value: postUrl
-    }), _.button({
-      class: 'widget widget--button small fa fa-copy',
-      title: 'Copy POST URL'
-    }).click(function (e) {
-      copyToClipboard(e.currentTarget.previousElementSibling.value);
-    })))), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Title'), _.div({
-      class: 'editor__field__value'
-    }, this.renderTitleEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Allowed origin'), _.div({
-      class: 'editor__field__value'
-    }, this.renderAllowedOriginEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Redirect URL'), _.div({
-      class: 'editor__field__value'
-    }, this.renderRedirectEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Inputs'), _.div({
-      class: 'editor__field__value'
-    }, this.renderInputsEditor())), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Preview'), _.div({
-      class: 'editor__field__value'
-    }, _.div({
-      class: 'editor--form__preview'
-    }))));
-  };
-  /**
-   * Post render
-   */
-
-
-  _proto.postrender = function postrender() {
-    this.renderPreview();
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this8 = this;
-
-    return _.div({
-      class: 'editor editor--form' + (this.model.isLocked ? ' locked' : '')
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-wpforms'
-    }), _.h4({
-      class: 'editor__header__title'
-    }, this.model.title)), this.renderFields(), _.div({
-      class: 'editor__footer'
-    }, _.div({
-      class: 'editor__footer__buttons'
-    }, _.button({
-      class: 'widget widget--button embedded'
-    }, 'Advanced').click(function () {
-      _this8.onClickAdvanced();
-    }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
-      class: 'widget widget--button'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save '), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving ')).click(function () {
-      _this8.onClickSave();
-    })))));
-  };
+      return _.div({
+        class: 'editor editor--form' + (this.model.isLocked ? ' locked' : '')
+      }, _.div({
+        class: 'editor__header'
+      }, _.span({
+        class: 'editor__header__icon fa fa-wpforms'
+      }), _.h4({
+        class: 'editor__header__title'
+      }, this.model.title)), this.renderFields(), _.div({
+        class: 'editor__footer'
+      }, _.div({
+        class: 'editor__footer__buttons'
+      }, _.button({
+        class: 'widget widget--button embedded'
+      }, 'Advanced').click(function () {
+        _this8.onClickAdvanced();
+      }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
+        class: 'widget widget--button'
+      }, _.span({
+        class: 'widget--button__text-default'
+      }, 'Save '), _.span({
+        class: 'widget--button__text-working'
+      }, 'Saving ')).click(function () {
+        _this8.onClickSave();
+      })))));
+    }
+  }]);
 
   return FormEditor;
 }(Crisp.View);
@@ -3381,7 +3761,23 @@ module.exports = FormEditor;
 "use strict";
 
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var beautify = __webpack_require__(248).js_beautify;
 /**
@@ -3394,12 +3790,14 @@ var beautify = __webpack_require__(248).js_beautify;
 var JSONEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(JSONEditor, _Crisp$View);
+  _inherits(JSONEditor, _Crisp$View);
 
   function JSONEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, JSONEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(JSONEditor).call(this, params));
     _this.$error = _.div({
       class: 'editor__footer__error'
     }, _.div({
@@ -3421,265 +3819,273 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = JSONEditor.prototype;
+  _createClass(JSONEditor, [{
+    key: "onClickBasic",
+    value: function onClickBasic() {
+      var url = $('.navbar-main__pane__item.active > a').attr('href');
 
-  _proto.onClickBasic = function onClickBasic() {
-    var url = $('.navbar-main__pane__item.active > a').attr('href');
-
-    if (url) {
-      location = url;
-    } else {
-      debug.log('Invalid url "' + url + '"', this);
-    }
-  };
-  /**
-   * Event: Click save. Posts the model to the apiPath
-   */
-
-
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
-
-    var view = this;
-    this.$saveBtn.toggleClass('working', true);
-
-    if (this.debug()) {
-      HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model).then(function () {
-        _this2.$saveBtn.toggleClass('working', false);
-      }).catch(UI.errorModal);
-    } else {
-      UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
-    }
-  };
-  /**
-   * Event: Click beautify button
-   */
-
-
-  _proto.onClickBeautify = function onClickBeautify() {
-    try {
-      this.value = beautify(this.value);
-      this.$element.find('textarea').val(this.value);
-    } catch (e) {
-      this.$error.children('.editor__footer__error__heading').html('JSON error');
-      this.$error.children('.editor__footer__error__body').html(e);
-      this.$error.show();
-    }
-  };
-  /**
-   * Debug the JSON string
-   *
-   * @param {Boolean} fromModel
-   */
-
-
-  _proto.debug = function debug(fromModel) {
-    var _this3 = this;
-
-    var isValid = true; // Function for checking model integrity
-
-    var check = function check(k, v) {
-      if (!v) {
-        return;
+      if (url) {
+        location = url;
+      } else {
+        debug.log('Invalid url "' + url + '"', this);
       }
+    }
+    /**
+     * Event: Click save. Posts the model to the apiPath
+     */
 
-      switch (k) {
-        case 'schemaId':
-        case 'parentSchemaId':
-          if (HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
-            return;
-          }
+  }, {
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-          return 'Schema "' + v + '" not found';
+      var view = this;
+      this.$saveBtn.toggleClass('working', true);
 
-        case 'schemaBindings':
-        case 'allowedSchemas':
-        case 'allowedChildSchemas':
-          var invalidSchemas = v.slice(0);
-
-          for (var r in resources.schemas) {
-            var schema = resources.schemas[r];
-
-            for (var b = invalidSchemas.length - 1; b >= 0; b--) {
-              if (schema.id == invalidSchemas[b]) {
-                invalidSchemas.splice(b, 1);
-              }
-            }
-          }
-
-          if (invalidSchemas.length > 0) {
-            if (invalidSchemas.length == 1) {
-              return 'Schema "' + invalidSchemas[0] + '" not found';
-            } else {
-              return 'Schemas "' + invalidSchemas.join(', ') + '" not found';
-            }
-          }
-
-          break;
-
-        case 'connections':
-          var invalidConnections = v.slice(0);
-
-          for (var _r in resources.connections) {
-            var connection = resources.connections[_r];
-
-            for (var c = invalidConnections.length - 1; c >= 0; c--) {
-              if (connection.id == invalidConnections[c]) {
-                invalidConnections.splice(c, 1);
-              }
-            }
-          }
-
-          if (invalidConnections.length > 0) {
-            if (invalidConnections.length == 1) {
-              return 'Connection "' + invalidConnections[0] + '" not found';
-            } else {
-              return 'Connections "' + invalidConnections.join(', ') + '" not found';
-            }
-          }
-
-          break;
+      if (this.debug()) {
+        HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model).then(function () {
+          _this2.$saveBtn.toggleClass('working', false);
+        }).catch(UI.errorModal);
+      } else {
+        UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
       }
+    }
+    /**
+     * Event: Click beautify button
+     */
 
-      return;
-    }; // Function for recursing through object
+  }, {
+    key: "onClickBeautify",
+    value: function onClickBeautify() {
+      try {
+        this.value = beautify(this.value);
+        this.$element.find('textarea').val(this.value);
+      } catch (e) {
+        this.$error.children('.editor__footer__error__heading').html('JSON error');
+        this.$error.children('.editor__footer__error__body').html(e);
+        this.$error.show();
+      }
+    }
+    /**
+     * Debug the JSON string
+     *
+     * @param {Boolean} fromModel
+     */
 
+  }, {
+    key: "debug",
+    value: function debug(fromModel) {
+      var _this3 = this;
 
-    var recurse = function recurse(obj) {
-      if (obj instanceof Object) {
-        for (var k in obj) {
-          var v = obj[k];
-          var failMessage = check(k, v);
+      var isValid = true; // Function for checking model integrity
 
-          if (failMessage) {
-            _this3.$error.children('.editor__footer__error__heading').html('Input error');
-
-            _this3.$error.children('.editor__footer__error__body').html(failMessage);
-
-            _this3.$error.show();
-
-            isValid = false;
-          }
-
-          ;
-          recurse(v);
+      var check = function check(k, v) {
+        if (!v) {
+          return;
         }
+
+        switch (k) {
+          case 'schemaId':
+          case 'parentSchemaId':
+            if (HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
+              return;
+            }
+
+            return 'Schema "' + v + '" not found';
+
+          case 'schemaBindings':
+          case 'allowedSchemas':
+          case 'allowedChildSchemas':
+            var invalidSchemas = v.slice(0);
+
+            for (var r in resources.schemas) {
+              var schema = resources.schemas[r];
+
+              for (var b = invalidSchemas.length - 1; b >= 0; b--) {
+                if (schema.id == invalidSchemas[b]) {
+                  invalidSchemas.splice(b, 1);
+                }
+              }
+            }
+
+            if (invalidSchemas.length > 0) {
+              if (invalidSchemas.length == 1) {
+                return 'Schema "' + invalidSchemas[0] + '" not found';
+              } else {
+                return 'Schemas "' + invalidSchemas.join(', ') + '" not found';
+              }
+            }
+
+            break;
+
+          case 'connections':
+            var invalidConnections = v.slice(0);
+
+            for (var _r in resources.connections) {
+              var connection = resources.connections[_r];
+
+              for (var c = invalidConnections.length - 1; c >= 0; c--) {
+                if (connection.id == invalidConnections[c]) {
+                  invalidConnections.splice(c, 1);
+                }
+              }
+            }
+
+            if (invalidConnections.length > 0) {
+              if (invalidConnections.length == 1) {
+                return 'Connection "' + invalidConnections[0] + '" not found';
+              } else {
+                return 'Connections "' + invalidConnections.join(', ') + '" not found';
+              }
+            }
+
+            break;
+        }
+
+        return;
+      }; // Function for recursing through object
+
+
+      var recurse = function recurse(obj) {
+        if (obj instanceof Object) {
+          for (var k in obj) {
+            var v = obj[k];
+            var failMessage = check(k, v);
+
+            if (failMessage) {
+              _this3.$error.children('.editor__footer__error__heading').html('Input error');
+
+              _this3.$error.children('.editor__footer__error__body').html(failMessage);
+
+              _this3.$error.show();
+
+              isValid = false;
+            }
+
+            ;
+            recurse(v);
+          }
+        }
+      }; // Hide error message initially
+
+
+      this.$error.hide(); // Syntax check
+
+      try {
+        if (!fromModel) {
+          this.model = JSON.parse(this.value);
+        } // Sanity check
+
+
+        recurse(this.model);
+      } catch (e) {
+        this.$error.children('.editor__footer__error__heading').html('Syntax error');
+        this.$error.children('.editor__footer__error__body').html(e);
+        this.$error.show();
+        isValid = false;
       }
-    }; // Hide error message initially
 
-
-    this.$error.hide(); // Syntax check
-
-    try {
-      if (!fromModel) {
-        this.model = JSON.parse(this.value);
-      } // Sanity check
-
-
-      recurse(this.model);
-    } catch (e) {
-      this.$error.children('.editor__footer__error__heading').html('Syntax error');
-      this.$error.children('.editor__footer__error__body').html(e);
-      this.$error.show();
-      isValid = false;
+      this.isValid = isValid;
+      return isValid;
     }
+    /**
+     * Event: Change text. Make sure the value is up to date
+     */
 
-    this.isValid = isValid;
-    return isValid;
-  };
-  /**
-   * Event: Change text. Make sure the value is up to date
-   */
+  }, {
+    key: "onChangeText",
+    value: function onChangeText() {
+      this.value = this.editor.getDoc().getValue();
 
-
-  _proto.onChangeText = function onChangeText() {
-    this.value = this.editor.getDoc().getValue();
-
-    if (this.debug()) {
-      this.trigger('change', this.model);
+      if (this.debug()) {
+        this.trigger('change', this.model);
+      }
     }
-  };
-  /**
-   * Pre render
-   */
+    /**
+     * Pre render
+     */
 
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      // Debug once before entering into the code editor
+      // This allows for backward compatibility adjustments to happen first
+      this.debug(true); // Convert the model to a string value
 
-  _proto.prerender = function prerender() {
-    // Debug once before entering into the code editor
-    // This allows for backward compatibility adjustments to happen first
-    this.debug(true); // Convert the model to a string value
+      this.value = beautify(JSON.stringify(this.model));
+    }
+    /**
+     * Renders this editor
+     */
 
-    this.value = beautify(JSON.stringify(this.model));
-  };
-  /**
-   * Renders this editor
-   */
+  }, {
+    key: "template",
+    value: function template() {
+      var _this4 = this;
 
+      return _.div({
+        class: 'editor editor--json'
+      }, _.div({
+        class: 'editor__header'
+      }, _.span({
+        class: 'editor__header__icon fa fa-code'
+      }), _.h4({
+        class: 'editor__header__title'
+      }, Crisp.Router.params.id)), _.div({
+        class: 'editor__body'
+      }, _.textarea()), _.div({
+        class: 'editor__footer'
+      }, this.$error, _.div({
+        class: 'editor__footer__buttons'
+      }, _.button({
+        class: 'widget widget--button embedded'
+      }, 'Basic').click(function () {
+        _this4.onClickBasic();
+      }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
+        class: 'widget widget--button'
+      }, _.span({
+        class: 'widget--button__text-default'
+      }, 'Save'), _.span({
+        class: 'widget--button__text-working'
+      }, 'Saving')).click(function () {
+        _this4.onClickSave();
+      })))));
+    }
+    /**
+     * Post render
+     */
 
-  _proto.template = function template() {
-    var _this4 = this;
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      var _this5 = this;
 
-    return _.div({
-      class: 'editor editor--json'
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-code'
-    }), _.h4({
-      class: 'editor__header__title'
-    }, Crisp.Router.params.id)), _.div({
-      class: 'editor__body'
-    }, _.textarea()), _.div({
-      class: 'editor__footer'
-    }, this.$error, _.div({
-      class: 'editor__footer__buttons'
-    }, _.button({
-      class: 'widget widget--button embedded'
-    }, 'Basic').click(function () {
-      _this4.onClickBasic();
-    }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
-      class: 'widget widget--button'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save'), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving')).click(function () {
-      _this4.onClickSave();
-    })))));
-  };
-  /**
-   * Post render
-   */
+      setTimeout(function () {
+        _this5.editor = CodeMirror.fromTextArea(_this5.element.querySelector('textarea'), {
+          lineNumbers: true,
+          mode: {
+            name: 'javascript',
+            json: true
+          },
+          viewportMargin: 10,
+          tabSize: 4,
+          lineWrapping: false,
+          indentUnit: 4,
+          indentWithTabs: true,
+          theme: getCookie('cmtheme') || 'default',
+          value: _this5.value
+        });
 
+        _this5.editor.getDoc().setValue(_this5.value);
 
-  _proto.postrender = function postrender() {
-    var _this5 = this;
+        _this5.editor.on('change', function () {
+          _this5.onChangeText();
+        });
 
-    setTimeout(function () {
-      _this5.editor = CodeMirror.fromTextArea(_this5.element.querySelector('textarea'), {
-        lineNumbers: true,
-        mode: {
-          name: 'javascript',
-          json: true
-        },
-        viewportMargin: 10,
-        tabSize: 4,
-        lineWrapping: false,
-        indentUnit: 4,
-        indentWithTabs: true,
-        theme: getCookie('cmtheme') || 'default',
-        value: _this5.value
-      });
-
-      _this5.editor.getDoc().setValue(_this5.value);
-
-      _this5.editor.on('change', function () {
         _this5.onChangeText();
-      });
-
-      _this5.onChangeText();
-    }, 1);
-  };
+      }, 1);
+    }
+  }]);
 
   return JSONEditor;
 }(Crisp.View);
@@ -6792,7 +7198,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
 /* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
 
 /*
 
@@ -6934,7 +7342,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
     is_wrap_attributes_force_expand_multiline = wrap_attributes === 'force-expand-multiline';
     is_wrap_attributes_force_aligned = wrap_attributes === 'force-aligned';
     end_with_newline = options.end_with_newline === undefined ? false : options.end_with_newline;
-    extra_liners = typeof options.extra_liners === 'object' && options.extra_liners ? options.extra_liners.concat() : typeof options.extra_liners === 'string' ? options.extra_liners.split(',') : 'head,body,/html'.split(',');
+    extra_liners = _typeof(options.extra_liners) === 'object' && options.extra_liners ? options.extra_liners.concat() : typeof options.extra_liners === 'string' ? options.extra_liners.split(',') : 'head,body,/html'.split(',');
     eol = options.eol ? options.eol : 'auto';
 
     if (options.indent_with_tabs) {
@@ -7977,12 +8385,28 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaViewer =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(MediaViewer, _Crisp$View);
+  _inherits(MediaViewer, _Crisp$View);
 
   /**
    * Constructor
@@ -7990,7 +8414,9 @@ function (_Crisp$View) {
   function MediaViewer(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, MediaViewer);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MediaViewer).call(this, params));
 
     _this.fetch();
 
@@ -8001,49 +8427,51 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = MediaViewer.prototype;
-
-  _proto.prerender = function prerender() {
-    if (this.model instanceof HashBrown.Models.Media === false) {
-      this.model = new HashBrown.Models.Media(this.model);
+  _createClass(MediaViewer, [{
+    key: "prerender",
+    value: function prerender() {
+      if (this.model instanceof HashBrown.Models.Media === false) {
+        this.model = new HashBrown.Models.Media(this.model);
+      }
     }
-  };
-  /**
-   * Renders this editor
-   */
+    /**
+     * Renders this editor
+     */
 
-
-  _proto.template = function template() {
-    var mediaSrc = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800&t=' + Date.now();
-    return _.div({
-      class: 'editor editor--media'
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-file-image-o'
-    }), _.h4({
-      class: 'editor__header__title'
-    }, this.model.name, _.span({
-      class: 'editor__header__title__appendix'
-    }, this.model.getContentTypeHeader()))), _.div({
-      class: 'editor__body'
-    }, _.if(this.model.isImage(), _.img({
-      class: 'editor--media__preview',
-      src: mediaSrc
-    })), _.if(this.model.isVideo(), _.video({
-      class: 'editor--media__preview',
-      controls: true
-    }, _.source({
-      src: mediaSrc,
-      type: this.model.getContentTypeHeader()
-    }))), _.if(this.model.isAudio(), _.audio({
-      class: 'editor--media__preview',
-      controls: true
-    }, _.source({
-      src: mediaSrc,
-      type: this.model.getContentTypeHeader()
-    })))));
-  };
+  }, {
+    key: "template",
+    value: function template() {
+      var mediaSrc = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + this.model.id + '?width=800&t=' + Date.now();
+      return _.div({
+        class: 'editor editor--media'
+      }, _.div({
+        class: 'editor__header'
+      }, _.span({
+        class: 'editor__header__icon fa fa-file-image-o'
+      }), _.h4({
+        class: 'editor__header__title'
+      }, this.model.name, _.span({
+        class: 'editor__header__title__appendix'
+      }, this.model.getContentTypeHeader()))), _.div({
+        class: 'editor__body'
+      }, _.if(this.model.isImage(), _.img({
+        class: 'editor--media__preview',
+        src: mediaSrc
+      })), _.if(this.model.isVideo(), _.video({
+        class: 'editor--media__preview',
+        controls: true
+      }, _.source({
+        src: mediaSrc,
+        type: this.model.getContentTypeHeader()
+      }))), _.if(this.model.isAudio(), _.audio({
+        class: 'editor--media__preview',
+        controls: true
+      }, _.source({
+        src: mediaSrc,
+        type: this.model.getContentTypeHeader()
+      })))));
+    }
+  }]);
 
   return MediaViewer;
 }(Crisp.View);
@@ -8062,18 +8490,36 @@ module.exports = MediaViewer;
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var UserEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(UserEditor, _HashBrown$Views$Moda);
+  _inherits(UserEditor, _HashBrown$Views$Moda);
 
   /**
    * Constructor
    */
   function UserEditor(params) {
     var _this;
+
+    _classCallCheck(this, UserEditor);
 
     params.title = 'Settings for "' + (params.model.fullName || params.model.username || params.model.email || params.model.id) + '"';
     params.actions = [{
@@ -8083,7 +8529,7 @@ function (_HashBrown$Views$Moda) {
       }
     }];
     params.autoFetch = false;
-    _this = _HashBrown$Views$Moda.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(UserEditor).call(this, params));
     HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects').then(function (projects) {
       _this.projects = projects;
 
@@ -8096,221 +8542,230 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = UserEditor.prototype;
+  _createClass(UserEditor, [{
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
+      var newUserObject = this.model.getObject();
 
-    var newUserObject = this.model.getObject();
+      if (this.newPassword) {
+        newUserObject.password = this.newPassword;
+      }
 
-    if (this.newPassword) {
-      newUserObject.password = this.newPassword;
+      HashBrown.Helpers.RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
+        _this2.close();
+
+        _this2.trigger('save', _this2.model);
+      }).catch(UI.errorModal);
     }
+    /**
+     * Renders the username editor
+     *
+     * @returns {HTMLElement} Element
+     */
 
-    HashBrown.Helpers.RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
-      _this2.close();
+  }, {
+    key: "renderUserNameEditor",
+    value: function renderUserNameEditor() {
+      var _this3 = this;
 
-      _this2.trigger('save', _this2.model);
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Renders the username editor
-   *
-   * @returns {HTMLElement} Element
-   */
-
-
-  _proto.renderUserNameEditor = function renderUserNameEditor() {
-    var _this3 = this;
-
-    return new HashBrown.Views.Widgets.Input({
-      value: this.model.username,
-      placeholder: 'Input the username here',
-      onChange: function onChange(newValue) {
-        _this3.model.username = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the scopes editor
-   *
-   * @param {String} project
-   *
-   * @returns {HTMLElement} Element
-   */
-
-
-  _proto.renderScopesEditor = function renderScopesEditor(project) {
-    var _this4 = this;
-
-    return new HashBrown.Views.Widgets.Dropdown({
-      value: this.model.getScopes(project),
-      useMultiple: true,
-      placeholder: '(no scopes)',
-      options: ['connections', 'schemas'],
-      onChange: function onChange(newValue) {
-        _this4.model.scopes[project] = newValue;
-
-        _this4.fetch();
-      }
-    }).$element;
-  };
-  /**
-   * Renders the full name editor
-   *
-   * @return {HTMLElement} Element
-   */
-
-
-  _proto.renderFullNameEditor = function renderFullNameEditor() {
-    var _this5 = this;
-
-    return new HashBrown.Views.Widgets.Input({
-      value: this.model.fullName,
-      onChange: function onChange(newValue) {
-        _this5.model.fullName = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the email editor
-   *
-   * @return {HTMLElement} Element
-   */
-
-
-  _proto.renderEmailEditor = function renderEmailEditor() {
-    var _this6 = this;
-
-    return new HashBrown.Views.Widgets.Input({
-      value: this.model.email,
-      onChange: function onChange(newValue) {
-        _this6.model.email = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the password
-   *
-   * @return {HTMLElement} Element
-   */
-
-
-  _proto.renderPasswordEditor = function renderPasswordEditor() {
-    var _this7 = this;
-
-    var password1;
-    var password2;
-
-    var _onChange = function onChange() {
-      var isMatch = password1 == password2;
-      var isLongEnough = password1 && password1.length > 3;
-      var isValid = isMatch && isLongEnough;
-
-      _this7.$element.find('.modal__footer .widget--button').toggleClass('disabled', !isValid);
-
-      var $passwordWarning = _this7.$element.find('.editor--user__password-warning');
-
-      if (isValid) {
-        _this7.newPassword = password1;
-        $passwordWarning.hide();
-      } else {
-        $passwordWarning.show();
-        _this7.newPassword = null;
-
-        if (!isMatch) {
-          $passwordWarning.html('Passwords do not match');
-        } else if (!isLongEnough) {
-          $passwordWarning.html('Passwords are too short');
+      return new HashBrown.Views.Widgets.Input({
+        value: this.model.username,
+        placeholder: 'Input the username here',
+        onChange: function onChange(newValue) {
+          _this3.model.username = newValue;
         }
-      }
-    };
+      }).$element;
+    }
+    /**
+     * Renders the scopes editor
+     *
+     * @param {String} project
+     *
+     * @returns {HTMLElement} Element
+     */
 
-    return _.div({
-      class: 'widget-group'
-    }, new HashBrown.Views.Widgets.Input({
-      placeholder: 'Type new password',
-      type: 'password',
-      onChange: function onChange(newValue) {
-        password1 = newValue;
+  }, {
+    key: "renderScopesEditor",
+    value: function renderScopesEditor(project) {
+      var _this4 = this;
 
-        _onChange();
-      }
-    }).$element, new HashBrown.Views.Widgets.Input({
-      placeholder: 'Confirm new password',
-      type: 'password',
-      onChange: function onChange(newValue) {
-        password2 = newValue;
+      return new HashBrown.Views.Widgets.Dropdown({
+        value: this.model.getScopes(project),
+        useMultiple: true,
+        placeholder: '(no scopes)',
+        options: ['connections', 'schemas'],
+        onChange: function onChange(newValue) {
+          _this4.model.scopes[project] = newValue;
 
-        _onChange();
-      }
-    }).$element);
-  };
-  /**
-   * Renders the admin editor
-   *
-   * @return {HTMLElement} Element
-   */
+          _this4.fetch();
+        }
+      }).$element;
+    }
+    /**
+     * Renders the full name editor
+     *
+     * @return {HTMLElement} Element
+     */
 
+  }, {
+    key: "renderFullNameEditor",
+    value: function renderFullNameEditor() {
+      var _this5 = this;
 
-  _proto.renderAdminEditor = function renderAdminEditor() {
-    var _this8 = this;
+      return new HashBrown.Views.Widgets.Input({
+        value: this.model.fullName,
+        onChange: function onChange(newValue) {
+          _this5.model.fullName = newValue;
+        }
+      }).$element;
+    }
+    /**
+     * Renders the email editor
+     *
+     * @return {HTMLElement} Element
+     */
 
-    return new HashBrown.Views.Widgets.Input({
-      type: 'checkbox',
-      value: this.model.isAdmin == true,
-      onChange: function onChange(newValue) {
-        _this8.model.isAdmin = newValue;
-        setTimeout(function () {
-          _this8.fetch();
-        }, 300);
-      }
-    }).$element;
-  };
-  /**
-   * Renders a single field
-   *
-   * @return {HTMLElement} Element
-   */
+  }, {
+    key: "renderEmailEditor",
+    value: function renderEmailEditor() {
+      var _this6 = this;
 
+      return new HashBrown.Views.Widgets.Input({
+        value: this.model.email,
+        onChange: function onChange(newValue) {
+          _this6.model.email = newValue;
+        }
+      }).$element;
+    }
+    /**
+     * Renders the password
+     *
+     * @return {HTMLElement} Element
+     */
 
-  _proto.renderField = function renderField(label, $content) {
-    return _.div({
-      class: 'widget-group'
-    }, _.div({
-      class: 'widget widget--label'
-    }, label), $content);
-  };
-  /**
-   * Renders this editor
-   */
+  }, {
+    key: "renderPasswordEditor",
+    value: function renderPasswordEditor() {
+      var _this7 = this;
 
+      var password1;
+      var password2;
 
-  _proto.renderBody = function renderBody() {
-    var _this9 = this;
+      var _onChange = function onChange() {
+        var isMatch = password1 == password2;
+        var isLongEnough = password1 && password1.length > 3;
+        var isValid = isMatch && isLongEnough;
 
-    return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({
-      class: 'widget widget--label warning hidden editor--user__password-warning'
-    }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({
-      class: 'widget widget--separator'
-    }, 'Projects'), _.each(this.projects, function (i, project) {
+        _this7.$element.find('.modal__footer .widget--button').toggleClass('disabled', !isValid);
+
+        var $passwordWarning = _this7.$element.find('.editor--user__password-warning');
+
+        if (isValid) {
+          _this7.newPassword = password1;
+          $passwordWarning.hide();
+        } else {
+          $passwordWarning.show();
+          _this7.newPassword = null;
+
+          if (!isMatch) {
+            $passwordWarning.html('Passwords do not match');
+          } else if (!isLongEnough) {
+            $passwordWarning.html('Passwords are too short');
+          }
+        }
+      };
+
       return _.div({
         class: 'widget-group'
       }, new HashBrown.Views.Widgets.Input({
-        type: 'checkbox',
-        value: _this9.model.hasScope(project.id),
+        placeholder: 'Type new password',
+        type: 'password',
         onChange: function onChange(newValue) {
-          if (newValue) {
-            _this9.model.giveScope(project.id);
-          } else {
-            _this9.model.removeScope(project.id);
-          }
+          password1 = newValue;
+
+          _onChange();
         }
-      }).$element, _.div({
+      }).$element, new HashBrown.Views.Widgets.Input({
+        placeholder: 'Confirm new password',
+        type: 'password',
+        onChange: function onChange(newValue) {
+          password2 = newValue;
+
+          _onChange();
+        }
+      }).$element);
+    }
+    /**
+     * Renders the admin editor
+     *
+     * @return {HTMLElement} Element
+     */
+
+  }, {
+    key: "renderAdminEditor",
+    value: function renderAdminEditor() {
+      var _this8 = this;
+
+      return new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        value: this.model.isAdmin == true,
+        onChange: function onChange(newValue) {
+          _this8.model.isAdmin = newValue;
+          setTimeout(function () {
+            _this8.fetch();
+          }, 300);
+        }
+      }).$element;
+    }
+    /**
+     * Renders a single field
+     *
+     * @return {HTMLElement} Element
+     */
+
+  }, {
+    key: "renderField",
+    value: function renderField(label, $content) {
+      return _.div({
+        class: 'widget-group'
+      }, _.div({
         class: 'widget widget--label'
-      }, project.settings.info.name), _this9.renderScopesEditor(project.id));
-    })))];
-  };
+      }, label), $content);
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this9 = this;
+
+      return [this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.div({
+        class: 'widget widget--label warning hidden editor--user__password-warning'
+      }), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.div({
+        class: 'widget widget--separator'
+      }, 'Projects'), _.each(this.projects, function (i, project) {
+        return _.div({
+          class: 'widget-group'
+        }, new HashBrown.Views.Widgets.Input({
+          type: 'checkbox',
+          value: _this9.model.hasScope(project.id),
+          onChange: function onChange(newValue) {
+            if (newValue) {
+              _this9.model.giveScope(project.id);
+            } else {
+              _this9.model.removeScope(project.id);
+            }
+          }
+        }).$element, _.div({
+          class: 'widget widget--label'
+        }, project.settings.info.name), _this9.renderScopesEditor(project.id));
+      })))];
+    }
+  }]);
 
   return UserEditor;
 }(HashBrown.Views.Modals.Modal);
@@ -8324,7 +8779,23 @@ module.exports = UserEditor;
 "use strict";
  // Icons
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var icons = __webpack_require__(238).icons;
 /**
@@ -8337,12 +8808,14 @@ var icons = __webpack_require__(238).icons;
 var SchemaEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(SchemaEditor, _Crisp$View);
+  _inherits(SchemaEditor, _Crisp$View);
 
   function SchemaEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, SchemaEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SchemaEditor).call(this, params));
 
     _this.fetch();
 
@@ -8353,189 +8826,196 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = SchemaEditor.prototype;
-
-  _proto.onClickAdvanced = function onClickAdvanced() {
-    location.hash = location.hash.replace('/schemas/', '/schemas/json/');
-  };
-  /**
-   * Event: Click save. Posts the model to the modelUrl
-   */
-
-
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
-
-    if (this.jsonEditor && this.jsonEditor.isValid == false) {
-      return;
+  _createClass(SchemaEditor, [{
+    key: "onClickAdvanced",
+    value: function onClickAdvanced() {
+      location.hash = location.hash.replace('/schemas/', '/schemas/json/');
     }
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
 
-    this.$saveBtn.toggleClass('working', true);
-    HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model).then(function (schema) {
-      _this2.$saveBtn.toggleClass('working', false);
+  }, {
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-      return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-    }).then(function () {
-      Crisp.View.get('NavbarMain').reload(); // If id changed, change the hash
-
-      if (Crisp.Router.params.id != _this2.model.id) {
-        location.hash = '/schemas/' + _this2.model.id;
+      if (this.jsonEditor && this.jsonEditor.isValid == false) {
+        return;
       }
-    }).catch(function (e) {
-      UI.errorModal(e);
 
-      _this2.$saveBtn.toggleClass('working', false);
-    });
-  };
-  /**
-   * Renders the icon editor
-   *  
-   * @return {Object} element
-   */
+      this.$saveBtn.toggleClass('working', true);
+      HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model).then(function (schema) {
+        _this2.$saveBtn.toggleClass('working', false);
 
+        return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
+      }).then(function () {
+        Crisp.View.get('NavbarMain').reload(); // If id changed, change the hash
 
-  _proto.renderIconEditor = function renderIconEditor() {
-    var _this3 = this;
+        if (Crisp.Router.params.id != _this2.model.id) {
+          location.hash = '/schemas/' + _this2.model.id;
+        }
+      }).catch(function (e) {
+        UI.errorModal(e);
 
-    return _.button({
-      class: 'widget small widget--button fa fa-' + this.getIcon()
-    }).click(function (e) {
-      var modal = new HashBrown.Views.Modals.IconModal();
-      modal.on('change', function (newIcon) {
-        _this3.model.icon = newIcon;
-        e.currentTarget.className = 'widget small widget--button fa fa-' + _this3.model.icon;
+        _this2.$saveBtn.toggleClass('working', false);
       });
-    });
-  };
-  /**
-   * Renders a single field
-   *
-   * @param {String} label
-   * @param {HTMLElement} content
-   * @param {Boolean} isVertical
-   * @param {Boolean} isLocked
-   *
-   * @return {HTMLElement} Editor element
-   */
-
-
-  _proto.renderField = function renderField(label, $content, isVertical, isLocked) {
-    if (!$content) {
-      return;
     }
+    /**
+     * Renders the icon editor
+     *  
+     * @return {Object} element
+     */
 
-    return _.div({
-      class: 'editor__field ' + (isVertical ? 'vertical' : '')
-    }, _.div({
-      class: 'editor__field__key'
-    }, label), _.div({
-      class: 'editor__field__value'
-    }, _.if(isLocked, _.input({
-      class: 'editor__field__value__lock',
-      title: 'Only edit this field if you know what you\'re doing',
-      type: 'checkbox',
-      checked: true
-    })), $content));
-  };
-  /**
-   * Renders all fields
-   *
-   * @return {Object} element
-   */
+  }, {
+    key: "renderIconEditor",
+    value: function renderIconEditor() {
+      var _this3 = this;
 
-
-  _proto.renderFields = function renderFields() {
-    var _this4 = this;
-
-    var id = parseInt(this.model.id);
-
-    var $element = _.div({
-      class: 'editor__body'
-    });
-
-    $element.empty();
-    $element.append(this.renderField('Id', new HashBrown.Views.Widgets.Input({
-      value: this.model.id,
-      onChange: function onChange(newValue) {
-        _this4.model.id = newValue;
-      }
-    }).$element, false, true));
-    $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
-      value: this.model.name,
-      onChange: function onChange(newValue) {
-        _this4.model.name = newValue;
-      }
-    }).$element));
-    $element.append(this.renderField('Icon', this.renderIconEditor()));
-    $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
-      value: this.model.parentSchemaId,
-      options: resources.schemas,
-      valueKey: 'id',
-      labelKey: 'name',
-      disabledOptions: [{
-        id: this.model.id,
-        name: this.model.name
-      }],
-      onChange: function onChange(newParent) {
-        _this4.model.parentSchemaId = newParent;
-
-        _this4.fetch();
-      }
-    }).$element));
-    return $element;
-  };
-  /**
-   * Gets the schema icon
-   *
-   * @returns {String} Icon
-   */
-
-
-  _proto.getIcon = function getIcon() {
-    if (this.model.icon) {
-      return this.model.icon;
+      return _.button({
+        class: 'widget small widget--button fa fa-' + this.getIcon()
+      }).click(function (e) {
+        var modal = new HashBrown.Views.Modals.IconModal();
+        modal.on('change', function (newIcon) {
+          _this3.model.icon = newIcon;
+          e.currentTarget.className = 'widget small widget--button fa fa-' + _this3.model.icon;
+        });
+      });
     }
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     * @param {Boolean} isLocked
+     *
+     * @return {HTMLElement} Editor element
+     */
 
-    if (this.parentSchema && this.parentSchema.icon) {
-      return this.parentSchema.icon;
+  }, {
+    key: "renderField",
+    value: function renderField(label, $content, isVertical, isLocked) {
+      if (!$content) {
+        return;
+      }
+
+      return _.div({
+        class: 'editor__field ' + (isVertical ? 'vertical' : '')
+      }, _.div({
+        class: 'editor__field__key'
+      }, label), _.div({
+        class: 'editor__field__value'
+      }, _.if(isLocked, _.input({
+        class: 'editor__field__value__lock',
+        title: 'Only edit this field if you know what you\'re doing',
+        type: 'checkbox',
+        checked: true
+      })), $content));
     }
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
 
-    return 'cogs';
-  };
-  /**
-   * Renders this editor
-   */
+  }, {
+    key: "renderFields",
+    value: function renderFields() {
+      var _this4 = this;
 
+      var id = parseInt(this.model.id);
 
-  _proto.template = function template() {
-    var _this5 = this;
+      var $element = _.div({
+        class: 'editor__body'
+      });
 
-    return _.div({
-      class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '')
-    }, _.div({
-      class: 'editor__header'
-    }, _.span({
-      class: 'editor__header__icon fa fa-' + this.getIcon()
-    }), _.h4({
-      class: 'editor__header__title'
-    }, this.model.name)), this.renderFields(), _.div({
-      class: 'editor__footer'
-    }, _.div({
-      class: 'editor__footer__buttons'
-    }, _.button({
-      class: 'widget widget--button embedded'
-    }, 'Advanced').click(function () {
-      _this5.onClickAdvanced();
-    }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
-      class: 'widget widget--button editor__footer__buttons__save'
-    }, _.span({
-      class: 'widget--button__text-default'
-    }, 'Save '), _.span({
-      class: 'widget--button__text-working'
-    }, 'Saving ')).click(function () {
-      _this5.onClickSave();
-    })))));
-  };
+      $element.empty();
+      $element.append(this.renderField('Id', new HashBrown.Views.Widgets.Input({
+        value: this.model.id,
+        onChange: function onChange(newValue) {
+          _this4.model.id = newValue;
+        }
+      }).$element, false, true));
+      $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
+        value: this.model.name,
+        onChange: function onChange(newValue) {
+          _this4.model.name = newValue;
+        }
+      }).$element));
+      $element.append(this.renderField('Icon', this.renderIconEditor()));
+      $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
+        value: this.model.parentSchemaId,
+        options: resources.schemas,
+        valueKey: 'id',
+        labelKey: 'name',
+        disabledOptions: [{
+          id: this.model.id,
+          name: this.model.name
+        }],
+        onChange: function onChange(newParent) {
+          _this4.model.parentSchemaId = newParent;
+
+          _this4.fetch();
+        }
+      }).$element));
+      return $element;
+    }
+    /**
+     * Gets the schema icon
+     *
+     * @returns {String} Icon
+     */
+
+  }, {
+    key: "getIcon",
+    value: function getIcon() {
+      if (this.model.icon) {
+        return this.model.icon;
+      }
+
+      if (this.parentSchema && this.parentSchema.icon) {
+        return this.parentSchema.icon;
+      }
+
+      return 'cogs';
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this5 = this;
+
+      return _.div({
+        class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '')
+      }, _.div({
+        class: 'editor__header'
+      }, _.span({
+        class: 'editor__header__icon fa fa-' + this.getIcon()
+      }), _.h4({
+        class: 'editor__header__title'
+      }, this.model.name)), this.renderFields(), _.div({
+        class: 'editor__footer'
+      }, _.div({
+        class: 'editor__footer__buttons'
+      }, _.button({
+        class: 'widget widget--button embedded'
+      }, 'Advanced').click(function () {
+        _this5.onClickAdvanced();
+      }), _.if(!this.model.isLocked, this.$saveBtn = _.button({
+        class: 'widget widget--button editor__footer__buttons__save'
+      }, _.span({
+        class: 'widget--button__text-default'
+      }, 'Save '), _.span({
+        class: 'widget--button__text-working'
+      }, 'Saving ')).click(function () {
+        _this5.onClickSave();
+      })))));
+    }
+  }]);
 
   return SchemaEditor;
 }(Crisp.View);
@@ -8554,413 +9034,447 @@ module.exports = SchemaEditor;
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentSchemaEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(ContentSchemaEditor, _HashBrown$Views$Edit);
+  _inherits(ContentSchemaEditor, _HashBrown$Views$Edit);
 
   function ContentSchemaEditor() {
-    return _HashBrown$Views$Edit.apply(this, arguments) || this;
+    _classCallCheck(this, ContentSchemaEditor);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContentSchemaEditor).apply(this, arguments));
   }
 
-  var _proto = ContentSchemaEditor.prototype;
+  _createClass(ContentSchemaEditor, [{
+    key: "getParentTabs",
 
-  /**
-   * Gets parent tabs
-   *
-   * @returns {Object} Parent tabs
-   */
-  _proto.getParentTabs = function getParentTabs() {
-    if (!this.parentSchema) {
-      return {};
+    /**
+     * Gets parent tabs
+     *
+     * @returns {Object} Parent tabs
+     */
+    value: function getParentTabs() {
+      if (!this.parentSchema) {
+        return {};
+      }
+
+      return this.parentSchema.tabs;
     }
+    /**
+     * Gets all tabs
+     *
+     * @returns {Object} All tabs
+     */
 
-    return this.parentSchema.tabs;
-  };
-  /**
-   * Gets all tabs
-   *
-   * @returns {Object} All tabs
-   */
+  }, {
+    key: "getAllTabs",
+    value: function getAllTabs() {
+      var allTabs = {};
+      var parentTabs = this.getParentTabs();
 
+      for (var tabId in parentTabs) {
+        allTabs[tabId] = parentTabs[tabId];
+      }
 
-  _proto.getAllTabs = function getAllTabs() {
-    var allTabs = {};
-    var parentTabs = this.getParentTabs();
+      for (var _tabId in this.model.tabs) {
+        allTabs[_tabId] = this.model.tabs[_tabId];
+      }
 
-    for (var tabId in parentTabs) {
-      allTabs[tabId] = parentTabs[tabId];
+      return allTabs;
     }
+    /**
+     * Gets parent properties
+     *
+     * @param {String} tabId
+     *
+     * @returns {Object} Parent properties
+     */
 
-    for (var _tabId in this.model.tabs) {
-      allTabs[_tabId] = this.model.tabs[_tabId];
-    }
+  }, {
+    key: "getParentProperties",
+    value: function getParentProperties(tabId) {
+      var parentProperties = {};
 
-    return allTabs;
-  };
-  /**
-   * Gets parent properties
-   *
-   * @param {String} tabId
-   *
-   * @returns {Object} Parent properties
-   */
+      if (!this.parentSchema) {
+        return parentProperties;
+      }
 
+      for (var key in this.parentSchema.fields.properties) {
+        // If a tab is specified, we only want properties in this tab
+        if (tabId && this.parentSchema.fields.properties[key].tabId !== tabId) {
+          continue;
+        }
 
-  _proto.getParentProperties = function getParentProperties(tabId) {
-    var parentProperties = {};
+        parentProperties[key] = this.parentSchema.fields.properties[key];
+      }
 
-    if (!this.parentSchema) {
       return parentProperties;
     }
+    /**
+     * Renders the editor fields
+     */
 
-    for (var key in this.parentSchema.fields.properties) {
-      // If a tab is specified, we only want properties in this tab
-      if (tabId && this.parentSchema.fields.properties[key].tabId !== tabId) {
-        continue;
+  }, {
+    key: "renderFields",
+    value: function renderFields() {
+      var _this = this;
+
+      var $element = _get(_getPrototypeOf(ContentSchemaEditor.prototype), "renderFields", this).call(this); // Allowed child Schemas
+
+
+      $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
+        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+        value: this.model.allowedChildSchemas,
+        labelKey: 'name',
+        valueKey: 'id',
+        useMultiple: true,
+        useClearButton: true,
+        useTypeAhead: true,
+        onChange: function onChange(newValue) {
+          _this.model.allowedChildSchemas = newValue;
+        }
+      }).$element)); // Default tab
+
+      var defaultTabEditor = new HashBrown.Views.Widgets.Dropdown({
+        options: this.getAllTabs(),
+        useClearButton: true,
+        value: this.model.defaultTabId,
+        onChange: function onChange(newValue) {
+          _this.model.defaultTabId = newValue;
+        }
+      });
+
+      if (!this.model.defaultTabId && this.parentSchema) {
+        this.model.defaultTabId = this.parentSchema.defaultTabId;
       }
 
-      parentProperties[key] = this.parentSchema.fields.properties[key];
-    }
+      $element.append(this.renderField('Default tab', defaultTabEditor.$element)); // Tabs
 
-    return parentProperties;
-  };
-  /**
-   * Renders the editor fields
-   */
+      $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+        disabledValue: Object.values(this.getParentTabs()),
+        value: Object.values(this.model.tabs),
+        placeholder: 'New tab',
+        onChange: function onChange(newValue) {
+          var newTabs = {};
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
 
-
-  _proto.renderFields = function renderFields() {
-    var _this = this;
-
-    var $element = _HashBrown$Views$Edit.prototype.renderFields.call(this); // Allowed child Schemas
-
-
-    $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
-      options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
-      value: this.model.allowedChildSchemas,
-      labelKey: 'name',
-      valueKey: 'id',
-      useMultiple: true,
-      useClearButton: true,
-      useTypeAhead: true,
-      onChange: function onChange(newValue) {
-        _this.model.allowedChildSchemas = newValue;
-      }
-    }).$element)); // Default tab
-
-    var defaultTabEditor = new HashBrown.Views.Widgets.Dropdown({
-      options: this.getAllTabs(),
-      useClearButton: true,
-      value: this.model.defaultTabId,
-      onChange: function onChange(newValue) {
-        _this.model.defaultTabId = newValue;
-      }
-    });
-
-    if (!this.model.defaultTabId && this.parentSchema) {
-      this.model.defaultTabId = this.parentSchema.defaultTabId;
-    }
-
-    $element.append(this.renderField('Default tab', defaultTabEditor.$element)); // Tabs
-
-    $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
-      disabledValue: Object.values(this.getParentTabs()),
-      value: Object.values(this.model.tabs),
-      placeholder: 'New tab',
-      onChange: function onChange(newValue) {
-        var newTabs = {};
-
-        for (var _iterator = newValue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref;
-
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-          } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-          }
-
-          var tab = _ref;
-          newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
-        }
-
-        _this.model.tabs = newTabs;
-        defaultTabEditor.options = _this.getAllTabs();
-        defaultTabEditor.fetch();
-        renderFieldProperties();
-      }
-    }).$element)); // Field properties
-
-    var $tabs = _.div({
-      class: 'editor--schema__tabs'
-    });
-
-    var $fieldProperties = _.div({
-      class: 'editor__field'
-    });
-
-    var $parentFieldProperties = _.div({
-      class: 'editor__field editor--schema__parent-field-properties'
-    });
-
-    $element.append($tabs);
-    $element.append($parentFieldProperties);
-    $element.append($fieldProperties);
-
-    var renderFieldProperties = function renderFieldProperties() {
-      // Render tabs
-      if (!_this.currentTab) {
-        _this.currentTab = Object.keys(_this.getAllTabs())[0] || 'meta';
-      }
-
-      _.append($tabs.empty(), _.each(_this.getAllTabs(), function (id, name) {
-        return _.button({
-          class: 'editor--schema__tab' + (_this.currentTab === id ? ' active' : '')
-        }, name).click(function () {
-          _this.currentTab = id;
-          renderFieldProperties();
-        });
-      }), _.button({
-        class: 'editor--schema__tab' + (_this.currentTab === 'meta' ? ' active' : '')
-      }, 'meta').click(function () {
-        _this.currentTab = 'meta';
-        renderFieldProperties();
-      })); // Render parent Schema's field properties
-
-
-      _.append($parentFieldProperties.empty(), _.if(Object.keys(_this.getParentProperties(_this.currentTab)).length > 0, _.div({
-        class: 'editor__field__key'
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, 'Parent properties'), _.div({
-        class: 'editor__field__key__description'
-      }, 'Properties that are inherited and can be changed if you add them to this Schema')), _.div({
-        class: 'editor__field__value'
-      }, _.each(_this.getParentProperties(_this.currentTab), function (fieldKey, fieldValue) {
-        if (_this.model.fields.properties[fieldKey]) {
-          return;
-        }
-
-        return _.button({
-          class: 'widget widget--button condensed',
-          title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'
-        }, _.span({
-          class: 'fa fa-plus'
-        }), fieldValue.label || fieldKey).click(function () {
-          var newProperties = {};
-          newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
-
-          for (var key in _this.model.fields.properties) {
-            newProperties[key] = _this.model.fields.properties[key];
-          }
-
-          _this.model.fields.properties = newProperties;
-          renderFieldProperties();
-        });
-      })))); // Render this Schema's fields
-
-
-      _.append($fieldProperties.empty(), _.div({
-        class: 'editor__field__key'
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, 'Properties'), _.div({
-        class: 'editor__field__key__description'
-      }, 'This Schema\'s own properties'), _.div({
-        class: 'editor__field__key__actions'
-      }, _.button({
-        class: 'editor__field__key__action editor__field__key__action--sort'
-      }).click(function (e) {
-        HashBrown.Helpers.UIHelper.fieldSortableObject(_this.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
-          _this.model.fields.properties = newProperties;
-        });
-      }))), _.div({
-        class: 'editor__field__value segmented'
-      }, _.each(_this.model.fields.properties, function (fieldKey, fieldValue) {
-        if (!fieldValue) {
-          return;
-        }
-
-        var isValidTab = !!_this.getAllTabs()[fieldValue.tabId];
-
-        if (isValidTab && fieldValue.tabId !== _this.currentTab) {
-          return;
-        }
-
-        if (!isValidTab && _this.currentTab !== 'meta') {
-          return;
-        }
-
-        var $field = _.div({
-          class: 'editor__field'
-        }); // Sanity check
-
-
-        fieldValue.config = fieldValue.config || {};
-        fieldValue.schemaId = fieldValue.schemaId || 'array';
-
-        var renderField = function renderField() {
-          _.append($field.empty(), _.div({
-            class: 'editor__field__sort-key'
-          }, fieldKey), _.div({
-            class: 'editor__field__value'
-          }, _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Tab'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Dropdown({
-            useClearButton: true,
-            options: _this.getAllTabs(),
-            value: fieldValue.tabId,
-            onChange: function onChange(newValue) {
-              fieldValue.tabId = newValue;
-              renderFieldProperties();
+          try {
+            for (var _iterator = newValue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var tab = _step.value;
+              newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
             }
-          }).$element)), _.div({
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          _this.model.tabs = newTabs;
+          defaultTabEditor.options = _this.getAllTabs();
+          defaultTabEditor.fetch();
+          renderFieldProperties();
+        }
+      }).$element)); // Field properties
+
+      var $tabs = _.div({
+        class: 'editor--schema__tabs'
+      });
+
+      var $fieldProperties = _.div({
+        class: 'editor__field'
+      });
+
+      var $parentFieldProperties = _.div({
+        class: 'editor__field editor--schema__parent-field-properties'
+      });
+
+      $element.append($tabs);
+      $element.append($parentFieldProperties);
+      $element.append($fieldProperties);
+
+      var renderFieldProperties = function renderFieldProperties() {
+        // Render tabs
+        if (!_this.currentTab) {
+          _this.currentTab = Object.keys(_this.getAllTabs())[0] || 'meta';
+        }
+
+        _.append($tabs.empty(), _.each(_this.getAllTabs(), function (id, name) {
+          return _.button({
+            class: 'editor--schema__tab' + (_this.currentTab === id ? ' active' : '')
+          }, name).click(function () {
+            _this.currentTab = id;
+            renderFieldProperties();
+          });
+        }), _.button({
+          class: 'editor--schema__tab' + (_this.currentTab === 'meta' ? ' active' : '')
+        }, 'meta').click(function () {
+          _this.currentTab = 'meta';
+          renderFieldProperties();
+        })); // Render parent Schema's field properties
+
+
+        _.append($parentFieldProperties.empty(), _.if(Object.keys(_this.getParentProperties(_this.currentTab)).length > 0, _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, 'Parent properties'), _.div({
+          class: 'editor__field__key__description'
+        }, 'Properties that are inherited and can be changed if you add them to this Schema')), _.div({
+          class: 'editor__field__value'
+        }, _.each(_this.getParentProperties(_this.currentTab), function (fieldKey, fieldValue) {
+          if (_this.model.fields.properties[fieldKey]) {
+            return;
+          }
+
+          return _.button({
+            class: 'widget widget--button condensed',
+            title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'
+          }, _.span({
+            class: 'fa fa-plus'
+          }), fieldValue.label || fieldKey).click(function () {
+            var newProperties = {};
+            newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+            for (var key in _this.model.fields.properties) {
+              newProperties[key] = _this.model.fields.properties[key];
+            }
+
+            _this.model.fields.properties = newProperties;
+            renderFieldProperties();
+          });
+        })))); // Render this Schema's fields
+
+
+        _.append($fieldProperties.empty(), _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, 'Properties'), _.div({
+          class: 'editor__field__key__description'
+        }, 'This Schema\'s own properties'), _.div({
+          class: 'editor__field__key__actions'
+        }, _.button({
+          class: 'editor__field__key__action editor__field__key__action--sort'
+        }).click(function (e) {
+          HashBrown.Helpers.UIHelper.fieldSortableObject(_this.model.fields.properties, $(e.currentTarget).parents('.editor__field')[0], function (newProperties) {
+            _this.model.fields.properties = newProperties;
+          });
+        }))), _.div({
+          class: 'editor__field__value segmented'
+        }, _.each(_this.model.fields.properties, function (fieldKey, fieldValue) {
+          if (!fieldValue) {
+            return;
+          }
+
+          var isValidTab = !!_this.getAllTabs()[fieldValue.tabId];
+
+          if (isValidTab && fieldValue.tabId !== _this.currentTab) {
+            return;
+          }
+
+          if (!isValidTab && _this.currentTab !== 'meta') {
+            return;
+          }
+
+          var $field = _.div({
             class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Key'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A variable name, e.g. "myField"',
-            tooltip: 'The field variable name',
-            value: fieldKey,
-            onChange: function onChange(newKey) {
-              if (!newKey) {
+          }); // Sanity check
+
+
+          fieldValue.config = fieldValue.config || {};
+          fieldValue.schemaId = fieldValue.schemaId || 'array';
+
+          var renderField = function renderField() {
+            _.append($field.empty(), _.div({
+              class: 'editor__field__sort-key'
+            }, fieldKey), _.div({
+              class: 'editor__field__value'
+            }, _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Tab'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Dropdown({
+              useClearButton: true,
+              options: _this.getAllTabs(),
+              value: fieldValue.tabId,
+              onChange: function onChange(newValue) {
+                fieldValue.tabId = newValue;
+                renderFieldProperties();
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Key'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A variable name, e.g. "myField"',
+              tooltip: 'The field variable name',
+              value: fieldKey,
+              onChange: function onChange(newKey) {
+                if (!newKey) {
+                  return;
+                }
+
+                var newProperties = {}; // Insert the changed key into the correct place in the object
+
+                for (var key in _this.model.fields.properties) {
+                  if (key === fieldKey) {
+                    newProperties[newKey] = _this.model.fields.properties[fieldKey];
+                  } else {
+                    newProperties[key] = _this.model.fields.properties[key];
+                  }
+                } // Change internal reference to new key
+
+
+                fieldKey = newKey; // Reassign the properties object
+
+                _this.model.fields.properties = newProperties; // Update the sort key
+
+                $field.find('.editor__field__sort-key').html(fieldKey);
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Label'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A label, e.g. "My field"',
+              tooltip: 'The field label',
+              value: fieldValue.label,
+              onChange: function onChange(newValue) {
+                fieldValue.label = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Description'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A description',
+              tooltip: 'The field description',
+              value: fieldValue.description,
+              onChange: function onChange(newValue) {
+                fieldValue.description = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Multilingual'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'checkbox',
+              tooltip: 'Whether or not this field should support multiple languages',
+              value: fieldValue.multilingual || false,
+              onChange: function onChange(newValue) {
+                fieldValue.multilingual = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Schema'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Dropdown({
+              useTypeAhead: true,
+              options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+              value: fieldValue.schemaId,
+              labelKey: 'name',
+              valueKey: 'id',
+              onChange: function onChange(newValue) {
+                fieldValue.schemaId = newValue;
+                renderField();
+              }
+            }).$element)), _.do(function () {
+              var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+              if (!schema) {
                 return;
               }
 
-              var newProperties = {}; // Insert the changed key into the correct place in the object
+              var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
-              for (var key in _this.model.fields.properties) {
-                if (key === fieldKey) {
-                  newProperties[newKey] = _this.model.fields.properties[fieldKey];
-                } else {
-                  newProperties[key] = _this.model.fields.properties[key];
-                }
-              } // Change internal reference to new key
+              if (!editor) {
+                return;
+              }
 
+              fieldValue.config = fieldValue.config || {};
+              return editor.renderConfigEditor(fieldValue.config);
+            })), _.div({
+              class: 'editor__field__actions'
+            }, _.button({
+              class: 'editor__field__action editor__field__action--remove',
+              title: 'Remove field'
+            }).click(function () {
+              delete _this.model.fields.properties[fieldKey];
+              renderFieldProperties();
+            })));
+          };
 
-              fieldKey = newKey; // Reassign the properties object
+          renderField();
+          return $field;
+        }), _.button({
+          title: 'Add a Content property',
+          class: 'editor__field__add widget widget--button round fa fa-plus'
+        }).click(function () {
+          if (_this.model.fields.properties.newField) {
+            return;
+          }
 
-              _this.model.fields.properties = newProperties; // Update the sort key
+          _this.model.fields.properties.newField = {
+            label: 'New field',
+            schemaId: 'array',
+            tabId: _this.currentTab
+          };
+          renderFieldProperties();
+        })));
+      };
 
-              $field.find('.editor__field__sort-key').html(fieldKey);
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Label'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A label, e.g. "My field"',
-            tooltip: 'The field label',
-            value: fieldValue.label,
-            onChange: function onChange(newValue) {
-              fieldValue.label = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Description'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A description',
-            tooltip: 'The field description',
-            value: fieldValue.description,
-            onChange: function onChange(newValue) {
-              fieldValue.description = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Multilingual'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'checkbox',
-            tooltip: 'Whether or not this field should support multiple languages',
-            value: fieldValue.multilingual || false,
-            onChange: function onChange(newValue) {
-              fieldValue.multilingual = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Schema'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Dropdown({
-            useTypeAhead: true,
-            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-            value: fieldValue.schemaId,
-            labelKey: 'name',
-            valueKey: 'id',
-            onChange: function onChange(newValue) {
-              fieldValue.schemaId = newValue;
-              renderField();
-            }
-          }).$element)), _.do(function () {
-            var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
-
-            if (!schema) {
-              return;
-            }
-
-            var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-            if (!editor) {
-              return;
-            }
-
-            fieldValue.config = fieldValue.config || {};
-            return editor.renderConfigEditor(fieldValue.config);
-          })), _.div({
-            class: 'editor__field__actions'
-          }, _.button({
-            class: 'editor__field__action editor__field__action--remove',
-            title: 'Remove field'
-          }).click(function () {
-            delete _this.model.fields.properties[fieldKey];
-            renderFieldProperties();
-          })));
-        };
-
-        renderField();
-        return $field;
-      }), _.button({
-        title: 'Add a Content property',
-        class: 'editor__field__add widget widget--button round fa fa-plus'
-      }).click(function () {
-        if (_this.model.fields.properties.newField) {
-          return;
-        }
-
-        _this.model.fields.properties.newField = {
-          label: 'New field',
-          schemaId: 'array',
-          tabId: _this.currentTab
-        };
-        renderFieldProperties();
-      })));
-    };
-
-    renderFieldProperties();
-    return $element;
-  };
+      renderFieldProperties();
+      return $element;
+    }
+  }]);
 
   return ContentSchemaEditor;
 }(HashBrown.Views.Editors.SchemaEditor);
@@ -8979,70 +9493,96 @@ module.exports = ContentSchemaEditor;
  * @memberof HashBrown.Client.Views.Editors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var FieldSchemaEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(FieldSchemaEditor, _HashBrown$Views$Edit);
+  _inherits(FieldSchemaEditor, _HashBrown$Views$Edit);
 
   function FieldSchemaEditor() {
-    return _HashBrown$Views$Edit.apply(this, arguments) || this;
+    _classCallCheck(this, FieldSchemaEditor);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(FieldSchemaEditor).apply(this, arguments));
   }
 
-  var _proto = FieldSchemaEditor.prototype;
+  _createClass(FieldSchemaEditor, [{
+    key: "prerender",
 
-  /**
-   * Pre render
-   */
-  _proto.prerender = function prerender() {
-    if (!this.model.editorId && this.parentSchema) {
-      this.model.editorId = this.parentSchema.editorId;
-    }
-  };
-  /**
-   * Renders the field config editor
-   *
-   * @returns {HTMLElement} Editor element
-   */
-
-
-  _proto.renderFieldConfigEditor = function renderFieldConfigEditor() {
-    var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-    if (!editor) {
-      return;
-    }
-
-    return _.div({
-      class: 'config'
-    }, editor.renderConfigEditor(this.model.config, this.model.id));
-  };
-  /**
-   * Renders the editor fields
-   */
-
-
-  _proto.renderFields = function renderFields() {
-    var _this = this;
-
-    var $element = _HashBrown$Views$Edit.prototype.renderFields.call(this);
-
-    $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
-      useTypeahead: true,
-      value: this.model.editorId,
-      options: HashBrown.Views.Editors.FieldEditors,
-      valueKey: 'name',
-      labelKey: 'name',
-      onChange: function onChange(newEditor) {
-        _this.model.editorId = newEditor;
-
-        _this.fetch();
+    /**
+     * Pre render
+     */
+    value: function prerender() {
+      if (!this.model.editorId && this.parentSchema) {
+        this.model.editorId = this.parentSchema.editorId;
       }
-    }).$element));
-    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-    return $element;
-  };
+    }
+    /**
+     * Renders the field config editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+
+  }, {
+    key: "renderFieldConfigEditor",
+    value: function renderFieldConfigEditor() {
+      var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+      if (!editor) {
+        return;
+      }
+
+      return _.div({
+        class: 'config'
+      }, editor.renderConfigEditor(this.model.config, this.model.id));
+    }
+    /**
+     * Renders the editor fields
+     */
+
+  }, {
+    key: "renderFields",
+    value: function renderFields() {
+      var _this = this;
+
+      var $element = _get(_getPrototypeOf(FieldSchemaEditor.prototype), "renderFields", this).call(this);
+
+      $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
+        useTypeahead: true,
+        value: this.model.editorId,
+        options: HashBrown.Views.Editors.FieldEditors,
+        valueKey: 'name',
+        labelKey: 'name',
+        onChange: function onChange(newEditor) {
+          _this.model.editorId = newEditor;
+
+          _this.fetch();
+        }
+      }).$element));
+      $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
+      return $element;
+    }
+  }]);
 
   return FieldSchemaEditor;
 }(HashBrown.Views.Editors.SchemaEditor);
@@ -9073,49 +9613,71 @@ namespace('Views.Editors.FieldEditors').add(__webpack_require__(258)).add(__webp
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var FieldEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(FieldEditor, _Crisp$View);
+  _inherits(FieldEditor, _Crisp$View);
 
   function FieldEditor() {
-    return _Crisp$View.apply(this, arguments) || this;
+    _classCallCheck(this, FieldEditor);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(FieldEditor).apply(this, arguments));
   }
 
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
-  FieldEditor.renderConfigEditor = function renderConfigEditor(config) {
-    return null;
-  };
-  /**
-   * Renders key actions
-   *
-   * @returns {HTMLElement} Actions
-   */
+  _createClass(FieldEditor, [{
+    key: "renderKeyActions",
 
+    /**
+     * Renders key actions
+     *
+     * @returns {HTMLElement} Actions
+     */
+    value: function renderKeyActions() {}
+    /**
+     * Post render
+     */
 
-  var _proto = FieldEditor.prototype;
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      if (!this.$keyActions) {
+        return;
+      }
 
-  _proto.renderKeyActions = function renderKeyActions() {};
-  /**
-   * Post render
-   */
-
-
-  _proto.postrender = function postrender() {
-    if (!this.$keyActions) {
-      return;
+      _.append(this.$keyActions.empty(), this.renderKeyActions());
     }
+  }], [{
+    key: "renderConfigEditor",
 
-    _.append(this.$keyActions.empty(), this.renderKeyActions());
-  };
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    value: function renderConfigEditor(config) {
+      return null;
+    }
+  }]);
 
   return FieldEditor;
 }(Crisp.View);
@@ -9150,12 +9712,28 @@ module.exports = FieldEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ArrayEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(ArrayEditor, _HashBrown$Views$Edit);
+  _inherits(ArrayEditor, _HashBrown$Views$Edit);
 
   /**
    * Constructor
@@ -9163,7 +9741,9 @@ function (_HashBrown$Views$Edit) {
   function ArrayEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, ArrayEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ArrayEditor).call(this, params));
 
     _this.fetch();
 
@@ -9176,323 +9756,329 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = ArrayEditor.prototype;
+  _createClass(ArrayEditor, [{
+    key: "renderKeyActions",
+    value: function renderKeyActions() {
+      var _this2 = this;
 
-  _proto.renderKeyActions = function renderKeyActions() {
-    var _this2 = this;
-
-    if (!this.value || this.value.length < 1 || this.config.useGrid) {
-      return;
-    }
-
-    return [_.button({
-      class: 'editor__field__key__action editor__field__key__action--sort'
-    }).click(function (e) {
-      HashBrown.Helpers.UHashBrown.Helpers.IHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
-        _this2.value = newArray;
-
-        _this2.trigger('change', _this2.value);
-      });
-    }), _.button({
-      class: 'editor__field__key__action editor__field__key__action--collapse'
-    }, 'Collapse all').click(function (e) {
-      Array.from(_this2.element.children).forEach(function (field) {
-        field.classList.toggle('collapsed', true);
-      });
-    }), _.button({
-      class: 'editor__field__key__action editor__field__key__action--expand'
-    }, 'Expand all').click(function (e) {
-      Array.from(_this2.element.children).forEach(function (field) {
-        field.classList.toggle('collapsed', false);
-      });
-    })];
-  };
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
-
-
-  ArrayEditor.renderConfigEditor = function renderConfigEditor(config) {
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Min items'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'number',
-      min: 0,
-      step: 1,
-      tooltip: 'How many items are required in this array (0 is unlimited)',
-      value: config.minItems || 0,
-      onChange: function onChange(newValue) {
-        config.minItems = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Max items'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'number',
-      min: 0,
-      step: 1,
-      tooltip: 'How many items are allowed in this array (0 is unlimited)',
-      value: config.maxItems || 0,
-      onChange: function onChange(newValue) {
-        config.maxItems = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Allowed Schemas'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      useMultiple: true,
-      useTypeAhead: true,
-      labelKey: 'name',
-      valueKey: 'id',
-      value: config.allowedSchemas,
-      useClearButton: true,
-      options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-      onChange: function onChange(newValue) {
-        config.allowedSchemas = newValue;
-      }
-    }).$element))];
-  };
-  /**
-   * Sanity check
-   */
-
-
-  _proto.sanityCheck = function sanityCheck() {
-    var _this3 = this;
-
-    // The value was null
-    if (!this.value) {
-      this.value = [];
-    } // Config
-
-
-    this.config = this.config || {}; // Sanity check for allowed Schemas array
-
-    this.config.allowedSchemas = this.config.allowedSchemas || []; // The value was not an array, recover the items
-
-    if (!Array.isArray(this.value)) {
-      debug.log('Restructuring array from old format...', this); // If this value isn't using the old system, we can't recover it
-
-      if (!Array.isArray(this.value.items) || !Array.isArray(this.value.schemaBindings)) {
-        return UI.errorModal(new Error('The type "' + typeof this.value + '" of the value is incorrect or corrupted'));
-      }
-
-      var newItems = []; // Restructure "items" array into objects
-
-      for (var i in this.value.items) {
-        newItems[i] = {
-          value: this.value.items[i]
-        }; // Try to get the Schema id
-
-        if (this.value.schemaBindings[i]) {
-          newItems[i].schemaId = this.value.schemaBindings[i]; // If we couldn't find it, just use the first allowed Schema
-        } else {
-          newItems[i].schemaId = this.config.allowedSchemas[0];
-        }
-      }
-
-      this.value = newItems;
-      setTimeout(function () {
-        _this3.trigger('silentchange', _this3.value);
-      }, 500);
-    } // The value was below the required amount
-
-
-    if (this.value.length < this.config.minItems) {
-      var diff = this.config.minItems - this.value.length;
-
-      for (var _i = 0; _i < diff; _i++) {
-        this.value.push({
-          value: null,
-          schemaId: null
-        });
-      }
-    } // The value was above the required amount
-
-
-    if (this.value.length > this.config.maxItems) {
-      for (var _i2 = this.config.maxItems; _i2 < this.value.length; _i2++) {
-        delete this.value[_i2];
-      }
-    }
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    this.sanityCheck();
-  };
-  /**
-   * Gets the label of an item
-   *
-   * @param {Object} item
-   * @param {Schema} schema
-   *
-   * @return {String} Label
-   */
-
-
-  _proto.getItemLabel = function getItemLabel(item, schema) {
-    if (schema.config) {
-      if (schema.config.label && item.value && item.value[schema.config.label]) {
-        return item.value[schema.config.label];
-      }
-    }
-
-    if (item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
-      return item.value;
-    }
-
-    return schema.name;
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this4 = this;
-
-    return _.div({
-      class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')
-    }, _.each(this.value, function (i, item) {
-      // Render field
-      var $field = _.div({
-        class: 'editor__field'
-      });
-
-      var renderField = function renderField() {
-        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId); // Schema could not be found, assign first allowed Schema
-
-        if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-          item.schemaId = _this4.config.allowedSchemas[0];
-          schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-        }
-
-        if (!schema) {
-          UI.errorModal(new Error('Item #' + i + ' has no available Schemas'));
-          $field = null;
-          return;
-        } // Obtain the field editor
-
-
-        if (schema.editorId.indexOf('Editor') < 0) {
-          schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
-        }
-
-        var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-        if (!editorClass) {
-          UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
-          $field = null;
-          return;
-        } // Perform sanity check on item value
-
-
-        item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema); // Init the field editor
-
-        var editorInstance = new editorClass({
-          value: item.value,
-          config: schema.config,
-          schema: schema
-        }); // Hook up the change event
-
-        editorInstance.on('change', function (newValue) {
-          item.value = newValue;
-        });
-        editorInstance.on('silentchange', function (newValue) {
-          item.value = newValue;
-        }); // Render Schema picker
-
-        if (_this4.config.allowedSchemas.length > 1) {
-          editorInstance.$element.prepend(_.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Schema'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Dropdown({
-            value: item.schemaId,
-            placeholder: 'Schema',
-            valueKey: 'id',
-            labelKey: 'name',
-            iconKey: 'icon',
-            options: resources.schemas.filter(function (schema) {
-              return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
-            }),
-            onChange: function onChange(newSchemaId) {
-              item.schemaId = newSchemaId;
-              item.value = null;
-              renderField();
-
-              _this4.trigger('change', _this4.value);
-            }
-          }).$element)));
-        }
-
-        _.append($field.empty(), _.div({
-          class: 'editor__field__sort-key'
-        }, _this4.getItemLabel(item, schema)), editorInstance.$element, _.div({
-          class: 'editor__field__actions'
-        }, _.if(!_this4.config.useGrid, _.button({
-          class: 'editor__field__action editor__field__action--collapse',
-          title: 'Collapse/expand item'
-        }).click(function () {
-          $field.toggleClass('collapsed');
-        })), _.button({
-          class: 'editor__field__action editor__field__action--remove',
-          title: 'Remove item'
-        }).click(function () {
-          _this4.value.splice(i, 1);
-
-          _this4.trigger('change', _this4.value);
-
-          _this4.fetch();
-        })));
-      };
-
-      renderField();
-      return $field;
-    }), _.button({
-      title: 'Add an item',
-      class: 'editor__field__add widget widget--button round fa fa-plus'
-    }).click(function () {
-      var index = _this4.value.length;
-
-      if (_this4.config.maxItems && index >= _this4.config.maxItems) {
-        UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this4.config.maxItems + ' items here');
+      if (!this.value || this.value.length < 1 || this.config.useGrid) {
         return;
       }
 
-      _this4.value[index] = {
-        value: null,
-        schemaId: null
-      };
+      return [_.button({
+        class: 'editor__field__key__action editor__field__key__action--sort'
+      }).click(function (e) {
+        HashBrown.Helpers.UHashBrown.Helpers.IHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
+          _this2.value = newArray;
 
-      _this4.trigger('change', _this4.value); // Restore the scroll position with 100ms delay
+          _this2.trigger('change', _this2.value);
+        });
+      }), _.button({
+        class: 'editor__field__key__action editor__field__key__action--collapse'
+      }, 'Collapse all').click(function (e) {
+        Array.from(_this2.element.children).forEach(function (field) {
+          field.classList.toggle('collapsed', true);
+        });
+      }), _.button({
+        class: 'editor__field__key__action editor__field__key__action--expand'
+      }, 'Expand all').click(function (e) {
+        Array.from(_this2.element.children).forEach(function (field) {
+          field.classList.toggle('collapsed', false);
+        });
+      })];
+    }
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+  }, {
+    key: "sanityCheck",
+
+    /**
+     * Sanity check
+     */
+    value: function sanityCheck() {
+      var _this3 = this;
+
+      // The value was null
+      if (!this.value) {
+        this.value = [];
+      } // Config
 
 
-      HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
+      this.config = this.config || {}; // Sanity check for allowed Schemas array
 
-      _this4.fetch();
-    }));
-  };
+      this.config.allowedSchemas = this.config.allowedSchemas || []; // The value was not an array, recover the items
+
+      if (!Array.isArray(this.value)) {
+        debug.log('Restructuring array from old format...', this); // If this value isn't using the old system, we can't recover it
+
+        if (!Array.isArray(this.value.items) || !Array.isArray(this.value.schemaBindings)) {
+          return UI.errorModal(new Error('The type "' + _typeof(this.value) + '" of the value is incorrect or corrupted'));
+        }
+
+        var newItems = []; // Restructure "items" array into objects
+
+        for (var i in this.value.items) {
+          newItems[i] = {
+            value: this.value.items[i]
+          }; // Try to get the Schema id
+
+          if (this.value.schemaBindings[i]) {
+            newItems[i].schemaId = this.value.schemaBindings[i]; // If we couldn't find it, just use the first allowed Schema
+          } else {
+            newItems[i].schemaId = this.config.allowedSchemas[0];
+          }
+        }
+
+        this.value = newItems;
+        setTimeout(function () {
+          _this3.trigger('silentchange', _this3.value);
+        }, 500);
+      } // The value was below the required amount
+
+
+      if (this.value.length < this.config.minItems) {
+        var diff = this.config.minItems - this.value.length;
+
+        for (var _i = 0; _i < diff; _i++) {
+          this.value.push({
+            value: null,
+            schemaId: null
+          });
+        }
+      } // The value was above the required amount
+
+
+      if (this.value.length > this.config.maxItems) {
+        for (var _i2 = this.config.maxItems; _i2 < this.value.length; _i2++) {
+          delete this.value[_i2];
+        }
+      }
+    }
+    /**
+     * Pre render
+     */
+
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      this.sanityCheck();
+    }
+    /**
+     * Gets the label of an item
+     *
+     * @param {Object} item
+     * @param {Schema} schema
+     *
+     * @return {String} Label
+     */
+
+  }, {
+    key: "getItemLabel",
+    value: function getItemLabel(item, schema) {
+      if (schema.config) {
+        if (schema.config.label && item.value && item.value[schema.config.label]) {
+          return item.value[schema.config.label];
+        }
+      }
+
+      if (item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
+        return item.value;
+      }
+
+      return schema.name;
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this4 = this;
+
+      return _.div({
+        class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')
+      }, _.each(this.value, function (i, item) {
+        // Render field
+        var $field = _.div({
+          class: 'editor__field'
+        });
+
+        var renderField = function renderField() {
+          var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId); // Schema could not be found, assign first allowed Schema
+
+          if (!schema || _this4.config.allowedSchemas.indexOf(item.schemaId) < 0) {
+            item.schemaId = _this4.config.allowedSchemas[0];
+            schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+          }
+
+          if (!schema) {
+            UI.errorModal(new Error('Item #' + i + ' has no available Schemas'));
+            $field = null;
+            return;
+          } // Obtain the field editor
+
+
+          if (schema.editorId.indexOf('Editor') < 0) {
+            schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
+          }
+
+          var editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+          if (!editorClass) {
+            UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));
+            $field = null;
+            return;
+          } // Perform sanity check on item value
+
+
+          item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema); // Init the field editor
+
+          var editorInstance = new editorClass({
+            value: item.value,
+            config: schema.config,
+            schema: schema
+          }); // Hook up the change event
+
+          editorInstance.on('change', function (newValue) {
+            item.value = newValue;
+          });
+          editorInstance.on('silentchange', function (newValue) {
+            item.value = newValue;
+          }); // Render Schema picker
+
+          if (_this4.config.allowedSchemas.length > 1) {
+            editorInstance.$element.prepend(_.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Schema'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Dropdown({
+              value: item.schemaId,
+              placeholder: 'Schema',
+              valueKey: 'id',
+              labelKey: 'name',
+              iconKey: 'icon',
+              options: resources.schemas.filter(function (schema) {
+                return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
+              }),
+              onChange: function onChange(newSchemaId) {
+                item.schemaId = newSchemaId;
+                item.value = null;
+                renderField();
+
+                _this4.trigger('change', _this4.value);
+              }
+            }).$element)));
+          }
+
+          _.append($field.empty(), _.div({
+            class: 'editor__field__sort-key'
+          }, _this4.getItemLabel(item, schema)), editorInstance.$element, _.div({
+            class: 'editor__field__actions'
+          }, _.if(!_this4.config.useGrid, _.button({
+            class: 'editor__field__action editor__field__action--collapse',
+            title: 'Collapse/expand item'
+          }).click(function () {
+            $field.toggleClass('collapsed');
+          })), _.button({
+            class: 'editor__field__action editor__field__action--remove',
+            title: 'Remove item'
+          }).click(function () {
+            _this4.value.splice(i, 1);
+
+            _this4.trigger('change', _this4.value);
+
+            _this4.fetch();
+          })));
+        };
+
+        renderField();
+        return $field;
+      }), _.button({
+        title: 'Add an item',
+        class: 'editor__field__add widget widget--button round fa fa-plus'
+      }).click(function () {
+        var index = _this4.value.length;
+
+        if (_this4.config.maxItems && index >= _this4.config.maxItems) {
+          UI.messageModal('Item maximum reached', 'You  can maximum add ' + _this4.config.maxItems + ' items here');
+          return;
+        }
+
+        _this4.value[index] = {
+          value: null,
+          schemaId: null
+        };
+
+        _this4.trigger('change', _this4.value); // Restore the scroll position with 100ms delay
+
+
+        HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
+
+        _this4.fetch();
+      }));
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Min items'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'number',
+        min: 0,
+        step: 1,
+        tooltip: 'How many items are required in this array (0 is unlimited)',
+        value: config.minItems || 0,
+        onChange: function onChange(newValue) {
+          config.minItems = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Max items'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'number',
+        min: 0,
+        step: 1,
+        tooltip: 'How many items are allowed in this array (0 is unlimited)',
+        value: config.maxItems || 0,
+        onChange: function onChange(newValue) {
+          config.maxItems = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Allowed Schemas'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        useMultiple: true,
+        useTypeAhead: true,
+        labelKey: 'name',
+        valueKey: 'id',
+        value: config.allowedSchemas,
+        useClearButton: true,
+        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+        onChange: function onChange(newValue) {
+          config.allowedSchemas = newValue;
+        }
+      }).$element))];
+    }
+  }]);
 
   return ArrayEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -9522,12 +10108,28 @@ module.exports = ArrayEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var BooleanEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(BooleanEditor, _HashBrown$Views$Edit);
+  _inherits(BooleanEditor, _HashBrown$Views$Edit);
 
   /**
    * Constructor
@@ -9535,7 +10137,9 @@ function (_HashBrown$Views$Edit) {
   function BooleanEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this; // Sanity check
+    _classCallCheck(this, BooleanEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(BooleanEditor).call(this, params)); // Sanity check
 
     if (typeof _this.value === 'undefined') {
       _this.value = false;
@@ -9559,24 +10163,25 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = BooleanEditor.prototype;
+  _createClass(BooleanEditor, [{
+    key: "template",
+    value: function template() {
+      var _this2 = this;
 
-  _proto.template = function template() {
-    var _this2 = this;
+      return _.div({
+        class: 'editor__field__value field-editor--boolean'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        value: this.value,
+        tooltip: this.description || '',
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
 
-    return _.div({
-      class: 'editor__field__value field-editor--boolean'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'checkbox',
-      value: this.value,
-      tooltip: this.description || '',
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
-      }
-    }).$element);
-  };
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element);
+    }
+  }]);
 
   return BooleanEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -9609,17 +10214,35 @@ module.exports = BooleanEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentReferenceEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(ContentReferenceEditor, _HashBrown$Views$Edit);
+  _inherits(ContentReferenceEditor, _HashBrown$Views$Edit);
 
   function ContentReferenceEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, ContentReferenceEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ContentReferenceEditor).call(this, params));
 
     _this.fetch();
 
@@ -9630,107 +10253,118 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = ContentReferenceEditor.prototype;
+  _createClass(ContentReferenceEditor, [{
+    key: "onChange",
+    value: function onChange(newValue) {
+      this.value = newValue;
+      this.trigger('change', this.value);
+    }
+    /**
+     * Gets a list of allowed Content options
+     *
+     * @returns {Array} List of options
+     */
 
-  _proto.onChange = function onChange(newValue) {
-    this.value = newValue;
-    this.trigger('change', this.value);
-  };
-  /**
-   * Gets a list of allowed Content options
-   *
-   * @returns {Array} List of options
-   */
+  }, {
+    key: "getDropdownOptions",
+    value: function getDropdownOptions() {
+      var allowedContent = [];
+      var areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
+      try {
+        for (var _iterator = resources.content[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var content = _step.value;
 
-  _proto.getDropdownOptions = function getDropdownOptions() {
-    var allowedContent = [];
-    var areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
+          if (areRulesDefined) {
+            var isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
 
-    for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
+            if (!isContentAllowed) {
+              continue;
+            }
+          }
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var content = _ref;
-
-      if (areRulesDefined) {
-        var isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
-
-        if (!isContentAllowed) {
-          continue;
+          allowedContent[allowedContent.length] = {
+            title: content.prop('title', window.language) || content.id,
+            id: content.id
+          };
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
       }
 
-      allowedContent[allowedContent.length] = {
-        title: content.prop('title', window.language) || content.id,
-        id: content.id
-      };
+      return allowedContent;
     }
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
 
-    return allowedContent;
-  };
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
+  }, {
+    key: "template",
 
+    /**
+     * Render this editor
+     */
+    value: function template() {
+      var _this2 = this;
 
-  ContentReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.allowedSchemas = config.allowedSchemas || [];
-    return _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Allowed Schemas'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
-      useMultiple: true,
-      value: config.allowedSchemas,
-      useClearButton: true,
-      valueKey: 'id',
-      labelKey: 'name',
-      onChange: function onChange(newValue) {
-        config.allowedSchemas = newValue;
-      }
-    }).$element));
-  };
-  /**
-   * Render this editor
-   */
+      return _.div({
+        class: 'editor__field__value'
+      }, [new HashBrown.Views.Widgets.Dropdown({
+        value: this.value,
+        options: this.getDropdownOptions(),
+        useTypeAhead: true,
+        valueKey: 'id',
+        useClearButton: true,
+        tooltip: this.description || '',
+        labelKey: 'title',
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
 
-
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, [new HashBrown.Views.Widgets.Dropdown({
-      value: this.value,
-      options: this.getDropdownOptions(),
-      useTypeAhead: true,
-      valueKey: 'id',
-      useClearButton: true,
-      tooltip: this.description || '',
-      labelKey: 'title',
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
-      }
-    }).$element]);
-  };
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element]);
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      config.allowedSchemas = config.allowedSchemas || [];
+      return _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Allowed Schemas'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+        useMultiple: true,
+        value: config.allowedSchemas,
+        useClearButton: true,
+        valueKey: 'id',
+        labelKey: 'name',
+        onChange: function onChange(newValue) {
+          config.allowedSchemas = newValue;
+        }
+      }).$element));
+    }
+  }]);
 
   return ContentReferenceEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -9763,17 +10397,35 @@ module.exports = ContentReferenceEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentSchemaReferenceEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(ContentSchemaReferenceEditor, _HashBrown$Views$Edit);
+  _inherits(ContentSchemaReferenceEditor, _HashBrown$Views$Edit);
 
   function ContentSchemaReferenceEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this; // Adopt allowed Schemas from parent if applicable
+    _classCallCheck(this, ContentSchemaReferenceEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ContentSchemaReferenceEditor).call(this, params)); // Adopt allowed Schemas from parent if applicable
 
     var parentSchema = _this.getParentSchema();
 
@@ -9792,146 +10444,151 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = ContentSchemaReferenceEditor.prototype;
-
-  _proto.getParentSchema = function getParentSchema() {
-    // Return config parent Schema if available
-    if (this.config.parentSchema) {
-      return this.config.parentSchema;
-    } // Fetch current ContentEditor
-
-
-    var contentEditor = Crisp.View.get('ContentEditor');
-
-    if (!contentEditor) {
-      return null;
-    } // Fetch current Content model
+  _createClass(ContentSchemaReferenceEditor, [{
+    key: "getParentSchema",
+    value: function getParentSchema() {
+      // Return config parent Schema if available
+      if (this.config.parentSchema) {
+        return this.config.parentSchema;
+      } // Fetch current ContentEditor
 
 
-    var thisContent = contentEditor.model;
+      var contentEditor = Crisp.View.get('ContentEditor');
 
-    if (!thisContent) {
-      return null;
-    } // Fetch parent Content
-
-
-    if (!thisContent.parentId) {
-      return null;
-    }
-
-    var parentContent = HashBrown.Helpers.ContentHelper.getContentByIdSync(thisContent.parentId);
-
-    if (!parentContent) {
-      UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
-      return null;
-    } // Fetch parent Schema
+      if (!contentEditor) {
+        return null;
+      } // Fetch current Content model
 
 
-    var parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
+      var thisContent = contentEditor.model;
 
-    if (!parentSchema) {
-      UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
-      return null;
-    } // Return parent Schema
-
-
-    return parentSchema;
-  };
-  /**
-   * Gets schema types
-   *
-   * @returns {Array} List of options
-   */
+      if (!thisContent) {
+        return null;
+      } // Fetch parent Content
 
 
-  _proto.getDropdownOptions = function getDropdownOptions() {
-    var contentSchemas = [];
-
-    for (var i in window.resources.schemas) {
-      var schema = window.resources.schemas[i];
-      var isNative = schema.id == 'page' || schema.id == 'contentBase';
-
-      if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
-        contentSchemas[contentSchemas.length] = {
-          name: schema.name,
-          id: schema.id
-        };
+      if (!thisContent.parentId) {
+        return null;
       }
+
+      var parentContent = HashBrown.Helpers.ContentHelper.getContentByIdSync(thisContent.parentId);
+
+      if (!parentContent) {
+        UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+        return null;
+      } // Fetch parent Schema
+
+
+      var parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
+
+      if (!parentSchema) {
+        UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
+        return null;
+      } // Return parent Schema
+
+
+      return parentSchema;
     }
+    /**
+     * Gets schema types
+     *
+     * @returns {Array} List of options
+     */
 
-    return contentSchemas;
-  };
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
+  }, {
+    key: "getDropdownOptions",
+    value: function getDropdownOptions() {
+      var contentSchemas = [];
 
+      for (var i in window.resources.schemas) {
+        var schema = window.resources.schemas[i];
+        var isNative = schema.id == 'page' || schema.id == 'contentBase';
 
-  ContentSchemaReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.allowedSchemas = config.allowedSchemas || [];
-    return _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Allowed Schemas'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
-      useMultiple: true,
-      value: config.allowedSchemas,
-      useClearButton: true,
-      valueKey: 'id',
-      labelKey: 'name',
-      iconKey: 'icon',
-      onChange: function onChange(newValue) {
-        config.allowedSchemas = newValue;
+        if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
+          contentSchemas[contentSchemas.length] = {
+            name: schema.name,
+            id: schema.id
+          };
+        }
       }
-    }).$element));
-  };
-  /**
-   * Picks the first available Schema
-   */
 
-
-  _proto.pickFirstSchema = function pickFirstSchema() {
-    var options = this.getDropdownOptions();
-
-    if (options.length < 1) {
-      return;
+      return contentSchemas;
     }
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
 
-    this.value = options[0].id;
-    this.trigger('change', this.value);
-    this.fetch();
-  };
-  /**
-   * Renders this editor
-   */
+  }, {
+    key: "pickFirstSchema",
 
+    /**
+     * Picks the first available Schema
+     */
+    value: function pickFirstSchema() {
+      var options = this.getDropdownOptions();
 
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: this.value,
-      options: this.getDropdownOptions(),
-      valueKey: 'id',
-      tooltip: this.description || '',
-      labelKey: 'name',
-      iconKey: 'icon',
-      useClearButton: true,
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
+      if (options.length < 1) {
+        return;
       }
-    }).$element);
-  };
+
+      this.value = options[0].id;
+      this.trigger('change', this.value);
+      this.fetch();
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this2 = this;
+
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: this.value,
+        options: this.getDropdownOptions(),
+        valueKey: 'id',
+        tooltip: this.description || '',
+        labelKey: 'name',
+        iconKey: 'icon',
+        useClearButton: true,
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
+
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element);
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      config.allowedSchemas = config.allowedSchemas || [];
+      return _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Allowed Schemas'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+        useMultiple: true,
+        value: config.allowedSchemas,
+        useClearButton: true,
+        valueKey: 'id',
+        labelKey: 'name',
+        iconKey: 'icon',
+        onChange: function onChange(newValue) {
+          config.allowedSchemas = newValue;
+        }
+      }).$element));
+    }
+  }]);
 
   return ContentSchemaReferenceEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -9961,17 +10618,35 @@ module.exports = ContentSchemaReferenceEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var DateEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(DateEditor, _HashBrown$Views$Edit);
+  _inherits(DateEditor, _HashBrown$Views$Edit);
 
   function DateEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, DateEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DateEditor).call(this, params));
 
     _this.fetch();
 
@@ -9982,101 +10657,105 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = DateEditor.prototype;
-
-  _proto.onClickRemove = function onClickRemove() {
-    this.value = null;
-    this.trigger('change', this.value);
-    this.fetch();
-  };
-  /**
-   * Event: Click open
-   */
-
-
-  _proto.onClickOpen = function onClickOpen() {
-    var _this2 = this;
-
-    var modal = new HashBrown.Views.Modals.DateModal({
-      value: this.value
-    });
-    modal.on('change', function (newValue) {
-      _this2.value = newValue.toISOString();
-
-      _this2.trigger('change', _this2.value);
-
-      _this2.fetch();
-    });
-  };
-  /**
-   * Format a date string
-   *
-   * @param {String} input
-   *
-   * @returns {String} Formatted date string
-   */
-
-
-  _proto.formatDate = function formatDate(input) {
-    var output = '(none)';
-    var date = new Date(input);
-
-    if (input && !isNaN(date.getTime())) {
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      var hours = date.getHours();
-      var minutes = date.getMinutes();
-
-      if (day < 10) {
-        day = '0' + day;
-      }
-
-      if (month < 10) {
-        month = '0' + month;
-      }
-
-      if (hours < 10) {
-        hours = '0' + hours;
-      }
-
-      if (minutes < 10) {
-        minutes = '0' + minutes;
-      }
-
-      output = date.getFullYear() + '.' + month + '.' + day + ' - ' + hours + ':' + minutes;
+  _createClass(DateEditor, [{
+    key: "onClickRemove",
+    value: function onClickRemove() {
+      this.value = null;
+      this.trigger('change', this.value);
+      this.fetch();
     }
+    /**
+     * Event: Click open
+     */
 
-    return output;
-  };
-  /**
-   * Renders this editor
-   */
+  }, {
+    key: "onClickOpen",
+    value: function onClickOpen() {
+      var _this2 = this;
 
+      var modal = new HashBrown.Views.Modals.DateModal({
+        value: this.value
+      });
+      modal.on('change', function (newValue) {
+        _this2.value = newValue.toISOString();
 
-  _proto.template = function template() {
-    var _this3 = this;
+        _this2.trigger('change', _this2.value);
 
-    return _.div({
-      class: 'editor__field__value'
-    }, _.do(function () {
-      if (_this3.disabled) {
-        return _this3.formatDate(_this3.value);
+        _this2.fetch();
+      });
+    }
+    /**
+     * Format a date string
+     *
+     * @param {String} input
+     *
+     * @returns {String} Formatted date string
+     */
+
+  }, {
+    key: "formatDate",
+    value: function formatDate(input) {
+      var output = '(none)';
+      var date = new Date(input);
+
+      if (input && !isNaN(date.getTime())) {
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+
+        if (day < 10) {
+          day = '0' + day;
+        }
+
+        if (month < 10) {
+          month = '0' + month;
+        }
+
+        if (hours < 10) {
+          hours = '0' + hours;
+        }
+
+        if (minutes < 10) {
+          minutes = '0' + minutes;
+        }
+
+        output = date.getFullYear() + '.' + month + '.' + day + ' - ' + hours + ':' + minutes;
       }
+
+      return output;
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this3 = this;
 
       return _.div({
-        class: 'widget widget-group',
-        title: _this3.description || ''
-      }, _.button({
-        class: 'widget widget--button low'
-      }, _this3.formatDate(_this3.value)).click(function () {
-        _this3.onClickOpen();
-      }), _.div({
-        class: 'widget widget--button small fa fa-remove'
-      }).click(function () {
-        _this3.onClickRemove();
+        class: 'editor__field__value'
+      }, _.do(function () {
+        if (_this3.disabled) {
+          return _this3.formatDate(_this3.value);
+        }
+
+        return _.div({
+          class: 'widget widget-group',
+          title: _this3.description || ''
+        }, _.button({
+          class: 'widget widget--button low'
+        }, _this3.formatDate(_this3.value)).click(function () {
+          _this3.onClickOpen();
+        }), _.div({
+          class: 'widget widget--button small fa fa-remove'
+        }).click(function () {
+          _this3.onClickRemove();
+        }));
       }));
-    }));
-  };
+    }
+  }]);
 
   return DateEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10118,17 +10797,35 @@ module.exports = DateEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var DropdownEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(DropdownEditor, _HashBrown$Views$Edit);
+  _inherits(DropdownEditor, _HashBrown$Views$Edit);
 
   function DropdownEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, DropdownEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DropdownEditor).call(this, params));
 
     if (!_this.config.options) {
       _this.config.options = [];
@@ -10147,52 +10844,54 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  DropdownEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.options = config.options || [];
-    return _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Options'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Chips({
-      value: config.options,
-      valueKey: 'value',
-      labelKey: 'label',
-      placeholder: 'New option',
-      onChange: function onChange(newValue) {
-        config.options = newValue;
-      }
-    }).$element));
-  };
-  /**
-   * Renders this editor
-   */
+  _createClass(DropdownEditor, [{
+    key: "template",
 
+    /**
+     * Renders this editor
+     */
+    value: function template() {
+      var _this2 = this;
 
-  var _proto = DropdownEditor.prototype;
+      return _.div({
+        class: 'editor__field__value'
+      }, _.if(this.config.options.length < 1, _.span({
+        class: 'editor__field__value__warning'
+      }, 'No options configured')), _.if(this.config.options.length > 0, new HashBrown.Views.Widgets.Dropdown({
+        value: this.value,
+        useClearButton: true,
+        options: this.config.options,
+        valueKey: 'value',
+        tooltip: this.description || '',
+        labelKey: 'label',
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
 
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, _.if(this.config.options.length < 1, _.span({
-      class: 'editor__field__value__warning'
-    }, 'No options configured')), _.if(this.config.options.length > 0, new HashBrown.Views.Widgets.Dropdown({
-      value: this.value,
-      useClearButton: true,
-      options: this.config.options,
-      valueKey: 'value',
-      tooltip: this.description || '',
-      labelKey: 'label',
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
-      }
-    }).$element));
-  };
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element));
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      config.options = config.options || [];
+      return _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Options'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Chips({
+        value: config.options,
+        valueKey: 'value',
+        labelKey: 'label',
+        placeholder: 'New option',
+        onChange: function onChange(newValue) {
+          config.options = newValue;
+        }
+      }).$element));
+    }
+  }]);
 
   return DropdownEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10222,12 +10921,28 @@ module.exports = DropdownEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var LanguageEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(LanguageEditor, _HashBrown$Views$Edit);
+  _inherits(LanguageEditor, _HashBrown$Views$Edit);
 
   /**
    * Constructor
@@ -10235,7 +10950,9 @@ function (_HashBrown$Views$Edit) {
   function LanguageEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, LanguageEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(LanguageEditor).call(this, params));
 
     _this.fetch();
 
@@ -10246,36 +10963,38 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = LanguageEditor.prototype;
+  _createClass(LanguageEditor, [{
+    key: "prerender",
+    value: function prerender() {
+      var options = HashBrown.Helpers.LanguageHelper.getLanguagesSync();
 
-  _proto.prerender = function prerender() {
-    var options = HashBrown.Helpers.LanguageHelper.getLanguagesSync();
-
-    if (!this.value || options.indexOf(this.value) < 0) {
-      this.value = options[0];
-    }
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: this.value,
-      options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
-      tooltip: this.description || '',
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
+      if (!this.value || options.indexOf(this.value) < 0) {
+        this.value = options[0];
       }
-    }).$element);
-  };
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this2 = this;
+
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: this.value,
+        options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
+        tooltip: this.description || '',
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
+
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element);
+    }
+  }]);
 
   return LanguageEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10305,17 +11024,35 @@ module.exports = LanguageEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaReferenceEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(MediaReferenceEditor, _HashBrown$Views$Edit);
+  _inherits(MediaReferenceEditor, _HashBrown$Views$Edit);
 
   function MediaReferenceEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, MediaReferenceEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MediaReferenceEditor).call(this, params));
 
     _this.fetch();
 
@@ -10326,67 +11063,68 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = MediaReferenceEditor.prototype;
+  _createClass(MediaReferenceEditor, [{
+    key: "template",
+    value: function template() {
+      var _this2 = this;
 
-  _proto.template = function template() {
-    var _this2 = this;
+      var media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
+      return _.div({
+        class: 'editor__field__value editor__field--media-reference',
+        title: this.description || ''
+      }, _.button({
+        class: 'editor__field--media-reference__pick'
+      }, _.do(function () {
+        if (!media) {
+          return _.div({
+            class: 'editor__field--media-reference__empty'
+          });
+        }
 
-    var media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
-    return _.div({
-      class: 'editor__field__value editor__field--media-reference',
-      title: this.description || ''
-    }, _.button({
-      class: 'editor__field--media-reference__pick'
-    }, _.do(function () {
-      if (!media) {
-        return _.div({
-          class: 'editor__field--media-reference__empty'
+        if (media.isAudio()) {
+          return _.div({
+            class: 'editor__field--media-reference__preview fa fa-file-audio-o'
+          });
+        }
+
+        if (media.isVideo()) {
+          return _.div({
+            class: 'editor__field--media-reference__preview fa fa-file-video-o'
+          });
+        }
+
+        if (media.isImage()) {
+          return _.img({
+            class: 'editor__field--media-reference__preview',
+            src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'
+          });
+        }
+      })).click(function () {
+        new HashBrown.Views.Modals.MediaBrowser({
+          value: _this2.value
+        }).on('select', function (id) {
+          _this2.value = id;
+
+          _this2.trigger('change', _this2.value);
+
+          _this2.fetch();
         });
-      }
-
-      if (media.isAudio()) {
-        return _.div({
-          class: 'editor__field--media-reference__preview fa fa-file-audio-o'
-        });
-      }
-
-      if (media.isVideo()) {
-        return _.div({
-          class: 'editor__field--media-reference__preview fa fa-file-video-o'
-        });
-      }
-
-      if (media.isImage()) {
-        return _.img({
-          class: 'editor__field--media-reference__preview',
-          src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'
-        });
-      }
-    })).click(function () {
-      new HashBrown.Views.Modals.MediaBrowser({
-        value: _this2.value
-      }).on('select', function (id) {
-        _this2.value = id;
+      }), _.div({
+        class: 'editor__field--media-reference__footer'
+      }, _.label({
+        class: 'editor__field--media-reference__name'
+      }, media ? media.name : ''), _.button({
+        class: 'editor__field--media-reference__remove',
+        title: 'Clear the Media selection'
+      }).click(function () {
+        _this2.value = null;
 
         _this2.trigger('change', _this2.value);
 
         _this2.fetch();
-      });
-    }), _.div({
-      class: 'editor__field--media-reference__footer'
-    }, _.label({
-      class: 'editor__field--media-reference__name'
-    }, media ? media.name : ''), _.button({
-      class: 'editor__field--media-reference__remove',
-      title: 'Clear the Media selection'
-    }).click(function () {
-      _this2.value = null;
-
-      _this2.trigger('change', _this2.value);
-
-      _this2.fetch();
-    })));
-  };
+      })));
+    }
+  }]);
 
   return MediaReferenceEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10419,17 +11157,35 @@ module.exports = MediaReferenceEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var NumberEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(NumberEditor, _HashBrown$Views$Edit);
+  _inherits(NumberEditor, _HashBrown$Views$Edit);
 
   function NumberEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, NumberEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(NumberEditor).call(this, params));
 
     _this.fetch();
 
@@ -10440,108 +11196,111 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = NumberEditor.prototype;
+  _createClass(NumberEditor, [{
+    key: "onChange",
+    value: function onChange() {
+      this.value = parseFloat(this.$input.val());
+      this.trigger('change', this.value);
+    }
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
 
-  _proto.onChange = function onChange() {
-    this.value = parseFloat(this.$input.val());
-    this.trigger('change', this.value);
-  };
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   *
-   * @returns {HTMLElement} Element
-   */
+  }, {
+    key: "template",
 
+    /**
+     * Renders this editor
+     */
+    value: function template() {
+      var _this2 = this;
 
-  NumberEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.step = config.step || 'any';
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Step'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'number',
-      step: 'any',
-      tooltip: 'The division by which the input number is allowed (0 is any division)',
-      value: config.step === 'any' ? 0 : config.step,
-      onChange: function onChange(newValue) {
-        if (newValue == 0) {
-          newValue = 'any';
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        value: this.value || '0',
+        type: this.config.isSlider ? 'range' : 'number',
+        step: this.config.step || 'any',
+        tooltip: this.description || '',
+        min: this.config.min || '0',
+        max: this.config.max || '0',
+        onChange: function onChange(newValue) {
+          _this2.value = parseFloat(newValue);
+
+          _this2.trigger('change', _this2.value);
         }
+      }).$element);
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      config.step = config.step || 'any';
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Step'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'number',
+        step: 'any',
+        tooltip: 'The division by which the input number is allowed (0 is any division)',
+        value: config.step === 'any' ? 0 : config.step,
+        onChange: function onChange(newValue) {
+          if (newValue == 0) {
+            newValue = 'any';
+          }
 
-        config.step = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Min value'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      tooltip: 'The minimum required value',
-      type: 'number',
-      step: 'any',
-      value: config.min || 0,
-      onChange: function onChange(newValue) {
-        config.min = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Max value'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      tooltip: 'The maximum allowed value (0 is infinite)',
-      type: 'number',
-      step: 'any',
-      value: config.max || 0,
-      onChange: function onChange(newValue) {
-        config.max = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Is slider'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      tooltip: 'Whether or not this number should be edited as a range slider',
-      type: 'checkbox',
-      value: config.isSlider || false,
-      onChange: function onChange(newValue) {
-        config.isSlider = newValue;
-      }
-    }).$element))];
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      value: this.value || '0',
-      type: this.config.isSlider ? 'range' : 'number',
-      step: this.config.step || 'any',
-      tooltip: this.description || '',
-      min: this.config.min || '0',
-      max: this.config.max || '0',
-      onChange: function onChange(newValue) {
-        _this2.value = parseFloat(newValue);
-
-        _this2.trigger('change', _this2.value);
-      }
-    }).$element);
-  };
+          config.step = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Min value'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        tooltip: 'The minimum required value',
+        type: 'number',
+        step: 'any',
+        value: config.min || 0,
+        onChange: function onChange(newValue) {
+          config.min = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Max value'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        tooltip: 'The maximum allowed value (0 is infinite)',
+        type: 'number',
+        step: 'any',
+        value: config.max || 0,
+        onChange: function onChange(newValue) {
+          config.max = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Is slider'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        tooltip: 'Whether or not this number should be edited as a range slider',
+        type: 'checkbox',
+        value: config.isSlider || false,
+        onChange: function onChange(newValue) {
+          config.isSlider = newValue;
+        }
+      }).$element))];
+    }
+  }]);
 
   return NumberEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10560,17 +11319,35 @@ module.exports = NumberEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ResourceReferenceEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(ResourceReferenceEditor, _HashBrown$Views$Edit);
+  _inherits(ResourceReferenceEditor, _HashBrown$Views$Edit);
 
   function ResourceReferenceEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, ResourceReferenceEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ResourceReferenceEditor).call(this, params));
 
     _this.fetch();
 
@@ -10585,92 +11362,102 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  ResourceReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
-    config.resourceKeys = config.resourceKeys || [];
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Resource'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: config.resource,
-      options: Object.keys(resources),
-      onChange: function onChange(newValue) {
-        config.resource = newValue;
-      }
-    }).$element)), _.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Resource keys'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Chips({
-      value: config.resourceKeys,
-      placeholder: 'keyName',
-      onChange: function onChange(newValue) {
-        config.resourceKeys = newValue;
-      }
-    }).$element))];
-  };
-  /**
-   * Renders this editor
-   */
+  _createClass(ResourceReferenceEditor, [{
+    key: "template",
 
+    /**
+     * Renders this editor
+     */
+    value: function template() {
+      var resource = resources[this.config.resource];
+      var value;
 
-  var _proto = ResourceReferenceEditor.prototype;
+      if (resource) {
+        value = resource[this.value];
 
-  _proto.template = function template() {
-    var resource = resources[this.config.resource];
-    var value;
-
-    if (resource) {
-      value = resource[this.value];
-
-      if (!value) {
-        for (var i in resource) {
-          if (resource[i].id == this.value) {
-            value = resource[i];
-            break;
+        if (!value) {
+          for (var i in resource) {
+            if (resource[i].id == this.value) {
+              value = resource[i];
+              break;
+            }
           }
+        }
+
+        if (value) {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = (this.config.resourceKeys || [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var key = _step.value;
+
+              if (value[key]) {
+                value = value[key];
+                break;
+              }
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+        } else if (this.value) {
+          var singularResourceName = this.config.resource;
+
+          if (singularResourceName[singularResourceName.length - 1] == 's') {
+            singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
+          }
+
+          value = '(' + singularResourceName + ' not found)';
         }
       }
 
-      if (value) {
-        for (var _iterator = this.config.resourceKeys || [], _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref;
-
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-          } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-          }
-
-          var key = _ref;
-
-          if (value[key]) {
-            value = value[key];
-            break;
-          }
-        }
-      } else if (this.value) {
-        var singularResourceName = this.config.resource;
-
-        if (singularResourceName[singularResourceName.length - 1] == 's') {
-          singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
-        }
-
-        value = '(' + singularResourceName + ' not found)';
-      }
+      return _.div({
+        class: 'editor__field__value'
+      }, value || '(none)');
     }
-
-    return _.div({
-      class: 'editor__field__value'
-    }, value || '(none)');
-  };
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      config.resourceKeys = config.resourceKeys || [];
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Resource'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: config.resource,
+        options: Object.keys(resources),
+        onChange: function onChange(newValue) {
+          config.resource = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Resource keys'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Chips({
+        value: config.resourceKeys,
+        placeholder: 'keyName',
+        onChange: function onChange(newValue) {
+          config.resourceKeys = newValue;
+        }
+      }).$element))];
+    }
+  }]);
 
   return ResourceReferenceEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -10700,17 +11487,35 @@ module.exports = ResourceReferenceEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var RichTextEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(RichTextEditor, _HashBrown$Views$Edit);
+  _inherits(RichTextEditor, _HashBrown$Views$Edit);
 
   function RichTextEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this; // Sanity check of value
+    _classCallCheck(this, RichTextEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(RichTextEditor).call(this, params)); // Sanity check of value
 
     if (typeof _this.value !== 'string') {
       _this.value = _this.value || '';
@@ -10735,344 +11540,355 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  RichTextEditor.renderConfigEditor = function renderConfigEditor(config) {
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Disable markdown'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'checkbox',
-      tooltip: 'Hides the markdown tab if enabled',
-      value: config.isMarkdownDisabled || false,
-      onChange: function onChange(newValue) {
-        config.isMarkdownDisabled = newValue;
+  _createClass(RichTextEditor, [{
+    key: "onChange",
+
+    /**
+     * Event: Change input
+     *
+     * @param {String} value
+     */
+    value: function onChange(value) {
+      value = value || '';
+      this.value = value;
+
+      if (this.silentChange === true) {
+        this.silentChange = false;
+        this.trigger('silentchange', this.value);
+      } else {
+        this.trigger('change', this.value);
       }
-    }).$element))];
-  };
-  /**
-   * Event: Change input
-   *
-   * @param {String} value
-   */
-
-
-  var _proto = RichTextEditor.prototype;
-
-  _proto.onChange = function onChange(value) {
-    value = value || '';
-    this.value = value;
-
-    if (this.silentChange === true) {
-      this.silentChange = false;
-      this.trigger('silentchange', this.value);
-    } else {
-      this.trigger('change', this.value);
     }
-  };
-  /**
-   * Event: On click tab
-   *
-   * @param {String} source
-   */
+    /**
+     * Event: On click tab
+     *
+     * @param {String} source
+     */
 
+  }, {
+    key: "onClickTab",
+    value: function onClickTab(source) {
+      this.silentChange = true;
+      this.activeView = source;
+      this.fetch();
+    }
+    /**
+     * Event: Click insert media
+     */
 
-  _proto.onClickTab = function onClickTab(source) {
-    this.silentChange = true;
-    this.activeView = source;
-    this.fetch();
-  };
-  /**
-   * Event: Click insert media
-   */
+  }, {
+    key: "onClickInsertMedia",
+    value: function onClickInsertMedia() {
+      var _this2 = this;
 
+      var mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
+      mediaBrowser.on('select', function (id) {
+        HashBrown.Helpers.MediaHelper.getMediaById(id).then(function (media) {
+          var html = '';
 
-  _proto.onClickInsertMedia = function onClickInsertMedia() {
-    var _this2 = this;
+          if (media.isImage()) {
+            html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+          } else if (media.isVideo()) {
+            html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+          }
 
-    var mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
-    mediaBrowser.on('select', function (id) {
-      HashBrown.Helpers.MediaHelper.getMediaById(id).then(function (media) {
-        var html = '';
+          var activeView = _this2.activeView || 'wysiwyg';
 
-        if (media.isImage()) {
-          html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
-        } else if (media.isVideo()) {
-          html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
-        }
+          switch (activeView) {
+            case 'wysiwyg':
+              _this2.wysiwyg.insertHtml(html);
 
-        var activeView = _this2.activeView || 'wysiwyg';
+              break;
 
-        switch (activeView) {
-          case 'wysiwyg':
-            _this2.wysiwyg.insertHtml(html);
+            case 'html':
+              _this2.html.replaceSelection(html, 'end');
 
-            break;
+              break;
 
-          case 'html':
-            _this2.html.replaceSelection(html, 'end');
+            case 'markdown':
+              _this2.markdown.replaceSelection(toMarkdown(html), 'end');
 
-            break;
+              break;
+          }
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Gets the tab content
+     *
+     * @returns {HTMLElement} Tab content
+     */
 
-          case 'markdown':
-            _this2.markdown.replaceSelection(toMarkdown(html), 'end');
+  }, {
+    key: "getTabContent",
+    value: function getTabContent() {
+      return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+    }
+    /**
+     * Initialises the HTML editor
+     */
 
-            break;
-        }
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Gets the tab content
-   *
-   * @returns {HTMLElement} Tab content
-   */
+  }, {
+    key: "initHtmlEditor",
+    value: function initHtmlEditor() {
+      var _this3 = this;
 
-
-  _proto.getTabContent = function getTabContent() {
-    return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
-  };
-  /**
-   * Initialises the HTML editor
-   */
-
-
-  _proto.initHtmlEditor = function initHtmlEditor() {
-    var _this3 = this;
-
-    setTimeout(function () {
-      // Kepp reference to editor
-      _this3.html = CodeMirror.fromTextArea(_this3.getTabContent(), {
-        lineNumbers: false,
-        mode: {
-          name: 'xml'
-        },
-        viewportMargin: Infinity,
-        tabSize: 4,
-        indentUnit: 4,
-        indentWithTabs: true,
-        theme: 'default',
-        value: _this3.value
-      }); // Change event
-
-      _this3.html.on('change', function () {
-        _this3.onChange(_this3.html.getDoc().getValue());
-      }); // Set value initially
-
-
-      _this3.silentChange = true;
-
-      _this3.html.getDoc().setValue(_this3.value);
-    }, 1);
-  };
-  /**
-   * Initialises the markdown editor
-   */
-
-
-  _proto.initMarkdownEditor = function initMarkdownEditor() {
-    var _this4 = this;
-
-    setTimeout(function () {
-      // Keep reference to editor
-      _this4.markdown = CodeMirror.fromTextArea(_this4.getTabContent(), {
-        lineNumbers: false,
-        mode: {
-          name: 'markdown'
-        },
-        viewportMargin: Infinity,
-        tabSize: 4,
-        indentUnit: 4,
-        indentWithTabs: true,
-        theme: 'default',
-        value: toMarkdown(_this4.value)
-      }); // Change event
-
-      _this4.markdown.on('change', function () {
-        _this4.onChange(marked(_this4.markdown.getDoc().getValue()));
-      }); // Set value initially
-
-
-      _this4.silentChange = true;
-
-      _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
-    }, 1);
-  };
-  /**
-   * Initialises the WYSIWYG editor
-   */
-
-
-  _proto.initWYSIWYGEditor = function initWYSIWYGEditor() {
-    var _this5 = this;
-
-    this.wysiwyg = CKEDITOR.replace(this.getTabContent(), {
-      removePlugins: 'contextmenu,liststyle,tabletools',
-      allowedContent: true,
-      height: 400,
-      toolbarGroups: [{
-        name: 'styles'
-      }, {
-        name: 'basicstyles',
-        groups: ['basicstyles', 'cleanup']
-      }, {
-        name: 'paragraph',
-        groups: ['list', 'indent', 'blocks', 'align', 'bidi']
-      }, {
-        name: 'links'
-      }, {
-        name: 'insert'
-      }, {
-        name: 'forms'
-      }, {
-        name: 'tools'
-      }, {
-        name: 'document',
-        groups: ['mode', 'document', 'doctools']
-      }, {
-        name: 'others'
-      }],
-      extraPlugins: 'justify,divarea',
-      removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
-      removeDialogTabs: 'image:advanced;link:advanced'
-    });
-    this.wysiwyg.on('change', function () {
-      _this5.onChange(_this5.wysiwyg.getData());
-    });
-    this.wysiwyg.on('instanceReady', function () {
-      // Strips the style information
-      var stripStyle = function stripStyle(element) {
-        delete element.attributes.style;
-      }; // Filtering rules
-
-
-      _this5.wysiwyg.dataProcessor.dataFilter.addRules({
-        elements: {
-          // Strip styling from these elements
-          p: stripStyle,
-          h1: stripStyle,
-          h2: stripStyle,
-          h3: stripStyle,
-          h4: stripStyle,
-          h5: stripStyle,
-          h6: stripStyle,
-          span: stripStyle,
-          div: stripStyle,
-          section: stripStyle,
-          hr: stripStyle,
-          header: stripStyle,
-          aside: stripStyle,
-          footer: stripStyle,
-          ul: stripStyle,
-          li: stripStyle,
-          blockquote: stripStyle,
-          // Refactor image src url to fit MediaController
-          img: function img(element) {
-            stripStyle(element); // Fetch from data attribute
-
-            if (element.attributes['data-id']) {
-              element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
-            } else {
-              element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
-            }
+      setTimeout(function () {
+        // Kepp reference to editor
+        _this3.html = CodeMirror.fromTextArea(_this3.getTabContent(), {
+          lineNumbers: false,
+          mode: {
+            name: 'xml'
           },
-          // Refactor video src url to fit MediaController
-          video: function video(element) {
-            stripStyle(element); // Fetch from data attribute
+          viewportMargin: Infinity,
+          tabSize: 4,
+          indentUnit: 4,
+          indentWithTabs: true,
+          theme: 'default',
+          value: _this3.value
+        }); // Change event
 
-            if (element.attributes['data-id']) {
-              element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
-            } else {
-              element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
+        _this3.html.on('change', function () {
+          _this3.onChange(_this3.html.getDoc().getValue());
+        }); // Set value initially
+
+
+        _this3.silentChange = true;
+
+        _this3.html.getDoc().setValue(_this3.value);
+      }, 1);
+    }
+    /**
+     * Initialises the markdown editor
+     */
+
+  }, {
+    key: "initMarkdownEditor",
+    value: function initMarkdownEditor() {
+      var _this4 = this;
+
+      setTimeout(function () {
+        // Keep reference to editor
+        _this4.markdown = CodeMirror.fromTextArea(_this4.getTabContent(), {
+          lineNumbers: false,
+          mode: {
+            name: 'markdown'
+          },
+          viewportMargin: Infinity,
+          tabSize: 4,
+          indentUnit: 4,
+          indentWithTabs: true,
+          theme: 'default',
+          value: toMarkdown(_this4.value)
+        }); // Change event
+
+        _this4.markdown.on('change', function () {
+          _this4.onChange(marked(_this4.markdown.getDoc().getValue()));
+        }); // Set value initially
+
+
+        _this4.silentChange = true;
+
+        _this4.markdown.getDoc().setValue(toMarkdown(_this4.value));
+      }, 1);
+    }
+    /**
+     * Initialises the WYSIWYG editor
+     */
+
+  }, {
+    key: "initWYSIWYGEditor",
+    value: function initWYSIWYGEditor() {
+      var _this5 = this;
+
+      this.wysiwyg = CKEDITOR.replace(this.getTabContent(), {
+        removePlugins: 'contextmenu,liststyle,tabletools',
+        allowedContent: true,
+        height: 400,
+        toolbarGroups: [{
+          name: 'styles'
+        }, {
+          name: 'basicstyles',
+          groups: ['basicstyles', 'cleanup']
+        }, {
+          name: 'paragraph',
+          groups: ['list', 'indent', 'blocks', 'align', 'bidi']
+        }, {
+          name: 'links'
+        }, {
+          name: 'insert'
+        }, {
+          name: 'forms'
+        }, {
+          name: 'tools'
+        }, {
+          name: 'document',
+          groups: ['mode', 'document', 'doctools']
+        }, {
+          name: 'others'
+        }],
+        extraPlugins: 'justify,divarea',
+        removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+        removeDialogTabs: 'image:advanced;link:advanced'
+      });
+      this.wysiwyg.on('change', function () {
+        _this5.onChange(_this5.wysiwyg.getData());
+      });
+      this.wysiwyg.on('instanceReady', function () {
+        // Strips the style information
+        var stripStyle = function stripStyle(element) {
+          delete element.attributes.style;
+        }; // Filtering rules
+
+
+        _this5.wysiwyg.dataProcessor.dataFilter.addRules({
+          elements: {
+            // Strip styling from these elements
+            p: stripStyle,
+            h1: stripStyle,
+            h2: stripStyle,
+            h3: stripStyle,
+            h4: stripStyle,
+            h5: stripStyle,
+            h6: stripStyle,
+            span: stripStyle,
+            div: stripStyle,
+            section: stripStyle,
+            hr: stripStyle,
+            header: stripStyle,
+            aside: stripStyle,
+            footer: stripStyle,
+            ul: stripStyle,
+            li: stripStyle,
+            blockquote: stripStyle,
+            // Refactor image src url to fit MediaController
+            img: function img(element) {
+              stripStyle(element); // Fetch from data attribute
+
+              if (element.attributes['data-id']) {
+                element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
+              } else {
+                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
+              }
+            },
+            // Refactor video src url to fit MediaController
+            video: function video(element) {
+              stripStyle(element); // Fetch from data attribute
+
+              if (element.attributes['data-id']) {
+                element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id']; // Failing that, use regex
+              } else {
+                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
+              }
             }
           }
-        }
-      }); // Set value initially
+        }); // Set value initially
 
 
-      _this5.silentChange = true;
+        _this5.silentChange = true;
 
-      _this5.wysiwyg.setData(_this5.value);
-    });
-  };
-  /**
-   * Prerender
-   */
-
-
-  _proto.prerender = function prerender() {
-    this.markdown = null;
-    this.wysiwyg = null;
-    this.html = null;
-  };
-  /** 
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this6 = this;
-
-    var activeView = this.activeView || 'wysiwyg';
-    return _.div({
-      class: 'editor__field__value editor__field--rich-text-editor',
-      title: this.description || ''
-    }, _.div({
-      class: 'editor__field--rich-text-editor__header'
-    }, _.each({
-      wysiwyg: 'Visual',
-      markdown: 'Markdown',
-      html: 'HTML'
-    }, function (alias, label) {
-      return _.button({
-        class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'
-      }, label).click(function () {
-        _this6.onClickTab(alias);
+        _this5.wysiwyg.setData(_this5.value);
       });
-    }), _.button({
-      class: 'editor__field--rich-text-editor__header__add-media'
-    }, 'Add media').click(function () {
-      _this6.onClickInsertMedia();
-    })), _.div({
-      class: 'editor__field--rich-text-editor__body'
-    }, _.if(activeView === 'wysiwyg', _.div({
-      class: 'editor__field--rich-text-editor__tab wysiwyg'
-    }, _.div({
-      class: 'editor__field--rich-text-editor__tab__content',
-      'contenteditable': true
-    }))), _.if(activeView === 'markdown', _.div({
-      class: 'editor__field--rich-text-editor__tab markdown'
-    }, _.textarea({
-      class: 'editor__field--rich-text-editor__tab__content'
-    }))), _.if(activeView === 'html', _.div({
-      class: 'editor__field--rich-text-editor__tab html'
-    }, _.textarea({
-      class: 'editor__field--rich-text-editor__tab__content'
-    })))));
-  };
-  /**
-   * Post render
-   */
-
-
-  _proto.postrender = function postrender() {
-    var activeView = this.activeView || 'wysiwyg';
-
-    switch (activeView) {
-      case 'html':
-        this.initHtmlEditor();
-        break;
-
-      case 'markdown':
-        this.initMarkdownEditor();
-        break;
-
-      case 'wysiwyg':
-        this.initWYSIWYGEditor();
-        break;
     }
-  };
+    /**
+     * Prerender
+     */
+
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      this.markdown = null;
+      this.wysiwyg = null;
+      this.html = null;
+    }
+    /** 
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this6 = this;
+
+      var activeView = this.activeView || 'wysiwyg';
+      return _.div({
+        class: 'editor__field__value editor__field--rich-text-editor',
+        title: this.description || ''
+      }, _.div({
+        class: 'editor__field--rich-text-editor__header'
+      }, _.each({
+        wysiwyg: 'Visual',
+        markdown: 'Markdown',
+        html: 'HTML'
+      }, function (alias, label) {
+        return _.button({
+          class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'
+        }, label).click(function () {
+          _this6.onClickTab(alias);
+        });
+      }), _.button({
+        class: 'editor__field--rich-text-editor__header__add-media'
+      }, 'Add media').click(function () {
+        _this6.onClickInsertMedia();
+      })), _.div({
+        class: 'editor__field--rich-text-editor__body'
+      }, _.if(activeView === 'wysiwyg', _.div({
+        class: 'editor__field--rich-text-editor__tab wysiwyg'
+      }, _.div({
+        class: 'editor__field--rich-text-editor__tab__content',
+        'contenteditable': true
+      }))), _.if(activeView === 'markdown', _.div({
+        class: 'editor__field--rich-text-editor__tab markdown'
+      }, _.textarea({
+        class: 'editor__field--rich-text-editor__tab__content'
+      }))), _.if(activeView === 'html', _.div({
+        class: 'editor__field--rich-text-editor__tab html'
+      }, _.textarea({
+        class: 'editor__field--rich-text-editor__tab__content'
+      })))));
+    }
+    /**
+     * Post render
+     */
+
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      var activeView = this.activeView || 'wysiwyg';
+
+      switch (activeView) {
+        case 'html':
+          this.initHtmlEditor();
+          break;
+
+        case 'markdown':
+          this.initMarkdownEditor();
+          break;
+
+        case 'wysiwyg':
+          this.initWYSIWYGEditor();
+          break;
+      }
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Disable markdown'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        tooltip: 'Hides the markdown tab if enabled',
+        value: config.isMarkdownDisabled || false,
+        onChange: function onChange(newValue) {
+          config.isMarkdownDisabled = newValue;
+        }
+      }).$element))];
+    }
+  }]);
 
   return RichTextEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -11105,12 +11921,28 @@ module.exports = RichTextEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var StringEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(StringEditor, _HashBrown$Views$Edit);
+  _inherits(StringEditor, _HashBrown$Views$Edit);
 
   /**
    * Constructor
@@ -11118,7 +11950,9 @@ function (_HashBrown$Views$Edit) {
   function StringEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, StringEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(StringEditor).call(this, params));
 
     _this.fetch();
 
@@ -11133,45 +11967,47 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  StringEditor.renderConfigEditor = function renderConfigEditor(config) {
-    return [_.div({
-      class: 'editor__field'
-    }, _.div({
-      class: 'editor__field__key'
-    }, 'Is multi-line'), _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: 'checkbox',
-      tooltip: 'Whether or not this string uses line breaks',
-      value: config.isMultiLine || false,
-      onChange: function onChange(newValue) {
-        config.isMultiLine = newValue;
-      }
-    }).$element))];
-  };
-  /**
-   * Render this editor
-   */
+  _createClass(StringEditor, [{
+    key: "template",
 
+    /**
+     * Render this editor
+     */
+    value: function template() {
+      var _this2 = this;
 
-  var _proto = StringEditor.prototype;
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: this.config.isMultiLine ? 'textarea' : 'text',
+        value: this.value,
+        tooltip: this.description || '',
+        onChange: function onChange(newValue) {
+          _this2.value = newValue;
 
-  _proto.template = function template() {
-    var _this2 = this;
-
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Input({
-      type: this.config.isMultiLine ? 'textarea' : 'text',
-      value: this.value,
-      tooltip: this.description || '',
-      onChange: function onChange(newValue) {
-        _this2.value = newValue;
-
-        _this2.trigger('change', _this2.value);
-      }
-    }));
-  };
+          _this2.trigger('change', _this2.value);
+        }
+      }));
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config) {
+      return [_.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Is multi-line'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        tooltip: 'Whether or not this string uses line breaks',
+        value: config.isMultiLine || false,
+        onChange: function onChange(newValue) {
+          config.isMultiLine = newValue;
+        }
+      }).$element))];
+    }
+  }]);
 
   return StringEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -11217,19 +12053,37 @@ module.exports = StringEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var StructEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(StructEditor, _HashBrown$Views$Edit);
+  _inherits(StructEditor, _HashBrown$Views$Edit);
 
   function StructEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this; // A sanity check to make sure we're working with an object
+    _classCallCheck(this, StructEditor);
 
-    if (!_this.value || typeof _this.value !== 'object') {
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(StructEditor).call(this, params)); // A sanity check to make sure we're working with an object
+
+    if (!_this.value || _typeof(_this.value) !== 'object') {
       _this.value = {};
     }
 
@@ -11247,342 +12101,345 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = StructEditor.prototype;
+  _createClass(StructEditor, [{
+    key: "onChange",
+    value: function onChange(newValue, key, keySchema, isSilent) {
+      if (keySchema.multilingual) {
+        // Sanity check to make sure multilingual fields are accomodated for
+        if (!this.value[key] || _typeof(this.value[key]) !== 'object') {
+          this.value[key] = {};
+        }
 
-  _proto.onChange = function onChange(newValue, key, keySchema, isSilent) {
-    if (keySchema.multilingual) {
-      // Sanity check to make sure multilingual fields are accomodated for
-      if (!this.value[key] || typeof this.value[key] !== 'object') {
-        this.value[key] = {};
+        this.value[key]._multilingual = true;
+        this.value[key][window.language] = newValue;
+      } else {
+        this.value[key] = newValue;
       }
 
-      this.value[key]._multilingual = true;
-      this.value[key][window.language] = newValue;
-    } else {
-      this.value[key] = newValue;
+      this.trigger(isSilent ? 'silentchange' : 'change', this.value);
     }
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     * @param {String} fieldSchemaId
+     *
+     * @returns {HTMLElement} Element
+     */
 
-    this.trigger(isSilent ? 'silentchange' : 'change', this.value);
-  };
-  /**
-   * Renders the config editor
-   *
-   * @param {Object} config
-   * @param {String} fieldSchemaId
-   *
-   * @returns {HTMLElement} Element
-   */
+  }, {
+    key: "template",
+
+    /**
+     * Renders this editor
+     */
+    value: function template() {
+      var _this2 = this;
+
+      var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
+      return _.div({
+        class: 'editor__field__value field-editor--struct'
+      }, // Loop through each key in the struct
+      _.each(compiledSchema.config.struct, function (k, keySchema) {
+        var value = _this2.value[k];
+
+        if (!keySchema.schemaId) {
+          UI.errorModal(new Error('Schema id not set for key "' + k + '"'));
+        }
+
+        var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
+
+        if (!fieldSchema) {
+          UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
+        }
+
+        var fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId); // Sanity check
+
+        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keySchema);
+        _this2.value[k] = value; // Init the field editor
+
+        var fieldEditorInstance = new fieldEditor({
+          value: keySchema.multilingual ? value[window.language] : value,
+          disabled: keySchema.disabled || false,
+          config: keySchema.config || fieldSchema.config || {},
+          schema: keySchema
+        }); // Hook up the change event
+
+        fieldEditorInstance.on('change', function (newValue) {
+          _this2.onChange(newValue, k, keySchema);
+        });
+        fieldEditorInstance.on('silentchange', function (newValue) {
+          _this2.onChange(newValue, k, keySchema, true);
+        }); // Return the DOM element
+
+        return _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, keySchema.label), _.if(keySchema.description, _.div({
+          class: 'editor__field__key__description'
+        }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
+      }));
+    }
+  }], [{
+    key: "renderConfigEditor",
+    value: function renderConfigEditor(config, fieldSchemaId) {
+      config.struct = config.struct || {};
+
+      var $element = _.div({
+        class: 'editor--schema__struct'
+      });
+
+      var compiledFieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldSchemaId);
+
+      var renderEditor = function renderEditor() {
+        // Get the parent struct fields
+        var parentStruct = {};
+
+        if (compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
+          for (var key in compiledFieldSchema.config.struct) {
+            // We only want parent struct values
+            if (config.struct[key]) {
+              continue;
+            }
+
+            parentStruct[key] = compiledFieldSchema.config.struct[key];
+          }
+        } // Compile the label options
 
 
-  StructEditor.renderConfigEditor = function renderConfigEditor(config, fieldSchemaId) {
-    config.struct = config.struct || {};
+        var labelOptions = {};
 
-    var $element = _.div({
-      class: 'editor--schema__struct'
-    });
-
-    var compiledFieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldSchemaId);
-
-    var renderEditor = function renderEditor() {
-      // Get the parent struct fields
-      var parentStruct = {};
-
-      if (compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
-        for (var key in compiledFieldSchema.config.struct) {
-          // We only want parent struct values
-          if (config.struct[key]) {
+        for (var _key in parentStruct) {
+          if (!parentStruct[_key]) {
             continue;
           }
 
-          parentStruct[key] = compiledFieldSchema.config.struct[key];
-        }
-      } // Compile the label options
-
-
-      var labelOptions = {};
-
-      for (var _key in parentStruct) {
-        if (!parentStruct[_key]) {
-          continue;
+          labelOptions[_key] = parentStruct[_key].label;
         }
 
-        labelOptions[_key] = parentStruct[_key].label;
-      }
-
-      for (var _key2 in config.struct) {
-        if (!config.struct[_key2]) {
-          continue;
-        }
-
-        labelOptions[_key2] = config.struct[_key2].label;
-      } // Render everything
-
-
-      _.append($element.empty(), // Render the label picker
-      _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, 'Label'), _.div({
-        class: 'editor__field__key__description'
-      }, 'The value of the field picked here will represent this struct when collapsed')), _.div({
-        class: 'editor__field__value'
-      }, new HashBrown.Views.Widgets.Dropdown({
-        options: labelOptions,
-        value: config.label,
-        onChange: function onChange(newLabel) {
-          config.label = newLabel;
-        }
-      }))), // Render the parent struct
-      _.if(Object.keys(parentStruct).length > 0, _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, 'Parent struct'), _.div({
-        class: 'editor__field__key__description'
-      }, 'Properties that are inherited and can be changed if you add them to this struct')), _.div({
-        class: 'editor__field__value flex'
-      }, _.each(parentStruct, function (fieldKey, fieldValue) {
-        return _.button({
-          class: 'widget widget--button condensed',
-          title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'
-        }, _.span({
-          class: 'fa fa-plus'
-        }), fieldValue.label || fieldKey).click(function () {
-          var newProperties = {};
-          newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
-
-          for (var _key3 in config.struct) {
-            newProperties[_key3] = config.struct[_key3];
+        for (var _key2 in config.struct) {
+          if (!config.struct[_key2]) {
+            continue;
           }
 
-          config.struct = newProperties;
-          renderEditor();
-        });
-      })))), // Render this struct
-      _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, 'Struct', _.div({
-        class: 'editor__field__key__actions'
-      }, _.button({
-        class: 'editor__field__key__action editor__field__key__action--sort'
-      }).click(function (e) {
-        HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
-          config.struct = newStruct;
-        });
-      }))), _.div({
-        class: 'editor__field__value segmented'
-      }, _.each(config.struct, function (fieldKey, fieldValue) {
-        // Sanity check
-        fieldValue.config = fieldValue.config || {};
-        fieldValue.schemaId = fieldValue.schemaId || 'array';
+          labelOptions[_key2] = config.struct[_key2].label;
+        } // Render everything
 
-        var $field = _.div({
+
+        _.append($element.empty(), // Render the label picker
+        _.div({
           class: 'editor__field'
-        });
+        }, _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, 'Label'), _.div({
+          class: 'editor__field__key__description'
+        }, 'The value of the field picked here will represent this struct when collapsed')), _.div({
+          class: 'editor__field__value'
+        }, new HashBrown.Views.Widgets.Dropdown({
+          options: labelOptions,
+          value: config.label,
+          onChange: function onChange(newLabel) {
+            config.label = newLabel;
+          }
+        }))), // Render the parent struct
+        _.if(Object.keys(parentStruct).length > 0, _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, _.div({
+          class: 'editor__field__key__label'
+        }, 'Parent struct'), _.div({
+          class: 'editor__field__key__description'
+        }, 'Properties that are inherited and can be changed if you add them to this struct')), _.div({
+          class: 'editor__field__value flex'
+        }, _.each(parentStruct, function (fieldKey, fieldValue) {
+          return _.button({
+            class: 'widget widget--button condensed',
+            title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'
+          }, _.span({
+            class: 'fa fa-plus'
+          }), fieldValue.label || fieldKey).click(function () {
+            var newProperties = {};
+            newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
 
-        var renderField = function renderField() {
-          _.append($field.empty(), _.div({
-            class: 'editor__field__sort-key'
-          }, fieldKey), _.div({
-            class: 'editor__field__value'
-          }, _.div({
+            for (var _key3 in config.struct) {
+              newProperties[_key3] = config.struct[_key3];
+            }
+
+            config.struct = newProperties;
+            renderEditor();
+          });
+        })))), // Render this struct
+        _.div({
+          class: 'editor__field'
+        }, _.div({
+          class: 'editor__field__key'
+        }, 'Struct', _.div({
+          class: 'editor__field__key__actions'
+        }, _.button({
+          class: 'editor__field__key__action editor__field__key__action--sort'
+        }).click(function (e) {
+          HashBrown.Helpers.UIHelper.fieldSortableObject(config.struct, $(e.currentTarget).parents('.editor__field')[0], function (newStruct) {
+            config.struct = newStruct;
+          });
+        }))), _.div({
+          class: 'editor__field__value segmented'
+        }, _.each(config.struct, function (fieldKey, fieldValue) {
+          // Sanity check
+          fieldValue.config = fieldValue.config || {};
+          fieldValue.schemaId = fieldValue.schemaId || 'array';
+
+          var $field = _.div({
             class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Key'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A variable name, e.g. "myField"',
-            tooltip: 'The field variable name',
-            value: fieldKey,
-            onChange: function onChange(newKey) {
-              if (!newKey) {
+          });
+
+          var renderField = function renderField() {
+            _.append($field.empty(), _.div({
+              class: 'editor__field__sort-key'
+            }, fieldKey), _.div({
+              class: 'editor__field__value'
+            }, _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Key'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A variable name, e.g. "myField"',
+              tooltip: 'The field variable name',
+              value: fieldKey,
+              onChange: function onChange(newKey) {
+                if (!newKey) {
+                  return;
+                }
+
+                var newStruct = {}; // Insert the changed key into the correct place in the struct
+
+                for (var _key4 in config.struct) {
+                  if (_key4 === fieldKey) {
+                    newStruct[newKey] = config.struct[fieldKey];
+                  } else {
+                    newStruct[_key4] = config.struct[_key4];
+                  }
+                } // Change internal reference to new key
+
+
+                fieldKey = newKey; // Reassign the struct object
+
+                config.struct = newStruct; // Update the sort key
+
+                $field.find('.editor__field__sort-key').html(fieldKey);
+              }
+            }))), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Label'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A label, e.g. "My field"',
+              tooltip: 'The field label',
+              value: fieldValue.label,
+              onChange: function onChange(newValue) {
+                fieldValue.label = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Description'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'text',
+              placeholder: 'A description',
+              tooltip: 'The field description',
+              value: fieldValue.description,
+              onChange: function onChange(newValue) {
+                fieldValue.description = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Multilingual'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Input({
+              type: 'checkbox',
+              tooltip: 'Whether or not this field should support multiple languages',
+              value: fieldValue.multilingual || false,
+              onChange: function onChange(newValue) {
+                fieldValue.multilingual = newValue;
+              }
+            }).$element)), _.div({
+              class: 'editor__field'
+            }, _.div({
+              class: 'editor__field__key'
+            }, 'Schema'), _.div({
+              class: 'editor__field__value'
+            }, new HashBrown.Views.Widgets.Dropdown({
+              useTypeAhead: true,
+              options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+              value: fieldValue.schemaId,
+              labelKey: 'name',
+              valueKey: 'id',
+              onChange: function onChange(newValue) {
+                fieldValue.schemaId = newValue;
+                renderField();
+              }
+            }).$element)), _.do(function () {
+              var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+              if (!schema) {
                 return;
               }
 
-              var newStruct = {}; // Insert the changed key into the correct place in the struct
+              var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
-              for (var _key4 in config.struct) {
-                if (_key4 === fieldKey) {
-                  newStruct[newKey] = config.struct[fieldKey];
-                } else {
-                  newStruct[_key4] = config.struct[_key4];
-                }
-              } // Change internal reference to new key
+              if (!editor) {
+                return;
+              }
 
+              return editor.renderConfigEditor(fieldValue.config);
+            })), _.div({
+              class: 'editor__field__actions'
+            }, _.button({
+              class: 'editor__field__action editor__field__action--remove',
+              title: 'Remove field'
+            }).click(function () {
+              delete config.struct[fieldKey];
+              renderEditor();
+            })));
+          };
 
-              fieldKey = newKey; // Reassign the struct object
+          renderField();
+          return $field;
+        }), _.button({
+          class: 'editor__field__add widget widget--button round right fa fa-plus',
+          title: 'Add a struct property'
+        }).click(function () {
+          if (config.struct.newField) {
+            return;
+          }
 
-              config.struct = newStruct; // Update the sort key
+          config.struct.newField = {
+            label: 'New field',
+            schemaId: 'string'
+          };
+          renderEditor();
+        }))));
+      };
 
-              $field.find('.editor__field__sort-key').html(fieldKey);
-            }
-          }))), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Label'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A label, e.g. "My field"',
-            tooltip: 'The field label',
-            value: fieldValue.label,
-            onChange: function onChange(newValue) {
-              fieldValue.label = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Description'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'text',
-            placeholder: 'A description',
-            tooltip: 'The field description',
-            value: fieldValue.description,
-            onChange: function onChange(newValue) {
-              fieldValue.description = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Multilingual'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Input({
-            type: 'checkbox',
-            tooltip: 'Whether or not this field should support multiple languages',
-            value: fieldValue.multilingual || false,
-            onChange: function onChange(newValue) {
-              fieldValue.multilingual = newValue;
-            }
-          }).$element)), _.div({
-            class: 'editor__field'
-          }, _.div({
-            class: 'editor__field__key'
-          }, 'Schema'), _.div({
-            class: 'editor__field__value'
-          }, new HashBrown.Views.Widgets.Dropdown({
-            useTypeAhead: true,
-            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-            value: fieldValue.schemaId,
-            labelKey: 'name',
-            valueKey: 'id',
-            onChange: function onChange(newValue) {
-              fieldValue.schemaId = newValue;
-              renderField();
-            }
-          }).$element)), _.do(function () {
-            var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
-
-            if (!schema) {
-              return;
-            }
-
-            var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-            if (!editor) {
-              return;
-            }
-
-            return editor.renderConfigEditor(fieldValue.config);
-          })), _.div({
-            class: 'editor__field__actions'
-          }, _.button({
-            class: 'editor__field__action editor__field__action--remove',
-            title: 'Remove field'
-          }).click(function () {
-            delete config.struct[fieldKey];
-            renderEditor();
-          })));
-        };
-
-        renderField();
-        return $field;
-      }), _.button({
-        class: 'editor__field__add widget widget--button round right fa fa-plus',
-        title: 'Add a struct property'
-      }).click(function () {
-        if (config.struct.newField) {
-          return;
-        }
-
-        config.struct.newField = {
-          label: 'New field',
-          schemaId: 'string'
-        };
-        renderEditor();
-      }))));
-    };
-
-    renderEditor();
-    return $element;
-  };
-  /**
-   * Renders this editor
-   */
-
-
-  _proto.template = function template() {
-    var _this2 = this;
-
-    var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
-    return _.div({
-      class: 'editor__field__value field-editor--struct'
-    }, // Loop through each key in the struct
-    _.each(compiledSchema.config.struct, function (k, keySchema) {
-      var value = _this2.value[k];
-
-      if (!keySchema.schemaId) {
-        UI.errorModal(new Error('Schema id not set for key "' + k + '"'));
-      }
-
-      var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
-
-      if (!fieldSchema) {
-        UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
-      }
-
-      var fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId); // Sanity check
-
-      value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keySchema);
-      _this2.value[k] = value; // Init the field editor
-
-      var fieldEditorInstance = new fieldEditor({
-        value: keySchema.multilingual ? value[window.language] : value,
-        disabled: keySchema.disabled || false,
-        config: keySchema.config || fieldSchema.config || {},
-        schema: keySchema
-      }); // Hook up the change event
-
-      fieldEditorInstance.on('change', function (newValue) {
-        _this2.onChange(newValue, k, keySchema);
-      });
-      fieldEditorInstance.on('silentchange', function (newValue) {
-        _this2.onChange(newValue, k, keySchema, true);
-      }); // Return the DOM element
-
-      return _.div({
-        class: 'editor__field'
-      }, _.div({
-        class: 'editor__field__key'
-      }, _.div({
-        class: 'editor__field__key__label'
-      }, keySchema.label), _.if(keySchema.description, _.div({
-        class: 'editor__field__key__description'
-      }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
-    }));
-  };
+      renderEditor();
+      return $element;
+    }
+  }]);
 
   return StructEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -11612,12 +12469,28 @@ module.exports = StructEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var TagsEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(TagsEditor, _HashBrown$Views$Edit);
+  _inherits(TagsEditor, _HashBrown$Views$Edit);
 
   /**
    * Constructor
@@ -11625,7 +12498,9 @@ function (_HashBrown$Views$Edit) {
   function TagsEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, TagsEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TagsEditor).call(this, params));
 
     _this.fetch();
 
@@ -11636,23 +12511,24 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  var _proto = TagsEditor.prototype;
+  _createClass(TagsEditor, [{
+    key: "template",
+    value: function template() {
+      var _this2 = this;
 
-  _proto.template = function template() {
-    var _this2 = this;
+      return _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Chips({
+        tooltip: this.description || '',
+        value: (this.value || '').split(','),
+        onChange: function onChange(newValue) {
+          _this2.value = newValue.join(',');
 
-    return _.div({
-      class: 'editor__field__value'
-    }, new HashBrown.Views.Widgets.Chips({
-      tooltip: this.description || '',
-      value: (this.value || '').split(','),
-      onChange: function onChange(newValue) {
-        _this2.value = newValue.join(',');
-
-        _this2.trigger('change', _this2.value);
-      }
-    }).$element);
-  };
+          _this2.trigger('change', _this2.value);
+        }
+      }).$element);
+    }
+  }]);
 
   return TagsEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -11682,17 +12558,35 @@ module.exports = TagsEditor;
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var UrlEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Edit) {
-  _inheritsLoose(UrlEditor, _HashBrown$Views$Edit);
+  _inherits(UrlEditor, _HashBrown$Views$Edit);
 
   function UrlEditor(params) {
     var _this;
 
-    _this = _HashBrown$Views$Edit.call(this, params) || this;
+    _classCallCheck(this, UrlEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(UrlEditor).call(this, params));
 
     _this.fetch();
 
@@ -11707,209 +12601,233 @@ function (_HashBrown$Views$Edit) {
    */
 
 
-  UrlEditor.getAllParents = function getAllParents(contentId) {
-    var nodes = [];
-    var contentEditor = Crisp.View.get('ContentEditor');
+  _createClass(UrlEditor, [{
+    key: "generateUrl",
 
-    function iterate(id) {
-      var node;
-      node = window.resources.content.filter(function (node) {
-        return node.id == id;
-      })[0];
+    /**
+     * Generates a new url based on content id
+     *
+     * @param {String} contentId
+     *
+     * @return {String} url
+     */
+    value: function generateUrl(contentId) {
+      var nodes = UrlEditor.getAllParents(contentId);
+      var url = '/';
 
-      if (node) {
-        nodes.push(node);
-
-        if (node.parentId) {
-          iterate(node.parentId);
-        }
-      } else {
-        debug.log('Content not found: "' + id + '"', this);
-      }
-    }
-
-    iterate(contentId);
-    nodes.reverse();
-    return nodes;
-  };
-  /**
-   * Generates a new url based on content id
-   *
-   * @param {String} contentId
-   *
-   * @return {String} url
-   */
-
-
-  var _proto = UrlEditor.prototype;
-
-  _proto.generateUrl = function generateUrl(contentId) {
-    var nodes = UrlEditor.getAllParents(contentId);
-    var url = '/';
-
-    if (this.multilingual) {
-      url += window.language + '/';
-    }
-
-    for (var _iterator = nodes, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+      if (this.multilingual) {
+        url += window.language + '/';
       }
 
-      var node = _ref;
-      var title = ''; // If the node equals the currently edited node, take the value directly from the "title" field
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-      if (node.id == Crisp.Router.params.id) {
-        title = $('.editor__field[data-key="title"] .editor__field__value input').val(); // If it's not, try to get the title from the model
-      } else {
-        // If title is set directly (unlikely), pass it
-        if (typeof node.title === 'string') {
-          title = node.title; // If title is defined in properties (typical)
-        } else if (node.properties && node.properties.title) {
-          // If title is multilingual
-          if (node.properties.title[window.language]) {
-            title = node.properties.title[window.language]; // If title is not multilingual
-          } else if (typeof node.properties.title === 'string') {
-            title = node.properties.title;
+      try {
+        for (var _iterator = nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var node = _step.value;
+          var title = ''; // If the node equals the currently edited node, take the value directly from the "title" field
+
+          if (node.id == Crisp.Router.params.id) {
+            title = $('.editor__field[data-key="title"] .editor__field__value input').val(); // If it's not, try to get the title from the model
+          } else {
+            // If title is set directly (unlikely), pass it
+            if (typeof node.title === 'string') {
+              title = node.title; // If title is defined in properties (typical)
+            } else if (node.properties && node.properties.title) {
+              // If title is multilingual
+              if (node.properties.title[window.language]) {
+                title = node.properties.title[window.language]; // If title is not multilingual
+              } else if (typeof node.properties.title === 'string') {
+                title = node.properties.title;
+              }
+            }
+          }
+
+          url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
+        } // Check for duplicate URLs
+
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
       }
 
-      url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
-    } // Check for duplicate URLs
+      var sameUrls = 0;
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
 
+      try {
+        for (var _iterator2 = window.resources.content[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var content = _step2.value;
 
-    var sameUrls = 0;
+          if (content.id != contentId) {
+            var thatUrl = content.prop('url', window.language);
+            var isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
+            var isSameUrl = url == thatUrl || isMatchWithNumber;
 
-    for (var _iterator2 = window.resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+            if (isSameUrl) {
+              sameUrls++;
+            }
+          }
+        } // Append a number, if duplidate URLs were found
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var content = _ref2;
-
-      if (content.id != contentId) {
-        var thatUrl = content.prop('url', window.language);
-        var isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
-        var isSameUrl = url == thatUrl || isMatchWithNumber;
-
-        if (isSameUrl) {
-          sameUrls++;
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
         }
       }
-    } // Append a number, if duplidate URLs were found
 
-
-    if (sameUrls > 0) {
-      url = url.replace(/\/$/, '-' + sameUrls + '/');
-    }
-
-    return url;
-  };
-  /**
-   * Regenerates the URL
-   */
-
-
-  _proto.regenerate = function regenerate() {
-    var newUrl = this.generateUrl(Crisp.Router.params.id);
-    this.$input.val(newUrl);
-    this.trigger('silentchange', this.$input.val());
-  };
-
-  /**
-   * Fetch the URL from the Content title
-   */
-  _proto.fetchFromTitle = function fetchFromTitle() {
-    this.value = this.$titleInput.val();
-    this.regenerate();
-  };
-  /**
-   * Event: Change value
-   */
-
-
-  _proto.onChange = function onChange() {
-    this.value = this.$input.val();
-
-    if (this.value.length > 0) {
-      if (this.value[0] != '/') {
-        this.value = '/' + this.value;
-        this.$input.val(this.value);
+      if (sameUrls > 0) {
+        url = url.replace(/\/$/, '-' + sameUrls + '/');
       }
 
-      if (this.value.length > 1 && this.value[this.value.length - 1] != '/') {
-        this.value = this.value + '/';
-        this.$input.val(this.value);
-      }
-    } else {
-      this.fetchFromTitle();
+      return url;
     }
+    /**
+     * Regenerates the URL
+     */
 
-    this.trigger('change', this.value);
-  };
+  }, {
+    key: "regenerate",
+    value: function regenerate() {
+      var newUrl = this.generateUrl(Crisp.Router.params.id);
+      this.$input.val(newUrl);
+      this.trigger('silentchange', this.$input.val());
+    }
+  }, {
+    key: "fetchFromTitle",
 
-  /**
-   * Renders this editor
-   */
-  _proto.template = function template() {
-    var _this2 = this;
+    /**
+     * Fetch the URL from the Content title
+     */
+    value: function fetchFromTitle() {
+      this.value = this.$titleInput.val();
+      this.regenerate();
+    }
+    /**
+     * Event: Change value
+     */
 
-    return _.div({
-      class: 'editor__field__value field-editor--url'
-    }, _.div({
-      class: 'widget-group',
-      title: this.description || ''
-    }, this.$input = _.input({
-      class: 'widget widget--input text',
-      type: 'text',
-      value: this.value
-    }).on('change', function () {
-      _this2.onChange();
-    }), _.button({
-      class: 'widget widget--button small fa fa-refresh',
-      title: 'Regenerate URL'
-    }).click(function () {
-      _this2.regenerate();
-    })));
-  };
-  /**
-   * Post render
-   */
+  }, {
+    key: "onChange",
+    value: function onChange() {
+      this.value = this.$input.val();
 
+      if (this.value.length > 0) {
+        if (this.value[0] != '/') {
+          this.value = '/' + this.value;
+          this.$input.val(this.value);
+        }
 
-  _proto.postrender = function postrender() {
-    var _this3 = this;
+        if (this.value.length > 1 && this.value[this.value.length - 1] != '/') {
+          this.value = this.value + '/';
+          this.$input.val(this.value);
+        }
+      } else {
+        this.fetchFromTitle();
+      }
 
-    //  Wait a bit before checking for title field
-    setTimeout(function () {
-      _this3.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');
+      this.trigger('change', this.value);
+    }
+  }, {
+    key: "template",
 
-      if (_this3.$titleInput.length === 1) {
-        _this3.$titleInput.on('input', function () {
+    /**
+     * Renders this editor
+     */
+    value: function template() {
+      var _this2 = this;
+
+      return _.div({
+        class: 'editor__field__value field-editor--url'
+      }, _.div({
+        class: 'widget-group',
+        title: this.description || ''
+      }, this.$input = _.input({
+        class: 'widget widget--input text',
+        type: 'text',
+        value: this.value
+      }).on('change', function () {
+        _this2.onChange();
+      }), _.button({
+        class: 'widget widget--button small fa fa-refresh',
+        title: 'Regenerate URL'
+      }).click(function () {
+        _this2.regenerate();
+      })));
+    }
+    /**
+     * Post render
+     */
+
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      var _this3 = this;
+
+      //  Wait a bit before checking for title field
+      setTimeout(function () {
+        _this3.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');
+
+        if (_this3.$titleInput.length === 1) {
+          _this3.$titleInput.on('input', function () {
+            _this3.fetchFromTitle();
+          });
+        }
+
+        if (!_this3.value) {
           _this3.fetchFromTitle();
-        });
+        }
+      }, 100);
+    }
+  }], [{
+    key: "getAllParents",
+    value: function getAllParents(contentId) {
+      var nodes = [];
+      var contentEditor = Crisp.View.get('ContentEditor');
+
+      function iterate(id) {
+        var node;
+        node = window.resources.content.filter(function (node) {
+          return node.id == id;
+        })[0];
+
+        if (node) {
+          nodes.push(node);
+
+          if (node.parentId) {
+            iterate(node.parentId);
+          }
+        } else {
+          debug.log('Content not found: "' + id + '"', this);
+        }
       }
 
-      if (!_this3.value) {
-        _this3.fetchFromTitle();
-      }
-    }, 100);
-  };
+      iterate(contentId);
+      nodes.reverse();
+      return nodes;
+    }
+  }]);
 
   return UrlEditor;
 }(HashBrown.Views.Editors.FieldEditors.FieldEditor);
@@ -11940,17 +12858,35 @@ namespace('Views.Navigation').add(__webpack_require__(275)).add(__webpack_requir
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var NavbarMain =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(NavbarMain, _Crisp$View);
+  _inherits(NavbarMain, _Crisp$View);
 
   function NavbarMain(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, NavbarMain);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(NavbarMain).call(this, params));
     _this.template = __webpack_require__(276);
     _this.tabPanes = [];
     HashBrown.Views.Navigation.ContentPane.init();
@@ -11973,474 +12909,503 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = NavbarMain.prototype;
+  _createClass(NavbarMain, [{
+    key: "onChangeFilter",
+    value: function onChangeFilter($pane, pane, search) {
+      search = search.toLowerCase();
+      $pane.find('.navbar-main__pane__item').each(function (i, item) {
+        var label = item.querySelector('.navbar-main__pane__item__label').innerText.toLowerCase();
+        item.classList.toggle('filter-not-matched', label.indexOf(search) < 0);
+      });
+    }
+    /**
+     * Event: Change sorting
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} sortingMethod
+     */
 
-  _proto.onChangeFilter = function onChangeFilter($pane, pane, search) {
-    search = search.toLowerCase();
-    $pane.find('.navbar-main__pane__item').each(function (i, item) {
-      var label = item.querySelector('.navbar-main__pane__item__label').innerText.toLowerCase();
-      item.classList.toggle('filter-not-matched', label.indexOf(search) < 0);
-    });
-  };
-  /**
-   * Event: Change sorting
-   *
-   * @param {HTMLElement} $pane
-   * @param {NavbarPane} pane
-   * @param {String} sortingMethod
-   */
+  }, {
+    key: "onChangeSorting",
+    value: function onChangeSorting($pane, pane, sortingMethod) {
+      this.applySorting($pane, pane, sortingMethod);
+    }
+    /**
+     * Event: Error was returned
+     */
 
+  }, {
+    key: "onError",
+    value: function onError(err) {
+      UI.errorModal(err);
+    }
+    /**
+     * Event: Click copy item id
+     */
 
-  _proto.onChangeSorting = function onChangeSorting($pane, pane, sortingMethod) {
-    this.applySorting($pane, pane, sortingMethod);
-  };
-  /**
-   * Event: Error was returned
-   */
+  }, {
+    key: "onClickCopyItemId",
+    value: function onClickCopyItemId() {
+      var id = $('.context-menu-target').data('id');
+      copyToClipboard(id);
+    }
+    /**
+     * Event: Click tab
+     */
 
+  }, {
+    key: "onClickTab",
+    value: function onClickTab(e) {
+      e.preventDefault();
+      location.hash = e.currentTarget.dataset.route;
+      $('.navbar-main__pane__item.active').toggleClass('active', false);
+      $('.page--environment__space--nav').toggleClass('expanded', true);
+    }
+    /**
+     * Event: Toggle children
+     */
 
-  _proto.onError = function onError(err) {
-    UI.errorModal(err);
-  };
-  /**
-   * Event: Click copy item id
-   */
+  }, {
+    key: "onClickToggleChildren",
+    value: function onClickToggleChildren(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.parentElement.parentElement.classList.toggle('open');
+    }
+    /**
+     * Toggles the tab buttons
+     *
+     * @param {Boolean} isActive
+     */
 
+  }, {
+    key: "toggleTabButtons",
+    value: function toggleTabButtons(isActive) {
+      this.$element.toggleClass('hide-tabs', !isActive);
+    }
+    /**
+     * Shows a tab
+     *
+     * @param {String} tabName
+     */
 
-  _proto.onClickCopyItemId = function onClickCopyItemId() {
-    var id = $('.context-menu-target').data('id');
-    copyToClipboard(id);
-  };
-  /**
-   * Event: Click tab
-   */
+  }, {
+    key: "showTab",
+    value: function showTab(tabRoute) {
+      this.$element.find('.navbar-main__pane').each(function (i) {
+        $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+      });
+      this.$element.find('.navbar-main__tab').each(function (i) {
+        $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+      });
+    }
+    /**
+     * Saves the navbar state
+     */
 
+  }, {
+    key: "save",
+    value: function save() {
+      var _this2 = this;
 
-  _proto.onClickTab = function onClickTab(e) {
-    e.preventDefault();
-    location.hash = e.currentTarget.dataset.route;
-    $('.navbar-main__pane__item.active').toggleClass('active', false);
-    $('.page--environment__space--nav').toggleClass('expanded', true);
-  };
-  /**
-   * Event: Toggle children
-   */
+      this.state = {
+        buttons: {},
+        panes: {},
+        items: {},
+        scroll: $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop() || 0
+      };
+      this.$element.find('.navbar-main__tab').each(function (i, element) {
+        var key = element.dataset.route;
 
+        if (!key) {
+          return;
+        }
 
-  _proto.onClickToggleChildren = function onClickToggleChildren(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.currentTarget.parentElement.parentElement.classList.toggle('open');
-  };
-  /**
-   * Toggles the tab buttons
-   *
-   * @param {Boolean} isActive
-   */
+        _this2.state.buttons[key] = element.className;
+      });
+      this.$element.find('.navbar-main__pane').each(function (i, element) {
+        var key = element.dataset.route;
+        _this2.state.panes[key] = element.className;
+      });
+      this.$element.find('.navbar-main__pane__item').each(function (i, element) {
+        var key = element.dataset.routingPath || element.dataset.mediaFolder;
+        _this2.state.items[key] = element.className.replace('loading', '');
+      });
+    }
+    /**
+     * Restores the navbar state
+     */
 
+  }, {
+    key: "restore",
+    value: function restore() {
+      var _this3 = this;
 
-  _proto.toggleTabButtons = function toggleTabButtons(isActive) {
-    this.$element.toggleClass('hide-tabs', !isActive);
-  };
-  /**
-   * Shows a tab
-   *
-   * @param {String} tabName
-   */
-
-
-  _proto.showTab = function showTab(tabRoute) {
-    this.$element.find('.navbar-main__pane').each(function (i) {
-      $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-    });
-    this.$element.find('.navbar-main__tab').each(function (i) {
-      $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-    });
-  };
-  /**
-   * Saves the navbar state
-   */
-
-
-  _proto.save = function save() {
-    var _this2 = this;
-
-    this.state = {
-      buttons: {},
-      panes: {},
-      items: {},
-      scroll: $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop() || 0
-    };
-    this.$element.find('.navbar-main__tab').each(function (i, element) {
-      var key = element.dataset.route;
-
-      if (!key) {
+      if (!this.state) {
         return;
-      }
-
-      _this2.state.buttons[key] = element.className;
-    });
-    this.$element.find('.navbar-main__pane').each(function (i, element) {
-      var key = element.dataset.route;
-      _this2.state.panes[key] = element.className;
-    });
-    this.$element.find('.navbar-main__pane__item').each(function (i, element) {
-      var key = element.dataset.routingPath || element.dataset.mediaFolder;
-      _this2.state.items[key] = element.className.replace('loading', '');
-    });
-  };
-  /**
-   * Restores the navbar state
-   */
+      } // Restore tab buttons
 
 
-  _proto.restore = function restore() {
-    var _this3 = this;
+      this.$element.find('.navbar-main__tab').each(function (i, element) {
+        var key = element.dataset.route;
 
-    if (!this.state) {
-      return;
-    } // Restore tab buttons
+        if (key && _this3.state.buttons[key]) {
+          element.className = _this3.state.buttons[key];
+        }
+      }); // Restore pane containers
 
+      this.$element.find('.navbar-main__pane').each(function (i, element) {
+        var key = element.dataset.route;
 
-    this.$element.find('.navbar-main__tab').each(function (i, element) {
-      var key = element.dataset.route;
+        if (key && _this3.state.panes[key]) {
+          element.className = _this3.state.panes[key];
+        }
+      }); // Restore pane items
 
-      if (key && _this3.state.buttons[key]) {
-        element.className = _this3.state.buttons[key];
-      }
-    }); // Restore pane containers
+      this.$element.find('.navbar-main__pane__item').each(function (i, element) {
+        var key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-    this.$element.find('.navbar-main__pane').each(function (i, element) {
-      var key = element.dataset.route;
+        if (key && _this3.state.items[key]) {
+          element.className = _this3.state.items[key];
+        }
+      }); // Restore scroll position
 
-      if (key && _this3.state.panes[key]) {
-        element.className = _this3.state.panes[key];
-      }
-    }); // Restore pane items
-
-    this.$element.find('.navbar-main__pane__item').each(function (i, element) {
-      var key = element.dataset.routingPath || element.dataset.mediaFolder;
-
-      if (key && _this3.state.items[key]) {
-        element.className = _this3.state.items[key];
-      }
-    }); // Restore scroll position
-
-    $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this.state.scroll || 0);
-    this.state = null;
-  };
-  /**
-   * Reloads this view
-   */
-
-
-  _proto.reload = function reload() {
-    this.save();
-    this.fetch();
-    this.restore();
-  };
-  /**
-   * Static version of the reload method
-   */
-
-
-  NavbarMain.reload = function reload() {
-    Crisp.View.get('NavbarMain').reload();
-  };
-  /**
-   * Adds a tab pane
-   *
-   * @param {String} route
-   * @param {Object} settings
-   */
-
-
-  NavbarMain.addTabPane = function addTabPane(route, label, icon, settings) {
-    Crisp.View.get('NavbarMain').tabPanes.push({
-      label: label,
-      route: route,
-      icon: icon,
-      settings: settings
-    });
-  };
-  /**
-   * Gets the icons of an item
-   *
-   * @param {Object} item
-   * @param {Object} settings
-   *
-   * @returns {String} Icon name
-   */
-
-
-  _proto.getItemIcon = function getItemIcon(item, settings) {
-    // If this item has a Schema id, fetch the appropriate icon
-    if (item.schemaId) {
-      var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-
-      if (schema) {
-        return schema.icon;
-      }
+      $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this.state.scroll || 0);
+      this.state = null;
     }
+    /**
+     * Reloads this view
+     */
 
-    return item.icon || settings.icon || 'file';
-  };
-  /**
-   * Gets whether the item is a directory
-   *
-   * @param {Object} item
-   *
-   * @return {Boolean} Is directory
-   */
-
-
-  _proto.isItemDirectory = function isItemDirectory(item) {
-    if (item.properties && item.createDate) {
-      return true;
+  }, {
+    key: "reload",
+    value: function reload() {
+      this.save();
+      this.fetch();
+      this.restore();
     }
+    /**
+     * Static version of the reload method
+     */
 
-    return false;
-  };
-  /**
-   * Gets the routing path for an item
-   *
-   * @param {Object} item
-   * @param {Object} settings
-   *
-   * @returns {String} Routing path
-   */
+  }, {
+    key: "getItemIcon",
 
+    /**
+     * Gets the icons of an item
+     *
+     * @param {Object} item
+     * @param {Object} settings
+     *
+     * @returns {String} Icon name
+     */
+    value: function getItemIcon(item, settings) {
+      // If this item has a Schema id, fetch the appropriate icon
+      if (item.schemaId) {
+        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
-  _proto.getItemRoutingPath = function getItemRoutingPath(item, settings) {
-    if (typeof settings.itemPath === 'function') {
-      return settings.itemPath(item);
-    }
-
-    return item.shortPath || item.path || item.id || null;
-  };
-  /**
-   * Gets the name of an item
-   *
-   * @param {Object} item
-   *
-   * @returns {String} Item name
-   */
-
-
-  _proto.getItemName = function getItemName(item) {
-    var name = ''; // This is a Content node
-
-    if (item.properties && item.createDate) {
-      // Use title directly if available
-      if (typeof item.properties.title === 'string') {
-        name = item.properties.title;
-      } else if (item.properties.title && typeof item.properties.title === 'object') {
-        // Use the current language title
-        if (item.properties.title[window.language]) {
-          name = item.properties.title[window.language]; // If no title was found, search in other languages
-        } else {
-          name = 'Untitled';
-
-          for (var language in item.properties.title) {
-            var languageTitle = item.properties.title[language];
-
-            if (languageTitle) {
-              name += ' - (' + language + ': ' + languageTitle + ')';
-              break;
-            }
-          }
+        if (schema) {
+          return schema.icon;
         }
       }
 
-      if (!name || name === 'Untitled') {
-        name = 'Untitled (id: ' + item.id.substring(0, 6) + '...)';
-      }
-    } else if (item.title && typeof item.title === 'string') {
-      name = item.title;
-    } else if (item.name && typeof item.name === 'string') {
-      name = item.name;
-    } else {
-      name = item.id;
+      return item.icon || settings.icon || 'file';
     }
+    /**
+     * Gets whether the item is a directory
+     *
+     * @param {Object} item
+     *
+     * @return {Boolean} Is directory
+     */
 
-    return name;
-  };
-  /**
-   * Highlights an item
-   */
-
-
-  _proto.highlightItem = function highlightItem(tab, route) {
-    this.showTab(tab);
-    this.$element.find('.navbar-main__pane.active .navbar-main__pane__item').each(function (i, element) {
-      var $item = $(element);
-      var id = ($item.children('a').attr('data-id') || '').toLowerCase();
-      var routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
-      $item.toggleClass('active', false);
-
-      if (id == route.toLowerCase() || routingPath == route.toLowerCase()) {
-        $item.toggleClass('active', true);
-        $item.parents('.navbar-main__pane__item').toggleClass('open', true);
+  }, {
+    key: "isItemDirectory",
+    value: function isItemDirectory(item) {
+      if (item.properties && item.createDate) {
+        return true;
       }
-    });
-  };
-  /**
-   * Clears all content within the navbar
-   */
 
+      return false;
+    }
+    /**
+     * Gets the routing path for an item
+     *
+     * @param {Object} item
+     * @param {Object} settings
+     *
+     * @returns {String} Routing path
+     */
 
-  _proto.clear = function clear() {
-    this.$element.find('.navbar-main__tabs').empty();
-    this.$element.find('.navbar-main__panes').empty();
-  };
-  /**
-   * Applies item sorting
-   *
-   * @param {HTMLElement} $pane
-   * @param {Object} pane
-   * @param {String} sortingMethod
-   */
-
-
-  _proto.applySorting = function applySorting($pane, pane, sortingMethod) {
-    var performSort = function performSort(a, b) {
-      switch (sortingMethod) {
-        case 'alphaAsc':
-          return a.querySelector('.navbar-main__pane__item__label').innerText > b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
-
-        case 'alphaDesc':
-          return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
-
-        case 'dateAsc':
-          return new Date(a.dataset.updateDate) > new Date(b.dataset.updateDate) ? 1 : -1;
-
-        case 'dateDesc':
-          return new Date(a.dataset.updateDate) < new Date(b.dataset.updateDate) ? 1 : -1;
-
-        default:
-          return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
+  }, {
+    key: "getItemRoutingPath",
+    value: function getItemRoutingPath(item, settings) {
+      if (typeof settings.itemPath === 'function') {
+        return settings.itemPath(item);
       }
-    }; // Sort direct and nested children
 
+      return item.shortPath || item.path || item.id || null;
+    }
+    /**
+     * Gets the name of an item
+     *
+     * @param {Object} item
+     *
+     * @returns {String} Item name
+     */
 
-    $pane.find('.navbar-main__pane__items, .navbar-main__pane__item .navbar-main__pane__item__children').each(function (i, container) {
-      var $nestedChildren = $(container).find('>.navbar-main__pane__item');
-      $nestedChildren.sort(performSort);
-      $nestedChildren.appendTo($(container));
-    });
-  };
-  /**
-   * Applies item hierarchy
-   *
-   * @param {HTMLElement} $pane
-   * @param {Object} pane
-   * @param {Array} queue
-   */
+  }, {
+    key: "getItemName",
+    value: function getItemName(item) {
+      var name = ''; // This is a Content node
 
+      if (item.properties && item.createDate) {
+        // Use title directly if available
+        if (typeof item.properties.title === 'string') {
+          name = item.properties.title;
+        } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
+          // Use the current language title
+          if (item.properties.title[window.language]) {
+            name = item.properties.title[window.language]; // If no title was found, search in other languages
+          } else {
+            name = 'Untitled';
 
-  _proto.applyHierarchy = function applyHierarchy($pane, pane, queue) {
-    var _this4 = this;
+            for (var language in item.properties.title) {
+              var languageTitle = item.properties.title[language];
 
-    for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
+              if (languageTitle) {
+                name += ' - (' + language + ': ' + languageTitle + ')';
+                break;
+              }
+            }
+          }
+        }
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
+        if (!name || name === 'Untitled') {
+          name = 'Untitled (id: ' + item.id.substring(0, 6) + '...)';
+        }
+      } else if (item.title && typeof item.title === 'string') {
+        name = item.title;
+      } else if (item.name && typeof item.name === 'string') {
+        name = item.name;
       } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+        name = item.id;
       }
 
-      var queueItem = _ref;
+      return name;
+    }
+    /**
+     * Highlights an item
+     */
 
-      if (!queueItem.parentDirAttr) {
-        continue;
-      } // Find parent item
+  }, {
+    key: "highlightItem",
+    value: function highlightItem(tab, route) {
+      this.showTab(tab);
+      this.$element.find('.navbar-main__pane.active .navbar-main__pane__item').each(function (i, element) {
+        var $item = $(element);
+        var id = ($item.children('a').attr('data-id') || '').toLowerCase();
+        var routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
+        $item.toggleClass('active', false);
+
+        if (id == route.toLowerCase() || routingPath == route.toLowerCase()) {
+          $item.toggleClass('active', true);
+          $item.parents('.navbar-main__pane__item').toggleClass('open', true);
+        }
+      });
+    }
+    /**
+     * Clears all content within the navbar
+     */
+
+  }, {
+    key: "clear",
+    value: function clear() {
+      this.$element.find('.navbar-main__tabs').empty();
+      this.$element.find('.navbar-main__panes').empty();
+    }
+    /**
+     * Applies item sorting
+     *
+     * @param {HTMLElement} $pane
+     * @param {Object} pane
+     * @param {String} sortingMethod
+     */
+
+  }, {
+    key: "applySorting",
+    value: function applySorting($pane, pane, sortingMethod) {
+      var performSort = function performSort(a, b) {
+        switch (sortingMethod) {
+          case 'alphaAsc':
+            return a.querySelector('.navbar-main__pane__item__label').innerText > b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+
+          case 'alphaDesc':
+            return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+
+          case 'dateAsc':
+            return new Date(a.dataset.updateDate) > new Date(b.dataset.updateDate) ? 1 : -1;
+
+          case 'dateDesc':
+            return new Date(a.dataset.updateDate) < new Date(b.dataset.updateDate) ? 1 : -1;
+
+          default:
+            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
+        }
+      }; // Sort direct and nested children
 
 
-      var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-      var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-      var parentDirSelector = '.navbar-main__pane__item[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-      var $parentDir = $pane.find(parentDirSelector); // If parent element already exists, just append the queue item element
+      $pane.find('.navbar-main__pane__items, .navbar-main__pane__item .navbar-main__pane__item__children').each(function (i, container) {
+        var $nestedChildren = $(container).find('>.navbar-main__pane__item');
+        $nestedChildren.sort(performSort);
+        $nestedChildren.appendTo($(container));
+      });
+    }
+    /**
+     * Applies item hierarchy
+     *
+     * @param {HTMLElement} $pane
+     * @param {Object} pane
+     * @param {Array} queue
+     */
 
-      if (parentDirAttrKey && parentDirAttrValue && $parentDir.length > 0) {
-        $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element); // If not, create parent elements if specified
-      } else if (queueItem.createDir) {
-        var dirNames = parentDirAttrValue.split('/').filter(function (item) {
-          return item != '';
-        });
-        var finalDirName = '/'; // Create a folder for each directory name in the path
+  }, {
+    key: "applyHierarchy",
+    value: function applyHierarchy($pane, pane, queue) {
+      var _this4 = this;
 
-        for (var i in dirNames) {
-          var dirName = dirNames[i];
-          var prevFinalDirName = finalDirName;
-          finalDirName += dirName + '/'; // Look for an existing directory element
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-          var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]'); // Create it if not found
+      try {
+        for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var queueItem = _step.value;
 
-          if ($dir.length < 1) {
-            $dir = _.div({
-              class: 'navbar-main__pane__item',
-              'data-is-directory': true
-            }, _.a({
-              class: 'navbar-main__pane__item__content'
-            }, _.span({
-              class: 'navbar-main__pane__item__icon fa fa-folder'
-            }), _.span({
-              class: 'navbar-main__pane__item__label'
-            }, dirName), // Toggle button
-            _.button({
+          if (!queueItem.parentDirAttr) {
+            continue;
+          } // Find parent item
+
+
+          var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+          var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+          var parentDirSelector = '.navbar-main__pane__item[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+          var $parentDir = $pane.find(parentDirSelector); // If parent element already exists, just append the queue item element
+
+          if (parentDirAttrKey && parentDirAttrValue && $parentDir.length > 0) {
+            $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element); // If not, create parent elements if specified
+          } else if (queueItem.createDir) {
+            var dirNames = parentDirAttrValue.split('/').filter(function (item) {
+              return item != '';
+            });
+            var finalDirName = '/'; // Create a folder for each directory name in the path
+
+            for (var i in dirNames) {
+              var dirName = dirNames[i];
+              var prevFinalDirName = finalDirName;
+              finalDirName += dirName + '/'; // Look for an existing directory element
+
+              var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]'); // Create it if not found
+
+              if ($dir.length < 1) {
+                $dir = _.div({
+                  class: 'navbar-main__pane__item',
+                  'data-is-directory': true
+                }, _.a({
+                  class: 'navbar-main__pane__item__content'
+                }, _.span({
+                  class: 'navbar-main__pane__item__icon fa fa-folder'
+                }), _.span({
+                  class: 'navbar-main__pane__item__label'
+                }, dirName), // Toggle button
+                _.button({
+                  class: 'navbar-main__pane__item__toggle-children'
+                }).click(function (e) {
+                  _this4.onClickToggleChildren(e);
+                })), _.div({
+                  class: 'navbar-main__pane__item__children'
+                }));
+                $dir.attr(parentDirAttrKey, finalDirName); // Extra parent dir attributes
+
+                if (queueItem.parentDirExtraAttr) {
+                  for (var k in queueItem.parentDirExtraAttr) {
+                    var v = queueItem.parentDirExtraAttr[k];
+                    $dir.attr(k, v);
+                  }
+                } // Append to previous dir 
+
+
+                var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+
+                if ($prevDir.length > 0) {
+                  $prevDir.children('.navbar-main__pane__item__children').prepend($dir); // If no previous dir was found, append directly to pane
+                } else {
+                  $pane.children('.navbar-main__pane__items').prepend($dir);
+                } // Attach item context menu
+
+
+                if (pane.settings.dirContextMenu) {
+                  UI.context($dir[0], pane.settings.dirContextMenu);
+                }
+              } // Only append the queue item to the final parent element
+
+
+              if (i >= dirNames.length - 1) {
+                $parentDir = $dir;
+              }
+            }
+
+            $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
+          } // Add expand/collapse buttons
+
+
+          if ($parentDir.children('.navbar-main__pane__item__content').children('.navbar-main__pane__item__toggle-children').length < 1) {
+            $parentDir.children('.navbar-main__pane__item__content').append(_.button({
               class: 'navbar-main__pane__item__toggle-children'
             }).click(function (e) {
               _this4.onClickToggleChildren(e);
-            })), _.div({
-              class: 'navbar-main__pane__item__children'
             }));
-            $dir.attr(parentDirAttrKey, finalDirName); // Extra parent dir attributes
-
-            if (queueItem.parentDirExtraAttr) {
-              for (var k in queueItem.parentDirExtraAttr) {
-                var v = queueItem.parentDirExtraAttr[k];
-                $dir.attr(k, v);
-              }
-            } // Append to previous dir 
-
-
-            var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
-
-            if ($prevDir.length > 0) {
-              $prevDir.children('.navbar-main__pane__item__children').prepend($dir); // If no previous dir was found, append directly to pane
-            } else {
-              $pane.children('.navbar-main__pane__items').prepend($dir);
-            } // Attach item context menu
-
-
-            if (pane.settings.dirContextMenu) {
-              UI.context($dir[0], pane.settings.dirContextMenu);
-            }
-          } // Only append the queue item to the final parent element
-
-
-          if (i >= dirNames.length - 1) {
-            $parentDir = $dir;
           }
         }
-
-        $parentDir.children('.navbar-main__pane__item__children').append(queueItem.$element);
-      } // Add expand/collapse buttons
-
-
-      if ($parentDir.children('.navbar-main__pane__item__content').children('.navbar-main__pane__item__toggle-children').length < 1) {
-        $parentDir.children('.navbar-main__pane__item__content').append(_.button({
-          class: 'navbar-main__pane__item__toggle-children'
-        }).click(function (e) {
-          _this4.onClickToggleChildren(e);
-        }));
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
       }
     }
-  };
+  }], [{
+    key: "reload",
+    value: function reload() {
+      Crisp.View.get('NavbarMain').reload();
+    }
+    /**
+     * Adds a tab pane
+     *
+     * @param {String} route
+     * @param {Object} settings
+     */
+
+  }, {
+    key: "addTabPane",
+    value: function addTabPane(route, label, icon, settings) {
+      Crisp.View.get('NavbarMain').tabPanes.push({
+        label: label,
+        route: route,
+        icon: icon,
+        settings: settings
+      });
+    }
+  }]);
 
   return NavbarMain;
 }(Crisp.View);
@@ -12618,17 +13583,35 @@ module.exports = function () {
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MainMenu =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(MainMenu, _Crisp$View);
+  _inherits(MainMenu, _Crisp$View);
 
   function MainMenu(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, MainMenu);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MainMenu).call(this, params));
 
     _this.fetch();
 
@@ -12642,132 +13625,137 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = MainMenu.prototype;
+  _createClass(MainMenu, [{
+    key: "onChangeLanguage",
+    value: function onChangeLanguage(newLanguage) {
+      var _this2 = this;
 
-  _proto.onChangeLanguage = function onChangeLanguage(newLanguage) {
-    var _this2 = this;
+      localStorage.setItem('language', newLanguage);
+      window.language = newLanguage;
+      HashBrown.Helpers.RequestHelper.reloadResource('content').then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        var contentEditor = Crisp.View.get('ContentEditor');
 
-    localStorage.setItem('language', newLanguage);
-    window.language = newLanguage;
-    HashBrown.Helpers.RequestHelper.reloadResource('content').then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      var contentEditor = Crisp.View.get('ContentEditor');
+        if (contentEditor) {
+          contentEditor.model = null;
+          contentEditor.fetch();
+        }
 
-      if (contentEditor) {
-        contentEditor.model = null;
-        contentEditor.fetch();
-      }
-
-      _this2.fetch();
-    });
-  };
-  /**
-   * Event: Click question
-   *
-   * @param {String} topic
-   */
-
-
-  _proto.onClickQuestion = function onClickQuestion(topic) {
-    switch (topic) {
-      case 'content':
-        var modal = UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
-        break;
-
-      case 'media':
-        UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')]);
-        break;
-
-      case 'forms':
-        UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
-        break;
-
-      case 'connections':
-        UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('They can also be set up to provide statically hosted media.')]);
-        break;
-
-      case 'schemas':
-        UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
-        break;
+        _this2.fetch();
+      });
     }
-  };
-  /**
-   * Pre render
-   */
+    /**
+     * Event: Click question
+     *
+     * @param {String} topic
+     */
 
+  }, {
+    key: "onClickQuestion",
+    value: function onClickQuestion(topic) {
+      switch (topic) {
+        case 'content':
+          var modal = UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
+          break;
 
-  _proto.prerender = function prerender() {
-    this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
-  };
-  /**
-   * Post render
-   */
+        case 'media':
+          UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')]);
+          break;
 
+        case 'forms':
+          UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
+          break;
 
-  _proto.postrender = function postrender() {
-    this.languageDropdown.notify(window.language);
-  };
-  /**
-   * Renders this menu
-   */
+        case 'connections':
+          UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('They can also be set up to provide statically hosted media.')]);
+          break;
 
-
-  _proto.template = function template() {
-    var _this3 = this;
-
-    return _.div({
-      class: 'main-menu widget-group'
-    }, // Language picker
-    _.if(Array.isArray(this.languages) && this.languages.length > 1, this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
-      tooltip: 'Language',
-      icon: 'flag',
-      value: window.language,
-      options: this.languages,
-      onChange: function onChange(newValue) {
-        _this3.onChangeLanguage(newValue);
+        case 'schemas':
+          UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
+          break;
       }
-    })), // User dropdown
-    this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
-      tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
-      icon: 'user',
-      reverseKeys: true,
-      options: {
-        'User settings': function UserSettings() {
-          new HashBrown.Views.Editors.UserEditor({
-            hidePermissions: true,
-            model: HashBrown.Models.User.current
-          });
-        },
-        'Log out': function LogOut() {
-          HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout').then(function () {
-            location = '/';
-          });
+    }
+    /**
+     * Pre render
+     */
+
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
+    }
+    /**
+     * Post render
+     */
+
+  }, {
+    key: "postrender",
+    value: function postrender() {
+      this.languageDropdown.notify(window.language);
+    }
+    /**
+     * Renders this menu
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this3 = this;
+
+      return _.div({
+        class: 'main-menu widget-group'
+      }, // Language picker
+      _.if(Array.isArray(this.languages) && this.languages.length > 1, this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
+        tooltip: 'Language',
+        icon: 'flag',
+        value: window.language,
+        options: this.languages,
+        onChange: function onChange(newValue) {
+          _this3.onChangeLanguage(newValue);
         }
-      }
-    }), // Help
-    this.helpDropdown = new HashBrown.Views.Widgets.Dropdown({
-      tooltip: 'Get help',
-      icon: 'question-circle',
-      reverseKeys: true,
-      options: {
-        'Connections': function Connections() {
-          _this3.onClickQuestion('connections');
-        },
-        'Content': function Content() {
-          _this3.onClickQuestion('content');
-        },
-        'Forms': function Forms() {
-          _this3.onClickQuestion('forms');
-        },
-        'Media': function Media() {
-          _this3.onClickQuestion('media');
-        },
-        'Schemas': function Schemas() {
-          _this3.onClickQuestion('schemas');
+      })), // User dropdown
+      this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
+        tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
+        icon: 'user',
+        reverseKeys: true,
+        options: {
+          'User settings': function UserSettings() {
+            new HashBrown.Views.Editors.UserEditor({
+              hidePermissions: true,
+              model: HashBrown.Models.User.current
+            });
+          },
+          'Log out': function LogOut() {
+            HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout').then(function () {
+              location = '/';
+            });
+          }
         }
-      }
-    }));
-  };
+      }), // Help
+      this.helpDropdown = new HashBrown.Views.Widgets.Dropdown({
+        tooltip: 'Get help',
+        icon: 'question-circle',
+        reverseKeys: true,
+        options: {
+          'Connections': function Connections() {
+            _this3.onClickQuestion('connections');
+          },
+          'Content': function Content() {
+            _this3.onClickQuestion('content');
+          },
+          'Forms': function Forms() {
+            _this3.onClickQuestion('forms');
+          },
+          'Media': function Media() {
+            _this3.onClickQuestion('media');
+          },
+          'Schemas': function Schemas() {
+            _this3.onClickQuestion('schemas');
+          }
+        }
+      }));
+    }
+  }]);
 
   return MainMenu;
 }(Crisp.View);
@@ -12786,158 +13774,176 @@ module.exports = MainMenu;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var NavbarPane =
 /*#__PURE__*/
 function () {
-  function NavbarPane() {}
+  function NavbarPane() {
+    _classCallCheck(this, NavbarPane);
+  }
 
-  /**
-   * Init
-   */
-  NavbarPane.init = function init() {
-    HashBrown.Views.Navigation.NavbarMain.addTabButton('My pane', '/my-route', 'question');
-  };
-  /**
-   * Event: Click copy item id
-   */
+  _createClass(NavbarPane, null, [{
+    key: "init",
+
+    /**
+     * Init
+     */
+    value: function init() {
+      HashBrown.Views.Navigation.NavbarMain.addTabButton('My pane', '/my-route', 'question');
+    }
+    /**
+     * Event: Click copy item id
+     */
+
+  }, {
+    key: "onClickCopyItemId",
+    value: function onClickCopyItemId() {
+      var id = $('.context-menu-target').data('id');
+      copyToClipboard(id);
+    }
+    /**
+     * Event: Click open in new tab
+     */
+
+  }, {
+    key: "onClickOpenInNewTab",
+    value: function onClickOpenInNewTab() {
+      var href = $('.context-menu-target').attr('href');
+      window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
+    }
+    /**
+     * Event: Click refresh resource
+     *
+     * @param {String} resource
+     */
+
+  }, {
+    key: "onClickRefreshResource",
+    value: function onClickRefreshResource(resource) {
+      HashBrown.Helpers.RequestHelper.reloadResource(resource).then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      });
+    }
+    /**
+     * Event: Change directory
+     *
+     * @param {String} id
+     * @param {String} newParent
+     */
+
+  }, {
+    key: "onChangeDirectory",
+    value: function onChangeDirectory(id, newParent) {}
+    /**
+     * Event: Change sort index
+     *
+     * @param {String} id
+     * @param {Number} newIndex
+     * @param {String} newParent
+     */
+
+  }, {
+    key: "onChangeSortIndex",
+    value: function onChangeSortIndex(id, newIndex, newParent) {}
+    /**
+     * Event: Click move item
+     */
+
+  }, {
+    key: "onClickMoveItem",
+    value: function onClickMoveItem() {
+      var _this = this;
+
+      var id = $('.context-menu-target').data('id');
+      var navbar = Crisp.View.get('NavbarMain');
+      var $pane = navbar.$element.find('.navbar-main__pane.active');
+      $pane.find('.navbar-main__pane__item a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
+      $pane.toggleClass('select-dir', true); // Reset
+
+      function reset(newPath) {
+        $pane.find('.navbar-main__pane__item[data-id="' + id + '"]').toggleClass('moving-item', false);
+        $pane.toggleClass('select-dir', false);
+        $pane.find('.navbar-main__pane__move-button').off('click');
+        $pane.find('.navbar-main__pane__item__content').off('click');
+        $pane.find('.moving-item').toggleClass('moving-item', false);
+      } // Cancel by escape key
 
 
-  NavbarPane.onClickCopyItemId = function onClickCopyItemId() {
-    var id = $('.context-menu-target').data('id');
-    copyToClipboard(id);
-  };
-  /**
-   * Event: Click open in new tab
-   */
+      $(document).on('keyup', function (e) {
+        if (e.which == 27) {
+          reset();
+        }
+      }); // Click existing directory
 
+      $pane.find('.navbar-main__pane__item[data-is-directory="true"]:not(.moving-item)').each(function (i, element) {
+        $(element).children('.navbar-main__pane__item__content').on('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var newPath = $(element).attr('data-media-folder') || $(element).attr('data-content-id');
+          reset(newPath);
 
-  NavbarPane.onClickOpenInNewTab = function onClickOpenInNewTab() {
-    var href = $('.context-menu-target').attr('href');
-    window.open(location.protocol + '//' + location.host + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + href);
-  };
-  /**
-   * Event: Click refresh resource
-   *
-   * @param {String} resource
-   */
+          _this.onChangeDirectory(id, newPath);
+        });
+      }); // Click below item
 
-
-  NavbarPane.onClickRefreshResource = function onClickRefreshResource(resource) {
-    HashBrown.Helpers.RequestHelper.reloadResource(resource).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    });
-  };
-  /**
-   * Event: Change directory
-   *
-   * @param {String} id
-   * @param {String} newParent
-   */
-
-
-  NavbarPane.onChangeDirectory = function onChangeDirectory(id, newParent) {};
-  /**
-   * Event: Change sort index
-   *
-   * @param {String} id
-   * @param {Number} newIndex
-   * @param {String} newParent
-   */
-
-
-  NavbarPane.onChangeSortIndex = function onChangeSortIndex(id, newIndex, newParent) {};
-  /**
-   * Event: Click move item
-   */
-
-
-  NavbarPane.onClickMoveItem = function onClickMoveItem() {
-    var _this = this;
-
-    var id = $('.context-menu-target').data('id');
-    var navbar = Crisp.View.get('NavbarMain');
-    var $pane = navbar.$element.find('.navbar-main__pane.active');
-    $pane.find('.navbar-main__pane__item a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
-    $pane.toggleClass('select-dir', true); // Reset
-
-    function reset(newPath) {
-      $pane.find('.navbar-main__pane__item[data-id="' + id + '"]').toggleClass('moving-item', false);
-      $pane.toggleClass('select-dir', false);
-      $pane.find('.navbar-main__pane__move-button').off('click');
-      $pane.find('.navbar-main__pane__item__content').off('click');
-      $pane.find('.moving-item').toggleClass('moving-item', false);
-    } // Cancel by escape key
-
-
-    $(document).on('keyup', function (e) {
-      if (e.which == 27) {
-        reset();
-      }
-    }); // Click existing directory
-
-    $pane.find('.navbar-main__pane__item[data-is-directory="true"]:not(.moving-item)').each(function (i, element) {
-      $(element).children('.navbar-main__pane__item__content').on('click', function (e) {
+      $pane.find('.navbar-main__pane__item__insert-below').click(function (e) {
         e.preventDefault();
-        e.stopPropagation();
-        var newPath = $(element).attr('data-media-folder') || $(element).attr('data-content-id');
+        e.stopPropagation(); // Create new sort index based on the container we clicked below
+
+        var $container = $(e.target).parent();
+        var containerIndex = parseInt($container.data('sort') || 0);
+        var newIndex = containerIndex + 1; // Reset the move state
+
+        reset(); // Fetch the parent id as well, in case that changed
+
+        var $parentItem = $container.parents('.navbar-main__pane__item');
+        var newPath = $parentItem.length > 0 ? $parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id') : null; // Trigger sort change event
+
+        _this.onChangeSortIndex(id, newIndex, newPath);
+      }); // Click "move to root" button
+
+      $pane.find('.navbar-main__pane__move-button--root-dir').on('click', function (e) {
+        var newPath = '/';
         reset(newPath);
 
         _this.onChangeDirectory(id, newPath);
       });
-    }); // Click below item
+      $pane.find('.navbar-main__pane__move-button--new-dir').toggle(this.canCreateDirectory == true);
 
-    $pane.find('.navbar-main__pane__item__insert-below').click(function (e) {
-      e.preventDefault();
-      e.stopPropagation(); // Create new sort index based on the container we clicked below
+      if (this.canCreateDirectory) {
+        $pane.find('.navbar-main__pane__move-button--new-dir').on('click', function () {
+          HashBrown.Helpers.MediaHelper.getMediaById(id).then(function (item) {
+            var messageModal = new HashBrown.Views.Modals.Modal({
+              title: 'Move item',
+              body: _.div({
+                class: 'widget-group'
+              }, _.input({
+                class: 'widget widget--input text',
+                value: item.folder || item.parentId || '',
+                placeholder: '/path/to/media/'
+              }), _.div({
+                class: 'widget widget--label'
+              }, item.name || item.title || item.id)),
+              actions: [{
+                label: 'OK',
+                onClick: function onClick() {
+                  var newPath = messageModal.$element.find('.widget--input').val();
+                  reset(newPath);
 
-      var $container = $(e.target).parent();
-      var containerIndex = parseInt($container.data('sort') || 0);
-      var newIndex = containerIndex + 1; // Reset the move state
-
-      reset(); // Fetch the parent id as well, in case that changed
-
-      var $parentItem = $container.parents('.navbar-main__pane__item');
-      var newPath = $parentItem.length > 0 ? $parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id') : null; // Trigger sort change event
-
-      _this.onChangeSortIndex(id, newIndex, newPath);
-    }); // Click "move to root" button
-
-    $pane.find('.navbar-main__pane__move-button--root-dir').on('click', function (e) {
-      var newPath = '/';
-      reset(newPath);
-
-      _this.onChangeDirectory(id, newPath);
-    });
-    $pane.find('.navbar-main__pane__move-button--new-dir').toggle(this.canCreateDirectory == true);
-
-    if (this.canCreateDirectory) {
-      $pane.find('.navbar-main__pane__move-button--new-dir').on('click', function () {
-        HashBrown.Helpers.MediaHelper.getMediaById(id).then(function (item) {
-          var messageModal = new HashBrown.Views.Modals.Modal({
-            title: 'Move item',
-            body: _.div({
-              class: 'widget-group'
-            }, _.input({
-              class: 'widget widget--input text',
-              value: item.folder || item.parentId || '',
-              placeholder: '/path/to/media/'
-            }), _.div({
-              class: 'widget widget--label'
-            }, item.name || item.title || item.id)),
-            actions: [{
-              label: 'OK',
-              onClick: function onClick() {
-                var newPath = messageModal.$element.find('.widget--input').val();
-                reset(newPath);
-
-                _this.onChangeDirectory(item.id, newPath);
-              }
-            }]
-          });
-        }).catch(UI.errorModal);
-      });
+                  _this.onChangeDirectory(item.id, newPath);
+                }
+              }]
+            });
+          }).catch(UI.errorModal);
+        });
+      }
     }
-  };
+  }]);
 
   return NavbarPane;
 }();
@@ -12956,183 +13962,209 @@ module.exports = NavbarPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ConnectionPane =
 /*#__PURE__*/
 function (_HashBrown$Views$Navi) {
-  _inheritsLoose(ConnectionPane, _HashBrown$Views$Navi);
+  _inherits(ConnectionPane, _HashBrown$Views$Navi);
 
   function ConnectionPane() {
-    return _HashBrown$Views$Navi.apply(this, arguments) || this;
+    _classCallCheck(this, ConnectionPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ConnectionPane).apply(this, arguments));
   }
 
-  /**
-   * Event: Click new connection
-   */
-  ConnectionPane.onClickNewConnection = function onClickNewConnection() {
-    var newConnection;
-    HashBrown.Helpers.RequestHelper.request('post', 'connections/new').then(function (connection) {
-      newConnection = connection;
-      return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/connections/' + newConnection.id;
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: On click remove connection
-   */
+  _createClass(ConnectionPane, null, [{
+    key: "onClickNewConnection",
 
-
-  ConnectionPane.onClickRemoveConnection = function onClickRemoveConnection() {
-    var _this = this;
-
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var name = $element.data('name');
-    new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', function () {
-      HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id).then(function () {
-        debug.log('Removed connection with alias "' + id + '"', _this);
+    /**
+     * Event: Click new connection
+     */
+    value: function onClickNewConnection() {
+      var newConnection;
+      HashBrown.Helpers.RequestHelper.request('post', 'connections/new').then(function (connection) {
+        newConnection = connection;
         return HashBrown.Helpers.RequestHelper.reloadResource('connections');
       }).then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the ConnectionEditor view if it was displaying the deleted connection
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/connections/' + newConnection.id;
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: On click remove connection
+     */
 
-        if (location.hash == '#/connections/' + id) {
-          location.hash = '/connections/';
+  }, {
+    key: "onClickRemoveConnection",
+    value: function onClickRemoveConnection() {
+      var _this = this;
+
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var name = $element.data('name');
+      new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', function () {
+        HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id).then(function () {
+          debug.log('Removed connection with alias "' + id + '"', _this);
+          return HashBrown.Helpers.RequestHelper.reloadResource('connections');
+        }).then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the ConnectionEditor view if it was displaying the deleted connection
+
+          if (location.hash == '#/connections/' + id) {
+            location.hash = '/connections/';
+          }
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Event: Click pull connection
+     */
+
+  }, {
+    key: "onClickPullConnection",
+    value: function onClickPullConnection() {
+      var connectionEditor = Crisp.View.get('ConnectionEditor');
+      var pullId = $('.context-menu-target').data('id'); // API call to pull the Connection by id
+
+      HashBrown.Helpers.RequestHelper.request('post', 'connections/pull/' + pullId, {}) // Upon success, reload all Connection models    
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('connections');
+      }) // Reload the UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/connections/' + pullId;
+        var editor = Crisp.View.get('ConnectionEditor');
+
+        if (editor && editor.model.id == pullId) {
+          editor.model = null;
+          editor.fetch();
         }
       }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click pull connection
-   */
-
-
-  ConnectionPane.onClickPullConnection = function onClickPullConnection() {
-    var connectionEditor = Crisp.View.get('ConnectionEditor');
-    var pullId = $('.context-menu-target').data('id'); // API call to pull the Connection by id
-
-    HashBrown.Helpers.RequestHelper.request('post', 'connections/pull/' + pullId, {}) // Upon success, reload all Connection models    
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-    }) // Reload the UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/connections/' + pullId;
-      var editor = Crisp.View.get('ConnectionEditor');
-
-      if (editor && editor.model.id == pullId) {
-        editor.model = null;
-        editor.fetch();
-      }
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click push connection
-   */
-
-
-  ConnectionPane.onClickPushConnection = function onClickPushConnection() {
-    var $element = $('.context-menu-target');
-    var pushId = $element.data('id');
-    $element.parent().addClass('loading'); // API call to push the Connection by id
-
-    HashBrown.Helpers.RequestHelper.request('post', 'connections/push/' + pushId) // Upon success, reload all Connection models
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-    }) // Reload the UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Init
-   */
-
-
-  ConnectionPane.init = function init() {
-    var _this2 = this;
-
-    if (!currentUserHasScope('connections')) {
-      return;
     }
+    /**
+     * Event: Click push connection
+     */
 
-    HashBrown.Views.Navigation.NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
-      icon: 'exchange',
-      getItems: function getItems() {
-        return resources.connections;
-      },
-      // Item context menu
-      getItemContextMenu: function getItemContextMenu(item) {
-        var menu = {};
-        var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-        menu['This connection'] = '---';
+  }, {
+    key: "onClickPushConnection",
+    value: function onClickPushConnection() {
+      var $element = $('.context-menu-target');
+      var pushId = $element.data('id');
+      $element.parent().addClass('loading'); // API call to push the Connection by id
 
-        menu['Open in new tab'] = function () {
-          _this2.onClickOpenInNewTab();
-        };
+      HashBrown.Helpers.RequestHelper.request('post', 'connections/push/' + pushId) // Upon success, reload all Connection models
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('connections');
+      }) // Reload the UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Init
+     */
 
-        if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-          menu['Remove'] = function () {
-            _this2.onClickRemoveConnection();
+  }, {
+    key: "init",
+    value: function init() {
+      var _this2 = this;
+
+      if (!currentUserHasScope('connections')) {
+        return;
+      }
+
+      HashBrown.Views.Navigation.NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+        icon: 'exchange',
+        getItems: function getItems() {
+          return resources.connections;
+        },
+        // Item context menu
+        getItemContextMenu: function getItemContextMenu(item) {
+          var menu = {};
+          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+          menu['This connection'] = '---';
+
+          menu['Open in new tab'] = function () {
+            _this2.onClickOpenInNewTab();
           };
-        }
 
-        menu['Copy id'] = function () {
-          _this2.onClickCopyItemId();
-        };
-
-        if (item.isLocked && !item.sync.isRemote) {
-          isSyncEnabled = false;
-        }
-
-        if (isSyncEnabled) {
-          menu['Sync'] = '---';
-
-          if (!item.sync.isRemote) {
-            menu['Push to remote'] = function () {
-              _this2.onClickPushConnection();
-            };
-          }
-
-          if (item.sync.hasRemote) {
-            menu['Remove local copy'] = function () {
+          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = function () {
               _this2.onClickRemoveConnection();
             };
           }
 
-          if (item.sync.isRemote) {
-            menu['Pull from remote'] = function () {
-              _this2.onClickPullConnection();
-            };
+          menu['Copy id'] = function () {
+            _this2.onClickCopyItemId();
+          };
+
+          if (item.isLocked && !item.sync.isRemote) {
+            isSyncEnabled = false;
+          }
+
+          if (isSyncEnabled) {
+            menu['Sync'] = '---';
+
+            if (!item.sync.isRemote) {
+              menu['Push to remote'] = function () {
+                _this2.onClickPushConnection();
+              };
+            }
+
+            if (item.sync.hasRemote) {
+              menu['Remove local copy'] = function () {
+                _this2.onClickRemoveConnection();
+              };
+            }
+
+            if (item.sync.isRemote) {
+              menu['Pull from remote'] = function () {
+                _this2.onClickPullConnection();
+              };
+            }
+          }
+
+          menu['General'] = '---';
+
+          menu['New connection'] = function () {
+            _this2.onClickNewConnection();
+          };
+
+          menu['Refresh'] = function () {
+            _this2.onClickRefreshResource('connections');
+          };
+
+          return menu;
+        },
+        // General context menu
+        paneContextMenu: {
+          'Connections': '---',
+          'New connection': function NewConnection() {
+            _this2.onClickNewConnection();
+          },
+          'Refresh': function Refresh() {
+            _this2.onClickRefreshResource('connections');
           }
         }
-
-        menu['General'] = '---';
-
-        menu['New connection'] = function () {
-          _this2.onClickNewConnection();
-        };
-
-        menu['Refresh'] = function () {
-          _this2.onClickRefreshResource('connections');
-        };
-
-        return menu;
-      },
-      // General context menu
-      paneContextMenu: {
-        'Connections': '---',
-        'New connection': function NewConnection() {
-          _this2.onClickNewConnection();
-        },
-        'Refresh': function Refresh() {
-          _this2.onClickRefreshResource('connections');
-        }
-      }
-    });
-  };
+      });
+    }
+  }]);
 
   return ConnectionPane;
 }(HashBrown.Views.Navigation.NavbarPane);
@@ -13151,429 +14183,460 @@ module.exports = ConnectionPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ContentPane =
 /*#__PURE__*/
 function (_HashBrown$Views$Navi) {
-  _inheritsLoose(ContentPane, _HashBrown$Views$Navi);
+  _inherits(ContentPane, _HashBrown$Views$Navi);
 
   function ContentPane() {
-    return _HashBrown$Views$Navi.apply(this, arguments) || this;
+    _classCallCheck(this, ContentPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContentPane).apply(this, arguments));
   }
 
-  /**
-   * Event: Change parent
-   */
-  ContentPane.onChangeDirectory = function onChangeDirectory(id, parentId) {
-    if (parentId == '/') {
-      parentId = '';
-    } // Get the Content model
+  _createClass(ContentPane, null, [{
+    key: "onChangeDirectory",
+
+    /**
+     * Event: Change parent
+     */
+    value: function onChangeDirectory(id, parentId) {
+      if (parentId == '/') {
+        parentId = '';
+      } // Get the Content model
 
 
-    HashBrown.Helpers.ContentHelper.getContentById(id) // API call to apply changes to Content parent
-    .then(function (content) {
-      content.parentId = parentId;
-      return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
-    }) // Reload all Content models
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('content');
-    }) // Reload UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Change sort index
-   */
-
-
-  ContentPane.onChangeSortIndex = function onChangeSortIndex(id, newIndex, parentId) {
-    if (parentId == '/') {
-      parentId = '';
-    } // Get the Content model
-
-
-    HashBrown.Helpers.ContentHelper.getContentById(id) // API call to apply changes to Content parent
-    .then(function (content) {
-      content.sort = newIndex;
-      content.parentId = parentId;
-      return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
-    }) // Reload all Content models
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('content');
-    }) // Reload UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click pull content
-   */
-
-
-  ContentPane.onClickPullContent = function onClickPullContent() {
-    var contentEditor = Crisp.View.get('ContentEditor');
-    var pullId = $('.context-menu-target').data('id'); // API call to pull the Content by id
-
-    HashBrown.Helpers.RequestHelper.request('post', 'content/pull/' + pullId, {}) // Upon success, reload all Content models    
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('content');
-    }) // Reload the UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/content/' + pullId;
-      var editor = Crisp.View.get('ContentEditor');
-
-      if (editor && editor.model && editor.model.id == pullId) {
-        editor.model = null;
-        editor.fetch();
-      }
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click push content
-   */
-
-
-  ContentPane.onClickPushContent = function onClickPushContent() {
-    var $element = $('.context-menu-target');
-    var pushId = $element.data('id');
-    $element.parent().addClass('loading'); // API call to push the Content by id
-
-    HashBrown.Helpers.RequestHelper.request('post', 'content/push/' + pushId) // Upon success, reload all Content models
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('content');
-    }) // Reload the UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click new content
-   *
-   * @param {String} parentId
-   */
-
-
-  ContentPane.onClickNewContent = function onClickNewContent(parentId, asSibling) {
-    // Try to get a parent Schema if it exists
-    return function getParentSchema() {
-      if (parentId) {
-        return HashBrown.Helpers.ContentHelper.getContentById(parentId).then(function (parentContent) {
-          return HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
-        });
-      } else {
-        return Promise.resolve();
-      }
-    }() // Parent Schema logic resolved, move on
-    .then(function (parentSchema) {
-      var allowedSchemas = parentSchema ? parentSchema.allowedChildSchemas : null; // If allowed child Schemas were found, but none were provided, don't create the Content node
-
-      if (allowedSchemas && allowedSchemas.length < 1) {
-        return Promise.reject(new Error('No child content schemas are allowed under this parent')); // Some child Schemas were provided, or no restrictions were defined
-      } else {
-        var schemaId;
-        var sortIndex = HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId); // Instatiate a new Content Schema reference editor
-
-        var schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
-          config: {
-            allowedSchemas: allowedSchemas,
-            parentSchema: parentSchema
-          }
-        });
-        schemaReference.on('change', function (newValue) {
-          schemaId = newValue;
-        });
-        schemaReference.pickFirstSchema();
-        schemaReference.$element.addClass('widget'); // Render the confirmation modal
-
-        UI.confirmModal('OK', 'Create new content', _.div({
-          class: 'widget-group'
-        }, _.label({
-          class: 'widget widget--label'
-        }, 'Schema'), schemaReference.$element), // Event fired when clicking "OK"
-        function () {
-          if (!schemaId) {
-            return false;
-          }
-
-          var apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
-          var newContent; // Append parent Content id to request URL
-
-          if (parentId) {
-            apiUrl += '&parent=' + parentId;
-          } // API call to create new Content node
-
-
-          HashBrown.Helpers.RequestHelper.request('post', apiUrl) // Upon success, reload resource and UI elements    
-          .then(function (result) {
-            newContent = result;
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-          }).then(function () {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-            location.hash = '/content/' + newContent.id;
-          }).catch(UI.errorModal);
-        });
-      }
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Render Content publishing modal
-   *
-   * @param {Content} content
-   */
-
-
-  ContentPane.renderPublishingModal = function renderPublishingModal(content) {
-    var modal = new HashBrown.Views.Modals.PublishingSettingsModal({
-      model: content
-    });
-    modal.on('change', function (newValue) {
-      if (newValue.governedBy) {
-        return;
-      } // Commit publishing settings to Content model
-
-
-      content.settings.publishing = newValue; // API call to save the Content model
-
-      HashBrown.Helpers.RequestHelper.request('post', 'content/' + content.id, content) // Upon success, reload the UI    
+      HashBrown.Helpers.ContentHelper.getContentById(id) // API call to apply changes to Content parent
+      .then(function (content) {
+        content.parentId = parentId;
+        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
+      }) // Reload all Content models
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('content');
+      }) // Reload UI
       .then(function () {
         HashBrown.Views.Navigation.NavbarMain.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Change sort index
+     */
 
-        if (Crisp.Router.params.id == content.id) {
-          var contentEditor = Crisp.View.get('ContentEditor');
-          contentEditor.model = content;
-          return contentEditor.fetch();
+  }, {
+    key: "onChangeSortIndex",
+    value: function onChangeSortIndex(id, newIndex, parentId) {
+      if (parentId == '/') {
+        parentId = '';
+      } // Get the Content model
+
+
+      HashBrown.Helpers.ContentHelper.getContentById(id) // API call to apply changes to Content parent
+      .then(function (content) {
+        content.sort = newIndex;
+        content.parentId = parentId;
+        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
+      }) // Reload all Content models
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('content');
+      }) // Reload UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click pull content
+     */
+
+  }, {
+    key: "onClickPullContent",
+    value: function onClickPullContent() {
+      var contentEditor = Crisp.View.get('ContentEditor');
+      var pullId = $('.context-menu-target').data('id'); // API call to pull the Content by id
+
+      HashBrown.Helpers.RequestHelper.request('post', 'content/pull/' + pullId, {}) // Upon success, reload all Content models    
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('content');
+      }) // Reload the UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/content/' + pullId;
+        var editor = Crisp.View.get('ContentEditor');
+
+        if (editor && editor.model && editor.model.id == pullId) {
+          editor.model = null;
+          editor.fetch();
+        }
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click push content
+     */
+
+  }, {
+    key: "onClickPushContent",
+    value: function onClickPushContent() {
+      var $element = $('.context-menu-target');
+      var pushId = $element.data('id');
+      $element.parent().addClass('loading'); // API call to push the Content by id
+
+      HashBrown.Helpers.RequestHelper.request('post', 'content/push/' + pushId) // Upon success, reload all Content models
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('content');
+      }) // Reload the UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click new content
+     *
+     * @param {String} parentId
+     */
+
+  }, {
+    key: "onClickNewContent",
+    value: function onClickNewContent(parentId, asSibling) {
+      // Try to get a parent Schema if it exists
+      return function getParentSchema() {
+        if (parentId) {
+          return HashBrown.Helpers.ContentHelper.getContentById(parentId).then(function (parentContent) {
+            return HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
+          });
         } else {
           return Promise.resolve();
         }
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click Content settings
-   */
+      }() // Parent Schema logic resolved, move on
+      .then(function (parentSchema) {
+        var allowedSchemas = parentSchema ? parentSchema.allowedChildSchemas : null; // If allowed child Schemas were found, but none were provided, don't create the Content node
 
+        if (allowedSchemas && allowedSchemas.length < 1) {
+          return Promise.reject(new Error('No child content schemas are allowed under this parent')); // Some child Schemas were provided, or no restrictions were defined
+        } else {
+          var schemaId;
+          var sortIndex = HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId); // Instatiate a new Content Schema reference editor
 
-  ContentPane.onClickContentPublishing = function onClickContentPublishing() {
-    var id = $('.context-menu-target').data('id'); // Get Content model
-
-    var content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
-    this.renderPublishingModal(content);
-  };
-  /**
-   * Event: Click remove content
-   *
-   * @param {Boolean} shouldUnpublish
-   */
-
-
-  ContentPane.onClickRemoveContent = function onClickRemoveContent(shouldUnpublish) {
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var name = $element.data('name');
-    HashBrown.Helpers.ContentHelper.getContentById(id).then(function (content) {
-      content.settingsSanityCheck('publishing');
-
-      function unpublishConnection() {
-        return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content).then(function () {
-          return onSuccess();
-        });
-      }
-
-      function onSuccess() {
-        return HashBrown.Helpers.RequestHelper.reloadResource('content').then(function () {
-          HashBrown.Views.Navigation.NavbarMain.reload();
-          var contentEditor = Crisp.View.get('ContentEditor'); // Change the ContentEditor view if it was displaying the deleted content
-
-          if (contentEditor && contentEditor.model && contentEditor.model.id == id) {
-            // The Content was actually deleted
-            if (shouldUnpublish) {
-              location.hash = '/content/'; // The Content still has a synced remote
-            } else {
-              contentEditor.model = null;
-              contentEditor.fetch();
+          var schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
+            config: {
+              allowedSchemas: allowedSchemas,
+              parentSchema: parentSchema
             }
+          });
+          schemaReference.on('change', function (newValue) {
+            schemaId = newValue;
+          });
+          schemaReference.pickFirstSchema();
+          schemaReference.$element.addClass('widget'); // Render the confirmation modal
+
+          UI.confirmModal('OK', 'Create new content', _.div({
+            class: 'widget-group'
+          }, _.label({
+            class: 'widget widget--label'
+          }, 'Schema'), schemaReference.$element), // Event fired when clicking "OK"
+          function () {
+            if (!schemaId) {
+              return false;
+            }
+
+            var apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
+            var newContent; // Append parent Content id to request URL
+
+            if (parentId) {
+              apiUrl += '&parent=' + parentId;
+            } // API call to create new Content node
+
+
+            HashBrown.Helpers.RequestHelper.request('post', apiUrl) // Upon success, reload resource and UI elements    
+            .then(function (result) {
+              newContent = result;
+              return HashBrown.Helpers.RequestHelper.reloadResource('content');
+            }).then(function () {
+              HashBrown.Views.Navigation.NavbarMain.reload();
+              location.hash = '/content/' + newContent.id;
+            }).catch(UI.errorModal);
+          });
+        }
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Render Content publishing modal
+     *
+     * @param {Content} content
+     */
+
+  }, {
+    key: "renderPublishingModal",
+    value: function renderPublishingModal(content) {
+      var modal = new HashBrown.Views.Modals.PublishingSettingsModal({
+        model: content
+      });
+      modal.on('change', function (newValue) {
+        if (newValue.governedBy) {
+          return;
+        } // Commit publishing settings to Content model
+
+
+        content.settings.publishing = newValue; // API call to save the Content model
+
+        HashBrown.Helpers.RequestHelper.request('post', 'content/' + content.id, content) // Upon success, reload the UI    
+        .then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload();
+
+          if (Crisp.Router.params.id == content.id) {
+            var contentEditor = Crisp.View.get('ContentEditor');
+            contentEditor.model = content;
+            return contentEditor.fetch();
+          } else {
+            return Promise.resolve();
           }
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Event: Click Content settings
+     */
 
-          $element.parent().toggleClass('loading', false);
-          return Promise.resolve();
+  }, {
+    key: "onClickContentPublishing",
+    value: function onClickContentPublishing() {
+      var id = $('.context-menu-target').data('id'); // Get Content model
+
+      var content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+      this.renderPublishingModal(content);
+    }
+    /**
+     * Event: Click remove content
+     *
+     * @param {Boolean} shouldUnpublish
+     */
+
+  }, {
+    key: "onClickRemoveContent",
+    value: function onClickRemoveContent(shouldUnpublish) {
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var name = $element.data('name');
+      HashBrown.Helpers.ContentHelper.getContentById(id).then(function (content) {
+        content.settingsSanityCheck('publishing');
+
+        function unpublishConnection() {
+          return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content).then(function () {
+            return onSuccess();
+          });
+        }
+
+        function onSuccess() {
+          return HashBrown.Helpers.RequestHelper.reloadResource('content').then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+            var contentEditor = Crisp.View.get('ContentEditor'); // Change the ContentEditor view if it was displaying the deleted content
+
+            if (contentEditor && contentEditor.model && contentEditor.model.id == id) {
+              // The Content was actually deleted
+              if (shouldUnpublish) {
+                location.hash = '/content/'; // The Content still has a synced remote
+              } else {
+                contentEditor.model = null;
+                contentEditor.fetch();
+              }
+            }
+
+            $element.parent().toggleClass('loading', false);
+            return Promise.resolve();
+          });
+        }
+
+        var shouldDeleteChildren = false;
+        UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({
+          class: 'widget-group'
+        }, _.label({
+          class: 'widget widget--label'
+        }, 'Remove child Content too'), new HashBrown.Views.Widgets.Input({
+          value: shouldDeleteChildren,
+          type: 'checkbox',
+          onChange: function onChange(newValue) {
+            shouldDeleteChildren = newValue;
+          }
+        }).$element), function () {
+          $element.parent().toggleClass('loading', true);
+          HashBrown.Helpers.RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren).then(function () {
+            if (shouldUnpublish && content.getSettings('publishing').connectionId) {
+              return unpublishConnection();
+            } else {
+              return onSuccess();
+            }
+          }).catch(function (e) {
+            $element.parent().toggleClass('loading', false);
+            UI.errorModal(e);
+          });
         });
-      }
+      });
+    }
+    /**
+     * Event: Click rename
+     */
 
-      var shouldDeleteChildren = false;
-      UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({
+  }, {
+    key: "onClickRename",
+    value: function onClickRename() {
+      var id = $('.context-menu-target').data('id');
+      var content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+      UI.messageModal('Rename "' + content.getPropertyValue('title', window.language) + '"', _.div({
         class: 'widget-group'
       }, _.label({
         class: 'widget widget--label'
-      }, 'Remove child Content too'), new HashBrown.Views.Widgets.Input({
-        value: shouldDeleteChildren,
-        type: 'checkbox',
+      }, 'New name'), new HashBrown.Views.Widgets.Input({
+        value: content.getPropertyValue('title', window.language),
         onChange: function onChange(newValue) {
-          shouldDeleteChildren = newValue;
+          content.setPropertyValue('title', newValue, window.language);
         }
-      }).$element), function () {
-        $element.parent().toggleClass('loading', true);
-        HashBrown.Helpers.RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren).then(function () {
-          if (shouldUnpublish && content.getSettings('publishing').connectionId) {
-            return unpublishConnection();
-          } else {
-            return onSuccess();
+      })), function () {
+        HashBrown.Helpers.ContentHelper.setContentById(id, content).then(function () {
+          return HashBrown.Helpers.RequestHelper.reloadResource('content');
+        }).then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload(); // Update ContentEditor if needed
+
+          var contentEditor = Crisp.View.get('ContentEditor');
+
+          if (!contentEditor || contentEditor.model.id !== id) {
+            return;
           }
-        }).catch(function (e) {
-          $element.parent().toggleClass('loading', false);
-          UI.errorModal(e);
-        });
+
+          contentEditor.model = null;
+          contentEditor.fetch();
+        }).catch(UI.errorModal);
       });
-    });
-  };
-  /**
-   * Event: Click rename
-   */
+    }
+    /**
+     * Init
+     */
 
+  }, {
+    key: "init",
+    value: function init() {
+      var _this = this;
 
-  ContentPane.onClickRename = function onClickRename() {
-    var id = $('.context-menu-target').data('id');
-    var content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
-    UI.messageModal('Rename "' + content.getPropertyValue('title', window.language) + '"', _.div({
-      class: 'widget-group'
-    }, _.label({
-      class: 'widget widget--label'
-    }, 'New name'), new HashBrown.Views.Widgets.Input({
-      value: content.getPropertyValue('title', window.language),
-      onChange: function onChange(newValue) {
-        content.setPropertyValue('title', newValue, window.language);
-      }
-    })), function () {
-      HashBrown.Helpers.ContentHelper.setContentById(id, content).then(function () {
-        return HashBrown.Helpers.RequestHelper.reloadResource('content');
-      }).then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload(); // Update ContentEditor if needed
-
-        var contentEditor = Crisp.View.get('ContentEditor');
-
-        if (!contentEditor || contentEditor.model.id !== id) {
-          return;
-        }
-
-        contentEditor.model = null;
-        contentEditor.fetch();
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Init
-   */
-
-
-  ContentPane.init = function init() {
-    var _this = this;
-
-    HashBrown.Views.Navigation.NavbarMain.addTabPane('/content/', 'Content', 'file', {
-      getItems: function getItems() {
-        return resources.content;
-      },
-      // Item context menu
-      getItemContextMenu: function getItemContextMenu(item) {
-        var menu = {};
-        var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-        menu['This content'] = '---';
-
-        menu['Open in new tab'] = function () {
-          _this.onClickOpenInNewTab();
-        };
-
-        menu['Rename'] = function () {
-          _this.onClickRename();
-        };
-
-        menu['New child content'] = function () {
-          _this.onClickNewContent($('.context-menu-target').data('id'));
-        };
-
-        if (!item.sync.isRemote && !item.isLocked) {
-          menu['Move'] = function () {
-            _this.onClickMoveItem();
-          };
-        }
-
-        if (!item.sync.hasRemote && !item.isLocked) {
-          menu['Remove'] = function () {
-            _this.onClickRemoveContent(true);
-          };
-        }
-
-        menu['Copy id'] = function () {
-          _this.onClickCopyItemId();
-        };
-
-        if (!item.sync.isRemote && !item.isLocked) {
-          menu['Settings'] = '---';
-
-          menu['Publishing'] = function () {
-            _this.onClickContentPublishing();
-          };
-        }
-
-        if (item.isLocked && !item.sync.isRemote) {
-          isSyncEnabled = false;
-        }
-
-        if (isSyncEnabled) {
-          menu['Sync'] = '---';
-
-          if (!item.sync.isRemote) {
-            menu['Push to remote'] = function () {
-              _this.onClickPushContent();
-            };
-          }
-
-          if (item.sync.hasRemote) {
-            menu['Remove local copy'] = function () {
-              _this.onClickRemoveContent();
-            };
-          }
-
-          if (item.sync.isRemote) {
-            menu['Pull from remote'] = function () {
-              _this.onClickPullContent();
-            };
-          }
-        }
-
-        menu['General'] = '---';
-
-        menu['New content'] = function () {
-          _this.onClickNewContent();
-        };
-
-        menu['Refresh'] = function () {
-          _this.onClickRefreshResource('content');
-        };
-
-        return menu;
-      },
-      // Set general context menu items
-      paneContextMenu: {
-        'Content': '---',
-        'New content': function NewContent() {
-          _this.onClickNewContent();
+      HashBrown.Views.Navigation.NavbarMain.addTabPane('/content/', 'Content', 'file', {
+        getItems: function getItems() {
+          return resources.content;
         },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('content');
+        // Item context menu
+        getItemContextMenu: function getItemContextMenu(item) {
+          var menu = {};
+          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+          menu['This content'] = '---';
+
+          menu['Open in new tab'] = function () {
+            _this.onClickOpenInNewTab();
+          };
+
+          menu['Rename'] = function () {
+            _this.onClickRename();
+          };
+
+          menu['New child content'] = function () {
+            _this.onClickNewContent($('.context-menu-target').data('id'));
+          };
+
+          if (!item.sync.isRemote && !item.isLocked) {
+            menu['Move'] = function () {
+              _this.onClickMoveItem();
+            };
+          }
+
+          if (!item.sync.hasRemote && !item.isLocked) {
+            menu['Remove'] = function () {
+              _this.onClickRemoveContent(true);
+            };
+          }
+
+          menu['Copy id'] = function () {
+            _this.onClickCopyItemId();
+          };
+
+          if (!item.sync.isRemote && !item.isLocked) {
+            menu['Settings'] = '---';
+
+            menu['Publishing'] = function () {
+              _this.onClickContentPublishing();
+            };
+          }
+
+          if (item.isLocked && !item.sync.isRemote) {
+            isSyncEnabled = false;
+          }
+
+          if (isSyncEnabled) {
+            menu['Sync'] = '---';
+
+            if (!item.sync.isRemote) {
+              menu['Push to remote'] = function () {
+                _this.onClickPushContent();
+              };
+            }
+
+            if (item.sync.hasRemote) {
+              menu['Remove local copy'] = function () {
+                _this.onClickRemoveContent();
+              };
+            }
+
+            if (item.sync.isRemote) {
+              menu['Pull from remote'] = function () {
+                _this.onClickPullContent();
+              };
+            }
+          }
+
+          menu['General'] = '---';
+
+          menu['New content'] = function () {
+            _this.onClickNewContent();
+          };
+
+          menu['Refresh'] = function () {
+            _this.onClickRefreshResource('content');
+          };
+
+          return menu;
+        },
+        // Set general context menu items
+        paneContextMenu: {
+          'Content': '---',
+          'New content': function NewContent() {
+            _this.onClickNewContent();
+          },
+          'Refresh': function Refresh() {
+            _this.onClickRefreshResource('content');
+          }
+        },
+        // Hierarchy logic
+        hierarchy: function hierarchy(item, queueItem) {
+          // Set id data attributes
+          queueItem.$element.attr('data-content-id', item.id);
+          queueItem.parentDirAttr = {
+            'data-content-id': item.parentId
+          };
         }
-      },
-      // Hierarchy logic
-      hierarchy: function hierarchy(item, queueItem) {
-        // Set id data attributes
-        queueItem.$element.attr('data-content-id', item.id);
-        queueItem.parentDirAttr = {
-          'data-content-id': item.parentId
-        };
-      }
-    });
-  };
+      });
+    }
+  }]);
 
   return ContentPane;
 }(HashBrown.Views.Navigation.NavbarPane);
@@ -13592,183 +14655,209 @@ module.exports = ContentPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var FormsPane =
 /*#__PURE__*/
 function (_HashBrown$Views$Navi) {
-  _inheritsLoose(FormsPane, _HashBrown$Views$Navi);
+  _inherits(FormsPane, _HashBrown$Views$Navi);
 
   function FormsPane() {
-    return _HashBrown$Views$Navi.apply(this, arguments) || this;
+    _classCallCheck(this, FormsPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(FormsPane).apply(this, arguments));
   }
 
-  /**
-   * Event: Click create new form
-   */
-  FormsPane.onClickNewForm = function onClickNewForm() {
-    HashBrown.Helpers.RequestHelper.request('post', 'forms/new').then(function (newFormId) {
-      return HashBrown.Helpers.RequestHelper.reloadResource('forms').then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload();
-        location.hash = '/forms/' + newFormId;
+  _createClass(FormsPane, null, [{
+    key: "onClickNewForm",
+
+    /**
+     * Event: Click create new form
+     */
+    value: function onClickNewForm() {
+      HashBrown.Helpers.RequestHelper.request('post', 'forms/new').then(function (newFormId) {
+        return HashBrown.Helpers.RequestHelper.reloadResource('forms').then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload();
+          location.hash = '/forms/' + newFormId;
+        });
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: On click remove
+     */
+
+  }, {
+    key: "onClickRemoveForm",
+    value: function onClickRemoveForm() {
+      var view = this;
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var form = resources.forms.filter(function (form) {
+        return form.id == id;
+      })[0];
+      UI.confirmModal('delete', 'Delete form', 'Are you sure you want to delete the form "' + form.title + '"?', function () {
+        HashBrown.Helpers.RequestHelper.request('delete', 'forms/' + form.id).then(function () {
+          debug.log('Removed Form with id "' + form.id + '"', view);
+          return HashBrown.Helpers.RequestHelper.reloadResource('forms');
+        }).then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the FormEditor view
+
+          location.hash = '/forms/';
+        }).catch(UI.errorModal);
       });
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: On click remove
-   */
+    }
+    /**
+     * Event: Click pull Form
+     */
 
+  }, {
+    key: "onClickPullForm",
+    value: function onClickPullForm() {
+      var pullId = $('.context-menu-target').data('id'); // API call to pull the Form by id
 
-  FormsPane.onClickRemoveForm = function onClickRemoveForm() {
-    var view = this;
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var form = resources.forms.filter(function (form) {
-      return form.id == id;
-    })[0];
-    UI.confirmModal('delete', 'Delete form', 'Are you sure you want to delete the form "' + form.title + '"?', function () {
-      HashBrown.Helpers.RequestHelper.request('delete', 'forms/' + form.id).then(function () {
-        debug.log('Removed Form with id "' + form.id + '"', view);
+      HashBrown.Helpers.RequestHelper.request('post', 'forms/pull/' + pullId, {}) // Upon success, reload all Form models    
+      .then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('forms');
+      }) // Reload the UI
+      .then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/forms/' + pullId;
+        var editor = Crisp.View.get('FormEditor');
+
+        if (editor && editor.model.id == pullId) {
+          editor.model = null;
+          editor.fetch();
+        }
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click push Form
+     */
+
+  }, {
+    key: "onClickPushForm",
+    value: function onClickPushForm() {
+      var $element = $('.context-menu-target');
+      var pushId = $element.data('id');
+      $element.parent().addClass('loading');
+      HashBrown.Helpers.RequestHelper.request('post', 'forms/push/' + pushId).then(function () {
         return HashBrown.Helpers.RequestHelper.reloadResource('forms');
       }).then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the FormEditor view
-
-        location.hash = '/forms/';
+        HashBrown.Views.Navigation.NavbarMain.reload();
       }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click pull Form
-   */
+    }
+    /**
+     * Init
+     */
 
+  }, {
+    key: "init",
+    value: function init() {
+      var _this = this;
 
-  FormsPane.onClickPullForm = function onClickPullForm() {
-    var pullId = $('.context-menu-target').data('id'); // API call to pull the Form by id
+      HashBrown.Views.Navigation.NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+        icon: 'wpforms',
+        getItems: function getItems() {
+          return resources.forms;
+        },
+        // Hierarchy logic
+        hierarchy: function hierarchy(item, queueItem) {
+          queueItem.$element.attr('data-form-id', item.id);
 
-    HashBrown.Helpers.RequestHelper.request('post', 'forms/pull/' + pullId, {}) // Upon success, reload all Form models    
-    .then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-    }) // Reload the UI
-    .then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/forms/' + pullId;
-      var editor = Crisp.View.get('FormEditor');
-
-      if (editor && editor.model.id == pullId) {
-        editor.model = null;
-        editor.fetch();
-      }
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click push Form
-   */
-
-
-  FormsPane.onClickPushForm = function onClickPushForm() {
-    var $element = $('.context-menu-target');
-    var pushId = $element.data('id');
-    $element.parent().addClass('loading');
-    HashBrown.Helpers.RequestHelper.request('post', 'forms/push/' + pushId).then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Init
-   */
-
-
-  FormsPane.init = function init() {
-    var _this = this;
-
-    HashBrown.Views.Navigation.NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
-      icon: 'wpforms',
-      getItems: function getItems() {
-        return resources.forms;
-      },
-      // Hierarchy logic
-      hierarchy: function hierarchy(item, queueItem) {
-        queueItem.$element.attr('data-form-id', item.id);
-
-        if (item.folder) {
-          queueItem.createDir = true;
-          queueItem.parentDirAttr = {
-            'data-form-folder': item.folder
-          };
-        }
-      },
-      // Item context menu
-      getItemContextMenu: function getItemContextMenu(item) {
-        var menu = {};
-        var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-        menu['This form'] = '---';
-
-        menu['Open in new tab'] = function () {
-          _this.onClickOpenInNewTab();
-        };
-
-        if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-          menu['Remove'] = function () {
-            _this.onClickRemoveForm();
-          };
-        }
-
-        menu['Copy id'] = function () {
-          _this.onClickCopyItemId();
-        };
-
-        if (item.isLocked && !item.sync.isRemote) {
-          isSyncEnabled = false;
-        }
-
-        if (isSyncEnabled) {
-          menu['Sync'] = '---';
-
-          if (!item.sync.isRemote) {
-            menu['Push to remote'] = function () {
-              _this.onClickPushForm();
+          if (item.folder) {
+            queueItem.createDir = true;
+            queueItem.parentDirAttr = {
+              'data-form-folder': item.folder
             };
           }
+        },
+        // Item context menu
+        getItemContextMenu: function getItemContextMenu(item) {
+          var menu = {};
+          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+          menu['This form'] = '---';
 
-          if (item.sync.hasRemote) {
-            menu['Remove local copy'] = function () {
+          menu['Open in new tab'] = function () {
+            _this.onClickOpenInNewTab();
+          };
+
+          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = function () {
               _this.onClickRemoveForm();
             };
           }
 
-          if (item.sync.isRemote) {
-            menu['Pull from remote'] = function () {
-              _this.onClickPullForm();
-            };
+          menu['Copy id'] = function () {
+            _this.onClickCopyItemId();
+          };
+
+          if (item.isLocked && !item.sync.isRemote) {
+            isSyncEnabled = false;
+          }
+
+          if (isSyncEnabled) {
+            menu['Sync'] = '---';
+
+            if (!item.sync.isRemote) {
+              menu['Push to remote'] = function () {
+                _this.onClickPushForm();
+              };
+            }
+
+            if (item.sync.hasRemote) {
+              menu['Remove local copy'] = function () {
+                _this.onClickRemoveForm();
+              };
+            }
+
+            if (item.sync.isRemote) {
+              menu['Pull from remote'] = function () {
+                _this.onClickPullForm();
+              };
+            }
+          }
+
+          menu['General'] = '---';
+
+          menu['New form'] = function () {
+            _this.onClickNewForm();
+          };
+
+          menu['Refresh'] = function () {
+            _this.onClickRefreshResource('forms');
+          };
+
+          return menu;
+        },
+        // General context menu
+        paneContextMenu: {
+          'Forms': '---',
+          'New form': function NewForm() {
+            _this.onClickNewForm();
+          },
+          'Refresh': function Refresh() {
+            _this.onClickRefreshResource('forms');
           }
         }
-
-        menu['General'] = '---';
-
-        menu['New form'] = function () {
-          _this.onClickNewForm();
-        };
-
-        menu['Refresh'] = function () {
-          _this.onClickRefreshResource('forms');
-        };
-
-        return menu;
-      },
-      // General context menu
-      paneContextMenu: {
-        'Forms': '---',
-        'New form': function NewForm() {
-          _this.onClickNewForm();
-        },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('forms');
-        }
-      }
-    });
-  };
+      });
+    }
+  }]);
 
   return FormsPane;
 }(HashBrown.Views.Navigation.NavbarPane);
@@ -13787,204 +14876,231 @@ module.exports = FormsPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MediaPane =
 /*#__PURE__*/
 function (_HashBrown$Views$Navi) {
-  _inheritsLoose(MediaPane, _HashBrown$Views$Navi);
+  _inherits(MediaPane, _HashBrown$Views$Navi);
 
   function MediaPane() {
-    return _HashBrown$Views$Navi.apply(this, arguments) || this;
+    _classCallCheck(this, MediaPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(MediaPane).apply(this, arguments));
   }
 
-  /**
-   * Event: On change folder path
-   *
-   * @param {String} newFolder
-   */
-  MediaPane.onChangeDirectory = function onChangeDirectory(id, newFolder) {
-    HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, newFolder ? {
-      id: id,
-      folder: newFolder
-    } : null).then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('media');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/media/' + id;
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click rename media
-   */
+  _createClass(MediaPane, null, [{
+    key: "onChangeDirectory",
 
-
-  MediaPane.onClickRenameMedia = function onClickRenameMedia() {
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var name = $element.data('name');
-    var modal = UI.messageModal('Rename ' + name, new HashBrown.Views.Widgets.Input({
-      type: 'text',
-      value: name,
-      onChange: function onChange(newValue) {
-        name = newValue;
-      }
-    }), function () {
-      HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name).then(function () {
+    /**
+     * Event: On change folder path
+     *
+     * @param {String} newFolder
+     */
+    value: function onChangeDirectory(id, newFolder) {
+      HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, newFolder ? {
+        id: id,
+        folder: newFolder
+      } : null).then(function () {
         return HashBrown.Helpers.RequestHelper.reloadResource('media');
       }).then(function () {
         HashBrown.Views.Navigation.NavbarMain.reload();
-        var mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
-
-        if (mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
-          mediaViewer.model = null;
-          mediaViewer.fetch();
-        }
+        location.hash = '/media/' + id;
       }).catch(UI.errorModal);
-    });
-    modal.$element.find('input').focus();
-  };
-  /**
-   * Event: Click remove media
-   */
+    }
+    /**
+     * Event: Click rename media
+     */
 
-
-  MediaPane.onClickRemoveMedia = function onClickRemoveMedia() {
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var name = $element.data('name');
-    UI.confirmModal('delete', 'Delete media', 'Are you sure you want to delete the media object "' + name + '"?', function () {
-      $element.parent().toggleClass('loading', true);
-      HashBrown.Helpers.RequestHelper.request('delete', 'media/' + id).then(function () {
-        return HashBrown.Helpers.RequestHelper.reloadResource('media');
-      }).then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the MediaViever view if it was displaying the deleted object
-
-        if (location.hash == '#/media/' + id) {
-          location.hash = '/media/';
+  }, {
+    key: "onClickRenameMedia",
+    value: function onClickRenameMedia() {
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var name = $element.data('name');
+      var modal = UI.messageModal('Rename ' + name, new HashBrown.Views.Widgets.Input({
+        type: 'text',
+        value: name,
+        onChange: function onChange(newValue) {
+          name = newValue;
         }
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click replace media
-   */
-
-
-  MediaPane.onClickReplaceMedia = function onClickReplaceMedia() {
-    var id = $('.context-menu-target').data('id');
-    this.onClickUploadMedia(id);
-  };
-  /**
-   * Event: Click upload media
-   */
-
-
-  MediaPane.onClickUploadMedia = function onClickUploadMedia(replaceId) {
-    var folder = $('.context-menu-target').data('media-folder') || '/';
-    new HashBrown.Views.Modals.MediaUploader({
-      onSuccess: function onSuccess(ids) {
-        // We got one id back
-        if (typeof ids === 'string') {
-          location.hash = '/media/' + ids; // We got several ids back
-        } else if (Array.isArray(ids)) {
-          location.hash = '/media/' + ids[0];
-        } // Refresh on replace
-
-
-        if (replaceId) {
+      }), function () {
+        HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name).then(function () {
+          return HashBrown.Helpers.RequestHelper.reloadResource('media');
+        }).then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload();
           var mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
-          if (mediaViewer) {
+          if (mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
             mediaViewer.model = null;
             mediaViewer.fetch();
           }
-        }
-      },
-      replaceId: replaceId,
-      folder: folder
-    });
-  };
-  /**
-   * Init
-   */
+        }).catch(UI.errorModal);
+      });
+      modal.$element.find('input').focus();
+    }
+    /**
+     * Event: Click remove media
+     */
+
+  }, {
+    key: "onClickRemoveMedia",
+    value: function onClickRemoveMedia() {
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var name = $element.data('name');
+      UI.confirmModal('delete', 'Delete media', 'Are you sure you want to delete the media object "' + name + '"?', function () {
+        $element.parent().toggleClass('loading', true);
+        HashBrown.Helpers.RequestHelper.request('delete', 'media/' + id).then(function () {
+          return HashBrown.Helpers.RequestHelper.reloadResource('media');
+        }).then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the MediaViever view if it was displaying the deleted object
+
+          if (location.hash == '#/media/' + id) {
+            location.hash = '/media/';
+          }
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Event: Click replace media
+     */
+
+  }, {
+    key: "onClickReplaceMedia",
+    value: function onClickReplaceMedia() {
+      var id = $('.context-menu-target').data('id');
+      this.onClickUploadMedia(id);
+    }
+    /**
+     * Event: Click upload media
+     */
+
+  }, {
+    key: "onClickUploadMedia",
+    value: function onClickUploadMedia(replaceId) {
+      var folder = $('.context-menu-target').data('media-folder') || '/';
+      new HashBrown.Views.Modals.MediaUploader({
+        onSuccess: function onSuccess(ids) {
+          // We got one id back
+          if (typeof ids === 'string') {
+            location.hash = '/media/' + ids; // We got several ids back
+          } else if (Array.isArray(ids)) {
+            location.hash = '/media/' + ids[0];
+          } // Refresh on replace
 
 
-  MediaPane.init = function init() {
-    var _this = this;
+          if (replaceId) {
+            var mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
-    HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
-      getItems: function getItems() {
-        return resources.media;
-      },
-      // Hierarchy logic
-      hierarchy: function hierarchy(item, queueItem) {
-        var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-        queueItem.$element.attr('data-media-id', item.id);
-        queueItem.$element.attr('data-remote', true);
+            if (mediaViewer) {
+              mediaViewer.model = null;
+              mediaViewer.fetch();
+            }
+          }
+        },
+        replaceId: replaceId,
+        folder: folder
+      });
+    }
+    /**
+     * Init
+     */
 
-        if (item.folder) {
-          queueItem.createDir = true;
-          queueItem.parentDirAttr = {
-            'data-media-folder': item.folder
-          };
-          queueItem.parentDirExtraAttr = {
-            'data-remote': isSyncEnabled
-          };
+  }, {
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
+        getItems: function getItems() {
+          return resources.media;
+        },
+        // Hierarchy logic
+        hierarchy: function hierarchy(item, queueItem) {
+          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+          queueItem.$element.attr('data-media-id', item.id);
+          queueItem.$element.attr('data-remote', true);
+
+          if (item.folder) {
+            queueItem.createDir = true;
+            queueItem.parentDirAttr = {
+              'data-media-folder': item.folder
+            };
+            queueItem.parentDirExtraAttr = {
+              'data-remote': isSyncEnabled
+            };
+          }
+        },
+        // Item context menu
+        itemContextMenu: {
+          'This media': '---',
+          'Open in new tab': function OpenInNewTab() {
+            _this.onClickOpenInNewTab();
+          },
+          'Move': function Move() {
+            _this.onClickMoveItem();
+          },
+          'Rename': function Rename() {
+            _this.onClickRenameMedia();
+          },
+          'Remove': function Remove() {
+            _this.onClickRemoveMedia();
+          },
+          'Replace': function Replace() {
+            _this.onClickReplaceMedia();
+          },
+          'Copy id': function CopyId() {
+            _this.onClickCopyItemId();
+          },
+          'General': '---',
+          'Upload new media': function UploadNewMedia() {
+            _this.onClickUploadMedia();
+          },
+          'Refresh': function Refresh() {
+            _this.onClickRefreshResource('media');
+          }
+        },
+        // Dir context menu
+        dirContextMenu: {
+          'Directory': '---',
+          'Upload new media': function UploadNewMedia() {
+            _this.onClickUploadMedia();
+          },
+          'General': '---',
+          'Refresh': function Refresh() {
+            _this.onClickRefreshResource('media');
+          }
+        },
+        // General context menu
+        paneContextMenu: {
+          'Media': '---',
+          'Upload new media': function UploadNewMedia() {
+            _this.onClickUploadMedia();
+          },
+          'Refresh': function Refresh() {
+            _this.onClickRefreshResource('media');
+          }
         }
-      },
-      // Item context menu
-      itemContextMenu: {
-        'This media': '---',
-        'Open in new tab': function OpenInNewTab() {
-          _this.onClickOpenInNewTab();
-        },
-        'Move': function Move() {
-          _this.onClickMoveItem();
-        },
-        'Rename': function Rename() {
-          _this.onClickRenameMedia();
-        },
-        'Remove': function Remove() {
-          _this.onClickRemoveMedia();
-        },
-        'Replace': function Replace() {
-          _this.onClickReplaceMedia();
-        },
-        'Copy id': function CopyId() {
-          _this.onClickCopyItemId();
-        },
-        'General': '---',
-        'Upload new media': function UploadNewMedia() {
-          _this.onClickUploadMedia();
-        },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('media');
-        }
-      },
-      // Dir context menu
-      dirContextMenu: {
-        'Directory': '---',
-        'Upload new media': function UploadNewMedia() {
-          _this.onClickUploadMedia();
-        },
-        'General': '---',
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('media');
-        }
-      },
-      // General context menu
-      paneContextMenu: {
-        'Media': '---',
-        'Upload new media': function UploadNewMedia() {
-          _this.onClickUploadMedia();
-        },
-        'Refresh': function Refresh() {
-          _this.onClickRefreshResource('media');
-        }
-      }
-    });
-  };
+      });
+    }
+  }]);
 
   return MediaPane;
 }(HashBrown.Views.Navigation.NavbarPane); // Settings
@@ -14005,192 +15121,218 @@ module.exports = MediaPane;
  * @memberof HashBrown.Client.Views.Navigation
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var SchemaPane =
 /*#__PURE__*/
 function (_HashBrown$Views$Navi) {
-  _inheritsLoose(SchemaPane, _HashBrown$Views$Navi);
+  _inherits(SchemaPane, _HashBrown$Views$Navi);
 
   function SchemaPane() {
-    return _HashBrown$Views$Navi.apply(this, arguments) || this;
+    _classCallCheck(this, SchemaPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SchemaPane).apply(this, arguments));
   }
 
-  /**
-   * Event: Click remove schema
-   */
-  SchemaPane.onClickRemoveSchema = function onClickRemoveSchema() {
-    var _this = this;
+  _createClass(SchemaPane, null, [{
+    key: "onClickRemoveSchema",
 
-    var $element = $('.context-menu-target');
-    var id = $element.data('id');
-    var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
+    /**
+     * Event: Click remove schema
+     */
+    value: function onClickRemoveSchema() {
+      var _this = this;
 
-    if (!schema.isLocked) {
-      UI.confirmModal('delete', 'Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', function () {
-        HashBrown.Helpers.RequestHelper.request('delete', 'schemas/' + id).then(function () {
-          debug.log('Removed schema with id "' + id + '"', _this);
-          return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-        }).then(function () {
-          HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the SchemaEditor view if it was displaying the deleted content
+      var $element = $('.context-menu-target');
+      var id = $element.data('id');
+      var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
 
-          if (location.hash == '#/schemas/' + id) {
-            location.hash = '/schemas/';
-          }
-        }).catch(UI.errorModal);
-      });
-    } else {
-      UI.messageModal('Delete schema', 'The schema "' + schema.name + '" is locked and cannot be removed');
-    }
-  };
-  /**
-   * Event: Click new Schema
-   */
+      if (!schema.isLocked) {
+        UI.confirmModal('delete', 'Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', function () {
+          HashBrown.Helpers.RequestHelper.request('delete', 'schemas/' + id).then(function () {
+            debug.log('Removed schema with id "' + id + '"', _this);
+            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
+          }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload(); // Cancel the SchemaEditor view if it was displaying the deleted content
 
-
-  SchemaPane.onClickNewSchema = function onClickNewSchema() {
-    var parentId = $('.context-menu-target').data('id');
-    var parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentId);
-    HashBrown.Helpers.RequestHelper.request('post', 'schemas/new', parentSchema).then(function (newSchema) {
-      return HashBrown.Helpers.RequestHelper.reloadResource('schemas').then(function () {
-        HashBrown.Views.Navigation.NavbarMain.reload();
-        location.hash = '/schemas/' + newSchema.id;
-      });
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click pull Schema
-   */
-
-
-  SchemaPane.onClickPullSchema = function onClickPullSchema() {
-    var schemaEditor = Crisp.View.get('SchemaEditor');
-    var pullId = $('.context-menu-target').data('id');
-    HashBrown.Helpers.RequestHelper.request('post', 'schemas/pull/' + pullId, {}).then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-      location.hash = '/schemas/' + pullId;
-      var editor = Crisp.View.get('SchemaEditor');
-
-      if (editor && editor.model.id == pullId) {
-        editor.model = null;
-        editor.fetch();
+            if (location.hash == '#/schemas/' + id) {
+              location.hash = '/schemas/';
+            }
+          }).catch(UI.errorModal);
+        });
+      } else {
+        UI.messageModal('Delete schema', 'The schema "' + schema.name + '" is locked and cannot be removed');
       }
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click push Schema
-   */
-
-
-  SchemaPane.onClickPushSchema = function onClickPushSchema() {
-    var $element = $('.context-menu-target');
-    var pushId = $element.data('id');
-    $element.parent().addClass('loading');
-    HashBrown.Helpers.RequestHelper.request('post', 'schemas/push/' + pushId).then(function () {
-      return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-    }).then(function () {
-      HashBrown.Views.Navigation.NavbarMain.reload();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Init
-   */
-
-
-  SchemaPane.init = function init() {
-    var _this2 = this;
-
-    if (!currentUserHasScope('schemas')) {
-      return;
     }
+    /**
+     * Event: Click new Schema
+     */
 
-    HashBrown.Views.Navigation.NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
-      getItems: function getItems() {
-        return resources.schemas;
-      },
-      // Item context menu
-      getItemContextMenu: function getItemContextMenu(item) {
-        var menu = {};
-        var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-        menu['This schema'] = '---';
+  }, {
+    key: "onClickNewSchema",
+    value: function onClickNewSchema() {
+      var parentId = $('.context-menu-target').data('id');
+      var parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentId);
+      HashBrown.Helpers.RequestHelper.request('post', 'schemas/new', parentSchema).then(function (newSchema) {
+        return HashBrown.Helpers.RequestHelper.reloadResource('schemas').then(function () {
+          HashBrown.Views.Navigation.NavbarMain.reload();
+          location.hash = '/schemas/' + newSchema.id;
+        });
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click pull Schema
+     */
 
-        menu['Open in new tab'] = function () {
-          _this2.onClickOpenInNewTab();
-        };
+  }, {
+    key: "onClickPullSchema",
+    value: function onClickPullSchema() {
+      var schemaEditor = Crisp.View.get('SchemaEditor');
+      var pullId = $('.context-menu-target').data('id');
+      HashBrown.Helpers.RequestHelper.request('post', 'schemas/pull/' + pullId, {}).then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
+      }).then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/schemas/' + pullId;
+        var editor = Crisp.View.get('SchemaEditor');
 
-        menu['New child schema'] = function () {
-          _this2.onClickNewSchema();
-        };
+        if (editor && editor.model.id == pullId) {
+          editor.model = null;
+          editor.fetch();
+        }
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click push Schema
+     */
 
-        if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-          menu['Remove'] = function () {
-            _this2.onClickRemoveSchema();
+  }, {
+    key: "onClickPushSchema",
+    value: function onClickPushSchema() {
+      var $element = $('.context-menu-target');
+      var pushId = $element.data('id');
+      $element.parent().addClass('loading');
+      HashBrown.Helpers.RequestHelper.request('post', 'schemas/push/' + pushId).then(function () {
+        return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
+      }).then(function () {
+        HashBrown.Views.Navigation.NavbarMain.reload();
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Init
+     */
+
+  }, {
+    key: "init",
+    value: function init() {
+      var _this2 = this;
+
+      if (!currentUserHasScope('schemas')) {
+        return;
+      }
+
+      HashBrown.Views.Navigation.NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
+        getItems: function getItems() {
+          return resources.schemas;
+        },
+        // Item context menu
+        getItemContextMenu: function getItemContextMenu(item) {
+          var menu = {};
+          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+          menu['This schema'] = '---';
+
+          menu['Open in new tab'] = function () {
+            _this2.onClickOpenInNewTab();
           };
-        }
 
-        menu['Copy id'] = function () {
-          _this2.onClickCopyItemId();
-        };
+          menu['New child schema'] = function () {
+            _this2.onClickNewSchema();
+          };
 
-        if (item.isLocked && !item.sync.isRemote) {
-          isSyncEnabled = false;
-        }
-
-        if (isSyncEnabled) {
-          menu['Sync'] = '---';
-
-          if (!item.sync.isRemote) {
-            menu['Push to remote'] = function () {
-              _this2.onClickPushSchema();
-            };
-          }
-
-          if (item.sync.hasRemote) {
-            menu['Remove local copy'] = function () {
+          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = function () {
               _this2.onClickRemoveSchema();
             };
           }
 
-          if (item.sync.isRemote) {
-            menu['Pull from remote'] = function () {
-              _this2.onClickPullSchema();
+          menu['Copy id'] = function () {
+            _this2.onClickCopyItemId();
+          };
+
+          if (item.isLocked && !item.sync.isRemote) {
+            isSyncEnabled = false;
+          }
+
+          if (isSyncEnabled) {
+            menu['Sync'] = '---';
+
+            if (!item.sync.isRemote) {
+              menu['Push to remote'] = function () {
+                _this2.onClickPushSchema();
+              };
+            }
+
+            if (item.sync.hasRemote) {
+              menu['Remove local copy'] = function () {
+                _this2.onClickRemoveSchema();
+              };
+            }
+
+            if (item.sync.isRemote) {
+              menu['Pull from remote'] = function () {
+                _this2.onClickPullSchema();
+              };
+            }
+          }
+
+          menu['General'] = '---';
+
+          menu['Refresh'] = function () {
+            _this2.onClickRefreshResource('schemas');
+          };
+
+          return menu;
+        },
+        // Set general context menu items
+        paneContextMenu: {
+          'Schemas': '---',
+          'Refresh': function Refresh() {
+            _this2.onClickRefreshResource('schemas');
+          }
+        },
+        // Hierarchy logic
+        hierarchy: function hierarchy(item, queueItem) {
+          queueItem.$element.attr('data-schema-id', item.id);
+
+          if (item.parentSchemaId) {
+            queueItem.parentDirAttr = {
+              'data-schema-id': item.parentSchemaId
+            };
+          } else {
+            queueItem.parentDirAttr = {
+              'data-schema-type': item.type
             };
           }
         }
-
-        menu['General'] = '---';
-
-        menu['Refresh'] = function () {
-          _this2.onClickRefreshResource('schemas');
-        };
-
-        return menu;
-      },
-      // Set general context menu items
-      paneContextMenu: {
-        'Schemas': '---',
-        'Refresh': function Refresh() {
-          _this2.onClickRefreshResource('schemas');
-        }
-      },
-      // Hierarchy logic
-      hierarchy: function hierarchy(item, queueItem) {
-        queueItem.$element.attr('data-schema-id', item.id);
-
-        if (item.parentSchemaId) {
-          queueItem.parentDirAttr = {
-            'data-schema-id': item.parentSchemaId
-          };
-        } else {
-          queueItem.parentDirAttr = {
-            'data-schema-type': item.type
-          };
-        }
-      }
-    });
-  };
+      });
+    }
+  }]);
 
   return SchemaPane;
 }(HashBrown.Views.Navigation.NavbarPane);
@@ -14221,202 +15363,227 @@ namespace('Views.Dashboard').add(__webpack_require__(285)).add(__webpack_require
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var BackupEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(BackupEditor, _HashBrown$Views$Moda);
+  _inherits(BackupEditor, _HashBrown$Views$Moda);
 
   function BackupEditor() {
-    return _HashBrown$Views$Moda.apply(this, arguments) || this;
+    _classCallCheck(this, BackupEditor);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(BackupEditor).apply(this, arguments));
   }
 
-  var _proto = BackupEditor.prototype;
+  _createClass(BackupEditor, [{
+    key: "onClickUploadBackup",
 
-  /**
-   * Event: Click upload button
-   */
-  _proto.onClickUploadBackup = function onClickUploadBackup() {
-    var _this = this;
+    /**
+     * Event: Click upload button
+     */
+    value: function onClickUploadBackup() {
+      var _this = this;
 
-    var uploadModal = new HashBrown.Views.Modals.Modal({
-      title: 'Upload a backup file',
-      body: new HashBrown.Views.Widgets.Input({
-        type: 'file',
-        name: 'backup',
-        onSubmit: function onSubmit(formData) {
-          var apiPath = 'server/backups/' + _this.model.id + '/upload'; // TODO: Use the HashBrown.Helpers.ReqestHelper for this
+      var uploadModal = new HashBrown.Views.Modals.Modal({
+        title: 'Upload a backup file',
+        body: new HashBrown.Views.Widgets.Input({
+          type: 'file',
+          name: 'backup',
+          onSubmit: function onSubmit(formData) {
+            var apiPath = 'server/backups/' + _this.model.id + '/upload'; // TODO: Use the HashBrown.Helpers.ReqestHelper for this
 
-          $.ajax({
-            url: HashBrown.Helpers.RequestHelper.environmentUrl(apiPath),
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function success(id) {
-              _this.model = null;
+            $.ajax({
+              url: HashBrown.Helpers.RequestHelper.environmentUrl(apiPath),
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function success(id) {
+                _this.model = null;
 
-              _this.fetch();
+                _this.fetch();
 
-              uploadModal.close();
-            }
-          });
-        }
-      }).$element,
-      actions: [{
-        label: 'OK',
-        onClick: function onClick() {
-          uploadModal.$element.find('form').submit();
-          return false;
-        }
-      }]
-    });
-  };
-  /**
-   * Event: Click backup button
-   */
-
-
-  _proto.onClickCreateBackup = function onClickCreateBackup() {
-    var _this2 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+                uploadModal.close();
+              }
+            });
+          }
+        }).$element,
+        actions: [{
+          label: 'OK',
+          onClick: function onClick() {
+            uploadModal.$element.find('form').submit();
+            return false;
+          }
+        }]
+      });
     }
+    /**
+     * Event: Click backup button
+     */
 
-    HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
-      _this2.model = null;
+  }, {
+    key: "onClickCreateBackup",
+    value: function onClickCreateBackup() {
+      var _this2 = this;
 
-      _this2.fetch();
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click restore backup button
-   *
-   * @param {String} timestamp
-   */
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
+      HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
+        _this2.model = null;
 
-  _proto.onClickRestoreBackup = function onClickRestoreBackup(timestamp) {
-    var _this3 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
-    }
-
-    var label = '"' + timestamp + '"';
-    var date = new Date(parseInt(timestamp));
-
-    if (!isNaN(date.getTime())) {
-      label = date.toString();
-    }
-
-    var modal = UI.confirmModal('restore', 'Restore backup', 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.', function () {
-      HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
-        modal.close();
-
-        _this3.trigger('change');
-
-        _this3.close();
+        _this2.fetch();
       }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click delete backup button
-   */
-
-
-  _proto.onClickDeleteBackup = function onClickDeleteBackup(timestamp) {
-    var _this4 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
     }
+    /**
+     * Event: Click restore backup button
+     *
+     * @param {String} timestamp
+     */
 
-    var label = timestamp;
-    var date = new Date(parseInt(timestamp));
+  }, {
+    key: "onClickRestoreBackup",
+    value: function onClickRestoreBackup(timestamp) {
+      var _this3 = this;
 
-    if (!isNaN(date.getTime())) {
-      label = date.toString();
-    }
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
-    var modal = UI.confirmModal('delete', 'Delete backup', 'Are you sure you want to delete the backup "' + label + '"?', function () {
-      HashBrown.Helpers.RequestHelper.request('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
-        modal.close();
-        _this4.model = null;
-
-        _this4.fetch();
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    var _this5 = this;
-
-    if (this.model instanceof HashBrown.Models.Project === false) {
-      this.model = new HashBrown.Models.Project(this.model);
-    }
-
-    this.title = this.model.settings.info.name + ' backups';
-    this.body = _.div(_.if(!this.model.backups || this.model.backups.length < 1, _.label({
-      class: 'widget widget--label'
-    }, 'No backups yet')), // List existing backups
-    _.each(this.model.backups, function (i, backup) {
-      var label = backup;
-      var date = new Date(parseInt(backup));
+      var label = '"' + timestamp + '"';
+      var date = new Date(parseInt(timestamp));
 
       if (!isNaN(date.getTime())) {
         label = date.toString();
       }
 
-      return _.div({
-        class: 'page--dashboard__backup-editor__backup widget-group'
-      }, _.p({
-        class: 'widget widget--label page--dashboard__backup-editor__back__label'
-      }, label), new HashBrown.Views.Widgets.Dropdown({
-        icon: 'ellipsis-v',
-        reverseKeys: true,
-        options: {
-          'Restore': function Restore() {
-            _this5.onClickRestoreBackup(backup);
-          },
-          'Download': function Download() {
-            location = HashBrown.Helpers.ReqestHelper.environmentUrl('server/backups/' + _this5.model.id + '/' + backup + '.hba');
-          },
-          'Delete': function Delete() {
-            _this5.onClickDeleteBackup(backup);
-          }
+      var modal = UI.confirmModal('restore', 'Restore backup', 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.', function () {
+        HashBrown.Helpers.RequestHelper.request('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
+          modal.close();
+
+          _this3.trigger('change');
+
+          _this3.close();
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Event: Click delete backup button
+     */
+
+  }, {
+    key: "onClickDeleteBackup",
+    value: function onClickDeleteBackup(timestamp) {
+      var _this4 = this;
+
+      if (!currentUserIsAdmin()) {
+        return;
+      }
+
+      var label = timestamp;
+      var date = new Date(parseInt(timestamp));
+
+      if (!isNaN(date.getTime())) {
+        label = date.toString();
+      }
+
+      var modal = UI.confirmModal('delete', 'Delete backup', 'Are you sure you want to delete the backup "' + label + '"?', function () {
+        HashBrown.Helpers.RequestHelper.request('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
+          modal.close();
+          _this4.model = null;
+
+          _this4.fetch();
+        }).catch(UI.errorModal);
+      });
+    }
+    /**
+     * Pre render
+     */
+
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      var _this5 = this;
+
+      if (this.model instanceof HashBrown.Models.Project === false) {
+        this.model = new HashBrown.Models.Project(this.model);
+      }
+
+      this.title = this.model.settings.info.name + ' backups';
+      this.body = _.div(_.if(!this.model.backups || this.model.backups.length < 1, _.label({
+        class: 'widget widget--label'
+      }, 'No backups yet')), // List existing backups
+      _.each(this.model.backups, function (i, backup) {
+        var label = backup;
+        var date = new Date(parseInt(backup));
+
+        if (!isNaN(date.getTime())) {
+          label = date.toString();
         }
-      }).$element);
-    }));
-  };
-  /**
-   * Renders the modal footer
-   *
-   * @returns {HTMLElement} Footer
-   */
 
+        return _.div({
+          class: 'page--dashboard__backup-editor__backup widget-group'
+        }, _.p({
+          class: 'widget widget--label page--dashboard__backup-editor__back__label'
+        }, label), new HashBrown.Views.Widgets.Dropdown({
+          icon: 'ellipsis-v',
+          reverseKeys: true,
+          options: {
+            'Restore': function Restore() {
+              _this5.onClickRestoreBackup(backup);
+            },
+            'Download': function Download() {
+              location = HashBrown.Helpers.ReqestHelper.environmentUrl('server/backups/' + _this5.model.id + '/' + backup + '.hba');
+            },
+            'Delete': function Delete() {
+              _this5.onClickDeleteBackup(backup);
+            }
+          }
+        }).$element);
+      }));
+    }
+    /**
+     * Renders the modal footer
+     *
+     * @returns {HTMLElement} Footer
+     */
 
-  _proto.renderFooter = function renderFooter() {
-    var _this6 = this;
+  }, {
+    key: "renderFooter",
+    value: function renderFooter() {
+      var _this6 = this;
 
-    return [_.button({
-      class: 'widget widget--button',
-      title: 'Upload backup'
-    }, 'Upload').click(function () {
-      _this6.onClickUploadBackup();
-    }), _.button({
-      class: 'widget widget--button',
-      title: 'Create a new backup'
-    }, 'Create').click(function () {
-      _this6.onClickCreateBackup();
-    })];
-  };
+      return [_.button({
+        class: 'widget widget--button',
+        title: 'Upload backup'
+      }, 'Upload').click(function () {
+        _this6.onClickUploadBackup();
+      }), _.button({
+        class: 'widget widget--button',
+        title: 'Create a new backup'
+      }, 'Create').click(function () {
+        _this6.onClickCreateBackup();
+      })];
+    }
+  }]);
 
   return BackupEditor;
 }(HashBrown.Views.Modals.Modal);
@@ -14435,15 +15602,33 @@ module.exports = BackupEditor;
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var InfoEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(InfoEditor, _HashBrown$Views$Moda);
+  _inherits(InfoEditor, _HashBrown$Views$Moda);
 
   function InfoEditor(params) {
     var _this;
+
+    _classCallCheck(this, InfoEditor);
 
     params.title = 'Project info';
     params.actions = [{
@@ -14455,7 +15640,7 @@ function (_HashBrown$Views$Moda) {
       }
     }];
     params.autoFetch = false;
-    _this = _HashBrown$Views$Moda.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(InfoEditor).call(this, params));
 
     _this.fetch();
 
@@ -14466,42 +15651,44 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = InfoEditor.prototype;
+  _createClass(InfoEditor, [{
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
+      HashBrown.Helpers.SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info).then(function () {
+        _this2.close();
 
-    HashBrown.Helpers.SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info).then(function () {
-      _this2.close();
-
-      _this2.trigger('change', _this2.model);
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Renders the modal body
-   *
-   * @returns {HTMLElement} Body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    var _this3 = this;
-
-    if (!this.model) {
-      return;
+        _this2.trigger('change', _this2.model);
+      }).catch(UI.errorModal);
     }
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
 
-    return _.div({
-      class: 'widget-group'
-    }, _.span({
-      class: 'widget widget--label'
-    }, 'Name'), new HashBrown.Views.Widgets.Input({
-      value: this.model.settings.info.name,
-      onChange: function onChange(newName) {
-        _this3.model.settings.info.name = newName;
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this3 = this;
+
+      if (!this.model) {
+        return;
       }
-    }));
-  };
+
+      return _.div({
+        class: 'widget-group'
+      }, _.span({
+        class: 'widget widget--label'
+      }, 'Name'), new HashBrown.Views.Widgets.Input({
+        value: this.model.settings.info.name,
+        onChange: function onChange(newName) {
+          _this3.model.settings.info.name = newName;
+        }
+      }));
+    }
+  }]);
 
   return InfoEditor;
 }(HashBrown.Views.Modals.Modal);
@@ -14520,15 +15707,33 @@ module.exports = InfoEditor;
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var LanguageEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(LanguageEditor, _HashBrown$Views$Moda);
+  _inherits(LanguageEditor, _HashBrown$Views$Moda);
 
   function LanguageEditor(params) {
     var _this;
+
+    _classCallCheck(this, LanguageEditor);
 
     params.title = 'Languages';
     params.actions = [{
@@ -14540,7 +15745,7 @@ function (_HashBrown$Views$Moda) {
       }
     }];
     params.autoFetch = false;
-    _this = _HashBrown$Views$Moda.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(LanguageEditor).call(this, params));
 
     _this.fetch();
 
@@ -14551,41 +15756,43 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = LanguageEditor.prototype;
+  _createClass(LanguageEditor, [{
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
+      HashBrown.Helpers.LanguageHelper.setLanguages(this.model.id, this.model.settings.languages).then(function () {
+        _this2.close();
 
-    HashBrown.Helpers.LanguageHelper.setLanguages(this.model.id, this.model.settings.languages).then(function () {
-      _this2.close();
+        _this2.trigger('change');
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
 
-      _this2.trigger('change');
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Renders the modal body
-   *
-   * @returns {HTMLElement} Body
-   */
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this3 = this;
 
-
-  _proto.renderBody = function renderBody() {
-    var _this3 = this;
-
-    return _.div({
-      class: 'widget-group'
-    }, _.label({
-      class: 'widget widget--label'
-    }, 'Selected languages'), new HashBrown.Views.Widgets.Dropdown({
-      value: this.model.settings.languages,
-      useTypeAhead: true,
-      useMultiple: true,
-      options: HashBown.Helpers.LanguageHelper.getLanguageOptions(this.model.id),
-      onChange: function onChange(newValue) {
-        _this3.model.settings.languages = newValue;
-      }
-    }).$element);
-  };
+      return _.div({
+        class: 'widget-group'
+      }, _.label({
+        class: 'widget widget--label'
+      }, 'Selected languages'), new HashBrown.Views.Widgets.Dropdown({
+        value: this.model.settings.languages,
+        useTypeAhead: true,
+        useMultiple: true,
+        options: HashBown.Helpers.LanguageHelper.getLanguageOptions(this.model.id),
+        onChange: function onChange(newValue) {
+          _this3.model.settings.languages = newValue;
+        }
+      }).$element);
+    }
+  }]);
 
   return LanguageEditor;
 }(HashBrown.Views.Modals.Modal);
@@ -14604,15 +15811,33 @@ module.exports = LanguageEditor;
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var MigrationEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(MigrationEditor, _HashBrown$Views$Moda);
+  _inherits(MigrationEditor, _HashBrown$Views$Moda);
 
   function MigrationEditor(params) {
     var _this;
+
+    _classCallCheck(this, MigrationEditor);
 
     params.title = 'Migrate content';
     params.actions = [{
@@ -14631,97 +15856,101 @@ function (_HashBrown$Views$Moda) {
         replace: true
       }
     };
-    return _this = _HashBrown$Views$Moda.call(this, params) || this;
+    return _this = _possibleConstructorReturn(this, _getPrototypeOf(MigrationEditor).call(this, params));
   }
   /**
    * Pre render
    */
 
 
-  var _proto = MigrationEditor.prototype;
-
-  _proto.prerender = function prerender() {
-    if (!this.data.to || this.getToOptions().indexOf(this.data.to) < 0) {
-      this.data.to = this.getToOptions()[0];
+  _createClass(MigrationEditor, [{
+    key: "prerender",
+    value: function prerender() {
+      if (!this.data.to || this.getToOptions().indexOf(this.data.to) < 0) {
+        this.data.to = this.getToOptions()[0];
+      }
     }
-  };
-  /**
-   * Renders this modal body
-   *
-   * @returns {HTMLElement} Body
-   */
+    /**
+     * Renders this modal body
+     *
+     * @returns {HTMLElement} Body
+     */
 
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      var _this2 = this;
 
-  _proto.renderBody = function renderBody() {
-    var _this2 = this;
-
-    return [_.div({
-      class: 'widget-group'
-    }, new HashBrown.Views.Widgets.Dropdown({
-      value: this.data.from,
-      options: this.model.environments,
-      onChange: function onChange(newValue) {
-        _this2.data.from = newValue;
-
-        _this2.fetch();
-      }
-    }).$element, _.div({
-      class: 'widget-group__separator fa fa-arrow-right'
-    }), new HashBrown.Views.Widgets.Dropdown({
-      value: this.data.to,
-      options: this.getToOptions(),
-      onChange: function onChange(newValue) {
-        _this2.data.to = newValue;
-      }
-    }).$element), _.each({
-      replace: 'Overwrite on target',
-      schemas: 'Schemas',
-      content: 'Content',
-      forms: 'Forms',
-      media: 'Media',
-      connections: 'Connections'
-    }, function (key, label) {
-      return _.div({
+      return [_.div({
         class: 'widget-group'
-      }, _.label({
-        class: 'widget widget--label'
-      }, label), new HashBrown.Views.Widgets.Input({
-        type: 'checkbox',
-        value: _this2.data.settings[key] === true,
+      }, new HashBrown.Views.Widgets.Dropdown({
+        value: this.data.from,
+        options: this.model.environments,
         onChange: function onChange(newValue) {
-          _this2.data.settings[key] = newValue;
+          _this2.data.from = newValue;
+
+          _this2.fetch();
         }
-      }).$element);
-    })];
-  };
-  /**
-   * Gets the displayed "to" options
-   */
+      }).$element, _.div({
+        class: 'widget-group__separator fa fa-arrow-right'
+      }), new HashBrown.Views.Widgets.Dropdown({
+        value: this.data.to,
+        options: this.getToOptions(),
+        onChange: function onChange(newValue) {
+          _this2.data.to = newValue;
+        }
+      }).$element), _.each({
+        replace: 'Overwrite on target',
+        schemas: 'Schemas',
+        content: 'Content',
+        forms: 'Forms',
+        media: 'Media',
+        connections: 'Connections'
+      }, function (key, label) {
+        return _.div({
+          class: 'widget-group'
+        }, _.label({
+          class: 'widget widget--label'
+        }, label), new HashBrown.Views.Widgets.Input({
+          type: 'checkbox',
+          value: _this2.data.settings[key] === true,
+          onChange: function onChange(newValue) {
+            _this2.data.settings[key] = newValue;
+          }
+        }).$element);
+      })];
+    }
+    /**
+     * Gets the displayed "to" options
+     */
 
+  }, {
+    key: "getToOptions",
+    value: function getToOptions() {
+      var _this3 = this;
 
-  _proto.getToOptions = function getToOptions() {
-    var _this3 = this;
-
-    return this.model.environments.filter(function (environment) {
-      return environment !== _this3.data.from;
-    });
-  };
-  /**
-   * Event: Clicked submit
-   */
-
-
-  _proto.onSubmit = function onSubmit() {
-    var _this4 = this;
-
-    HashBrown.Helpers.RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data).then(function () {
-      UI.messageModal('Success', 'Successfully migrated content from "' + _this4.data.from + '" to "' + _this4.data.to + '"', function () {
-        _this4.trigger('change');
-
-        _this4.close();
+      return this.model.environments.filter(function (environment) {
+        return environment !== _this3.data.from;
       });
-    }).catch(UI.errorModal);
-  };
+    }
+    /**
+     * Event: Clicked submit
+     */
+
+  }, {
+    key: "onSubmit",
+    value: function onSubmit() {
+      var _this4 = this;
+
+      HashBrown.Helpers.RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data).then(function () {
+        UI.messageModal('Success', 'Successfully migrated content from "' + _this4.data.from + '" to "' + _this4.data.to + '"', function () {
+          _this4.trigger('change');
+
+          _this4.close();
+        });
+      }).catch(UI.errorModal);
+    }
+  }]);
 
   return MigrationEditor;
 }(HashBrown.Views.Modals.Modal);
@@ -14740,17 +15969,35 @@ module.exports = MigrationEditor;
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var ProjectEditor =
 /*#__PURE__*/
 function (_Crisp$View) {
-  _inheritsLoose(ProjectEditor, _Crisp$View);
+  _inherits(ProjectEditor, _Crisp$View);
 
   function ProjectEditor(params) {
     var _this;
 
-    _this = _Crisp$View.call(this, params) || this;
+    _classCallCheck(this, ProjectEditor);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ProjectEditor).call(this, params));
 
     _.append(_this.element, _.div({
       class: 'widget--spinner embedded'
@@ -14767,280 +16014,290 @@ function (_Crisp$View) {
    */
 
 
-  var _proto = ProjectEditor.prototype;
+  _createClass(ProjectEditor, [{
+    key: "onClickRemove",
+    value: function onClickRemove() {
+      var _this2 = this;
 
-  _proto.onClickRemove = function onClickRemove() {
-    var _this2 = this;
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
-    if (!currentUserIsAdmin()) {
-      return;
+      var modal = new HashBrown.Views.Modals.Modal({
+        title: 'Delete ' + this.model.settings.info.name,
+        body: _.div({
+          class: 'widget-group'
+        }, _.p({
+          class: 'widget widget--label'
+        }, 'Type the project name to confirm'), _.input({
+          class: 'widget widget--input text',
+          type: 'text',
+          placeholder: this.model.settings.info.name
+        }).on('input', function (e) {
+          var $btn = modal.$element.find('.widget.warning');
+
+          var isMatch = $(e.target).val() == _this2.model.settings.info.name;
+
+          $btn.toggleClass('disabled', !isMatch);
+        })),
+        actions: [{
+          label: 'Cancel',
+          class: 'default'
+        }, {
+          label: 'Delete',
+          class: 'warning disabled',
+          onClick: function onClick() {
+            HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + _this2.model.id).then(function () {
+              location.reload();
+            }).catch(UI.errorModal);
+          }
+        }]
+      });
     }
+    /**
+     * Event: Click remove environment
+     *
+     * @param {String} environmentName
+     */
 
-    var modal = new HashBrown.Views.Modals.Modal({
-      title: 'Delete ' + this.model.settings.info.name,
-      body: _.div({
-        class: 'widget-group'
-      }, _.p({
-        class: 'widget widget--label'
-      }, 'Type the project name to confirm'), _.input({
-        class: 'widget widget--input text',
-        type: 'text',
-        placeholder: this.model.settings.info.name
-      }).on('input', function (e) {
-        var $btn = modal.$element.find('.widget.warning');
+  }, {
+    key: "onClickRemoveEnvironment",
+    value: function onClickRemoveEnvironment(environmentName) {
+      var _this3 = this;
 
-        var isMatch = $(e.target).val() == _this2.model.settings.info.name;
+      var modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', function () {
+        HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + _this3.model.id + '/' + environmentName).then(function () {
+          _this3.model = null;
 
-        $btn.toggleClass('disabled', !isMatch);
-      })),
-      actions: [{
-        label: 'Cancel',
-        class: 'default'
-      }, {
-        label: 'Delete',
-        class: 'warning disabled',
-        onClick: function onClick() {
-          HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + _this2.model.id).then(function () {
-            location.reload();
-          }).catch(UI.errorModal);
-        }
-      }]
-    });
-  };
-  /**
-   * Event: Click remove environment
-   *
-   * @param {String} environmentName
-   */
-
-
-  _proto.onClickRemoveEnvironment = function onClickRemoveEnvironment(environmentName) {
-    var _this3 = this;
-
-    var modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', function () {
-      HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + _this3.model.id + '/' + environmentName).then(function () {
-        _this3.model = null;
-
-        _this3.fetch();
-      }).catch(UI.errorModal);
-    });
-  };
-  /**
-   * Event: Click info button */
-
-
-  _proto.onClickInfo = function onClickInfo() {
-    var _this4 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+          _this3.fetch();
+        }).catch(UI.errorModal);
+      });
     }
+    /**
+     * Event: Click info button */
 
-    new HashBrown.Views.Dashboard.InfoEditor({
-      modelUrl: '/api/server/projects/' + this.model.id
-    }).on('change', function (newInfo) {
-      _this4.model = null;
+  }, {
+    key: "onClickInfo",
+    value: function onClickInfo() {
+      var _this4 = this;
 
-      _this4.fetch();
-    });
-  };
-  /**
-   * Event: Click sync button
-   */
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
+      new HashBrown.Views.Dashboard.InfoEditor({
+        modelUrl: '/api/server/projects/' + this.model.id
+      }).on('change', function (newInfo) {
+        _this4.model = null;
 
-  _proto.onClickSync = function onClickSync() {
-    var _this5 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+        _this4.fetch();
+      });
     }
+    /**
+     * Event: Click sync button
+     */
 
-    new HashBrown.Views.Dashboard.SyncEditor({
-      projectId: this.model.id,
-      modelUrl: '/api/' + this.model.id + '/settings/sync'
-    }).on('change', function (newSettings) {
-      _this5.model = null;
+  }, {
+    key: "onClickSync",
+    value: function onClickSync() {
+      var _this5 = this;
 
-      _this5.fetch();
-    });
-  };
-  /**
-   * Event: Click languages button
-   */
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
+      new HashBrown.Views.Dashboard.SyncEditor({
+        projectId: this.model.id,
+        modelUrl: '/api/' + this.model.id + '/settings/sync'
+      }).on('change', function (newSettings) {
+        _this5.model = null;
 
-  _proto.onClickLanguages = function onClickLanguages() {
-    var _this6 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+        _this5.fetch();
+      });
     }
+    /**
+     * Event: Click languages button
+     */
 
-    new HashBrown.Views.Dashboard.LanguageEditor({
-      modelUrl: '/api/server/projects/' + this.model.id
-    }).on('change', function () {
-      _this6.model = null;
+  }, {
+    key: "onClickLanguages",
+    value: function onClickLanguages() {
+      var _this6 = this;
 
-      _this6.fetch();
-    });
-  };
-  /**
-   * Event: Click backups button
-   */
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
+      new HashBrown.Views.Dashboard.LanguageEditor({
+        modelUrl: '/api/server/projects/' + this.model.id
+      }).on('change', function () {
+        _this6.model = null;
 
-  _proto.onClickBackups = function onClickBackups() {
-    var _this7 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+        _this6.fetch();
+      });
     }
+    /**
+     * Event: Click backups button
+     */
 
-    new HashBrown.Views.Dashboard.BackupEditor({
-      modelUrl: '/api/server/projects/' + this.model.id
-    }).on('change', function () {
-      _this7.model = null;
+  }, {
+    key: "onClickBackups",
+    value: function onClickBackups() {
+      var _this7 = this;
 
-      _this7.fetch();
-    });
-  };
-  /**
-   * Event: Click migration button
-   */
+      if (!currentUserIsAdmin()) {
+        return;
+      }
 
+      new HashBrown.Views.Dashboard.BackupEditor({
+        modelUrl: '/api/server/projects/' + this.model.id
+      }).on('change', function () {
+        _this7.model = null;
 
-  _proto.onClickMigrate = function onClickMigrate() {
-    var _this8 = this;
-
-    if (!currentUserIsAdmin()) {
-      return;
+        _this7.fetch();
+      });
     }
+    /**
+     * Event: Click migration button
+     */
 
-    if (this.model.environments.length < 2) {
-      UI.errorModal(new Error('You need at least 2 environments to migrate content'));
-      return;
+  }, {
+    key: "onClickMigrate",
+    value: function onClickMigrate() {
+      var _this8 = this;
+
+      if (!currentUserIsAdmin()) {
+        return;
+      }
+
+      if (this.model.environments.length < 2) {
+        UI.errorModal(new Error('You need at least 2 environments to migrate content'));
+        return;
+      }
+
+      new HashBrown.Views.Dashboard.MigrationEditor({
+        model: this.model
+      }).on('change', function () {
+        _this8.model = null;
+
+        _this8.fetch();
+      });
     }
+    /**
+     * Event: Click add environment button
+     */
 
-    new HashBrown.Views.Dashboard.MigrationEditor({
-      model: this.model
-    }).on('change', function () {
-      _this8.model = null;
+  }, {
+    key: "onClickAddEnvironment",
+    value: function onClickAddEnvironment() {
+      var _this9 = this;
 
-      _this8.fetch();
-    });
-  };
-  /**
-   * Event: Click add environment button
-   */
+      var modal = new HashBrown.Views.Modals.Modal({
+        title: 'New environment for "' + this.model.id + '"',
+        body: _.div({
+          class: 'widget-group'
+        }, _.label({
+          class: 'widget widget--label'
+        }, 'Environment name'), new HashBrown.Views.Widgets.Input({
+          placeholder: 'i.e. "testing" or "staging"'
+        })),
+        actions: [{
+          label: 'Create',
+          onClick: function onClick() {
+            var environmentName = modal.$element.find('input').val();
 
+            if (!environmentName) {
+              return false;
+            }
 
-  _proto.onClickAddEnvironment = function onClickAddEnvironment() {
-    var _this9 = this;
+            HashBrown.Helpers.RequestHelper.request('put', 'server/projects/' + _this9.model.id + '/' + environmentName).then(function () {
+              modal.close();
+              _this9.model = null;
 
-    var modal = new HashBrown.Views.Modals.Modal({
-      title: 'New environment for "' + this.model.id + '"',
-      body: _.div({
-        class: 'widget-group'
-      }, _.label({
-        class: 'widget widget--label'
-      }, 'Environment name'), new HashBrown.Views.Widgets.Input({
-        placeholder: 'i.e. "testing" or "staging"'
-      })),
-      actions: [{
-        label: 'Create',
-        onClick: function onClick() {
-          var environmentName = modal.$element.find('input').val();
-
-          if (!environmentName) {
+              _this9.fetch();
+            }).catch(UI.errorModal);
             return false;
           }
-
-          HashBrown.Helpers.RequestHelper.request('put', 'server/projects/' + _this9.model.id + '/' + environmentName).then(function () {
-            modal.close();
-            _this9.model = null;
-
-            _this9.fetch();
-          }).catch(UI.errorModal);
-          return false;
-        }
-      }]
-    });
-  };
-  /**
-   * Pre render
-   */
-
-
-  _proto.prerender = function prerender() {
-    if (this.model instanceof HashBrown.Models.Project === false) {
-      this.model = new HashBrown.Models.Project(this.model);
+        }]
+      });
     }
-  };
-  /**
-   * Renders this editor
-   */
+    /**
+     * Pre render
+     */
 
-
-  _proto.template = function template() {
-    var _this10 = this;
-
-    var languageCount = this.model.settings.languages.length;
-    var userCount = this.model.users.length;
-    return _.div({
-      class: 'page--dashboard__project in'
-    }, _.div({
-      class: 'page--dashboard__project__body'
-    }, _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
-      icon: 'ellipsis-v',
-      reverseKeys: true,
-      options: {
-        'Info': function Info() {
-          _this10.onClickInfo();
-        },
-        'Languages': function Languages() {
-          _this10.onClickLanguages();
-        },
-        'Backups': function Backups() {
-          _this10.onClickBackups();
-        },
-        'Sync': function Sync() {
-          _this10.onClickSync();
-        },
-        'Delete': function Delete() {
-          _this10.onClickRemove();
-        },
-        'Migrate content': function MigrateContent() {
-          _this10.onClickMigrate();
-        }
+  }, {
+    key: "prerender",
+    value: function prerender() {
+      if (this.model instanceof HashBrown.Models.Project === false) {
+        this.model = new HashBrown.Models.Project(this.model);
       }
-    }).$element.addClass('page--dashboard__project__menu')), _.div({
-      class: 'page--dashboard__project__info'
-    }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({
-      class: 'page--dashboard__project__environments'
-    }, _.each(this.model.environments, function (i, environment) {
+    }
+    /**
+     * Renders this editor
+     */
+
+  }, {
+    key: "template",
+    value: function template() {
+      var _this10 = this;
+
+      var languageCount = this.model.settings.languages.length;
+      var userCount = this.model.users.length;
       return _.div({
-        class: 'page--dashboard__project__environment'
-      }, _.a({
-        title: 'Go to "' + environment + '" CMS',
-        href: '/' + _this10.model.id + '/' + environment,
-        class: 'widget widget--button expanded'
-      }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+        class: 'page--dashboard__project in'
+      }, _.div({
+        class: 'page--dashboard__project__body'
+      }, _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
         icon: 'ellipsis-v',
         reverseKeys: true,
         options: {
+          'Info': function Info() {
+            _this10.onClickInfo();
+          },
+          'Languages': function Languages() {
+            _this10.onClickLanguages();
+          },
+          'Backups': function Backups() {
+            _this10.onClickBackups();
+          },
+          'Sync': function Sync() {
+            _this10.onClickSync();
+          },
           'Delete': function Delete() {
-            _this10.onClickRemoveEnvironment(environment);
+            _this10.onClickRemove();
+          },
+          'Migrate content': function MigrateContent() {
+            _this10.onClickMigrate();
           }
         }
-      }).$element.addClass('page--dashboard__project__environment__menu')));
-    }), _.if(currentUserIsAdmin(), _.button({
-      title: 'Add environment',
-      class: 'widget widget--button round right fa fa-plus'
-    }).click(function () {
-      _this10.onClickAddEnvironment();
-    })))));
-  };
+      }).$element.addClass('page--dashboard__project__menu')), _.div({
+        class: 'page--dashboard__project__info'
+      }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({
+        class: 'page--dashboard__project__environments'
+      }, _.each(this.model.environments, function (i, environment) {
+        return _.div({
+          class: 'page--dashboard__project__environment'
+        }, _.a({
+          title: 'Go to "' + environment + '" CMS',
+          href: '/' + _this10.model.id + '/' + environment,
+          class: 'widget widget--button expanded'
+        }, environment), _.if(currentUserIsAdmin(), new HashBrown.Views.Widgets.Dropdown({
+          icon: 'ellipsis-v',
+          reverseKeys: true,
+          options: {
+            'Delete': function Delete() {
+              _this10.onClickRemoveEnvironment(environment);
+            }
+          }
+        }).$element.addClass('page--dashboard__project__environment__menu')));
+      }), _.if(currentUserIsAdmin(), _.button({
+        title: 'Add environment',
+        class: 'widget widget--button round right fa fa-plus'
+      }).click(function () {
+        _this10.onClickAddEnvironment();
+      })))));
+    }
+  }]);
 
   return ProjectEditor;
 }(Crisp.View);
@@ -15059,15 +16316,33 @@ module.exports = ProjectEditor;
  * @memberof HashBrown.Client.Views.Dashboard
  */
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var SyncEditor =
 /*#__PURE__*/
 function (_HashBrown$Views$Moda) {
-  _inheritsLoose(SyncEditor, _HashBrown$Views$Moda);
+  _inherits(SyncEditor, _HashBrown$Views$Moda);
 
   function SyncEditor(params) {
     var _this;
+
+    _classCallCheck(this, SyncEditor);
 
     params.title = 'Sync';
     params.actions = [{
@@ -15088,7 +16363,7 @@ function (_HashBrown$Views$Moda) {
       }
     }];
     params.autoFetch = false;
-    _this = _HashBrown$Views$Moda.call(this, params) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SyncEditor).call(this, params));
 
     _this.fetch();
 
@@ -15099,167 +16374,175 @@ function (_HashBrown$Views$Moda) {
    */
 
 
-  var _proto = SyncEditor.prototype;
+  _createClass(SyncEditor, [{
+    key: "onClickSave",
+    value: function onClickSave() {
+      var _this2 = this;
 
-  _proto.onClickSave = function onClickSave() {
-    var _this2 = this;
+      this.model.url = this.$element.find('input[name="url"]').val();
+      HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
+        _this2.close();
 
-    this.model.url = this.$element.find('input[name="url"]').val();
-    HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
-      _this2.close();
+        _this2.trigger('change', _this2.model);
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Event: Click apply. Posts the model to the modelUrl
+     */
 
-      _this2.trigger('change', _this2.model);
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Event: Click apply. Posts the model to the modelUrl
-   */
+  }, {
+    key: "onClickApply",
+    value: function onClickApply() {
+      var _this3 = this;
 
+      this.model.url = this.$element.find('input[name="url"]').val();
+      HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
+        _this3.trigger('change', _this3.model);
+      }).catch(UI.errorModal);
+    }
+    /**
+     * Render enabled switch
+     */
 
-  _proto.onClickApply = function onClickApply() {
-    var _this3 = this;
+  }, {
+    key: "renderEnabledSwitch",
+    value: function renderEnabledSwitch() {
+      var _this4 = this;
 
-    this.model.url = this.$element.find('input[name="url"]').val();
-    HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
-      _this3.trigger('change', _this3.model);
-    }).catch(UI.errorModal);
-  };
-  /**
-   * Render enabled switch
-   */
+      return new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        name: 'enabled',
+        value: this.model.enabled === true,
+        onChange: function onChange(newValue) {
+          _this4.model.enabled = newValue;
+        }
+      }).$element;
+    }
+    /**
+     * Renders the URL editor
+     *
+     * @returns {HTMLElement} Element
+     */
 
+  }, {
+    key: "renderUrlEditor",
+    value: function renderUrlEditor() {
+      return new HashBrown.Views.Widgets.Input({
+        name: 'url',
+        type: 'text',
+        value: this.model.url || '',
+        placeholder: 'e.g. "https://myserver.com/api/"'
+      }).$element;
+    }
+    /**
+     * Renders the project id editor
+     *
+     * @returns {HTMLElement} Element
+     */
 
-  _proto.renderEnabledSwitch = function renderEnabledSwitch() {
-    var _this4 = this;
+  }, {
+    key: "renderProjectIdEditor",
+    value: function renderProjectIdEditor() {
+      var _this5 = this;
 
-    return new HashBrown.Views.Widgets.Input({
-      type: 'checkbox',
-      name: 'enabled',
-      value: this.model.enabled === true,
-      onChange: function onChange(newValue) {
-        _this4.model.enabled = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the URL editor
-   *
-   * @returns {HTMLElement} Element
-   */
+      return new HashBrown.Views.Widgets.Input({
+        name: 'name',
+        value: this.model.project,
+        onChange: function onChange(newValue) {
+          _this5.model.project = newValue;
+        }
+      }).$element;
+    }
+    /**
+     * Renders the token editor
+     *
+     * @returns {HTMLElement} Element
+     */
 
+  }, {
+    key: "renderTokenEditor",
+    value: function renderTokenEditor() {
+      var _this6 = this;
 
-  _proto.renderUrlEditor = function renderUrlEditor() {
-    return new HashBrown.Views.Widgets.Input({
-      name: 'url',
-      type: 'text',
-      value: this.model.url || '',
-      placeholder: 'e.g. "https://myserver.com/api/"'
-    }).$element;
-  };
-  /**
-   * Renders the project id editor
-   *
-   * @returns {HTMLElement} Element
-   */
+      return [new HashBrown.Views.Widgets.Input({
+        value: this.model.token,
+        name: 'token',
+        placeholder: 'API token',
+        onChange: function onChange(newToken) {
+          _this6.model.token = newToken;
+        }
+      }).$element, _.button({
+        class: 'widget widget--button small fa fa-refresh'
+      }).on('click', function () {
+        if (!_this6.model.url) {
+          alert('You need to specify a URL. Please do so and apply the settings first.');
+          return;
+        }
 
+        var tokenModal = new HashBrown.Views.Modals.Modal({
+          title: 'Refresh token',
+          body: [_.div({
+            class: 'widget-group'
+          }, _.label({
+            class: 'widget widget--label'
+          }, 'Username'), _.input({
+            class: 'widget widget--input text',
+            type: 'text'
+          })), _.div({
+            class: 'widget-group'
+          }, _.label({
+            class: 'widget widget--label'
+          }, 'Password'), _.input({
+            class: 'widget widget--input text',
+            type: 'password'
+          }))],
+          actions: [{
+            label: 'Get token',
+            onClick: function onClick() {
+              var username = tokenModal.element.querySelector('input[type="text"]').value;
+              var password = tokenModal.element.querySelector('input[type="password"]').value;
+              HashBrown.Helpers.RequestHelper.request('post', _this6.projectId + '/sync/login', {
+                username: username,
+                password: password
+              }).then(function (token) {
+                _this6.model.token = token;
+                _this6.element.querySelector('input[name="token"]').value = token;
+              }).catch(UI.errorModal);
+            }
+          }]
+        });
+      })];
+    }
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} $content
+     *
+     * @return {HTMLElement} Editor element
+     */
 
-  _proto.renderProjectIdEditor = function renderProjectIdEditor() {
-    var _this5 = this;
+  }, {
+    key: "renderField",
+    value: function renderField(label, $content) {
+      return _.div({
+        class: 'widget-group'
+      }, _.div({
+        class: 'widget widget--label'
+      }, label), $content);
+    }
+    /**
+     * Renders the modal body
+     *
+     * @returns {HTMLElement} Body
+     */
 
-    return new HashBrown.Views.Widgets.Input({
-      name: 'name',
-      value: this.model.project,
-      onChange: function onChange(newValue) {
-        _this5.model.project = newValue;
-      }
-    }).$element;
-  };
-  /**
-   * Renders the token editor
-   *
-   * @returns {HTMLElement} Element
-   */
-
-
-  _proto.renderTokenEditor = function renderTokenEditor() {
-    var _this6 = this;
-
-    return [new HashBrown.Views.Widgets.Input({
-      value: this.model.token,
-      name: 'token',
-      placeholder: 'API token',
-      onChange: function onChange(newToken) {
-        _this6.model.token = newToken;
-      }
-    }).$element, _.button({
-      class: 'widget widget--button small fa fa-refresh'
-    }).on('click', function () {
-      if (!_this6.model.url) {
-        alert('You need to specify a URL. Please do so and apply the settings first.');
-        return;
-      }
-
-      var tokenModal = new HashBrown.Views.Modals.Modal({
-        title: 'Refresh token',
-        body: [_.div({
-          class: 'widget-group'
-        }, _.label({
-          class: 'widget widget--label'
-        }, 'Username'), _.input({
-          class: 'widget widget--input text',
-          type: 'text'
-        })), _.div({
-          class: 'widget-group'
-        }, _.label({
-          class: 'widget widget--label'
-        }, 'Password'), _.input({
-          class: 'widget widget--input text',
-          type: 'password'
-        }))],
-        actions: [{
-          label: 'Get token',
-          onClick: function onClick() {
-            var username = tokenModal.element.querySelector('input[type="text"]').value;
-            var password = tokenModal.element.querySelector('input[type="password"]').value;
-            HashBrown.Helpers.RequestHelper.request('post', _this6.projectId + '/sync/login', {
-              username: username,
-              password: password
-            }).then(function (token) {
-              _this6.model.token = token;
-              _this6.element.querySelector('input[name="token"]').value = token;
-            }).catch(UI.errorModal);
-          }
-        }]
-      });
-    })];
-  };
-  /**
-   * Renders a single field
-   *
-   * @param {String} label
-   * @param {HTMLElement} $content
-   *
-   * @return {HTMLElement} Editor element
-   */
-
-
-  _proto.renderField = function renderField(label, $content) {
-    return _.div({
-      class: 'widget-group'
-    }, _.div({
-      class: 'widget widget--label'
-    }, label), $content);
-  };
-  /**
-   * Renders the modal body
-   *
-   * @returns {HTMLElement} Body
-   */
-
-
-  _proto.renderBody = function renderBody() {
-    return [this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project id', this.renderProjectIdEditor())];
-  };
+  }, {
+    key: "renderBody",
+    value: function renderBody() {
+      return [this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project id', this.renderProjectIdEditor())];
+    }
+  }]);
 
   return SyncEditor;
 }(HashBrown.Views.Modals.Modal);

@@ -125,15 +125,17 @@ class DebugHelper {
     /**
      * Shows an error
      *
-     * @param {String} message
+     * @param {String|Error} error
      * @param {Object} sender
      */
-    static error(message, sender) {
-        if(message instanceof Error) {
-            message = message.message || message.trace;
+    static error(error, sender) {
+        if(error instanceof Error !== true) {
+            error = new Error(error);
         }
 
-        this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
+        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
+    
+        throw error;
     }
 
     /**

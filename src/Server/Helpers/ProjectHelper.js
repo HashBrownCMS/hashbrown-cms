@@ -96,6 +96,8 @@ class ProjectHelper {
      * @returns {Promise} Promise
      */
     static projectExists(project) {
+        if(!project) { return Promise.resolve(false); }
+
         return DatabaseHelper.collectionExists(project, 'settings');
     }
     

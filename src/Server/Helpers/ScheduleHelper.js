@@ -16,7 +16,8 @@ class ScheduleHelper {
     static startWatching() {
         // Start the interval
         setInterval(() => {
-            this.checkTasks();
+            this.checkTasks()
+            .catch(debug.error);
         }, WATCH_INTERVAL);
 
         // Do an initial check
