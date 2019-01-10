@@ -452,73 +452,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /**
- * Project editor
- */
-.page--dashboard__project {
-  padding: 1rem;
-  margin: 0.5rem;
-  position: relative;
-  flex-grow: 0;
-  flex-basis: calc(33.33% - 1rem);
-  width: calc(33.33% - 1rem);
-  color: #333333;
-  background-color: #ffffff;
-  transform-origin: center;
-  transition: transform 0.25s ease;
-  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-}
-@media (max-width: 991px) {
-  .page--dashboard__project {
-    flex-basis: calc(50% - 1rem);
-    width: calc(50% - 1rem);
-  }
-}
-@media (max-width: 767px) {
-  .page--dashboard__project {
-    flex-basis: 0;
-    width: auto;
-  }
-}
-.page--dashboard__project__remove {
-  padding: 0rem;
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  display: block;
-  color: material-color("red", "500");
-}
-.page--dashboard__project__environment {
-  position: relative;
-  margin-bottom: 1rem;
-}
-.page--dashboard__project__environment__menu {
-  position: absolute !important;
-  right: 0;
-  top: 0.5rem;
-  height: 3rem !important;
-  background-color: transparent !important;
-}
-.page--dashboard__project__environment__menu .widget--dropdown__value {
-  color: #ffffff;
-  background-color: transparent;
-  border-radius: 0 !important;
-  border-top-right-radius: 0.2rem !important;
-  border-bottom-right-radius: 0.2rem !important;
-}
-.page--dashboard__project__menu {
-  position: absolute !important;
-  right: 0.5rem;
-  top: 0.5rem;
-}
-
-/**
- * The project backup editor
- */
-.page--dashboard__backup-editor__backup {
-  margin-bottom: 0.5rem;
-}
-
-/**
  * The main menu
  */
 @keyframes navbar-main__pane__item__spinner {
@@ -2280,10 +2213,18 @@ h1, h2, h3, h4, h5, h6 {
 .widget--button.standard {
   background-color: #ffffff;
   color: #333333;
+  border-color: #333333;
+}
+.widget--button.standard:hover {
+  background-color: #eeeeee;
 }
 .widget--button.list-item {
   text-align: left;
   text-transform: none;
+}
+.widget--button.dashed {
+  border-style: dashed;
+  border-width: 1px;
 }
 .widget--button .fa:first-child {
   margin-right: 0.5rem;
@@ -2717,6 +2658,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 2px solid #eeeeee;
   height: 2rem;
   user-select: none;
+  color: #333333;
 }
 .widget--dropdown.small {
   max-width: 2rem;
@@ -2737,10 +2679,13 @@ h1, h2, h3, h4, h5, h6 {
   width: 2rem;
   height: 2rem;
   border: 0;
+  background-color: transparent;
+}
+.widget--dropdown.has-icon:hover {
+  color: #ffffff;
 }
 .widget--dropdown.has-icon:hover .widget--dropdown__value {
   background-color: #e70d3b;
-  color: #ffffff;
 }
 .widget--dropdown.has-icon.right .widget--dropdown__options:before {
   left: auto;
@@ -2806,7 +2751,7 @@ h1, h2, h3, h4, h5, h6 {
   width: calc(100% - 2rem);
   line-height: calc(2rem - 2px);
   padding: 0 0.5rem;
-  color: #333333;
+  color: inherit;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -3069,6 +3014,66 @@ h1, h2, h3, h4, h5, h6 {
 }
 .widget--spinner__message.loaded:before {
   width: 100%;
+}
+
+/**
+ * Project editor
+ */
+.page--dashboard__project {
+  padding: 1rem;
+  margin: 0.5rem;
+  position: relative;
+  flex-grow: 0;
+  flex-basis: calc(33.33% - 1rem);
+  width: calc(33.33% - 1rem);
+  color: #333333;
+  background-color: #ffffff;
+  transform-origin: center;
+  transition: transform 0.25s ease;
+  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+}
+@media (max-width: 991px) {
+  .page--dashboard__project {
+    flex-basis: calc(50% - 1rem);
+    width: calc(50% - 1rem);
+  }
+}
+@media (max-width: 767px) {
+  .page--dashboard__project {
+    flex-basis: 0;
+    width: auto;
+  }
+}
+.page--dashboard__project__remove {
+  padding: 0rem;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  display: block;
+  color: material-color("red", "500");
+}
+.page--dashboard__project__environment {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.page--dashboard__project__environment__menu {
+  position: absolute !important;
+  top: 0.5rem;
+  right: 0;
+  background-color: transparent;
+  color: #f66483;
+}
+.page--dashboard__project__menu {
+  position: absolute !important;
+  right: 0.5rem;
+  top: 0.5rem;
+}
+
+/**
+ * The project backup editor
+ */
+.page--dashboard__backup-editor__backup {
+  margin-bottom: 0.5rem;
 }
 
 /*# sourceMappingURL=client.css.map */

@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
           modelUrl: '/api/server/projects/' + projectId
         });
-        $('.page--dashboard__projects__list').append(projectEditor.$element);
+        $('.page--dashboard__projects__list').prepend(projectEditor.$element);
       }
     } catch (err) {
       _didIteratorError = true;
@@ -200,11 +200,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }) // Check for updates
   .then(function () {
-    if (!currentUserIsAdmin()) {
+    var $btnUpdate = _.find('.page--dashboard__update');
+
+    if (!currentUserIsAdmin() || !$btnUpdate) {
       return;
     }
-
-    var $btnUpdate = _.find('.page--dashboard__update');
 
     return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check').then(function (update) {
       $btnUpdate.removeClass('working');

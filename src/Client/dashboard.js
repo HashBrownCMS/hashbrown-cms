@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modelUrl: '/api/server/projects/' + projectId
             });
 
-            $('.page--dashboard__projects__list').append(projectEditor.$element);
+            $('.page--dashboard__projects__list').prepend(projectEditor.$element);
         }
     })
 
@@ -85,9 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check for updates
     .then(() => {
-        if(!currentUserIsAdmin()) { return; }
-
         let $btnUpdate = _.find('.page--dashboard__update');
+        
+        if(!currentUserIsAdmin() || !$btnUpdate) { return; }
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check')
         .then((update) => {

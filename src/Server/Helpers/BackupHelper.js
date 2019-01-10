@@ -126,6 +126,8 @@ class BackupHelper {
      * @returns {Promise} Promise
      */
     static createBackup(projectName) {
+        checkParam(projectName, 'projectName', String);
+
         return DatabaseHelper.dump(projectName);
     }
 

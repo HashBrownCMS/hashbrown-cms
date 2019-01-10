@@ -104,6 +104,7 @@ class Controller {
         if(values) {
             if(!values[0]) { values.shift(); }
             if(values[0] === 'api') { values.shift(); }
+            if(values[0] === 'media') { values.shift(); }
 
             req.project = values[0];
             req.environment = values[1];

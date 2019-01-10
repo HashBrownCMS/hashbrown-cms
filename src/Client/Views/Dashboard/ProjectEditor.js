@@ -243,7 +243,7 @@ class ProjectEditor extends Crisp.View {
                         );
                     }),
                     _.if(currentUserIsAdmin(),
-                        _.button({title: 'Add environment', class: 'widget widget--button round right fa fa-plus'})
+                        _.button({title: 'Add environment', class: 'widget widget--button dashed standard expanded'}, 'Add environment')
                             .click(() => { this.onClickAddEnvironment(); })
                     )
                 )

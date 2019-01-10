@@ -271,7 +271,7 @@ class ProjectHelper {
     /**
      * Deletes a project
      *
-     * @param {String} name
+     * @param {String} id
      * @param {Boolean} makeBackup
      *
      * @returns {Promise} Promise
@@ -351,7 +351,7 @@ class ProjectHelper {
             debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
 
             // Make a backup
-            return BackupHelper.createBackup(project.id);
+            return BackupHelper.createBackup(project);
         })
 
         // Get all collections with the environment prefix

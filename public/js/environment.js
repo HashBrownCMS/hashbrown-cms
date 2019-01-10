@@ -6473,7 +6473,7 @@ document.addEventListener('DOMContentLoaded', function () {
     heading: /^ *(#{1,6}) *([^\n]+?) *(?:#+ *)?(?:\n+|$)/,
     nptable: noop,
     blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
-    list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+    list: /^( {0,3})(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
     html: '^ {0,3}(?:' // optional indentation
     + '<(script|pre|style)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)' // (1)
     + '|comment[^\\n]*(\\n+|$)' // (2)
@@ -6493,8 +6493,8 @@ document.addEventListener('DOMContentLoaded', function () {
   block._label = /(?!\s*\])(?:\\[\[\]]|[^\[\]])+/;
   block._title = /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/;
   block.def = edit(block.def).replace('label', block._label).replace('title', block._title).getRegex();
-  block.bullet = /(?:[*+-]|\d+\.)/;
-  block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
+  block.bullet = /(?:[*+-]|\d{1,9}\.)/;
+  block.item = /^( *)(bull) ?[^\n]*(?:\n(?!\1bull ?)[^\n]*)*/;
   block.item = edit(block.item, 'gm').replace(/bull/g, block.bullet).getRegex();
   block.list = edit(block.list).replace(/bull/g, block.bullet).replace('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))').replace('def', '\\n+(?=' + block.def.source + ')').getRegex();
   block._tag = 'address|article|aside|base|basefont|blockquote|body|caption' + '|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption' + '|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe' + '|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option' + '|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr' + '|track|ul';
@@ -6513,7 +6513,7 @@ document.addEventListener('DOMContentLoaded', function () {
    */
 
   block.gfm = merge({}, block.normal, {
-    fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\n? *\1 *(?:\n+|$)/,
+    fences: /^ {0,3}(`{3,}|~{3,})([^`\n]*)\n(?:|([\s\S]*?)\n)(?: {0,3}\1[~`]* *(?:\n+|$)|$)/,
     paragraph: /^/,
     heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
   });
@@ -6615,7 +6615,7 @@ document.addEventListener('DOMContentLoaded', function () {
         src = src.substring(cap[0].length);
         this.tokens.push({
           type: 'code',
-          lang: cap[2],
+          lang: cap[2] ? cap[2].trim() : cap[2],
           text: cap[3] || ''
         });
         continue;
@@ -6715,7 +6715,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // so it is seen as the next token.
 
           space = item.length;
-          item = item.replace(/^ *([*+-]|\d+\.) +/, ''); // Outdent whatever the
+          item = item.replace(/^ *([*+-]|\d+\.) */, ''); // Outdent whatever the
           // list item contains. Hacky.
 
           if (~item.indexOf('\n ')) {
@@ -6725,10 +6725,10 @@ document.addEventListener('DOMContentLoaded', function () {
           // Backpedal if it does not belong in this list.
 
 
-          if (this.options.smartLists && i !== l - 1) {
+          if (i !== l - 1) {
             b = block.bullet.exec(cap[i + 1])[0];
 
-            if (bull !== b && !(bull.length > 1 && b.length > 1)) {
+            if (bull.length > 1 ? b.length === 1 : b.length > 1 || this.options.smartLists && b !== bull) {
               src = cap.slice(i + 1).join('\n') + src;
               i = l - 1;
             }
@@ -6904,13 +6904,17 @@ document.addEventListener('DOMContentLoaded', function () {
     link: /^!?\[(label)\]\(href(?:\s+(title))?\s*\)/,
     reflink: /^!?\[(label)\]\[(?!\s*\])((?:\\[\[\]]?|[^\[\]\\])+)\]/,
     nolink: /^!?\[(?!\s*\])((?:\[[^\[\]]*\]|\\[\[\]]|[^\[\]])*)\](?:\[\])?/,
-    strong: /^__([^\s])__(?!_)|^\*\*([^\s])\*\*(?!\*)|^__([^\s][\s\S]*?[^\s])__(?!_)|^\*\*([^\s][\s\S]*?[^\s])\*\*(?!\*)/,
-    em: /^_([^\s_])_(?!_)|^\*([^\s*"<\[])\*(?!\*)|^_([^\s][\s\S]*?[^\s_])_(?!_|[^\s.])|^_([^\s_][\s\S]*?[^\s])_(?!_|[^\s.])|^\*([^\s"<\[][\s\S]*?[^\s*])\*(?!\*)|^\*([^\s*"<\[][\s\S]*?[^\s])\*(?!\*)/,
+    strong: /^__([^\s_])__(?!_)|^\*\*([^\s*])\*\*(?!\*)|^__([^\s][\s\S]*?[^\s])__(?!_)|^\*\*([^\s][\s\S]*?[^\s])\*\*(?!\*)/,
+    em: /^_([^\s_])_(?!_)|^\*([^\s*"<\[])\*(?!\*)|^_([^\s][\s\S]*?[^\s_])_(?!_|[^\spunctuation])|^_([^\s_][\s\S]*?[^\s])_(?!_|[^\spunctuation])|^\*([^\s"<\[][\s\S]*?[^\s*])\*(?!\*)|^\*([^\s*"<\[][\s\S]*?[^\s])\*(?!\*)/,
     code: /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/,
     br: /^( {2,}|\\)\n(?!\s*$)/,
     del: noop,
     text: /^(`+|[^`])[\s\S]*?(?=[\\<!\[`*]|\b_| {2,}\n|$)/
-  };
+  }; // list of punctuation marks from common mark spec
+  // without ` and ] to workaround Rule 17 (inline code blocks/links)
+
+  inline._punctuation = '!"#$%&\'()*+,\\-./:;<=>?@\\[^_{|}~';
+  inline.em = edit(inline.em).replace(/punctuation/g, inline._punctuation).getRegex();
   inline._escapes = /\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/g;
   inline._scheme = /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/;
   inline._email = /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/;
@@ -6949,7 +6953,7 @@ document.addEventListener('DOMContentLoaded', function () {
     del: /^~+(?=\S)([\s\S]*?\S)~+/,
     text: edit(inline.text).replace(']|', '~]|').replace('|$', '|https?://|ftp://|www\\.|[a-zA-Z0-9.!#$%&\'*+/=?^_`{\\|}~-]+@|$').getRegex()
   });
-  inline.gfm.url = edit(inline.gfm.url).replace('email', inline.gfm._extended_email).getRegex();
+  inline.gfm.url = edit(inline.gfm.url, 'i').replace('email', inline.gfm._extended_email).getRegex();
   /**
    * GFM + Line Breaks Inline Grammar
    */
@@ -7015,49 +7019,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // escape
       if (cap = this.rules.escape.exec(src)) {
         src = src.substring(cap[0].length);
-        out += cap[1];
-        continue;
-      } // autolink
-
-
-      if (cap = this.rules.autolink.exec(src)) {
-        src = src.substring(cap[0].length);
-
-        if (cap[2] === '@') {
-          text = escape(this.mangle(cap[1]));
-          href = 'mailto:' + text;
-        } else {
-          text = escape(cap[1]);
-          href = text;
-        }
-
-        out += this.renderer.link(href, null, text);
-        continue;
-      } // url (gfm)
-
-
-      if (!this.inLink && (cap = this.rules.url.exec(src))) {
-        if (cap[2] === '@') {
-          text = escape(cap[0]);
-          href = 'mailto:' + text;
-        } else {
-          // do extended autolink path validation
-          do {
-            prevCapZero = cap[0];
-            cap[0] = this.rules._backpedal.exec(cap[0])[0];
-          } while (prevCapZero !== cap[0]);
-
-          text = escape(cap[0]);
-
-          if (cap[1] === 'www.') {
-            href = 'http://' + text;
-          } else {
-            href = text;
-          }
-        }
-
-        src = src.substring(cap[0].length);
-        out += this.renderer.link(href, null, text);
+        out += escape(cap[1]);
         continue;
       } // tag
 
@@ -7159,6 +7121,48 @@ document.addEventListener('DOMContentLoaded', function () {
         src = src.substring(cap[0].length);
         out += this.renderer.del(this.output(cap[1]));
         continue;
+      } // autolink
+
+
+      if (cap = this.rules.autolink.exec(src)) {
+        src = src.substring(cap[0].length);
+
+        if (cap[2] === '@') {
+          text = escape(this.mangle(cap[1]));
+          href = 'mailto:' + text;
+        } else {
+          text = escape(cap[1]);
+          href = text;
+        }
+
+        out += this.renderer.link(href, null, text);
+        continue;
+      } // url (gfm)
+
+
+      if (!this.inLink && (cap = this.rules.url.exec(src))) {
+        if (cap[2] === '@') {
+          text = escape(cap[0]);
+          href = 'mailto:' + text;
+        } else {
+          // do extended autolink path validation
+          do {
+            prevCapZero = cap[0];
+            cap[0] = this.rules._backpedal.exec(cap[0])[0];
+          } while (prevCapZero !== cap[0]);
+
+          text = escape(cap[0]);
+
+          if (cap[1] === 'www.') {
+            href = 'http://' + text;
+          } else {
+            href = text;
+          }
+        }
+
+        src = src.substring(cap[0].length);
+        out += this.renderer.link(href, null, text);
+        continue;
       } // text
 
 
@@ -7244,7 +7248,9 @@ document.addEventListener('DOMContentLoaded', function () {
     this.options = options || marked.defaults;
   }
 
-  Renderer.prototype.code = function (code, lang, escaped) {
+  Renderer.prototype.code = function (code, infostring, escaped) {
+    var lang = (infostring || '').match(/\S*/)[0];
+
     if (this.options.highlight) {
       var out = this.options.highlight(code, lang);
 
@@ -7269,9 +7275,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return html;
   };
 
-  Renderer.prototype.heading = function (text, level, raw) {
+  Renderer.prototype.heading = function (text, level, raw, slugger) {
     if (this.options.headerIds) {
-      return '<h' + level + ' id="' + this.options.headerPrefix + raw.toLowerCase().replace(/[^\w]+/g, '-') + '">' + text + '</h' + level + '>\n';
+      return '<h' + level + ' id="' + this.options.headerPrefix + slugger.slug(raw) + '">' + text + '</h' + level + '>\n';
     } // ignore IDs
 
 
@@ -7405,6 +7411,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.options.renderer = this.options.renderer || new Renderer();
     this.renderer = this.options.renderer;
     this.renderer.options = this.options;
+    this.slugger = new Slugger();
   }
   /**
    * Static Parse Method
@@ -7484,7 +7491,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       case 'heading':
         {
-          return this.renderer.heading(this.inline.output(this.token.text), this.token.depth, unescape(this.inlineText.output(this.token.text)));
+          return this.renderer.heading(this.inline.output(this.token.text), this.token.depth, unescape(this.inlineText.output(this.token.text)), this.slugger);
         }
 
       case 'code':
@@ -7584,7 +7591,46 @@ document.addEventListener('DOMContentLoaded', function () {
         {
           return this.renderer.paragraph(this.parseText());
         }
+
+      default:
+        {
+          var errMsg = 'Token with "' + this.token.type + '" type was not found.';
+
+          if (this.options.silent) {
+            console.log(errMsg);
+          } else {
+            throw new Error(errMsg);
+          }
+        }
     }
+  };
+  /**
+   * Slugger generates header id
+   */
+
+
+  function Slugger() {
+    this.seen = {};
+  }
+  /**
+   * Convert string to unique id
+   */
+
+
+  Slugger.prototype.slug = function (value) {
+    var slug = value.toLowerCase().trim().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~]/g, '').replace(/\s/g, '-');
+
+    if (this.seen.hasOwnProperty(slug)) {
+      var originalSlug = slug;
+
+      do {
+        this.seen[originalSlug]++;
+        slug = originalSlug + '-' + this.seen[originalSlug];
+      } while (this.seen.hasOwnProperty(slug));
+    }
+
+    this.seen[slug] = 0;
+    return slug;
   };
   /**
    * Helpers
@@ -7930,6 +7976,7 @@ document.addEventListener('DOMContentLoaded', function () {
   marked.lexer = Lexer.lex;
   marked.InlineLexer = InlineLexer;
   marked.inlineLexer = InlineLexer.output;
+  marked.Slugger = Slugger;
   marked.parse = marked;
 
   if ( true && ( false ? undefined : _typeof(exports)) === 'object') {
@@ -7948,7 +7995,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /***/ 27:
 /***/ (function(module) {
 
-module.exports = {"name":"hashbrown-cms","repository":"https://github.com/HashBrownCMS/hashbrown-cms.git","version":"1.1.0","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.5.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.5.2","mongodb":"^2.1.7","multer":"^1.1.0","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","webpack":"^4.27.0","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","babel-loader":"^8.0.0","json-loader":"^0.5.4","sass":"^1.15.2","webpack-cli":"^3.1.2"}};
+module.exports = {"name":"hashbrown-cms","repository":"https://github.com/HashBrownCMS/hashbrown-cms.git","version":"1.1.0","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.5.3","body-parser":"^1.18.3","cookie-parser":"^1.4.3","express":"^4.16.4","express-ws":"^4.0.0","glob":"^7.1.3","js-beautify":"^1.8.9","marked":"^0.6.0","mongodb":"^3.1.10","multer":"^1.4.1","path-to-regexp":"^2.4.0","pug":"^2.0.3","rimraf":"^2.6.3","semver":"^5.6.0","webpack":"^4.28.1","yamljs":"^0.3.0"},"devDependencies":{"@babel/core":"^7.2.2","@babel/preset-env":"^7.2.3","babel-loader":"^8.0.5","json-loader":"^0.5.4","sass":"^1.16.0","webpack-cli":"^3.2.1"}};
 
 /***/ }),
 

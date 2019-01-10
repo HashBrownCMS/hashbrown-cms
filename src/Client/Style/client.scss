@@ -11,10 +11,6 @@
 @import 'Pages/Dashboard';
 @import 'Pages/Environment';
 
-// Dashboard
-@import 'Views/Dashboard/ProjectEditor';
-@import 'Views/Dashboard/BackupEditor';
-
 // Navigation
 @import 'Views/Navigation/MainMenu';
 @import 'Views/Navigation/NavbarMain';
@@ -50,3 +46,8 @@
 @import 'Views/Widgets/Highlight';
 @import 'Views/Widgets/Dropdown';
 @import 'Views/Widgets/Spinner';
+
+// Dashboard
+@import 'Views/Dashboard/ProjectEditor';
+@import 'Views/Dashboard/BackupEditor';
+

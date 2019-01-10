@@ -100,7 +100,7 @@ class DatabaseHelper {
      * @returns {Promise} Data string
      */
     static async restore(databaseName, timestamp) {
-        let archivePath = Path.join(APP_ROOT, '/storage', databaseName, 'dump', timestamp + '.hba');
+        let archivePath = Path.join(APP_ROOT, 'storage', databaseName, 'dump', timestamp + '.hba');
        
         try {
             let archiveContent = await HashBrown.Helpers.FileHelper.read(archivePath, 'utf8'); 
@@ -144,6 +144,8 @@ class DatabaseHelper {
      * @returns {Promise} Timestamp
      */
     static async dump(databaseName) {
+        checkParam(databaseName, 'databaseName', String);
+
         let dumpPath = Path.join(APP_ROOT, 'storage', databaseName, 'dump');
 
         // Archive

@@ -12,6 +12,7 @@
     border: 2px solid $standard-dark;
     height: 2rem;
     user-select: none;
+    color: $standard-text;
 
     // Small
     &.small {
@@ -45,11 +46,13 @@
         width: 2rem;
         height: 2rem;
         border: 0;
+        background-color: transparent;
 
         &:hover {
+            color: $primary-text;
+            
             .widget--dropdown__value {
                 background-color: $primary;
-                color: $primary-text;
             }
         }
       
@@ -133,7 +136,7 @@
         width: calc(100% - 2rem);
         line-height: calc(2rem - 2px);
         padding: 0 0.5rem;
-        color: $standard-text;
+        color: inherit;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
