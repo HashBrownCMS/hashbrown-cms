@@ -13424,7 +13424,7 @@ function (_HashBrown$Views$Edit) {
       return [_.button({
         class: 'editor__field__key__action editor__field__key__action--sort'
       }).click(function (e) {
-        HashBrown.Helpers.UHashBrown.Helpers.IHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
+        HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
           _this2.value = newArray;
 
           _this2.trigger('change', _this2.value);

@@ -42,7 +42,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
                 .click((e) => {
-                    HashBrown.Helpers.UHashBrown.Helpers.IHelper.fieldSortableArray(
+                    HashBrown.Helpers.UIHelper.fieldSortableArray(
                         this.value,
                         $(e.currentTarget).parents('.editor__field')[0],
                         (newArray) => {
