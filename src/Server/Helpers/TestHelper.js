@@ -1,13 +1,5 @@
 'use strict';
 
-const BackupHelper = require('Server/Helpers/BackupHelper');
-const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-const ContentHelper = require('Server/Helpers/ContentHelper');
-const FormHelper = require('Server/Helpers/FormHelper');
-const ProjectHelper = require('Server/Helpers/ProjectHelper');
-const SchemaHelper = require('Server/Helpers/SchemaHelper');
-const UpdateHelper = require('Server/Helpers/UpdateHelper');
-
 /**
  * The helpers class for system tests
  *
@@ -15,7 +7,7 @@ const UpdateHelper = require('Server/Helpers/UpdateHelper');
  */
 class TestHelper {
     /**
-     * BackupHelper test
+     * HashBrown.Helpers.BackupHelper test
      *
      * @param {String} project
      * @param {Function} onMessage
@@ -29,27 +21,27 @@ class TestHelper {
         let timestamp;
 
         onMessage('Get backups for project "' + project + '"');
-        return BackupHelper.getBackupsForProject(project)
+        return HashBrown.Helpers.BackupHelper.getBackupsForProject(project)
         .then((backups) => {
             onMessage('Create backup'); 
-            return BackupHelper.createBackup(project);
+            return HashBrown.Helpers.BackupHelper.createBackup(project);
         })
         .then((newTimestamp) => {
             timestamp = newTimestamp;
 
             onMessage('Get path of backup "' + timestamp + '"');
-            return BackupHelper.getBackupPath(project, timestamp);
+            return HashBrown.Helpers.BackupHelper.getBackupPath(project, timestamp);
         }).then((path) => {
             onMessage('Restore backup "' + timestamp + '"');
-            return BackupHelper.restoreBackup(project, timestamp);
+            return HashBrown.Helpers.BackupHelper.restoreBackup(project, timestamp);
         }).then((path) => {
             onMessage('Delete backup "' + timestamp + '"');
-            return BackupHelper.deleteBackup(project, timestamp);
+            return HashBrown.Helpers.BackupHelper.deleteBackup(project, timestamp);
         });
     }
 
     /**
-     * ConnectionHelper test
+     * HashBrown.Helpers.ConnectionHelper test
      *
      * @param {String} project
      * @param {String} environment
@@ -63,27 +55,27 @@ class TestHelper {
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create connection')
-        return ConnectionHelper.createConnection(project, environment)
+        return HashBrown.Helpers.ConnectionHelper.createConnection(project, environment)
         .then((testConnection) => {
             onMessage('Get connection by id "' + testConnection.id + '"');
-            return ConnectionHelper.getConnectionById(project, environment, testConnection.id);
+            return HashBrown.Helpers.ConnectionHelper.getConnectionById(project, environment, testConnection.id);
         })
         .then((testConnection) => {
             onMessage('Update connection by id "' + testConnection.id + '"');
-            return ConnectionHelper.setConnectionById(project, environment, testConnection.id, testConnection, false);
+            return HashBrown.Helpers.ConnectionHelper.setConnectionById(project, environment, testConnection.id, testConnection, false);
         })
         .then((testConnection) => {
             onMessage('Remove connection by id "' + testConnection.id + '"');
-            return ConnectionHelper.removeConnectionById(project, environment, testConnection.id);
+            return HashBrown.Helpers.ConnectionHelper.removeConnectionById(project, environment, testConnection.id);
         })
         .then(() => {   
             onMessage('Get all connections');
-            return ConnectionHelper.getAllConnections(project, environment)
+            return HashBrown.Helpers.ConnectionHelper.getAllConnections(project, environment)
         });
     }
 
     /**
-     * FormHelper test
+     * HashBrown.Helpers.FormHelper test
      *
      * @param {String} project
      * @param {String} environment
@@ -97,31 +89,31 @@ class TestHelper {
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create form')
-        return FormHelper.createForm(project, environment)
+        return HashBrown.Helpers.FormHelper.createForm(project, environment)
         .then((testForm) => {
             onMessage('Get form by id "' + testForm.id + '"');
-            return FormHelper.getForm(project, environment, testForm.id);
+            return HashBrown.Helpers.FormHelper.getForm(project, environment, testForm.id);
         })
         .then((testForm) => {
             onMessage('Update form by id "' + testForm.id + '"');
-            return FormHelper.setForm(project, environment, testForm.id, testForm, false);
+            return HashBrown.Helpers.FormHelper.setForm(project, environment, testForm.id, testForm, false);
         })
         .then((testForm) => {
             onMessage('Add entry to form "' + testForm.id + '"');
-            return FormHelper.addEntry(project, environment, testForm.id, {});
+            return HashBrown.Helpers.FormHelper.addEntry(project, environment, testForm.id, {});
         })
         .then((testForm) => {
             onMessage('Remove form by id "' + testForm.id + '"');
-            return FormHelper.deleteForm(project, environment, testForm.id);
+            return HashBrown.Helpers.FormHelper.deleteForm(project, environment, testForm.id);
         })
         .then(() => {   
             onMessage('Get all forms');
-            return FormHelper.getAllForms(project, environment)
+            return HashBrown.Helpers.FormHelper.getAllForms(project, environment)
         });
     }
 
     /**
-     * ContentHelper test
+     * HashBrown.Helpers.ContentHelper test
      *
      * @param {String} project
      * @param {String} environment
@@ -137,7 +129,7 @@ class TestHelper {
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create content');
-        return ContentHelper.createContent(
+        return HashBrown.Helpers.ContentHelper.createContent(
             project,
             environment,
             'contentBase',
@@ -145,64 +137,56 @@ class TestHelper {
             user
         ).then((testContent) => {
             onMessage('Get content by id "' + testContent.id + '"');
-            return ContentHelper.getContentById(project, environment, testContent.id);
+            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, testContent.id);
         })
         .then((testContent) => {
             onMessage('Update content by id "' + testContent.id + '"');
-            return ContentHelper.setContentById(project, environment, testContent.id, testContent, user);
+            return HashBrown.Helpers.ContentHelper.setContentById(project, environment, testContent.id, testContent, user);
         })
         .then((testContent) => {
             onMessage('Remove content by id "' + testContent.id + '"');
-            return ContentHelper.removeContentById(project, environment, testContent.id);
+            return HashBrown.Helpers.ContentHelper.removeContentById(project, environment, testContent.id);
         })
         .then(() => {   
             onMessage('Get all contents');
-            return ContentHelper.getAllContents(project, environment)
+            return HashBrown.Helpers.ContentHelper.getAllContents(project, environment)
         });
     }
     
     /**
-     * ProjectHelper test
+     * HashBrown.Helpers.ProjectHelper test
      *
-     * @param {User} user
+     * @param {Project} testProject 
      * @param {Function} onMessage
      *
      * @returns {Promise}
      */
-    static testProjectHelper(user, onMessage) {
-        checkParam(user, 'user', HashBrown.Models.User);
+    static testProjectHelper(testProject, onMessage) {
+        checkParam(testProject, 'testProject', HashBrown.Models.Project);
         checkParam(onMessage, 'onMessage', Function);
 
-        let testProject;
-
-        onMessage('Create project "Tæ$tp_r ojéct"');
-        return ProjectHelper.createProject('Tæ$tp_r ojéct', user.id)
-        .then((newProject) => {
-            testProject = newProject;
-
-            onMessage('Get project by id "' + testProject.id + '"');
-            return ProjectHelper.getProject(testProject.id);
-        })
+        onMessage('Get project by id "' + testProject.id + '"');
+        return HashBrown.Helpers.ProjectHelper.getProject(testProject.id)
         .then(() => {
             onMessage('Add environment to project "' + testProject.id + '"');
-            return ProjectHelper.addEnvironment(testProject.id, 'testenvironment');
+            return HashBrown.Helpers.ProjectHelper.addEnvironment(testProject.id, 'testenvironment');
         })
         .then((testEnvironment) => {
             onMessage('Remove environment from project "' + testProject.id  + '"');
-            return ProjectHelper.deleteEnvironment(testProject.id, testEnvironment);
+            return HashBrown.Helpers.ProjectHelper.deleteEnvironment(testProject.id, testEnvironment);
         })
         .then(() => {
             onMessage('Get all environments from project "' + testProject.id  + '"');
-            return ProjectHelper.getAllEnvironments(testProject.id);
+            return HashBrown.Helpers.ProjectHelper.getAllEnvironments(testProject.id);
         })
         .then(() => {
             onMessage('Delete project "' + testProject.id  + '"');
-            return ProjectHelper.deleteProject(testProject.id, false);
+            return HashBrown.Helpers.ProjectHelper.deleteProject(testProject.id, false);
         });
     }
 
     /**
-     * SchemaHelper test
+     * HashBrown.Helpers.SchemaHelper test
      *
      * @param {String} project
      * @param {String} environment
@@ -216,7 +200,7 @@ class TestHelper {
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Get native schemas');
-        return SchemaHelper.getNativeSchemas()
+        return HashBrown.Helpers.SchemaHelper.getNativeSchemas()
         .then((nativeSchemas) => {
             let contentBase;
 
@@ -228,7 +212,7 @@ class TestHelper {
             }
 
             onMessage('Create schema')
-            return SchemaHelper.createSchema(
+            return HashBrown.Helpers.SchemaHelper.createSchema(
                 project,
                 environment,
                 contentBase
@@ -236,19 +220,19 @@ class TestHelper {
         })
         .then((testSchema) => {
             onMessage('Get schema by id "' + testSchema.id + '"');
-            return SchemaHelper.getSchemaWithParentFields(project, environment, testSchema.id);
+            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(project, environment, testSchema.id);
         })
         .then((testSchema) => {
             onMessage('Update schema by id "' + testSchema.id + '"');
-            return SchemaHelper.setSchemaById(project, environment, testSchema.id, testSchema, false);
+            return HashBrown.Helpers.SchemaHelper.setSchemaById(project, environment, testSchema.id, testSchema, false);
         })
         .then((testSchema) => {
             onMessage('Remove schema by id "' + testSchema.id + '"');
-            return SchemaHelper.removeSchemaById(project, environment, testSchema.id);
+            return HashBrown.Helpers.SchemaHelper.removeSchemaById(project, environment, testSchema.id);
         })
         .then(() => {   
             onMessage('Get all schemas');
-            return SchemaHelper.getAllSchemas(project, environment)
+            return HashBrown.Helpers.SchemaHelper.getAllSchemas(project, environment)
         });
     }
 }

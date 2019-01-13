@@ -1,7 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Server/Helpers/RequestHelper');
-
 /**
  * The helper class for all synchronisation services
  *
@@ -35,7 +33,7 @@ class SyncHelper {
                 password: password
             };
                 
-            return RequestHelper.request('post', settings.url + 'user/login?persist=true', postData)
+            return HashBrown.Helpers.RequestHelper.request('post', settings.url + 'user/login?persist=true', postData)
             .then((data) => {
                 debug.log('Sync token renewed successfully', this);
                     
@@ -99,7 +97,7 @@ class SyncHelper {
 
                 debug.log('Requesting remote resource item ' + resource + ' for ' + path + '...', this, 3);
 
-                return RequestHelper.request('get', settings.url + path + '/' + resource + '?token=' + settings.token)
+                return HashBrown.Helpers.RequestHelper.request('get', settings.url + path + '/' + resource + '?token=' + settings.token)
                 .then((data) => {
                     if(data instanceof Object) {
                         data.isLocked = true;
@@ -171,7 +169,7 @@ class SyncHelper {
                 };
                
                 // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
-                return RequestHelper.request('post', settings.url + path + '/' + resource + '?create=true&token=' + settings.token, remoteItemData)
+                return HashBrown.Helpers.RequestHelper.request('post', settings.url + path + '/' + resource + '?create=true&token=' + settings.token, remoteItemData)
                 .then((data) => {
                     debug.log('Remote resource item ' + resource + ' posted successfully', this, 3);
                     
@@ -212,7 +210,7 @@ class SyncHelper {
                 
                 params.token = settings.token;
               
-                return RequestHelper.request('get', settings.url + path + '/' + remoteResourceName, params)
+                return HashBrown.Helpers.RequestHelper.request('get', settings.url + path + '/' + remoteResourceName, params)
                 .then((data) => {
                     debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);
                         

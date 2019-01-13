@@ -1,13 +1,5 @@
 'use strict';
 
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const BackupHelper = require('Server/Helpers/BackupHelper');
-const UserHelper = require('Server/Helpers/UserHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-const SettingsHelper = require('Server/Helpers/SettingsHelper');
-
-const Project = require('Common/Models/Project');
-
 /**
  * A helper class for managing projects
  *
@@ -20,7 +12,7 @@ class ProjectHelper {
      * @returns {Promise} Array of Project names
      */
     static getAllProjectIds() {
-        return DatabaseHelper.listDatabases()
+        return HashBrown.Helpers.DatabaseHelper.listDatabases()
         .then((allDatabases) => {
             allDatabases = allDatabases || [];
 
@@ -51,7 +43,7 @@ class ProjectHelper {
      * @returns {Promise} Array of Projects
      */
     static getAllProjects() {
-        return DatabaseHelper.listDatabases()
+        return HashBrown.Helpers.DatabaseHelper.listDatabases()
         .then((allDatabases) => {
             allDatabases = allDatabases || [];
 
@@ -98,7 +90,7 @@ class ProjectHelper {
     static projectExists(project) {
         if(!project) { return Promise.resolve(false); }
 
-        return DatabaseHelper.collectionExists(project, 'settings');
+        return HashBrown.Helpers.DatabaseHelper.collectionExists(project, 'settings');
     }
     
     /**
@@ -164,7 +156,7 @@ class ProjectHelper {
 
             settings.sync.enabled = isEnabled;
             
-            return DatabaseHelper.updateOne(
+            return HashBrown.Helpers.DatabaseHelper.updateOne(
                 id,
                 'settings',
                 { usedBy: 'project' },
@@ -206,7 +198,7 @@ class ProjectHelper {
             return this.getAllEnvironments(id);
         })
         .then((foundEnvironments) => {
-            let project = new Project({
+            let project = new HashBrown.Models.Project({
                 id: id,
                 backups: backups,
                 settings: settings,
@@ -229,7 +221,7 @@ class ProjectHelper {
         return this.checkProject(project)
         .then(() => {
             // First attempt to get remote environments
-            return SyncHelper.getResource(project, null, 'environments')
+            return HashBrown.Helpers.SyncHelper.getResource(project, null, 'environments')
         })
         .then((environments) => {
             // If remote environments were found, resolve immediately
@@ -238,7 +230,7 @@ class ProjectHelper {
             }
 
             // If remote environments were not found, return local ones
-            return DatabaseHelper.find(project, 'settings', {})
+            return HashBrown.Helpers.DatabaseHelper.find(project, 'settings', {})
             .then((allSettings) => {
                 let names = [];
 
@@ -254,8 +246,8 @@ class ProjectHelper {
                 }
 
                 // If we don't, make sure there is a "live" one
-                // NOTE: Using the DatabaseHelper directly here, since using the SettingsHelper would create a cyclic call stack
-                return DatabaseHelper.insertOne(
+                // NOTE: Using the HashBrown.Helpers.DatabaseHelper directly here, since using the HashBrown.Helpers.SettingsHelper would create a cyclic call stack
+                return HashBrown.Helpers.DatabaseHelper.insertOne(
                     project,
                     'settings',
                     { usedBy: 'live' },
@@ -283,14 +275,14 @@ class ProjectHelper {
         .then(() => {
             // Make backup first, if specified
             if(makeBackup) {
-                return BackupHelper.createBackup(id)
+                return HashBrown.Helpers.BackupHelper.createBackup(id)
                 .then(() => {
-                    return DatabaseHelper.dropDatabase(id);
+                    return HashBrown.Helpers.DatabaseHelper.dropDatabase(id);
                 });
 
             // If not, just drop the database
             } else {
-                return DatabaseHelper.dropDatabase(id);
+                return HashBrown.Helpers.DatabaseHelper.dropDatabase(id);
             }
         });
     }
@@ -310,7 +302,7 @@ class ProjectHelper {
         return this.checkProject(project)
         .then(() => {
             // Check if project is synced first
-            return SettingsHelper.getSettings(project, null, 'sync');
+            return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'sync');
         })
         .then((sync) => {
             if(sync.enabled) {
@@ -319,7 +311,7 @@ class ProjectHelper {
             
             debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
       
-            return SettingsHelper.setSettings(project, environment, null, {}, true);
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, null, {}, true);
         })
         .then(() => {
             return Promise.resolve(environment);  
@@ -341,7 +333,7 @@ class ProjectHelper {
         return this.checkProject(project)
         .then(() => {
             // Check if project is synced first
-            return SettingsHelper.getSettings(project, null, 'sync');
+            return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'sync');
         })
         .then((sync) => {
             if(sync.enabled) {
@@ -351,12 +343,12 @@ class ProjectHelper {
             debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
 
             // Make a backup
-            return BackupHelper.createBackup(project);
+            return HashBrown.Helpers.BackupHelper.createBackup(project);
         })
 
         // Get all collections with the environment prefix
         .then(() => {
-            return DatabaseHelper.listCollections(project);
+            return HashBrown.Helpers.DatabaseHelper.listCollections(project);
         })
 
         // Iterate through collections and match them with the environment name
@@ -372,7 +364,7 @@ class ProjectHelper {
 
                 // This collection matches the environment name, drop it
                 if(collection.name.indexOf(environment + '.') == 0) {
-                    return DatabaseHelper.dropCollection(project, collection.name)
+                    return HashBrown.Helpers.DatabaseHelper.dropCollection(project, collection.name)
                     .then(() => {
                         return next();
                     });
@@ -387,7 +379,7 @@ class ProjectHelper {
         
         // Remove environment settings settings
         .then(() => {
-            return DatabaseHelper.remove(project, 'settings', { usedBy: environment });
+            return HashBrown.Helpers.DatabaseHelper.remove(project, 'settings', { usedBy: environment });
         });
     }
     
@@ -407,9 +399,9 @@ class ProjectHelper {
             return Promise.reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
         }
             
-        let project = Project.create(name);
+        let project = HashBrown.Models.Project.create(name);
 
-        return UserHelper.getUserById(userId)
+        return HashBrown.Helpers.UserHelper.getUserById(userId)
         .then((user) => {
             if(!user.isAdmin) {
                 return Promise.reject(new Error('Only admins can create projects'));
@@ -422,7 +414,7 @@ class ProjectHelper {
                 return Promise.reject('A project by name "' + name + '" already exists');
             }
 
-            return DatabaseHelper.insertOne(project.id, 'settings', project.settings);
+            return HashBrown.Helpers.DatabaseHelper.insertOne(project.id, 'settings', project.settings);
         })
         .then(() => {
             return Promise.resolve(project);

@@ -8,10 +8,6 @@ const Path = require('path');
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 
-const Content = require('Server/Models/Content');
-const Connection = require('Server/Models/Connection');
-const User = require('Server/Models/User');
-
 /**
  * The helper class for database operations
  *
@@ -176,6 +172,8 @@ class DatabaseHelper {
         await HashBrown.Helpers.FileHelper.write(collections, archivePath);
                     
         debug.log('Database dumped successfully', this);
+
+        return timestamp;
     }
 
     /**

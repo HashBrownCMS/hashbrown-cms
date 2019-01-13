@@ -2,9 +2,6 @@
 
 const Path = require('path');
 
-const Processor = require('Common/Models/Processor');
-const Deployer = require('Common/Models/Deployer');
-
 const ConnectionCommon = require('Common/Models/Connection');
 
 /**
@@ -19,8 +16,8 @@ class Connection extends ConnectionCommon {
     structure() {
         super.structure();
 
-        this.def(Processor, 'processor');
-        this.def(Deployer, 'deployer');
+        this.def(HashBrown.Models.Processor, 'processor');
+        this.def(HashBrown.Models.Deployer, 'deployer');
     }
 
     /**
@@ -33,7 +30,7 @@ class Connection extends ConnectionCommon {
     static paramsCheck(params) {
         params = super.paramsCheck(params);
 
-        if(params.processor instanceof Processor === false) {
+        if(params.processor instanceof HashBrown.Models.Processor === false) {
             let processor = HashBrown.Helpers.ConnectionHelper.getProcessor(params.processor.alias);
 
             if(processor) {
@@ -41,7 +38,7 @@ class Connection extends ConnectionCommon {
             }
         }
         
-        if(params.deployer instanceof Deployer === false) {
+        if(params.deployer instanceof HashBrown.Models.Deployer === false) {
             let deployer = HashBrown.Helpers.ConnectionHelper.getDeployer(params.deployer.alias);
 
             if(deployer) {

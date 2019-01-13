@@ -1,15 +1,11 @@
 'use strict';
 
-const Schema = require('Server/Models/Schema');
-const FieldSchema = require('Server/Models/FieldSchema');
-const ContentSchema = require('Server/Models/ContentSchema');
-
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const FileSystem = require('fs');
 const Path = require('path');
+
+// TODO: Make this a GIT submodule
 const Glob = require('glob');
 
 /**
@@ -55,10 +51,10 @@ class SchemaHelper extends SchemaHelperCommon {
                                 
                                 switch(parentDirName) {
                                     case 'Content':
-                                        schema = new ContentSchema(properties);
+                                        schema = new HashBrown.Models.ContentSchema(properties);
                                         break;
                                     case 'Field':
-                                        schema = new FieldSchema(properties);
+                                        schema = new HashBrown.Models.FieldSchema(properties);
                                         break;
                                 }
 
@@ -109,7 +105,7 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
         let result = [];
        
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             project,
             collection,
             {}
@@ -119,7 +115,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 schemas[i] = this.getModel(schemas[i]);
             }
 
-            return SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
+            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
         });
     }
 
@@ -231,7 +227,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         let promise = this.isNativeSchema(id) ?
             this.getNativeSchema(id) :
-            DatabaseHelper.findOne(
+            HashBrown.Helpers.DatabaseHelper.findOne(
                 project,
                 collection
                 ,
@@ -246,7 +242,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 return Promise.resolve(schemaData);
             
             } else {
-                return SyncHelper.getResourceItem(project, environment, 'schemas', id);
+                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'schemas', id);
 
             }
         })
@@ -355,7 +351,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         // Then remove the requested Schema
         .then(() => {
-            return DatabaseHelper.removeOne(
+            return HashBrown.Helpers.DatabaseHelper.removeOne(
                 project,
                 collection,
                 {
@@ -428,7 +424,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 return Promise.reject(new Error('The Schema id "' + schema.id + '" already exists.'));
             }   
 
-            return DatabaseHelper.updateOne(
+            return HashBrown.Helpers.DatabaseHelper.updateOne(
                 project,
                 collection,
                 {
@@ -459,9 +455,9 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
 
         let collection = environment + '.schemas';
-        let newSchema = Schema.create(parentSchema);
+        let newSchema = HashBrown.Models.Schema.create(parentSchema);
 
-        return DatabaseHelper.insertOne(
+        return HashBrown.Helpers.DatabaseHelper.insertOne(
             project,
             collection,
             newSchema.getObject() 

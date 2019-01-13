@@ -1,6 +1,5 @@
 'use strict';
 
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
 
 /**
@@ -31,7 +30,7 @@ class SettingsHelper extends SettingsHelperCommon {
         collection.push(newProjectSettings);
 
         // First check if project exists
-        return DatabaseHelper.databaseExists(project)
+        return HashBrown.Helpers.DatabaseHelper.databaseExists(project)
         .then((doesExist) => {
             if(!doesExist) {
                 return Promise.reject(new Error('Project by id "' + project + '" not found'));
@@ -40,7 +39,7 @@ class SettingsHelper extends SettingsHelperCommon {
             debug.log('Getting project settings...', this, 3);
 
             // Then get project settings
-            return DatabaseHelper.find(
+            return HashBrown.Helpers.DatabaseHelper.find(
                 project,
                 'settings',
                 {}
@@ -77,7 +76,7 @@ class SettingsHelper extends SettingsHelperCommon {
             
                 debug.log('Getting settings for environment "' + environment + '"...', this, 3);
 
-                return DatabaseHelper.find(
+                return HashBrown.Helpers.DatabaseHelper.find(
                     project, 
                     environment + '.settings',
                     {}
@@ -113,7 +112,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     
                     if(!commitChanges) { return Promise.resolve(); }
                     
-                    return DatabaseHelper.remove(
+                    return HashBrown.Helpers.DatabaseHelper.remove(
                         project,
                         environment + '.settings',
                         {}
@@ -133,7 +132,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
             if(!commitChanges) { return Promise.resolve(); }
 
-            return DatabaseHelper.remove(
+            return HashBrown.Helpers.DatabaseHelper.remove(
                 project,
                 'settings',
                 {}
@@ -155,7 +154,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     
                 if(!commitChanges) { return insertNextSetting(); }
 
-                return DatabaseHelper.insertOne(
+                return HashBrown.Helpers.DatabaseHelper.insertOne(
                     project,
                     'settings',
                     setting
@@ -184,7 +183,7 @@ class SettingsHelper extends SettingsHelperCommon {
     static checkIfNeedsMigration(project) {
         checkParam(project, 'project', String);
 
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             project,
             'settings',
             { section: { $exists: true } }
@@ -248,7 +247,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
         // If the requested section is "sync", always return the local setting
         if(section === 'sync') {
-            return DatabaseHelper.findOne(project, 'settings', { usedBy: 'project' })
+            return HashBrown.Helpers.DatabaseHelper.findOne(project, 'settings', { usedBy: 'project' })
             .then((projectSettings) => {
                 if(!projectSettings) {
                     projectSettings = {};
@@ -275,7 +274,7 @@ class SettingsHelper extends SettingsHelperCommon {
                 query.usedBy = environment;
             }
 
-            return DatabaseHelper.findOne(project, 'settings', query);
+            return HashBrown.Helpers.DatabaseHelper.findOne(project, 'settings', query);
         })
 
         // Return appropriate section or all settings
@@ -329,7 +328,7 @@ class SettingsHelper extends SettingsHelperCommon {
             if(section === 'sync') {
                 oldSettings.sync = settings;
 
-                return DatabaseHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings, { upsert: true });
+                return HashBrown.Helpers.DatabaseHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings, { upsert: true });
             }
 
             // Set the remote setting, if applicable
@@ -366,7 +365,7 @@ class SettingsHelper extends SettingsHelperCommon {
                 }
                 
                 // Update the database
-                return DatabaseHelper.updateOne(
+                return HashBrown.Helpers.DatabaseHelper.updateOne(
                     project,
                     'settings',
                     query,

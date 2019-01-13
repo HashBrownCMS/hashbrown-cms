@@ -1,29 +1,23 @@
 'use strict';
 
-const ApiController = require('./ApiController');
-const TestHelper = require('Server/Helpers/TestHelper');
-
 /**
  * The Controller for testing
  *
  * @memberof HashBrown.Server.Controllers
  */
-class TestController extends ApiController {
+class TestController extends HashBrown.Controllers.ApiController {
     /**
      * Initialises this controller
      */
     static init(app) {
-        app.ws('/api/:project/:environment/test', this.wsTest);
+        app.ws('/api/test', this.wsTest);
     }
 
     /**
      * Starts up the testing process
      */
     static wsTest(ws, req) {
-        let project = req.params.project;
-        let environment = req.params.environment;
-
-        return TestController.authenticate(req.cookies.token, project, environment, true)
+        return TestController.authenticate(req.cookies.token, null, null, true)
         .then((user) => {
             if(!user.isAdmin) {
                 return Promise.reject(new Error('The testing tool requires admin privileges'));
@@ -48,28 +42,38 @@ class TestController extends ApiController {
                     ws.send(JSON.stringify({isDone: true}));
                 };
 
-                onMessage('Testing BackupHelper...', true);
-                return TestHelper.testBackupHelper(project, onMessage)
-                .catch(onError)
+                let testProject;
+                let project = null;
+                let environment = 'live';
+
+                onMessage('Creating test project...', true);
+                return HashBrown.Helpers.ProjectHelper.createProject('test ' + new Date().toString(), user.id)
+                .then((newProject) => {
+                    testProject = newProject;
+                    project = newProject.id;
+
+                    onMessage('Testing BackupHelper...', true);
+                    return HashBrown.Helpers.TestHelper.testBackupHelper(project, onMessage)
+                }).catch(onError)
                 .then(() => {
                     onMessage('Testing ConnectionHelper...', true);
-                    return TestHelper.testConnectionHelper(project, environment, onMessage);
+                    return HashBrown.Helpers.TestHelper.testConnectionHelper(project, environment, onMessage);
                 }).catch(onError)
                 .then(() => {
                     onMessage('Testing ContentHelper...', true);
-                    return TestHelper.testContentHelper(project, environment, user, onMessage);
+                    return HashBrown.Helpers.TestHelper.testContentHelper(project, environment, user, onMessage);
                 }).catch(onError)
                 .then(() => {
                     onMessage('Testing FormHelper...', true);
-                    return TestHelper.testFormHelper(project, environment, onMessage);
+                    return HashBrown.Helpers.TestHelper.testFormHelper(project, environment, onMessage);
                 }).catch(onError)
                 .then(() => {
                     onMessage('Testing SchemaHelper...', true);
-                    return TestHelper.testSchemaHelper(project, environment, onMessage);
+                    return HashBrown.Helpers.TestHelper.testSchemaHelper(project, environment, onMessage);
                 }).catch(onError)
                 .then(() => {
                     onMessage('Testing ProjectHelper...', true);
-                    return TestHelper.testProjectHelper(user, onMessage);
+                    return HashBrown.Helpers.TestHelper.testProjectHelper(testProject, onMessage);
                 }).catch(onError)
                 .then(() => {
                     onDone();

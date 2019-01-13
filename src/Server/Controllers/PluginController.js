@@ -3,14 +3,12 @@
 const Glob = require('glob');
 const FileSystem = require('fs');
 
-const Controller = require('./Controller');
-
 /**
  * The controller for serving plugin content
  *
  * @memberof HashBrown.Server.Controllers
  */
-class PluginController extends Controller {
+class PluginController extends HashBrown.Controllers.Controller {
     /**
      * Initialises this controller
      */

@@ -1,9 +1,11 @@
 'use strict';
 
 const FileSystem = require('fs');
+const Path = require('path');
+
+// TODO: Make these GIT submodules
 const RimRaf = require('rimraf');
 const Glob = require('glob');
-const Path = require('path');
 
 /**
  * A helper class for handling file system operations

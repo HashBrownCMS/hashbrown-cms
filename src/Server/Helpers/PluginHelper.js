@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: Make this a GIT submodule
 const Glob = require('glob');
 
 /**

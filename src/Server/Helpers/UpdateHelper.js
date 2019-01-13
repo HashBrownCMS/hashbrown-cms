@@ -3,6 +3,8 @@
 const ChildProcess = require('child_process');
 const Path = require('path');
 const FileSystem = require('fs');
+
+// TODO: Make this a GIT submodule
 const SemanticVersion = require('semver');
 
 /**

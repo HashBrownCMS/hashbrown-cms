@@ -1,6 +1,5 @@
 'use strict';
 
-const SettingsHelper = require('Server/Helpers/SettingsHelper');
 const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
 
 /**
@@ -19,7 +18,7 @@ class LanguageHelper extends LanguageHelperCommon {
     static getLanguages(project) {
         checkParam(project, 'project', String);
 
-        return SettingsHelper.getSettings(project, null, 'languages')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages')
         .then((selected) => {
             if(!selected || !Array.isArray(selected)) {
                 selected = ['en'];

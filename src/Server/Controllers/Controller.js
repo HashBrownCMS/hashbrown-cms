@@ -1,7 +1,5 @@
 'use strict';
 
-const PathToRegexp = require('path-to-regexp');
-
 /**
  * The base class for all controllers
  *

@@ -23,5 +23,6 @@ namespace('Helpers')
 .add(require('./SchemaHelper'))
 .add(require('./SettingsHelper'))
 .add(require('./SyncHelper'))
+.add(require('./TestHelper'))
 .add(require('./UpdateHelper'))
 .add(require('./UserHelper'));

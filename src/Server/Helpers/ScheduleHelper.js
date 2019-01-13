@@ -1,7 +1,5 @@
 'use strict';
 
-const Task = require('Server/Models/Task');
-
 const WATCH_INTERVAL = 1000 * 60; // One minute
 
 /**
@@ -138,7 +136,7 @@ class ScheduleHelper {
             query
         ).then((tasks) => {
             for(let i in tasks) {
-                tasks[i] = new Task(tasks[i]);
+                tasks[i] = new HashBrown.Models.Task(tasks[i]);
             }
 
             return Promise.resolve(tasks);
@@ -170,7 +168,7 @@ class ScheduleHelper {
             return Promise.reject(new Error('Date "' + date + '" is invalid'));
         }
 
-        let task = new Task({
+        let task = new HashBrown.Models.Task({
             type: type,
             content: contentId,
             date: date,

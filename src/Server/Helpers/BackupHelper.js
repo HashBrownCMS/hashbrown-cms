@@ -4,11 +4,6 @@ const FileSystem = require('fs');
 const Glob = require('glob');
 const Multer = require('multer');
 
-const MediaHelper = require('Server/Helpers/MediaHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-
-const Connection = require('Server/Models/Connection');
-
 /**
  * A helper class for managing backups
  *
@@ -63,15 +58,10 @@ class BackupHelper {
                    
                     debug.log('Handling file upload to dump storage...', this);
 
-                    if(!FileSystem.existsSync(path)){
-                        MediaHelper.mkdirRecursively(path, () => {
-                            resolve(null, path);
-                        });
-                    
-                    } else {
+                    HashBrown.Helpers.FileHelper.makeDirectory(path)
+                    .then(() => {
                         resolve(null, path);
-
-                    }
+                    });
                 },
                 filename: (req, file, resolve) => {
                     resolve(null, file.originalname);
@@ -114,7 +104,7 @@ class BackupHelper {
      * @returns {Promise} Promise
      */
     static restoreBackup(projectName, timestamp) {
-        return DatabaseHelper.restore(projectName, timestamp);
+        return HashBrown.Helpers.DatabaseHelper.restore(projectName, timestamp);
     }
     
 
@@ -128,7 +118,7 @@ class BackupHelper {
     static createBackup(projectName) {
         checkParam(projectName, 'projectName', String);
 
-        return DatabaseHelper.dump(projectName);
+        return HashBrown.Helpers.DatabaseHelper.dump(projectName);
     }
 
     /**

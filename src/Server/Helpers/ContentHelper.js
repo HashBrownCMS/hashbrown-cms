@@ -1,15 +1,6 @@
 'use strict';
 
 const ContentHelperCommon = require('Common/Helpers/ContentHelper');
-const ScheduleHelper = require('Server/Helpers/ScheduleHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-const SchemaHelper = require('Server/Helpers/SchemaHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-
-const Content = require('Server/Models/Content');
-const ContentSchema = require('Common/Models/ContentSchema');
-const FieldSchema = require('Common/Models/FieldSchema');
-const User = require('Server/Models/User');
 
 /**
  * The helper class for Content
@@ -31,7 +22,7 @@ class ContentHelper extends ContentHelperCommon {
 
         let collection = environment + '.content';
 
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             project,
             collection,
             {},
@@ -43,7 +34,7 @@ class ContentHelper extends ContentHelperCommon {
             let contentList = [];
 
             for(let i in results) {
-                let content = new Content(results[i]);
+                let content = new HashBrown.Models.Content(results[i]);
 
                 // Make sure runaway publish dates are not included
                 content.publishOn = null;
@@ -57,7 +48,7 @@ class ContentHelper extends ContentHelperCommon {
                 return a.sort > b.sort;
             });
 
-            return SyncHelper.mergeResource(project, environment, 'content', contentList);
+            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'content', contentList);
         });
     }
 
@@ -79,7 +70,7 @@ class ContentHelper extends ContentHelperCommon {
         let collection = environment + '.content';
         let content;
 
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -91,7 +82,7 @@ class ContentHelper extends ContentHelperCommon {
                     return Promise.reject(new Error('Content by id "' + id + '" was not found'));
                 }
 
-                return SyncHelper.getResourceItem(project, environment, 'content', id);
+                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'content', id);
             }
             
             return Promise.resolve(result);
@@ -101,13 +92,13 @@ class ContentHelper extends ContentHelperCommon {
                 return Promise.reject(new Error('Content by id "' + id + '" was not found'));
             }
 
-            content = new Content(result);
+            content = new HashBrown.Models.Content(result);
 
             // Make sure runaway publish dates are not included
             content.publishOn = null;
             content.unpublishOn = null;
 
-            return ScheduleHelper.getTasks(null, content.id);
+            return HashBrown.Helpers.ScheduleHelper.getTasks(null, content.id);
         })
         .then((tasks) => {
             content.adoptTasks(tasks);
@@ -128,7 +119,7 @@ class ContentHelper extends ContentHelperCommon {
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
-        return DatabaseHelper.updateOne(
+        return HashBrown.Helpers.DatabaseHelper.updateOne(
             project,
             environment + '.content',
             { id: content.id },
@@ -193,22 +184,22 @@ class ContentHelper extends ContentHelperCommon {
             
             // Handle scheduled publish task
             if(content.publishOn) {
-                return ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
+                return HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
             } else {
-                return ScheduleHelper.removeTask(project, environment, 'publish', id);
+                return HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'publish', id);
             }
         })
         .then(() => {
             // Handle scheduled unpublish task
             if(content.unpublishOn) {
-                return ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
+                return HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
             } else {
-                return ScheduleHelper.removeTask(project, environment, 'unpublish', id);
+                return HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'unpublish', id);
             }
         })
         .then(() => {
             // Insert into database
-            return DatabaseHelper.updateOne(
+            return HashBrown.Helpers.DatabaseHelper.updateOne(
                 project,
                 environment + '.content',
                 { id: id },
@@ -244,10 +235,10 @@ class ContentHelper extends ContentHelperCommon {
 
         return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
         .then(() => {
-            return SchemaHelper.getSchemaById(project, environment, schemaId);
+            return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, schemaId);
         })
         .then((schema) => {
-            let content = Content.create(schema.id, properties);
+            let content = HashBrown.Models.Content.create(schema.id, properties);
             let collection = environment + '.content';
 
             debug.log('Creating content "' + content.id + '"...', this);
@@ -261,7 +252,7 @@ class ContentHelper extends ContentHelperCommon {
 
             content.sort = sortIndex;
 
-            return DatabaseHelper.insertOne(
+            return HashBrown.Helpers.DatabaseHelper.insertOne(
                 project,
                 collection,
                 content.getObject()
@@ -293,7 +284,7 @@ class ContentHelper extends ContentHelperCommon {
 
         let collection = environment + '.content';
         
-        return DatabaseHelper.removeOne(
+        return HashBrown.Helpers.DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -303,7 +294,7 @@ class ContentHelper extends ContentHelperCommon {
         .then(() => {
             // Remove children if specified
             if(removeChildren) {
-                return DatabaseHelper.remove(
+                return HashBrown.Helpers.DatabaseHelper.remove(
                     project,
                     collection,
                     {
@@ -313,7 +304,7 @@ class ContentHelper extends ContentHelperCommon {
 
             // If not removing children, we should unset their parent
             } else {
-                return DatabaseHelper.update(
+                return HashBrown.Helpers.DatabaseHelper.update(
                     project,
                     collection,
                     {
@@ -346,9 +337,9 @@ class ContentHelper extends ContentHelperCommon {
         checkParam(environment, 'environment', String);
 
         // Example page Schema
-        let examplePageSchemaId = ContentSchema.createId();
+        let examplePageSchemaId = HashBrown.Models.ContentSchema.createId();
         
-        let examplePageSchema = new ContentSchema({
+        let examplePageSchema = new HashBrown.Models.ContentSchema({
             id: examplePageSchemaId,
             icon: 'file',
             type: 'content',
@@ -488,8 +479,8 @@ class ContentHelper extends ContentHelperCommon {
         });
 
         // Example page Content node
-        let examplePageContent = new Content({
-            id: Content.createId(),
+        let examplePageContent = new HashBrown.Models.Content({
+            id: HashBrown.Models.Content.createId(),
             createDate: Date.now(),
             updateDate: Date.now(),
             schemaId: examplePageSchema.id,
@@ -502,7 +493,7 @@ class ContentHelper extends ContentHelperCommon {
         });
 
         // Create example page
-        return SchemaHelper.setSchemaById(
+        return HashBrown.Helpers.SchemaHelper.setSchemaById(
             project,
             environment,
             examplePageSchema.id,

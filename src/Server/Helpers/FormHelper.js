@@ -1,10 +1,5 @@
 'use strict';
 
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
-const Form = require('Common/Models/Form');
-
 /**
  * The helper class for Forms
  *
@@ -27,7 +22,7 @@ class FormHelper {
 
         let collection = environment + '.forms';
     
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -36,13 +31,13 @@ class FormHelper {
         )
         .then((result) => {
             if(!result) {
-                return SyncHelper.getResourceItem(project, environment, 'forms', id);
+                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'forms', id);
             }
 
             return Promise.resolve(result);
         })
         .then((result) => {
-            return Promise.resolve(new Form(result));
+            return Promise.resolve(new HashBrown.Models.Form(result));
         });
     }
     
@@ -62,7 +57,7 @@ class FormHelper {
 
         let collection = environment + '.forms';
     
-        return DatabaseHelper.removeOne(
+        return HashBrown.Helpers.DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -85,13 +80,13 @@ class FormHelper {
 
         let collection = environment + '.forms';
         
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             project,
             collection,
             {}
         )
         .then((results) => {
-            return SyncHelper.mergeResource(project, environment, 'forms', results); 
+            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'forms', results); 
         });
     }
     
@@ -122,7 +117,7 @@ class FormHelper {
             hasRemote: false
         };
         
-        return DatabaseHelper.updateOne(
+        return HashBrown.Helpers.DatabaseHelper.updateOne(
             project,
             collection,
             {
@@ -134,7 +129,7 @@ class FormHelper {
             }
         )
         .then(() => {
-            return Promise.resolve(new Form(properties));
+            return Promise.resolve(new HashBrown.Models.Form(properties));
         });
     }
 
@@ -150,10 +145,10 @@ class FormHelper {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
-        let form = Form.create();
+        let form = HashBrown.Models.Form.create();
         let collection = environment + '.forms';
 
-        return DatabaseHelper.insertOne(
+        return HashBrown.Helpers.DatabaseHelper.insertOne(
             project,
             collection,
             form.getObject()

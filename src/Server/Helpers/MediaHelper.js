@@ -2,14 +2,11 @@
 
 const Path = require('path');
 const FileSystem = require('fs');
+
+// TODO: Make these GIT submodules
 const RimRaf = require('rimraf');
 const Multer = require('multer');
 const Glob = require('glob');
-
-const Media = require('Server/Models/Media');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const AppHelper = require('Server/Helpers/AppHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
@@ -195,10 +192,10 @@ class MediaHelper extends MediaHelperCommon {
 
         let collection = environment + '.media';
        
-        return SyncHelper.getResource(project, environment, 'media/tree')
+        return HashBrown.Helpers.SyncHelper.getResource(project, environment, 'media/tree')
         .then((tree) => {
             if(!tree || tree.length < 1) {
-                return DatabaseHelper.find(project, environment + '.media', {});
+                return HashBrown.Helpers.DatabaseHelper.find(project, environment + '.media', {});
             }
 
             return Promise.resolve(tree);   
@@ -243,13 +240,13 @@ class MediaHelper extends MediaHelperCommon {
         checkParam(id, 'id', String);
         checkParam(item, 'item', Object);
 
-        return SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
+        return HashBrown.Helpers.SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
         .then((wasItemSet) => {
             if(wasItemSet) { return Promise.resolve(); }        
 
             // Remove the item if it's null
             if(!item) {
-                return DatabaseHelper.removeOne(
+                return HashBrown.Helpers.DatabaseHelper.removeOne(
                     project,
                     environment + '.media',
                     {
@@ -261,7 +258,7 @@ class MediaHelper extends MediaHelperCommon {
             } else {
                 item.id = id;
 
-                return DatabaseHelper.updateOne(
+                return HashBrown.Helpers.DatabaseHelper.updateOne(
                     project,
                     environment + '.media',
                     {
@@ -355,7 +352,7 @@ class MediaHelper extends MediaHelperCommon {
      */
     static getCachedMedia(project, media, width = 0, height = 0) {
         checkParam(project, 'project', String);
-        checkParam(media, 'media', Media);
+        checkParam(media, 'media', HashBrown.Models.Media);
         checkParam(width, 'width', Number);
         checkParam(height, 'height', Number);
 
