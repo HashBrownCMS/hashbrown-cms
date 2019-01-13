@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let renderUser = () => {
                 _.append($user.empty(),
-                    _.button({class: 'widget widget--button expanded low list-item', title: 'Edit user'},
+                    _.button({class: 'widget widget--button page--dashboard__users__list__user__button', title: 'Edit user'},
                         _.span({class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
                         (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')
                     ).on('click', () => {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             $('.page--dashboard__users__list').append(
-                $user = _.div({class: 'widget-group page--dashboard__users__list__user'})
+                $user = _.div({class: 'page--dashboard__users__list__user'})
             );
 
             renderUser();

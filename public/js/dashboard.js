@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var renderUser = function renderUser() {
           _.append($user.empty(), _.button({
-            class: 'widget widget--button expanded low list-item',
+            class: 'widget widget--button page--dashboard__users__list__user__button',
             title: 'Edit user'
           }, _.span({
             class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         $('.page--dashboard__users__list').append($user = _.div({
-          class: 'widget-group page--dashboard__users__list__user'
+          class: 'page--dashboard__users__list__user'
         }));
         renderUser();
       };
