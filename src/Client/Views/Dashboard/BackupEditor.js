@@ -18,7 +18,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                 onSubmit: (formData) => {
                     let apiPath = 'server/backups/' + this.model.id + '/upload';
 
-                    // TODO: Use the HashBrown.Helpers.ReqestHelper for this
+                    // TODO: Use the HashBrown.Helpers.RequestHelper for this
                     $.ajax({
                         url: HashBrown.Helpers.RequestHelper.environmentUrl(apiPath),
                         type: 'POST',
@@ -143,7 +143,7 @@ class BackupEditor extends HashBrown.Views.Modals.Modal {
                         reverseKeys: true,
                         options: {
                             'Restore': () => { this.onClickRestoreBackup(backup); },
-                            'Download': () => { location = HashBrown.Helpers.ReqestHelper.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba') },
+                            'Download': () => { location = HashBrown.Helpers.RequestHelper.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba') },
                             'Delete': () => { this.onClickDeleteBackup(backup); }
                         }
                     }).$element

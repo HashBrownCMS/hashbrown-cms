@@ -19063,7 +19063,7 @@ function (_HashBrown$Views$Moda) {
           type: 'file',
           name: 'backup',
           onSubmit: function onSubmit(formData) {
-            var apiPath = 'server/backups/' + _this.model.id + '/upload'; // TODO: Use the HashBrown.Helpers.ReqestHelper for this
+            var apiPath = 'server/backups/' + _this.model.id + '/upload'; // TODO: Use the HashBrown.Helpers.RequestHelper for this
 
             $.ajax({
               url: HashBrown.Helpers.RequestHelper.environmentUrl(apiPath),
@@ -19207,7 +19207,7 @@ function (_HashBrown$Views$Moda) {
               _this5.onClickRestoreBackup(backup);
             },
             'Download': function Download() {
-              location = HashBrown.Helpers.ReqestHelper.environmentUrl('server/backups/' + _this5.model.id + '/' + backup + '.hba');
+              location = HashBrown.Helpers.RequestHelper.environmentUrl('server/backups/' + _this5.model.id + '/' + backup + '.hba');
             },
             'Delete': function Delete() {
               _this5.onClickDeleteBackup(backup);
