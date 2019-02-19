@@ -51,7 +51,7 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
                 value: this.model.settings.languages,
                 useTypeAhead: true,
                 useMultiple: true,
-                options: HashBown.Helpers.LanguageHelper.getLanguageOptions(this.model.id),
+                options: HashBrown.Helpers.LanguageHelper.getLanguageOptions(this.model.id),
                 onChange: (newValue) => {
                     this.model.settings.languages = newValue;
                 }
