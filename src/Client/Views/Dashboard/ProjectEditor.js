@@ -157,7 +157,7 @@ class ProjectEditor extends Crisp.View {
      */
     onClickAddEnvironment() {
         let modal = new HashBrown.Views.Modals.Modal({
-            title: 'New environment for "' + this.model.id + '"',
+            title: 'New environment for "' + this.model.settings.info.name + '"',
             body: _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label'}, 'Environment name'),
                 new HashBrown.Views.Widgets.Input({
