@@ -124,17 +124,22 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Sanity check
      */
     sanityCheck() {
-        // The value was null
-        if(!this.value) { this.value = []; }
-
         // Config
         this.config = this.config || {};
 
         // Sanity check for allowed Schemas array
         this.config.allowedSchemas = this.config.allowedSchemas || [];
         
+        // The value was null
+        if(!this.value) {
+            this.value = [];
+            
+            setTimeout(() => {
+                this.trigger('silentchange', this.value);
+            }, 500);
+        
         // The value was not an array, recover the items
-        if(!Array.isArray(this.value)) {
+        } else if(!Array.isArray(this.value)) {
             debug.log('Restructuring array from old format...', this);
 
             // If this value isn't using the old system, we can't recover it
