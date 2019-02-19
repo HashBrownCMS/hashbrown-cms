@@ -2671,6 +2671,15 @@ h1, h2, h3, h4, h5, h6 {
   user-select: none;
   color: #333333;
 }
+.widget--dropdown:not(.has-icon):after {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  content: "";
+  border-left: 0.5rem solid transparent;
+  border-right: 0.5rem solid transparent;
+  border-top: 0.5rem solid #eeeeee;
+}
 .widget--dropdown.small {
   max-width: 2rem;
   width: 2rem;
@@ -2791,7 +2800,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   display: block;
   margin: 0 !important;
-  width: calc(100% - 2rem);
+  width: 100%;
   height: 100%;
   cursor: pointer;
   z-index: 20;

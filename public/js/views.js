@@ -1086,11 +1086,11 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var Modal =
 /*#__PURE__*/
@@ -1122,11 +1122,11 @@ function (_Crisp$View) {
         for (var _iterator = Crisp.View.getAll('Modal')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var modal = _step.value;
 
-          if (modal.group !== _this.group || modal === _assertThisInitialized(_assertThisInitialized(_this))) {
+          if (modal.group !== _this.group || modal === _assertThisInitialized(_this)) {
             continue;
           }
 
-          modal.append(_assertThisInitialized(_assertThisInitialized(_this)));
+          modal.append(_assertThisInitialized(_this));
 
           _this.remove();
 
