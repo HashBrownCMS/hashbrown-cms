@@ -282,9 +282,9 @@ class ContentEditor extends Crisp.View {
             onChange(newValue);
         });
 
-        return _.div({class: 'editor__field__value'},
-            fieldEditorInstance.$element
-        );
+        fieldEditorInstance.element.classList.toggle('editor__field__value', true);
+
+        return fieldEditorInstance.$element;
     }
 
     /**

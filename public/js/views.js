@@ -2964,9 +2964,8 @@ function (_Crisp$View) {
 
         onChange(newValue);
       });
-      return _.div({
-        class: 'editor__field__value'
-      }, fieldEditorInstance.$element);
+      fieldEditorInstance.element.classList.toggle('editor__field__value', true);
+      return fieldEditorInstance.$element;
     }
     /**
      * Renders fields
@@ -13426,7 +13425,7 @@ function (_HashBrown$Views$Edit) {
       return [_.button({
         class: 'editor__field__key__action editor__field__key__action--sort'
       }).click(function (e) {
-        HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, $(e.currentTarget).parents('.editor__field')[0], function (newArray) {
+        HashBrown.Helpers.UIHelper.fieldSortableArray(_this2.value, _this2.element.parentElement, function (newArray) {
           _this2.value = newArray;
 
           _this2.trigger('change', _this2.value);
@@ -13602,7 +13601,9 @@ function (_HashBrown$Views$Edit) {
             value: item.value,
             config: schema.config,
             schema: schema
-          }); // Hook up the change event
+          }); // Assign the "value" class name to the field editor
+
+          editorInstance.element.classList.toggle('editor__field__value', true); // Hook up the change event
 
           editorInstance.on('change', function (newValue) {
             item.value = newValue;
@@ -13636,9 +13637,7 @@ function (_HashBrown$Views$Edit) {
               _this4.trigger('change', _this4.value);
             }
           }).$element)), // Render field editor instance
-          _.div({
-            class: 'editor__field__value'
-          }, editorInstance.$element), // Render field actions (collapse/expand, remove)
+          editorInstance.$element, // Render field actions (collapse/expand, remove)
           _.div({
             class: 'editor__field__actions'
           }, _.if(!_this4.config.useGrid, _.button({

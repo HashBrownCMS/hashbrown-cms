@@ -44,7 +44,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 .click((e) => {
                     HashBrown.Helpers.UIHelper.fieldSortableArray(
                         this.value,
-                        $(e.currentTarget).parents('.editor__field')[0],
+                        this.element.parentElement,
                         (newArray) => {
                             this.value = newArray;
 
@@ -267,6 +267,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         schema: schema
                     });
 
+                    // Assign the "value" class name to the field editor
+                    editorInstance.element.classList.toggle('editor__field__value', true);
+
+
                     // Hook up the change event
                     editorInstance.on('change', (newValue) => {
                         item.value = newValue;
@@ -306,9 +310,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         ),
                 
                         // Render field editor instance
-                        _.div({class: 'editor__field__value'},
-                            editorInstance.$element
-                        ),
+                        editorInstance.$element,
 
                         // Render field actions (collapse/expand, remove)
                         _.div({class: 'editor__field__actions'},
