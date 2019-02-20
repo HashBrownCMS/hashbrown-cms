@@ -56,7 +56,7 @@ class StringEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Render this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--string'},
             new HashBrown.Views.Widgets.Input({
                 type: this.config.isMultiLine ? 'textarea' : 'text',
                 value: this.value,

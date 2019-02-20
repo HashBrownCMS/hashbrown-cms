@@ -30,27 +30,29 @@ class MediaController extends require('./ApiController') {
     /**
      * Serves Media content
      */
-    static serveMedia(req, res) {
+    static async serveMedia(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-        .then((connection) => {
-            return connection.getMedia(id);
-        })
-        .then((media) => {
+        if(id.indexOf('?') > -1) {
+            id = id.substring(0, id.indexOf('?'));
+        }
+
+        try {
+            let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
+            let media = await connection.getMedia(id);
+
             if(!media || (!media.url && !media.path)) {
                 return res.status(404).send('Not found');
             }
+            
+            let data = await HashBrown.Helpers.MediaHelper.getCachedMedia(req.project, media, parseInt(req.query.width), parseInt(req.query.height));
+            
+            res.writeHead(200, {'Content-Type': media.getContentTypeHeader()});
+            res.end(data);
 
-            return HashBrown.Helpers.MediaHelper.getCachedMedia(req.project, media, parseInt(req.query.width), parseInt(req.query.height))
-            .then((data) => {
-                res.writeHead(200, {'Content-Type': media.getContentTypeHeader()});
-                res.end(data);
-            });
-        })
-        .catch((e) => {
+        } catch(e) {
             res.status(404).end(MediaController.printError(e, false)); 
-        });
+        }
     }
     
     /**

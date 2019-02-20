@@ -81,11 +81,11 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 228);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ (Array(228).concat([
-/* 228 */
+/******/ ([
+/* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -94,18 +94,18 @@
  * @namespace HashBrown.Client.Views
  */
 
-__webpack_require__(229);
+__webpack_require__(1);
 
-__webpack_require__(234);
+__webpack_require__(6);
 
-__webpack_require__(244);
+__webpack_require__(16);
 
-__webpack_require__(275);
+__webpack_require__(47);
 
-__webpack_require__(285);
+__webpack_require__(57);
 
 /***/ }),
-/* 229 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -114,10 +114,10 @@ __webpack_require__(285);
  * @namespace HashBrown.Client.Views.Widgets
  */
 
-namespace('Views.Widgets').add(__webpack_require__(230)).add(__webpack_require__(231)).add(__webpack_require__(232)).add(__webpack_require__(233));
+namespace('Views.Widgets').add(__webpack_require__(2)).add(__webpack_require__(3)).add(__webpack_require__(4)).add(__webpack_require__(5));
 
 /***/ }),
-/* 230 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -205,7 +205,7 @@ function (_Crisp$View) {
 module.exports = Widget;
 
 /***/ }),
-/* 231 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -649,7 +649,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Dropdown;
 
 /***/ }),
-/* 232 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -853,7 +853,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Chips;
 
 /***/ }),
-/* 233 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1051,7 +1051,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Input;
 
 /***/ }),
-/* 234 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1060,10 +1060,10 @@ module.exports = Input;
  * @namespace HashBrown.Client.Views.Modals
  */
 
-namespace('Views.Modals').add(__webpack_require__(235)).add(__webpack_require__(236)).add(__webpack_require__(237)).add(__webpack_require__(238)).add(__webpack_require__(240)).add(__webpack_require__(241)).add(__webpack_require__(242)).add(__webpack_require__(243));
+namespace('Views.Modals').add(__webpack_require__(7)).add(__webpack_require__(8)).add(__webpack_require__(9)).add(__webpack_require__(10)).add(__webpack_require__(12)).add(__webpack_require__(13)).add(__webpack_require__(14)).add(__webpack_require__(15));
 
 /***/ }),
-/* 235 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1344,7 +1344,7 @@ document.addEventListener('keyup', function (e) {
 module.exports = Modal;
 
 /***/ }),
-/* 236 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1446,7 +1446,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = ConfirmModal;
 
 /***/ }),
-/* 237 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1653,7 +1653,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = DateModal;
 
 /***/ }),
-/* 238 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1677,7 +1677,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(239).icons;
+var icons = __webpack_require__(11).icons;
 /**
  * A modal for picking icons
  *
@@ -1772,13 +1772,13 @@ function (_HashBrown$Views$Moda) {
 module.exports = IconModal;
 
 /***/ }),
-/* 239 */
+/* 11 */
 /***/ (function(module) {
 
 module.exports = {"icons":["500px","adjust","adn","align-center","align-justify","align-left","align-right","amazon","ambulance","anchor","android","angellist","angle-double-down","angle-double-left","angle-double-right","angle-double-up","angle-down","angle-left","angle-right","angle-up","apple","archive","area-chart","arrow-circle-down","arrow-circle-left","arrow-circle-o-down","arrow-circle-o-left","arrow-circle-o-right","arrow-circle-o-up","arrow-circle-right","arrow-circle-up","arrow-down","arrow-left","arrow-right","arrow-up","arrows","arrows-alt","arrows-h","arrows-v","asterisk","at","automobile","backward","balance-scale","ban","bank","bar-chart","bar-chart-o","barcode","bars","battery-0","battery-1","battery-2","battery-3","battery-4","battery-empty","battery-full","battery-half","battery-quarter","battery-three-quarters","bed","beer","behance","behance-square","bell","bell-o","bell-slash","bell-slash-o","bicycle","binoculars","birthday-cake","bitbucket","bitbucket-square","bitcoin","black-tie","bluetooth","bluetooth-b","bold","bolt","bomb","book","bookmark","bookmark-o","briefcase","btc","bug","building","building-o","bullhorn","bullseye","bus","buysellads","cab","calculator","calendar","calendar-check-o","calendar-minus-o","calendar-o","calendar-plus-o","calendar-times-o","camera","camera-retro","car","caret-down","caret-left","caret-right","caret-square-o-down","caret-square-o-left","caret-square-o-right","caret-square-o-up","caret-up","cart-arrow-down","cart-plus","cc","cc-amex","cc-diners-club","cc-discover","cc-jcb","cc-mastercard","cc-paypal","cc-stripe","cc-visa","certificate","chain","chain-broken","check","check-circle","check-circle-o","check-square","check-square-o","chevron-circle-down","chevron-circle-left","chevron-circle-right","chevron-circle-up","chevron-down","chevron-left","chevron-right","chevron-up","child","chrome","circle","circle-o","circle-o-notch","circle-thin","clipboard","clock-o","clone","close","cloud","cloud-download","cloud-upload","cny","code","code-fork","codepen","codiepie","coffee","cog","cogs","columns","comment","comment-o","commenting","commenting-o","comments","comments-o","compass","compress","connectdevelop","contao","copy","copyright","creative-commons","credit-card","credit-card-alt","crop","crosshairs","css3","cube","cubes","cut","cutlery","dashboard","dashcube","database","dedent","delicious","desktop","deviantart","diamond","digg","dollar","dot-circle-o","download","dribbble","dropbox","drupal","edge","edit","eject","ellipsis-h","ellipsis-v","empire","envelope","envelope-o","envelope-square","eraser","eur","euro","exchange","exclamation","exclamation-circle","exclamation-triangle","expand","expeditedssl","external-link","external-link-square","eye","eye-slash","eyedropper","facebook","facebook-f","facebook-official","facebook-square","fast-backward","fast-forward","fax","feed","female","fighter-jet","file","file-archive-o","file-audio-o","file-code-o","file-excel-o","file-image-o","file-movie-o","file-o","file-pdf-o","file-photo-o","file-picture-o","file-powerpoint-o","file-sound-o","file-text","file-text-o","file-video-o","file-word-o","file-zip-o","files-o","film","filter","fire","fire-extinguisher","firefox","flag","flag-checkered","flag-o","flash","flask","flickr","floppy-o","folder","folder-o","folder-open","folder-open-o","font","fonticons","fort-awesome","forumbee","forward","foursquare","frown-o","futbol-o","gamepad","gavel","gbp","ge","gear","gears","genderless","get-pocket","gg","gg-circle","gift","git","git-square","github","github-alt","github-square","gittip","glass","globe","google","google-plus","google-plus-square","google-wallet","graduation-cap","gratipay","group","h-square","hacker-news","hand-grab-o","hand-lizard-o","hand-o-down","hand-o-left","hand-o-right","hand-o-up","hand-paper-o","hand-peace-o","hand-pointer-o","hand-rock-o","hand-scissors-o","hand-spock-o","hand-stop-o","hashtag","hdd-o","header","headphones","heart","heart-o","heartbeat","history","home","hospital-o","hotel","hourglass","hourglass-1","hourglass-2","hourglass-3","hourglass-end","hourglass-half","hourglass-o","hourglass-start","houzz","html5","i-cursor","ils","image","inbox","indent","industry","info","info-circle","inr","instagram","institution","internet-explorer","intersex","ioxhost","italic","joomla","jpy","jsfiddle","key","keyboard-o","krw","language","laptop","lastfm","lastfm-square","leaf","leanpub","legal","lemon-o","level-down","level-up","life-bouy","life-buoy","life-ring","life-saver","lightbulb-o","line-chart","link","linkedin","linkedin-square","linux","list","list-alt","list-ol","list-ul","location-arrow","lock","long-arrow-down","long-arrow-left","long-arrow-right","long-arrow-up","magic","magnet","mail-forward","mail-reply","mail-reply-all","male","map","map-marker","map-o","map-pin","map-signs","mars","mars-double","mars-stroke","mars-stroke-h","mars-stroke-v","maxcdn","meanpath","medium","medkit","meh-o","mercury","microphone","microphone-slash","minus","minus-circle","minus-square","minus-square-o","mixcloud","mobile","mobile-phone","modx","money","moon-o","mortar-board","motorcycle","mouse-pointer","music","navicon","neuter","newspaper-o","object-group","object-ungroup","odnoklassniki","odnoklassniki-square","opencart","openid","opera","optin-monster","outdent","pagelines","paint-brush","paper-plane","paper-plane-o","paperclip","paragraph","paste","pause","pause-circle","pause-circle-o","paw","paypal","pencil","pencil-square","pencil-square-o","percent","phone","phone-square","photo","picture-o","pie-chart","pied-piper","pied-piper-alt","pinterest","pinterest-p","pinterest-square","plane","play","play-circle","play-circle-o","plug","plus","plus-circle","plus-square","plus-square-o","power-off","print","product-hunt","puzzle-piece","qq","qrcode","question","question-circle","quote-left","quote-right","ra","random","rebel","recycle","reddit","reddit-alien","reddit-square","refresh","registered","remove","renren","reorder","repeat","reply","reply-all","retweet","rmb","road","rocket","rotate-left","rotate-right","rouble","rss","rss-square","rub","ruble","rupee","safari","save","scissors","scribd","search","search-minus","search-plus","sellsy","send","send-o","server","share","share-alt","share-alt-square","share-square","share-square-o","shekel","sheqel","shield","ship","shirtsinbulk","shopping-bag","shopping-basket","shopping-cart","sign-in","sign-out","signal","simplybuilt","sitemap","skyatlas","skype","slack","sliders","slideshare","smile-o","soccer-ball-o","sort","sort-alpha-asc","sort-alpha-desc","sort-amount-asc","sort-amount-desc","sort-asc","sort-desc","sort-down","sort-numeric-asc","sort-numeric-desc","sort-up","soundcloud","space-shuttle","spinner","spoon","spotify","square","square-o","stack-exchange","stack-overflow","star","star-half","star-half-empty","star-half-full","star-half-o","star-o","steam","steam-square","step-backward","step-forward","stethoscope","sticky-note","sticky-note-o","stop","stop-circle","stop-circle-o","street-view","strikethrough","stumbleupon","stumbleupon-circle","subscript","subway","suitcase","sun-o","superscript","support","table","tablet","tachometer","tag","tags","tasks","taxi","television","tencent-weibo","terminal","text-height","text-width","th","th-large","th-list","thumb-tack","thumbs-down","thumbs-o-down","thumbs-o-up","thumbs-up","ticket","times","times-circle","times-circle-o","tint","toggle-down","toggle-left","toggle-off","toggle-on","toggle-right","toggle-up","trademark","train","transgender","transgender-alt","trash","trash-o","tree","trello","tripadvisor","trophy","truck","try","tty","tumblr","tumblr-square","turkish-lira","tv","twitch","twitter","twitter-square","umbrella","underline","undo","university","unlink","unlock","unlock-alt","unsorted","upload","usb","usd","user","user-md","user-plus","user-secret","user-times","users","venus","venus-double","venus-mars","viacoin","video-camera","vimeo","vimeo-square","vine","vk","volume-down","volume-off","volume-up","warning","wechat","weibo","weixin","whatsapp","wheelchair","wifi","wikipedia-w","windows","won","wordpress","wrench","xing","xing-square","y-combinator","y-combinator-square","yahoo","yc","yc-square","yelp","yen","youtube","youtube-play","youtube-square"]};
 
 /***/ }),
-/* 240 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1847,7 +1847,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = IframeModal;
 
 /***/ }),
-/* 241 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1977,7 +1977,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 242 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2180,7 +2180,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 243 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2288,7 +2288,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = PublishingSettingsModal;
 
 /***/ }),
-/* 244 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2297,14 +2297,14 @@ module.exports = PublishingSettingsModal;
  * @namespace HashBrown.Client.Views.Editors
  */
 
-namespace('Views.Editors').add(__webpack_require__(245)).add(__webpack_require__(246)).add(__webpack_require__(247)).add(__webpack_require__(248)).add(__webpack_require__(253)).add(__webpack_require__(254)).add(__webpack_require__(255)).add(__webpack_require__(256)).add(__webpack_require__(257));
+namespace('Views.Editors').add(__webpack_require__(17)).add(__webpack_require__(18)).add(__webpack_require__(19)).add(__webpack_require__(20)).add(__webpack_require__(25)).add(__webpack_require__(26)).add(__webpack_require__(27)).add(__webpack_require__(28)).add(__webpack_require__(29));
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');
 
-__webpack_require__(258);
+__webpack_require__(30);
 
 /***/ }),
-/* 245 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2654,7 +2654,7 @@ function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 246 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2964,7 +2964,9 @@ function (_Crisp$View) {
 
         onChange(newValue);
       });
-      return fieldEditorInstance.$element;
+      return _.div({
+        class: 'editor__field__value'
+      }, fieldEditorInstance.$element);
     }
     /**
      * Renders fields
@@ -3272,7 +3274,7 @@ function (_Crisp$View) {
 module.exports = ContentEditor;
 
 /***/ }),
-/* 247 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3461,10 +3463,10 @@ function (_Crisp$View) {
 
       var types = ['checkbox', 'hidden', 'number', 'select', 'text'];
       return _.div({
-        class: 'editor__field__value segmented'
+        class: 'editor__field__value'
       }, _.each(this.model.inputs, function (key, input) {
         return _.div({
-          class: 'editor__field'
+          class: 'editor__field raised'
         }, _.div({
           class: 'editor__field__actions'
         }, _.button({
@@ -3755,7 +3757,7 @@ function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 248 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3779,7 +3781,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var beautify = __webpack_require__(249).js_beautify;
+var beautify = __webpack_require__(21).js_beautify;
 /**
  * A basic JSON editor for any object
  *
@@ -4093,7 +4095,7 @@ function (_Crisp$View) {
 module.exports = JSONEditor;
 
 /***/ }),
-/* 249 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4163,14 +4165,14 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
   // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(250), __webpack_require__(251), __webpack_require__(252)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
+  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(22), __webpack_require__(23), __webpack_require__(24)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
     return get_beautify(js_beautify, css_beautify, html_beautify);
   }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {}
 
 /***/ }),
-/* 250 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7771,7 +7773,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 251 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9383,7 +9385,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 252 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -12016,9 +12018,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 
   if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(250), __webpack_require__(251)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
-      var js_beautify = __webpack_require__(250);
-      var css_beautify = __webpack_require__(251);
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(22), __webpack_require__(23)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
+      var js_beautify = __webpack_require__(22);
+      var css_beautify = __webpack_require__(23);
       return {
         html_beautify: function html_beautify(html_source, options) {
           return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
@@ -12030,7 +12032,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 253 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12135,7 +12137,7 @@ function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 254 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12429,7 +12431,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = UserEditor;
 
 /***/ }),
-/* 255 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12453,7 +12455,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(239).icons;
+var icons = __webpack_require__(11).icons;
 /**
  * The editor for schemas
  *
@@ -12679,7 +12681,7 @@ function (_Crisp$View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 256 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12949,7 +12951,7 @@ function (_HashBrown$Views$Edit) {
             _this.model.fields.properties = newProperties;
           });
         }))), _.div({
-          class: 'editor__field__value segmented'
+          class: 'editor__field__value'
         }, _.each(_this.model.fields.properties, function (fieldKey, fieldValue) {
           if (!fieldValue) {
             return;
@@ -12966,7 +12968,7 @@ function (_HashBrown$Views$Edit) {
           }
 
           var $field = _.div({
-            class: 'editor__field'
+            class: 'editor__field raised'
           }); // Sanity check
 
 
@@ -13138,7 +13140,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 257 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13246,7 +13248,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 258 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13255,10 +13257,10 @@ module.exports = FieldSchemaEditor;
  * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 
-namespace('Views.Editors.FieldEditors').add(__webpack_require__(259)).add(__webpack_require__(260)).add(__webpack_require__(261)).add(__webpack_require__(262)).add(__webpack_require__(263)).add(__webpack_require__(264)).add(__webpack_require__(265)).add(__webpack_require__(266)).add(__webpack_require__(267)).add(__webpack_require__(268)).add(__webpack_require__(269)).add(__webpack_require__(270)).add(__webpack_require__(271)).add(__webpack_require__(272)).add(__webpack_require__(273)).add(__webpack_require__(274));
+namespace('Views.Editors.FieldEditors').add(__webpack_require__(31)).add(__webpack_require__(32)).add(__webpack_require__(33)).add(__webpack_require__(34)).add(__webpack_require__(35)).add(__webpack_require__(36)).add(__webpack_require__(37)).add(__webpack_require__(38)).add(__webpack_require__(39)).add(__webpack_require__(40)).add(__webpack_require__(41)).add(__webpack_require__(42)).add(__webpack_require__(43)).add(__webpack_require__(44)).add(__webpack_require__(45)).add(__webpack_require__(46));
 
 /***/ }),
-/* 259 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13341,7 +13343,7 @@ function (_Crisp$View) {
 module.exports = FieldEditor;
 
 /***/ }),
-/* 260 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13559,11 +13561,11 @@ function (_HashBrown$Views$Edit) {
       var _this4 = this;
 
       return _.div({
-        class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')
+        class: 'field-editor field-editor--array ' + (this.config.useGrid ? 'grid' : '')
       }, _.each(this.value, function (i, item) {
         // Render field
         var $field = _.div({
-          class: 'editor__field'
+          class: 'editor__field raised field-editor--array__item'
         });
 
         var renderField = function renderField() {
@@ -13607,37 +13609,37 @@ function (_HashBrown$Views$Edit) {
           });
           editorInstance.on('silentchange', function (newValue) {
             item.value = newValue;
-          }); // Render Schema picker
+          });
 
-          if (_this4.config.allowedSchemas.length > 1) {
-            editorInstance.$element.prepend(_.div({
-              class: 'editor__field'
-            }, _.div({
-              class: 'editor__field__key'
-            }, 'Schema'), _.div({
-              class: 'editor__field__value'
-            }, new HashBrown.Views.Widgets.Dropdown({
-              value: item.schemaId,
-              placeholder: 'Schema',
-              valueKey: 'id',
-              labelKey: 'name',
-              iconKey: 'icon',
-              options: resources.schemas.filter(function (schema) {
-                return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
-              }),
-              onChange: function onChange(newSchemaId) {
-                item.schemaId = newSchemaId;
-                item.value = null;
-                renderField();
-
-                _this4.trigger('change', _this4.value);
-              }
-            }).$element)));
-          }
-
-          _.append($field.empty(), _.div({
+          _.append($field.empty(), // Render sort key
+          _.div({
             class: 'editor__field__sort-key'
-          }, _this4.getItemLabel(item, schema)), editorInstance.$element, _.div({
+          }, _this4.getItemLabel(item, schema)), // Render Schema picker
+          _.if(_this4.config.allowedSchemas.length > 1, _.div({
+            class: 'field-editor--array__item__toolbar'
+          }, _.div({
+            class: 'widget--label'
+          }, 'Schema'), new HashBrown.Views.Widgets.Dropdown({
+            value: item.schemaId,
+            placeholder: 'Schema',
+            valueKey: 'id',
+            labelKey: 'name',
+            iconKey: 'icon',
+            options: resources.schemas.filter(function (schema) {
+              return _this4.config.allowedSchemas.indexOf(schema.id) > -1;
+            }),
+            onChange: function onChange(newSchemaId) {
+              item.schemaId = newSchemaId;
+              item.value = null;
+              renderField();
+
+              _this4.trigger('change', _this4.value);
+            }
+          }).$element)), // Render field editor instance
+          _.div({
+            class: 'editor__field__value'
+          }, editorInstance.$element), // Render field actions (collapse/expand, remove)
+          _.div({
             class: 'editor__field__actions'
           }, _.if(!_this4.config.useGrid, _.button({
             class: 'editor__field__action editor__field__action--collapse',
@@ -13742,7 +13744,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 261 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13825,7 +13827,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value field-editor--boolean'
+        class: 'field-editor field-editor--boolean'
       }, new HashBrown.Views.Widgets.Input({
         type: 'checkbox',
         value: this.value,
@@ -13845,7 +13847,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 262 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13982,7 +13984,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--content-reference'
       }, [new HashBrown.Views.Widgets.Dropdown({
         value: this.value,
         options: this.getDropdownOptions(),
@@ -14028,7 +14030,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 263 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14205,7 +14207,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--content-schema-reference'
       }, new HashBrown.Views.Widgets.Dropdown({
         value: this.value,
         options: this.getDropdownOptions(),
@@ -14252,7 +14254,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 264 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14391,7 +14393,7 @@ function (_HashBrown$Views$Edit) {
       var _this3 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--date'
       }, _.do(function () {
         if (_this3.disabled) {
           return _this3.formatDate(_this3.value);
@@ -14419,7 +14421,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 265 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14510,7 +14512,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--dropdown'
       }, _.if(this.config.options.length < 1, _.span({
         class: 'editor__field__value__warning'
       }, 'No options configured')), _.if(this.config.options.length > 0, new HashBrown.Views.Widgets.Dropdown({
@@ -14555,7 +14557,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 266 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14638,7 +14640,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--language'
       }, new HashBrown.Views.Widgets.Dropdown({
         value: this.value,
         options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
@@ -14658,7 +14660,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 267 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14726,32 +14728,32 @@ function (_HashBrown$Views$Edit) {
 
       var media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
       return _.div({
-        class: 'editor__field__value editor__field--media-reference',
+        class: 'field-editor field-editor--media-reference',
         title: this.description || ''
       }, _.button({
-        class: 'editor__field--media-reference__pick'
+        class: 'field-editor--media-reference__pick'
       }, _.do(function () {
         if (!media) {
           return _.div({
-            class: 'editor__field--media-reference__empty'
+            class: 'field-editor--media-reference__empty'
           });
         }
 
         if (media.isAudio()) {
           return _.div({
-            class: 'editor__field--media-reference__preview fa fa-file-audio-o'
+            class: 'field-editor--media-reference__preview fa fa-file-audio-o'
           });
         }
 
         if (media.isVideo()) {
           return _.div({
-            class: 'editor__field--media-reference__preview fa fa-file-video-o'
+            class: 'field-editor--media-reference__preview fa fa-file-video-o'
           });
         }
 
         if (media.isImage()) {
           return _.img({
-            class: 'editor__field--media-reference__preview',
+            class: 'field-editor--media-reference__preview',
             src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'
           });
         }
@@ -14766,11 +14768,11 @@ function (_HashBrown$Views$Edit) {
           _this2.fetch();
         });
       }), _.div({
-        class: 'editor__field--media-reference__footer'
+        class: 'field-editor--media-reference__footer'
       }, _.label({
-        class: 'editor__field--media-reference__name'
+        class: 'field-editor--media-reference__name'
       }, media ? media.name : ''), _.button({
-        class: 'editor__field--media-reference__remove',
+        class: 'field-editor--media-reference__remove',
         title: 'Clear the Media selection'
       }).click(function () {
         _this2.value = null;
@@ -14788,7 +14790,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 268 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14876,7 +14878,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--number'
       }, new HashBrown.Views.Widgets.Input({
         value: this.value || '0',
         type: this.config.isSlider ? 'range' : 'number',
@@ -14964,7 +14966,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 269 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15080,7 +15082,7 @@ function (_HashBrown$Views$Edit) {
       }
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--resource-reference'
       }, value || '(none)');
     }
   }], [{
@@ -15121,7 +15123,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 270 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15243,9 +15245,9 @@ function (_HashBrown$Views$Edit) {
           var html = '';
 
           if (media.isImage()) {
-            html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+            html = '<img data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
           } else if (media.isVideo()) {
-            html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+            html = '<video data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
           }
 
           var activeView = _this2.activeView || 'wysiwyg';
@@ -15278,7 +15280,7 @@ function (_HashBrown$Views$Edit) {
   }, {
     key: "getTabContent",
     value: function getTabContent() {
-      return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+      return this.element.querySelector('.field-editor--rich-text__tab__content');
     }
     /**
      * Initialises the HTML editor
@@ -15468,39 +15470,39 @@ function (_HashBrown$Views$Edit) {
 
       var activeView = this.activeView || 'wysiwyg';
       return _.div({
-        class: 'editor__field__value editor__field--rich-text-editor',
+        class: 'field-editor field-editor--rich-text',
         title: this.description || ''
       }, _.div({
-        class: 'editor__field--rich-text-editor__header'
+        class: 'field-editor--rich-text__header'
       }, _.each({
         wysiwyg: 'Visual',
         markdown: 'Markdown',
         html: 'HTML'
       }, function (alias, label) {
         return _.button({
-          class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'
+          class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'
         }, label).click(function () {
           _this6.onClickTab(alias);
         });
       }), _.button({
-        class: 'editor__field--rich-text-editor__header__add-media'
+        class: 'field-editor--rich-text__header__add-media'
       }, 'Add media').click(function () {
         _this6.onClickInsertMedia();
       })), _.div({
-        class: 'editor__field--rich-text-editor__body'
+        class: 'field-editor--rich-text__body'
       }, _.if(activeView === 'wysiwyg', _.div({
-        class: 'editor__field--rich-text-editor__tab wysiwyg'
+        class: 'field-editor--rich-text__tab wysiwyg'
       }, _.div({
-        class: 'editor__field--rich-text-editor__tab__content',
+        class: 'field-editor--rich-text__tab__content',
         'contenteditable': true
       }))), _.if(activeView === 'markdown', _.div({
-        class: 'editor__field--rich-text-editor__tab markdown'
+        class: 'field-editor--rich-text__tab markdown'
       }, _.textarea({
-        class: 'editor__field--rich-text-editor__tab__content'
+        class: 'field-editor--rich-text__tab__content'
       }))), _.if(activeView === 'html', _.div({
-        class: 'editor__field--rich-text-editor__tab html'
+        class: 'field-editor--rich-text__tab html'
       }, _.textarea({
-        class: 'editor__field--rich-text-editor__tab__content'
+        class: 'field-editor--rich-text__tab__content'
       })))));
     }
     /**
@@ -15552,7 +15554,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 271 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15633,7 +15635,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--string'
       }, new HashBrown.Views.Widgets.Input({
         type: this.config.isMultiLine ? 'textarea' : 'text',
         value: this.value,
@@ -15671,7 +15673,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 272 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15794,7 +15796,7 @@ function (_HashBrown$Views$Edit) {
 
       var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
       return _.div({
-        class: 'editor__field__value field-editor--struct'
+        class: 'field-editor field-editor--struct'
       }, // Loop through each key in the struct
       _.each(compiledSchema.config.struct, function (k, keySchema) {
         var value = _this2.value[k];
@@ -15944,14 +15946,14 @@ function (_HashBrown$Views$Edit) {
             config.struct = newStruct;
           });
         }))), _.div({
-          class: 'editor__field__value segmented'
+          class: 'editor__field__value'
         }, _.each(config.struct, function (fieldKey, fieldValue) {
           // Sanity check
           fieldValue.config = fieldValue.config || {};
           fieldValue.schemaId = fieldValue.schemaId || 'array';
 
           var $field = _.div({
-            class: 'editor__field'
+            class: 'editor__field raised'
           });
 
           var renderField = function renderField() {
@@ -16103,7 +16105,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 273 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16173,7 +16175,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value'
+        class: 'field-editor field-editor--tags'
       }, new HashBrown.Views.Widgets.Chips({
         tooltip: this.description || '',
         value: (this.value || '').split(','),
@@ -16192,7 +16194,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 274 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16415,7 +16417,7 @@ function (_HashBrown$Views$Edit) {
       var _this2 = this;
 
       return _.div({
-        class: 'editor__field__value field-editor--url'
+        class: 'field-editor field-editor--url'
       }, _.div({
         class: 'widget-group',
         title: this.description || ''
@@ -16491,7 +16493,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = UrlEditor;
 
 /***/ }),
-/* 275 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16500,10 +16502,10 @@ module.exports = UrlEditor;
  * @namespace HashBrown.Client.Views.Navigation
  */
 
-namespace('Views.Navigation').add(__webpack_require__(276)).add(__webpack_require__(278)).add(__webpack_require__(279)).add(__webpack_require__(280)).add(__webpack_require__(281)).add(__webpack_require__(282)).add(__webpack_require__(283)).add(__webpack_require__(284));
+namespace('Views.Navigation').add(__webpack_require__(48)).add(__webpack_require__(50)).add(__webpack_require__(51)).add(__webpack_require__(52)).add(__webpack_require__(53)).add(__webpack_require__(54)).add(__webpack_require__(55)).add(__webpack_require__(56));
 
 /***/ }),
-/* 276 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16543,7 +16545,7 @@ function (_Crisp$View) {
     _classCallCheck(this, NavbarMain);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(NavbarMain).call(this, params));
-    _this.template = __webpack_require__(277);
+    _this.template = __webpack_require__(49);
     _this.tabPanes = [];
     HashBrown.Views.Navigation.ContentPane.init();
     HashBrown.Views.Navigation.MediaPane.init();
@@ -17069,7 +17071,7 @@ function (_Crisp$View) {
 module.exports = NavbarMain;
 
 /***/ }),
-/* 277 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -17228,7 +17230,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 278 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17419,7 +17421,7 @@ function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 279 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17607,7 +17609,7 @@ function () {
 module.exports = NavbarPane;
 
 /***/ }),
-/* 280 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17828,7 +17830,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 281 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18300,7 +18302,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 282 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18521,7 +18523,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 283 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18766,7 +18768,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 284 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18996,7 +18998,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 285 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19005,10 +19007,10 @@ module.exports = SchemaPane;
  * @namespace HashBrown.Client.Views.Dashboard
  */
 
-namespace('Views.Dashboard').add(__webpack_require__(286)).add(__webpack_require__(287)).add(__webpack_require__(288)).add(__webpack_require__(289)).add(__webpack_require__(290)).add(__webpack_require__(291));
+namespace('Views.Dashboard').add(__webpack_require__(58)).add(__webpack_require__(59)).add(__webpack_require__(60)).add(__webpack_require__(61)).add(__webpack_require__(62)).add(__webpack_require__(63));
 
 /***/ }),
-/* 286 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19247,7 +19249,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 287 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19352,7 +19354,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 288 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19456,7 +19458,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 289 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19614,7 +19616,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MigrationEditor;
 
 /***/ }),
-/* 290 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19961,7 +19963,7 @@ function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 291 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20206,5 +20208,5 @@ function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ })
-/******/ ]));
+/******/ ]);
 //# sourceMappingURL=views.js.map

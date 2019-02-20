@@ -29,21 +29,21 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
     template() {
         let media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
 
-        return _.div({class: 'editor__field__value editor__field--media-reference', title: this.description || ''},
-            _.button({class: 'editor__field--media-reference__pick'},
+        return _.div({class: 'field-editor field-editor--media-reference', title: this.description || ''},
+            _.button({class: 'field-editor--media-reference__pick'},
                 _.do(()=> {
-                    if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }
+                    if(!media) { return _.div({class: 'field-editor--media-reference__empty'}); }
             
                     if(media.isAudio()) {
-                        return _.div({class: 'editor__field--media-reference__preview fa fa-file-audio-o'});
+                        return _.div({class: 'field-editor--media-reference__preview fa fa-file-audio-o'});
                     }
 
                     if(media.isVideo()) {
-                        return _.div({class: 'editor__field--media-reference__preview fa fa-file-video-o'});
+                        return _.div({class: 'field-editor--media-reference__preview fa fa-file-video-o'});
                     }
 
                     if(media.isImage()) {
-                        return _.img({class: 'editor__field--media-reference__preview', src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
+                        return _.img({class: 'field-editor--media-reference__preview', src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
                     }
                 })
             ).click(() => {
@@ -58,9 +58,9 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
                     this.fetch();
                 });
             }),
-            _.div({class: 'editor__field--media-reference__footer'},
-                _.label({class: 'editor__field--media-reference__name'}, media ? media.name : ''),
-                _.button({class: 'editor__field--media-reference__remove', title: 'Clear the Media selection'})
+            _.div({class: 'field-editor--media-reference__footer'},
+                _.label({class: 'field-editor--media-reference__name'}, media ? media.name : ''),
+                _.button({class: 'field-editor--media-reference__remove', title: 'Clear the Media selection'})
                     .click(() => {
                         this.value = null;
 

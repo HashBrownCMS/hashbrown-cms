@@ -111,7 +111,7 @@ class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--number'},
             new HashBrown.Views.Widgets.Input({
                 value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',

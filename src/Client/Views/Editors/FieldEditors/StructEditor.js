@@ -176,13 +176,13 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                 })
                         )
                     ),
-                    _.div({class: 'editor__field__value segmented'},
+                    _.div({class: 'editor__field__value'},
                         _.each(config.struct, (fieldKey, fieldValue) => {
                             // Sanity check
                             fieldValue.config = fieldValue.config || {};
                             fieldValue.schemaId = fieldValue.schemaId || 'array';
 
-                            let $field = _.div({class: 'editor__field'});
+                            let $field = _.div({class: 'editor__field raised'});
 
                             let renderField = () => {
                                 _.append($field.empty(),
@@ -332,7 +332,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
    template() {
         let compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(this.schema.id);
            
-        return _.div({class: 'editor__field__value field-editor--struct'},
+        return _.div({class: 'field-editor field-editor--struct'},
             // Loop through each key in the struct
             _.each(compiledSchema.config.struct, (k, keySchema) => {
                 let value = this.value[k];

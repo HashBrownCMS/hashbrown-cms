@@ -28,22 +28,21 @@ class AppHelper {
 
             let process = ChildProcess.exec(cmd, { cwd: cwd });
             let result = '';
+            let message = '';
 
             process.stdout.on('data', (data) => {
                 result += data;
-                debug.log(data, this, 3);
             });
 
             process.stderr.on('data', (data) => {
-                result += data;
-                debug.log(data, this, 3);
+                message += data;
             });
 
             process.on('exit', (code) => {
                 if(code == 0 || code == '0') {
                     resolve(result);
                 } else {
-                    reject(new Error('Process "' + cmd + '" in "' + cwd + '" exited with code ' + code));
+                    reject(new Error('Process "' + cmd + '" in "' + cwd + '" exited with code ' + code + ': ' + message));
                 }
             });
         });

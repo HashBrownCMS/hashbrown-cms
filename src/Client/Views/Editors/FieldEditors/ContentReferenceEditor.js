@@ -92,7 +92,7 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
      * Render this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'}, [
+        return _.div({class: 'field-editor field-editor--content-reference'}, [
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: this.getDropdownOptions(),

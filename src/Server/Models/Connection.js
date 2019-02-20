@@ -299,7 +299,7 @@ class Connection extends ConnectionCommon {
                 
                 let media = new HashBrown.Models.Media({
                     id: id,
-                    url: this.deployer.getPath('media', id + '/' + name),
+                    url: this.deployer.getPath('media', id + '/' + name, true),
                     name: name
                 });
 

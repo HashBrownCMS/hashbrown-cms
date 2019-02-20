@@ -89,7 +89,7 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
             }
         }
         
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--resource-reference'},
             value || '(none)'
         );
     }

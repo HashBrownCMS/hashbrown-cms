@@ -48,6 +48,19 @@ class FileHelper {
     }
 
     /**
+     * Checks if a file or folder exists
+     *
+     * @param {String} path
+     *
+     * @return {Promise} Whether or not the file/folder exists
+     */
+    static async exists(path) {
+        checkParam(path, 'path', String);
+
+        return FileSystem.existsSync(path);
+    }
+
+    /**
      * Lists a file or files in a folder
      *
      * @param {String} path
@@ -173,6 +186,48 @@ class FileHelper {
             }
 
             FileSystem.writeFile(path, content, (err) => {
+                if(err) { return reject(err); }
+
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * Moves a file
+     *
+     * @param {String} from
+     * @param {String} to
+     *
+     * @return {Promise} Result
+     */
+    static move(from, to) {
+        checkParam(from, 'from', String);
+        checkParam(to, 'to', String);
+
+        return new Promise((resolve, reject) => {
+            FileSystem.rename(from, to, (err) => {
+                if(err) { return reject(err); }
+
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * Copies a file
+     *
+     * @param {String} from
+     * @param {String} to
+     *
+     * @return {Promise} Result
+     */
+    static copy(from, to) {
+        checkParam(from, 'from', String);
+        checkParam(to, 'to', String);
+
+        return new Promise((resolve, reject) => {
+            FileSystem.copyFile(from, to, (err) => {
                 if(err) { return reject(err); }
 
                 resolve();

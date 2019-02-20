@@ -6,7 +6,48 @@ const webpack = require('webpack');
 const exec = require('child_process').exec;
 const sass = require('sass/sass.dart.js');
 
-let isWatching = Array.isArray(process.argv) ? process.argv.indexOf('--watch') > -1 : false;
+// Are we watching for changes?
+let isWatching = false;
+
+// Observe changes for specific files
+let entry = {
+    dashboard: './src/Client/dashboard.js',
+    demo: './src/Client/demo.js',
+    environment: './src/Client/environment.js',
+    
+    routes: './src/Client/Routes',
+    
+    common: './src/Common',
+    helpers: './src/Client/Helpers',
+    models: './src/Client/Models',
+    utilities: './src/Client/utilities',
+    views: './src/Client/Views'
+}
+
+// Process input arguments
+if(Array.isArray(process.argv)) {
+    for(let arg of process.argv) {
+        // Watching
+        if(arg === '--watch') {
+            isWatching = true;
+        
+        // Files
+        } else if(arg.indexOf('--files') === 0) {
+            arg = arg.replace('--files', '');
+
+            let files = {};
+
+            for(let file of arg.match(/[a-z]*/g)) {
+                if(!file) { continue; }
+                if(!entry[file]) { throw new Error('File "' + file + '.js" not found'); }
+
+                files[file] = entry[file];
+            }
+
+            entry = files;
+        }
+    }
+}
 
 // Define settings
 module.exports = {
@@ -15,19 +56,7 @@ module.exports = {
     devtool: 'source-map',
 
     // Input .js
-    entry: {
-        dashboard: './src/Client/dashboard.js',
-        demo: './src/Client/demo.js',
-        environment: './src/Client/environment.js',
-        
-        routes: './src/Client/Routes',
-        
-        common: './src/Common',
-        helpers: './src/Client/Helpers',
-        models: './src/Client/Models',
-        utilities: './src/Client/utilities',
-        views: './src/Client/Views',
-    },
+    entry: entry,
 
     // Output .js
     output: {

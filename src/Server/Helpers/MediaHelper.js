@@ -350,7 +350,7 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @returns {Promise} Media
      */
-    static getCachedMedia(project, media, width = 0, height = 0) {
+    static async getCachedMedia(project, media, width = 0, height = 0) {
         checkParam(project, 'project', String);
         checkParam(media, 'media', HashBrown.Models.Media);
         checkParam(width, 'width', Number);
@@ -367,61 +367,36 @@ class MediaHelper extends MediaHelperCommon {
             cachedPath += 'x' + height;
         }
 
-        // Check the cache folder
-        if(!FileSystem.existsSync(cacheFolder)) {
-            FileSystem.mkdirSync(cacheFolder);
-        }
+        // Create the cache folder, if it doesn't exist
+        await HashBrown.Helpers.FileHelper.makeDirectory(cacheFolder);
 
-        // Read the file
-        let readFile = () => {
-            return new Promise((resolve, reject) => {
-                FileSystem.readFile(cachedPath, (err, data) => {
-                    if(err) { return reject(err); }
-
-                    resolve(data);
-                });
-            });
-        };
-
-        // Copy the file
-        let copyFile = () => {
+        let data = null;
+       
+        // Read the data
+        try {
+            data = await HashBrown.Helpers.FileHelper.read(cachedPath);
+        
+        // File wasn't found, copy it
+        } catch(e) {
             // Download with web request
             if(media.url) {
-                return HashBrown.Helpers.RequestHelper.download(media.url, path);
-            }
+                await HashBrown.Helpers.RequestHelper.download(media.url, cachedPath);
 
             // Copy from file system
-            return new Promise((resolve, reject) => {
-                FileSystem.copyFile(media.path, cachedPath, (err) => {
-                    if(err) { return reject(err); }
-
-                    resolve();
-                });
-            });
-        };
-
-        // Resize the file
-        let resizeFile = () => {
-            if(!width || !media.isImage() || media.isSvg()) { 
-                return Promise.resolve();
-            }
-            
-            return HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
-        };
-
-        // Check the file
-        let checkFile = () => {
-            if(FileSystem.existsSync(cachedPath)) {
-                return Promise.resolve();
-
             } else {
-                return copyFile()
-                .then(resizeFile);
+                await HashBrown.Helpers.FileHelper.copy(media.path, cachedPath);
+               
+                // Resize file
+                if(width && media.isImage() && !media.isSvg()) { 
+                    await HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
+                }
             }
-        };
 
-        return checkFile()
-        .then(readFile);
+            // Read file
+            data = await HashBrown.Helpers.FileHelper.read(cachedPath);
+        }
+
+        return data;
     }
 }
 

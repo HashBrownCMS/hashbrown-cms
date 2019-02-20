@@ -76,7 +76,7 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
         if(levels < 1) { levels = 1; }
 
         for(let i = 0; i < levels; i++) {
-            path += (i > 0 ? '/' : '') + '*';
+            path = Path.join(path, '*');
         }
 
         return new Promise((resolve, reject) => {

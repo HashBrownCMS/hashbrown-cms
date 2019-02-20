@@ -14,6 +14,17 @@ class GitDeployer extends HashBrown.Models.Deployer {
     static get alias() { return 'git'; }
 
     /**
+     * Constructor
+     */
+    constructor(params) {
+        super(params);
+
+        if(this.repo.indexOf('https://') === 0) {
+            this.repo = this.repo.replace('https://', '');
+        }
+    }
+    
+    /**
      * Structure
      */
     structure() {
@@ -30,57 +41,38 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} Promise
      */
-    pullRepo() {
-        let storagePath = Path.join(APP_ROOT, 'storage');
+    async pullRepo() {
+        let gitPath = Path.join(APP_ROOT, 'plugins', 'git');
         
-        if(!FileSystem.existsSync(storagePath)) { FileSystem.mkdirSync(storagePath); }
+        await HashBrown.Helpers.FileHelper.makeDirectory(gitPath);
 
-        let pluginsPath = Path.join(storagePath, 'plugins');
+        let repoPath = this.getRootPath();
+       
+        let dirExists = await HashBrown.Helpers.FileHelper.exists(repoPath);
 
-        if(!FileSystem.existsSync(pluginsPath)) { FileSystem.mkdirSync(pluginsPath); }
-
-        let gitPath = Path.join(pluginsPath, 'git');
-        
-        if(!FileSystem.existsSync(gitPath)) { FileSystem.mkdirSync(gitPath); }
-        
-        let repoPath = Path.join(gitPath, Buffer.from(this.repo + (this.branch || 'master')).toString('base64'));
-        
-        return (() => {
-            if(!FileSystem.existsSync(repoPath)) {
-                let url = 'https://';
+        if(!dirExists) {
+            let url = 'https://';
+            
+            if(this.username) {
+                url += this.username;
                 
-                if(this.username) {
-                    url += this.username;
-                    
-                    if(this.password) {
-                        url += ':' + this.password.replace(/@/g, '%40');
-                    }
-                        
-                    url += '@';
+                if(this.password) {
+                    url += ':' + this.password.replace(/@/g, '%40');
                 }
-
-                url += this.repo;
-
-                return HashBrown.Helpers.AppHelper.exec('git clone \'' + url + '\' \'' + repoPath + '\''); 
+                    
+                url += '@';
             }
 
-            return Promise.resolve();
-        })()
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git config user.name "HashBrown CMS"', repoPath);
-        })
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git config user.email "git@hashbrown.cms"', repoPath);
-        })
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git checkout ' + (this.branch || 'master'), repoPath);
-        })
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git reset --hard', repoPath);
-        })
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git pull', repoPath);
-        });
+            url += this.repo;
+
+            await HashBrown.Helpers.AppHelper.exec('git clone \'' + url + '\' \'' + repoPath + '\''); 
+        }
+
+        await HashBrown.Helpers.AppHelper.exec('git config user.name "HashBrown CMS"', repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git config user.email "git@hashbrown.cms"', repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git checkout ' + (this.branch || 'master'), repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git reset --hard', repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git pull', repoPath);
     }
     
     /**
@@ -88,16 +80,12 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} Promise
      */
-    pushRepo() {
-        let repoPath = APP_ROOT + this.getRootPath();
+    async pushRepo() {
+        let repoPath = this.getRootPath();
         
-        return HashBrown.Helpers.AppHelper.exec('git add -A .', repoPath)
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git commit -m "Commit from HashBrown CMS"', repoPath)
-        })
-        .then(() => {
-            return HashBrown.Helpers.AppHelper.exec('git push', repoPath);
-        });
+        await HashBrown.Helpers.AppHelper.exec('git add -A .', repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git commit -m "Commit from HashBrown CMS"', repoPath);
+        await HashBrown.Helpers.AppHelper.exec('git push', repoPath);
     }
 
     /**
@@ -106,7 +94,7 @@ class GitDeployer extends HashBrown.Models.Deployer {
      * @returns {String} Root
      */
     getRootPath() {
-        return '/' + Path.join('storage', 'plugins', 'git', Buffer.from(this.repo + (this.branch || 'master')).toString('base64'));
+        return Path.join(APP_ROOT, 'storage', 'plugins', 'git', Buffer.from(this.repo + (this.branch || 'master')).toString('base64'));
     }
 
     /**
@@ -114,11 +102,10 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} Result
      */
-    test() {
-        return this.pullRepo()
-        .then(() => {
-            return Promise.resolve(true);  
-        });
+    async test() {
+        await this.pullRepo();
+        
+        return true;
     }
 
     /**
@@ -128,17 +115,10 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @return {Promise} Promise
      */
-    getFile(path) {
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                FileSystem.readFile(path, (err, data) => {
-                    if(err) { return reject(err); }
+    async getFile(path) {
+        await this.pullRepo();
 
-                    resolve(data);
-                });
-            });
-        });
+        return HashBrown.Helpers.FileHelper.read(path);
     }
     
     /**
@@ -149,34 +129,26 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} List of files
      */
-    getFolder(path, recursions = 0) {
+    async getFolder(path, recursions = 0) {
         for(let i = 0; i < recursions; i++) {
-            path += '/*';
+            path = Path.join(path, '*');
         }
 
-        path = path.replace('//', '/');
+        await this.pullRepo();
+        
+        let files = await HashBrown.Helpers.FileHelper.list(path);
+        
+        for(let i = 0; i < files.length; i++) {
+            let fullPath = files[i];
+            let relativePath = fullPath.replace(this.getRootPath(), '');
 
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                Glob(APP_ROOT + path, (err, data) => {
-                    if(err) { return reject(err); }
+            files[i] = {
+                name: Path.basename(relativePath),
+                path: fullPath
+            };
+        }
 
-                    let files = [];
-
-                    for(let fullPath of data) {
-                        let relativePath = fullPath.replace(APP_ROOT + this.getRootPath(), '');
-
-                        files.push({
-                            name: Path.basename(relativePath),
-                            path: fullPath
-                        });
-                    }
-
-                    resolve(files);
-                });
-            });
-        });
+        return files;
     }
 
     /**
@@ -187,26 +159,16 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @return {Promise} Promise
      */
-    setFile(path, base64) {
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                let folder = Path.dirname(APP_ROOT + path);
+    async setFile(path, base64) {
+        await this.pullRepo()
 
-                if(!FileSystem.existsSync(folder)) {
-                    FileSystem.mkdirSync(folder);
-                }
+        let folder = Path.dirname(path);
 
-                FileSystem.writeFile(APP_ROOT + path, base64, 'base64', (err) => {
-                    if(err) { return reject(err); }
+        await HashBrown.Helpers.FileHelper.makeDirectory(folder);
 
-                    resolve();
-                });
-            })
-        })
-        .then(() => {
-            return this.pushRepo();   
-        });
+        await HashBrown.Helpers.FileHelper.write(path, Buffer.from(base64, 'base64'));
+        
+        await this.pushRepo();   
     }
     
     /**
@@ -217,22 +179,14 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @return {Promise} Promise
      */
-    renameFile(oldPath, name) {
+    async renameFile(oldPath, name) {
         let newPath = Path.join(Path.dirname(oldPath), name);
         
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                FileSystem.rename(oldPath, newPath, (err) => {
-                    if(err) { reject(err); }
+        await this.pullRepo();
 
-                    resolve();
-                });
-            });
-        })
-        .then(() => {
-            return this.pushRepo();
-        });
+        await HashBrown.Helpers.FileHelper.move(oldPath, newPath);
+        
+        await this.pushRepo();
     }
    
     /**
@@ -242,20 +196,12 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @return {Promise} Promise
      */
-    removeFile(path) {
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                FileSystem.unlink(APP_ROOT + path, (err) => {
-                    if(err) { reject(err); }
+    async removeFile(path) {
+        await this.pullRepo();
 
-                    resolve();
-                });
-            });
-        })
-        .then(() => {
-            return this.pushRepo();
-        });
+        await HashBrown.Helpers.FileHelper.remove(Path.join(APP_DOOR, path));
+
+        await this.pushRepo();
     }
 
     /**
@@ -265,20 +211,12 @@ class GitDeployer extends HashBrown.Models.Deployer {
      *
      * @returns {Promise} Result
      */
-    removeFolder(path) {
-        return this.pullRepo()
-        .then(() => {
-            return new Promise((resolve, reject) => {
-                RimRaf(APP_ROOT + path, (err) => {
-                    if(err) { reject(err); }
+    async removeFolder(path) {
+        await this.pullRepo();
 
-                    resolve();
-                });
-            });
-        })
-        .then(() => {
-            return this.pushRepo();
-        });
+        await HashBrown.Helpers.FileHelper.remove(Path.join(APP_DOOR, path));
+
+        await this.pushRepo();
     }
 }
 

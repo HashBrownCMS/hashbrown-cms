@@ -41,7 +41,7 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--language'},
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),

@@ -198,7 +198,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                             })
                     )
                 ),
-                _.div({class: 'editor__field__value segmented'},
+                _.div({class: 'editor__field__value'},
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                         if(!fieldValue) { return; }
 
@@ -207,7 +207,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                         if(isValidTab && fieldValue.tabId !== this.currentTab) { return; }
                         if(!isValidTab && this.currentTab !== 'meta') { return; }
 
-                        let $field = _.div({class: 'editor__field'});
+                        let $field = _.div({class: 'editor__field raised'});
 
                         // Sanity check
                         fieldValue.config = fieldValue.config || {};

@@ -175,6 +175,35 @@
             display: block;
         }
 
+        // Raised
+        &.raised {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+            background-color: $standard;
+
+            // Nested
+            & & {
+                box-shadow: none;
+                border: 1px dashed $standard-darker;
+            }
+
+            & & & {
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                border: none;
+            }
+
+            & & & & {
+                box-shadow: none;
+                border: 1px dashed $standard-darker;
+            }
+
+            & & & & & {
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                border: none;
+            }
+        }
+
         // Collapsed & sorting mode
         .editor__field__value.collapsed &,
         .editor__field__value.sorting &,
@@ -199,7 +228,6 @@
                 display: none;
             }
         }
-
 
         // Vertical mode
         &.vertical {
@@ -341,42 +369,6 @@
             transition: border 0.5s ease, padding 0.5s ease;
             position: relative;
 
-            // Segmented
-            &.segmented > .editor__field {
-                border-bottom: 0;
-                padding: 1rem;
-                margin-bottom: 1rem;
-                background-color: $standard;
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-
-                &:last-child {
-                    margin-bottom: 0;
-                }
-            }
-            
-            // Grid
-            &.grid > .editor__field {
-                float: left;
-                margin: 0.5rem;
-                width: calc(100% / 3 - 1rem);
-            }
-
-            // Nested segmentation
-            &.segmented .editor__field__value.segmented {
-                padding: 1rem;
-                background-color: $standard-dark;
-                border-radius: 0.2rem;
-                box-shadow: inset 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-            }
-
-            // Collapsed mode
-            &.collapsed {
-                // Style the items inside
-                .editor__field {
-                    background-color: $standard;
-                }
-            }
-
             // Sorting mode
             &.sorting {
                 padding: 1rem;
@@ -416,15 +408,6 @@
                     &__remove {
                         display: none;
                     }
-                }
-            }
-
-            // Flex mode
-            &.flex {
-                display: flex;
-
-                .widget {
-                    margin: 0 0.5rem 0.5rem 0;
                 }
             }
 

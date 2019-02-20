@@ -223,10 +223,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value segmented ' + (this.config.useGrid ? 'grid' : '')},
+        return _.div({class: 'field-editor field-editor--array ' + (this.config.useGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
                 // Render field
-                let $field = _.div({class: 'editor__field'});
+                let $field = _.div({class: 'editor__field raised field-editor--array__item'});
 
                 let renderField = () => {
                     let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
@@ -276,38 +276,41 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         item.value = newValue;
                     });
 
-                    // Render Schema picker
-                    if(this.config.allowedSchemas.length > 1) {
-                        editorInstance.$element.prepend(
-                            _.div({class: 'editor__field'},
-                                _.div({class: 'editor__field__key'}, 'Schema'),
-                                _.div({class: 'editor__field__value'},
-                                    new HashBrown.Views.Widgets.Dropdown({
-                                        value: item.schemaId,
-                                        placeholder: 'Schema',
-                                        valueKey: 'id',
-                                        labelKey: 'name',
-                                        iconKey: 'icon',
-                                        options: resources.schemas.filter((schema) => {
-                                            return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                        }),
-                                        onChange: (newSchemaId) => {
-                                            item.schemaId = newSchemaId;
-                                            item.value = null;
-                                            
-                                            renderField();
-
-                                            this.trigger('change', this.value);
-                                        }
-                                    }).$element
-                                )
-                            )
-                        );
-                    }
-                
                     _.append($field.empty(),
+                        // Render sort key
                         _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
-                        editorInstance.$element,
+
+                        // Render Schema picker
+                        _.if(this.config.allowedSchemas.length > 1,
+                            _.div({class: 'field-editor--array__item__toolbar'},
+                                _.div({class: 'widget--label'}, 'Schema'),
+                                new HashBrown.Views.Widgets.Dropdown({
+                                    value: item.schemaId,
+                                    placeholder: 'Schema',
+                                    valueKey: 'id',
+                                    labelKey: 'name',
+                                    iconKey: 'icon',
+                                    options: resources.schemas.filter((schema) => {
+                                        return this.config.allowedSchemas.indexOf(schema.id) > -1;
+                                    }),
+                                    onChange: (newSchemaId) => {
+                                        item.schemaId = newSchemaId;
+                                        item.value = null;
+                                        
+                                        renderField();
+
+                                        this.trigger('change', this.value);
+                                    }
+                                }).$element
+                            )
+                        ),
+                
+                        // Render field editor instance
+                        _.div({class: 'editor__field__value'},
+                            editorInstance.$element
+                        ),
+
+                        // Render field actions (collapse/expand, remove)
                         _.div({class: 'editor__field__actions'},
                             _.if(!this.config.useGrid,
                                 _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})

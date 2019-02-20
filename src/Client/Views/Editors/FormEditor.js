@@ -138,9 +138,9 @@ class FormEditor extends Crisp.View {
             'text'
         ];
 
-        return _.div({class: 'editor__field__value segmented'},
+        return _.div({class: 'editor__field__value'},
             _.each(this.model.inputs, (key, input) => {
-                return _.div({class: 'editor__field'},
+                return _.div({class: 'editor__field raised'},
                     _.div({class: 'editor__field__actions'},
                         _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
                             .click(() => { view.onClickRemoveInput(key); })

@@ -16,9 +16,9 @@
 
     &:not(.has-icon):after {
         position: absolute;
-        top: 0.5rem;
+        top: 0.7rem;
         right: 0.6rem;
-        content: "";
+        content: '';
         border-left: 0.5rem solid transparent;
         border-right: 0.5rem solid transparent;
         border-top: 0.5rem solid $standard-dark;

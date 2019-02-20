@@ -30,7 +30,7 @@ class TagsEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--tags'},
             new HashBrown.Views.Widgets.Chips({
                 tooltip: this.description || '',
                 value: (this.value || '').split(','),

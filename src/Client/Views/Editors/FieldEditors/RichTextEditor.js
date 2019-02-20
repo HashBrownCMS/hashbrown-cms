@@ -104,9 +104,9 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 let html = '';
 
                 if(media.isImage()) {
-                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
                 } else if(media.isVideo()) {
-                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
                 }
 
                 let activeView = this.activeView || 'wysiwyg';
@@ -135,7 +135,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Tab content
      */
     getTabContent() {
-        return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+        return this.element.querySelector('.field-editor--rich-text__tab__content');
     }
 
     /**
@@ -315,30 +315,30 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     template() {
         let activeView = this.activeView || 'wysiwyg';
 
-        return _.div({class: 'editor__field__value editor__field--rich-text-editor', title: this.description || ''},
-            _.div({class: 'editor__field--rich-text-editor__header'},
+        return _.div({class: 'field-editor field-editor--rich-text', title: this.description || ''},
+            _.div({class: 'field-editor--rich-text__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
-                    return _.button({class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'}, label)
+                    return _.button({class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'}, label)
                         .click(() => { this.onClickTab(alias); })
                 }),
-                _.button({class: 'editor__field--rich-text-editor__header__add-media'},
+                _.button({class: 'field-editor--rich-text__header__add-media'},
                     'Add media'
                 ).click(() => { this.onClickInsertMedia(); })
             ),
-            _.div({class: 'editor__field--rich-text-editor__body'},
+            _.div({class: 'field-editor--rich-text__body'},
                 _.if(activeView === 'wysiwyg',
-                    _.div({class: 'editor__field--rich-text-editor__tab wysiwyg'},
-                        _.div({class: 'editor__field--rich-text-editor__tab__content', 'contenteditable': true})
+                    _.div({class: 'field-editor--rich-text__tab wysiwyg'},
+                        _.div({class: 'field-editor--rich-text__tab__content', 'contenteditable': true})
                     )
                 ),
                 _.if(activeView === 'markdown',
-                    _.div({class: 'editor__field--rich-text-editor__tab markdown'},
-                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    _.div({class: 'field-editor--rich-text__tab markdown'},
+                        _.textarea({class: 'field-editor--rich-text__tab__content'})
                     )
                 ),
                 _.if(activeView === 'html',
-                    _.div({class: 'editor__field--rich-text-editor__tab html'},
-                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    _.div({class: 'field-editor--rich-text__tab html'},
+                        _.textarea({class: 'field-editor--rich-text__tab__content'})
                     )
                 )
             )
