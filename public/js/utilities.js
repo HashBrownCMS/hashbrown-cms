@@ -90,10 +90,27 @@
 /***/ (function(module, exports) {
 
 /**
+ * Performs a submodule check
+ */
+window.submoduleCheck = function submoduleCheck() {
+  var message = '';
+
+  if (typeof Crisp === 'undefined') {
+    message = 'Git submodule "crisp-ui" not loaded. Please run "git submodule update --init" in the HashBrown root directory and reload this page';
+  }
+
+  if (message) {
+    alert(message);
+    throw new Error(message);
+  }
+};
+/**
  * Converts a string from HTML to markdown
  *
  * @return {String} Markdown
  */
+
+
 window.toMarkdown = function toMarkdown(html) {
   return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
 };

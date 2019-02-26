@@ -4,6 +4,8 @@
  * @namespace HashBrown.Client
  */
 document.addEventListener('DOMContentLoaded', () => {
+    submoduleCheck();
+    
     // Resource cache
     window.resources = {
         connections: [],

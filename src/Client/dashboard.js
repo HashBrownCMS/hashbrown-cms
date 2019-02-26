@@ -1,6 +1,8 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
+    submoduleCheck();
+
     // Libraries
     window._ = Crisp.Elements;
     window.Promise = require('bluebird');

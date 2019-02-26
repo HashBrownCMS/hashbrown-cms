@@ -6366,7 +6366,8 @@ process.umask = function () {
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Resource cache
+  submoduleCheck(); // Resource cache
+
   window.resources = {
     connections: [],
     content: [],

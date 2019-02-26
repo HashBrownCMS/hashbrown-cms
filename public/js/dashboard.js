@@ -92,7 +92,8 @@
 
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Libraries
+  submoduleCheck(); // Libraries
+
   window._ = Crisp.Elements;
   window.Promise = __webpack_require__(1); // Helper shortcuts
 
