@@ -6922,7 +6922,7 @@ document.addEventListener('DOMContentLoaded', function () {
   inline._attribute = /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/;
   inline.tag = edit(inline.tag).replace('comment', block._comment).replace('attribute', inline._attribute).getRegex();
   inline._label = /(?:\[[^\[\]]*\]|\\[\[\]]?|`[^`]*`|[^\[\]\\])*?/;
-  inline._href = /\s*(<(?:\\[<>]?|[^\s<>\\])*>|(?:\\[()]?|\([^\s\x00-\x1f\\]*\)|[^\s\x00-\x1f()\\])*?)/;
+  inline._href = /\s*(<(?:\\[<>]?|[^\s<>\\])*>|[^\s\x00-\x1f]*)/;
   inline._title = /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/;
   inline.link = edit(inline.link).replace('label', inline._label).replace('href', inline._href).replace('title', inline._title).getRegex();
   inline.reflink = edit(inline.reflink).replace('label', inline._label).getRegex();
@@ -7044,6 +7044,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
       if (cap = this.rules.link.exec(src)) {
+        var lastParenIndex = findClosingBracket(cap[2], '()');
+
+        if (lastParenIndex > -1) {
+          var removeChars = cap[2].length - lastParenIndex;
+          cap[2] = cap[2].substring(0, lastParenIndex);
+          cap[0] = cap[0].substring(0, cap[0].length - removeChars);
+        }
+
         src = src.substring(cap[0].length);
         this.inLink = true;
         href = cap[2];
@@ -7834,6 +7842,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     return str.substr(0, str.length - suffLen);
+  }
+
+  function findClosingBracket(str, b) {
+    if (str.indexOf(b[1]) === -1) {
+      return -1;
+    }
+
+    var level = 0;
+
+    for (var i = 0; i < str.length; i++) {
+      if (str[i] === '\\') {
+        i++;
+      } else if (str[i] === b[0]) {
+        level++;
+      } else if (str[i] === b[1]) {
+        level--;
+
+        if (level < 0) {
+          return i;
+        }
+      }
+    }
+
+    return -1;
   }
   /**
    * Marked

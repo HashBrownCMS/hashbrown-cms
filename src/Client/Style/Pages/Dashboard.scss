@@ -83,7 +83,7 @@
 
     // Users
     &__users {
-        &__list {
+        /*&__list {
             column-count: 3;
             column-gap: 1rem;
 
@@ -98,6 +98,19 @@
                     height: 10rem;
                 }
             }
+        }*/
+        &__list {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.5rem;
+
+            @media($xs) {
+                flex-direction: column;
+            }
+        }
+
+        &__add {
+            margin-top: 1rem;
         }
     }
 

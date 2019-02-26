@@ -45,38 +45,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let renderUser = () => {
                 _.append($user.empty(),
-                    _.button({class: 'widget widget--button page--dashboard__users__list__user__button', title: 'Edit user'},
-                        _.span({class: 'fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
-                        (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')
-                    ).on('click', () => {
-                        let userEditor = new HashBrown.Views.Editors.UserEditor({ model: user });
+                    _.div({class: 'page--dashboard__user__body'},
+                        new HashBrown.Views.Widgets.Dropdown({
+                            icon: 'ellipsis-v',
+                            reverseKeys: true,
+                            options: {
+                                'Edit': () => { 
+                                    let userEditor = new HashBrown.Views.Editors.UserEditor({ model: user });
 
-                        userEditor.on('save', () => {
-                            renderUser();
-                        });
-                    }),
-                    _.if(user.id !== HashBrown.Models.User.current.id,
-                        _.button({class: 'widget widget--button small fa fa-remove', title: 'Remove user'})
-                            .on('click', () => {
-                                UI.confirmModal(
-                                    'remove',
-                                    'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
-                                    'Are you sure you want to remove this user?',
-                                    () => {
-                                        HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
-                                        .then(() => {
-                                            $user.remove();
-                                        })
-                                        .catch(UI.errorModal);
-                                    }
-                                );
-                            })
+                                    userEditor.on('save', () => {
+                                        renderUser();
+                                    });
+                                },
+                                'Delete': () => {
+                                    if(user.id === HashBrown.Models.User.current.id) { return UI.errorModal(new Error('You cannot delete yourself')); }
+                                    
+                                    UI.confirmModal(
+                                        'remove',
+                                        'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
+                                        'Are you sure you want to remove this user?',
+                                        () => {
+                                            HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
+                                            .then(() => {
+                                                $user.remove();
+                                            })
+                                            .catch(UI.errorModal);
+                                        }
+                                    );
+                                },
+                            }
+                        }).$element.addClass('page--dashboard__user__menu'),
+                        _.h4({class: 'page--dashboard__user__name'},
+                            (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')
+                        ),
+                        _.div({class: 'page--dashboard__user__type'},
+                            _.if(user.isAdmin,
+                                _.span({class: 'page--dashboard__user__type__icon fa fa-black-tie'}),
+                                'Admin'
+                            ),
+                            _.if(!user.isAdmin,
+                                _.span({class: 'page--dashboard__user__type__icon fa fa-user'}),
+                                'Editor'
+                            )
+                        )
                     )
                 );
             };
 
             $('.page--dashboard__users__list').append(
-                $user = _.div({class: 'page--dashboard__users__list__user'})
+                $user = _.div({class: 'page--dashboard__user'})
             );
 
             renderUser();
