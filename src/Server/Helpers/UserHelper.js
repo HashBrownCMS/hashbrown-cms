@@ -435,14 +435,19 @@ class UserHelper {
         )
         .then((users) => {
             let userModels = [];
+            
+            users = users.sort((a, b) => {
+                a = a.fullName || a.username || a.email;
+                b = b.fullName || b.username || b.email;
+
+                if(a < b) { return -1; }
+                if(a > b) { return 1; }
+                return 0;
+            });
 
             for(let user of users) {
                 userModels.push(new HashBrown.Models.User(user));
             }  
-
-            userModels.sort((a, b) => {
-                return a.username > b.username;
-            });
 
             return Promise.resolve(userModels);
         });
