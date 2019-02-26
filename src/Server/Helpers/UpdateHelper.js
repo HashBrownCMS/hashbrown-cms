@@ -19,7 +19,7 @@ class UpdateHelper {
      * @returns {Promise} Status info
      */
     static check() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/HashBrownCMS/hashbrown-cms/releases/latest')
         .then((res) => {
             if(!res || !res.tag_name) {
                 return Promise.reject(new Error('Couldn\'t fetch update information'));
@@ -66,7 +66,7 @@ class UpdateHelper {
         debug.log('Updating HashBrown...', this);
         
         // Get latest release info
-        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        return HashBrown.Helpers.RequestHelper.request('get', 'https://api.github.com/repos/HashBrownCMS/hashbrown-cms/releases/latest')
         
         // Check versions
         .then((res) => {
