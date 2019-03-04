@@ -13606,7 +13606,10 @@ function (_HashBrown$Views$Edit) {
             schema: schema
           }); // Assign the "value" class name to the field editor
 
-          editorInstance.element.classList.toggle('editor__field__value', true); // Hook up the change event
+          editorInstance.element.classList.toggle('editor__field__value', true);
+          editorInstance.on('ready', function () {
+            editorInstance.element.classList.toggle('editor__field__value', true);
+          }); // Hook up the change event
 
           editorInstance.on('change', function (newValue) {
             item.value = newValue;
