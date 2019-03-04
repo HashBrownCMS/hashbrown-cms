@@ -405,6 +405,9 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0;
   }
 }
+.page--environment__space--menu .widget--dropdown.has-icon {
+  background-color: #ffffff;
+}
 .page--environment__space--nav {
   width: 30rem;
   flex-basis: 30rem;
