@@ -43,7 +43,7 @@ npm install --production
 If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/HashBrownCMS/hashbrown-cms) or contact us about becoming a collaborator
 
 ## Talk to us
-Reddit: [/r/HashBrownCMS/](https://www.reddit.com/r/HashBrownCMS/)  
+
 Matrix: #hashbrowncms:matrix.org
 
 ## Report issues
