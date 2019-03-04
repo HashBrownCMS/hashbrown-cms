@@ -33,8 +33,6 @@ class FieldEditor extends Crisp.View {
         _.append(this.$keyActions.empty(),
             this.renderKeyActions()
         );
-
-        this.element.classList.toggle('editor__field__value', true);
     }
 }
 

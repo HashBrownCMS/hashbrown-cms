@@ -2964,6 +2964,10 @@ function (_Crisp$View) {
 
         onChange(newValue);
       });
+      fieldEditorInstance.element.classList.toggle('editor__field__value', true);
+      fieldEditorInstance.on('ready', function () {
+        fieldEditorInstance.element.classList.toggle('editor__field__value', true);
+      });
       return fieldEditorInstance.$element;
     }
     /**
@@ -13319,8 +13323,6 @@ function (_Crisp$View) {
       }
 
       _.append(this.$keyActions.empty(), this.renderKeyActions());
-
-      this.element.classList.toggle('editor__field__value', true);
     }
   }], [{
     key: "renderConfigEditor",
