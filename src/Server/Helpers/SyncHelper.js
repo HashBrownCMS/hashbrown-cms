@@ -37,7 +37,7 @@ class SyncHelper {
         checkParam(username, 'username', String);
         checkParam(password, 'password', String);
 
-        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync');
+        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync') || {};
 
         if(!settings.enabled) { return ''; }
 
@@ -112,7 +112,7 @@ class SyncHelper {
             return this.getResource(project, environment, remoteResourceName);
         }
 
-        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync');
+        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync') || {};
 
         if(!settings.enabled) { return ''; }
         
@@ -161,7 +161,7 @@ class SyncHelper {
         checkParam(remoteItemName, 'remoteItemName', String);
         checkParam(remoteItemData, 'remoteItemData', Object);
 
-        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync');
+        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync') || {};
 
         if(!settings.enabled) { return; }
 
@@ -201,7 +201,7 @@ class SyncHelper {
         checkParam(environment, 'environment', String);
         checkParam(remoteResourceName, 'remoteResourceName', String);
 
-        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync');
+        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync') || {};
 
         if(!settings.enabled) { return null; }
 
