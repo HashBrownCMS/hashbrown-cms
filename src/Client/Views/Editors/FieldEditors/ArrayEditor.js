@@ -270,7 +270,6 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     // Assign the "value" class name to the field editor
                     editorInstance.element.classList.toggle('editor__field__value', true);
 
-
                     // Hook up the change event
                     editorInstance.on('change', (newValue) => {
                         item.value = newValue;

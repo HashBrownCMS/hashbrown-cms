@@ -2691,7 +2691,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   position: relative;
   max-width: 20rem;
-  min-width: 10rem;
+  min-width: 8rem;
   flex-grow: 1;
   background-color: #ffffff;
   border-radius: 0.2rem;

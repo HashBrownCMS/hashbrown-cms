@@ -189,6 +189,8 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Post render
      */
     postrender() {
+        super.postrender();
+        
         //  Wait a bit before checking for title field
         setTimeout(() => {
             this.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');

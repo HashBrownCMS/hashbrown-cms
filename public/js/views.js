@@ -81,11 +81,11 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 227);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ (Array(227).concat([
-/* 227 */
+/******/ ([
+/* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -94,18 +94,18 @@
  * @namespace HashBrown.Client.Views
  */
 
-__webpack_require__(228);
+__webpack_require__(1);
 
-__webpack_require__(233);
+__webpack_require__(6);
 
-__webpack_require__(243);
+__webpack_require__(16);
 
-__webpack_require__(274);
+__webpack_require__(47);
 
-__webpack_require__(284);
+__webpack_require__(57);
 
 /***/ }),
-/* 228 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -114,10 +114,10 @@ __webpack_require__(284);
  * @namespace HashBrown.Client.Views.Widgets
  */
 
-namespace('Views.Widgets').add(__webpack_require__(229)).add(__webpack_require__(230)).add(__webpack_require__(231)).add(__webpack_require__(232));
+namespace('Views.Widgets').add(__webpack_require__(2)).add(__webpack_require__(3)).add(__webpack_require__(4)).add(__webpack_require__(5));
 
 /***/ }),
-/* 229 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -205,7 +205,7 @@ function (_Crisp$View) {
 module.exports = Widget;
 
 /***/ }),
-/* 230 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -649,7 +649,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Dropdown;
 
 /***/ }),
-/* 231 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -853,7 +853,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Chips;
 
 /***/ }),
-/* 232 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1051,7 +1051,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Input;
 
 /***/ }),
-/* 233 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1060,10 +1060,10 @@ module.exports = Input;
  * @namespace HashBrown.Client.Views.Modals
  */
 
-namespace('Views.Modals').add(__webpack_require__(234)).add(__webpack_require__(235)).add(__webpack_require__(236)).add(__webpack_require__(237)).add(__webpack_require__(239)).add(__webpack_require__(240)).add(__webpack_require__(241)).add(__webpack_require__(242));
+namespace('Views.Modals').add(__webpack_require__(7)).add(__webpack_require__(8)).add(__webpack_require__(9)).add(__webpack_require__(10)).add(__webpack_require__(12)).add(__webpack_require__(13)).add(__webpack_require__(14)).add(__webpack_require__(15));
 
 /***/ }),
-/* 234 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1344,7 +1344,7 @@ document.addEventListener('keyup', function (e) {
 module.exports = Modal;
 
 /***/ }),
-/* 235 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1446,7 +1446,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = ConfirmModal;
 
 /***/ }),
-/* 236 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1653,7 +1653,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = DateModal;
 
 /***/ }),
-/* 237 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1677,7 +1677,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(238).icons;
+var icons = __webpack_require__(11).icons;
 /**
  * A modal for picking icons
  *
@@ -1772,13 +1772,13 @@ function (_HashBrown$Views$Moda) {
 module.exports = IconModal;
 
 /***/ }),
-/* 238 */
+/* 11 */
 /***/ (function(module) {
 
 module.exports = {"icons":["500px","adjust","adn","align-center","align-justify","align-left","align-right","amazon","ambulance","anchor","android","angellist","angle-double-down","angle-double-left","angle-double-right","angle-double-up","angle-down","angle-left","angle-right","angle-up","apple","archive","area-chart","arrow-circle-down","arrow-circle-left","arrow-circle-o-down","arrow-circle-o-left","arrow-circle-o-right","arrow-circle-o-up","arrow-circle-right","arrow-circle-up","arrow-down","arrow-left","arrow-right","arrow-up","arrows","arrows-alt","arrows-h","arrows-v","asterisk","at","automobile","backward","balance-scale","ban","bank","bar-chart","bar-chart-o","barcode","bars","battery-0","battery-1","battery-2","battery-3","battery-4","battery-empty","battery-full","battery-half","battery-quarter","battery-three-quarters","bed","beer","behance","behance-square","bell","bell-o","bell-slash","bell-slash-o","bicycle","binoculars","birthday-cake","bitbucket","bitbucket-square","bitcoin","black-tie","bluetooth","bluetooth-b","bold","bolt","bomb","book","bookmark","bookmark-o","briefcase","btc","bug","building","building-o","bullhorn","bullseye","bus","buysellads","cab","calculator","calendar","calendar-check-o","calendar-minus-o","calendar-o","calendar-plus-o","calendar-times-o","camera","camera-retro","car","caret-down","caret-left","caret-right","caret-square-o-down","caret-square-o-left","caret-square-o-right","caret-square-o-up","caret-up","cart-arrow-down","cart-plus","cc","cc-amex","cc-diners-club","cc-discover","cc-jcb","cc-mastercard","cc-paypal","cc-stripe","cc-visa","certificate","chain","chain-broken","check","check-circle","check-circle-o","check-square","check-square-o","chevron-circle-down","chevron-circle-left","chevron-circle-right","chevron-circle-up","chevron-down","chevron-left","chevron-right","chevron-up","child","chrome","circle","circle-o","circle-o-notch","circle-thin","clipboard","clock-o","clone","close","cloud","cloud-download","cloud-upload","cny","code","code-fork","codepen","codiepie","coffee","cog","cogs","columns","comment","comment-o","commenting","commenting-o","comments","comments-o","compass","compress","connectdevelop","contao","copy","copyright","creative-commons","credit-card","credit-card-alt","crop","crosshairs","css3","cube","cubes","cut","cutlery","dashboard","dashcube","database","dedent","delicious","desktop","deviantart","diamond","digg","dollar","dot-circle-o","download","dribbble","dropbox","drupal","edge","edit","eject","ellipsis-h","ellipsis-v","empire","envelope","envelope-o","envelope-square","eraser","eur","euro","exchange","exclamation","exclamation-circle","exclamation-triangle","expand","expeditedssl","external-link","external-link-square","eye","eye-slash","eyedropper","facebook","facebook-f","facebook-official","facebook-square","fast-backward","fast-forward","fax","feed","female","fighter-jet","file","file-archive-o","file-audio-o","file-code-o","file-excel-o","file-image-o","file-movie-o","file-o","file-pdf-o","file-photo-o","file-picture-o","file-powerpoint-o","file-sound-o","file-text","file-text-o","file-video-o","file-word-o","file-zip-o","files-o","film","filter","fire","fire-extinguisher","firefox","flag","flag-checkered","flag-o","flash","flask","flickr","floppy-o","folder","folder-o","folder-open","folder-open-o","font","fonticons","fort-awesome","forumbee","forward","foursquare","frown-o","futbol-o","gamepad","gavel","gbp","ge","gear","gears","genderless","get-pocket","gg","gg-circle","gift","git","git-square","github","github-alt","github-square","gittip","glass","globe","google","google-plus","google-plus-square","google-wallet","graduation-cap","gratipay","group","h-square","hacker-news","hand-grab-o","hand-lizard-o","hand-o-down","hand-o-left","hand-o-right","hand-o-up","hand-paper-o","hand-peace-o","hand-pointer-o","hand-rock-o","hand-scissors-o","hand-spock-o","hand-stop-o","hashtag","hdd-o","header","headphones","heart","heart-o","heartbeat","history","home","hospital-o","hotel","hourglass","hourglass-1","hourglass-2","hourglass-3","hourglass-end","hourglass-half","hourglass-o","hourglass-start","houzz","html5","i-cursor","ils","image","inbox","indent","industry","info","info-circle","inr","instagram","institution","internet-explorer","intersex","ioxhost","italic","joomla","jpy","jsfiddle","key","keyboard-o","krw","language","laptop","lastfm","lastfm-square","leaf","leanpub","legal","lemon-o","level-down","level-up","life-bouy","life-buoy","life-ring","life-saver","lightbulb-o","line-chart","link","linkedin","linkedin-square","linux","list","list-alt","list-ol","list-ul","location-arrow","lock","long-arrow-down","long-arrow-left","long-arrow-right","long-arrow-up","magic","magnet","mail-forward","mail-reply","mail-reply-all","male","map","map-marker","map-o","map-pin","map-signs","mars","mars-double","mars-stroke","mars-stroke-h","mars-stroke-v","maxcdn","meanpath","medium","medkit","meh-o","mercury","microphone","microphone-slash","minus","minus-circle","minus-square","minus-square-o","mixcloud","mobile","mobile-phone","modx","money","moon-o","mortar-board","motorcycle","mouse-pointer","music","navicon","neuter","newspaper-o","object-group","object-ungroup","odnoklassniki","odnoklassniki-square","opencart","openid","opera","optin-monster","outdent","pagelines","paint-brush","paper-plane","paper-plane-o","paperclip","paragraph","paste","pause","pause-circle","pause-circle-o","paw","paypal","pencil","pencil-square","pencil-square-o","percent","phone","phone-square","photo","picture-o","pie-chart","pied-piper","pied-piper-alt","pinterest","pinterest-p","pinterest-square","plane","play","play-circle","play-circle-o","plug","plus","plus-circle","plus-square","plus-square-o","power-off","print","product-hunt","puzzle-piece","qq","qrcode","question","question-circle","quote-left","quote-right","ra","random","rebel","recycle","reddit","reddit-alien","reddit-square","refresh","registered","remove","renren","reorder","repeat","reply","reply-all","retweet","rmb","road","rocket","rotate-left","rotate-right","rouble","rss","rss-square","rub","ruble","rupee","safari","save","scissors","scribd","search","search-minus","search-plus","sellsy","send","send-o","server","share","share-alt","share-alt-square","share-square","share-square-o","shekel","sheqel","shield","ship","shirtsinbulk","shopping-bag","shopping-basket","shopping-cart","sign-in","sign-out","signal","simplybuilt","sitemap","skyatlas","skype","slack","sliders","slideshare","smile-o","soccer-ball-o","sort","sort-alpha-asc","sort-alpha-desc","sort-amount-asc","sort-amount-desc","sort-asc","sort-desc","sort-down","sort-numeric-asc","sort-numeric-desc","sort-up","soundcloud","space-shuttle","spinner","spoon","spotify","square","square-o","stack-exchange","stack-overflow","star","star-half","star-half-empty","star-half-full","star-half-o","star-o","steam","steam-square","step-backward","step-forward","stethoscope","sticky-note","sticky-note-o","stop","stop-circle","stop-circle-o","street-view","strikethrough","stumbleupon","stumbleupon-circle","subscript","subway","suitcase","sun-o","superscript","support","table","tablet","tachometer","tag","tags","tasks","taxi","television","tencent-weibo","terminal","text-height","text-width","th","th-large","th-list","thumb-tack","thumbs-down","thumbs-o-down","thumbs-o-up","thumbs-up","ticket","times","times-circle","times-circle-o","tint","toggle-down","toggle-left","toggle-off","toggle-on","toggle-right","toggle-up","trademark","train","transgender","transgender-alt","trash","trash-o","tree","trello","tripadvisor","trophy","truck","try","tty","tumblr","tumblr-square","turkish-lira","tv","twitch","twitter","twitter-square","umbrella","underline","undo","university","unlink","unlock","unlock-alt","unsorted","upload","usb","usd","user","user-md","user-plus","user-secret","user-times","users","venus","venus-double","venus-mars","viacoin","video-camera","vimeo","vimeo-square","vine","vk","volume-down","volume-off","volume-up","warning","wechat","weibo","weixin","whatsapp","wheelchair","wifi","wikipedia-w","windows","won","wordpress","wrench","xing","xing-square","y-combinator","y-combinator-square","yahoo","yc","yc-square","yelp","yen","youtube","youtube-play","youtube-square"]};
 
 /***/ }),
-/* 239 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1847,7 +1847,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = IframeModal;
 
 /***/ }),
-/* 240 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1977,7 +1977,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 241 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2180,7 +2180,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 242 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2288,7 +2288,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = PublishingSettingsModal;
 
 /***/ }),
-/* 243 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2297,14 +2297,14 @@ module.exports = PublishingSettingsModal;
  * @namespace HashBrown.Client.Views.Editors
  */
 
-namespace('Views.Editors').add(__webpack_require__(244)).add(__webpack_require__(245)).add(__webpack_require__(246)).add(__webpack_require__(247)).add(__webpack_require__(252)).add(__webpack_require__(253)).add(__webpack_require__(254)).add(__webpack_require__(255)).add(__webpack_require__(256));
+namespace('Views.Editors').add(__webpack_require__(17)).add(__webpack_require__(18)).add(__webpack_require__(19)).add(__webpack_require__(20)).add(__webpack_require__(25)).add(__webpack_require__(26)).add(__webpack_require__(27)).add(__webpack_require__(28)).add(__webpack_require__(29));
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');
 
-__webpack_require__(257);
+__webpack_require__(30);
 
 /***/ }),
-/* 244 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2654,7 +2654,7 @@ function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 245 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2964,7 +2964,6 @@ function (_Crisp$View) {
 
         onChange(newValue);
       });
-      fieldEditorInstance.element.classList.toggle('editor__field__value', true);
       return fieldEditorInstance.$element;
     }
     /**
@@ -3273,7 +3272,7 @@ function (_Crisp$View) {
 module.exports = ContentEditor;
 
 /***/ }),
-/* 246 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3756,7 +3755,7 @@ function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 247 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3780,7 +3779,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var beautify = __webpack_require__(248).js_beautify;
+var beautify = __webpack_require__(21).js_beautify;
 /**
  * A basic JSON editor for any object
  *
@@ -4094,7 +4093,7 @@ function (_Crisp$View) {
 module.exports = JSONEditor;
 
 /***/ }),
-/* 248 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4164,14 +4163,14 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
   // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(249), __webpack_require__(250), __webpack_require__(251)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
+  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(22), __webpack_require__(23), __webpack_require__(24)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
     return get_beautify(js_beautify, css_beautify, html_beautify);
   }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {}
 
 /***/ }),
-/* 249 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7772,7 +7771,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 250 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9384,7 +9383,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 251 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -12017,9 +12016,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 
   if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(249), __webpack_require__(250)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
-      var js_beautify = __webpack_require__(249);
-      var css_beautify = __webpack_require__(250);
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(22), __webpack_require__(23)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
+      var js_beautify = __webpack_require__(22);
+      var css_beautify = __webpack_require__(23);
       return {
         html_beautify: function html_beautify(html_source, options) {
           return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
@@ -12031,7 +12030,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 252 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12136,7 +12135,7 @@ function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 253 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12430,7 +12429,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = UserEditor;
 
 /***/ }),
-/* 254 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12454,7 +12453,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(238).icons;
+var icons = __webpack_require__(11).icons;
 /**
  * The editor for schemas
  *
@@ -12680,7 +12679,7 @@ function (_Crisp$View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 255 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13139,7 +13138,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 256 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13247,7 +13246,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 257 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13256,10 +13255,10 @@ module.exports = FieldSchemaEditor;
  * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 
-namespace('Views.Editors.FieldEditors').add(__webpack_require__(258)).add(__webpack_require__(259)).add(__webpack_require__(260)).add(__webpack_require__(261)).add(__webpack_require__(262)).add(__webpack_require__(263)).add(__webpack_require__(264)).add(__webpack_require__(265)).add(__webpack_require__(266)).add(__webpack_require__(267)).add(__webpack_require__(268)).add(__webpack_require__(269)).add(__webpack_require__(270)).add(__webpack_require__(271)).add(__webpack_require__(272)).add(__webpack_require__(273));
+namespace('Views.Editors.FieldEditors').add(__webpack_require__(31)).add(__webpack_require__(32)).add(__webpack_require__(33)).add(__webpack_require__(34)).add(__webpack_require__(35)).add(__webpack_require__(36)).add(__webpack_require__(37)).add(__webpack_require__(38)).add(__webpack_require__(39)).add(__webpack_require__(40)).add(__webpack_require__(41)).add(__webpack_require__(42)).add(__webpack_require__(43)).add(__webpack_require__(44)).add(__webpack_require__(45)).add(__webpack_require__(46));
 
 /***/ }),
-/* 258 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13320,6 +13319,8 @@ function (_Crisp$View) {
       }
 
       _.append(this.$keyActions.empty(), this.renderKeyActions());
+
+      this.element.classList.toggle('editor__field__value', true);
     }
   }], [{
     key: "renderConfigEditor",
@@ -13342,7 +13343,7 @@ function (_Crisp$View) {
 module.exports = FieldEditor;
 
 /***/ }),
-/* 259 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13743,7 +13744,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 260 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13846,7 +13847,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 261 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14029,7 +14030,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 262 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14253,7 +14254,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 263 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14420,7 +14421,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 264 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14556,7 +14557,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 265 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14659,7 +14660,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 266 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14789,7 +14790,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 267 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14965,7 +14966,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 268 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15122,7 +15123,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 269 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15155,6 +15156,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -15511,6 +15516,8 @@ function (_HashBrown$Views$Edit) {
   }, {
     key: "postrender",
     value: function postrender() {
+      _get(_getPrototypeOf(RichTextEditor.prototype), "postrender", this).call(this);
+
       var activeView = this.activeView || 'wysiwyg';
 
       switch (activeView) {
@@ -15553,7 +15560,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 270 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15672,7 +15679,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 271 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16104,7 +16111,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 272 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16193,7 +16200,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 273 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16226,6 +16233,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -16442,7 +16453,9 @@ function (_HashBrown$Views$Edit) {
     value: function postrender() {
       var _this3 = this;
 
-      //  Wait a bit before checking for title field
+      _get(_getPrototypeOf(UrlEditor.prototype), "postrender", this).call(this); //  Wait a bit before checking for title field
+
+
       setTimeout(function () {
         _this3.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');
 
@@ -16492,7 +16505,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = UrlEditor;
 
 /***/ }),
-/* 274 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16501,10 +16514,10 @@ module.exports = UrlEditor;
  * @namespace HashBrown.Client.Views.Navigation
  */
 
-namespace('Views.Navigation').add(__webpack_require__(275)).add(__webpack_require__(277)).add(__webpack_require__(278)).add(__webpack_require__(279)).add(__webpack_require__(280)).add(__webpack_require__(281)).add(__webpack_require__(282)).add(__webpack_require__(283));
+namespace('Views.Navigation').add(__webpack_require__(48)).add(__webpack_require__(50)).add(__webpack_require__(51)).add(__webpack_require__(52)).add(__webpack_require__(53)).add(__webpack_require__(54)).add(__webpack_require__(55)).add(__webpack_require__(56));
 
 /***/ }),
-/* 275 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16544,7 +16557,7 @@ function (_Crisp$View) {
     _classCallCheck(this, NavbarMain);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(NavbarMain).call(this, params));
-    _this.template = __webpack_require__(276);
+    _this.template = __webpack_require__(49);
     _this.tabPanes = [];
     HashBrown.Views.Navigation.ContentPane.init();
     HashBrown.Views.Navigation.MediaPane.init();
@@ -17070,7 +17083,7 @@ function (_Crisp$View) {
 module.exports = NavbarMain;
 
 /***/ }),
-/* 276 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -17229,7 +17242,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 277 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17420,7 +17433,7 @@ function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 278 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17608,7 +17621,7 @@ function () {
 module.exports = NavbarPane;
 
 /***/ }),
-/* 279 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17829,7 +17842,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 280 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18301,7 +18314,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 281 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18522,7 +18535,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 282 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18767,7 +18780,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 283 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18997,7 +19010,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 284 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19006,10 +19019,10 @@ module.exports = SchemaPane;
  * @namespace HashBrown.Client.Views.Dashboard
  */
 
-namespace('Views.Dashboard').add(__webpack_require__(285)).add(__webpack_require__(286)).add(__webpack_require__(287)).add(__webpack_require__(288)).add(__webpack_require__(289)).add(__webpack_require__(290));
+namespace('Views.Dashboard').add(__webpack_require__(58)).add(__webpack_require__(59)).add(__webpack_require__(60)).add(__webpack_require__(61)).add(__webpack_require__(62)).add(__webpack_require__(63));
 
 /***/ }),
-/* 285 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19248,7 +19261,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 286 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19353,7 +19366,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 287 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19457,7 +19470,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 288 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19615,7 +19628,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MigrationEditor;
 
 /***/ }),
-/* 289 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19962,7 +19975,7 @@ function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 290 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20207,5 +20220,5 @@ function (_HashBrown$Views$Moda) {
 module.exports = SyncEditor;
 
 /***/ })
-/******/ ]));
+/******/ ]);
 //# sourceMappingURL=views.js.map

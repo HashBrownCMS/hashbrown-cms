@@ -349,6 +349,8 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Post render
      */
     postrender() {
+        super.postrender();
+        
         let activeView = this.activeView || 'wysiwyg';
        
         switch(activeView) {
