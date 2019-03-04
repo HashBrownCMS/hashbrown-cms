@@ -28,11 +28,15 @@ class FieldEditor extends Crisp.View {
      * Post render
      */
     postrender() {
-        if(!this.$keyActions) { return; }
-
-        _.append(this.$keyActions.empty(),
-            this.renderKeyActions()
-        );
+        if(this.className) {
+            this.element.classList.toggle(this.className, true);
+        }
+        
+        if(this.$keyActions) {
+            _.append(this.$keyActions.empty(),
+                this.renderKeyActions()
+            );
+        }
     }
 }
 

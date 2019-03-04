@@ -264,14 +264,8 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     let editorInstance = new editorClass({
                         value: item.value,
                         config: schema.config,
-                        schema: schema
-                    });
-
-                    // Assign the "value" class name to the field editor
-                    editorInstance.element.classList.toggle('editor__field__value', true);
-
-                    editorInstance.on('ready', () => {
-                        editorInstance.element.classList.toggle('editor__field__value', true);
+                        schema: schema,
+                        className: 'editor__field__value'
                     });
 
                     // Hook up the change event

@@ -358,7 +358,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     value: keySchema.multilingual ? value[window.language] : value,
                     disabled: keySchema.disabled || false,
                     config: keySchema.config || fieldSchema.config || {},
-                    schema: keySchema
+                    schema: keySchema,
+                    className: 'editor__field__value'
                 });
 
                 // Hook up the change event

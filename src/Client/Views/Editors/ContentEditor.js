@@ -265,7 +265,8 @@ class ContentEditor extends Crisp.View {
             description: fieldDefinition.description || '',
             schema: compiledSchema.getObject(),
             multilingual: fieldDefinition.multilingual === true,
-            $keyActions: $keyActions
+            $keyActions: $keyActions,
+            className: 'editor__field__value'
         });
 
         fieldEditorInstance.on('change', (newValue) => {
@@ -282,12 +283,6 @@ class ContentEditor extends Crisp.View {
             onChange(newValue);
         });
             
-        fieldEditorInstance.element.classList.toggle('editor__field__value', true);
-
-        fieldEditorInstance.on('ready', () => {
-            fieldEditorInstance.element.classList.toggle('editor__field__value', true);
-        });
-
         return fieldEditorInstance.$element;
     }
 
