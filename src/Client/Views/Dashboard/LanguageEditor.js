@@ -1,7 +1,5 @@
 'use strict';
 
-const LanguageHelper = require('Client/Helpers/LanguageHelper');
-
 /**
  * The language settings editor
  *
@@ -32,7 +30,7 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
      * Event: Click save
      */
     onClickSave() {
-        LanguageHelper.setLanguages(this.model.id, this.model.settings.languages)
+        HashBrown.Helpers.LanguageHelper.setLanguages(this.model.id, this.model.settings.languages)
         .then(() => {
             this.close();
 
@@ -53,7 +51,7 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
                 value: this.model.settings.languages,
                 useTypeAhead: true,
                 useMultiple: true,
-                options: LanguageHelper.getLanguageOptions(this.model.id),
+                options: HashBrown.Helpers.LanguageHelper.getLanguageOptions(this.model.id),
                 onChange: (newValue) => {
                     this.model.settings.languages = newValue;
                 }

@@ -1,8 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
-
 /**
  * The editor for Connections
  *
@@ -28,7 +25,7 @@ class ConnectionEditor extends Crisp.View {
     onClickSave() {
         this.$saveBtn.toggleClass('saving', true);
 
-        RequestHelper.request('post', 'connections/' + this.model.id, this.model)
+        HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
         .then(() => {
             this.$saveBtn.toggleClass('saving', false);
        
@@ -38,35 +35,6 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
-     * Renders the Template provider editor
-     */
-    renderTemplateProviderEditor() {
-        let input = new HashBrown.Views.Widgets.Input({
-            value: false,
-            type: 'checkbox',
-            onChange: (isProvider) => {
-                ConnectionHelper.setTemplateProvider(isProvider ? this.model.id : null)
-                .catch(UI.errorModal);
-            }
-        });
-
-        // Set the value
-        input.$element.toggleClass('working', true);
-
-        ConnectionHelper.getTemplateProvider()
-        .then((connection) => {
-            if(connection && connection.id === this.model.id) {
-                input.value = true;
-                input.fetch();
-            }
-        
-            input.$element.toggleClass('working', false);
-        });
-
-        return input.$element;
-    }
-    
-    /**
      * Renders the Media provider editor
      */
     renderMediaProviderEditor() {
@@ -74,7 +42,7 @@ class ConnectionEditor extends Crisp.View {
             value: false,
             type: 'checkbox',
             onChange: (isProvider) => {
-                ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
+                HashBrown.Helpers.ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
                 .catch(UI.errorModal);
             }
         });
@@ -82,7 +50,7 @@ class ConnectionEditor extends Crisp.View {
         // Set the value
         input.$element.toggleClass('working', true);
 
-        ConnectionHelper.getMediaProvider()
+        HashBrown.Helpers.ConnectionHelper.getMediaProvider()
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
                 input.value = true;
@@ -115,28 +83,6 @@ class ConnectionEditor extends Crisp.View {
             value: this.model.url,
             onChange: (newValue) => {
                 this.model.url = newValue;
-            }
-        }).$element;
-    }
-    
-    /**
-     * Renders the preset editor
-     */
-    renderPresetEditor() {
-        return new HashBrown.Views.Widgets.Dropdown({
-            options: [
-                'GitHub Pages',
-                'HashBrown Driver'
-            ],
-            placeholder: 'Pick a preset...',
-            onChange: (newValue) => {
-                let newModel = this.model.getObject();
-                
-                newModel.preset = newValue;
-               
-                this.model = new HashBrown.Models.Connection(newModel);
-
-                this.fetch();
             }
         }).$element;
     }
@@ -246,28 +192,6 @@ class ConnectionEditor extends Crisp.View {
                                     }
                                 })
                             )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Page templates'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: this.model.deployer.paths.templates.page,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.templates.page = newValue;
-                                    }
-                                })
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Partial templates'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: this.model.deployer.paths.templates.partial,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.templates.partial = newValue;
-                                    }
-                                })
-                            )
                         )
                     )
                 );
@@ -295,12 +219,6 @@ class ConnectionEditor extends Crisp.View {
             ),
             _.div({class: 'editor__body'},
                 _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Is Template provider'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderTemplateProviderEditor()
-                    )
-                ),
-                _.div({class: 'editor__field'},
                     _.div({class: 'editor__field__key'}, 'Is Media provider'),
                     _.div({class: 'editor__field__value'},
                         this.renderMediaProviderEditor()
@@ -316,12 +234,6 @@ class ConnectionEditor extends Crisp.View {
                     _.div({class: 'editor__field__key'}, 'URL'),
                     _.div({class: 'editor__field__value'},
                         this.renderUrlEditor()
-                    )
-                ),
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'}, 'Preset'),
-                    _.div({class: 'editor__field__value'},
-                        this.renderPresetEditor()
                     )
                 ),
                 _.div({class: 'editor__field'},

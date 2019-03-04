@@ -1,5 +1,7 @@
 'use strict';
 
+const Path = require('path');
+
 const Entity = require('./Entity');
 
 /**
@@ -22,7 +24,6 @@ class Deployer extends Entity {
         this.alias = this.constructor.alias;
 
         if(!this.paths) { this.paths = {}; }
-        if(!this.paths.templates) { this.paths.templates = {}; }
     }
     
     /**
@@ -32,10 +33,6 @@ class Deployer extends Entity {
         this.def(String, 'name');
         this.def(String, 'alias');
         this.def(Object, 'paths', {
-            templates: {
-                page: '',
-                partial: ''
-            },
             media: '',
             content: ''
         });
@@ -53,50 +50,27 @@ class Deployer extends Entity {
     /**
      * Gets a deployment path
      *
-     * @param {String} query
+     * @param {String} name
      * @param {String} filename
+     * @param {Boolean} ignoreRoot
      *
      * @returns {String} Path
      */
-    getPath(query, filename) {
-        // The "query" variable is a syntax for getting the paths defined in the config
-        let lvl1 = query ? query.split('/')[0] : null;
-        let lvl2 = query ? query.split('/')[1] : null;
+    getPath(name, filename = '', ignoreRoot = false) {
+        let path = '';
         
-        // Start with the root path
-        let path = this.getRootPath();
-        
-        // Add slash if needed
-        if(path.lastIndexOf('/') !== path.length - 1) {
-            path += '/';
+        if(!ignoreRoot) {
+            path = this.getRootPath();
         }
-        
-        // Add level 2 path if it exists
-        if(lvl1 && lvl2 && this.paths[lvl1][lvl2] && typeof this.paths[lvl1][lvl2] === 'string') {
-            path += this.paths[lvl1][lvl2];     
-        } 
-        
-        // Add level 1 path if it exists
-        else if(lvl1 && this.paths[lvl1] && typeof this.paths[lvl1] === 'string') {
-            path += this.paths[lvl1];
-        }
-        
-        // Add slash if needed
-        if(path.lastIndexOf('/') !== path.length - 1) {
-            path += '/';
+       
+        if(this.paths[name]) {
+            path = Path.join(path, this.paths[name]);
         }
 
-        // Add filename if needed
         if(filename) {
-            path += filename;
+            path = Path.join(path, filename);
         }
-
-        // Remove any unwanted double slashes
-        path = path.replace(/\/\//g, '/');
-
-        // Add back double slashes for protocols
-        path = path.replace(':/', '://');
-
+        
         return path;
     }
 
@@ -107,6 +81,18 @@ class Deployer extends Entity {
      */
     test() {
         return Promise.reject(new Error('The "test" method should be overridden.'));
+    }
+    
+    /**
+     * Renames a file
+     *
+     * @param {String} path
+     * @param {String} name
+     *
+     * @returns {Promise} Result
+     */
+    renameFile(path, name) {
+        return Promise.reject(new Error('The "renameFile" method should be overridden.'));
     }
 
     /**

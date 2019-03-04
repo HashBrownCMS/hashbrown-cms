@@ -1,15 +1,11 @@
 'use strict';
 
-const Schema = require('Server/Models/Schema');
-const FieldSchema = require('Server/Models/FieldSchema');
-const ContentSchema = require('Server/Models/ContentSchema');
-
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const FileSystem = require('fs');
 const Path = require('path');
+
+// TODO: Make this a GIT submodule
 const Glob = require('glob');
 
 /**
@@ -25,7 +21,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchemas() {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/src/Common/Schemas/*/*.schema', function(err, paths) {
+            Glob(APP_ROOT + '/src/Common/Schemas/*/*.json', function(err, paths) {
                 if(err) {
                     reject(new Error(err));
                 
@@ -46,7 +42,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
                                 let properties = JSON.parse(data);
                                 let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                                let id = Path.basename(schemaPath, '.schema');
+                                let id = Path.basename(schemaPath, '.json');
 
                                 // Generated values, will be overwritten every time
                                 properties.id = id;
@@ -55,10 +51,10 @@ class SchemaHelper extends SchemaHelperCommon {
                                 
                                 switch(parentDirName) {
                                     case 'Content':
-                                        schema = new ContentSchema(properties);
+                                        schema = new HashBrown.Models.ContentSchema(properties);
                                         break;
                                     case 'Field':
-                                        schema = new FieldSchema(properties);
+                                        schema = new HashBrown.Models.FieldSchema(properties);
                                         break;
                                 }
 
@@ -109,7 +105,7 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
         let result = [];
        
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             project,
             collection,
             {}
@@ -119,7 +115,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 schemas[i] = this.getModel(schemas[i]);
             }
 
-            return SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
+            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
         });
     }
 
@@ -152,8 +148,8 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Boolean} isNative
      */
     static isNativeSchema(id) {
-        let fieldPath = appRoot + '/src/Common/Schemas/Field/' + id + '.schema';
-        let contentPath = appRoot + '/src/Common/Schemas/Content/' + id + '.schema';
+        let fieldPath = APP_ROOT + '/src/Common/Schemas/Field/' + id + '.json';
+        let contentPath = APP_ROOT + '/src/Common/Schemas/Content/' + id + '.json';
     
         try {
             FileSystem.statSync(fieldPath);
@@ -180,7 +176,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchema(id) {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/src/Common/Schemas/*/' + id + '.schema', function(err, paths) {
+            Glob(APP_ROOT + '/src/Common/Schemas/*/' + id + '.json', function(err, paths) {
                 if(err) {
                     reject(new Error(err));
                 
@@ -194,7 +190,7 @@ class SchemaHelper extends SchemaHelperCommon {
                         } else {
                             let properties = JSON.parse(data);
                             let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                            let id = Path.basename(schemaPath, '.schema');
+                            let id = Path.basename(schemaPath, '.json');
 
                             // Generated values, will be overwritten every time
                             properties.id = id;
@@ -231,7 +227,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         let promise = this.isNativeSchema(id) ?
             this.getNativeSchema(id) :
-            DatabaseHelper.findOne(
+            HashBrown.Helpers.DatabaseHelper.findOne(
                 project,
                 collection
                 ,
@@ -246,7 +242,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 return Promise.resolve(schemaData);
             
             } else {
-                return SyncHelper.getResourceItem(project, environment, 'schemas', id);
+                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'schemas', id);
 
             }
         })
@@ -355,7 +351,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         // Then remove the requested Schema
         .then(() => {
-            return DatabaseHelper.removeOne(
+            return HashBrown.Helpers.DatabaseHelper.removeOne(
                 project,
                 collection,
                 {
@@ -366,12 +362,39 @@ class SchemaHelper extends SchemaHelperCommon {
     }
     
     /**
-     * Sets a schema object by id
+     * Checks if a Schema is being updated with an id that already exists
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} oldId
+     * @param {String} newId
+     *
+     * @return {Promise} Check result
+     */
+    static duplicateIdCheck(project, environment, oldId, newId) { 
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(oldId, 'oldId', String);
+        checkParam(newId, 'newId', String);
+        
+        // If the id wasn't updated, skip the check{
+        if(oldId === newId) {
+            return Promise.resolve(false);
+        }
+
+        return this.getSchemaById(project, environment, newId)
+        .then((existingSchema) => {
+            return Promise.resolve(!!existingSchema);
+        });
+    }
+
+    /**
+     * Sets a Schema by id
      *
      * @param {String} project
      * @param {String} environment
      * @param {Number} id
-     * @param {Object} schema
+     * @param {Schema} schema
      * @param {Boolean} create
      *
      * @return {Promise} Resulting Schema
@@ -395,17 +418,24 @@ class SchemaHelper extends SchemaHelperCommon {
             hasRemote: false
         };
 
-        return DatabaseHelper.updateOne(
-            project,
-            collection,
-            {
-                id: id
-            },
-            schema,
-            {
-                upsert: create // Creates a schema if none existed
-            }
-        ).then(() => {
+        return this.duplicateIdCheck(project, environment, id, schema.id)
+        .then((isDuplicate) => {
+            if(isDuplicate) {
+                return Promise.reject(new Error('The Schema id "' + schema.id + '" already exists.'));
+            }   
+
+            return HashBrown.Helpers.DatabaseHelper.updateOne(
+                project,
+                collection,
+                {
+                    id: id
+                },
+                schema,
+                {
+                    upsert: create // Creates a schema if none existed
+                }
+            );
+        }).then(() => {
             return Promise.resolve(this.getModel(schema));
         });
     }
@@ -425,9 +455,9 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
 
         let collection = environment + '.schemas';
-        let newSchema = Schema.create(parentSchema);
+        let newSchema = HashBrown.Models.Schema.create(parentSchema);
 
-        return DatabaseHelper.insertOne(
+        return HashBrown.Helpers.DatabaseHelper.insertOne(
             project,
             collection,
             newSchema.getObject() 

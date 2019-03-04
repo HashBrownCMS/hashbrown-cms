@@ -1,12 +1,5 @@
 'use strict';
 
-const Media = require('Common/Models/Media');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A picker for referencing Media 
  *
@@ -23,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class MediaReferenceEditor extends FieldEditor {
+class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -34,28 +27,30 @@ class MediaReferenceEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        let media = MediaHelper.getMediaByIdSync(this.value);
+        let media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
 
-        return _.div({class: 'editor__field__value editor__field--media-reference', title: this.description || ''},
-            _.button({class: 'editor__field--media-reference__pick'},
+        return _.div({class: 'field-editor field-editor--media-reference', title: this.description || ''},
+            _.button({class: 'field-editor--media-reference__pick'},
                 _.do(()=> {
-                    if(!media) { return _.div({class: 'editor__field--media-reference__empty'}); }
+                    if(!media) { return _.div({class: 'field-editor--media-reference__empty'}); }
             
-                    return [
-                        _.if(media.isVideo(),
-                            _.video({class: 'editor__field--media-reference__preview', muted: true, autoplay: true, loop: true, src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-                        ),
-                        _.if(media.isImage(),
-                            _.img({class: 'editor__field--media-reference__preview', src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-                        )
-                    ];
+                    if(media.isAudio()) {
+                        return _.div({class: 'field-editor--media-reference__preview fa fa-file-audio-o'});
+                    }
+
+                    if(media.isVideo()) {
+                        return _.div({class: 'field-editor--media-reference__preview fa fa-file-video-o'});
+                    }
+
+                    if(media.isImage()) {
+                        return _.img({class: 'field-editor--media-reference__preview', src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
+                    }
                 })
             ).click(() => {
-                let mediaBrowser = new MediaBrowser({
+                new HashBrown.Views.Modals.MediaBrowser({
                     value: this.value
-                });
-
-                mediaBrowser.on('select', (id) => {
+                })
+                .on('select', (id) => {
                     this.value = id;
 
                     this.trigger('change', this.value);
@@ -63,9 +58,9 @@ class MediaReferenceEditor extends FieldEditor {
                     this.fetch();
                 });
             }),
-            _.div({class: 'editor__field--media-reference__footer'},
-                _.label({class: 'editor__field--media-reference__name'}, media ? media.name : ''),
-                _.button({class: 'editor__field--media-reference__remove', title: 'Clear the Media selection'})
+            _.div({class: 'field-editor--media-reference__footer'},
+                _.label({class: 'field-editor--media-reference__name'}, media ? media.name : ''),
+                _.button({class: 'field-editor--media-reference__remove', title: 'Clear the Media selection'})
                     .click(() => {
                         this.value = null;
 

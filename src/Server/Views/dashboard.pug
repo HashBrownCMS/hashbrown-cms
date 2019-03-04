@@ -24,12 +24,6 @@ html
                 a.page--dashboard__header__tab(href='/dashboard/server', class=(tab === 'server' ? 'active': '')) Server
 
             .page--dashboard__header__actions
-                if(user.isAdmin)
-                    button.widget.widget--button.low.page--dashboard__restart(title='Restart this HashBrown instance') Restart
-                    button.widget.widget--button.low.working.page--dashboard__update
-                        .widget--button__text-default Update
-                        .widget--button__text-working Checking
-
                 form(action='/api/user/logout', method='POST')
                     button.widget.widget--button.condensed.low.fa.fa-sign-out(type='submit', title='Log out')
 
@@ -96,7 +90,20 @@ html
                                 - var minutes = Math.floor(seconds % (60*60) / 60);
 
                                 .widget.widget--label #{days}d #{hours}h #{minutes}m
+                            
+                            .widget-group
+                                button.widget.widget--button.low.page--dashboard__restart(title='Restart this HashBrown instance') Restart
+                                button.widget.widget--button.low.working.page--dashboard__update
+                                    .widget--button__text-default Update
+                                    .widget--button__text-working Checking
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.min.js')
+
+        script(src='/js/common.js')
+        script(src='/js/helpers.js')
+        script(src='/js/models.js')
+        script(src='/js/utilities.js')
+        script(src='/js/views.js')
+        
         script(src='/js/dashboard.js')

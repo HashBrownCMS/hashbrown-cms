@@ -20,7 +20,7 @@ class UIHelper {
         if(element === false) {
             $('.widget--highlight').remove();
 
-            return Promise.resolve();
+            return;
         }
 
         if(typeof element === 'string') {
@@ -28,8 +28,6 @@ class UIHelper {
         }
 
         if(!element) { return Promise.resolve(); }
-
-        this.highlight(false);
 
         return new Promise((resolve) => {
             let dismiss = () => {
@@ -559,13 +557,13 @@ class UIHelper {
                 error = new Error(error.responseText);
             }
         
-        } else if(error instanceof Error == false) {
+        } else if(error instanceof Error === false) {
             error = new Error(error.toString());
 
         }
+       
+        debug.log(error.message, error.stack, 'HashBrown');
 
-        console.log(error.stack);
-        
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
     

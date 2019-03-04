@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: Make this a GIT submodule
 const Glob = require('glob');
 
 /**
@@ -17,7 +18,7 @@ class PluginHelper {
      */
     static init(app) {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/plugins/*', (err, paths) => {
+            Glob(APP_ROOT + '/plugins/*', (err, paths) => {
                 for(let path of paths) {
                     let plugin = require(path + '/index.js');
                     

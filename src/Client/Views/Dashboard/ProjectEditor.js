@@ -1,13 +1,5 @@
 'use strict';
 
-const Project = require('Common/Models/Project');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const InfoEditor = require('Client/Views/Dashboard/InfoEditor');
-const SyncEditor = require('Client/Views/Dashboard/SyncEditor');
-const LanguageEditor = require('Client/Views/Dashboard/LanguageEditor');
-const BackupEditor = require('Client/Views/Dashboard/BackupEditor');
-const MigrationEditor = require('Client/Views/Dashboard/MigrationEditor');        
-
 /**
  * The editor for projects as seen on the dashboard
  *
@@ -53,7 +45,7 @@ class ProjectEditor extends Crisp.View {
                     label: 'Delete',
                     class: 'warning disabled',
                     onClick: () => {
-                        RequestHelper.request('delete', 'server/projects/' + this.model.id)
+                        HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id)
                         .then(() => {
                             location.reload();
                         })
@@ -71,7 +63,7 @@ class ProjectEditor extends Crisp.View {
      */
     onClickRemoveEnvironment(environmentName) {
         let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', () => {
-            RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
+            HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
             .then(() => {
                 this.model = null;
                 this.fetch();
@@ -85,9 +77,10 @@ class ProjectEditor extends Crisp.View {
     onClickInfo() {
         if(!currentUserIsAdmin()) { return; }
         
-        let infoEditor = new InfoEditor({ modelUrl: '/api/server/projects/' + this.model.id });
-
-        infoEditor.on('change', (newInfo) => {
+        new HashBrown.Views.Dashboard.InfoEditor({
+            modelUrl: '/api/server/projects/' + this.model.id
+        })
+        .on('change', (newInfo) => {
             this.model = null;
             this.fetch();
         });
@@ -99,12 +92,11 @@ class ProjectEditor extends Crisp.View {
     onClickSync() {
         if(!currentUserIsAdmin()) { return; }
 
-        let syncEditor = new SyncEditor({
+        new HashBrown.Views.Dashboard.SyncEditor({
             projectId: this.model.id,
             modelUrl: '/api/' + this.model.id + '/settings/sync'
-        });
-        
-        syncEditor.on('change', (newSettings) => {
+        })
+        .on('change', (newSettings) => {
             this.model = null;
             this.fetch();
         });
@@ -116,9 +108,10 @@ class ProjectEditor extends Crisp.View {
     onClickLanguages() {
         if(!currentUserIsAdmin()) { return; }
         
-        let languageEditor = new LanguageEditor({ modelUrl: '/api/server/projects/' + this.model.id });
-        
-        languageEditor.on('change', () => {
+        new HashBrown.Views.Dashboard.LanguageEditor({
+            modelUrl: '/api/server/projects/' + this.model.id
+        })
+        .on('change', () => {
             this.model = null;
             this.fetch();
         });
@@ -130,9 +123,10 @@ class ProjectEditor extends Crisp.View {
     onClickBackups() {
         if(!currentUserIsAdmin()) { return; }
         
-        let backupEditor = new BackupEditor({ modelUrl: '/api/server/projects/' + this.model.id });
-
-        backupEditor.on('change', () => {
+        new HashBrown.Views.Dashboard.BackupEditor({
+            modelUrl: '/api/server/projects/' + this.model.id
+        })
+        .on('change', () => {
             this.model = null;
             this.fetch();
         });
@@ -149,9 +143,10 @@ class ProjectEditor extends Crisp.View {
             return;
         }
     
-        let migrationEditor = new MigrationEditor({ model: this.model });
-
-        migrationEditor.on('change', () => {
+        new HashBrown.Views.Dashboard.MigrationEditor({
+            model: this.model
+        })
+        .on('change', () => {
             this.model = null;
             this.fetch();
         });
@@ -162,7 +157,7 @@ class ProjectEditor extends Crisp.View {
      */
     onClickAddEnvironment() {
         let modal = new HashBrown.Views.Modals.Modal({
-            title: 'New environment for "' + this.model.id + '"',
+            title: 'New environment for "' + this.model.settings.info.name + '"',
             body: _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label'}, 'Environment name'),
                 new HashBrown.Views.Widgets.Input({
@@ -177,7 +172,7 @@ class ProjectEditor extends Crisp.View {
 
                         if(!environmentName) { return false; }
 
-                        RequestHelper.request('put', 'server/projects/' + this.model.id + '/' + environmentName)
+                        HashBrown.Helpers.RequestHelper.request('put', 'server/projects/' + this.model.id + '/' + environmentName)
                         .then(() => {
                             modal.close();
 
@@ -248,7 +243,7 @@ class ProjectEditor extends Crisp.View {
                         );
                     }),
                     _.if(currentUserIsAdmin(),
-                        _.button({title: 'Add environment', class: 'widget widget--button round right fa fa-plus'})
+                        _.button({title: 'Add environment', class: 'widget widget--button dashed standard expanded'}, 'Add environment')
                             .click(() => { this.onClickAddEnvironment(); })
                     )
                 )

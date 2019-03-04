@@ -3,9 +3,8 @@
 /**
  * @namespace HashBrown.Client.Views
  */
-module.exports = {
-    Dashboard: require('./Dashboard'),
-    Editors: require('./Editors'),
-    Modals: require('./Modals'),
-    Navigation: require('./Navigation')
-};
+require('./Widgets');
+require('./Modals');
+require('./Editors');
+require('./Navigation');
+require('./Dashboard');

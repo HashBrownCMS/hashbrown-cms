@@ -1,13 +1,11 @@
 'use strict';
 
-const Widget = require('./Widget');
-
 /**
  * A multi purpose dropdown
  *
  * @memberof HashBrown.Client.Views.Widgets
  */
-class Dropdown extends Widget {
+class Dropdown extends HashBrown.Views.Widgets.Widget {
     /**
      * Constructor
      */

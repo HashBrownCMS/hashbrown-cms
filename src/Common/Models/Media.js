@@ -41,6 +41,7 @@ class Media extends Resource {
         this.def(String, 'url');
         this.def(String, 'path');
         this.def(String, 'folder', '/');
+        this.def(Date, 'updateDate');
     }
 
     /**
@@ -71,45 +72,72 @@ class Media extends Resource {
      */
     getContentTypeHeader() {
         let name = (this.name || '').toLowerCase();
-
-        // Image types
-        if(name.match(/\.jpg/)) {
-            return 'image/jpeg';
-        } else if(name.match(/\.png/)) {
-            return 'image/png';
-        } else if(name.match(/\.gif/)) {
-            return 'image/gif';
-        } else if(name.match(/\.bmp/)) {
-            return 'image/bmp';
+        let extension = name.split('.');
         
-        // Video types
-        } else if(name.match(/\.mp4/)) {
-            return 'video/mp4';
-        } else if(name.match(/\.avi/)) {
-            return 'video/avi';
-        } else if(name.match(/\.mov/)) {
-            return 'video/quicktime';
-        } else if(name.match(/\.bmp/)) {
-            return 'video/bmp';
-        } else if(name.match(/\.wmv/)) {
-            return 'video/x-ms-wmv';
-        } else if(name.match(/\.3gp/)) {
-            return 'video/3gpp';
-        } else if(name.match(/\.mkv/)) {
-            return 'video/x-matroska';
-
-        // SVG
-        } else if(name.match(/\.svg/)) {
-            return 'image/svg+xml';
-        
-        // PDF
-        } else if(name.match(/\.pdf/)) {
-            return 'application/pdf';
-
-        // Everything else
-        } else {
-            return 'application/octet-stream';
+        if(extension && extension.length > 0) {
+            extension = extension[extension.length - 1];
         }
+
+        switch(extension) {
+            // Image types
+            case 'jpg':
+                return 'image/jpeg';
+            case 'png':
+                return 'image/png';
+            case 'gif':
+                return 'image/gif';
+            case 'bmp':
+                return 'image/bmp';
+            
+            // Audio types
+            case 'm4a':
+                return 'audio/m4a';
+            case 'mp3':
+                return 'audio/mp3';
+            case 'ogg':
+                return 'audio/ogg';
+            case 'wav':
+                return 'audio/wav';
+            
+            // Video types
+            case 'mp4':
+                return 'video/mp4';
+            case 'webm':
+                return 'video/webm';
+            case 'avi':
+                return 'video/avi';
+            case 'mov':
+                return 'video/quicktime';
+            case 'bmp':
+                return 'video/bmp';
+            case 'wmv':
+                return 'video/x-ms-wmv';
+            case '3gp':
+                return 'video/3gpp';
+            case 'mkv':
+                return 'video/x-matroska';
+
+            // SVG
+            case 'svg':
+                return 'image/svg+xml';
+            
+            // PDF
+            case 'pdf':
+                return 'application/pdf';
+
+            // Everything else
+            default:
+                return 'application/octet-stream';
+        }
+    }
+    
+    /**
+     * Gets whether this is audio
+     *
+     * @returns {Boolean} Is audio
+     */
+    isAudio() {
+        return this.getContentTypeHeader().indexOf('audio') > -1;
     }
 
     /**
@@ -128,6 +156,15 @@ class Media extends Resource {
      */
     isImage() {
         return this.getContentTypeHeader().indexOf('image') > -1;
+    }
+    
+    /**
+     * Gets whether this is an SVG file
+     *
+     * @returns {Boolean} Is SVG file
+     */
+    isSvg() {
+        return this.getContentTypeHeader().indexOf('svg') > -1;
     }
 
     /**

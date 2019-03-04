@@ -69,6 +69,18 @@ class ApiDeployer extends HashBrown.Models.Deployer {
     setFile(path, base64) {
         return HashBrown.Helpers.RequestHelper.request('post', path, base64);
     }
+    
+    /**
+     * Rename file
+     *
+     * @param {String} path
+     * @param {String} name
+     *
+     * @return {Promise} Promise
+     */
+    renameFile(path, name) {
+        return HashBrown.Helpers.RequestHelper.request('post', path, name);
+    }
    
     /**
      * Removes a file

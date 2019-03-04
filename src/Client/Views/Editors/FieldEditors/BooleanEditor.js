@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple boolean editor
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class BooleanEditor extends FieldEditor {
+class BooleanEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Constructor
      */
@@ -49,7 +47,7 @@ class BooleanEditor extends FieldEditor {
      * Render this editor
      */
     template() {
-        return _.div({class: 'editor__field__value field-editor--boolean'},
+        return _.div({class: 'field-editor field-editor--boolean'},
             new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: this.value,

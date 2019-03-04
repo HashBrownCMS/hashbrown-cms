@@ -12,6 +12,7 @@ class UserController extends require('./ApiController') {
     static init(app) {
         app.get('/api/user', this.getCurrentUser);
         app.get('/api/user/scopes', this.getScopes);
+        app.get('/api/user/:id', this.middleware({needsAdmin: true, setProject: false}), this.getUser);
         app.get('/api/users', this.middleware({needsAdmin: true, setProject: false}), this.getUsers);
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
         app.get('/api/:project/:environment/users/:id', this.middleware(), this.getUser);

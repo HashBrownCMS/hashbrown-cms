@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * An editor for date values
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class DateEditor extends FieldEditor {
+class DateEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -96,7 +94,7 @@ class DateEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--date'},
             _.do(() => {
                 if(this.disabled) {
                     return this.formatDate(this.value);

@@ -1,13 +1,11 @@
 'use strict';
 
-const Modal = require('./Modal');
-
 /**
  * A modal for picking dates
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class DateModal extends Modal {
+class DateModal extends HashBrown.Views.Modals.Modal {
     /**
      * Constructor
      */

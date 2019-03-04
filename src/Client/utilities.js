@@ -1,0 +1,110 @@
+/**
+ * Performs a submodule check
+ */
+window.submoduleCheck = function submoduleCheck() {
+    let message = '';
+    
+    if(typeof Crisp === 'undefined') {
+        message = 'Git submodule "crisp-ui" not loaded. Please run "git submodule update --init" in the HashBrown root directory and reload this page';
+    }
+
+    if(message) {
+        alert(message);
+        throw new Error(message);
+    }
+}
+
+/**
+ * Converts a string from HTML to markdown
+ *
+ * @return {String} Markdown
+ */
+window.toMarkdown = function toMarkdown(html) {
+    return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
+}
+
+/**
+ * Checks if the currently logged in user is admin
+ *
+ * @returns {Boolean} Is admin
+ */
+window.currentUserIsAdmin = function isCurrentUserAdmin() {
+    return HashBrown.Models.User.current.isAdmin;
+}
+
+/**
+ * Checks if the currently logged in user has a certain scope
+ *
+ * @param {String} scope
+ *
+ * @returns {Boolean} Has scope
+ */
+window.currentUserHasScope = function currentUsr(scope) {
+    return HashBrown.Models.User.current.hasScope(HashBrown.Helpers.ProjectHelper.currentProject, scope);
+}
+
+/**
+ * Gets a cookie by name
+ *
+ * @param {String} name
+ *
+ * @returns {String} value
+ */
+window.getCookie = function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+
+    if(parts.length == 2) {
+        return parts.pop().split(";").shift();
+    }
+}
+
+/**
+ * Copies string to the clipboard
+ *
+ * @param {String} string
+ */
+window.copyToClipboard = function copyToClipboard(string) {
+    let text = document.createElement('TEXTAREA');
+
+    text.innerHTML = string;
+
+    document.body.appendChild(text);
+
+    text.select();
+
+    try {
+        let success = document.execCommand('copy');
+
+        if(!success) {
+            UI.errorModal('Your browser does not yet support copying to clipboard');
+        }
+    } catch(e) {
+            UI.errorModal(e.toString());
+    }
+
+    document.body.removeChild(text);
+}
+
+/**
+ * Clears the workspace
+ */
+window.clearWorkspace = function clearWorkspace() {
+    $('.workspace').empty();
+};
+
+/**
+ * Sets workspace content
+ */
+window.populateWorkspace = function populateWorkspace($html, classes) {
+    let $workspace = $('.page--environment__space--editor');
+
+    $workspace.empty();
+    $workspace.attr('class', 'page--environment__space--editor');
+    
+    _.append($workspace, $html);
+
+    if(classes) {
+        $workspace.addClass(classes);
+    }
+};

@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * An editor for content URLs
  *
@@ -18,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class UrlEditor extends FieldEditor {
+class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -177,7 +175,7 @@ class UrlEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value field-editor--url'},
+        return _.div({class: 'field-editor field-editor--url'},
             _.div({class: 'widget-group', title: this.description || ''},
                 this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),
@@ -191,6 +189,8 @@ class UrlEditor extends FieldEditor {
      * Post render
      */
     postrender() {
+        super.postrender();
+        
         //  Wait a bit before checking for title field
         setTimeout(() => {
             this.$titleInput = $('.editor__field[data-key="title"] input[type="text"]');

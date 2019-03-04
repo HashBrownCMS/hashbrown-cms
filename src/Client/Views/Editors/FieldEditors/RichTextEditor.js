@@ -1,10 +1,5 @@
 'use strict';
 
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A rich text editor
  *
@@ -21,7 +16,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class RichTextEditor extends FieldEditor {
+class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -38,6 +33,29 @@ class RichTextEditor extends FieldEditor {
         }
         
         this.fetch();
+    }
+    
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Disable markdown'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'checkbox',
+                        tooltip: 'Hides the markdown tab if enabled',
+                        value: config.isMarkdownDisabled || false,
+                        onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
+                    }).$element
+                )
+            )
+        ];
     }
 
     /**
@@ -81,14 +99,14 @@ class RichTextEditor extends FieldEditor {
         let mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
         mediaBrowser.on('select', (id) => {
-            MediaHelper.getMediaById(id)
+            HashBrown.Helpers.MediaHelper.getMediaById(id)
             .then((media) => {
                 let html = '';
 
                 if(media.isImage()) {
-                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
                 } else if(media.isVideo()) {
-                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
                 }
 
                 let activeView = this.activeView || 'wysiwyg';
@@ -117,7 +135,7 @@ class RichTextEditor extends FieldEditor {
      * @returns {HTMLElement} Tab content
      */
     getTabContent() {
-        return this.element.querySelector('.editor__field--rich-text-editor__tab__content');
+        return this.element.querySelector('.field-editor--rich-text__tab__content');
     }
 
     /**
@@ -184,104 +202,102 @@ class RichTextEditor extends FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        setTimeout(() => {
-            this.wysiwyg = CKEDITOR.replace(
-                this.getTabContent(),
-                {
-                    removePlugins: 'contextmenu,liststyle,tabletools',
-                    allowedContent: true,
-                    height: 400,
-                    toolbarGroups: [
-                        { name: 'styles' },
-                        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-                        { name: 'links' },
-                        { name: 'insert' },
-                        { name: 'forms' },
-                        { name: 'tools' },
-                        { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-                        { name: 'others' },
-                    ],
-               
-                    extraPlugins: 'justify,divarea',
+        this.wysiwyg = CKEDITOR.replace(
+            this.getTabContent(),
+            {
+                removePlugins: 'contextmenu,liststyle,tabletools',
+                allowedContent: true,
+                height: 400,
+                toolbarGroups: [
+                    { name: 'styles' },
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                    { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+                    { name: 'links' },
+                    { name: 'insert' },
+                    { name: 'forms' },
+                    { name: 'tools' },
+                    { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
+                    { name: 'others' },
+                ],
+           
+                extraPlugins: 'justify,divarea',
 
-                    removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-                    removeDialogTabs: 'image:advanced;link:advanced'
-                }
-            );
+                removeDialogTabs: 'image:advanced;link:advanced'
+            }
+        );
 
-            this.wysiwyg.on('change', () => {
-                this.onChange(this.wysiwyg.getData());
-            });
+        this.wysiwyg.on('change', () => {
+            this.onChange(this.wysiwyg.getData());
+        });
 
-            this.wysiwyg.on('instanceReady', () => {
-                // Strips the style information
-                let stripStyle = (element) => {
-                    delete element.attributes.style;
-                };
+        this.wysiwyg.on('instanceReady', () => {
+            // Strips the style information
+            let stripStyle = (element) => {
+                delete element.attributes.style;
+            };
 
-                // Filtering rules
-                this.wysiwyg.dataProcessor.dataFilter.addRules({
-                    elements: {
-                        // Strip styling from these elements
-                        p: stripStyle,
-                        h1: stripStyle,
-                        h2: stripStyle,
-                        h3: stripStyle,
-                        h4: stripStyle,
-                        h5: stripStyle,
-                        h6: stripStyle,
-                        span: stripStyle,
-                        div: stripStyle,
-                        section: stripStyle,
-                        hr: stripStyle,
-                        header: stripStyle,
-                        aside: stripStyle,
-                        footer: stripStyle,
-                        ul: stripStyle,
-                        li: stripStyle,
-                        blockquote: stripStyle,
+            // Filtering rules
+            this.wysiwyg.dataProcessor.dataFilter.addRules({
+                elements: {
+                    // Strip styling from these elements
+                    p: stripStyle,
+                    h1: stripStyle,
+                    h2: stripStyle,
+                    h3: stripStyle,
+                    h4: stripStyle,
+                    h5: stripStyle,
+                    h6: stripStyle,
+                    span: stripStyle,
+                    div: stripStyle,
+                    section: stripStyle,
+                    hr: stripStyle,
+                    header: stripStyle,
+                    aside: stripStyle,
+                    footer: stripStyle,
+                    ul: stripStyle,
+                    li: stripStyle,
+                    blockquote: stripStyle,
 
-                        // Refactor image src url to fit MediaController
-                        img: (element) => {
-                            stripStyle(element);
+                    // Refactor image src url to fit MediaController
+                    img: (element) => {
+                        stripStyle(element);
 
-                            // Fetch from data attribute
-                            if(element.attributes['data-id']) {
-                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                            
-                            // Failing that, use regex
-                            } else {
-                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                            
-                            }
-                            
-                        },
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
                         
-                        // Refactor video src url to fit MediaController
-                        video: (element) => {
-                            stripStyle(element);
-
-                            // Fetch from data attribute
-                            if(element.attributes['data-id']) {
-                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                            
-                            // Failing that, use regex
-                            } else {
-                                element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
-                            
-                            }
-                            
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
+                        
                         }
-                    }
-                });
+                        
+                    },
+                    
+                    // Refactor video src url to fit MediaController
+                    video: (element) => {
+                        stripStyle(element);
 
-                // Set value initially
-                this.silentChange = true;
-                this.wysiwyg.setData(this.value);
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                        
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
+                        
+                        }
+                        
+                    }
+                }
             });
-        }, 1);
+
+            // Set value initially
+            this.silentChange = true;
+            this.wysiwyg.setData(this.value);
+        });
     }
 
     /**
@@ -299,30 +315,30 @@ class RichTextEditor extends FieldEditor {
     template() {
         let activeView = this.activeView || 'wysiwyg';
 
-        return _.div({class: 'editor__field__value editor__field--rich-text-editor', title: this.description || ''},
-            _.div({class: 'editor__field--rich-text-editor__header'},
+        return _.div({class: 'field-editor field-editor--rich-text', title: this.description || ''},
+            _.div({class: 'field-editor--rich-text__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
-                    return _.button({class: (activeView === alias ? 'active ' : '') + 'editor__field--rich-text-editor__header__tab'}, label)
+                    return _.button({class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'}, label)
                         .click(() => { this.onClickTab(alias); })
                 }),
-                _.button({class: 'editor__field--rich-text-editor__header__add-media'},
+                _.button({class: 'field-editor--rich-text__header__add-media'},
                     'Add media'
                 ).click(() => { this.onClickInsertMedia(); })
             ),
-            _.div({class: 'editor__field--rich-text-editor__body'},
+            _.div({class: 'field-editor--rich-text__body'},
                 _.if(activeView === 'wysiwyg',
-                    _.div({class: 'editor__field--rich-text-editor__tab wysiwyg'},
-                        _.div({class: 'editor__field--rich-text-editor__tab__content', 'contenteditable': true})
+                    _.div({class: 'field-editor--rich-text__tab wysiwyg'},
+                        _.div({class: 'field-editor--rich-text__tab__content', 'contenteditable': true})
                     )
                 ),
                 _.if(activeView === 'markdown',
-                    _.div({class: 'editor__field--rich-text-editor__tab markdown'},
-                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    _.div({class: 'field-editor--rich-text__tab markdown'},
+                        _.textarea({class: 'field-editor--rich-text__tab__content'})
                     )
                 ),
                 _.if(activeView === 'html',
-                    _.div({class: 'editor__field--rich-text-editor__tab html'},
-                        _.textarea({class: 'editor__field--rich-text-editor__tab__content'})
+                    _.div({class: 'field-editor--rich-text__tab html'},
+                        _.textarea({class: 'field-editor--rich-text__tab__content'})
                     )
                 )
             )
@@ -333,6 +349,8 @@ class RichTextEditor extends FieldEditor {
      * Post render
      */
     postrender() {
+        super.postrender();
+        
         let activeView = this.activeView || 'wysiwyg';
        
         switch(activeView) {

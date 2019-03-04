@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple list picker
  *
@@ -30,7 +28,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class DropdownEditor extends FieldEditor {
+class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -71,7 +69,7 @@ class DropdownEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--dropdown'},
             _.if(this.config.options.length < 1,
                 _.span({class: 'editor__field__value__warning'}, 'No options configured')
             ),

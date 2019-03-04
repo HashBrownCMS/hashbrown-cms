@@ -68,27 +68,44 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
      * Gets a folder
      *
      * @param {String} path
-     * @param {Number} recursions
+     * @param {Number} levels
      *
      * @returns {Promise} Result
      */
-    getFolder(path, recursions = 0) {
-        path += '*';
+    getFolder(path, levels = 1) {
+        if(levels < 1) { levels = 1; }
 
-        if(recursions > 0) {
-            for(let i = 0; i < recursions || 0; i++) {
-                path += '/*';
-            }
+        for(let i = 0; i < levels; i++) {
+            path = Path.join(path, '*');
         }
 
         return new Promise((resolve, reject) => {
             Glob(path, (err, data) => {
+                if(err) { return reject(err); }
+                
+                resolve(data);
+            });
+        });
+    }
+    
+    /**
+     * Rename file
+     *
+     * @param {String} oldPath
+     * @param {String} name
+     *
+     * @return {Promise} Promise
+     */
+    renameFile(oldPath, name) {
+        let newPath = Path.join(Path.dirname(oldPath), name);
+        
+        return new Promise((resolve, reject) => {
+            FileSystem.rename(oldPath, newPath, (err) => {
                 if(err) {
                     reject(err);
-                
                 } else {
-                    resolve(data);
-
+                    resolve();
+                    debug.log('Renamed file successfully to ' + newPath, this);
                 }
             });
         });

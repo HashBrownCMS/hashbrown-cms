@@ -6,11 +6,11 @@
     &.media-picker {
         .navbar-main__tabs,
         .page--environment__space--menu,
-        .page--environment__space--editor .editor__header { 
+        .page--environment__space--editor .editor__header {
             display: none;
         }
     }
-   
+
     // Demo reset button
     &__demo__reset {
         position: fixed !important;
@@ -55,6 +55,11 @@
                 top: 5.5rem;
                 padding: 0;
             }
+
+            // overwriting default dropdown-background
+            .widget--dropdown.has-icon {
+                background-color: $standard;
+            }
         }
 
         // Navigation
@@ -64,7 +69,7 @@
             flex-shrink: 0;
             height: 100%;
             transition: width 0.5s, flex-basis 0.5s;
-           
+
             // Mobile mode
             @media($sm) {
                 overflow: hidden;
@@ -101,6 +106,11 @@
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 position: relative;
 
+                .widget--button {
+                    float: left;
+                    margin: 0 0.5rem 0.5rem 0;
+                }
+
                 // Tablet mode
                 @media($sm) {
                     display: block;
@@ -111,15 +121,15 @@
                 &:before {
                     content: '';
                     display: block;
-                    width: 0; 
-                    height: 0; 
+                    width: 0;
+                    height: 0;
                     position: absolute;
                     right: 100%;
                     top: 50%;
                     transform: translateY(-50%);
                     border-top: 2rem solid transparent;
-                    border-bottom: 2rem solid transparent; 
-                    border-right: 2rem solid $standard; 
+                    border-bottom: 2rem solid transparent;
+                    border-right: 2rem solid $standard;
 
                     // Tablet mode
                     @media($sm) {
@@ -128,8 +138,8 @@
                         top: auto;
                         transform: translateX(50%);
                         border-left: 2rem solid transparent;
-                        border-right: 2rem solid transparent; 
-                        border-bottom: 2rem solid $standard; 
+                        border-right: 2rem solid transparent;
+                        border-bottom: 2rem solid $standard;
                     }
                 }
             }

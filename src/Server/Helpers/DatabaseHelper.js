@@ -3,13 +3,10 @@
 const FileSystem = require('fs');
 const Spawn = require('child_process').spawn;
 const QueryString = require('querystring');
+const Path = require('path');
 
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
-
-const Content = require('Server/Models/Content');
-const Connection = require('Server/Models/Connection');
-const User = require('Server/Models/User');
 
 /**
  * The helper class for database operations
@@ -18,6 +15,23 @@ const User = require('Server/Models/User');
  */
 class DatabaseHelper {
     /**
+     * Gets a database config parameter
+     *
+     * @param {String} key
+     *
+     * @return {String} Value
+     */
+    static getConfig(key) {
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+
+        if(!config[key] && key === 'prefix') {
+            return 'hb_';
+        }
+
+        return config[key];
+    }
+
+    /**
      * Gets the connection string
      *
      * @param {String} databaseName
@@ -25,14 +39,12 @@ class DatabaseHelper {
      * @returns {String} Connection string
      */
     static getConnectionString(databaseName) {
-        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
-
         let connectionString = 'mongodb://';
       
-        let username = process.env.MONGODB_USERNAME || config.username;
-        let password = process.env.MONGODB_PASSWORD || config.password;
-        let host = process.env.MONGODB_HOST || config.host || config.url || 'localhost';
-        let port = process.env.MONGODB_PORT || config.port;
+        let username = process.env.MONGODB_USERNAME || this.getConfig('username');
+        let password = process.env.MONGODB_PASSWORD || this.getConfig('password');
+        let host = process.env.MONGODB_HOST || this.getConfig('host') || this.getConfig('url') || 'localhost';
+        let port = process.env.MONGODB_PORT || this.getConfig('port');
 
         if(username) {
             connectionString += username;
@@ -51,45 +63,30 @@ class DatabaseHelper {
         }
         
         if(databaseName) {
-            connectionString += '/' + (config.prefix || '') + databaseName;
+            connectionString += '/' + this.getConfig('prefix') + databaseName;
 
         } else {
             connectionString += '/';
         }
         
-        if(config.options && Object.keys(config.options).length > 0) {
-            connectionString += '?' + QueryString.stringify(config.options);
+        if(this.getConfig('options') && Object.keys(this.getConfig('options')).length > 0) {
+            connectionString += '?' + QueryString.stringify(this.getConfig('options'));
         }
 
         return connectionString;
     }
 
     /**
-     * Inits the this database
+     * Connects to the database
      *
      * @param {String} databaseName
      *
-     * @return {Promise} promise
+     * @return {Promise} Client
      */
-    static getDatabase(databaseName) {
-        return new Promise((resolve, reject) => {
-            MongoClient.connect(this.getConnectionString(databaseName), (err, db) => {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
-                    if(db) {
-                        resolve(db);
-
-                    } else {
-                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + this.getConnectionString(databaseName) + '".'));
-                    
-                    }
-                }
-            });
-        });
+    static async connect(databaseName) {
+        return await MongoClient.connect(this.getConnectionString(databaseName), { useNewUrlParser: true });
     }
-    
+
     /**
      * Restores a database
      *
@@ -98,45 +95,41 @@ class DatabaseHelper {
      *
      * @returns {Promise} Data string
      */
-    static restore(databaseName, timestamp) {
-        return new Promise((resolve, reject) => {
-            let args = [];
-            let basePath = appRoot + '/storage';
-            let projectPath = basePath + '/' + databaseName + '/dump';
-            let archivePath = projectPath + '/' + timestamp + '.hba';
+    static async restore(databaseName, timestamp) {
+        let archivePath = Path.join(APP_ROOT, 'storage', databaseName, 'dump', timestamp + '.hba');
+       
+        try {
+            let archiveContent = await HashBrown.Helpers.FileHelper.read(archivePath, 'utf8'); 
+            let collections = JSON.parse(archiveContent);
 
-            // Drop existing
-            args.push('--drop');
+            await this.dropDatabase(databaseName);
 
-            // Archive
-            if(!FileSystem.existsSync(archivePath)) {
-                reject(new Error('Archive at "' + archivePath + '" could not be found'));
+            let collectionNames = Object.keys(collections);
+           
+            let insertCollection = async (index) => {
+                if(index >= collectionNames.length) { return; }
             
-            } else {
-                args.push('--archive=' + archivePath);
-                args.push('--db=' + databaseName);
+                let collectionName = collectionNames[index];
+                let documents = collections[collectionName];
 
-                let mongorestore = Spawn('mongorestore', args);
-
-                mongorestore.stdout.on('data', (data) => {
-                    debug.log(data.toString(), this);
-                });
-
-                mongorestore.stderr.on('data', (data) => {
-                    debug.log(data.toString(), this);
-                });
+                let insertDocument = async (index) => {
+                    if(index >= documents.length) { return; }
                 
-                mongorestore.on('exit', (code) => {
-                    if(code != 0) {
-                        reject(new Error('mongorestore exited with status code ' + code));
-                    
-                    } else {
-                        resolve();
+                    await this.insertOne(databaseName, collectionName, documents[index])
+                    await insertDocument(index + 1);
+                };
 
-                    }
-                });
-            }
-        });
+                await insertDocument(0);
+                await insertCollection(index + 1);    
+            };
+
+            await insertCollection(0);
+        
+            debug.log('Database restored successfully', this);
+
+        } catch(e) {
+            debug.error(e, this);
+        }
     }
    
     /**
@@ -146,60 +139,41 @@ class DatabaseHelper {
      *
      * @returns {Promise} Timestamp
      */
-    static dump(databaseName) {
-        return new Promise((resolve, reject) => {
-            let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
-            let args = [];
-            let basePath = appRoot + '/storage';
-            let projectPath = basePath + '/' + databaseName + '/';
-            let dumpPath = projectPath + 'dump/';
+    static async dump(databaseName) {
+        checkParam(databaseName, 'databaseName', String);
 
-            if(databaseName) {
-                args.push('--db');
-                args.push((config.prefix || '') + databaseName);
-            }
+        let dumpPath = Path.join(APP_ROOT, 'storage', databaseName, 'dump');
 
-            // Archive
-            if(!FileSystem.existsSync(basePath)) {
-                FileSystem.mkdirSync(basePath);
-            }
+        // Archive
+        await HashBrown.Helpers.FileHelper.makeDirectory(dumpPath);
+
+        let timestamp = Date.now();
+        let archivePath = Path.join(dumpPath, timestamp + '.hba'); 
+
+        debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '.hba...', this);
+    
+        let collectionNames = await this.listCollections(databaseName);
+    
+        let getDocuments = async (index) => {
+            if(index >= collectionNames.length) { return; }
+
+            let collectionName = collectionNames[index].name;
+            let documents = await this.find(databaseName, collectionName, {});
             
-            if(!FileSystem.existsSync(projectPath)) {
-                FileSystem.mkdirSync(projectPath);
-            }
+            collections[collectionName] = documents;
             
-            if(!FileSystem.existsSync(dumpPath)) {
-                FileSystem.mkdirSync(dumpPath);
-            }
+            await getDocuments(index + 1);
+        };
 
-            let timestamp = Date.now()
+        let collections = {};
 
-            args.push('--archive=' + dumpPath + '/' + timestamp + '.hba');
+        await getDocuments(0); 
+        
+        await HashBrown.Helpers.FileHelper.write(collections, archivePath);
+                    
+        debug.log('Database dumped successfully', this);
 
-            debug.log('Dumping database "' + databaseName + '" to ' + dumpPath + '/' + timestamp + '.hba...', this);
-
-            let mongodump = Spawn('mongodump', args);
-
-            mongodump.stdout.on('data', (data) => {
-                debug.log(data.toString(), this);
-            });
-
-            mongodump.stderr.on('data', (data) => {
-                debug.log(data.toString(), this);
-            });
-            
-            mongodump.on('exit', (code) => {
-                if(code != 0) {
-                    debug.log('Dumping database failed!', this);
-                    reject(new Error('mongodump exited with status code ' + code));
-                
-                } else {
-                    debug.log('Dumping database succeeded!', this);
-                    resolve(timestamp);
-
-                }
-            });
-        });
+        return timestamp;
     }
 
     /**
@@ -209,23 +183,24 @@ class DatabaseHelper {
      *
      * @return {Promise} Array of collections
      */
-    static listCollections(databaseName) {
+    static async listCollections(databaseName) {
+        checkParam(databaseName, 'databaseName', String);
+
         debug.log(databaseName + '::listCollections...', this, 4);
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.listCollections().toArray((findErr, arr) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve(arr);
-                    }
+        let collections = [];
+        let client = null;
 
-                    db.close();
-                });
-            });
-        });
+        try {
+            client = await this.connect(databaseName);
+            collections = await client.db().listCollections().toArray();
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
+
+        return collections;
     }
 
     /**
@@ -233,49 +208,42 @@ class DatabaseHelper {
      *
      * @returns {Promise} Array of databases
      */
-    static listDatabases() {
-        return new Promise((resolve, reject) => {
-            let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
-            let prefix = config.prefix || '';
-            
-            debug.log('Listing all databases...', this, 4);
+    static async listDatabases() {
+        debug.log('Listing all databases...', this, 4);
 
-            MongoClient.connect(this.getConnectionString(), (err, db) => {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
-                    if(db) {
-                        db.admin().listDatabases()
-                        .then((result) => {
-                            let databases = [];
+        let result = null;
+        let client = null;
 
-                            for(let i = 0; i < result.databases.length; i++) {
-                                let database = result.databases[i];
+        try { 
+            client = await this.connect();
+            result = await client.db('admin').admin().listDatabases();
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
 
-                                if(
-                                    !database.empty &&
-                                    database.name !== 'admin' &&
-                                    database.name !== 'local' &&
-                                    database.name !== 'config' &&
-                                    database.name !== prefix + 'users' &&
-                                    database.name !== prefix + 'schedule' &&
-                                    database.name.indexOf(prefix) === 0
-                                ) {
-                                    databases[databases.length] = database.name.replace(prefix, '');
-                                }
-                            }
+        if(!result) { return []; }
 
-                            resolve(databases);
-                        });
+        let databases = [];
 
-                    } else {
-                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + this.getConnectionString() + '".'));
-                    
-                    }
-                }
-            });
-        });
+        for(let i = 0; i < result.databases.length; i++) {
+            let database = result.databases[i];
+
+            if(
+                !database.empty &&
+                database.name !== 'admin' &&
+                database.name !== 'local' &&
+                database.name !== 'config' &&
+                database.name !== this.getConfig('prefix') + 'users' &&
+                database.name !== this.getConfig('prefix') + 'schedule' &&
+                database.name.indexOf(this.getConfig('prefix')) === 0
+            ) {
+                databases[databases.length] = database.name.replace(this.getConfig('prefix'), '');
+            }
+        }
+
+        return databases;
     }
 
     /**
@@ -285,11 +253,10 @@ class DatabaseHelper {
      *
      * @returns {Promise} Whether or not database exists
      */
-    static databaseExists(databaseName) {
-        return this.listDatabases()
-        .then((databases) => {
-            return Promise.resolve(databases.indexOf(databaseName) > -1);
-        });
+    static async databaseExists(databaseName) {
+        let databases = await this.listDatabases();
+
+        return databases.indexOf(databaseName) > -1;
     }
     
     /**
@@ -300,18 +267,16 @@ class DatabaseHelper {
      *
      * @returns {Promise} Whether or not collection exists
      */
-    static collectionExists(databaseName, collectionName) {
-        return this.listCollections(databaseName)
-        .then((collections) => {
+    static async collectionExists(databaseName, collectionName) {
+        let collections = await this.listCollections(databaseName);
 
-            for(let collection of collections || []) {
-                if(collection.name === collectionName) {
-                    return Promise.resolve(true);
-                }
+        for(let collection of collections || []) {
+            if(collection.name === collectionName) {
+                return true;
             }
-            
-            return Promise.resolve(false);
-        });
+        }
+    
+        return false;
     }
 
     /**
@@ -320,30 +285,28 @@ class DatabaseHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
-     * @param {Object} pattern
+     * @param {Object} projection
      *
      * @return {Promise} Document
      */
-    static findOne(databaseName, collectionName, query, pattern) {
+    static async findOne(databaseName, collectionName, query, projection = {}) {
         debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this, 4);
 
-        pattern = pattern || {};
-        pattern._id = 0;
+        projection._id = 0;
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.collection(collectionName).findOne(query, pattern, (findErr, doc) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve(doc);
-                    }
+        let doc = null;
+        let client = null;
 
-                    db.close();
-                });
-            });
-        });
+        try {
+            client = await this.connect(databaseName);
+            doc = await client.db().collection(collectionName).findOne(query, projection);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
+
+        return doc;
     }
     
     /**
@@ -352,33 +315,30 @@ class DatabaseHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
-     * @param {Object} pattern
+     * @param {Object} projection
      * @param {Object} sort
      *
      * @return {Promise} Documents
      */
-    static find(databaseName, collectionName, query, pattern, sort) {
+    static async find(databaseName, collectionName, query, projection = {}, sort = null) {
         debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this, 4);
 
-        pattern = pattern || {};
-        pattern._id = 0;
+        projection._id = 0;
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.collection(collectionName).find(query, pattern).sort(sort).toArray((findErr, docs) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
+        let docs = [];
+        let client = null;
 
-                    } else {
-                        resolve(docs);
-                    
-                    }
+        try {
+            client = await this.connect(databaseName);
+            docs = await client.db().collection(collectionName).find(query, { sort: sort, projection: projection }).toArray();
 
-                    db.close();
-                });
-            });
-        });
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
+
+        return docs;
     }
     
     /**
@@ -390,25 +350,22 @@ class DatabaseHelper {
      *
      * @return {Promise} Number of matching documents
      */
-    static count(databaseName, collectionName, query) {
+    static async count(databaseName, collectionName, query) {
         debug.log(databaseName + '/' + collectionName + '::count ' + JSON.stringify(query) + '...', this, 4);
+        
+        let client = null;
+        let result = 0;
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.collection(collectionName).count(query, (findErr, result) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
+        try {
+            client = await this.connect(databaseName);
+            result = await client.db().collection(collectionName).count(query);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
 
-                    } else {
-                        resolve(result);
-                    
-                    }
-
-                    db.close();
-                });
-            });
-        });
+        return result;
     }
     
     /**
@@ -422,17 +379,14 @@ class DatabaseHelper {
      *
      * @return {Promise}
      */
-    static mergeOne(databaseName, collectionName, query, doc, options) {
-        return this.findOne(databaseName, collectionName, query)
-        .then((foundDoc) => {
-            foundDoc = foundDoc || {};
+    static async mergeOne(databaseName, collectionName, query, doc, options) {
+        let foundDoc = await this.findOne(databaseName, collectionName, query) || {};
 
-            for(let k in doc) {
-                foundDoc[k] = doc[k];
-            }
+        for(let k in doc) {
+            foundDoc[k] = doc[k];
+        }
 
-            return this.updateOne(databaseName, collectionName, query, foundDoc, options);
-        });
+        return this.updateOne(databaseName, collectionName, query, foundDoc, options);
     }
     
     /**
@@ -446,26 +400,22 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static updateOne(databaseName, collectionName, query, doc, options) {
+    static async updateOne(databaseName, collectionName, query, doc, options) {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
         debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
-    
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.collection(collectionName).updateOne(query, doc, options || {}, (findErr) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve();
-                    }
+   
+        let client = null;
 
-                    db.close();
-                });
-            });
-        });
+        try {
+            client = await this.connect(databaseName);
+            await client.db().collection(collectionName).updateOne(query, { $set: doc }, options || {});
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }
     
     /**
@@ -479,26 +429,22 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static update(databaseName, collectionName, query, doc, options) {
+    static async update(databaseName, collectionName, query, doc, options) {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
         debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
-    
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.collection(collectionName).update(query, { $set: doc }, options || {}, (findErr) => {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve();
-                    }
-
-                    db.close();
-                });
-            })
-        });
+        
+        let client = null;
+       
+        try {
+            client = await this.connect(databaseName);
+            await client.db().collection(collectionName).updateMany(query, { $set: doc }, options || {});
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }
     
     /**
@@ -510,27 +456,22 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static insertOne(databaseName, collectionName, doc) {
+    static async insertOne(databaseName, collectionName, doc) {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this, 4);
+        debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this, 4);
         
-            this.getDatabase(databaseName)
-            .then(function(db) {
-                db.collection(collectionName).insertOne(doc, function(insertErr) {
-                    if(insertErr) {
-                        reject(new Error(insertErr));
-                    } else {
-                        resolve(doc);
-                    }
-
-                    db.close();
-                });
-            })
-            .catch(reject);
-        });
+        let client = null;
+       
+        try {
+            client = await this.connect(databaseName);
+            await client.db().collection(collectionName).insertOne(doc);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }
     
     /**
@@ -542,24 +483,19 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static remove(databaseName, collectionName, query) {
-        return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::remove ' + JSON.stringify(query) + '...', this, 4);
+    static async remove(databaseName, collectionName, query) {
+        debug.log(databaseName + '/' + collectionName + '::remove ' + JSON.stringify(query) + '...', this, 4);
         
-            this.getDatabase(databaseName)
-            .then(function(db) {
-                db.collection(collectionName).remove(query, true, function(findErr) {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve();
-                    }
-
-                    db.close();
-                });
-            })
-            .catch(reject);
-        });
+        let client = null;
+       
+        try {
+            client = await this.connect(databaseName);
+            await client.db().collection(collectionName).deleteMany(query, true);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }    
     
     /**
@@ -571,24 +507,19 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static removeOne(databaseName, collectionName, query) {
-        return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this, 4);
+    static async removeOne(databaseName, collectionName, query) {
+        debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this, 4);
+       
+        let client = null;
         
-            this.getDatabase(databaseName)
-            .then(function(db) {
-                db.collection(collectionName).remove(query, true, function(findErr) {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    } else {
-                        resolve();
-                    }
-
-                    db.close();
-                });
-            })
-            .catch(reject);
-        });
+        try {
+            client = await this.connect(databaseName);
+            await client.db().collection(collectionName).removeOne(query, true);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }    
     
     /**
@@ -599,24 +530,19 @@ class DatabaseHelper {
      *
      * @return {Promise} promise
      */
-    static dropCollection(databaseName, collectionName) {
+    static async dropCollection(databaseName, collectionName) {
         debug.log(databaseName + '::dropCollection...', this, 4);
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.dropCollection(collectionName, (err) => {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        resolve();
-                    }
-
-                    db.close();
-                });
-            });
-        });
+        let client = null;
+        
+        try {
+            client = await this.connect(databaseName);
+            await client.db().dropCollection(collectionName);
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }
 
     /**
@@ -626,24 +552,19 @@ class DatabaseHelper {
      *
      * @returns {Promise}
      */
-    static dropDatabase(databaseName) {
+    static async dropDatabase(databaseName) {
         debug.log(databaseName + '::dropDatabase...', this, 4);
 
-        return this.getDatabase(databaseName)
-        .then((db) => {
-            return new Promise((resolve, reject) => {
-                db.dropDatabase((err) => {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        resolve();
-                    }
-
-                    db.close();
-                });
-            });
-        });
+        let client = null;
+        
+        try {
+            client = await this.connect(databaseName);
+            await client.db().dropDatabase();
+        } catch(e) {
+            debug.error(e, this);
+        } finally {
+            client.close();
+        }
     }
 }
 

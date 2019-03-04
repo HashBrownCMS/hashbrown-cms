@@ -5,20 +5,31 @@
     display: flex;
     position: relative;
     max-width: 20rem;
-    min-width: 10rem;
+    min-width: 8rem;
     flex-grow: 1;
     background-color: $standard;
     border-radius: 0.2rem;
     border: 2px solid $standard-dark;
     height: 2rem;
     user-select: none;
+    color: $standard-text;
+
+    &:not(.has-icon):after {
+        position: absolute;
+        top: 0.7rem;
+        right: 0.6rem;
+        content: '';
+        border-left: 0.5rem solid transparent;
+        border-right: 0.5rem solid transparent;
+        border-top: 0.5rem solid $standard-dark;
+    }
 
     // Small
     &.small {
         max-width: 2rem;
         width: 2rem;
     }
-   
+
     // Right + bottom modes
     &.right {
         .widget--dropdown__options {
@@ -31,7 +42,7 @@
             transform: translateY(-100%);
         }
     }
-    
+
     &.bottom.right {
         .widget--dropdown__options {
             transform: translate(-100%, -100%);
@@ -45,14 +56,16 @@
         width: 2rem;
         height: 2rem;
         border: 0;
+        background-color: transparent;
 
         &:hover {
+            color: $primary-text;
+
             .widget--dropdown__value {
                 background-color: $primary;
-                color: $primary-text;
             }
         }
-      
+
         // Right mode
         &.right .widget--dropdown__options:before {
             left: auto;
@@ -63,7 +76,7 @@
         .widget-group & .widget--dropdown__value {
             border-radius: 0;
         }
-        
+
         .widget-group &:first-child .widget--dropdown__value {
             border-top-left-radius: 0.2rem;
             border-bottom-left-radius: 0.2rem;
@@ -81,7 +94,7 @@
             height: 2rem;
             line-height: 2rem;
         }
-        
+
         .widget--dropdown__options {
             top: 3.5rem;
             left: -0.5rem;
@@ -98,8 +111,8 @@
                 display: block;
                 left: 0.5rem;
                 bottom: 100%;
-                width: 0; 
-                height: 0; 
+                width: 0;
+                height: 0;
                 border-left: 1rem solid transparent;
                 border-right: 1rem solid transparent;
                 border-bottom: 1rem solid $primary;
@@ -114,6 +127,7 @@
         position: absolute;
         z-index: 1200;
         border: 0;
+        background-color: transparent;
 
         .widget--dropdown__value {
             display: none;
@@ -132,7 +146,7 @@
         width: calc(100% - 2rem);
         line-height: calc(2rem - 2px);
         padding: 0 0.5rem;
-        color: $standard-text;
+        color: inherit;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -167,7 +181,8 @@
         left: 0;
         display: block;
         margin: 0 !important;
-        width: calc(100% - 2rem);
+        // width: calc(100% - 2rem);
+        width: 100%;
         height: 100%;
         cursor: pointer;
         z-index: 20;
@@ -193,7 +208,7 @@
     &__toggle:checked ~ &__typeahead__icon {
         display: block;
     }
-    
+
     // Typeahead
     &__typeahead {
         display: none;
@@ -239,7 +254,7 @@
         color: $secondary;
         font-weight: bold;
         user-select: none;
-        
+
         &:first-child {
             margin-top: 0;
         }
@@ -249,7 +264,7 @@
     &__options {
         border-bottom-right-radius: 0.2rem;
         border-bottom-left-radius: 0.2rem;
-        box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+        box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
         z-index: 910;
         display: none;
         position: absolute;
@@ -262,7 +277,7 @@
         overflow-y: auto;
         user-select: none;
     }
-        
+
     // Option
     &__option {
         line-height: 2rem;
@@ -289,7 +304,7 @@
         }
 
         &.selected {
-            padding-right: 2rem;    
+            padding-right: 2rem;
 
             &::after {
                 display: block;
@@ -303,7 +318,7 @@
                 content: '\f00c';
             }
         }
-        
+
         // Icon
         &__icon {
             display: inline-block;
@@ -321,7 +336,7 @@
         display: block;
         padding: 0 0.5rem;
         position: absolute;
-        z-index: 5;
+        z-index: 25;
         background: transparent;
         right: 0;
         height: 100%;

@@ -1,7 +1,5 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple number editor
  *
@@ -21,7 +19,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class NumberEditor extends FieldEditor {
+class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -113,7 +111,7 @@ class NumberEditor extends FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--number'},
             new HashBrown.Views.Widgets.Input({
                 value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',

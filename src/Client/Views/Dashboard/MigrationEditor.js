@@ -1,7 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The editor for migrating content between environments
  *
@@ -104,7 +102,7 @@ class MigrationEditor extends HashBrown.Views.Modals.Modal {
      * Event: Clicked submit
      */
     onSubmit() {
-        RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data)
+        HashBrown.Helpers.RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data)
         .then(() => {
             UI.messageModal('Success', 'Successfully migrated content from "' + this.data.from + '" to "' + this.data.to + '"', () => {
                 this.trigger('change');

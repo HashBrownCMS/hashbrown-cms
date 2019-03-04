@@ -1,25 +1,18 @@
 'use strict';
 
-const NavbarPane = require('./NavbarPane');
-const NavbarMain = require('./NavbarMain');
-const MediaUploader = require('Client/Views/Modals/MediaUploader');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The Media navbar pane
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class MediaPane extends NavbarPane {
+class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On change folder path
      *
      * @param {String} newFolder
      */
     static onChangeDirectory(id, newFolder) {
-        RequestHelper.request(
+        HashBrown.Helpers.RequestHelper.request(
             'post',
             'media/tree/' + id,
             newFolder ? {
@@ -28,14 +21,52 @@ class MediaPane extends NavbarPane {
             } : null
         )
         .then(() => {
-            return RequestHelper.reloadResource('media');
+            return HashBrown.Helpers.RequestHelper.reloadResource('media');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             location.hash = '/media/' + id;
         })
         .catch(UI.errorModal);
+    }
+
+    /**
+     * Event: Click rename media
+     */
+    static onClickRenameMedia() {
+        let $element = $('.context-menu-target'); 
+        let id = $element.data('id');
+        let name = $element.data('name');
+
+        let modal = UI.messageModal(
+            'Rename ' + name,
+            new HashBrown.Views.Widgets.Input({
+                type: 'text',
+                value: name,
+                onChange: (newValue) => { name = newValue; }
+            }),
+            () => {
+                HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name)
+                .then(() => {
+                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
+                })
+                .then(() => {
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+
+                    if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
+                        mediaViewer.model = null;
+
+                        mediaViewer.fetch();
+                    }
+                })
+                .catch(UI.errorModal);
+            }
+        );
+
+        modal.$element.find('input').focus();
     }
 
     /**
@@ -53,12 +84,12 @@ class MediaPane extends NavbarPane {
             () => {
                 $element.parent().toggleClass('loading', true);
 
-                RequestHelper.request('delete', 'media/' + id)
+                HashBrown.Helpers.RequestHelper.request('delete', 'media/' + id)
                 .then(() => {
-                    return RequestHelper.reloadResource('media');
+                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
                 })
                 .then(() => {
-                    NavbarMain.reload();
+                    HashBrown.Views.Navigation.NavbarMain.reload();
 
                     // Cancel the MediaViever view if it was displaying the deleted object
                     if(location.hash == '#/media/' + id) {
@@ -85,14 +116,14 @@ class MediaPane extends NavbarPane {
     static onClickUploadMedia(replaceId) {
         let folder = $('.context-menu-target').data('media-folder') || '/';
 
-        new MediaUploader({
+        new HashBrown.Views.Modals.MediaUploader({
             onSuccess: (ids) => {
                 // We got one id back
                 if(typeof ids === 'string') {
                     location.hash = '/media/' + ids;
 
                 // We got several ids back
-                } else {
+                } else if(Array.isArray(ids)) {
                     location.hash = '/media/' + ids[0];
                 
                 }
@@ -117,12 +148,12 @@ class MediaPane extends NavbarPane {
      * Init
      */
     static init() {
-        NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
+        HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
             getItems: () => { return resources.media; },
 
             // Hierarchy logic
             hierarchy: (item, queueItem) => {
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
 
                 queueItem.$element.attr('data-media-id', item.id);
                 queueItem.$element.attr('data-remote', true);
@@ -139,6 +170,7 @@ class MediaPane extends NavbarPane {
                 'This media': '---',
                 'Open in new tab': () => { this.onClickOpenInNewTab(); },
                 'Move': () => { this.onClickMoveItem(); },
+                'Rename': () => { this.onClickRenameMedia(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
                 'Copy id': () => { this.onClickCopyItemId(); },

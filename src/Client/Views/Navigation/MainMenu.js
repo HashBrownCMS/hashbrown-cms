@@ -1,9 +1,5 @@
 'use strict';
 
-const User = require('Common/Models/User');
-const UserEditor = require('Client/Views/Editors/UserEditor');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 /**
  * The main menu
  * 
@@ -28,7 +24,7 @@ class MainMenu extends Crisp.View {
 
         window.language = newLanguage;
 
-        RequestHelper.reloadResource('content')
+        HashBrown.Helpers.RequestHelper.reloadResource('content')
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -67,17 +63,10 @@ class MainMenu extends Crisp.View {
                 UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
                 break;
 
-            case 'templates':
-                UI.messageModal('Templates', [
-                    _.p('This section contains rendering Templates for your authored Content.'),
-                    _.p('Templates are served through the Connection assigned as the Template provider.')
-                ]);
-                break;
-
             case 'connections':
                 UI.messageModal('Connections', [
                     _.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'),
-                    _.p('They can also be set up to provide statically hosted media and serve rendering templates.')
+                    _.p('They can also be set up to provide statically hosted media.')
                 ]);
                 break;
 
@@ -121,11 +110,11 @@ class MainMenu extends Crisp.View {
 
             // User dropdown
             this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
-                tooltip: 'Logged in as "' + (User.current.fullName || User.current.username) + '"',
+                tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
                 options: {
-                    'User settings': () => { new UserEditor({ hidePermissions: true, model: User.current }); },
+                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Models.User.current }); },
                     'Log out': () => {
                         HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout')
                         .then(() => {
@@ -145,8 +134,7 @@ class MainMenu extends Crisp.View {
                     'Content': () => { this.onClickQuestion('content'); },
                     'Forms': () => { this.onClickQuestion('forms'); },
                     'Media': () => { this.onClickQuestion('media'); },
-                    'Schemas': () => { this.onClickQuestion('schemas'); },
-                    'Templates': () => { this.onClickQuestion('templates'); }
+                    'Schemas': () => { this.onClickQuestion('schemas'); }
                 }
             })
         );

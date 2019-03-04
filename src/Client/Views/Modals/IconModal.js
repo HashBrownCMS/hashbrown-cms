@@ -2,14 +2,12 @@
 
 const icons = require('../../icons.json').icons;
 
-const Modal = require('./Modal');
-
 /**
  * A modal for picking icons
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class IconModal extends Modal {
+class IconModal extends HashBrown.Views.Modals.Modal {
     /**
      * Constructor
      */

@@ -5,7 +5,7 @@
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class Pane {
+class NavbarPane {
     /**
      * Init
      */
@@ -168,4 +168,4 @@ class Pane {
     }
 }
 
-module.exports = Pane;
+module.exports = NavbarPane;

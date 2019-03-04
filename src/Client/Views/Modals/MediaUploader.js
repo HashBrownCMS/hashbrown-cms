@@ -1,19 +1,11 @@
 'use strict';
 
-const Media = require('Common/Models/Media');
-const Modal = require('./Modal');
-
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const SettingsHelper = require('Client/Helpers/SettingsHelper');
-
 /**
  * A modal for uploading Media objects
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MediaUploader extends Modal {
+class MediaUploader extends HashBrown.Views.Modals.Modal {
     /**
      * Constructor
      */
@@ -24,7 +16,7 @@ class MediaUploader extends Modal {
 
         super(params);
 
-        MediaHelper.checkMediaProvider()
+        HashBrown.Helpers.MediaHelper.checkMediaProvider()
         .catch((e) => {
             UI.errorModal(e);
 
@@ -108,7 +100,7 @@ class MediaUploader extends Modal {
         let uploadedIds = [];
 
         // First upload the Media files
-        return RequestHelper.uploadFile(apiPath, type, content)
+        return HashBrown.Helpers.RequestHelper.uploadFile(apiPath, type, content)
 
         // Then update the Media tree
         .then((ids) => {
@@ -129,7 +121,7 @@ class MediaUploader extends Modal {
 
                 if(!id) { return Promise.resolve(); }
 
-                return RequestHelper.request('post', 'media/tree/' + id, {
+                return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, {
                     id: id,
                     folder: this.folder
                 })
@@ -143,7 +135,7 @@ class MediaUploader extends Modal {
 
         // Then reload the Media resource
         .then(() => {
-            return RequestHelper.reloadResource('media');
+            return HashBrown.Helpers.RequestHelper.reloadResource('media');
         })
 
         // Then update the UI and trigger the success callback

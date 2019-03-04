@@ -1,7 +1,6 @@
 'use strict';
 
 const ContentCommon = require('Common/Models/Content');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
 /**
  * The client-side content model

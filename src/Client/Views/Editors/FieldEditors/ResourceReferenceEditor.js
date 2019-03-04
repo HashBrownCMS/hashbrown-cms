@@ -1,13 +1,11 @@
 'use strict';
 
-const FieldEditor = require('./FieldEditor');
-
 /**
  * A simple string editor
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class ResourceReferenceEditor extends FieldEditor {
+class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -91,7 +89,7 @@ class ResourceReferenceEditor extends FieldEditor {
             }
         }
         
-        return _.div({class: 'editor__field__value'},
+        return _.div({class: 'field-editor field-editor--resource-reference'},
             value || '(none)'
         );
     }

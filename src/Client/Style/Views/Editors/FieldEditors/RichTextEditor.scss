@@ -1,9 +1,8 @@
 /**
  * A rich text editor
  */
-.editor__field--rich-text-editor {
+.field-editor--rich-text {
     margin: 0px;
-    width: 100px; // A hack to prevent CodeMirror from exceeding boundaries
     border-radius: 0.2rem;
     border: 1px solid $standard-darker;
 

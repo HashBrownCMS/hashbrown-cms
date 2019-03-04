@@ -1,9 +1,5 @@
 'use strict';
 
-const Content = require('Client/Models/Content');
-
-const FieldEditor = require('./FieldEditor');
-
 /**
  * An editor for referring to other Content
  *
@@ -23,7 +19,7 @@ const FieldEditor = require('./FieldEditor');
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class ContentReferenceEditor extends FieldEditor {
+class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     constructor(params) {
         super(params);
 
@@ -96,7 +92,7 @@ class ContentReferenceEditor extends FieldEditor {
      * Render this editor
      */
     template() {
-        return _.div({class: 'editor__field__value'}, [
+        return _.div({class: 'field-editor field-editor--content-reference'}, [
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: this.getDropdownOptions(),

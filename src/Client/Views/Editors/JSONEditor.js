@@ -1,8 +1,6 @@
 'use strict';
 
 const beautify = require('js-beautify').js_beautify;
-const SchemaHelper = require('Client/Helpers/SchemaHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * A basic JSON editor for any object
@@ -19,7 +17,7 @@ class JSONEditor extends Crisp.View {
         ).hide();
 
         if(!this.model && !this.modelUrl) {
-            this.modelUrl = RequestHelper.environmentUrl(this.apiPath);
+            this.modelUrl = HashBrown.Helpers.RequestHelper.environmentUrl(this.apiPath);
         }
 
         this.fetch();
@@ -47,7 +45,7 @@ class JSONEditor extends Crisp.View {
         this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
-            RequestHelper.request('post', this.apiPath, this.model)
+            HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model)
             .then(() => {
                 this.$saveBtn.toggleClass('working', false);
             })
@@ -89,7 +87,7 @@ class JSONEditor extends Crisp.View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
-                    if(SchemaHelper.getSchemaByIdSync(v)) {
+                    if(HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
                         return;
                     }
 
@@ -136,82 +134,6 @@ class JSONEditor extends Crisp.View {
                             return 'Connection "' + invalidConnections[0] + '" not found';
                         } else {
                             return 'Connections "' + invalidConnections.join(', ') + '" not found';
-                        }
-                    }
-
-                    break;
-
-                case 'template':
-                    if(typeof v === 'string') {
-                        for(let template of resources.templates) {
-                            if(template.id == v) {
-                                return;
-                            }
-                        }   
-                        
-                        return 'Template "' + v + '" not found';
-                    }
-
-                    break;
-
-                case 'config':
-                    // Backward compatibility adjustment for template configs
-                    if(v.resource) {
-                        switch(v.resource) {
-                            case 'partialTemplates':
-                            case 'sectionTemplates':
-                                v.type = 'partial';
-                                delete v.resource;
-                                break;
-                            
-                            case 'templates':
-                                v.type = 'page';
-                                delete v.resource;
-                                break;
-                        }
-                    }
-
-                    // Allowed templates config
-                    if(v.allowedTemplates) {
-                        // Assume that all templates are invalid
-                        let invalidTemplates = v.allowedTemplates.slice(0);
-
-                        // Backwards compatibility adjustment
-                        if(v.resource) {
-                            if(v.resource == 'partialTemplates' || v.resource == 'sectionTemplates') {
-                                v.type = 'partial';
-                            } else {
-                                v.type = 'page';
-                            }
-
-                            delete v.resource;
-                        }
-
-                        // Sanity check for type
-                        if(!v.type) {
-                            v.type = 'page';
-                        }
-
-                        // Loop through all available templates
-                        for(let existingTemplate of resources.templates) {
-                            for(let a = invalidTemplates.length - 1; a >= 0; a--) {
-
-                                // If a template was found, and it's of the correct type, remove it from the invalid templates array
-                                if(
-                                    existingTemplate.type == v.type &&
-                                    existingTemplate.id == invalidTemplates[a]
-                                ) {
-                                    invalidTemplates.splice(a, 1);
-                                }
-                            }   
-                        }
-
-                        if(invalidTemplates.length > 0) {
-                            if(invalidTemplates.length == 1) {
-                                return 'Template "' + invalidTemplates[0] + '" of type "' + v.type + '" not found';
-                            } else {
-                                return 'Templates "' + invalidTemplates.join(', ') + '" of type "' + v.type + '" not found';
-                            }
                         }
                     }
 

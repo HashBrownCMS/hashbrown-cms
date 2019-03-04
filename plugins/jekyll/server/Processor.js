@@ -81,11 +81,8 @@ class JekyllProcessor extends HashBrown.Models.Processor {
                 delete properties.url;
             }
 
-            // Remap "template" to "layout"
-            if(properties.template) {
-                properties.layout = properties.template;
-                delete properties.template;
-            } 
+            // Set the layout to the Schema id
+            properties.layout = content.schemaId;
 
             let frontMatter = '';
 

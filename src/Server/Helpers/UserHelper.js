@@ -2,11 +2,6 @@
 
 const Crypto = require('crypto');
 
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const ConfigHelper = require('Server/Helpers/ConfigHelper');
-
-const User = require('Server/Models/User');
-
 /**
  * A helper class for managing and getting information about CMS users
  *
@@ -23,7 +18,7 @@ class UserHelper {
      */
     static invite(email, project) {
         let token = Crypto.randomBytes(10).toString('hex');
-        let user = User.create();
+        let user = HashBrown.Models.User.create();
 
         user.inviteToken = token;
         user.email = email;
@@ -33,7 +28,7 @@ class UserHelper {
             user.scopes[project] = [];
         }
         
-        return DatabaseHelper.insertOne(
+        return HashBrown.Helpers.DatabaseHelper.insertOne(
             'users',
             'users',
             user.getObject()
@@ -52,7 +47,7 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findUser(username) {
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -63,7 +58,7 @@ class UserHelper {
                 return Promise.reject(new Error('No user "' + username + '" found'));
             }
             
-            return Promise.resolve(new User(user));
+            return Promise.resolve(new HashBrown.Models.User(user));
         });
     }
 
@@ -142,14 +137,14 @@ class UserHelper {
      * @returns {Promise} User
      */
     static findToken(token) {
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             'users',
             'users',
             {}
         )
         .then((users) => {
             for(let u of users) {
-                let user = new User(u);
+                let user = new HashBrown.Models.User(u);
                 
                 let isValid = user.validateToken(token);
 
@@ -170,7 +165,7 @@ class UserHelper {
      * @returns {Promise} User
      */
     static findInviteToken(inviteToken) {
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -179,7 +174,7 @@ class UserHelper {
         ).then((user) => {
             return new Promise((resolve, reject) => {
                 if(user && Object.keys(user).length > 0) {
-                    resolve(new User(user));
+                    resolve(new HashBrown.Models.User(user));
                 
                 } else {
                     reject(new Error('Invite token "' + inviteToken + '" could not be found'));
@@ -197,7 +192,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static removeUser(id) {
-        return DatabaseHelper.removeOne(
+        return HashBrown.Helpers.DatabaseHelper.removeOne(
             'users',
             'users',
             {
@@ -232,7 +227,7 @@ class UserHelper {
                 });
             
             } else {
-                return DatabaseHelper.findOne('users', 'users', { id: id });
+                return HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id });
             }
         })
         .then((result) => {
@@ -242,7 +237,7 @@ class UserHelper {
 
             delete user.scopes[scope];
             
-            return DatabaseHelper.updateOne('users', 'users', { id: id }, user);
+            return HashBrown.Helpers.DatabaseHelper.updateOne('users', 'users', { id: id }, user);
         });
     }
     
@@ -256,7 +251,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static addUserProjectScope(id, project, scopes) {
-        return DatabaseHelper.findOne('users', 'users', { id: id })
+        return HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id })
         .then((user) => {
             user.scopes  = user.scopes || {};
 
@@ -298,7 +293,7 @@ class UserHelper {
 
             newUser = user;
 
-            return DatabaseHelper.findOne(
+            return HashBrown.Helpers.DatabaseHelper.findOne(
                 'users',
                 'users',
                 {
@@ -346,25 +341,25 @@ class UserHelper {
             });
         }
         
-        let user = User.create(username, password);
+        let user = HashBrown.Models.User.create(username, password);
 
         user.isAdmin = admin || false;
         user.scopes = scopes || {};
 
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'users',
             'users',
             {
                 username: username
             }
         ).then((found) => {
-            let foundUser = new User(found);
+            let foundUser = new HashBrown.Models.User(found);
 
             // User wasn't found, create
             if(!found) {
                 debug.log('Creating user "' + username + '"...', this);
                 
-                return DatabaseHelper.insertOne(
+                return HashBrown.Helpers.DatabaseHelper.insertOne(
                     'users',
                     'users',
                     user.getObject()
@@ -429,7 +424,7 @@ class UserHelper {
             debug.log('Getting all users...', this, 3);
         }
 
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             'users',
             'users',
             query,
@@ -440,14 +435,19 @@ class UserHelper {
         )
         .then((users) => {
             let userModels = [];
+            
+            users = users.sort((a, b) => {
+                a = a.fullName || a.username || a.email;
+                b = b.fullName || b.username || b.email;
+
+                if(a < b) { return -1; }
+                if(a > b) { return 1; }
+                return 0;
+            });
 
             for(let user of users) {
-                userModels.push(new User(user));
+                userModels.push(new HashBrown.Models.User(user));
             }  
-
-            userModels.sort((a, b) => {
-                return a.username > b.username;
-            });
 
             return Promise.resolve(userModels);
         });
@@ -465,7 +465,7 @@ class UserHelper {
 
         debug.log('Getting user "' + id + '"...', this, 3);
 
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -490,7 +490,7 @@ class UserHelper {
 
         debug.log('Getting user "' + username + '"...', this, 3);
 
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -535,10 +535,10 @@ class UserHelper {
      */
     static updateUserById(id, properties) {
         if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
-            properties.password = User.createPasswordHashSalt(properties.password);
+            properties.password = HashBrown.Models.User.createPasswordHashSalt(properties.password);
         }
         
-        return DatabaseHelper.mergeOne(
+        return HashBrown.Helpers.DatabaseHelper.mergeOne(
             'users',
             'users',
             {
@@ -548,7 +548,7 @@ class UserHelper {
         ).then(() => {
             debug.log('Updated user "' + id + '" successfully', this);
             
-            return Promise.resolve(new User(properties));
+            return Promise.resolve(new HashBrown.Models.User(properties));
         });
     }
 
@@ -562,10 +562,10 @@ class UserHelper {
      */
     static updateUser(username, properties) {
         if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
-            properties.password = User.createPasswordHashSalt(properties.password);
+            properties.password = HashBrown.Models.User.createPasswordHashSalt(properties.password);
         }
 
-        return DatabaseHelper.mergeOne(
+        return HashBrown.Helpers.DatabaseHelper.mergeOne(
             'users',
             'users',
             {

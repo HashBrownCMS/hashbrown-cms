@@ -1,20 +1,11 @@
 'use strict';
 
-const Media = require('Common/Models/Media');
-
-const Modal = require('./Modal');
-
-const MediaHelper = require('Client/Helpers/MediaHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const SettingsHelper = require('Client/Helpers/SettingsHelper');
-
 /**
  * A browser modal for Media objects
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MediaBrowser extends Modal {
+class MediaBrowser extends HashBrown.Views.Modals.Modal {
     constructor(params) {
         params = params || {};
 
@@ -76,7 +67,7 @@ class MediaBrowser extends Modal {
      * Event: Change resource
      */
     onChangeResource() {
-        RequestHelper.reloadResource('media')
+        HashBrown.Helpers.RequestHelper.reloadResource('media')
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();
         });

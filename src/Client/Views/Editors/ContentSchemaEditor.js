@@ -1,13 +1,11 @@
 'use strict';
 
-const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
-
 /**
  * The editor for Content Schemas
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ContentSchemaEditor extends SchemaEditor {
+class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
     /**
      * Gets parent tabs
      *
@@ -200,7 +198,7 @@ class ContentSchemaEditor extends SchemaEditor {
                             })
                     )
                 ),
-                _.div({class: 'editor__field__value segmented'},
+                _.div({class: 'editor__field__value'},
                     _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                         if(!fieldValue) { return; }
 
@@ -209,7 +207,7 @@ class ContentSchemaEditor extends SchemaEditor {
                         if(isValidTab && fieldValue.tabId !== this.currentTab) { return; }
                         if(!isValidTab && this.currentTab !== 'meta') { return; }
 
-                        let $field = _.div({class: 'editor__field'});
+                        let $field = _.div({class: 'editor__field raised'});
 
                         // Sanity check
                         fieldValue.config = fieldValue.config || {};

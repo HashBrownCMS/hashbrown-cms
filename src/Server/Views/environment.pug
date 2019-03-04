@@ -27,17 +27,20 @@ html
                 .widget--spinner__messages.page--environment__spinner__messages
 
         script(src='/lib/jquery/jquery.min.js')
+        script(src='/lib/crisp-ui/crisp-ui.js')
+            
         script(src='/lib/ckeditor/ckeditor.js')
         script(src='/lib/codemirror/lib/codemirror.js')
         script(src='/lib/codemirror/mode/javascript/javascript.js')
         script(src='/lib/codemirror/mode/markdown/markdown.js')
         script(src='/lib/codemirror/mode/xml/xml.js')
-        script(src='/lib/crisp-ui/crisp-ui.js')
-        script(src='/js/client.js')
+
+        script(src='/js/common.js')
+        script(src='/js/helpers.js')
+        script(src='/js/models.js')
+        script(src='/js/routes.js')
+        script(src='/js/utilities.js')
+        script(src='/js/views.js')
+            
+        script(src='/js/environment.js')
         script(src='/js/plugins.js')
-        
-        script.
-            HashBrown.Helpers.ProjectHelper.currentProject = '#{currentProject}';
-            HashBrown.Helpers.ProjectHelper.currentProjectName = '#{currentProjectName}';
-            HashBrown.Helpers.ProjectHelper.currentEnvironment = '#{currentEnvironment}';
-        

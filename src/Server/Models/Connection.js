@@ -2,9 +2,6 @@
 
 const Path = require('path');
 
-const Processor = require('Common/Models/Processor');
-const Deployer = require('Common/Models/Deployer');
-
 const ConnectionCommon = require('Common/Models/Connection');
 
 /**
@@ -19,8 +16,8 @@ class Connection extends ConnectionCommon {
     structure() {
         super.structure();
 
-        this.def(Processor, 'processor');
-        this.def(Deployer, 'deployer');
+        this.def(HashBrown.Models.Processor, 'processor');
+        this.def(HashBrown.Models.Deployer, 'deployer');
     }
 
     /**
@@ -33,19 +30,23 @@ class Connection extends ConnectionCommon {
     static paramsCheck(params) {
         params = super.paramsCheck(params);
 
-        if(params.processor instanceof Processor === false) {
+        if(params.processor instanceof HashBrown.Models.Processor === false) {
             let processor = HashBrown.Helpers.ConnectionHelper.getProcessor(params.processor.alias);
 
             if(processor) {
                 params.processor = new processor(params.processor);
+            } else {
+                params.processor = new HashBrown.Models.Processor(params.processor);
             }
         }
         
-        if(params.deployer instanceof Deployer === false) {
+        if(params.deployer instanceof HashBrown.Models.Deployer === false) {
             let deployer = HashBrown.Helpers.ConnectionHelper.getDeployer(params.deployer.alias);
 
             if(deployer) {
                 params.deployer = new deployer(params.deployer);
+            } else {
+                params.deployer = new HashBrown.Models.Deployer(params.deployer);
             }
         }
 
@@ -265,138 +266,6 @@ class Connection extends ConnectionCommon {
     }
     
     /**
-     * Gets a list of Templates
-     *
-     * @param {String} type
-     *
-     * @returns {Promise} Templates
-     */
-    getAllTemplates(type) {
-        checkParam(type, 'type', String);
-
-        if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
-        }
-
-        return this.deployer.getFolder(this.deployer.getPath('templates/' + type))
-        .then((files) => {
-            if(!files) { return Promise.resolve([]); }
-
-            let allTemplates = [];
-
-            for(let file of files) {
-                let name = file.path || file.name;
-                
-                if(!name && typeof file === 'string') {
-                    name = file;
-                }
-
-                name = Path.basename(name);
-                
-                let template = new HashBrown.Models.Template({
-                    name: name,
-                    type: type
-                });
-
-                allTemplates.push(template);
-            }
-
-            return Promise.resolve(allTemplates);
-        });
-    }
-    
-    /**
-     * Gets a Template by name
-     *
-     * @param {String} type
-     * @param {String} name
-     *
-     * @returns {Promise} Template
-     */
-    getTemplate(type, name) {
-        checkParam(type, 'type', String);
-        checkParam(name, 'name', String);
-
-        if(!this.deployer || typeof this.deployer.getFile !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
-        }
-
-        return this.deployer.getFile(this.deployer.getPath('templates/' + type, name))
-        .then((file) => {
-            if(!file) { return Promise.reject(new Error('Template by id "' + id + '" not found')); }
-
-            let name = file.path || file.name;
-            
-            if(!name && typeof file === 'string') {
-                name = file;
-            }
-
-            name = Path.basename(name);
-            
-            let content = file.data || file.content || file.markup;
-
-            // Detect base64 and convert if necessary
-            // NOTE: This is a good guess, but not perfect, as it's basically impossible to be sure
-            if(typeof content === 'string' && content.indexOf(' ') < 0) {
-                let test = content.replace(/\r?\n|\r/g, '');
-                let matches = test.match(/[A-Za-z0-9+/=]+/);
-
-                if(matches && matches.length > 0 && matches[0].length === test.length) {
-                    content = Buffer.from(content, 'base64').toString('utf8');
-                }
-            }
-
-            return Promise.resolve(new HashBrown.Models.Template({
-                name: file.name,
-                type: type,
-                markup: content
-            }));
-        });
-    }
-    
-    /**
-     * Sets a Template by name
-     *
-     * @param {String} type
-     * @param {String} name
-     * @param {String} content
-     *
-     * @returns {Promise} Result
-     */
-    setTemplate(type, name, content) {
-        checkParam(type, 'type', String);
-        checkParam(name, 'name', String);
-        checkParam(content, 'content', String);
-
-        content = Buffer.from(content, 'utf8').toString('base64');
-        
-        if(!this.deployer || typeof this.deployer.setFile !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
-        }
-
-        return this.deployer.setFile(this.deployer.getPath('templates/' + type, name), content);
-    }
-   
-    /**
-     * Removes a Template by name
-     *
-     * @param {String} type
-     * @param {String} name
-     *
-     * @returns {Promise} Result
-     */
-    removeTemplate(type, name) {
-        checkParam(type, 'type', String);
-        checkParam(name, 'name', String);
-
-        if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
-        }
-
-        return this.deployer.removeFile(this.deployer.getPath('templates/' + type, name));
-    }
-    
-    /**
      * Gets a list of Media nodes
      *
      * @returns {Promise} Media
@@ -406,7 +275,7 @@ class Connection extends ConnectionCommon {
             return Promise.reject(new Error('This Connection has no deployer defined'));
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media'), 1)
+        return this.deployer.getFolder(this.deployer.getPath('media'), 2)
         .then((folders) => {
             if(!folders) { return Promise.resolve([]); }
 
@@ -434,7 +303,7 @@ class Connection extends ConnectionCommon {
                 
                 let media = new HashBrown.Models.Media({
                     id: id,
-                    url: this.deployer.getPath('media', id + '/' + name),
+                    url: this.deployer.getPath('media', id + '/' + name, true),
                     name: name
                 });
 
@@ -459,7 +328,7 @@ class Connection extends ConnectionCommon {
             return Promise.reject(new Error('This Connection has no deployer defined'));
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media', id), 1)
+        return this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1)
         .then((files) => {
             if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
 
@@ -479,6 +348,24 @@ class Connection extends ConnectionCommon {
                 url: file.url,
                 path: file.path || file
             }));
+        });
+    }
+    
+    /**
+     * Renames a Media node by id
+     *
+     * @param {String} id
+     * @param {String} name
+     *
+     * @returns {Promise} Media node
+     */
+    renameMedia(id, name) {
+        checkParam(id, 'id', String);
+        checkParam(name, 'name', String);
+        
+        return this.getMedia(id)
+        .then((media) => {
+            return this.deployer.renameFile(media.path, name);
         });
     }
     

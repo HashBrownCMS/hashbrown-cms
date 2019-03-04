@@ -3,24 +3,26 @@
 /**
  * @namespace HashBrown.Server.Helpers
  */
-module.exports = {
-    AppHelper: require('./AppHelper'),
-    BackupHelper: require('./BackupHelper'),
-    ConfigHelper: require('./ConfigHelper'),
-    ConnectionHelper: require('./ConnectionHelper'),
-    ContentHelper: require('./ContentHelper'),
-    DebugHelper: require('./DebugHelper'),
-    FormHelper: require('./FormHelper'),
-    LanguageHelper: require('./LanguageHelper'),
-    MediaHelper: require('./MediaHelper'),
-    DatabaseHelper: require('./DatabaseHelper'),
-    PluginHelper: require('./PluginHelper'),
-    ProjectHelper: require('./ProjectHelper'),
-    RequestHelper: require('./RequestHelper'),
-    ScheduleHelper: require('./ScheduleHelper'),
-    SchemaHelper: require('./SchemaHelper'),
-    SettingsHelper: require('./SettingsHelper'),
-    SyncHelper: require('./SyncHelper'),
-    UpdateHelper: require('./UpdateHelper'),
-    UserHelper: require('./UserHelper')
-};
+namespace('Helpers')
+.add(require('./AppHelper'))
+.add(require('./BackupHelper'))
+.add(require('./CacheHelper'))
+.add(require('./ConfigHelper'))
+.add(require('./ConnectionHelper'))
+.add(require('./ContentHelper'))
+.add(require('./DatabaseHelper'))
+.add(require('./DebugHelper'))
+.add(require('./FileHelper'))
+.add(require('./FormHelper'))
+.add(require('./LanguageHelper'))
+.add(require('./MediaHelper'))
+.add(require('./PluginHelper'))
+.add(require('./ProjectHelper'))
+.add(require('./RequestHelper'))
+.add(require('./ScheduleHelper'))
+.add(require('./SchemaHelper'))
+.add(require('./SettingsHelper'))
+.add(require('./SyncHelper'))
+.add(require('./TestHelper'))
+.add(require('./UpdateHelper'))
+.add(require('./UserHelper'));

@@ -215,10 +215,12 @@ class Content extends Resource {
         return {
             id: this.id,
             parentId: this.parentId,
+            schemaId: this.schemaId,
             createDate: this.createDate,
             updateDate: this.updateDate,
             createdBy: this.createdBy,
-            updatedBy: this.updatedBy
+            updatedBy: this.updatedBy,
+            sort: this.sort
         };
     }
 
@@ -308,16 +310,6 @@ class Content extends Resource {
 
                     // If not, recurse into the object
                     } else {
-                        // If this value was created with the ArrayEditor, filter out Schema ids
-                        // by assigning the "value" of each item directly to the array
-                        if(Array.isArray(value)) {
-                            for(let i in value) {
-                                if(!value[i].value) { continue; }
-
-                                value[i] = value[i].value;
-                            }
-                        }
-
                         // Prepare target data type for either Object or Array
                         if(Array.isArray(value)) {
                             target[key] = [];

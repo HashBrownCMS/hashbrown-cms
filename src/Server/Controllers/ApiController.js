@@ -1,13 +1,11 @@
 'use strict';
 
-const Controller = require('./Controller');
-
 /**
  * The main API controller
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ApiController extends Controller {
+class ApiController extends HashBrown.Controllers.Controller {
     /**
      * Check CORS
      *

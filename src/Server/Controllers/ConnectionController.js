@@ -95,8 +95,9 @@ class ConnectionController extends require('./ApiController') {
     static postConnection(req, res) {
         let id = req.params.id;
         let connection = req.body;
+        let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection))
+        HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection), shouldCreate)
         .then(() => {
             res.status(200).send(connection);
         })

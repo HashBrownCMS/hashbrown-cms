@@ -25,7 +25,7 @@ class ConfigHelper {
         checkParam(config, 'config', Object);
 
         return new Promise((resolve, reject) => {
-            let path = Path.join(appRoot, 'config', name + '.cfg');
+            let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
             FileSystem.writeFile(path, JSON.stringify(config), 'utf8', (err, data) => {
                 if(err) {
@@ -51,7 +51,7 @@ class ConfigHelper {
     static existsSync(name) {
         checkParam(name, 'name', String);
        
-        let path = Path.join(appRoot, 'config', name + '.cfg');
+        let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
         try {
             FileSystem.statSync(path);
@@ -72,7 +72,7 @@ class ConfigHelper {
     static exists(name) {
         checkParam(name, 'name', String);
        
-        let path = Path.join(appRoot, 'config', name + '.cfg');
+        let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
         return new Promise((resolve, reject) => {
             FileSystem.stat(path, (err, stats) => {
@@ -100,7 +100,7 @@ class ConfigHelper {
         }
 
         return new Promise((resolve, reject) => {
-            let path = Path.join(appRoot, 'config', name + '.cfg');
+            let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
             FileSystem.exists(path, (exists) => {
                 if(exists) {
@@ -124,7 +124,7 @@ class ConfigHelper {
                     });
             
                 } else {
-                    reject(new Error('Config "' + name + '" could not be found'));
+                    resolve(null);
 
                 }
             });
@@ -146,7 +146,7 @@ class ConfigHelper {
             return cache[name];
         }
 
-        let path = Path.join(appRoot, 'config', name + '.cfg');
+        let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
         if(!FileSystem.existsSync(path)) { return {}; }
 
@@ -165,4 +165,3 @@ class ConfigHelper {
 }
 
 module.exports = ConfigHelper;
-

@@ -12,7 +12,7 @@ const AppModulePath = require('app-module-path');
 const Path = require('path');
 
 // Set app root
-global.appRoot = Path.resolve(__dirname);
+global.APP_ROOT = Path.resolve(__dirname);
 
 // Make sure we can require our source files conveniently
 AppModulePath.addPath(__dirname);
@@ -26,4 +26,4 @@ Promise.onPossiblyUnhandledRejection((error, promise) => {
 });
 
 // Include main server module
-require(appRoot + '/src/Server/server.js');
+require(APP_ROOT + '/src/Server');

@@ -1,13 +1,11 @@
 'use strict';
 
-const SchemaEditor = require('Client/Views/Editors/SchemaEditor');
-
 /**
  * The editor for field Schemas
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class FieldSchemaEditor extends SchemaEditor {
+class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
     /**
      * Pre render
      */
@@ -28,7 +26,7 @@ class FieldSchemaEditor extends SchemaEditor {
         if(!editor) { return; }
 
         return _.div({class: 'config'},
-            editor.renderConfigEditor(this.model.config)
+            editor.renderConfigEditor(this.model.config, this.model.id)
         );
     }
 

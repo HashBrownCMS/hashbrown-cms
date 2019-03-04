@@ -1,13 +1,11 @@
 'use strict';
 
-const Modal = require('./Modal');
-
 /**
  * A dialog for editing publishing settings for Content nodes
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class PublishingSettingsModal extends Modal {
+class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
     /**
      * Constructor
      */

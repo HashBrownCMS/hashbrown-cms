@@ -3,7 +3,7 @@
 /**
  * @namespace HashBrown.Client.Models
  */
-module.exports = {
+HashBrown.Models = {
     Content: require('./Content'),
     Connection: require('./Connection'),
     ContentSchema: require('Common/Models/ContentSchema'),
@@ -15,6 +15,5 @@ module.exports = {
     Processor: require('Common/Models/Processor'),
     Project: require('Common/Models/Project'),
     Schema: require('Common/Models/Schema'),
-    Template: require('Common/Models/Template'),
     User: require('Common/Models/User')
 };

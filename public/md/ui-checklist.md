@@ -152,9 +152,6 @@
   - Can add tags
 - Content Reference
   - Can pick a Content node using the dropdown
-- Template reference
-  - Can pick a Template provided by a Connection
-  - If no Connection is set up to provide Templates, a warning message appears
 - Boolean
   - Can toggle the switch on/off
 - Url
@@ -215,23 +212,11 @@
 - If "check for duplicates" is checked, no duplicates are allowed
 - If a regex pattern is defined, it is checked properly
 
-## Templates
-### Navbar
-- Can copy Template id
-- Can remove Template
-- Can rename Template
-- Templates are sorted into "Partials" and "Pages"
-- [PENDING] Templates are sorted into appropriate subdirectories
-
-### Editor
-- Can edit template and save it
-
 ## Connections
 ### Publishing
 - Can publish Content with every Connection type
 - Can unpublish Content with every Connection type
 - Can preview Content with every Connection type
-- Can see and edit Templates with every Connection type
 - Can see and edit Media with every Connection type
 
 ### Navbar
@@ -242,7 +227,6 @@
 - Can pull Connection from remote
 
 ### Editor
-- Can set as Template provider
 - Can set as Media provider
 - Can edit title
 - Can edit URL
@@ -267,5 +251,4 @@
   - Changes are reflected in the navbar immediately
 - Can change field editor
 - Can change config
-- Can change preview template
 - Can save changes

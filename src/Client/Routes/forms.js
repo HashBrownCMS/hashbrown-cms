@@ -1,9 +1,5 @@
 'use strict';
 
-const JSONEditor = require('Client/Views/Editors/JSONEditor');
-const FormEditor = require('Client/Views/Editors/FormEditor');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 // Dashboard
 Crisp.Router.route('/forms/', function() {
     Crisp.View.get('NavbarMain').showTab('/forms/');
@@ -12,7 +8,9 @@ Crisp.Router.route('/forms/', function() {
         [
             _.h1('Forms'),
             _.p('Right click in the Forms pane to create a new Form.'),
-            _.p('Click on a Form to edit it.')
+            _.p('Click on a Form to edit it.'),
+            _.button({class: 'widget widget--button'}, 'New Form')
+                .click(() => { HashBrown.Views.Navigation.FormsPane.onClickNewForm(); }),
         ],
         'text'
     );
@@ -22,8 +20,8 @@ Crisp.Router.route('/forms/', function() {
 Crisp.Router.route('/forms/:id', function() {
     Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
-    let formEditor = new FormEditor({
-        modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
+    let formEditor = new HashBrown.Views.Editors.FormEditor({
+        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id)
     });
    
     UI.setEditorSpaceContent(formEditor.$element);
@@ -31,8 +29,8 @@ Crisp.Router.route('/forms/:id', function() {
 
 // Edit (JSON editor)
 Crisp.Router.route('/forms/json/:id', function() {
-    let formEditor = new JSONEditor({
-        modelUrl: RequestHelper.environmentUrl('forms/' + this.id),
+    let formEditor = new HashBrown.Views.Editors.JSONEditor({
+        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
      

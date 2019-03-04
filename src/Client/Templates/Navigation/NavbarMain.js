@@ -4,7 +4,6 @@ module.exports = function() {
 
     let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
     let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-    let hasTemplatesScope = currentUser.hasScope(currentProject, 'templates');
     let hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
      
     return _.nav({class: 'navbar-main'},
@@ -18,7 +17,7 @@ module.exports = function() {
                 return _.button({class: 'navbar-main__tab', 'data-route': pane.route, title: pane.label},
                     _.div({class: 'navbar-main__tab__icon fa fa-' + pane.icon}),
                     _.div({class: 'navbar-main__tab__label'}, pane.label)
-                ).click((e) => { this.onClickTab(e); });
+                ).on('click', (e) => { this.onClickTab(e); });
             })
         ),
 
@@ -27,10 +26,32 @@ module.exports = function() {
             _.each(this.tabPanes, (i, pane) => {
                 let queue = [];
 
+                let sortingOptions = {
+                    default: 'Default',
+                    alphaAsc: 'A → Z',
+                    alphaDesc: 'Z → A'
+                };
+
+                if(pane.label === 'Content') {
+                    sortingOptions.dateAsc = 'Old → new';
+                    sortingOptions.dateDesc = 'New → old';
+                }
+
                 let $pane = _.div({class: 'navbar-main__pane', 'data-route': pane.route},
-                    // Toolbar
-                    _.if(pane.settings.toolbar,
-                        pane.settings.toolbar
+                    // Filter/sort bar
+                    _.div({class: 'navbar-main__pane__filter-sort-bar'},
+                        _.div({class: 'widget-group'},
+                            new HashBrown.Views.Widgets.Input({
+                                placeholder: 'Filter',
+                                onChange: (newValue) => { this.onChangeFilter($pane, pane, newValue); },
+                                type: 'text'
+                            }),
+                            new HashBrown.Views.Widgets.Dropdown({
+                                placeholder: 'Sort',
+                                options: sortingOptions,
+                                onChange: (newValue) => { this.onChangeSorting($pane, pane, newValue); }
+                            })
+                        )
                     ),
 
                     // Move buttons
@@ -59,7 +80,8 @@ module.exports = function() {
                                     'data-remote': isRemote,
                                     'data-local': hasRemote,
                                     'data-is-directory': isDirectory,
-                                    'data-sort': item.sort || 0
+                                    'data-sort': item.sort || 0,
+                                    'data-update-date': item.updateDate || item.createDate
                                 },
                                 _.a({
                                     'data-id': id,

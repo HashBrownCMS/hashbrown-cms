@@ -18,6 +18,9 @@ class Resource extends Entity {
     static paramsCheck(params) {
         params = params || {}
 
+        // Remove MongoDB id
+        delete params._id;
+
         // Convert from old sync variables
         params.sync = params.sync || {};
 

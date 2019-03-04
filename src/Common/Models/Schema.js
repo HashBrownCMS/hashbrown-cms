@@ -15,6 +15,7 @@ class Schema extends Resource {
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
+        this.def(String, 'type');
         this.def(String, 'parentSchemaId');
         this.def(Boolean, 'isLocked');
 
@@ -22,6 +23,15 @@ class Schema extends Resource {
         this.def(Object, 'sync');
 
         this.def(Array, 'hiddenProperties', []);
+    }
+
+    /**
+     * Gets a URL safe name for this schema
+     *
+     * @return {String} URL safe name
+     */
+    getUrlSafeName() {
+        return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     }
 
     /**

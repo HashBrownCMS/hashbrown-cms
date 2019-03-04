@@ -1,9 +1,6 @@
 'use strict';
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
-const Connection = require('Client/Models/Connection');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * The client side connection helper
@@ -46,7 +43,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {String} environment
      * @param {String} id
      *
-     * @return {Promise(Connection)} promise
+     * @return {Promise} Connection
      */
     static getConnectionById(project, environment, id) {
         checkParam(project, 'project', String);
@@ -73,11 +70,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      */
     static setMediaProvider(id) {
         return super.setMediaProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment,
+            HashBrown.Helpers.ProjectHelper.currentProject,
+            HashBrown.Helpers.ProjectHelper.currentEnvironment,
             id
         ).then(() => {
-            return RequestHelper.reloadResource('media');  
+            return HashBrown.Helpers.RequestHelper.reloadResource('media');  
         })
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();  
@@ -91,40 +88,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
      */
     static getMediaProvider() {
         return super.getMediaProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment
-        );
-    }
-    
-    /**
-     * Sets the Template provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-    static setTemplateProvider(id) {
-        return super.setTemplateProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment,
-            id
-        ).then(() => {
-            return RequestHelper.reloadResource('templates');  
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();  
-        });
-    }
-    
-    /**
-     * Gets the Template provider
-     *
-     * @returns {Promise} Connection
-     */
-    static getTemplateProvider() {
-        return super.getTemplateProvider(
-            ProjectHelper.currentProject,
-            ProjectHelper.currentEnvironment
+            HashBrown.Helpers.ProjectHelper.currentProject,
+            HashBrown.Helpers.ProjectHelper.currentEnvironment
         );
     }
 }

@@ -2,18 +2,13 @@
 *.swp
 *.swo
 node_modules/*
+package-lock.json
+.sass-cache/*
+/remote
 
 # Storage directories
 storage/*
+db/*
 
 # Config directories
 config/*
-
-# Database dumps
-dump/*
-
-# SSL
-certs/*
-
-# NPM
-package-lock.json

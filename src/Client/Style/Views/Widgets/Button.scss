@@ -80,11 +80,21 @@
     &.standard {
         background-color: $standard;
         color: $standard-text;
+        border-color: $standard-text;
+        
+        &:hover {
+            background-color: $standard-dark;
+        }
     }
 
     &.list-item {
         text-align: left;
         text-transform: none;
+    }
+
+    &.dashed {
+        border-style: dashed;
+        border-width: 1px;
     }
 
     .fa:first-child {

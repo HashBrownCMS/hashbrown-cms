@@ -21,6 +21,7 @@ class MediaController extends require('./ApiController') {
         app.post('/api/:project/:environment/media/new', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(), this.createMedia);
         app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setMediaTreeItem);
         app.post('/api/:project/:environment/media/:id', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(), this.setMedia);
+        app.post('/api/:project/:environment/media/rename/:id', this.middleware(), this.renameMedia);
         app.post('/api/:project/:environment/media/replace/:id', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(true), this.setMedia);
         
         app.delete('/api/:project/:environment/media/:id', this.middleware(), this.deleteMedia);
@@ -29,32 +30,29 @@ class MediaController extends require('./ApiController') {
     /**
      * Serves Media content
      */
-    static serveMedia(req, res) {
+    static async serveMedia(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-        .then((connection) => {
-            return connection.getMedia(id)
-            .then((media) => {
-                if(!media) {
-                    return res.status(404).send('Not found');
-                }
+        if(id.indexOf('?') > -1) {
+            id = id.substring(0, id.indexOf('?'));
+        }
 
-                // Serve local files directly
-                if(!media.url) {
-                    res.sendFile(media.path);
+        try {
+            let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
+            let media = await connection.getMedia(id);
 
-                // Serve remote files through redirection
-                // NOTE: Piping the data through would be a more elegant solution, but ultimately more work for the server
-                // NOTE: The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
-                } else {
-                    res.redirect(media.url);
-                }
-            });
-        })
-        .catch((e) => {
-            res.status(404).end(MediaController.printError(e, false));  
-        });
+            if(!media || (!media.url && !media.path)) {
+                return res.status(404).send('Not found');
+            }
+            
+            let data = await HashBrown.Helpers.MediaHelper.getCachedMedia(req.project, media, parseInt(req.query.width), parseInt(req.query.height));
+            
+            res.writeHead(200, {'Content-Type': media.getContentTypeHeader()});
+            res.end(data);
+
+        } catch(e) {
+            res.status(404).end(MediaController.printError(e, false)); 
+        }
     }
     
     /**
@@ -119,11 +117,13 @@ class MediaController extends require('./ApiController') {
 
         HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
+            if(!connection) { return Promise.resolve([]); }
+
             return connection.getAllMedia();
         })
         .then((result) => {
             media = result;
-
+            
             return HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
         })
         .then((result) => {
@@ -187,7 +187,10 @@ class MediaController extends require('./ApiController') {
     static deleteMedia(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
+        HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
+        .then(() => {
+            return HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
+        })
         .then((connection) => {
             return connection.removeMedia(id);
         })
@@ -198,9 +201,32 @@ class MediaController extends require('./ApiController') {
             res.status(404).send(MediaController.printError(e));
         });            
     }
-
+    
     /**
-     * @example GET /api/:project/:environment/media/:id
+     * @example POST /api/:project/:environment/media/rename/:id
+     *
+     * @apiGroup Media
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} name
+     */
+    static renameMedia(req, res) {
+        let id = req.params.id;
+        let name = req.query.name;
+
+        HashBrown.Helpers.MediaHelper.renameMedia(req.project, req.environment, id, name)
+        .then(() => {
+            res.status(200).send(id);
+        })            
+        .catch((e) => {
+            res.status(400).send(MediaController.printError(e));
+        });            
+    }
+    
+    /**
+     * @example POST /api/:project/:environment/media/:id
      *
      * @apiGroup Media
      *
@@ -208,7 +234,7 @@ class MediaController extends require('./ApiController') {
      * @param {String} environment
      * @param {String} id
      *
-     * @param {FileData} files Binary Media data
+     * @param {FileData} Binary Media data
      */
     static setMedia(req, res) {
         let file = req.file;
@@ -220,14 +246,11 @@ class MediaController extends require('./ApiController') {
         }
 
         if(file) {
-            return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
+            HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
             .then(() => {
-                // Remove temp file
-                if(FileSystem.existsSync(file.path)) {
-                    FileSystem.unlinkSync(file.path);
-                }
-
-                // Return the id
+                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
+            })
+            .then(() => {
                 res.status(200).send(id);
             })            
             .catch((e) => {
@@ -279,7 +302,7 @@ class MediaController extends require('./ApiController') {
                 res.status(200).send(ids);
             })
             .catch((e) => {
-                res.status(400).send(MediaController.printError(e));    
+                res.status(500).send(MediaController.printError(e));    
             });
 
         } else {

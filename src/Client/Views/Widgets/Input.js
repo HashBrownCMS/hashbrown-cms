@@ -1,13 +1,11 @@
 'use strict';
 
-const Widget = require('./Widget');
-
 /**
  * A versatile input widget
  *
  * @memberof HashBrown.Client.Views.Widgets
  */
-class Input extends Widget {
+class Input extends HashBrown.Views.Widgets.Widget {
     /**
      * Event: Change value
      *
@@ -112,6 +110,12 @@ class Input extends Widget {
 
                     this.onSubmit(new FormData(e.currentTarget), input.files);
                 });
+            
+            case 'textarea':
+                return _.textarea(config, config.value)
+                    .on('input', (e) => {
+                        this.onChangeInternal(e.currentTarget.value);
+                    });
 
             default:
                 return _.input(config)

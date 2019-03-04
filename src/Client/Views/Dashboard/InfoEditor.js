@@ -1,7 +1,5 @@
 'use strict';
 
-const SettingsHelper = require('Client/Helpers/SettingsHelper');
-
 /**
  * The info settings editor
  *
@@ -32,7 +30,7 @@ class InfoEditor extends HashBrown.Views.Modals.Modal {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info)
+        HashBrown.Helpers.SettingsHelper.setSettings(this.model.id, null, 'info', this.model.settings.info)
         .then(() => {
             this.close();
 

@@ -15,7 +15,6 @@ class NavbarMain extends Crisp.View {
         HashBrown.Views.Navigation.ContentPane.init();
         HashBrown.Views.Navigation.MediaPane.init();
         HashBrown.Views.Navigation.FormsPane.init();
-        HashBrown.Views.Navigation.TemplatePane.init();
         HashBrown.Views.Navigation.ConnectionPane.init();
         HashBrown.Views.Navigation.SchemaPane.init();
 
@@ -24,6 +23,34 @@ class NavbarMain extends Crisp.View {
         $('.page--environment__space--nav').html(this.$element);
     }
     
+    /**
+     * Event: Change filter
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} search
+     */
+    onChangeFilter($pane, pane, search) {
+        search = search.toLowerCase();
+
+        $pane.find('.navbar-main__pane__item').each((i, item) => {
+            let label = item.querySelector('.navbar-main__pane__item__label').innerText.toLowerCase();
+
+            item.classList.toggle('filter-not-matched', label.indexOf(search) < 0);
+        });
+    }
+
+    /**
+     * Event: Change sorting
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} sortingMethod
+     */
+    onChangeSorting($pane, pane, sortingMethod) {
+        this.applySorting($pane, pane, sortingMethod);
+    }
+
     /**
      * Event: Error was returned
      */
@@ -44,17 +71,11 @@ class NavbarMain extends Crisp.View {
      * Event: Click tab
      */
     onClickTab(e) {
-        let route = e.currentTarget.dataset.route;
-        let $currentTab = this.$element.find('.navbar-main__pane.active');
-
-        if(route == $currentTab.attr('data-route')) {
-            location.hash = route;
+        e.preventDefault();
         
-        } else {
-            this.showTab(route);
+        location.hash = e.currentTarget.dataset.route;
         
-        }
-        
+        $('.navbar-main__pane__item.active').toggleClass('active', false);
         $('.page--environment__space--nav').toggleClass('expanded', true);
     }
 
@@ -100,28 +121,27 @@ class NavbarMain extends Crisp.View {
             buttons: {},
             panes: {},
             items: {},
-            scroll: $('.navbar-main__pane.active .navbar-main__pane').scrollTop() || 0
+            scroll: $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop() || 0
         };
         
         this.$element.find('.navbar-main__tab').each((i, element) => {
-            let $button = $(element);
-            let key = $button.data('route');
+            let key = element.dataset.route;
 
-            this.state.buttons[key] = $button[0].className;
+            if(!key) { return; }
+
+            this.state.buttons[key] = element.className;
         });
         
         this.$element.find('.navbar-main__pane').each((i, element) => {
-            let $pane = $(element);
-            let key = $pane.data('route');
+            let key = element.dataset.route;
 
-            this.state.panes[key] = $pane[0].className;
+            this.state.panes[key] = element.className;
         });
 
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let $item = $(element);
-            let key = $item.data('routing-path');
+            let key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-            this.state.items[key] = $item[0].className.replace('loading', '');
+            this.state.items[key] = element.className.replace('loading', '');
         });
     }
 
@@ -133,35 +153,33 @@ class NavbarMain extends Crisp.View {
 
         // Restore tab buttons
         this.$element.find('.navbar-main__tab').each((i, element) => {
-            let $button = $(element);
-            let key = $button.data('route');
+            let key = element.dataset.route;
 
-            if(this.state.buttons[key]) {
-                $button[0].className = this.state.buttons[key];
+            if(key && this.state.buttons[key]) {
+                element.className = this.state.buttons[key];
             }
         });
         
         // Restore pane containers
         this.$element.find('.navbar-main__pane').each((i, element) => {
-            let $pane = $(element);
-            let key = $pane.data('route');
+            let key = element.dataset.route;
 
-            if(this.state.panes[key]) {
-                $pane[0].className = this.state.panes[key];
+            if(key && this.state.panes[key]) {
+                element.className = this.state.panes[key];
             }
         });
 
         // Restore pane items
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let $item = $(element);
-            let key = $item.data('routing-path');
+            let key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-            if(this.state.items[key]) {
-                $item[0].className = this.state.items[key];
+            if(key && this.state.items[key]) {
+                element.className = this.state.items[key];
             }
         });
 
-        $('.navbar-main__pane.active .navbar-main__pane__content').scrollTop(this.state.scroll || 0);
+        // Restore scroll position
+        $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this.state.scroll || 0);
 
         this.state = null;
     }
@@ -341,22 +359,33 @@ class NavbarMain extends Crisp.View {
      *
      * @param {HTMLElement} $pane
      * @param {Object} pane
+     * @param {String} sortingMethod
      */
-    applySorting($pane, pane) {
-        $pane = $pane.children('.navbar-main__pane');
+    applySorting($pane, pane, sortingMethod) {
+        let performSort = (a, b) => {
+            switch(sortingMethod) {
+                case 'alphaAsc':
+                    return a.querySelector('.navbar-main__pane__item__label').innerText > b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+                
+                case 'alphaDesc':
+                    return a.querySelector('.navbar-main__pane__item__label').innerText < b.querySelector('.navbar-main__pane__item__label').innerText ? 1 : -1;
+                
+                case 'dateAsc':
+                    return new Date(a.dataset.updateDate) > new Date(b.dataset.updateDate) ? 1 : -1;
+                
+                case 'dateDesc':
+                    return new Date(a.dataset.updateDate) < new Date(b.dataset.updateDate) ? 1 : -1;
 
-        // Sort direct children
-        $pane.find('>.navbar-main__pane__item').sort((a, b) => {
-            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-        }).appendTo($pane);
-        
-        // Sort nested children
-        $pane.find('.navbar-main__pane__item .navbar-main__pane__item__children').each((i, children) => {
-            let $children = $(children);
+                default:
+                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
+            }
+        };
 
-            $children.find('>.navbar-main__pane__item').sort((a, b) => {
-                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
-            }).appendTo($children);
+        // Sort direct and nested children
+        $pane.find('.navbar-main__pane__items, .navbar-main__pane__item .navbar-main__pane__item__children').each((i, container) => {
+            let $nestedChildren = $(container).find('>.navbar-main__pane__item');
+            $nestedChildren.sort(performSort);
+            $nestedChildren.appendTo($(container));
         });
     }
 

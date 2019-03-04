@@ -163,7 +163,19 @@
             display: flex;
             flex-direction: column;
         }
-       
+      
+        // Filter/sort bar
+        &__filter-sort-bar {
+            margin: 0 !important;
+            padding: 0.5rem;
+            background-color: $secondary;
+
+            // Tablet mode
+            @media($sm) {
+                display: none;
+            }   
+        }
+
         // Move buttons
         &__move-buttons {
             padding: 1rem;
@@ -264,24 +276,17 @@
             position: relative;
             user-select: none;
 
-            // Active state
-            &.active:before { 
-                content: '';
-                display: block;
-                height: 4rem;
-                width: 100%;
-                background-color: $primary;
-                position: absolute;
-                left: 0;
-            }
+            // Filter not matched
+            &.filter-not-matched {
+                opacity: 0.5;
+                pointer-events: none;
+            }   
 
+            // Active state
             &.active > &__content {
                 font-weight: 700;
                 color: $primary-text;
-
-                &:hover {
-                    background-color: transparent;
-                }
+                background-color: $primary;
 
                 &:after {
                     color: $primary-text !important;
@@ -289,7 +294,7 @@
                 }
             }
 
-            &.active &__toggle-children {
+            &.active > &__content &__toggle-children {
                 color: $primary-text;
             }
 

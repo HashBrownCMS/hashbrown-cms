@@ -2,14 +2,16 @@
 
 const Path = require('path');
 const FileSystem = require('fs');
+
+// TODO: Make these GIT submodules
 const RimRaf = require('rimraf');
 const Multer = require('multer');
-
-const Media = require('Server/Models/Media');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
+const Glob = require('glob');
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
+
+const WATCH_CACHE_INTERVAL = 1000 * 60; // One minute
+const MAX_CACHE_TIME = 1000 * 60 * 60 * 24 * 10 // 10 days
 
 /**
  * The helper class for Media
@@ -17,6 +19,17 @@ const MediaHelperCommon = require('Common/Helpers/MediaHelper');
  * @memberof HashBrown.Server.Helpers
  */
 class MediaHelper extends MediaHelperCommon {
+    /**
+     * Start watching cache
+     */
+    static startWatchingCache() {
+        setInterval(() => {
+            this.cleanCache();
+        }, WATCH_CACHE_INTERVAL);
+
+        this.cleanCache();
+    }
+    
     /**
      * Gets the upload handler
      *
@@ -43,17 +56,7 @@ class MediaHelper extends MediaHelperCommon {
                     }
                 },
                 filename: (req, file, resolve) => {
-                    let split = file.originalname.split('.');
-                    let name = split[0];
-                    let extension = split[1];
-                    
-                    name = name.replace(/\W+/g, '-').toLowerCase();
-                   
-                    if(extension) {
-                        name += '.' + extension;
-                    }
-
-                    resolve(null, name);
+                    resolve(null, file.originalname);
                 }
             })
         })
@@ -97,72 +100,28 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
-     * Sets a Media object
+     * Renames a Media object
      *
-     * @param {Number} id
-     * @param {Object} file
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} name
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
-    static setMediaData(id, file) {
-        checkParam(id, 'id', Number);
-        checkParam(file, 'file', Object);
+    static renameMedia(project, environment, id, name) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(name, 'name', String);
 
-        return new Promise((resolve, reject) => {
-            let oldPath = file.path;
-            let name = Path.basename(oldPath);
-            let newDir = this.getMediaPath() + id;
-            let newPath = newDir + '/' + name;
-
-            debug.log('Setting media data at "' + newPath + '"...', this);
-
-            // First check if the given directory exists
-            // If it doesn't, create it with parents recursively
-            if(!FileSystem.existsSync(newDir)){
-                this.mkdirRecursively(newDir, (err) => {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        // Move the temp file to the new path
-                        FileSystem.rename(oldPath, newPath, function(err) {
-                            if(err) {
-                                reject(new Error(err));
-                            
-                            } else {
-                                resolve();
-
-                            }
-                        });
-                    
-                    }
-                });
-
-            // If it does exist, remove the directory
-            } else {
-                RimRaf(newDir, function(err) {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        // Move the temp file to the new path
-                        FileSystem.rename(oldPath, newPath, function(err) {
-                            if(err) {
-                                reject(new Error(err));
-                            
-                            } else {
-                                resolve();
-
-                            }
-                        });
-                    
-                    }
-                });
-            }
-
+        // Get Media provider
+        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
+        .then((provider) => {
+            return provider.renameMedia(id, name);
         });
     }
-
+    
     /**
      * Uploads a file from temp storage
      *
@@ -188,6 +147,8 @@ class MediaHelper extends MediaHelperCommon {
             connection = provider;
 
             // Read the file from temp
+            debug.log('Reading file from temp dir ' + tempPath + '...', this);
+
             return new Promise((resolve, reject)  => {
                 FileSystem.readFile(tempPath, (err, fileData) => {
                     if(err) { return reject(err); }
@@ -198,14 +159,16 @@ class MediaHelper extends MediaHelperCommon {
         })
         .then((fileData) => {
             // Upload the data
+            debug.log('Uploading file...', this);
+            
             return connection.setMedia(id, filename, fileData.toString('base64'));
         })
         .then(() => {
             // Remove the file from temp storage
+            debug.log('Removing temp file...', this);
+            
             return new Promise((resolve, reject)  => {
                 FileSystem.unlink(tempPath, (err) => {
-                    if(err) { return reject(err); }
-
                     resolve();
                 });
             });
@@ -215,8 +178,7 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
-     * NOTE:
-     * This method, as opposed to most other resource methods, does not merge
+     * NOTE: This method, as opposed to most other resource methods, does not merge
      * local and remote resources since it would be too complicated in the end
      *
      * @param {String} project
@@ -230,10 +192,10 @@ class MediaHelper extends MediaHelperCommon {
 
         let collection = environment + '.media';
        
-        return SyncHelper.getResource(project, environment, 'media/tree')
+        return HashBrown.Helpers.SyncHelper.getResource(project, environment, 'media/tree')
         .then((tree) => {
             if(!tree || tree.length < 1) {
-                return DatabaseHelper.find(project, environment + '.media', {});
+                return HashBrown.Helpers.DatabaseHelper.find(project, environment + '.media', {});
             }
 
             return Promise.resolve(tree);   
@@ -278,13 +240,13 @@ class MediaHelper extends MediaHelperCommon {
         checkParam(id, 'id', String);
         checkParam(item, 'item', Object);
 
-        return SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
+        return HashBrown.Helpers.SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
         .then((wasItemSet) => {
             if(wasItemSet) { return Promise.resolve(); }        
 
             // Remove the item if it's null
             if(!item) {
-                return DatabaseHelper.removeOne(
+                return HashBrown.Helpers.DatabaseHelper.removeOne(
                     project,
                     environment + '.media',
                     {
@@ -296,7 +258,7 @@ class MediaHelper extends MediaHelperCommon {
             } else {
                 item.id = id;
 
-                return DatabaseHelper.updateOne(
+                return HashBrown.Helpers.DatabaseHelper.updateOne(
                     project,
                     environment + '.media',
                     {
@@ -321,7 +283,120 @@ class MediaHelper extends MediaHelperCommon {
     static getTempPath(project) {
         checkParam(project, 'project', String);
 
-        return Path.join(appRoot, 'storage', project, 'temp');
+        return Path.join(APP_ROOT, 'storage', project, 'temp');
+    }
+
+    /**
+     * Cleans the Media cache
+     */
+    static cleanCache() {
+        let storageFolder = Path.join(APP_ROOT, 'storage');
+       
+        if(!FileSystem.existsSync(storageFolder)) { return; }
+
+        FileSystem.readdir(storageFolder, (err, folders) => {
+            if(err) { return; }
+        
+            for(let folder of folders) { 
+                let cacheFolder = Path.join(storageFolder, folder, 'cache');
+
+                if(!FileSystem.existsSync(cacheFolder)) { continue; }
+
+                FileSystem.readdir(cacheFolder, (err, files) => {
+                    if(err) { return; }
+                    
+                    for(let file of files) {
+                        let cachedFile = Path.join(cacheFolder, file);
+
+                        FileSystem.stat(cachedFile, (err, stats) => {
+                            if(err) { return; }
+
+                            if(new Date().getTime() - new Date(stats.atime).getTime() > MAX_CACHE_TIME) {
+                                FileSystem.unlink(cachedFile, (err) => { });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Removes a cached version of a Media object
+     *
+     * @param {String} project
+     * @param {String} id
+     * 
+     * @return {Promise} Result
+     */
+    static removeCachedMedia(project, id) {
+        checkParam(project, 'project', String);
+        checkParam(id, 'id', String);
+
+        let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
+        let cachedPath = Path.join(cacheFolder, id);
+     
+        return HashBrown.Helpers.FileHelper.remove(cachedPath + '*');
+    }
+
+
+    /**
+     * Gets a cached version of a Media object
+     *
+     * @param {String} project
+     * @param {Media} media
+     * @param {Number} width
+     * @param {Number} height
+     *
+     * @returns {Promise} Media
+     */
+    static async getCachedMedia(project, media, width = 0, height = 0) {
+        checkParam(project, 'project', String);
+        checkParam(media, 'media', HashBrown.Models.Media);
+        checkParam(width, 'width', Number);
+        checkParam(height, 'height', Number);
+
+        let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
+        let cachedPath = Path.join(cacheFolder, media.id);
+        
+        if(width) {
+            cachedPath += '_' + width;
+        }
+        
+        if(height) {
+            cachedPath += 'x' + height;
+        }
+
+        // Create the cache folder, if it doesn't exist
+        await HashBrown.Helpers.FileHelper.makeDirectory(cacheFolder);
+
+        let data = null;
+       
+        // Read the data
+        try {
+            data = await HashBrown.Helpers.FileHelper.read(cachedPath);
+        
+        // File wasn't found, copy it
+        } catch(e) {
+            // Download with web request
+            if(media.url) {
+                await HashBrown.Helpers.RequestHelper.download(media.url, cachedPath);
+
+            // Copy from file system
+            } else {
+                await HashBrown.Helpers.FileHelper.copy(media.path, cachedPath);
+               
+                // Resize file
+                if(width && media.isImage() && !media.isSvg()) { 
+                    await HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
+                }
+            }
+
+            // Read file
+            data = await HashBrown.Helpers.FileHelper.read(cachedPath);
+        }
+
+        return data;
     }
 }
 

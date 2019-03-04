@@ -3,11 +3,10 @@
 /**
  * @namespace HashBrown.Client.Views.Dashboard
  */
-module.exports = {
-    BackupEditor: require('./BackupEditor'),
-    InfoEditor: require('./InfoEditor'),
-    LanguageEditor: require('./LanguageEditor'),
-    MigrationEditor: require('./MigrationEditor'),
-    ProjectEditor: require('./ProjectEditor'),
-    SyncEditor: require('./SyncEditor')
-};
+namespace('Views.Dashboard')
+.add(require('./BackupEditor'))
+.add(require('./InfoEditor'))
+.add(require('./LanguageEditor'))
+.add(require('./MigrationEditor'))
+.add(require('./ProjectEditor'))
+.add(require('./SyncEditor'));

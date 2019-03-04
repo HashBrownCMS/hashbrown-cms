@@ -1,11 +1,6 @@
 'use strict';
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
-const ContentHelper = require('Server/Helpers/ContentHelper');
-const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
-const SyncHelper = require('Server/Helpers/SyncHelper');
-
-const Connection = require('Server/Models/Connection');
 
 /**
  * The helper class for Connections
@@ -154,7 +149,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             // Update published flag
             content.isPublished = true;
 
-            return ContentHelper.setContentById(project, environment, content.id, content, user);
+            return HashBrown.Helpers.ContentHelper.setContentById(project, environment, content.id, content, user);
         });
     }
     
@@ -197,7 +192,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             // Update published flag
             content.isPublished = false;
 
-            return ContentHelper.setContentById(project, environment, content.id, content, user);
+            return HashBrown.Helpers.ContentHelper.setContentById(project, environment, content.id, content, user);
         });
     }
 
@@ -215,15 +210,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         let collection = environment + '.connections';
         
-        return DatabaseHelper.find(
+        return HashBrown.Helpers.DatabaseHelper.find(
             project,
             collection,
             {}
         ).then((array) => {
-            return SyncHelper.mergeResource(project, environment, 'connections', array)
+            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
-                    connections[i] = new Connection(connections[i]);
+                    connections[i] = new HashBrown.Models.Connection(connections[i]);
                 }
 
                 return Promise.resolve(connections);
@@ -247,7 +242,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         let collection = environment + '.connections';
        
-        return DatabaseHelper.findOne(
+        return HashBrown.Helpers.DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -255,17 +250,17 @@ class ConnectionHelper extends ConnectionHelperCommon {
             }
         ).then((data) => {
             if(!data) {
-                return SyncHelper.getResourceItem(project, environment, 'connections', id)
+                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
                     if(!resourceItem) {
                         return Promise.reject(new Error('Connection by id "' + id + '" was not found'));
                     }
 
-                    return Promise.resolve(new Connection(resourceItem));
+                    return Promise.resolve(new HashBrown.Models.Connection(resourceItem));
                 });
             } 
             
-            return Promise.resolve(new Connection(data));
+            return Promise.resolve(new HashBrown.Models.Connection(data));
         });
     }
     
@@ -285,7 +280,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         let collection = environment + '.connections';
         
-        return DatabaseHelper.removeOne(
+        return HashBrown.Helpers.DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -319,7 +314,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             hasRemote: false
         };
         
-        return DatabaseHelper.updateOne(
+        return HashBrown.Helpers.DatabaseHelper.updateOne(
             project,
             environment + '.connections',
             {
@@ -346,9 +341,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
-        let connection = Connection.create();
+        let connection = HashBrown.Models.Connection.create();
 
-        return DatabaseHelper.insertOne(
+        return HashBrown.Helpers.DatabaseHelper.insertOne(
             project,
             environment + '.connections',
             connection.getObject()

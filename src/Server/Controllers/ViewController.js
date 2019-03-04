@@ -1,22 +1,17 @@
 'use strict';
 
 const FileSystem = require('fs');
-const Marked = require('marked');
 const OS = require('os');
 
-const ProjectHelper = require('Server/Helpers/ProjectHelper');
-const UserHelper = require('Server/Helpers/UserHelper');
-const ConfigHelper = require('Server/Helpers/ConfigHelper');
-
-const Controller = require('./Controller');
-const ApiController = require('./ApiController');
+// TODO: Make this a GIT submodule
+const Marked = require('marked');
 
 /**
  * The controller for views
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ViewController extends Controller {
+class ViewController extends HashBrown.Controllers.Controller {
     /**
      * Initialises this controller
      */
@@ -52,7 +47,7 @@ class ViewController extends Controller {
                     break;
             }
 
-            FileSystem.readFile(appRoot + '/' + filename, (err, file) => {
+            FileSystem.readFile(APP_ROOT + '/' + filename, (err, file) => {
                 if(err) {
                     res.status(400).render('error', { message: e.message });
                 } else {
@@ -63,7 +58,7 @@ class ViewController extends Controller {
 
         // First time setup
         app.get('/setup/:step', (req, res) => {
-            return UserHelper.getAllUsers()
+            return HashBrown.Helpers.UserHelper.getAllUsers()
             .then((users) => {
                 if(users && users.length > 0) { 
                     return res.status(400).render('error', { message: 'Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.' });
@@ -76,7 +71,7 @@ class ViewController extends Controller {
         // Login
         app.get('/login/', (req, res) => {
             if(req.query.inviteToken) {
-                UserHelper.findInviteToken(req.query.inviteToken)
+                HashBrown.Helpers.UserHelper.findInviteToken(req.query.inviteToken)
                 .then((user) => {
                     res.render('login', {
                         invitedUser: user
@@ -87,7 +82,7 @@ class ViewController extends Controller {
                 });
 
             } else {
-                UserHelper.getAllUsers()
+                HashBrown.Helpers.UserHelper.getAllUsers()
                 .then((users) => {
                     if(!users || users.length < 1) { 
                         res.redirect('/setup/1');
@@ -110,7 +105,7 @@ class ViewController extends Controller {
                     tab: req.params.tab,
                     os: OS,
                     user: user,
-                    app: require(appRoot + '/package.json')
+                    app: require(APP_ROOT + '/package.json')
                 });
             })
             .catch((e) => {
@@ -118,12 +113,43 @@ class ViewController extends Controller {
             });
         });
 
+        // Test
+        app.get('/test', (req, res) => {
+            res.redirect('/test/frontend');
+        });
+
+        app.get('/test/:tab', (req, res) => {
+            ViewController.authenticate(req.cookies.token, null, null, true)
+            .then((user) => {
+                FileSystem.readFile(APP_ROOT + '/public/md/ui-checklist.md', (err, file) => {
+                    if(err) {
+                        return res.status(400).render('error', { message: err.message });
+                    }
+                
+                    res.render('test', {
+                        user: user,
+                        tab: req.params.tab,
+                        uiChecklistHtml: Marked(file.toString())
+                    });
+                });
+
+            })
+            .catch((e) => {
+                res.status(400).render('error', { message: e.message });
+            });
+        });
+
+        // Demo
+        app.get('/demo/', (req, res) => {
+            res.render('demo');
+        });
+
         // Environment
         app.get('/:project/:environment/', (req, res) => {
             let user;
             let project;
 
-            ProjectHelper.getProject(req.params.project)
+            HashBrown.Helpers.ProjectHelper.getProject(req.params.project)
             .then((result) => {
                 project = result;
 
@@ -150,37 +176,6 @@ class ViewController extends Controller {
             .catch((e) => {
                 res.status(400).render('error', { message: e.message });
             });
-        });
-
-        // Test
-        app.get('/:project/:environment/test', (req, res) => {
-            res.redirect('/' + req.params.project + '/' + req.params.environment + '/test/frontend');
-        });
-
-        app.get('/:project/:environment/test/:tab', (req, res) => {
-            ViewController.authenticate(req.cookies.token)
-            .then((user) => {
-                FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
-                    if(err) {
-                        return res.status(400).render('error', { message: err.message });
-                    }
-                
-                    res.render('test', {
-                        user: user,
-                        tab: req.params.tab,
-                        uiChecklistHtml: Marked(file.toString())
-                    });
-                });
-
-            })
-            .catch((e) => {
-                res.status(400).render('error', { message: e.message });
-            });
-        });
-
-        // Demo
-        app.get('/demo/', (req, res) => {
-            res.render('demo');
         });
     }
 }

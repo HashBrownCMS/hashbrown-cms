@@ -1,10 +1,5 @@
 'use strict';
 
-const ContentSchema = require('Common/Models/ContentSchema');
-const FieldSchema = require('Common/Models/FieldSchema');
-
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
 
 /**
@@ -25,7 +20,7 @@ class SchemaHelper extends SchemaHelperCommon {
             return Promise.resolve(null);
         }
         
-        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true')
+        return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true')
         .then((schema) => {
             return Promise.resolve(SchemaHelper.getModel(schema));
         });
@@ -43,7 +38,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         if(fieldSchema) {
             let nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
-            let compiledSchema = new FieldSchema(fieldSchema.getObject());
+            let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
            
             while(nextSchema) {
                 compiledSchema.appendConfig(nextSchema.config);
@@ -63,7 +58,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @return {Promise} Promise
      */
     static getSchemaById(id) {
-        return RequestHelper.request('get', 'schemas/' + id)
+        return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id)
         .then((schema) => {
             return Promise.resolve(this.getModel(schema));
         });
@@ -98,7 +93,7 @@ class SchemaHelper extends SchemaHelperCommon {
             let schema = resources.schemas[i];
 
             if(schema.id == id) {
-                if(schema instanceof ContentSchema || schema instanceof FieldSchema) {
+                if(schema instanceof HashBrown.Models.ContentSchema || schema instanceof HashBrown.Models.FieldSchema) {
                     return schema;
                 }
 

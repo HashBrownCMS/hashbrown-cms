@@ -1,7 +1,5 @@
 'use strict';
 
-const VERBOSITY = 2;
-
 /**
  * A helper for debugging
  *
@@ -101,7 +99,16 @@ class DebugHelper {
 
         return senderName;
     }
-    
+   
+    /**
+     * Gets the debug verbosity
+     *
+     * @returns {Number} Verbosity
+     */
+    static getDebugVerbosity() {
+        return 1;
+    }
+
     /**
      * Logs a message
      *
@@ -117,7 +124,7 @@ class DebugHelper {
             verbosity = 1;
         }
 
-        if(VERBOSITY >= verbosity) {
+        if(this.getDebugVerbosity() >= verbosity) {
             this.onLog(this.getDateString(), this.parseSender(sender), message);
         }
     }
@@ -125,15 +132,17 @@ class DebugHelper {
     /**
      * Shows an error
      *
-     * @param {String} message
+     * @param {String|Error} error
      * @param {Object} sender
      */
-    static error(message, sender) {
-        if(message instanceof Error) {
-            message = message.message || message.trace;
+    static error(error, sender) {
+        if(error instanceof Error !== true) {
+            error = new Error(error);
         }
 
-        this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
+        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
+    
+        throw error;
     }
 
     /**

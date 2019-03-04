@@ -1,0 +1,26 @@
+.field-editor--array {
+    &__item {
+        flex-wrap: wrap;
+
+        &.collapsed &__toolbar { display: none; }
+
+        &__toolbar {
+            flex-basis: 100%;
+            display: flex;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    // Grid
+    &.grid &__item {
+        float: left;
+        margin: 0.5rem;
+        width: calc(100% / 3 - 1rem);
+    }
+
+    // Sorting
+    &.sorting &__item__toolbar {
+        display: none;
+    }
+}

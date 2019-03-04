@@ -1,13 +1,11 @@
 'use strict';
 
-const ApiController = require('./ApiController');
-
 /**
  * The Controller for debugging
  *
  * @memberof HashBrown.Server.Controllers
  */
-class DebugController extends ApiController {
+class DebugController extends HashBrown.Controllers.ApiController {
     /**
      * Initialises this controller
      */

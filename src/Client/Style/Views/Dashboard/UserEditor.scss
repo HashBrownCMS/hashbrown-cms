@@ -1,0 +1,49 @@
+/**
+ * User editor
+ */
+.page--dashboard__user {
+    padding: 1rem;
+    margin: 0.5rem;
+    position: relative;
+    flex-grow: 0;
+    flex-basis: calc(33.33% - 1rem);
+    width: calc(33.33% - 1rem);
+    color: $standard-text;
+    background-color: $standard;
+    transform-origin: center;
+    transition: transform 0.25s ease;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+    
+    @media($sm) {
+        flex-basis: calc(50% - 1rem);
+        width: calc(50% - 1rem);
+    }
+
+    @media($xs) {
+        flex-basis: 0;
+        width: auto;
+    }
+
+    &__type {
+        margin-top: 0.5rem;
+
+        &__icon {
+            margin-right: 0.5rem;
+        }   
+    }
+
+    &__remove {
+        padding: 0rem;
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        display: block;
+        color: material-color('red', '500');
+    }
+
+    &__menu {
+        position: absolute !important;
+        right: 0.5rem;
+        top: 0.5rem;
+    }
+}

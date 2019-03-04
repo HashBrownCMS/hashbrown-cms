@@ -1,8 +1,5 @@
 'use strict';
 
-const MediaViewer = require('Client/Views/Editors/MediaViewer');
-const RequestHelper = require('Client/Helpers/RequestHelper');
-
 // Dashboard
 Crisp.Router.route('/media/', function() {
     Crisp.View.get('NavbarMain').showTab('/media/');
@@ -34,8 +31,8 @@ Crisp.Router.route('/media/', function() {
 
 // Preview
 Crisp.Router.route('/media/:id', function() {
-    let mediaViewer = new MediaViewer({
-        modelUrl: RequestHelper.environmentUrl('media/' + this.id)
+    let mediaViewer = new HashBrown.Views.Editors.MediaViewer({
+        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('media/' + this.id)
     });
     
     Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);

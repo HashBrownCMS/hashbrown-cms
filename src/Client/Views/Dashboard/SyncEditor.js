@@ -1,9 +1,5 @@
 'use strict';
 
-const RequestHelper = require('Client/Helpers/RequestHelper');
-const SettingsHelper = require('Client/Helpers/SettingsHelper');
-const ProjectHelper = require('Client/Helpers/ProjectHelper');
-
 /**
  * The sync settings editor
  *
@@ -46,7 +42,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
     onClickSave() {
         this.model.url = this.$element.find('input[name="url"]').val();
 
-        SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
+        HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
             this.close();
 
@@ -61,7 +57,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
     onClickApply() {
         this.model.url = this.$element.find('input[name="url"]').val();
 
-        SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
+        HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
             this.trigger('change', this.model);
         })
@@ -150,7 +146,7 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
                                     let username = tokenModal.element.querySelector('input[type="text"]').value;
                                     let password = tokenModal.element.querySelector('input[type="password"]').value;
                                     
-                                    RequestHelper.request(
+                                    HashBrown.Helpers.RequestHelper.request(
                                         'post',
                                         this.projectId + '/sync/login',
                                         {
