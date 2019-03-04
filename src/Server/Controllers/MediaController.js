@@ -117,6 +117,8 @@ class MediaController extends require('./ApiController') {
 
         HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
+            if(!connection) { return Promise.resolve([]); }
+
             return connection.getAllMedia();
         })
         .then((result) => {

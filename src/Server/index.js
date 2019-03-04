@@ -99,11 +99,7 @@ function ready(files) {
             process.exit();
             return;
         }
-    
-        // Check if any migrations are needed
-        return HashBrown.Helpers.SettingsHelper.migrationCheck();
-    })
-    .then(() => {
+        
         // Start HTTP server
         let port = process.env.PORT || 8080;
         

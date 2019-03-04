@@ -1,31 +1,32 @@
 version: "3.4"
 
 networks:
-    n-hashbrown: ~
+    hashbrown-cms--network: ~
     
 services:
     node:
         image: node
-        container_name: "hashbrown-node"
+        container_name: "hashbrown-cms--node"
         ports:
             - "8080:8080"
         depends_on:
             - mongodb
         networks:
-            - n-hashbrown
+            - hashbrown-cms--network
         restart: unless-stopped
         command: "node /opt/hashbrown-cms"
         environment:
             - MONGODB_HOST=mongodb
+            - DEBUG_VERBOSITY=4
         volumes:
             - "./:/opt/hashbrown-cms"
             - "./remote:/remote"
 
     mongodb:
         image: mongo
-        container_name: "hashbrown-mongo"
+        container_name: "hashbrown-cms--mongodb"
         networks:
-            - n-hashbrown
+            - hashbrown-cms--network
         restart: unless-stopped
         volumes:
             - "./db:/data/db"

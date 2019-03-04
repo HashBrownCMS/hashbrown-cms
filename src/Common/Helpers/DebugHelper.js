@@ -1,7 +1,5 @@
 'use strict';
 
-const VERBOSITY = 2;
-
 /**
  * A helper for debugging
  *
@@ -117,7 +115,9 @@ class DebugHelper {
             verbosity = 1;
         }
 
-        if(VERBOSITY >= verbosity) {
+        let debugVerbosity = process.env.DEBUG_VERBOSITY || 1;
+
+        if(debugVerbosity >= verbosity) {
             this.onLog(this.getDateString(), this.parseSender(sender), message);
         }
     }

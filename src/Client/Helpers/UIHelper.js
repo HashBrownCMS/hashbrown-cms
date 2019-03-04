@@ -561,11 +561,9 @@ class UIHelper {
             error = new Error(error.toString());
 
         }
-        
-        setTimeout(() => {
-            throw error;
-        }, 100);
-        
+       
+        debug.log(error.message, error.stack, 'HashBrown');
+
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
     

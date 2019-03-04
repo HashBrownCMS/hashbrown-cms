@@ -98,7 +98,9 @@ document.addEventListener('DOMContentLoaded', function () {
   window.Promise = __webpack_require__(1); // Helper shortcuts
 
   window.debug = HashBrown.Helpers.DebugHelper;
-  window.UI = HashBrown.Helpers.UIHelper; // Get current user
+  window.UI = HashBrown.Helpers.UIHelper; // Error handling
+
+  window.onerror = UI.errorModal; // Get current user
 
   HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
     HashBrown.Models.User.current = new HashBrown.Models.User(user);

@@ -35,6 +35,8 @@ class Connection extends ConnectionCommon {
 
             if(processor) {
                 params.processor = new processor(params.processor);
+            } else {
+                params.processor = new HashBrown.Models.Processor(params.processor);
             }
         }
         
@@ -43,6 +45,8 @@ class Connection extends ConnectionCommon {
 
             if(deployer) {
                 params.deployer = new deployer(params.deployer);
+            } else {
+                params.deployer = new HashBrown.Models.Deployer(params.deployer);
             }
         }
 

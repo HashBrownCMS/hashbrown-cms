@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.debug = HashBrown.Helpers.DebugHelper;
     window.UI = HashBrown.Helpers.UIHelper;
 
+    // Error handling
+    window.onerror = UI.errorModal;
+
     // Get current user
     HashBrown.Helpers.RequestHelper.request('get', 'user')
     .then((user) => {

@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.debug = HashBrown.Helpers.DebugHelper;
     window.UI = HashBrown.Helpers.UIHelper;
 
+    // Error handling
+    window.onerror = UI.errorModal;
+    
     // Get package file
     window.app = require('package.json');
 
