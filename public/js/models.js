@@ -22360,7 +22360,9 @@ function (_Entity) {
      * @returns {Object} Params
      */
     value: function paramsCheck(params) {
-      params = params || {}; // Convert from old sync variables
+      params = params || {}; // Remove MongoDB id
+
+      delete params._id; // Convert from old sync variables
 
       params.sync = params.sync || {};
 
