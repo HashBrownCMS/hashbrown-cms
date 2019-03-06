@@ -6,8 +6,9 @@ Ever wonder why you have to run a completely separate CMS for every single proje
 
 ## Installing and running HashBrown
 First make sure you have these dependencies met:  
-- node.js >= v6 
-- mongodb >= v3.2  
+- node.js >= v10 
+- mongodb >= v4
+- imagemagick  
 
 Then checkout the code and install the dependencies:  
 ```
