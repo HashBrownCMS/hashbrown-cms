@@ -94,7 +94,7 @@
  * @namespace HashBrown.Client.Helpers
  */
 
-namespace('Helpers').add(__webpack_require__(65)).add(__webpack_require__(232)).add(__webpack_require__(234)).add(__webpack_require__(236)).add(__webpack_require__(238)).add(__webpack_require__(239)).add(__webpack_require__(242)).add(__webpack_require__(243)).add(__webpack_require__(244)).add(__webpack_require__(246)).add(__webpack_require__(248));
+namespace('Helpers').add(__webpack_require__(65)).add(__webpack_require__(232)).add(__webpack_require__(234)).add(__webpack_require__(236)).add(__webpack_require__(238)).add(__webpack_require__(239)).add(__webpack_require__(242)).add(__webpack_require__(243)).add(__webpack_require__(249)).add(__webpack_require__(244)).add(__webpack_require__(246)).add(__webpack_require__(248));
 
 /***/ }),
 /* 65 */
@@ -26760,6 +26760,26 @@ function () {
 }();
 
 module.exports = UIHelper;
+
+/***/ }),
+/* 249 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * A helper class for accessing resources on the server and in cache
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ResourceHelper = function ResourceHelper() {
+  _classCallCheck(this, ResourceHelper);
+};
+
+module.exports = ResourceHelper;
 
 /***/ })
 /******/ ]));

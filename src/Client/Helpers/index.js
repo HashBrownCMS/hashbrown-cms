@@ -12,6 +12,7 @@ namespace('Helpers')
 .add(require('./MediaHelper'))
 .add(require('./ProjectHelper'))
 .add(require('./RequestHelper'))
+.add(require('./ResourceHelper'))
 .add(require('./SchemaHelper'))
 .add(require('./SettingsHelper'))
 .add(require('./UIHelper'));
