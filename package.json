@@ -1,8 +1,8 @@
 {
   "name": "hashbrown-cms",
   "repository": "https://github.com/HashBrownCMS/hashbrown-cms.git",
-  "version": "1.1.0",
-  "description": "The pluggable CMS",
+  "version": "1.1.1",
+  "description": "A free and open-source headless CMS",
   "main": "hashbrown.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
