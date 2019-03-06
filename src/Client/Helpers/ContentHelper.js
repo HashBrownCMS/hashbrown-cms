@@ -35,10 +35,7 @@ class ContentHelper extends ContentHelperCommon {
     static getContentById(id) {
         if(!id) { return Promise.resolve(null); }
 
-        return HashBrown.Helpers.RequestHelper.request('get', 'content/' + id)
-        .then((content) => {
-            return Promise.resolve(new HashBrown.Models.Content(content));
-        });
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content', id);
     }
     
     /**
@@ -53,10 +50,7 @@ class ContentHelper extends ContentHelperCommon {
         checkParam(id, 'id', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
-        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content.getObject())
-        .then((content) => {
-            return Promise.resolve(content);
-        });
+        return HashBrown.Helpers.ResourceHelper.set('content', id, content);
     }
 
     /**
