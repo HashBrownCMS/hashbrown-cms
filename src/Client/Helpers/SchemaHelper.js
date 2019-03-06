@@ -36,18 +36,18 @@ class SchemaHelper extends SchemaHelperCommon {
     static getFieldSchemaWithParentConfigs(id) {
         let fieldSchema = this.getSchemaByIdSync(id);
 
-        if(fieldSchema) {
-            let nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
-            let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
-           
-            while(nextSchema) {
-                compiledSchema.appendConfig(nextSchema.config);
+        if(!fieldSchema) { return null; }
 
-                nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
-            }
+        let nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
+        let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
+       
+        while(nextSchema) {
+            compiledSchema.appendConfig(nextSchema.config);
 
-            return compiledSchema;
+            nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
         }
+
+        return compiledSchema;
     }
 
     /**

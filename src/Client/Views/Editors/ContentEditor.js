@@ -211,9 +211,7 @@ class ContentEditor extends Crisp.View {
     renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
         let compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
-        if(!compiledSchema) {
-            return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
-        }
+        if(!compiledSchema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
 
         let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
           

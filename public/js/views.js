@@ -2890,7 +2890,7 @@ function (_Crisp$View) {
       var compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
       if (!compiledSchema) {
-        return debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
+        throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found');
       }
 
       var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
@@ -15766,15 +15766,15 @@ function (_HashBrown$Views$Edit) {
    *
    * @param {Object} newValue
    * @param {String} key
-   * @param {Object} keySchema
+   * @param {Object} keyConfig
    * @param {Boolean} isSilent
    */
 
 
   _createClass(StructEditor, [{
     key: "onChange",
-    value: function onChange(newValue, key, keySchema, isSilent) {
-      if (keySchema.multilingual) {
+    value: function onChange(newValue, key, keyConfig, isSilent) {
+      if (keyConfig.multilingual) {
         // Sanity check to make sure multilingual fields are accomodated for
         if (!this.value[key] || _typeof(this.value[key]) !== 'object') {
           this.value[key] = {};
@@ -15810,37 +15810,42 @@ function (_HashBrown$Views$Edit) {
       return _.div({
         class: 'field-editor field-editor--struct'
       }, // Loop through each key in the struct
-      _.each(compiledSchema.config.struct, function (k, keySchema) {
-        var value = _this2.value[k];
+      _.each(this.config.struct || compiledSchema.config.struct, function (keyName, keyConfig) {
+        var value = _this2.value[keyName];
 
-        if (!keySchema.schemaId) {
-          UI.errorModal(new Error('Schema id not set for key "' + k + '"'));
+        if (!keyConfig || !keyConfig.schemaId) {
+          throw new Error('Schema id not set for key "' + keyName + '"');
         }
 
-        var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
+        var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keyConfig.schemaId);
 
         if (!fieldSchema) {
-          UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
+          throw new Error('FieldSchema "' + keyConfig.schemaId + '" could not be found for key "' + keyName + '"');
         }
 
-        var fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId); // Sanity check
+        var fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId);
 
-        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keySchema);
-        _this2.value[k] = value; // Init the field editor
+        if (!fieldEditor) {
+          throw new Error('FieldEditor ' + fieldSchema.editorId + ' could not be found for FieldSchema ' + fieldSchema.id);
+        } // Sanity check
+
+
+        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keyConfig);
+        _this2.value[keyName] = value; // Init the field editor
 
         var fieldEditorInstance = new fieldEditor({
-          value: keySchema.multilingual ? value[window.language] : value,
-          disabled: keySchema.disabled || false,
-          config: keySchema.config || fieldSchema.config || {},
-          schema: keySchema,
+          value: keyConfig.multilingual ? value[window.language] : value,
+          disabled: keyConfig.disabled || false,
+          config: keyConfig.config || fieldSchema.config || {},
+          schema: fieldSchema,
           className: 'editor__field__value'
         }); // Hook up the change event
 
         fieldEditorInstance.on('change', function (newValue) {
-          _this2.onChange(newValue, k, keySchema);
+          _this2.onChange(newValue, keyName, keyConfig);
         });
         fieldEditorInstance.on('silentchange', function (newValue) {
-          _this2.onChange(newValue, k, keySchema, true);
+          _this2.onChange(newValue, keyName, keyConfig, true);
         }); // Return the DOM element
 
         return _.div({
@@ -15849,9 +15854,9 @@ function (_HashBrown$Views$Edit) {
           class: 'editor__field__key'
         }, _.div({
           class: 'editor__field__key__label'
-        }, keySchema.label), _.if(keySchema.description, _.div({
+        }, keyConfig.label), _.if(keyConfig.description, _.div({
           class: 'editor__field__key__description'
-        }, keySchema.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
+        }, keyConfig.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
       }));
     }
   }], [{
