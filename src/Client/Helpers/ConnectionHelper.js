@@ -39,26 +39,14 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets a Connection by id
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} id
      *
      * @return {Promise} Connection
      */
-    static getConnectionById(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
+    static getConnectionById(id) {
+        if(!id) { return Promise.resolve(null); }
 
-        for(let i in resources.connections) {
-            let connection = resources.connections[i];
-
-            if(connection.id == id) {
-                return Promise.resolve(connection);
-            }
-        }
-
-        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
     }
 
     /**

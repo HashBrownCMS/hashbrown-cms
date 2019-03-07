@@ -73,9 +73,7 @@ Crisp.Router.route('/content/:id/:tab', () => {
     let contentEditor = Crisp.View.get('ContentEditor');
 
     if(!contentEditor || !contentEditor.model || contentEditor.model.id !== Crisp.Router.params.id) {
-        contentEditor = new HashBrown.Views.Editors.ContentEditor({
-            modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('content/' + Crisp.Router.params.id)
-        });
+        contentEditor = new HashBrown.Views.Editors.ContentEditor(Crisp.Router.params.id);
     
         UI.setEditorSpaceContent(contentEditor.$element);
     } else {

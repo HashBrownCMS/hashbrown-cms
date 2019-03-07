@@ -9,39 +9,105 @@ class ResourceHelper {
     /**
      * Opens a connection to the indexedDB
      *
+     * @param {String} action
+     * @param {String} store
+     * @param {Object} query
+     *
      * @return {Promise} Result
      */
-    static openDb() {
-        return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('HashBrownCMS', 3);
+    static indexedDbTransaction(action, store, id = null, data = null) {
+        checkParam(action, 'action', String);
+        checkParam(store, 'store', String);
+        checkParam(id, 'id', String);
+        checkParam(data, 'data', Object);
 
-            request.onsuccess = (e) => {
-                resolve(e.target.result);
-            };
-            
-            request.onerror = (e) => {
-                reject(new Error('Query "' + query + '" failed. Error code: ' + e.target.errorCode));
-            };
+        return new Promise((resolve, reject) => {
+            try {
+                let request = window.indexedDB.open('HashBrownCMS', 1);
+
+                request.onsuccess = (e) => {
+                    resolve(e.target.result);
+                };
+                
+                request.onerror = (e) => {
+                    reject(new Error('Query ' + JSON.stringify(query) + ' with action "' + action + '" for store "' + store + '" failed. Error code: ' + e.target.errorCode));
+                };
+
+                request.onupgradeneeded = (e) => {
+                    let db = e.target.result;
+                    
+                    db.createObjectStore('connections', { keyPath: 'id', autoIncrement: false });
+                    db.createObjectStore('content', { keyPath: 'id', autoIncrement: false });
+                    db.createObjectStore('schemas', { keyPath: 'id', autoIncrement: false });
+                    db.createObjectStore('media', { keyPath: 'id', autoIncrement: false });
+                    db.createObjectStore('forms', { keyPath: 'id', autoIncrement: false });
+                    db.createObjectStore('users', { keyPath: 'id', autoIncrement: false });
+                };
+
+            } catch(e) {
+                reject(e);
+
+            }
+        })
+        .then((db) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    let objectStore = db.transaction([store], 'readwrite').objectStore(store);
+                    let request = null;
+
+                    if(action === 'put') {
+                        data.id = id;
+                        request = objectStore.put(data);
+                    } else if(action === 'get') {
+                        request = objectStore.get(id);
+                    } else if(action === 'delete') {
+                        request = objectStore.delete(id);
+                    }
+
+                    request.onsuccess = (e) => {
+                        resolve(e.target.result);
+                    };
+                    
+                    request.onerror = (e) => {
+                        reject(new Error('Query ' + JSON.stringify(query) + ' with action "' + action + '" for store "' + store + '" failed. Error code: ' + e.target.errorCode));
+                    };
+
+                } catch(e) {
+                    reject(e);
+
+                }
+            });
         });
     }
-   
+  
     /**
      * Gets a resource or a list of resources from cache
      *
+     * @param {Resource} model
      * @param {String} category
      * @param {String} id
      *
      * @returns {Promise} Result
      */
-    static getCache(category, id) {
+    static getCache(model, category, id) {
+        checkParam(model, 'model', HashBrown.Models.Resource);
         checkParam(category, 'category', String);
 
-        if(!this.cache) { return Promise.resolve(null); }
-        if(!this.cache[category]) { return Promise.resolve([]); }
-        if(!id) { return Promise.resolve(this.cache[category]); }
-        if(!this.cache[category][id]) { return Promise.resolve(null); }
-        
-        return Promise.resolve(this.cache[category][id]);
+        return this.indexedDbTransaction('get', category, id)
+        .then((data) => {
+            if(!data) { return Promise.resolve(null); }
+
+            if(!Array.isArray(data)) { return Promise.resolve(new model(data));  }
+
+            for(let i in data) {
+                data[i] = new model(data[i]);
+            }
+
+            return Promise.resolve(data);
+        })
+        .catch((e) => {
+            return Promise.resolve(null);  
+        });
     }
 
     /**
@@ -49,37 +115,68 @@ class ResourceHelper {
      *
      * @param {String} category
      * @param {String} id
-     * @param {Entity} data
+     * @param {Resource} data
      *
      * @returns {Promise} Result
      */
     static setCache(category, id, data) {
         checkParam(category, 'category', String);
         checkParam(id, 'id', String);
-        checkParam(data, 'data', HashBrown.Models.Entity);
+        checkParam(data, 'data', HashBrown.Models.Resource);
 
-        if(!this.cache) { this.cache = {}; }
-        if(!this.cache[category]) { this.cache[category] = {}; }
-      
-        this.cache[category][id] = data;
+        return this.removeCache(category, id)
+        .then(() => {
+            return this.indexedDbTransaction('put', category, id, data.getObject());
+        });
+    }
+    
+    /**
+     * Removes a resource from cache
+     *
+     * @param {String} category
+     * @param {String} id
+     *
+     * @returns {Promise} Result
+     */
+    static removeCache(category, id, data) {
+        checkParam(category, 'category', String);
+        checkParam(id, 'id', String);
 
-        return Promise.resolve(data);
+        return this.indexedDbTransaction('delete', category, id);
+    }
+
+    /**
+     * Removes a resource
+     *
+     * @param {String} category
+     * @param {String} id
+     *
+     * @returns {Promise} Result
+     */
+    static remove(category, id) {
+        checkParam(category, 'category', String);
+        checkParam(id, 'id', String);
+
+        return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id)
+        .then(() => {
+            return this.removeCache(category, id);
+        });
     }
 
     /**
      * Gets a resource or a list of resources
      *
-     * @param {Entity} model
+     * @param {Resource} model
      * @param {String} category
      * @param {String} id
      *
      * @returns {Promise} Result
      */
     static get(model, category, id = null) {
-        checkParam(model, 'model', HashBrown.Models.Entity);
+        checkParam(model, 'model', HashBrown.Models.Resource);
         checkParam(category, 'category', String);
     
-        return this.getCache(category, id)
+        return this.getCache(model, category, id)
         .then((result) => {
             if(result) { return Promise.resolve(result); }
 
@@ -87,16 +184,22 @@ class ResourceHelper {
             .then((result) => {
                 if(!result) { throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found'); }
 
-                if(id) {
-                    this.setCache(category, id, new model(result));
+                if(!Array.isArray(result)) {
+                    result = new model(result);
+
+                    this.setCache(category, result.id, result);
                 
+                    return Promise.resolve(result);
+
                 } else {
                     for(let i in result) {
-                        this.setCache(category, result[i].id, new model(result[i]));
+                        result[i] = new model(result[i]);
+                        
+                        this.setCache(category, result[i].id, result[i]);
                     }
                 }
 
-                return this.getCache(category, id);
+                return Promise.resolve(result);
             });
         });
     }
@@ -106,14 +209,14 @@ class ResourceHelper {
      *
      * @param {String} category
      * @param {String} id
-     * @param {Entity} data
+     * @param {Resource} data
      *
      * @returns {Promise} Result
      */
     static set(category, id, data) {
         checkParam(category, 'category', String);
-        checkParam(id, 'id', String);
-        checkParam(data, 'data', HashBrown.Models.Entity);
+        checkParam(category, 'id', String);
+        checkParam(data, 'data', HashBrown.Models.Resource);
 
         return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data)
         .then(() => {

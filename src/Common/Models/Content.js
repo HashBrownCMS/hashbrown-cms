@@ -1,13 +1,11 @@
 'use strict';
 
-const Resource = require('./Resource');
-
 /**
  * The base class for all Content types
  *
  * @memberof HashBrown.Common.Models
  */
-class Content extends Resource {
+class Content extends HashBrown.Models.Resource {
     structure() {
         // Fundamental fields
         this.def(String, 'id');

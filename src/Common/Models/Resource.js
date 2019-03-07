@@ -1,13 +1,11 @@
 'use strict';
 
-const Entity = require('./Entity');
-
 /**
  * Basic resource class
  *
  * @memberof HashBrown.Common.Models
  */
-class Resource extends Entity {
+class Resource extends HashBrown.Models.Entity {
     /**
      * Checks the format of the params
      *

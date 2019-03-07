@@ -6,12 +6,38 @@
  * @memberof HashBrown.Client.Views.Editors
  */
 class ContentEditor extends Crisp.View {
-    constructor(params) {
-        super(params);
+    constructor(id) {
+        super({});
+
+        checkParam(id, 'id', String);
 
         this.dirty = false;
 
-        this.fetch();
+        this.fetch(id);
+    }
+
+    /**
+     * Fetches the model
+     *
+     * @param {String} id
+     */
+    fetch(id) {
+        return HashBrown.Helpers.ContentHelper.getContentById(id)
+        .then((model) => {
+            this.model = model;
+        
+            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId);
+        })
+        .then((schema) => {
+            this.schema = schema;
+
+            return HashBrown.Helpers.ConnectionHelper.getConnectionById(this.model.getSettings('publishing').connectionId);
+        })
+        .then((connection) => {
+            this.connection = connection;
+
+            super.fetch();
+        });
     }
 
     /**
@@ -60,55 +86,30 @@ class ContentEditor extends Crisp.View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        let saveAction = this.$element.find('.editor__footer__buttons select').val();
-        let postSaveUrl;
+        this.$saveBtn.toggleClass('working', true);
+        
+        return HashBrown.Helpers.ContentHelper.setContentById(this.model.id, this.model)
+        .then(() => {
+            let saveAction = this.$element.find('.editor__footer__buttons select').val();
 
-        let setContent = () => {
-            // Use publishing API
-            if(this.model.getSettings('publishing').connectionId) {
-                // Unpublish
-                if(saveAction === 'unpublish') {
-                    return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
-
-                // Publish
-                } else if(saveAction === 'publish') {
-                    return HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
-                
-                // Preview
-                } else if(saveAction === 'preview') {
-                    return HashBrown.Helpers.RequestHelper.request('post', 'content/preview', this.model);
-
-                }
+            // Unpublish
+            if(this.connection && saveAction === 'unpublish') {
+                return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
             }
 
-            // Just save normally
-            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + this.model.id, this.model);
-        }
-
-        this.$saveBtn.toggleClass('working', true);
-
-        // Save content to database
-        setContent()
-        .then((url) => {
-            postSaveUrl = url;
-            
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
+            // Publish
+            if(this.connection && saveAction === 'publish') {
+                return HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
+            }
+        
+            return Promise.resolve();
         })
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
             
-            this.reload();
-            
             HashBrown.Views.Navigation.NavbarMain.reload();
 
             this.dirty = false;
-
-            if(saveAction === 'preview') {
-                UI.iframeModal(
-                    'Preview',
-                    postSaveUrl
-                );
-            }
         })
         .catch((e) => {
             this.$saveBtn.toggleClass('working', false);
@@ -125,31 +126,6 @@ class ContentEditor extends Crisp.View {
         this.model = null;
 
         this.fetch();
-    }
-
-    /**
-     * Binds event to fire when field editors are ready
-     * Or fires them if no callback was passed
-     *
-     * @param {Function} callback
-     */
-    onFieldEditorsReady(callback) {
-        if(!this.fieldEditorReadyCallbacks) {
-            this.fieldEditorReadyCallbacks = [];
-        }
-
-        if(callback) {
-            this.fieldEditorReadyCallbacks.push(callback);
-
-        } else {
-            for(let registeredCallback of this.fieldEditorReadyCallbacks) {
-                registeredCallback();
-            }
-
-            this.fieldEditorReadyCallbacks = [];
-        }
-
-        this.restoreScrollPos();
     }
 
     /**
@@ -370,141 +346,101 @@ class ContentEditor extends Crisp.View {
     }
 
     /**
-     * Renders the editor
-     *
-     * @param {Content} content
-     * @param {ContentSchema} schema
-     *
-     * @return {Object} element
+     * Render this editor
      */
-    renderEditor(content, schema) {
-        let activeTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
+    template() {
+        let activeTab = Crisp.Router.params.tab || this.schema.defaultTabId || 'meta';
 
-        // Render editor
-        return [
+        return _.div({class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')},
+            // Header
             _.div({class: 'editor__header'}, 
-                _.each(schema.tabs, (tabId, tabName) => {
+                _.each(this.schema.tabs, (tabId, tabName) => {
                     return _.button({class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
                         .click(() => {
-                            location.hash = '/content/' + Crisp.Router.params.id + '/' + tabId;
+                            location.hash = '/content/' + this.model.id + '/' + tabId;
 
                             this.fetch();
                         });
                 }),
                 _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
                     .click(() => {
-                        location.hash = '/content/' + Crisp.Router.params.id + '/meta';
+                        location.hash = '/content/' + this.model.id + '/meta';
 
                         this.fetch();
                     })
             ),
+
+            // Body
             _.div({class: 'editor__body'},
                 // Render content properties
-                _.each(schema.tabs, (tabId, tabName) => {
+                _.each(this.schema.tabs, (tabId, tabName) => {
                     if(tabId !== activeTab) { return; }
 
                     return _.div({class: 'editor__body__tab active'},
-                        this.renderFields(tabId, schema.fields.properties, content.properties)
+                        this.renderFields(tabId, this.schema.fields.properties, this.model.properties)
                     );
                 }),
 
                 // Render meta properties
                 _.if(activeTab === 'meta',
                     _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
-                        this.renderFields('meta', schema.fields, content),
-                        this.renderFields('meta', schema.fields.properties, content.properties)
+                        this.renderFields('meta', this.schema.fields, this.model),
+                        this.renderFields('meta', this.schema.fields.properties, this.model.properties)
                     )
                 )
             ).on('scroll', (e) => {
                 this.onScroll(e);
             }),
-            _.div({class: 'editor__footer'})
-        ];
-    }
 
-    /**
-     * Renders the action buttons
-     */
-    renderButtons() {
-        let url = this.model.properties.url;
-
-        if(url instanceof Object) {
-            url = url[window.language];
-        }
-
-        let remoteUrl;
-        let connectionId = this.model.getSettings('publishing').connectionId;
-        let connection;
-
-        // Construct the remote URL, if a Connection is set up for publishing
-        let contentUrl = this.model.properties.url;
-
-        if(connectionId) {
-            connection = HashBrown.Helpers.ConnectionHelper.getConnectionByIdSync(connectionId);
-                
-            if(connection && connection.url && contentUrl) {
-                // Language versioning
-                if(contentUrl instanceof Object) {
-                    contentUrl = contentUrl[window.language];
-                }
-
-                // Construct remote URL
-                if(contentUrl && contentUrl !== '//') {
-                    remoteUrl = connection.url + contentUrl;
-                    remoteUrl = remoteUrl.replace(/\/\//g, '/').replace(':/', '://');
-
-                } else {
-                    contentUrl = null;
-                
-                }
-            }
-        }
-            
-        _.append($('.editor__footer').empty(),
-            _.div({class: 'editor__footer__message'},
-                _.do(() => {
-                    if(!connection) {
-                        return 'No Connection is assigned for publishing'   ;
-                    }
-                    
-                    if(connection && !connection.url) {
-                        return 'No remote URL is defined in the <a href="#/connections/' + connection.id + '">"' + connection.title + '"</a> Connection';
-                    }
-                    
-                    if(connection && connection.url && !contentUrl) {
-                        return 'Content without a URL may not be visible after publishing';
-                    }
-                })
-            ),
-
-            _.div({class: 'editor__footer__buttons'},
-                // JSON editor
-                _.button({class: 'widget widget--button condensed embedded'},
-                    'Advanced'
-                ).click(() => { this.onClickAdvanced(); }),
-
-                // View remote
-                _.if(this.model.isPublished && remoteUrl,
-                    _.a({target: '_blank', href: remoteUrl, class: 'widget widget--button condensed embedded'}, 'View')
+            // Footer actions
+            _.div({class: 'editor__footer'},
+                _.div({class: 'editor__footer__message'},
+                    _.do(() => {
+                        if(!this.connection) {
+                            return 'No Connection is assigned for publishing';
+                        }
+                        
+                        if(this.connection && !this.connection.url) {
+                            return 'No remote URL is defined in the <a href="#/connections/' + this.connection.id + '">"' + this.connection.title + '"</a> Connection';
+                        }
+                        
+                        if(this.connection && this.connection.url && !this.model.properties.url) {
+                            return 'Content without a URL may not be visible after publishing';
+                        }
+                    })
                 ),
 
-                _.if(!this.model.isLocked,
-                    // Save & publish
-                    _.div({class: 'widget widget-group'},
-                        this.$saveBtn = _.button({class: 'widget widget--button'},
-                            _.span({class: 'widget--button__text-default'}, 'Save'),
-                            _.span({class: 'widget--button__text-working'}, 'Saving')
-                        ).click(() => { this.onClickSave(); }),
-                        _.if(connection,
-                            _.span({class: 'widget widget--button widget-group__separator'}, '&'),
-                            _.select({class: 'widget widget--select'},
-                                _.option({value: 'publish'}, 'Publish'),
-                                _.option({value: 'preview'}, 'Preview'),
-                                _.if(this.model.isPublished, 
-                                    _.option({value: 'unpublish'}, 'Unpublish')
-                                ),
-                                _.option({value: ''}, '(No action)')
-                            ).val('publish')
+                _.div({class: 'editor__footer__buttons'},
+                    // JSON editor
+                    _.button({class: 'widget widget--button condensed embedded'},
+                        'Advanced'
+                    ).click(() => { this.onClickAdvanced(); }),
+
+                    // View remote
+                    _.do(() => {
+                        if(!this.connection || !this.model.isPublished || !this.connection.url || !this.model.url) { return; }
+                        
+                        return _.a({target: '_blank', href: this.connection.getUrl(this.model.url), class: 'widget widget--button condensed embedded'}, 'View');
+                    }),
+
+                    _.if(!this.model.isLocked,
+                        // Save & publish
+                        _.div({class: 'widget widget-group'},
+                            this.$saveBtn = _.button({class: 'widget widget--button'},
+                                _.span({class: 'widget--button__text-default'}, 'Save'),
+                                _.span({class: 'widget--button__text-working'}, 'Saving')
+                            ).click(() => { this.onClickSave(); }),
+                            _.if(this.connection,
+                                _.span({class: 'widget widget--button widget-group__separator'}, '&'),
+                                _.select({class: 'widget widget--select'},
+                                    _.option({value: 'publish'}, 'Publish'),
+                                    _.option({value: 'preview'}, 'Preview'),
+                                    _.if(this.model.isPublished, 
+                                        _.option({value: 'unpublish'}, 'Unpublish')
+                                    ),
+                                    _.option({value: ''}, '(No action)')
+                                ).val('publish')
+                            )
                         )
                     )
                 )
@@ -513,46 +449,10 @@ class ContentEditor extends Crisp.View {
     }
 
     /**
-     * Pre render
-     */
-    prerender() {
-        // Make sure the model data is using the Content model
-        if(this.model instanceof HashBrown.Models.Content === false) {
-            this.model = new HashBrown.Models.Content(this.model);
-        }
-    }
-
-    /**
-     * Render this editor
-     */
-    template() {
-        return _.div({class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')});
-    }
-
-    /**
      * Post render
      */
     postrender() {
-        // Fetch information
-        let contentSchema;
-
-        return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
-        .then((schema) => {
-            contentSchema = schema;
-
-            this.schema = contentSchema;
-
-            this.$element.html(
-                this.renderEditor(this.model, contentSchema)
-            );
-           
-            this.renderButtons();
-
-            this.onFieldEditorsReady();
-        })
-        .catch((e) => {
-            UI.errorModal(e, () => { location.hash = '/content/json/' + this.model.id; });
-        });
+        this.restoreScrollPos();
     }
 }
 

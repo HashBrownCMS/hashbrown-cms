@@ -3,18 +3,17 @@
 /**
  * @namespace HashBrown.Client.Models
  */
-HashBrown.Models = {
-    Content: require('./Content'),
-    Connection: require('./Connection'),
-    ContentSchema: require('Common/Models/ContentSchema'),
-    Deployer: require('Common/Models/Deployer'),
-    Entity: require('Common/Models/Entity'),
-    FieldSchema: require('Common/Models/FieldSchema'),
-    Form: require('Common/Models/Form'),
-    Media: require('Common/Models/Media'),
-    Processor: require('Common/Models/Processor'),
-    Project: require('Common/Models/Project'),
-    Resource: require('Common/Models/Resource'),
-    Schema: require('Common/Models/Schema'),
-    User: require('Common/Models/User')
-};
+namespace('Models')
+.add(require('Common/Models/Entity'))
+.add(require('Common/Models/Resource'))
+.add(require('./Content'))
+.add(require('./Connection'))
+.add(require('Common/Models/ContentSchema'))
+.add(require('Common/Models/Deployer'))
+.add(require('Common/Models/FieldSchema'))
+.add(require('Common/Models/Form'))
+.add(require('Common/Models/Media'))
+.add(require('Common/Models/Processor'))
+.add(require('Common/Models/Project'))
+.add(require('Common/Models/Schema'))
+.add(require('Common/Models/User'));

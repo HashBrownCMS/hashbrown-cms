@@ -1,13 +1,11 @@
 'use strict';
 
-const Resource = require('./Resource');
-
 /**
  * The Form class
  *
  * @memberof HashBrown.Common.Models
  */
-class Form extends Resource {
+class Form extends HashBrown.Models.Resource {
     /**
      * Structure
      */

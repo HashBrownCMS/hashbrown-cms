@@ -81,30 +81,30 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 28:
+/***/ 20:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(29);
+__webpack_require__(21);
 
-__webpack_require__(30);
+__webpack_require__(22);
 
-__webpack_require__(31);
+__webpack_require__(23);
 
-__webpack_require__(32);
+__webpack_require__(24);
 
-__webpack_require__(33);
+__webpack_require__(25);
 
 /***/ }),
 
-/***/ 29:
+/***/ 21:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -164,9 +164,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
   var contentEditor = Crisp.View.get('ContentEditor');
 
   if (!contentEditor || !contentEditor.model || contentEditor.model.id !== Crisp.Router.params.id) {
-    contentEditor = new HashBrown.Views.Editors.ContentEditor({
-      modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('content/' + Crisp.Router.params.id)
-    });
+    contentEditor = new HashBrown.Views.Editors.ContentEditor(Crisp.Router.params.id);
     UI.setEditorSpaceContent(contentEditor.$element);
   } else {
     contentEditor.fetch();
@@ -175,7 +173,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 
 /***/ }),
 
-/***/ 30:
+/***/ 22:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -220,7 +218,7 @@ Crisp.Router.route('/connections/json/:id', function () {
 
 /***/ }),
 
-/***/ 31:
+/***/ 23:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -254,7 +252,7 @@ Crisp.Router.route('/media/:id', function () {
 
 /***/ }),
 
-/***/ 32:
+/***/ 24:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -330,7 +328,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 
 /***/ }),
 
-/***/ 33:
+/***/ 25:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
