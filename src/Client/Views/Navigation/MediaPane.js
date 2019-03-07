@@ -6,6 +6,10 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/media/'; }
+    static get label() { return 'Media'; }
+    static get icon() { return 'file-image-o'; }
+    
     /**
      * Event: On change folder path
      *
@@ -143,57 +147,71 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             folder: folder
         });
     }
+   
+    /**
+     * Gets all items
+     *
+     * @returns {Promise} items
+     */
+    static getItems() {
+        return HashBrown.Helpers.MediaHelper.getAllMedia();
+    }
+
+    /**
+     * Hierarchy logic
+     */
+    static hierarchy(item, queueItem) {
+        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+
+        queueItem.$element.attr('data-media-id', item.id);
+        queueItem.$element.attr('data-remote', true);
+       
+        if(item.folder) {
+            queueItem.createDir = true;
+            queueItem.parentDirAttr = { 'data-media-folder': item.folder };
+            queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
+        }
+    }
     
     /**
-     * Init
+     * Item context menu
      */
-    static init() {
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
-            getItems: () => { return resources.media; },
+    getItemContextMenu() {
+        return {
+            'This media': '---',
+            'Open in new tab': () => { this.onClickOpenInNewTab(); },
+            'Move': () => { this.onClickMoveItem(); },
+            'Rename': () => { this.onClickRenameMedia(); },
+            'Remove': () => { this.onClickRemoveMedia(); },
+            'Replace': () => { this.onClickReplaceMedia(); },
+            'Copy id': () => { this.onClickCopyItemId(); },
+            'General': '---',
+            'Upload new media': () => { this.onClickUploadMedia(); },
+            'Refresh': () => { this.onClickRefreshResource('media'); }
+        };
+    }
 
-            // Hierarchy logic
-            hierarchy: (item, queueItem) => {
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+    /**
+     * Dir context menu
+     */
+    static getDirContextMenu() {
+        return {
+            'Directory': '---',
+            'Upload new media': () => { this.onClickUploadMedia(); },
+            'General': '---',
+            'Refresh': () => { this.onClickRefreshResource('media'); }
+        };
+    }
 
-                queueItem.$element.attr('data-media-id', item.id);
-                queueItem.$element.attr('data-remote', true);
-               
-                if(item.folder) {
-                    queueItem.createDir = true;
-                    queueItem.parentDirAttr = { 'data-media-folder': item.folder };
-                    queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
-                }
-            },
-            
-            // Item context menu
-            itemContextMenu: {
-                'This media': '---',
-                'Open in new tab': () => { this.onClickOpenInNewTab(); },
-                'Move': () => { this.onClickMoveItem(); },
-                'Rename': () => { this.onClickRenameMedia(); },
-                'Remove': () => { this.onClickRemoveMedia(); },
-                'Replace': () => { this.onClickReplaceMedia(); },
-                'Copy id': () => { this.onClickCopyItemId(); },
-                'General': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            },
-
-            // Dir context menu
-            dirContextMenu: {
-                'Directory': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'General': '---',
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            },
-
-            // General context menu
-            paneContextMenu: {
-                'Media': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            }
-        });
+    /**
+     * General context menu
+     */
+    static getPaneContextMenu() {
+        return {
+            'Media': '---',
+            'Upload new media': () => { this.onClickUploadMedia(); },
+            'Refresh': () => { this.onClickRefreshResource('media'); }
+        };
     }
 }
 

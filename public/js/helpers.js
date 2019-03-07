@@ -94,7 +94,7 @@
  * @namespace HashBrown.Client.Helpers
  */
 
-namespace('Helpers').add(__webpack_require__(1)).add(__webpack_require__(3)).add(__webpack_require__(5)).add(__webpack_require__(7)).add(__webpack_require__(9)).add(__webpack_require__(10)).add(__webpack_require__(12)).add(__webpack_require__(13)).add(__webpack_require__(14)).add(__webpack_require__(15)).add(__webpack_require__(17)).add(__webpack_require__(19));
+namespace('Helpers').add(__webpack_require__(1)).add(__webpack_require__(3)).add(__webpack_require__(5)).add(__webpack_require__(6)).add(__webpack_require__(8)).add(__webpack_require__(10)).add(__webpack_require__(11)).add(__webpack_require__(13)).add(__webpack_require__(14)).add(__webpack_require__(15)).add(__webpack_require__(16)).add(__webpack_require__(18)).add(__webpack_require__(20)).add(__webpack_require__(21));
 
 /***/ }),
 /* 1 */
@@ -436,6 +436,17 @@ function (_ContentHelperCommon) {
       return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content', id);
     }
     /**
+     * Gets all Content
+     *
+     * @returns {Promise} Content node
+     */
+
+  }, {
+    key: "getAllContent",
+    value: function getAllContent() {
+      return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content');
+    }
+    /**
      * Sets Content by id
      *
      * @param {String} id
@@ -745,6 +756,45 @@ module.exports = ContentHelper;
 
 "use strict";
 
+/**
+ * The client side helper class for Forms
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var FormHelper =
+/*#__PURE__*/
+function () {
+  function FormHelper() {
+    _classCallCheck(this, FormHelper);
+  }
+
+  _createClass(FormHelper, null, [{
+    key: "getAllForms",
+
+    /**
+     * Gets all Forms
+     */
+    value: function getAllForms() {
+      return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms');
+    }
+  }]);
+
+  return FormHelper;
+}();
+
+module.exports = FormHelper;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -764,7 +814,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var DebugHelperCommon = __webpack_require__(6);
+var DebugHelperCommon = __webpack_require__(7);
 /**
  * The client side debug helper
  *
@@ -833,7 +883,7 @@ function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1013,7 +1063,7 @@ function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1037,7 +1087,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var LanguageHelperCommon = __webpack_require__(8);
+var LanguageHelperCommon = __webpack_require__(9);
 
 var selectedLanguages = {};
 /**
@@ -1122,7 +1172,7 @@ function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1241,7 +1291,7 @@ function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2094,7 +2144,7 @@ function () {
 module.exports = MarkdownHelper;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2118,7 +2168,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var MediaHelperCommon = __webpack_require__(11);
+var MediaHelperCommon = __webpack_require__(12);
 /**
  * The client side media helper
  *
@@ -2206,18 +2256,22 @@ function (_MediaHelperCommon) {
   }, {
     key: "getMediaById",
     value: function getMediaById(id) {
-      return new Promise(function (resolve, reject) {
-        for (var i = 0; i < resources.media.length; i++) {
-          var media = resources.media[i];
+      if (!id) {
+        return Promise.resolve(null);
+      }
 
-          if (media.id == id) {
-            resolve(media);
-            return;
-          }
-        }
+      return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media', id);
+    }
+    /**
+     * Gets all Media objects
+     *
+     * @return {Promise} Media objects
+     */
 
-        reject(new Error('Media with id "' + id + '" not found'));
-      });
+  }, {
+    key: "getAllMedia",
+    value: function getAllMedia(id) {
+      return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media');
     }
     /**
      * Sets a Media tree item
@@ -2278,7 +2332,7 @@ function (_MediaHelperCommon) {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2365,7 +2419,7 @@ function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2431,7 +2485,7 @@ function () {
 module.exports = ProjectHelper;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2717,13 +2771,13 @@ function () {
 module.exports = RequestHelper;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 /**
- * A helper class for accessing resources on the server and in cache
+ * A helper class for accessing resources on the server
  *
  * @memberof HashBrown.Client.Helpers
  */
@@ -2762,7 +2816,7 @@ function () {
       checkParam(data, 'data', Object);
       return new Promise(function (resolve, reject) {
         try {
-          var request = window.indexedDB.open('HashBrownCMS', 1);
+          var request = indexedDB.open('hb_' + HashBrown.Helpers.ProjectHelper.currentProject + '_' + HashBrown.Helpers.ProjectHelper.currentEnvironment, 1);
 
           request.onsuccess = function (e) {
             resolve(e.target.result);
@@ -2831,77 +2885,6 @@ function () {
       });
     }
     /**
-     * Gets a resource or a list of resources from cache
-     *
-     * @param {Resource} model
-     * @param {String} category
-     * @param {String} id
-     *
-     * @returns {Promise} Result
-     */
-
-  }, {
-    key: "getCache",
-    value: function getCache(model, category, id) {
-      checkParam(model, 'model', HashBrown.Models.Resource);
-      checkParam(category, 'category', String);
-      return this.indexedDbTransaction('get', category, id).then(function (data) {
-        if (!data) {
-          return Promise.resolve(null);
-        }
-
-        if (!Array.isArray(data)) {
-          return Promise.resolve(new model(data));
-        }
-
-        for (var i in data) {
-          data[i] = new model(data[i]);
-        }
-
-        return Promise.resolve(data);
-      }).catch(function (e) {
-        return Promise.resolve(null);
-      });
-    }
-    /**
-     * Sets a resource in cache
-     *
-     * @param {String} category
-     * @param {String} id
-     * @param {Resource} data
-     *
-     * @returns {Promise} Result
-     */
-
-  }, {
-    key: "setCache",
-    value: function setCache(category, id, data) {
-      var _this = this;
-
-      checkParam(category, 'category', String);
-      checkParam(id, 'id', String);
-      checkParam(data, 'data', HashBrown.Models.Resource);
-      return this.removeCache(category, id).then(function () {
-        return _this.indexedDbTransaction('put', category, id, data.getObject());
-      });
-    }
-    /**
-     * Removes a resource from cache
-     *
-     * @param {String} category
-     * @param {String} id
-     *
-     * @returns {Promise} Result
-     */
-
-  }, {
-    key: "removeCache",
-    value: function removeCache(category, id, data) {
-      checkParam(category, 'category', String);
-      checkParam(id, 'id', String);
-      return this.indexedDbTransaction('delete', category, id);
-    }
-    /**
      * Removes a resource
      *
      * @param {String} category
@@ -2913,13 +2896,10 @@ function () {
   }, {
     key: "remove",
     value: function remove(category, id) {
-      var _this2 = this;
-
       checkParam(category, 'category', String);
       checkParam(id, 'id', String);
-      return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id).then(function () {
-        return _this2.removeCache(category, id);
-      });
+      HashBrown.Helpers.EventHelper.trigger(category, id);
+      return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
     }
     /**
      * Gets a resource or a list of resources
@@ -2934,37 +2914,25 @@ function () {
   }, {
     key: "get",
     value: function get(model, category) {
-      var _this3 = this;
-
       var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       checkParam(model, 'model', HashBrown.Models.Resource);
       checkParam(category, 'category', String);
-      return this.getCache(model, category, id).then(function (result) {
-        if (result) {
-          return Promise.resolve(result);
+      return HashBrown.Helpers.RequestHelper.request('get', category + (id ? '/' + id : '')).then(function (result) {
+        if (!result) {
+          throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found');
         }
 
-        return HashBrown.Helpers.RequestHelper.request('get', category + (id ? '/' + id : '')).then(function (result) {
-          if (!result) {
-            throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found');
-          }
-
+        if (typeof model === 'function') {
           if (!Array.isArray(result)) {
             result = new model(result);
-
-            _this3.setCache(category, result.id, result);
-
-            return Promise.resolve(result);
           } else {
             for (var i in result) {
               result[i] = new model(result[i]);
-
-              _this3.setCache(category, result[i].id, result[i]);
             }
           }
+        }
 
-          return Promise.resolve(result);
-        });
+        return Promise.resolve(result);
       });
     }
     /**
@@ -2980,14 +2948,11 @@ function () {
   }, {
     key: "set",
     value: function set(category, id, data) {
-      var _this4 = this;
-
       checkParam(category, 'category', String);
       checkParam(category, 'id', String);
       checkParam(data, 'data', HashBrown.Models.Resource);
-      return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data).then(function () {
-        return _this4.setCache(category, id, data);
-      });
+      HashBrown.Helpers.EventHelper.trigger(category, id);
+      return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data.getObject());
     }
   }]);
 
@@ -2997,7 +2962,7 @@ function () {
 module.exports = ResourceHelper;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3021,7 +2986,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var SchemaHelperCommon = __webpack_require__(16);
+var SchemaHelperCommon = __webpack_require__(17);
 /**
  * The client side Schema helper
  *
@@ -3127,6 +3092,55 @@ function (_SchemaHelperCommon) {
       });
     }
     /**
+     * Gets all Schemas
+     *
+     * @returns {Array} All Schemas
+     */
+
+  }, {
+    key: "getAllSchemas",
+    value: function getAllSchemas() {
+      return HashBrown.Helpers.ResourceHelper.get(null, 'schemas').then(function (result) {
+        var schemas = [];
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = result[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var schema = _step.value;
+
+            if (!schema.parentId) {
+              continue;
+            }
+
+            if (schema.type === 'content') {
+              schema = new HashBrown.Models.ContentSchema(schema);
+            } else if (schema.type === 'field') {
+              schema = new HashBrown.Models.FieldSchema(schema);
+            }
+
+            schemas.push(schema);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        return Promise.resolve(schemas);
+      });
+    }
+    /**
      * Gets a Schema by id (sync)
      *
      * @param {String} id
@@ -3157,7 +3171,7 @@ function (_SchemaHelperCommon) {
 module.exports = SchemaHelper;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3324,7 +3338,7 @@ function () {
 module.exports = SchemaHelper;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3348,7 +3362,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var SettingsHelperCommon = __webpack_require__(18);
+var SettingsHelperCommon = __webpack_require__(19);
 /**
  * The client side settings helper
  *
@@ -3569,7 +3583,7 @@ function (_SettingsHelperCommon) {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3589,7 +3603,7 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4269,7 +4283,7 @@ function () {
         error = new Error(error.toString());
       }
 
-      debug.log(error.message, error.stack, 'HashBrown');
+      debug.log(error.message + ': ' + error.stack, 'HashBrown');
       return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
     /**
@@ -4452,6 +4466,102 @@ function () {
 }();
 
 module.exports = UIHelper;
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var EVENTS = {};
+/**
+ * A helper class for triggering and registering EVENTS
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var EventHelper =
+/*#__PURE__*/
+function () {
+  function EventHelper() {
+    _classCallCheck(this, EventHelper);
+  }
+
+  _createClass(EventHelper, null, [{
+    key: "on",
+
+    /**
+     * Bind an event
+     *
+     * @param {String} type
+     * @param {String} id
+     * @param {Function} callback
+     */
+    value: function on(type, id, callback) {
+      checkParam(type, 'type', String);
+      checkParam(id, 'id', String);
+      checkParam(callback, 'callback', Function);
+
+      if (!EVENTS[type]) {
+        EVENTS[type] = {};
+      }
+
+      EVENTS[type][id] = callback;
+    }
+    /**
+     * Unbind an event
+     *
+     * @param {String} type
+     * @param {String} id
+     */
+
+  }, {
+    key: "off",
+    value: function off(type, id) {
+      checkParam(type, 'type', String);
+      checkParam(id, 'id', String);
+
+      if (!EVENTS[type]) {
+        return;
+      }
+
+      delete EVENTS[type][id];
+    }
+    /**
+     * Triggers an event type
+     *
+     * @param {String} type
+     * @param {*} value
+     */
+
+  }, {
+    key: "trigger",
+    value: function trigger(type, value) {
+      if (!EVENTS[type]) {
+        return;
+      }
+
+      for (var id in EVENTS[type]) {
+        if (typeof EVENTS[type][id] !== 'function') {
+          continue;
+        }
+
+        EVENTS[type][id](value);
+      }
+    }
+  }]);
+
+  return EventHelper;
+}();
+
+module.exports = EventHelper;
 
 /***/ })
 /******/ ]);

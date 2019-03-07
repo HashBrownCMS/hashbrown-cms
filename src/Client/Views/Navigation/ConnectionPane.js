@@ -6,6 +6,10 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/connections/'; }
+    static get label() { return 'Connections'; }
+    static get icon() { return 'exchange'; }
+    
     /**
      * Event: Click new connection
      */
@@ -109,63 +113,65 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
-    static init() {
-        if(!currentUserHasScope('connections')) { return; }
+    static getItems() {
+        return HashBrown.Helpers.ConnectionHelper.getAllConnections();
+    }
 
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
-            icon: 'exchange',
-            
-            getItems: () => { return resources.connections; },
+    /**
+     * Item context menu
+     */
+    static getItemContextMenu(item) {
+        let menu = {};
+        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        
+        menu['This connection'] = '---';
 
-            // Item context menu
-            getItemContextMenu: (item) => {
-                let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-                
-                menu['This connection'] = '---';
+        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
 
-                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+        if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = () => { this.onClickRemoveConnection(); };
+        }
+        
+        menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
-                if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-                    menu['Remove'] = () => { this.onClickRemoveConnection(); };
-                }
-                
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
-                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+        if(isSyncEnabled) {
+            menu['Sync'] = '---';
 
-                if(isSyncEnabled) {
-                    menu['Sync'] = '---';
-
-                    if(!item.sync.isRemote) {
-                        menu['Push to remote'] = () => { this.onClickPushConnection(); };
-                    }
-
-                    if(item.sync.hasRemote) {
-                        menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
-                    }
-                    
-                    if(item.sync.isRemote) {
-                        menu['Pull from remote'] = () => { this.onClickPullConnection(); };
-                    }
-                }
-                
-                menu['General'] = '---';
-                menu['New connection'] = () => { this.onClickNewConnection(); };
-                menu['Refresh'] = () => { this.onClickRefreshResource('connections'); };
-
-                return menu;
-            },
-            
-            // General context menu
-            paneContextMenu: {
-                'Connections': '---',
-                'New connection': () => { this.onClickNewConnection(); },
-                'Refresh': () => { this.onClickRefreshResource('connections'); }
+            if(!item.sync.isRemote) {
+                menu['Push to remote'] = () => { this.onClickPushConnection(); };
             }
-        });
+
+            if(item.sync.hasRemote) {
+                menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
+            }
+            
+            if(item.sync.isRemote) {
+                menu['Pull from remote'] = () => { this.onClickPullConnection(); };
+            }
+        }
+        
+        menu['General'] = '---';
+        menu['New connection'] = () => { this.onClickNewConnection(); };
+        menu['Refresh'] = () => { this.onClickRefreshResource('connections'); };
+
+        return menu;
+    }
+      
+    /**
+     * General context menu
+     */
+    static getPaneContextMenu() {
+        return {
+            'Connections': '---',
+            'New connection': () => { this.onClickNewConnection(); },
+            'Refresh': () => { this.onClickRefreshResource('connections'); }
+        };
     }
 }
 

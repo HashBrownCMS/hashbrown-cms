@@ -6,6 +6,10 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/content/'; }
+    static get label() { return 'Content'; }
+    static get icon() { return 'file'; }
+    
     /**
      * Event: Change parent
      */
@@ -386,81 +390,89 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
-    static init() {
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/content/', 'Content', 'file', {
-            getItems: () => { return resources.content; },
+    static getItems() {
+        return HashBrown.Helpers.ContentHelper.getAllContent();
+    }
 
-            // Item context menu
-            getItemContextMenu: (item) => {
-                let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-                
-                menu['This content'] = '---';
-                
-                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-                
-                menu['Rename'] = () => { this.onClickRename(); };
+    /**
+     * Item context menu
+     */
+    static getItemContextMenu(item) {
+        let menu = {};
+        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        
+        menu['This content'] = '---';
+        
+        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+        
+        menu['Rename'] = () => { this.onClickRename(); };
 
-                menu['New child content'] = () => {
-                    this.onClickNewContent($('.context-menu-target').data('id'));
-                };
-                                
-                if(!item.sync.isRemote && !item.isLocked) {
-                    menu['Move'] = () => { this.onClickMoveItem(); };
-                }
+        menu['New child content'] = () => {
+            this.onClickNewContent($('.context-menu-target').data('id'));
+        };
+                        
+        if(!item.sync.isRemote && !item.isLocked) {
+            menu['Move'] = () => { this.onClickMoveItem(); };
+        }
 
-                if(!item.sync.hasRemote && !item.isLocked) {
-                    menu['Remove'] = () => { this.onClickRemoveContent(true); };
-                }
-                
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-                
-                if(!item.sync.isRemote && !item.isLocked) {
-                    menu['Settings'] = '---';
-                    menu['Publishing'] = () => { this.onClickContentPublishing(); };
-                }
-                
-                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
-               
-                if(isSyncEnabled) {
-                    menu['Sync'] = '---';
-                    
-                    if(!item.sync.isRemote) {
-                        menu['Push to remote'] = () => { this.onClickPushContent(); };
-                    }
-
-                    if(item.sync.hasRemote) {
-                        menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
-                    }
-                    
-                    if(item.sync.isRemote) {
-                        menu['Pull from remote'] = () => { this.onClickPullContent(); };
-                    }
-                }
-
-                menu['General'] = '---';
-                menu['New content'] = () => { this.onClickNewContent(); };  
-                menu['Refresh'] = () => { this.onClickRefreshResource('content'); };
-
-                return menu;
-            },
-
-            // Set general context menu items
-            paneContextMenu: {
-                'Content': '---',
-                'New content': () => { this.onClickNewContent(); },
-                'Refresh': () => { this.onClickRefreshResource('content'); }
-            },
-
-            // Hierarchy logic
-            hierarchy: function(item, queueItem) {
-                // Set id data attributes
-                queueItem.$element.attr('data-content-id', item.id);
-                queueItem.parentDirAttr = {'data-content-id': item.parentId };
+        if(!item.sync.hasRemote && !item.isLocked) {
+            menu['Remove'] = () => { this.onClickRemoveContent(true); };
+        }
+        
+        menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        
+        if(!item.sync.isRemote && !item.isLocked) {
+            menu['Settings'] = '---';
+            menu['Publishing'] = () => { this.onClickContentPublishing(); };
+        }
+        
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+       
+        if(isSyncEnabled) {
+            menu['Sync'] = '---';
+            
+            if(!item.sync.isRemote) {
+                menu['Push to remote'] = () => { this.onClickPushContent(); };
             }
-        });
+
+            if(item.sync.hasRemote) {
+                menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
+            }
+            
+            if(item.sync.isRemote) {
+                menu['Pull from remote'] = () => { this.onClickPullContent(); };
+            }
+        }
+
+        menu['General'] = '---';
+        menu['New content'] = () => { this.onClickNewContent(); };  
+        menu['Refresh'] = () => { this.onClickRefreshResource('content'); };
+
+        return menu;
+    }
+
+    /**
+     * Pane context menu
+     */
+    static getPaneContextMenu() {
+        return {
+            'Content': '---',
+            'New content': () => { this.onClickNewContent(); },
+            'Refresh': () => { this.onClickRefreshResource('content'); }
+        };
+    }
+
+    /**
+     * Hierarchy logic
+     */
+    static hierarchy(item, queueItem) {
+        // Set id data attributes
+        queueItem.$element.attr('data-content-id', item.id);
+        queueItem.parentDirAttr = {'data-content-id': item.parentId };
     }
 }
 

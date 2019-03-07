@@ -6,6 +6,10 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/forms/'; }
+    static get label() { return 'Forms'; }
+    static get icon() { return 'wpforms'; }
+    
     /**
      * Event: Click create new form
      */
@@ -103,71 +107,77 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
-    static init() {
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
-            icon: 'wpforms',
-            
-            getItems: () => { return resources.forms; },
+    static getItems() {
+        return HashBrown.Helpers.FormHelper.getAllForms();
+    }
 
-            // Hierarchy logic
-            hierarchy: function(item, queueItem) {
-                queueItem.$element.attr('data-form-id', item.id);
-               
-                if(item.folder) {
-                    queueItem.createDir = true;
-                    queueItem.parentDirAttr = {'data-form-folder': item.folder };
-                }
-            },
-            
-            // Item context menu
-            getItemContextMenu: (item) => {
-                let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-                
-                menu['This form'] = '---';
+    /**
+     * Hierarchy logic
+     */
+    static hierarchy(item, queueItem) {
+        queueItem.$element.attr('data-form-id', item.id);
+       
+        if(item.folder) {
+            queueItem.createDir = true;
+            queueItem.parentDirAttr = {'data-form-folder': item.folder };
+        }
+    }
+    
+    /**
+     * Item context menu
+     */
+    static getItemContextMenu(item) {
+        let menu = {};
+        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        
+        menu['This form'] = '---';
 
-                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
 
-                if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-                    menu['Remove'] = () => { this.onClickRemoveForm(); };
-                }
-                
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = () => { this.onClickRemoveForm(); };
+        }
+        
+        menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
-                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
-                if(isSyncEnabled) {
-                    menu['Sync'] = '---';
+        if(isSyncEnabled) {
+            menu['Sync'] = '---';
 
-                    if(!item.sync.isRemote) {
-                        menu['Push to remote'] = () => { this.onClickPushForm(); };
-                    }
-
-                    if(item.sync.hasRemote) {
-                        menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
-                    }
-                    
-                    if(item.sync.isRemote) {
-                        menu['Pull from remote'] = () => { this.onClickPullForm(); };
-                    }
-                }
-                
-                menu['General'] = '---';
-                menu['New form'] = () => { this.onClickNewForm(); };
-                menu['Refresh'] = () => { this.onClickRefreshResource('forms'); };
-
-                return menu;
-            },
-            
-            // General context menu
-            paneContextMenu: {
-                'Forms': '---',
-                'New form': () => { this.onClickNewForm(); },
-                'Refresh': () => { this.onClickRefreshResource('forms'); }
+            if(!item.sync.isRemote) {
+                menu['Push to remote'] = () => { this.onClickPushForm(); };
             }
-        });
+
+            if(item.sync.hasRemote) {
+                menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
+            }
+            
+            if(item.sync.isRemote) {
+                menu['Pull from remote'] = () => { this.onClickPullForm(); };
+            }
+        }
+        
+        menu['General'] = '---';
+        menu['New form'] = () => { this.onClickNewForm(); };
+        menu['Refresh'] = () => { this.onClickRefreshResource('forms'); };
+
+        return menu;
+    }
+    
+    /**
+     * General context menu
+     */
+    static getPaneContextMenu() {
+        return {
+            'Forms': '---',
+            'New form': () => { this.onClickNewForm(); },
+            'Refresh': () => { this.onClickRefreshResource('forms'); }
+        }
     }
 }
 

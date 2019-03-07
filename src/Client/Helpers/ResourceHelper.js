@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * A helper class for accessing resources on the server and in cache
+ * A helper class for accessing resources on the server
  *
  * @memberof HashBrown.Client.Helpers
  */
@@ -23,7 +23,7 @@ class ResourceHelper {
 
         return new Promise((resolve, reject) => {
             try {
-                let request = window.indexedDB.open('HashBrownCMS', 1);
+                let request = indexedDB.open('hb_' + HashBrown.Helpers.ProjectHelper.currentProject + '_' + HashBrown.Helpers.ProjectHelper.currentEnvironment, 1);
 
                 request.onsuccess = (e) => {
                     resolve(e.target.result);
@@ -81,71 +81,6 @@ class ResourceHelper {
     }
   
     /**
-     * Gets a resource or a list of resources from cache
-     *
-     * @param {Resource} model
-     * @param {String} category
-     * @param {String} id
-     *
-     * @returns {Promise} Result
-     */
-    static getCache(model, category, id) {
-        checkParam(model, 'model', HashBrown.Models.Resource);
-        checkParam(category, 'category', String);
-
-        return this.indexedDbTransaction('get', category, id)
-        .then((data) => {
-            if(!data) { return Promise.resolve(null); }
-
-            if(!Array.isArray(data)) { return Promise.resolve(new model(data));  }
-
-            for(let i in data) {
-                data[i] = new model(data[i]);
-            }
-
-            return Promise.resolve(data);
-        })
-        .catch((e) => {
-            return Promise.resolve(null);  
-        });
-    }
-
-    /**
-     * Sets a resource in cache
-     *
-     * @param {String} category
-     * @param {String} id
-     * @param {Resource} data
-     *
-     * @returns {Promise} Result
-     */
-    static setCache(category, id, data) {
-        checkParam(category, 'category', String);
-        checkParam(id, 'id', String);
-        checkParam(data, 'data', HashBrown.Models.Resource);
-
-        return this.removeCache(category, id)
-        .then(() => {
-            return this.indexedDbTransaction('put', category, id, data.getObject());
-        });
-    }
-    
-    /**
-     * Removes a resource from cache
-     *
-     * @param {String} category
-     * @param {String} id
-     *
-     * @returns {Promise} Result
-     */
-    static removeCache(category, id, data) {
-        checkParam(category, 'category', String);
-        checkParam(id, 'id', String);
-
-        return this.indexedDbTransaction('delete', category, id);
-    }
-
-    /**
      * Removes a resource
      *
      * @param {String} category
@@ -157,10 +92,9 @@ class ResourceHelper {
         checkParam(category, 'category', String);
         checkParam(id, 'id', String);
 
-        return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id)
-        .then(() => {
-            return this.removeCache(category, id);
-        });
+        HashBrown.Helpers.EventHelper.trigger(category, id);  
+        
+        return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
     }
 
     /**
@@ -176,31 +110,22 @@ class ResourceHelper {
         checkParam(model, 'model', HashBrown.Models.Resource);
         checkParam(category, 'category', String);
     
-        return this.getCache(model, category, id)
+        return HashBrown.Helpers.RequestHelper.request('get', category + (id ? '/' + id : ''))
         .then((result) => {
-            if(result) { return Promise.resolve(result); }
+            if(!result) { throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found'); }
 
-            return HashBrown.Helpers.RequestHelper.request('get', category + (id ? '/' + id : ''))
-            .then((result) => {
-                if(!result) { throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found'); }
-
+            if(typeof model === 'function') {
                 if(!Array.isArray(result)) {
                     result = new model(result);
-
-                    this.setCache(category, result.id, result);
-                
-                    return Promise.resolve(result);
 
                 } else {
                     for(let i in result) {
                         result[i] = new model(result[i]);
-                        
-                        this.setCache(category, result[i].id, result[i]);
                     }
                 }
+            }
 
-                return Promise.resolve(result);
-            });
+            return Promise.resolve(result);
         });
     }
     
@@ -218,10 +143,9 @@ class ResourceHelper {
         checkParam(category, 'id', String);
         checkParam(data, 'data', HashBrown.Models.Resource);
 
-        return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data)
-        .then(() => {
-            return this.setCache(category, id, data);
-        });
+        HashBrown.Helpers.EventHelper.trigger(category, id);  
+
+        return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data.getObject());
     }
 }
 

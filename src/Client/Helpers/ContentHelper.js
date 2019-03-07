@@ -39,6 +39,15 @@ class ContentHelper extends ContentHelperCommon {
     }
     
     /**
+     * Gets all Content
+     *
+     * @returns {Promise} Content node
+     */
+    static getAllContent() {
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content');
+    }
+    
+    /**
      * Sets Content by id
      *
      * @param {String} id

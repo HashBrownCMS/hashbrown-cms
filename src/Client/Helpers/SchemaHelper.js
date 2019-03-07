@@ -80,6 +80,32 @@ class SchemaHelper extends SchemaHelperCommon {
             return schema.type === type;
         });
     }
+    
+    /**
+     * Gets all Schemas
+     *
+     * @returns {Array} All Schemas
+     */
+    static getAllSchemas() {
+        return HashBrown.Helpers.ResourceHelper.get(null, 'schemas')
+        .then((result) => {
+            let schemas = [];
+
+            for(let schema of result) {
+                if(!schema.parentId) { continue; }
+
+                if(schema.type === 'content') {
+                    schema = new HashBrown.Models.ContentSchema(schema);
+                } else if(schema.type === 'field') {
+                    schema = new HashBrown.Models.FieldSchema(schema);
+                }
+
+                schemas.push(schema);
+            }
+
+            return Promise.resolve(schemas);
+        });
+    }
 
     /**
      * Gets a Schema by id (sync)

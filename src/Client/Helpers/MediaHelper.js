@@ -67,18 +67,18 @@ class MediaHelper extends MediaHelperCommon {
      * @return {Promise} Media object
      */
     static getMediaById(id) {
-        return new Promise((resolve, reject) => {
-            for(let i = 0; i < resources.media.length; i++) {
-                let media = resources.media[i];
-
-                if(media.id == id) {
-                    resolve(media);
-                    return;
-                }
-            }
-
-            reject(new Error('Media with id "' + id + '" not found'));
-        });
+        if(!id) { return Promise.resolve(null); }
+        
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media', id);
+    }
+    
+    /**
+     * Gets all Media objects
+     *
+     * @return {Promise} Media objects
+     */
+    static getAllMedia(id) {
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media');
     }
 
     /**

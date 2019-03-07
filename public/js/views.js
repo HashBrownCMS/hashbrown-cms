@@ -81,11 +81,11 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
-/******/ (Array(26).concat([
-/* 26 */
+/******/ (Array(22).concat([
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -94,18 +94,18 @@
  * @namespace HashBrown.Client.Views
  */
 
-__webpack_require__(27);
+__webpack_require__(23);
 
-__webpack_require__(32);
+__webpack_require__(28);
 
-__webpack_require__(42);
+__webpack_require__(38);
 
-__webpack_require__(73);
+__webpack_require__(69);
 
-__webpack_require__(83);
+__webpack_require__(79);
 
 /***/ }),
-/* 27 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -114,10 +114,10 @@ __webpack_require__(83);
  * @namespace HashBrown.Client.Views.Widgets
  */
 
-namespace('Views.Widgets').add(__webpack_require__(28)).add(__webpack_require__(29)).add(__webpack_require__(30)).add(__webpack_require__(31));
+namespace('Views.Widgets').add(__webpack_require__(24)).add(__webpack_require__(25)).add(__webpack_require__(26)).add(__webpack_require__(27));
 
 /***/ }),
-/* 28 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -205,7 +205,7 @@ function (_Crisp$View) {
 module.exports = Widget;
 
 /***/ }),
-/* 29 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -649,7 +649,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Dropdown;
 
 /***/ }),
-/* 30 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -853,7 +853,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Chips;
 
 /***/ }),
-/* 31 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1051,7 +1051,7 @@ function (_HashBrown$Views$Widg) {
 module.exports = Input;
 
 /***/ }),
-/* 32 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1060,10 +1060,10 @@ module.exports = Input;
  * @namespace HashBrown.Client.Views.Modals
  */
 
-namespace('Views.Modals').add(__webpack_require__(33)).add(__webpack_require__(34)).add(__webpack_require__(35)).add(__webpack_require__(36)).add(__webpack_require__(38)).add(__webpack_require__(39)).add(__webpack_require__(40)).add(__webpack_require__(41));
+namespace('Views.Modals').add(__webpack_require__(29)).add(__webpack_require__(30)).add(__webpack_require__(31)).add(__webpack_require__(32)).add(__webpack_require__(34)).add(__webpack_require__(35)).add(__webpack_require__(36)).add(__webpack_require__(37));
 
 /***/ }),
-/* 33 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1344,7 +1344,7 @@ document.addEventListener('keyup', function (e) {
 module.exports = Modal;
 
 /***/ }),
-/* 34 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1446,7 +1446,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = ConfirmModal;
 
 /***/ }),
-/* 35 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1653,7 +1653,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = DateModal;
 
 /***/ }),
-/* 36 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1677,7 +1677,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(37).icons;
+var icons = __webpack_require__(33).icons;
 /**
  * A modal for picking icons
  *
@@ -1772,13 +1772,13 @@ function (_HashBrown$Views$Moda) {
 module.exports = IconModal;
 
 /***/ }),
-/* 37 */
+/* 33 */
 /***/ (function(module) {
 
 module.exports = {"icons":["500px","adjust","adn","align-center","align-justify","align-left","align-right","amazon","ambulance","anchor","android","angellist","angle-double-down","angle-double-left","angle-double-right","angle-double-up","angle-down","angle-left","angle-right","angle-up","apple","archive","area-chart","arrow-circle-down","arrow-circle-left","arrow-circle-o-down","arrow-circle-o-left","arrow-circle-o-right","arrow-circle-o-up","arrow-circle-right","arrow-circle-up","arrow-down","arrow-left","arrow-right","arrow-up","arrows","arrows-alt","arrows-h","arrows-v","asterisk","at","automobile","backward","balance-scale","ban","bank","bar-chart","bar-chart-o","barcode","bars","battery-0","battery-1","battery-2","battery-3","battery-4","battery-empty","battery-full","battery-half","battery-quarter","battery-three-quarters","bed","beer","behance","behance-square","bell","bell-o","bell-slash","bell-slash-o","bicycle","binoculars","birthday-cake","bitbucket","bitbucket-square","bitcoin","black-tie","bluetooth","bluetooth-b","bold","bolt","bomb","book","bookmark","bookmark-o","briefcase","btc","bug","building","building-o","bullhorn","bullseye","bus","buysellads","cab","calculator","calendar","calendar-check-o","calendar-minus-o","calendar-o","calendar-plus-o","calendar-times-o","camera","camera-retro","car","caret-down","caret-left","caret-right","caret-square-o-down","caret-square-o-left","caret-square-o-right","caret-square-o-up","caret-up","cart-arrow-down","cart-plus","cc","cc-amex","cc-diners-club","cc-discover","cc-jcb","cc-mastercard","cc-paypal","cc-stripe","cc-visa","certificate","chain","chain-broken","check","check-circle","check-circle-o","check-square","check-square-o","chevron-circle-down","chevron-circle-left","chevron-circle-right","chevron-circle-up","chevron-down","chevron-left","chevron-right","chevron-up","child","chrome","circle","circle-o","circle-o-notch","circle-thin","clipboard","clock-o","clone","close","cloud","cloud-download","cloud-upload","cny","code","code-fork","codepen","codiepie","coffee","cog","cogs","columns","comment","comment-o","commenting","commenting-o","comments","comments-o","compass","compress","connectdevelop","contao","copy","copyright","creative-commons","credit-card","credit-card-alt","crop","crosshairs","css3","cube","cubes","cut","cutlery","dashboard","dashcube","database","dedent","delicious","desktop","deviantart","diamond","digg","dollar","dot-circle-o","download","dribbble","dropbox","drupal","edge","edit","eject","ellipsis-h","ellipsis-v","empire","envelope","envelope-o","envelope-square","eraser","eur","euro","exchange","exclamation","exclamation-circle","exclamation-triangle","expand","expeditedssl","external-link","external-link-square","eye","eye-slash","eyedropper","facebook","facebook-f","facebook-official","facebook-square","fast-backward","fast-forward","fax","feed","female","fighter-jet","file","file-archive-o","file-audio-o","file-code-o","file-excel-o","file-image-o","file-movie-o","file-o","file-pdf-o","file-photo-o","file-picture-o","file-powerpoint-o","file-sound-o","file-text","file-text-o","file-video-o","file-word-o","file-zip-o","files-o","film","filter","fire","fire-extinguisher","firefox","flag","flag-checkered","flag-o","flash","flask","flickr","floppy-o","folder","folder-o","folder-open","folder-open-o","font","fonticons","fort-awesome","forumbee","forward","foursquare","frown-o","futbol-o","gamepad","gavel","gbp","ge","gear","gears","genderless","get-pocket","gg","gg-circle","gift","git","git-square","github","github-alt","github-square","gittip","glass","globe","google","google-plus","google-plus-square","google-wallet","graduation-cap","gratipay","group","h-square","hacker-news","hand-grab-o","hand-lizard-o","hand-o-down","hand-o-left","hand-o-right","hand-o-up","hand-paper-o","hand-peace-o","hand-pointer-o","hand-rock-o","hand-scissors-o","hand-spock-o","hand-stop-o","hashtag","hdd-o","header","headphones","heart","heart-o","heartbeat","history","home","hospital-o","hotel","hourglass","hourglass-1","hourglass-2","hourglass-3","hourglass-end","hourglass-half","hourglass-o","hourglass-start","houzz","html5","i-cursor","ils","image","inbox","indent","industry","info","info-circle","inr","instagram","institution","internet-explorer","intersex","ioxhost","italic","joomla","jpy","jsfiddle","key","keyboard-o","krw","language","laptop","lastfm","lastfm-square","leaf","leanpub","legal","lemon-o","level-down","level-up","life-bouy","life-buoy","life-ring","life-saver","lightbulb-o","line-chart","link","linkedin","linkedin-square","linux","list","list-alt","list-ol","list-ul","location-arrow","lock","long-arrow-down","long-arrow-left","long-arrow-right","long-arrow-up","magic","magnet","mail-forward","mail-reply","mail-reply-all","male","map","map-marker","map-o","map-pin","map-signs","mars","mars-double","mars-stroke","mars-stroke-h","mars-stroke-v","maxcdn","meanpath","medium","medkit","meh-o","mercury","microphone","microphone-slash","minus","minus-circle","minus-square","minus-square-o","mixcloud","mobile","mobile-phone","modx","money","moon-o","mortar-board","motorcycle","mouse-pointer","music","navicon","neuter","newspaper-o","object-group","object-ungroup","odnoklassniki","odnoklassniki-square","opencart","openid","opera","optin-monster","outdent","pagelines","paint-brush","paper-plane","paper-plane-o","paperclip","paragraph","paste","pause","pause-circle","pause-circle-o","paw","paypal","pencil","pencil-square","pencil-square-o","percent","phone","phone-square","photo","picture-o","pie-chart","pied-piper","pied-piper-alt","pinterest","pinterest-p","pinterest-square","plane","play","play-circle","play-circle-o","plug","plus","plus-circle","plus-square","plus-square-o","power-off","print","product-hunt","puzzle-piece","qq","qrcode","question","question-circle","quote-left","quote-right","ra","random","rebel","recycle","reddit","reddit-alien","reddit-square","refresh","registered","remove","renren","reorder","repeat","reply","reply-all","retweet","rmb","road","rocket","rotate-left","rotate-right","rouble","rss","rss-square","rub","ruble","rupee","safari","save","scissors","scribd","search","search-minus","search-plus","sellsy","send","send-o","server","share","share-alt","share-alt-square","share-square","share-square-o","shekel","sheqel","shield","ship","shirtsinbulk","shopping-bag","shopping-basket","shopping-cart","sign-in","sign-out","signal","simplybuilt","sitemap","skyatlas","skype","slack","sliders","slideshare","smile-o","soccer-ball-o","sort","sort-alpha-asc","sort-alpha-desc","sort-amount-asc","sort-amount-desc","sort-asc","sort-desc","sort-down","sort-numeric-asc","sort-numeric-desc","sort-up","soundcloud","space-shuttle","spinner","spoon","spotify","square","square-o","stack-exchange","stack-overflow","star","star-half","star-half-empty","star-half-full","star-half-o","star-o","steam","steam-square","step-backward","step-forward","stethoscope","sticky-note","sticky-note-o","stop","stop-circle","stop-circle-o","street-view","strikethrough","stumbleupon","stumbleupon-circle","subscript","subway","suitcase","sun-o","superscript","support","table","tablet","tachometer","tag","tags","tasks","taxi","television","tencent-weibo","terminal","text-height","text-width","th","th-large","th-list","thumb-tack","thumbs-down","thumbs-o-down","thumbs-o-up","thumbs-up","ticket","times","times-circle","times-circle-o","tint","toggle-down","toggle-left","toggle-off","toggle-on","toggle-right","toggle-up","trademark","train","transgender","transgender-alt","trash","trash-o","tree","trello","tripadvisor","trophy","truck","try","tty","tumblr","tumblr-square","turkish-lira","tv","twitch","twitter","twitter-square","umbrella","underline","undo","university","unlink","unlock","unlock-alt","unsorted","upload","usb","usd","user","user-md","user-plus","user-secret","user-times","users","venus","venus-double","venus-mars","viacoin","video-camera","vimeo","vimeo-square","vine","vk","volume-down","volume-off","volume-up","warning","wechat","weibo","weixin","whatsapp","wheelchair","wifi","wikipedia-w","windows","won","wordpress","wrench","xing","xing-square","y-combinator","y-combinator-square","yahoo","yc","yc-square","yelp","yen","youtube","youtube-play","youtube-square"]};
 
 /***/ }),
-/* 38 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1847,7 +1847,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = IframeModal;
 
 /***/ }),
-/* 39 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1977,7 +1977,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 40 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2180,7 +2180,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 41 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2288,7 +2288,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = PublishingSettingsModal;
 
 /***/ }),
-/* 42 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2297,14 +2297,14 @@ module.exports = PublishingSettingsModal;
  * @namespace HashBrown.Client.Views.Editors
  */
 
-namespace('Views.Editors').add(__webpack_require__(43)).add(__webpack_require__(44)).add(__webpack_require__(45)).add(__webpack_require__(46)).add(__webpack_require__(51)).add(__webpack_require__(52)).add(__webpack_require__(53)).add(__webpack_require__(54)).add(__webpack_require__(55));
+namespace('Views.Editors').add(__webpack_require__(39)).add(__webpack_require__(40)).add(__webpack_require__(41)).add(__webpack_require__(42)).add(__webpack_require__(47)).add(__webpack_require__(48)).add(__webpack_require__(49)).add(__webpack_require__(50)).add(__webpack_require__(51));
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');
 
-__webpack_require__(56);
+__webpack_require__(52);
 
 /***/ }),
-/* 43 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2654,7 +2654,7 @@ function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 44 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3168,7 +3168,7 @@ function (_Crisp$View) {
 module.exports = ContentEditor;
 
 /***/ }),
-/* 45 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3651,7 +3651,7 @@ function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 46 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3675,7 +3675,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var beautify = __webpack_require__(47).js_beautify;
+var beautify = __webpack_require__(43).js_beautify;
 /**
  * A basic JSON editor for any object
  *
@@ -3989,7 +3989,7 @@ function (_Crisp$View) {
 module.exports = JSONEditor;
 
 /***/ }),
-/* 47 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4059,14 +4059,14 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
   // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(48), __webpack_require__(49), __webpack_require__(50)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
+  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(44), __webpack_require__(45), __webpack_require__(46)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (js_beautify, css_beautify, html_beautify) {
     return get_beautify(js_beautify, css_beautify, html_beautify);
   }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {}
 
 /***/ }),
-/* 48 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7667,7 +7667,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 49 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9279,7 +9279,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 50 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -11912,9 +11912,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 
   if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(48), __webpack_require__(49)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
-      var js_beautify = __webpack_require__(48);
-      var css_beautify = __webpack_require__(49);
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(44), __webpack_require__(45)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (requireamd) {
+      var js_beautify = __webpack_require__(44);
+      var css_beautify = __webpack_require__(45);
       return {
         html_beautify: function html_beautify(html_source, options) {
           return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
@@ -11926,7 +11926,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;function _typeof
 })();
 
 /***/ }),
-/* 51 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12031,7 +12031,7 @@ function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 52 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12325,7 +12325,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = UserEditor;
 
 /***/ }),
-/* 53 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12349,7 +12349,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var icons = __webpack_require__(37).icons;
+var icons = __webpack_require__(33).icons;
 /**
  * The editor for schemas
  *
@@ -12575,7 +12575,7 @@ function (_Crisp$View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 54 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13034,7 +13034,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 55 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13142,7 +13142,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = FieldSchemaEditor;
 
 /***/ }),
-/* 56 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13151,10 +13151,10 @@ module.exports = FieldSchemaEditor;
  * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 
-namespace('Views.Editors.FieldEditors').add(__webpack_require__(57)).add(__webpack_require__(58)).add(__webpack_require__(59)).add(__webpack_require__(60)).add(__webpack_require__(61)).add(__webpack_require__(62)).add(__webpack_require__(63)).add(__webpack_require__(64)).add(__webpack_require__(65)).add(__webpack_require__(66)).add(__webpack_require__(67)).add(__webpack_require__(68)).add(__webpack_require__(69)).add(__webpack_require__(70)).add(__webpack_require__(71)).add(__webpack_require__(72));
+namespace('Views.Editors.FieldEditors').add(__webpack_require__(53)).add(__webpack_require__(54)).add(__webpack_require__(55)).add(__webpack_require__(56)).add(__webpack_require__(57)).add(__webpack_require__(58)).add(__webpack_require__(59)).add(__webpack_require__(60)).add(__webpack_require__(61)).add(__webpack_require__(62)).add(__webpack_require__(63)).add(__webpack_require__(64)).add(__webpack_require__(65)).add(__webpack_require__(66)).add(__webpack_require__(67)).add(__webpack_require__(68));
 
 /***/ }),
-/* 57 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13239,7 +13239,7 @@ function (_Crisp$View) {
 module.exports = FieldEditor;
 
 /***/ }),
-/* 58 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13639,7 +13639,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 59 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13742,7 +13742,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 60 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13925,7 +13925,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 61 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14149,7 +14149,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 62 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14316,7 +14316,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 63 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14452,7 +14452,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 64 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14555,7 +14555,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 65 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14685,7 +14685,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 66 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14861,7 +14861,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 67 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15018,7 +15018,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 68 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15455,7 +15455,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 69 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15574,7 +15574,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 70 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16012,7 +16012,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 71 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16101,7 +16101,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 72 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16406,7 +16406,7 @@ function (_HashBrown$Views$Edit) {
 module.exports = UrlEditor;
 
 /***/ }),
-/* 73 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16415,10 +16415,10 @@ module.exports = UrlEditor;
  * @namespace HashBrown.Client.Views.Navigation
  */
 
-namespace('Views.Navigation').add(__webpack_require__(74)).add(__webpack_require__(76)).add(__webpack_require__(77)).add(__webpack_require__(78)).add(__webpack_require__(79)).add(__webpack_require__(80)).add(__webpack_require__(81)).add(__webpack_require__(82));
+namespace('Views.Navigation').add(__webpack_require__(70)).add(__webpack_require__(72)).add(__webpack_require__(73)).add(__webpack_require__(74)).add(__webpack_require__(75)).add(__webpack_require__(76)).add(__webpack_require__(77)).add(__webpack_require__(78));
 
 /***/ }),
-/* 74 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16441,6 +16441,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -16458,13 +16462,7 @@ function (_Crisp$View) {
     _classCallCheck(this, NavbarMain);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(NavbarMain).call(this, params));
-    _this.template = __webpack_require__(75);
-    _this.tabPanes = [];
-    HashBrown.Views.Navigation.ContentPane.init();
-    HashBrown.Views.Navigation.MediaPane.init();
-    HashBrown.Views.Navigation.FormsPane.init();
-    HashBrown.Views.Navigation.ConnectionPane.init();
-    HashBrown.Views.Navigation.SchemaPane.init();
+    _this.template = __webpack_require__(71);
 
     _this.fetch();
 
@@ -16472,15 +16470,66 @@ function (_Crisp$View) {
     return _this;
   }
   /**
-   * Event: Change filter
-   *
-   * @param {HTMLElement} $pane
-   * @param {NavbarPane} pane
-   * @param {String} search
+   * Fetches content
    */
 
 
   _createClass(NavbarMain, [{
+    key: "fetch",
+    value: function fetch() {
+      var _this2 = this;
+
+      var panes = this.getPanes();
+
+      var next = function next(i) {
+        if (!panes[i]) {
+          return Promise.resolve();
+        }
+
+        if (typeof panes[i].getItems !== 'function') {
+          return next(i + 1);
+        }
+
+        return panes[i].getItems().then(function (items) {
+          panes[i].items = items;
+          return next(i + 1);
+        });
+      };
+
+      return next(0).then(function () {
+        _get(_getPrototypeOf(NavbarMain.prototype), "fetch", _this2).call(_this2);
+      });
+    }
+    /**
+     * Gets all panes
+     *
+     * @return {Array} Panes
+     */
+
+  }, {
+    key: "getPanes",
+    value: function getPanes() {
+      var panes = [];
+
+      for (var name in HashBrown.Views.Navigation) {
+        var pane = HashBrown.Views.Navigation[name];
+
+        if (pane.prototype instanceof HashBrown.Views.Navigation.NavbarPane) {
+          panes.push(pane);
+        }
+      }
+
+      return panes;
+    }
+    /**
+     * Event: Change filter
+     *
+     * @param {HTMLElement} $pane
+     * @param {NavbarPane} pane
+     * @param {String} search
+     */
+
+  }, {
     key: "onChangeFilter",
     value: function onChangeFilter($pane, pane, search) {
       search = search.toLowerCase();
@@ -16578,7 +16627,7 @@ function (_Crisp$View) {
   }, {
     key: "save",
     value: function save() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.state = {
         buttons: {},
@@ -16593,15 +16642,15 @@ function (_Crisp$View) {
           return;
         }
 
-        _this2.state.buttons[key] = element.className;
+        _this3.state.buttons[key] = element.className;
       });
       this.$element.find('.navbar-main__pane').each(function (i, element) {
         var key = element.dataset.route;
-        _this2.state.panes[key] = element.className;
+        _this3.state.panes[key] = element.className;
       });
       this.$element.find('.navbar-main__pane__item').each(function (i, element) {
         var key = element.dataset.routingPath || element.dataset.mediaFolder;
-        _this2.state.items[key] = element.className.replace('loading', '');
+        _this3.state.items[key] = element.className.replace('loading', '');
       });
     }
     /**
@@ -16611,7 +16660,7 @@ function (_Crisp$View) {
   }, {
     key: "restore",
     value: function restore() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!this.state) {
         return;
@@ -16621,24 +16670,24 @@ function (_Crisp$View) {
       this.$element.find('.navbar-main__tab').each(function (i, element) {
         var key = element.dataset.route;
 
-        if (key && _this3.state.buttons[key]) {
-          element.className = _this3.state.buttons[key];
+        if (key && _this4.state.buttons[key]) {
+          element.className = _this4.state.buttons[key];
         }
       }); // Restore pane containers
 
       this.$element.find('.navbar-main__pane').each(function (i, element) {
         var key = element.dataset.route;
 
-        if (key && _this3.state.panes[key]) {
-          element.className = _this3.state.panes[key];
+        if (key && _this4.state.panes[key]) {
+          element.className = _this4.state.panes[key];
         }
       }); // Restore pane items
 
       this.$element.find('.navbar-main__pane__item').each(function (i, element) {
         var key = element.dataset.routingPath || element.dataset.mediaFolder;
 
-        if (key && _this3.state.items[key]) {
-          element.className = _this3.state.items[key];
+        if (key && _this4.state.items[key]) {
+          element.className = _this4.state.items[key];
         }
       }); // Restore scroll position
 
@@ -16844,7 +16893,7 @@ function (_Crisp$View) {
   }, {
     key: "applyHierarchy",
     value: function applyHierarchy($pane, pane, queue) {
-      var _this4 = this;
+      var _this5 = this;
 
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -16893,7 +16942,7 @@ function (_Crisp$View) {
                 _.button({
                   class: 'navbar-main__pane__item__toggle-children'
                 }).click(function (e) {
-                  _this4.onClickToggleChildren(e);
+                  _this5.onClickToggleChildren(e);
                 })), _.div({
                   class: 'navbar-main__pane__item__children'
                 }));
@@ -16916,8 +16965,8 @@ function (_Crisp$View) {
                 } // Attach item context menu
 
 
-                if (pane.settings.dirContextMenu) {
-                  UI.context($dir[0], pane.settings.dirContextMenu);
+                if (pane.settings.getDirContextMenu) {
+                  UI.context($dir[0], pane.settings.getDirContextMenu());
                 }
               } // Only append the queue item to the final parent element
 
@@ -16935,7 +16984,7 @@ function (_Crisp$View) {
             $parentDir.children('.navbar-main__pane__item__content').append(_.button({
               class: 'navbar-main__pane__item__toggle-children'
             }).click(function (e) {
-              _this4.onClickToggleChildren(e);
+              _this5.onClickToggleChildren(e);
             }));
           }
         }
@@ -16959,23 +17008,6 @@ function (_Crisp$View) {
     value: function reload() {
       Crisp.View.get('NavbarMain').reload();
     }
-    /**
-     * Adds a tab pane
-     *
-     * @param {String} route
-     * @param {Object} settings
-     */
-
-  }, {
-    key: "addTabPane",
-    value: function addTabPane(route, label, icon, settings) {
-      Crisp.View.get('NavbarMain').tabPanes.push({
-        label: label,
-        route: route,
-        icon: icon,
-        settings: settings
-      });
-    }
   }]);
 
   return NavbarMain;
@@ -16984,7 +17016,7 @@ function (_Crisp$View) {
 module.exports = NavbarMain;
 
 /***/ }),
-/* 75 */
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -16994,7 +17026,6 @@ module.exports = function () {
   var currentProject = HashBrown.Helpers.ProjectHelper.currentProject;
   var hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
   var hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-  var hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
   return _.nav({
     class: 'navbar-main'
   }, // Buttons
@@ -17008,7 +17039,7 @@ module.exports = function () {
     class: 'navbar-main__tab__icon'
   }), _.div({
     class: 'navbar-main__tab__label'
-  }, 'Dashboard')), _.each(this.tabPanes, function (i, pane) {
+  }, 'Dashboard')), _.each(this.getPanes(), function (i, pane) {
     return _.button({
       class: 'navbar-main__tab',
       'data-route': pane.route,
@@ -17023,7 +17054,7 @@ module.exports = function () {
   })), // Panes
   _.div({
     class: 'navbar-main__panes'
-  }, _.each(this.tabPanes, function (i, pane) {
+  }, _.each(this.getPanes(), function (i, pane) {
     var queue = [];
     var sortingOptions = {
       default: 'Default',
@@ -17066,14 +17097,14 @@ module.exports = function () {
     }, 'New folder')), // Items
     _.div({
       class: 'navbar-main__pane__items'
-    }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
+    }, _.each(pane.items, function (i, item) {
       var id = item.id || i;
 
       var name = _this.getItemName(item);
 
-      var icon = _this.getItemIcon(item, pane.settings);
+      var icon = _this.getItemIcon(item, pane);
 
-      var routingPath = _this.getItemRoutingPath(item, pane.settings);
+      var routingPath = _this.getItemRoutingPath(item, pane);
 
       var isDirectory = _this.isItemDirectory(item);
 
@@ -17106,17 +17137,17 @@ module.exports = function () {
       })); // Attach item context menu
 
 
-      if (pane.settings.getItemContextMenu) {
-        UI.context($item.find('a')[0], pane.settings.getItemContextMenu(item));
-      } else if (pane.settings.itemContextMenu) {
-        UI.context($item.find('a')[0], pane.settings.itemContextMenu);
+      if (pane.getItemContextMenu) {
+        UI.context($item.find('a')[0], pane.getItemContextMenu(item));
+      } else if (pane.itemContextMenu) {
+        UI.context($item.find('a')[0], pane.itemContextMenu);
       } // Add element to queue item
 
 
       queueItem.$element = $item; // Use specific hierarchy behaviours
 
-      if (pane.settings.hierarchy) {
-        pane.settings.hierarchy(item, queueItem);
+      if (pane.hierarchy) {
+        pane.hierarchy(item, queueItem);
       } // Add queue item to sorting queue
 
 
@@ -17129,8 +17160,8 @@ module.exports = function () {
     _this.applySorting($pane, pane); // Attach pane context menu
 
 
-    if (pane.settings.paneContextMenu) {
-      UI.context($pane[0], pane.settings.paneContextMenu);
+    if (pane.getPaneContextMenu) {
+      UI.context($pane[0], pane.getPaneContextMenu());
     }
 
     return $pane;
@@ -17143,7 +17174,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 76 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17334,7 +17365,7 @@ function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 77 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17522,7 +17553,7 @@ function () {
 module.exports = NavbarPane;
 
 /***/ }),
-/* 78 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17648,92 +17679,114 @@ function (_HashBrown$Views$Navi) {
       }).catch(UI.errorModal);
     }
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
 
   }, {
-    key: "init",
-    value: function init() {
+    key: "getItems",
+    value: function getItems() {
+      return HashBrown.Helpers.ConnectionHelper.getAllConnections();
+    }
+    /**
+     * Item context menu
+     */
+
+  }, {
+    key: "getItemContextMenu",
+    value: function getItemContextMenu(item) {
       var _this2 = this;
 
-      if (!currentUserHasScope('connections')) {
-        return;
+      var menu = {};
+      var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+      menu['This connection'] = '---';
+
+      menu['Open in new tab'] = function () {
+        _this2.onClickOpenInNewTab();
+      };
+
+      if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+        menu['Remove'] = function () {
+          _this2.onClickRemoveConnection();
+        };
       }
 
-      HashBrown.Views.Navigation.NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
-        icon: 'exchange',
-        getItems: function getItems() {
-          return resources.connections;
-        },
-        // Item context menu
-        getItemContextMenu: function getItemContextMenu(item) {
-          var menu = {};
-          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-          menu['This connection'] = '---';
+      menu['Copy id'] = function () {
+        _this2.onClickCopyItemId();
+      };
 
-          menu['Open in new tab'] = function () {
-            _this2.onClickOpenInNewTab();
+      if (item.isLocked && !item.sync.isRemote) {
+        isSyncEnabled = false;
+      }
+
+      if (isSyncEnabled) {
+        menu['Sync'] = '---';
+
+        if (!item.sync.isRemote) {
+          menu['Push to remote'] = function () {
+            _this2.onClickPushConnection();
           };
-
-          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = function () {
-              _this2.onClickRemoveConnection();
-            };
-          }
-
-          menu['Copy id'] = function () {
-            _this2.onClickCopyItemId();
-          };
-
-          if (item.isLocked && !item.sync.isRemote) {
-            isSyncEnabled = false;
-          }
-
-          if (isSyncEnabled) {
-            menu['Sync'] = '---';
-
-            if (!item.sync.isRemote) {
-              menu['Push to remote'] = function () {
-                _this2.onClickPushConnection();
-              };
-            }
-
-            if (item.sync.hasRemote) {
-              menu['Remove local copy'] = function () {
-                _this2.onClickRemoveConnection();
-              };
-            }
-
-            if (item.sync.isRemote) {
-              menu['Pull from remote'] = function () {
-                _this2.onClickPullConnection();
-              };
-            }
-          }
-
-          menu['General'] = '---';
-
-          menu['New connection'] = function () {
-            _this2.onClickNewConnection();
-          };
-
-          menu['Refresh'] = function () {
-            _this2.onClickRefreshResource('connections');
-          };
-
-          return menu;
-        },
-        // General context menu
-        paneContextMenu: {
-          'Connections': '---',
-          'New connection': function NewConnection() {
-            _this2.onClickNewConnection();
-          },
-          'Refresh': function Refresh() {
-            _this2.onClickRefreshResource('connections');
-          }
         }
-      });
+
+        if (item.sync.hasRemote) {
+          menu['Remove local copy'] = function () {
+            _this2.onClickRemoveConnection();
+          };
+        }
+
+        if (item.sync.isRemote) {
+          menu['Pull from remote'] = function () {
+            _this2.onClickPullConnection();
+          };
+        }
+      }
+
+      menu['General'] = '---';
+
+      menu['New connection'] = function () {
+        _this2.onClickNewConnection();
+      };
+
+      menu['Refresh'] = function () {
+        _this2.onClickRefreshResource('connections');
+      };
+
+      return menu;
+    }
+    /**
+     * General context menu
+     */
+
+  }, {
+    key: "getPaneContextMenu",
+    value: function getPaneContextMenu() {
+      var _this3 = this;
+
+      return {
+        'Connections': '---',
+        'New connection': function NewConnection() {
+          _this3.onClickNewConnection();
+        },
+        'Refresh': function Refresh() {
+          _this3.onClickRefreshResource('connections');
+        }
+      };
+    }
+  }, {
+    key: "route",
+    get: function get() {
+      return '/connections/';
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return 'Connections';
+    }
+  }, {
+    key: "icon",
+    get: function get() {
+      return 'exchange';
     }
   }]);
 
@@ -17743,7 +17796,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 79 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18095,117 +18148,149 @@ function (_HashBrown$Views$Navi) {
       });
     }
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
 
   }, {
-    key: "init",
-    value: function init() {
+    key: "getItems",
+    value: function getItems() {
+      return HashBrown.Helpers.ContentHelper.getAllContent();
+    }
+    /**
+     * Item context menu
+     */
+
+  }, {
+    key: "getItemContextMenu",
+    value: function getItemContextMenu(item) {
       var _this = this;
 
-      HashBrown.Views.Navigation.NavbarMain.addTabPane('/content/', 'Content', 'file', {
-        getItems: function getItems() {
-          return resources.content;
-        },
-        // Item context menu
-        getItemContextMenu: function getItemContextMenu(item) {
-          var menu = {};
-          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-          menu['This content'] = '---';
+      var menu = {};
+      var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+      menu['This content'] = '---';
 
-          menu['Open in new tab'] = function () {
-            _this.onClickOpenInNewTab();
-          };
+      menu['Open in new tab'] = function () {
+        _this.onClickOpenInNewTab();
+      };
 
-          menu['Rename'] = function () {
-            _this.onClickRename();
-          };
+      menu['Rename'] = function () {
+        _this.onClickRename();
+      };
 
-          menu['New child content'] = function () {
-            _this.onClickNewContent($('.context-menu-target').data('id'));
-          };
+      menu['New child content'] = function () {
+        _this.onClickNewContent($('.context-menu-target').data('id'));
+      };
 
-          if (!item.sync.isRemote && !item.isLocked) {
-            menu['Move'] = function () {
-              _this.onClickMoveItem();
-            };
-          }
+      if (!item.sync.isRemote && !item.isLocked) {
+        menu['Move'] = function () {
+          _this.onClickMoveItem();
+        };
+      }
 
-          if (!item.sync.hasRemote && !item.isLocked) {
-            menu['Remove'] = function () {
-              _this.onClickRemoveContent(true);
-            };
-          }
+      if (!item.sync.hasRemote && !item.isLocked) {
+        menu['Remove'] = function () {
+          _this.onClickRemoveContent(true);
+        };
+      }
 
-          menu['Copy id'] = function () {
-            _this.onClickCopyItemId();
-          };
+      menu['Copy id'] = function () {
+        _this.onClickCopyItemId();
+      };
 
-          if (!item.sync.isRemote && !item.isLocked) {
-            menu['Settings'] = '---';
+      if (!item.sync.isRemote && !item.isLocked) {
+        menu['Settings'] = '---';
 
-            menu['Publishing'] = function () {
-              _this.onClickContentPublishing();
-            };
-          }
+        menu['Publishing'] = function () {
+          _this.onClickContentPublishing();
+        };
+      }
 
-          if (item.isLocked && !item.sync.isRemote) {
-            isSyncEnabled = false;
-          }
+      if (item.isLocked && !item.sync.isRemote) {
+        isSyncEnabled = false;
+      }
 
-          if (isSyncEnabled) {
-            menu['Sync'] = '---';
+      if (isSyncEnabled) {
+        menu['Sync'] = '---';
 
-            if (!item.sync.isRemote) {
-              menu['Push to remote'] = function () {
-                _this.onClickPushContent();
-              };
-            }
-
-            if (item.sync.hasRemote) {
-              menu['Remove local copy'] = function () {
-                _this.onClickRemoveContent();
-              };
-            }
-
-            if (item.sync.isRemote) {
-              menu['Pull from remote'] = function () {
-                _this.onClickPullContent();
-              };
-            }
-          }
-
-          menu['General'] = '---';
-
-          menu['New content'] = function () {
-            _this.onClickNewContent();
-          };
-
-          menu['Refresh'] = function () {
-            _this.onClickRefreshResource('content');
-          };
-
-          return menu;
-        },
-        // Set general context menu items
-        paneContextMenu: {
-          'Content': '---',
-          'New content': function NewContent() {
-            _this.onClickNewContent();
-          },
-          'Refresh': function Refresh() {
-            _this.onClickRefreshResource('content');
-          }
-        },
-        // Hierarchy logic
-        hierarchy: function hierarchy(item, queueItem) {
-          // Set id data attributes
-          queueItem.$element.attr('data-content-id', item.id);
-          queueItem.parentDirAttr = {
-            'data-content-id': item.parentId
+        if (!item.sync.isRemote) {
+          menu['Push to remote'] = function () {
+            _this.onClickPushContent();
           };
         }
-      });
+
+        if (item.sync.hasRemote) {
+          menu['Remove local copy'] = function () {
+            _this.onClickRemoveContent();
+          };
+        }
+
+        if (item.sync.isRemote) {
+          menu['Pull from remote'] = function () {
+            _this.onClickPullContent();
+          };
+        }
+      }
+
+      menu['General'] = '---';
+
+      menu['New content'] = function () {
+        _this.onClickNewContent();
+      };
+
+      menu['Refresh'] = function () {
+        _this.onClickRefreshResource('content');
+      };
+
+      return menu;
+    }
+    /**
+     * Pane context menu
+     */
+
+  }, {
+    key: "getPaneContextMenu",
+    value: function getPaneContextMenu() {
+      var _this2 = this;
+
+      return {
+        'Content': '---',
+        'New content': function NewContent() {
+          _this2.onClickNewContent();
+        },
+        'Refresh': function Refresh() {
+          _this2.onClickRefreshResource('content');
+        }
+      };
+    }
+    /**
+     * Hierarchy logic
+     */
+
+  }, {
+    key: "hierarchy",
+    value: function hierarchy(item, queueItem) {
+      // Set id data attributes
+      queueItem.$element.attr('data-content-id', item.id);
+      queueItem.parentDirAttr = {
+        'data-content-id': item.parentId
+      };
+    }
+  }, {
+    key: "route",
+    get: function get() {
+      return '/content/';
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return 'Content';
+    }
+  }, {
+    key: "icon",
+    get: function get() {
+      return 'file';
     }
   }]);
 
@@ -18215,7 +18300,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 80 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18334,99 +18419,130 @@ function (_HashBrown$Views$Navi) {
       }).catch(UI.errorModal);
     }
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
 
   }, {
-    key: "init",
-    value: function init() {
+    key: "getItems",
+    value: function getItems() {
+      return HashBrown.Helpers.FormHelper.getAllForms();
+    }
+    /**
+     * Hierarchy logic
+     */
+
+  }, {
+    key: "hierarchy",
+    value: function hierarchy(item, queueItem) {
+      queueItem.$element.attr('data-form-id', item.id);
+
+      if (item.folder) {
+        queueItem.createDir = true;
+        queueItem.parentDirAttr = {
+          'data-form-folder': item.folder
+        };
+      }
+    }
+    /**
+     * Item context menu
+     */
+
+  }, {
+    key: "getItemContextMenu",
+    value: function getItemContextMenu(item) {
       var _this = this;
 
-      HashBrown.Views.Navigation.NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
-        icon: 'wpforms',
-        getItems: function getItems() {
-          return resources.forms;
-        },
-        // Hierarchy logic
-        hierarchy: function hierarchy(item, queueItem) {
-          queueItem.$element.attr('data-form-id', item.id);
+      var menu = {};
+      var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+      menu['This form'] = '---';
 
-          if (item.folder) {
-            queueItem.createDir = true;
-            queueItem.parentDirAttr = {
-              'data-form-folder': item.folder
-            };
-          }
-        },
-        // Item context menu
-        getItemContextMenu: function getItemContextMenu(item) {
-          var menu = {};
-          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-          menu['This form'] = '---';
+      menu['Open in new tab'] = function () {
+        _this.onClickOpenInNewTab();
+      };
 
-          menu['Open in new tab'] = function () {
-            _this.onClickOpenInNewTab();
+      if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+        menu['Remove'] = function () {
+          _this.onClickRemoveForm();
+        };
+      }
+
+      menu['Copy id'] = function () {
+        _this.onClickCopyItemId();
+      };
+
+      if (item.isLocked && !item.sync.isRemote) {
+        isSyncEnabled = false;
+      }
+
+      if (isSyncEnabled) {
+        menu['Sync'] = '---';
+
+        if (!item.sync.isRemote) {
+          menu['Push to remote'] = function () {
+            _this.onClickPushForm();
           };
-
-          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = function () {
-              _this.onClickRemoveForm();
-            };
-          }
-
-          menu['Copy id'] = function () {
-            _this.onClickCopyItemId();
-          };
-
-          if (item.isLocked && !item.sync.isRemote) {
-            isSyncEnabled = false;
-          }
-
-          if (isSyncEnabled) {
-            menu['Sync'] = '---';
-
-            if (!item.sync.isRemote) {
-              menu['Push to remote'] = function () {
-                _this.onClickPushForm();
-              };
-            }
-
-            if (item.sync.hasRemote) {
-              menu['Remove local copy'] = function () {
-                _this.onClickRemoveForm();
-              };
-            }
-
-            if (item.sync.isRemote) {
-              menu['Pull from remote'] = function () {
-                _this.onClickPullForm();
-              };
-            }
-          }
-
-          menu['General'] = '---';
-
-          menu['New form'] = function () {
-            _this.onClickNewForm();
-          };
-
-          menu['Refresh'] = function () {
-            _this.onClickRefreshResource('forms');
-          };
-
-          return menu;
-        },
-        // General context menu
-        paneContextMenu: {
-          'Forms': '---',
-          'New form': function NewForm() {
-            _this.onClickNewForm();
-          },
-          'Refresh': function Refresh() {
-            _this.onClickRefreshResource('forms');
-          }
         }
-      });
+
+        if (item.sync.hasRemote) {
+          menu['Remove local copy'] = function () {
+            _this.onClickRemoveForm();
+          };
+        }
+
+        if (item.sync.isRemote) {
+          menu['Pull from remote'] = function () {
+            _this.onClickPullForm();
+          };
+        }
+      }
+
+      menu['General'] = '---';
+
+      menu['New form'] = function () {
+        _this.onClickNewForm();
+      };
+
+      menu['Refresh'] = function () {
+        _this.onClickRefreshResource('forms');
+      };
+
+      return menu;
+    }
+    /**
+     * General context menu
+     */
+
+  }, {
+    key: "getPaneContextMenu",
+    value: function getPaneContextMenu() {
+      var _this2 = this;
+
+      return {
+        'Forms': '---',
+        'New form': function NewForm() {
+          _this2.onClickNewForm();
+        },
+        'Refresh': function Refresh() {
+          _this2.onClickRefreshResource('forms');
+        }
+      };
+    }
+  }, {
+    key: "route",
+    get: function get() {
+      return '/forms/';
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return 'Forms';
+    }
+  }, {
+    key: "icon",
+    get: function get() {
+      return 'wpforms';
     }
   }]);
 
@@ -18436,7 +18552,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 81 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18476,7 +18592,49 @@ function (_HashBrown$Views$Navi) {
     return _possibleConstructorReturn(this, _getPrototypeOf(MediaPane).apply(this, arguments));
   }
 
-  _createClass(MediaPane, null, [{
+  _createClass(MediaPane, [{
+    key: "getItemContextMenu",
+
+    /**
+     * Item context menu
+     */
+    value: function getItemContextMenu() {
+      var _this = this;
+
+      return {
+        'This media': '---',
+        'Open in new tab': function OpenInNewTab() {
+          _this.onClickOpenInNewTab();
+        },
+        'Move': function Move() {
+          _this.onClickMoveItem();
+        },
+        'Rename': function Rename() {
+          _this.onClickRenameMedia();
+        },
+        'Remove': function Remove() {
+          _this.onClickRemoveMedia();
+        },
+        'Replace': function Replace() {
+          _this.onClickReplaceMedia();
+        },
+        'Copy id': function CopyId() {
+          _this.onClickCopyItemId();
+        },
+        'General': '---',
+        'Upload new media': function UploadNewMedia() {
+          _this.onClickUploadMedia();
+        },
+        'Refresh': function Refresh() {
+          _this.onClickRefreshResource('media');
+        }
+      };
+    }
+    /**
+     * Dir context menu
+     */
+
+  }], [{
     key: "onChangeDirectory",
 
     /**
@@ -18591,85 +18749,86 @@ function (_HashBrown$Views$Navi) {
       });
     }
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} items
      */
 
   }, {
-    key: "init",
-    value: function init() {
-      var _this = this;
+    key: "getItems",
+    value: function getItems() {
+      return HashBrown.Helpers.MediaHelper.getAllMedia();
+    }
+    /**
+     * Hierarchy logic
+     */
 
-      HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
-        getItems: function getItems() {
-          return resources.media;
-        },
-        // Hierarchy logic
-        hierarchy: function hierarchy(item, queueItem) {
-          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-          queueItem.$element.attr('data-media-id', item.id);
-          queueItem.$element.attr('data-remote', true);
+  }, {
+    key: "hierarchy",
+    value: function hierarchy(item, queueItem) {
+      var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+      queueItem.$element.attr('data-media-id', item.id);
+      queueItem.$element.attr('data-remote', true);
 
-          if (item.folder) {
-            queueItem.createDir = true;
-            queueItem.parentDirAttr = {
-              'data-media-folder': item.folder
-            };
-            queueItem.parentDirExtraAttr = {
-              'data-remote': isSyncEnabled
-            };
-          }
+      if (item.folder) {
+        queueItem.createDir = true;
+        queueItem.parentDirAttr = {
+          'data-media-folder': item.folder
+        };
+        queueItem.parentDirExtraAttr = {
+          'data-remote': isSyncEnabled
+        };
+      }
+    }
+  }, {
+    key: "getDirContextMenu",
+    value: function getDirContextMenu() {
+      var _this2 = this;
+
+      return {
+        'Directory': '---',
+        'Upload new media': function UploadNewMedia() {
+          _this2.onClickUploadMedia();
         },
-        // Item context menu
-        itemContextMenu: {
-          'This media': '---',
-          'Open in new tab': function OpenInNewTab() {
-            _this.onClickOpenInNewTab();
-          },
-          'Move': function Move() {
-            _this.onClickMoveItem();
-          },
-          'Rename': function Rename() {
-            _this.onClickRenameMedia();
-          },
-          'Remove': function Remove() {
-            _this.onClickRemoveMedia();
-          },
-          'Replace': function Replace() {
-            _this.onClickReplaceMedia();
-          },
-          'Copy id': function CopyId() {
-            _this.onClickCopyItemId();
-          },
-          'General': '---',
-          'Upload new media': function UploadNewMedia() {
-            _this.onClickUploadMedia();
-          },
-          'Refresh': function Refresh() {
-            _this.onClickRefreshResource('media');
-          }
-        },
-        // Dir context menu
-        dirContextMenu: {
-          'Directory': '---',
-          'Upload new media': function UploadNewMedia() {
-            _this.onClickUploadMedia();
-          },
-          'General': '---',
-          'Refresh': function Refresh() {
-            _this.onClickRefreshResource('media');
-          }
-        },
-        // General context menu
-        paneContextMenu: {
-          'Media': '---',
-          'Upload new media': function UploadNewMedia() {
-            _this.onClickUploadMedia();
-          },
-          'Refresh': function Refresh() {
-            _this.onClickRefreshResource('media');
-          }
+        'General': '---',
+        'Refresh': function Refresh() {
+          _this2.onClickRefreshResource('media');
         }
-      });
+      };
+    }
+    /**
+     * General context menu
+     */
+
+  }, {
+    key: "getPaneContextMenu",
+    value: function getPaneContextMenu() {
+      var _this3 = this;
+
+      return {
+        'Media': '---',
+        'Upload new media': function UploadNewMedia() {
+          _this3.onClickUploadMedia();
+        },
+        'Refresh': function Refresh() {
+          _this3.onClickRefreshResource('media');
+        }
+      };
+    }
+  }, {
+    key: "route",
+    get: function get() {
+      return '/media/';
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return 'Media';
+    }
+  }, {
+    key: "icon",
+    get: function get() {
+      return 'file-image-o';
     }
   }]);
 
@@ -18681,7 +18840,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 82 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18806,102 +18965,130 @@ function (_HashBrown$Views$Navi) {
       }).catch(UI.errorModal);
     }
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
 
   }, {
-    key: "init",
-    value: function init() {
+    key: "getItems",
+    value: function getItems() {
+      return HashBrown.Helpers.SchemaHelper.getAllSchemas();
+    }
+    /**
+     * Item context menu
+     */
+
+  }, {
+    key: "getItemContextMenu",
+    value: function getItemContextMenu(item) {
       var _this2 = this;
 
-      if (!currentUserHasScope('schemas')) {
-        return;
+      var menu = {};
+      var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+      menu['This schema'] = '---';
+
+      menu['Open in new tab'] = function () {
+        _this2.onClickOpenInNewTab();
+      };
+
+      menu['New child schema'] = function () {
+        _this2.onClickNewSchema();
+      };
+
+      if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+        menu['Remove'] = function () {
+          _this2.onClickRemoveSchema();
+        };
       }
 
-      HashBrown.Views.Navigation.NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
-        getItems: function getItems() {
-          return resources.schemas;
-        },
-        // Item context menu
-        getItemContextMenu: function getItemContextMenu(item) {
-          var menu = {};
-          var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-          menu['This schema'] = '---';
+      menu['Copy id'] = function () {
+        _this2.onClickCopyItemId();
+      };
 
-          menu['Open in new tab'] = function () {
-            _this2.onClickOpenInNewTab();
+      if (item.isLocked && !item.sync.isRemote) {
+        isSyncEnabled = false;
+      }
+
+      if (isSyncEnabled) {
+        menu['Sync'] = '---';
+
+        if (!item.sync.isRemote) {
+          menu['Push to remote'] = function () {
+            _this2.onClickPushSchema();
           };
-
-          menu['New child schema'] = function () {
-            _this2.onClickNewSchema();
-          };
-
-          if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = function () {
-              _this2.onClickRemoveSchema();
-            };
-          }
-
-          menu['Copy id'] = function () {
-            _this2.onClickCopyItemId();
-          };
-
-          if (item.isLocked && !item.sync.isRemote) {
-            isSyncEnabled = false;
-          }
-
-          if (isSyncEnabled) {
-            menu['Sync'] = '---';
-
-            if (!item.sync.isRemote) {
-              menu['Push to remote'] = function () {
-                _this2.onClickPushSchema();
-              };
-            }
-
-            if (item.sync.hasRemote) {
-              menu['Remove local copy'] = function () {
-                _this2.onClickRemoveSchema();
-              };
-            }
-
-            if (item.sync.isRemote) {
-              menu['Pull from remote'] = function () {
-                _this2.onClickPullSchema();
-              };
-            }
-          }
-
-          menu['General'] = '---';
-
-          menu['Refresh'] = function () {
-            _this2.onClickRefreshResource('schemas');
-          };
-
-          return menu;
-        },
-        // Set general context menu items
-        paneContextMenu: {
-          'Schemas': '---',
-          'Refresh': function Refresh() {
-            _this2.onClickRefreshResource('schemas');
-          }
-        },
-        // Hierarchy logic
-        hierarchy: function hierarchy(item, queueItem) {
-          queueItem.$element.attr('data-schema-id', item.id);
-
-          if (item.parentSchemaId) {
-            queueItem.parentDirAttr = {
-              'data-schema-id': item.parentSchemaId
-            };
-          } else {
-            queueItem.parentDirAttr = {
-              'data-schema-type': item.type
-            };
-          }
         }
-      });
+
+        if (item.sync.hasRemote) {
+          menu['Remove local copy'] = function () {
+            _this2.onClickRemoveSchema();
+          };
+        }
+
+        if (item.sync.isRemote) {
+          menu['Pull from remote'] = function () {
+            _this2.onClickPullSchema();
+          };
+        }
+      }
+
+      menu['General'] = '---';
+
+      menu['Refresh'] = function () {
+        _this2.onClickRefreshResource('schemas');
+      };
+
+      return menu;
+    }
+    /**
+     * Set general context menu items
+     */
+
+  }, {
+    key: "getPaneContextMenu",
+    value: function getPaneContextMenu() {
+      var _this3 = this;
+
+      return {
+        'Schemas': '---',
+        'Refresh': function Refresh() {
+          _this3.onClickRefreshResource('schemas');
+        }
+      };
+    }
+    /**
+     * Hierarchy logic
+     */
+
+  }, {
+    key: "hierarchy",
+    value: function hierarchy(item, queueItem) {
+      queueItem.$element.attr('data-schema-id', item.id);
+
+      if (item.parentSchemaId) {
+        queueItem.parentDirAttr = {
+          'data-schema-id': item.parentSchemaId
+        };
+      } else {
+        queueItem.parentDirAttr = {
+          'data-schema-type': item.type
+        };
+      }
+    }
+  }, {
+    key: "route",
+    get: function get() {
+      return '/schemas/';
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return 'Schemas';
+    }
+  }, {
+    key: "icon",
+    get: function get() {
+      return 'gears';
     }
   }]);
 
@@ -18911,7 +19098,7 @@ function (_HashBrown$Views$Navi) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 83 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18920,10 +19107,10 @@ module.exports = SchemaPane;
  * @namespace HashBrown.Client.Views.Dashboard
  */
 
-namespace('Views.Dashboard').add(__webpack_require__(84)).add(__webpack_require__(85)).add(__webpack_require__(86)).add(__webpack_require__(87)).add(__webpack_require__(88)).add(__webpack_require__(89));
+namespace('Views.Dashboard').add(__webpack_require__(80)).add(__webpack_require__(81)).add(__webpack_require__(82)).add(__webpack_require__(83)).add(__webpack_require__(84)).add(__webpack_require__(85));
 
 /***/ }),
-/* 84 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19162,7 +19349,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 85 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19267,7 +19454,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 86 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19371,7 +19558,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 87 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19529,7 +19716,7 @@ function (_HashBrown$Views$Moda) {
 module.exports = MigrationEditor;
 
 /***/ }),
-/* 88 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19876,7 +20063,7 @@ function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 89 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

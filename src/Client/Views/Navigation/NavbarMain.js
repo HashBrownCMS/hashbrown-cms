@@ -10,19 +10,58 @@ class NavbarMain extends Crisp.View {
         super(params);
 
         this.template = require('Client/Templates/Navigation/NavbarMain');
-        this.tabPanes = [];
-
-        HashBrown.Views.Navigation.ContentPane.init();
-        HashBrown.Views.Navigation.MediaPane.init();
-        HashBrown.Views.Navigation.FormsPane.init();
-        HashBrown.Views.Navigation.ConnectionPane.init();
-        HashBrown.Views.Navigation.SchemaPane.init();
 
         this.fetch();
         
         $('.page--environment__space--nav').html(this.$element);
     }
-    
+  
+    /**
+     * Fetches content
+     */
+    fetch() {
+        let panes = this.getPanes();
+
+        let next = (i) => {
+            if(!panes[i]) { return Promise.resolve(); }
+
+            if(typeof panes[i].getItems !== 'function') {
+                return next(i+1);
+            }
+
+            return panes[i].getItems()
+            .then((items) => {
+                panes[i].items = items;
+
+                return next(i+1);
+            });
+        }
+
+        return next(0)
+        .then(() => {
+            super.fetch();
+        });
+    }
+
+    /**
+     * Gets all panes
+     *
+     * @return {Array} Panes
+     */
+    getPanes() {
+        let panes = [];
+        
+        for(let name in HashBrown.Views.Navigation) {
+            let pane = HashBrown.Views.Navigation[name];
+            
+            if(pane.prototype instanceof HashBrown.Views.Navigation.NavbarPane) {
+                panes.push(pane);
+            }
+        }
+
+        return panes;
+    }
+
     /**
      * Event: Change filter
      *
@@ -200,21 +239,6 @@ class NavbarMain extends Crisp.View {
      */
     static reload() {
         Crisp.View.get('NavbarMain').reload();
-    }
-
-    /**
-     * Adds a tab pane
-     *
-     * @param {String} route
-     * @param {Object} settings
-     */
-    static addTabPane(route, label, icon, settings) {
-        Crisp.View.get('NavbarMain').tabPanes.push({
-            label: label,
-            route: route,
-            icon: icon,
-            settings: settings
-        });
     }
 
     /**
@@ -464,8 +488,8 @@ class NavbarMain extends Crisp.View {
                         }
                         
                         // Attach item context menu
-                        if(pane.settings.dirContextMenu) {
-                            UI.context($dir[0], pane.settings.dirContextMenu);
+                        if(pane.settings.getDirContextMenu) {
+                            UI.context($dir[0], pane.settings.getDirContextMenu());
                         }
                     }
                    

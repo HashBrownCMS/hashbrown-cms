@@ -6,6 +6,7 @@
 namespace('Helpers')
 .add(require('./ConnectionHelper'))
 .add(require('./ContentHelper'))
+.add(require('./FormHelper'))
 .add(require('./DebugHelper'))
 .add(require('./LanguageHelper'))
 .add(require('./MarkdownHelper'))
@@ -15,4 +16,5 @@ namespace('Helpers')
 .add(require('./ResourceHelper'))
 .add(require('./SchemaHelper'))
 .add(require('./SettingsHelper'))
-.add(require('./UIHelper'));
+.add(require('./UIHelper'))
+.add(require('./EventHelper'));

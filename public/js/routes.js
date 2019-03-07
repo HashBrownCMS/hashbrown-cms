@@ -81,30 +81,30 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 86);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 20:
+/***/ 86:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(21);
+__webpack_require__(87);
 
-__webpack_require__(22);
+__webpack_require__(88);
 
-__webpack_require__(23);
+__webpack_require__(89);
 
-__webpack_require__(24);
+__webpack_require__(90);
 
-__webpack_require__(25);
+__webpack_require__(91);
 
 /***/ }),
 
-/***/ 21:
+/***/ 87:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -173,7 +173,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 
 /***/ }),
 
-/***/ 22:
+/***/ 88:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -218,7 +218,7 @@ Crisp.Router.route('/connections/json/:id', function () {
 
 /***/ }),
 
-/***/ 23:
+/***/ 89:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -252,7 +252,7 @@ Crisp.Router.route('/media/:id', function () {
 
 /***/ }),
 
-/***/ 24:
+/***/ 90:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -328,7 +328,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 
 /***/ }),
 
-/***/ 25:
+/***/ 91:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -4,7 +4,6 @@ module.exports = function() {
 
     let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
     let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-    let hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
      
     return _.nav({class: 'navbar-main'},
         // Buttons
@@ -13,7 +12,7 @@ module.exports = function() {
                 _.img({src: '/svg/logo_white.svg', class: 'navbar-main__tab__icon'}),
                 _.div({class: 'navbar-main__tab__label'}, 'Dashboard')
             ),            
-            _.each(this.tabPanes, (i, pane) => {
+            _.each(this.getPanes(), (i, pane) => {
                 return _.button({class: 'navbar-main__tab', 'data-route': pane.route, title: pane.label},
                     _.div({class: 'navbar-main__tab__icon fa fa-' + pane.icon}),
                     _.div({class: 'navbar-main__tab__label'}, pane.label)
@@ -23,7 +22,7 @@ module.exports = function() {
 
         // Panes
         _.div({class: 'navbar-main__panes'},
-            _.each(this.tabPanes, (i, pane) => {
+            _.each(this.getPanes(), (i, pane) => {
                 let queue = [];
 
                 let sortingOptions = {
@@ -62,11 +61,11 @@ module.exports = function() {
 
                     // Items
                     _.div({class: 'navbar-main__pane__items'},
-                        _.each(pane.settings.items || pane.settings.getItems(), (i, item) => {
+                        _.each(pane.items, (i, item) => {
                             let id = item.id || i;
                             let name = this.getItemName(item);
-                            let icon = this.getItemIcon(item, pane.settings);
-                            let routingPath = this.getItemRoutingPath(item, pane.settings);
+                            let icon = this.getItemIcon(item, pane);
+                            let routingPath = this.getItemRoutingPath(item, pane);
                             let isDirectory = this.isItemDirectory(item);
                             let queueItem = {};
                             let hasRemote = item.sync ? item.sync.hasRemote : false;
@@ -97,11 +96,11 @@ module.exports = function() {
                             );
 
                             // Attach item context menu
-                            if(pane.settings.getItemContextMenu) {
-                                UI.context($item.find('a')[0], pane.settings.getItemContextMenu(item));
+                            if(pane.getItemContextMenu) {
+                                UI.context($item.find('a')[0], pane.getItemContextMenu(item));
 
-                            } else if(pane.settings.itemContextMenu) {
-                                UI.context($item.find('a')[0], pane.settings.itemContextMenu);
+                            } else if(pane.itemContextMenu) {
+                                UI.context($item.find('a')[0], pane.itemContextMenu);
 
                             }
                             
@@ -109,8 +108,8 @@ module.exports = function() {
                             queueItem.$element = $item;
 
                             // Use specific hierarchy behaviours
-                            if(pane.settings.hierarchy) {
-                                pane.settings.hierarchy(item, queueItem);
+                            if(pane.hierarchy) {
+                                pane.hierarchy(item, queueItem);
                             }
 
                             // Add queue item to sorting queue
@@ -125,8 +124,8 @@ module.exports = function() {
                 this.applySorting($pane, pane);
 
                 // Attach pane context menu
-                if(pane.settings.paneContextMenu) {
-                    UI.context($pane[0], pane.settings.paneContextMenu);
+                if(pane.getPaneContextMenu) {
+                    UI.context($pane[0], pane.getPaneContextMenu());
                 }
                 
                 return $pane;

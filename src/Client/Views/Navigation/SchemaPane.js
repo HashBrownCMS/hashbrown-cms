@@ -6,6 +6,10 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/schemas/'; }
+    static get label() { return 'Schemas'; }
+    static get icon() { return 'gears'; }
+    
     /**
      * Event: Click remove schema
      */
@@ -110,73 +114,79 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Init
+     * Gets all items
+     *
+     * @returns {Promise} Items
      */
-    static init() {
-        if(!currentUserHasScope('schemas')) { return; }
+    static getItems() {
+        return HashBrown.Helpers.SchemaHelper.getAllSchemas();
+    }
 
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
-            getItems: () => { return resources.schemas; },
+    /**
+     * Item context menu
+     */
+    static getItemContextMenu(item) {
+        let menu = {};
+        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
 
-            // Item context menu
-            getItemContextMenu: (item) => {
-                let menu = {};
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        menu['This schema'] = '---';
+        
+        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
+       
+        menu['New child schema'] = () => { this.onClickNewSchema(); };
+        
+        if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = () => { this.onClickRemoveSchema(); };
+        }
+        
+        menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
-                menu['This schema'] = '---';
-                
-                menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-               
-                menu['New child schema'] = () => { this.onClickNewSchema(); };
-                
-                if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-                    menu['Remove'] = () => { this.onClickRemoveSchema(); };
-                }
-                
-                menu['Copy id'] = () => { this.onClickCopyItemId(); };
-                
-                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
-
-                if(isSyncEnabled) {
-                    menu['Sync'] = '---';
-                    
-                    if(!item.sync.isRemote) {
-                        menu['Push to remote'] = () => { this.onClickPushSchema(); };
-                    }
-
-                    if(item.sync.hasRemote) {
-                        menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
-                    }
-
-                    if(item.sync.isRemote) {
-                        menu['Pull from remote'] = () => { this.onClickPullSchema(); };
-                    }
-                }
-
-                menu['General'] = '---';
-                menu['Refresh'] = () => { this.onClickRefreshResource('schemas'); };
-
-                return menu;
-            },
+        if(isSyncEnabled) {
+            menu['Sync'] = '---';
             
-            // Set general context menu items
-            paneContextMenu: {
-                'Schemas': '---',
-                'Refresh': () => { this.onClickRefreshResource('schemas'); }
-            },
-
-            // Hierarchy logic
-            hierarchy: function(item, queueItem) {
-                queueItem.$element.attr('data-schema-id', item.id);
-              
-                if(item.parentSchemaId) {
-                    queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
-
-                } else {
-                    queueItem.parentDirAttr = {'data-schema-type': item.type};
-                }
+            if(!item.sync.isRemote) {
+                menu['Push to remote'] = () => { this.onClickPushSchema(); };
             }
-        });
+
+            if(item.sync.hasRemote) {
+                menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
+            }
+
+            if(item.sync.isRemote) {
+                menu['Pull from remote'] = () => { this.onClickPullSchema(); };
+            }
+        }
+
+        menu['General'] = '---';
+        menu['Refresh'] = () => { this.onClickRefreshResource('schemas'); };
+
+        return menu;
+    }
+    
+    /**
+     * Set general context menu items
+     */
+    static getPaneContextMenu() {
+        return {
+            'Schemas': '---',
+            'Refresh': () => { this.onClickRefreshResource('schemas'); }
+        };
+    }
+
+    /**
+     * Hierarchy logic
+     */
+    static hierarchy(item, queueItem) {
+        queueItem.$element.attr('data-schema-id', item.id);
+      
+        if(item.parentSchemaId) {
+            queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
+
+        } else {
+            queueItem.parentDirAttr = {'data-schema-type': item.type};
+        }
     }
 }
 

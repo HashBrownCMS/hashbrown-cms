@@ -562,7 +562,7 @@ class UIHelper {
 
         }
        
-        debug.log(error.message, error.stack, 'HashBrown');
+        debug.log(error.message + ': ' + error.stack, 'HashBrown');
 
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
