@@ -2900,42 +2900,13 @@ function (_Crisp$View) {
       } // Get the config
 
 
-      var config; // If the field has a config, check recursively if it's empty
-      // If it isn't, use this config
+      var config;
 
-      if (fieldDefinition.config) {
-        var isEmpty = true;
-
-        var checkRecursive = function checkRecursive(object) {
-          if (!object) {
-            return;
-          } // We consider a config not empty, if it has a value that is not an object
-          // Remember, null is of type 'object' too
-
-
-          if (_typeof(object) !== 'object') {
-            return isEmpty = false;
-          }
-
-          for (var k in object) {
-            checkRecursive(object[k]);
-          }
-        };
-
-        checkRecursive(fieldDefinition.config);
-
-        if (!isEmpty) {
-          config = fieldDefinition.config;
-        }
-      } // If no config was found, and the Schema has one, use it
-
-
-      if (!config && compiledSchema.config) {
+      if (!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+        config = fieldDefinition.config;
+      } else if (!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
         config = compiledSchema.config;
-      } // If still no config was found, assign a placeholder
-
-
-      if (!config) {
+      } else {
         config = {};
       } // Instantiate the field editor
 
@@ -15766,15 +15737,15 @@ function (_HashBrown$Views$Edit) {
    *
    * @param {Object} newValue
    * @param {String} key
-   * @param {Object} keyConfig
+   * @param {Object} fieldDefinition
    * @param {Boolean} isSilent
    */
 
 
   _createClass(StructEditor, [{
     key: "onChange",
-    value: function onChange(newValue, key, keyConfig, isSilent) {
-      if (keyConfig.multilingual) {
+    value: function onChange(newValue, key, fieldDefinition, isSilent) {
+      if (fieldDefinition.multilingual) {
         // Sanity check to make sure multilingual fields are accomodated for
         if (!this.value[key] || _typeof(this.value[key]) !== 'object') {
           this.value[key] = {};
@@ -15810,17 +15781,17 @@ function (_HashBrown$Views$Edit) {
       return _.div({
         class: 'field-editor field-editor--struct'
       }, // Loop through each key in the struct
-      _.each(this.config.struct || compiledSchema.config.struct, function (keyName, keyConfig) {
-        var value = _this2.value[keyName];
+      _.each(this.config.struct || compiledSchema.config.struct, function (fieldName, fieldDefinition) {
+        var value = _this2.value[fieldName];
 
-        if (!keyConfig || !keyConfig.schemaId) {
-          throw new Error('Schema id not set for key "' + keyName + '"');
+        if (!fieldDefinition || !fieldDefinition.schemaId) {
+          throw new Error('Schema id not set for key "' + fieldName + '"');
         }
 
-        var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(keyConfig.schemaId);
+        var fieldSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
         if (!fieldSchema) {
-          throw new Error('FieldSchema "' + keyConfig.schemaId + '" could not be found for key "' + keyName + '"');
+          throw new Error('FieldSchema "' + fieldDefinition.schemaId + '" could not be found for key "' + fieldName + '"');
         }
 
         var fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId);
@@ -15830,22 +15801,33 @@ function (_HashBrown$Views$Edit) {
         } // Sanity check
 
 
-        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, keyConfig);
-        _this2.value[keyName] = value; // Init the field editor
+        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, fieldDefinition);
+        _this2.value[fieldName] = value; // Get the config
+
+        var config;
+
+        if (!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+          config = fieldDefinition.config;
+        } else if (!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldSchema.config)) {
+          config = fieldSchema.config;
+        } else {
+          config = {};
+        } // Init the field editor
+
 
         var fieldEditorInstance = new fieldEditor({
-          value: keyConfig.multilingual ? value[window.language] : value,
-          disabled: keyConfig.disabled || false,
-          config: keyConfig.config || fieldSchema.config || {},
+          value: fieldDefinition.multilingual ? value[window.language] : value,
+          disabled: fieldDefinition.disabled || false,
+          config: config,
           schema: fieldSchema,
           className: 'editor__field__value'
         }); // Hook up the change event
 
         fieldEditorInstance.on('change', function (newValue) {
-          _this2.onChange(newValue, keyName, keyConfig);
+          _this2.onChange(newValue, fieldName, fieldDefinition);
         });
         fieldEditorInstance.on('silentchange', function (newValue) {
-          _this2.onChange(newValue, keyName, keyConfig, true);
+          _this2.onChange(newValue, fieldName, fieldDefinition, true);
         }); // Return the DOM element
 
         return _.div({
@@ -15854,9 +15836,9 @@ function (_HashBrown$Views$Edit) {
           class: 'editor__field__key'
         }, _.div({
           class: 'editor__field__key__label'
-        }, keyConfig.label), _.if(keyConfig.description, _.div({
+        }, fieldDefinition.label), _.if(fieldDefinition.description, _.div({
           class: 'editor__field__key__description'
-        }, keyConfig.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
+        }, fieldDefinition.description)), fieldEditorInstance.renderKeyActions()), fieldEditorInstance.$element);
       }));
     }
   }], [{

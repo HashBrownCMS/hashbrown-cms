@@ -222,39 +222,14 @@ class ContentEditor extends Crisp.View {
         // Get the config
         let config;
 
-        // If the field has a config, check recursively if it's empty
-        // If it isn't, use this config
-        if(fieldDefinition.config) {
-            let isEmpty = true;
-            let checkRecursive = (object) => {
-                if(!object) { return; }
-
-                // We consider a config not empty, if it has a value that is not an object
-                // Remember, null is of type 'object' too
-                if(typeof object !== 'object') { return isEmpty = false; }
-
-                for(let k in object) {
-                    checkRecursive(object[k]);
-                }
-            };
-
-            checkRecursive(fieldDefinition.config);
-
-            if(!isEmpty) {
-                config = fieldDefinition.config;
-            }
-        }
-
-        // If no config was found, and the Schema has one, use it
-        if(!config && compiledSchema.config) {
+        if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+            config = fieldDefinition.config;
+        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
             config = compiledSchema.config;
-        }
-
-        // If still no config was found, assign a placeholder
-        if(!config) {
+        } else {
             config = {};
         }
-
+        
         // Instantiate the field editor
         let fieldEditorInstance = new fieldEditor({
             value: fieldValue,

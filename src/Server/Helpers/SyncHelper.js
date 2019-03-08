@@ -39,8 +39,6 @@ class SyncHelper {
 
         let settings = await HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync') || {};
 
-        if(!settings.enabled) { return ''; }
-
         this.validateSettings(settings, project, true);
 
         let url = this.parseUrl(settings.url, 'user', 'login') + '?persist=true';

@@ -22751,32 +22751,68 @@ function (_ContentHelperCommon) {
       });
     }
     /**
+     * A check for field definitions
+     *
+     * @param {Object} definition
+     *
+     * @return {Boolean} Whether or not the definition is empty
+     */
+
+  }, {
+    key: "isFieldDefinitionEmpty",
+    value: function isFieldDefinitionEmpty(definition) {
+      if (!definition) {
+        return true;
+      }
+
+      var isEmpty = true;
+
+      var checkRecursive = function checkRecursive(object) {
+        if (!object) {
+          return;
+        } // We consider a definition not empty, if it has a value that is not an object
+        // Remember, null is of type 'object' too
+
+
+        if (_typeof(object) !== 'object') {
+          return isEmpty = false;
+        }
+
+        for (var k in object) {
+          checkRecursive(object[k]);
+        }
+      };
+
+      checkRecursive(definition);
+      return isEmpty;
+    }
+    /**
      * A sanity check for fields
      *
      * @param {Object} value
-     * @param {Schema} schema
+     * @param {Object} definition
      */
 
   }, {
     key: "fieldSanityCheck",
-    value: function fieldSanityCheck(value, schema) {
-      // If the schema value is set to multilingual, but the value isn't an object, convert it
-      if (schema.multilingual && (!value || _typeof(value) !== 'object')) {
+    value: function fieldSanityCheck(value, definition) {
+      // If the definition value is set to multilingual, but the value isn't an object, convert it
+      if (definition.multilingual && (!value || _typeof(value) !== 'object')) {
         var oldValue = value;
         value = {};
         value[window.language] = oldValue;
-      } // If the schema value is not set to multilingual, but the value is an object
+      } // If the definition value is not set to multilingual, but the value is an object
       // containing the _multilingual flag, convert it
 
 
-      if (!schema.multilingual && value && _typeof(value) === 'object' && value._multilingual) {
+      if (!definition.multilingual && value && _typeof(value) === 'object' && value._multilingual) {
         value = value[window.language];
       } // Update the _multilingual flag
 
 
-      if (schema.multilingual && value && !value._multilingual) {
+      if (definition.multilingual && value && !value._multilingual) {
         value._multilingual = true;
-      } else if (!schema.multilingual && value && value._multilingual) {
+      } else if (!definition.multilingual && value && value._multilingual) {
         delete value._multilingual;
       }
 
