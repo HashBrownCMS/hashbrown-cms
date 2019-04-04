@@ -27,7 +27,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         // Make sure the string is HTML
         try {
-            this.value = marked(this.value);
+            this.value = HashBrown.Helpers.MarkdownHelper.toHtml(this.value);
         } catch(e) {
             // Catch this silly exception that marked does sometimes
         }
@@ -189,7 +189,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             // Change event
             this.markdown.on('change', () => {
-                this.onChange(marked(this.markdown.getDoc().getValue()));
+                this.onChange(HashBrown.Helpers.MarkdownHelper.toHtml(this.markdown.getDoc().getValue()));
             });
 
             // Set value initially

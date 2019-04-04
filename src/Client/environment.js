@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Libraries
     window._ = Crisp.Elements;
     window.Promise = require('bluebird');
-    window.marked = require('marked');
 
     // Helper shortcuts
     window.debug = HashBrown.Helpers.DebugHelper;

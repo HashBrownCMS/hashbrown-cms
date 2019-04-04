@@ -34,8 +34,8 @@ html
             .page--dashboard__body__container
                 if(tab === 'frontend')
                     .page--dashboard__frontend-test
-                        | !{ uiChecklistHtml }
-                
+                        include ui-checklist.pug
+
                 if(user.isAdmin && tab === 'backend')
                     .page--dashboard__backend-test
                         ul.page--dashboard__backend-test__messages

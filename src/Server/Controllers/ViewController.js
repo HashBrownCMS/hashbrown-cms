@@ -3,9 +3,6 @@
 const FileSystem = require('fs');
 const OS = require('os');
 
-// TODO: Make this a GIT submodule
-const Marked = require('marked');
-
 /**
  * The controller for views
  *
@@ -26,36 +23,6 @@ class ViewController extends HashBrown.Controllers.Controller {
             res.redirect('/dashboard/projects');
         });
         
-        // Text
-        app.get('/text/:name', (req, res) => {
-            let filename = '';
-            let isMarkdown = false;
-
-            switch(req.params.name) {
-                case 'readme':
-                    filename = 'README.md';
-                    isMarkdown = true;
-                    break;
-
-                case 'license':
-                    filename = 'LICENSE';
-                    break;
-
-                case 'welcome':
-                    filename = 'WELCOME.md';
-                    isMarkdown = true;
-                    break;
-            }
-
-            FileSystem.readFile(APP_ROOT + '/' + filename, (err, file) => {
-                if(err) {
-                    res.status(400).render('error', { message: e.message });
-                } else {
-                    res.status(200).send(isMarkdown ? Marked(file.toString()) : file.toString());
-                }
-            });
-        });
-
         // First time setup
         app.get('/setup/:step', (req, res) => {
             return HashBrown.Helpers.UserHelper.getAllUsers()
@@ -121,18 +88,10 @@ class ViewController extends HashBrown.Controllers.Controller {
         app.get('/test/:tab', (req, res) => {
             ViewController.authenticate(req.cookies.token, null, null, true)
             .then((user) => {
-                FileSystem.readFile(APP_ROOT + '/public/md/ui-checklist.md', (err, file) => {
-                    if(err) {
-                        return res.status(400).render('error', { message: err.message });
-                    }
-                
-                    res.render('test', {
-                        user: user,
-                        tab: req.params.tab,
-                        uiChecklistHtml: Marked(file.toString())
-                    });
+                res.render('test', {
+                    user: user,
+                    tab: req.params.tab
                 });
-
             })
             .catch((e) => {
                 res.status(400).render('error', { message: e.message });
