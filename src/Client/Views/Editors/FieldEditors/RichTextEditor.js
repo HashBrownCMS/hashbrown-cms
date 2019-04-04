@@ -54,6 +54,17 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
                     }).$element
                 )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Disable HTML'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'checkbox',
+                        tooltip: 'Hides the HTML tab if enabled',
+                        value: config.isMarkdownDisabled || false,
+                        onChange: (newValue) => { config.isHtmlDisabled = newValue; }
+                    }).$element
+                )
             )
         ];
     }
@@ -315,9 +326,15 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     template() {
         let activeView = this.activeView || 'wysiwyg';
 
+        if((activeView === 'html' && this.config.isHtmlDisabled) || (activeView === 'markdown' && this.config.isMarkdownDisabled)) {
+            activeView = 'wysiwyg';
+        }
+
         return _.div({class: 'field-editor field-editor--rich-text', title: this.description || ''},
             _.div({class: 'field-editor--rich-text__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
+                    if((alias === 'html' && this.config.isHtmlDisabled) || (alias === 'markdown' && this.config.isMarkdownDisabled)) { return; }
+
                     return _.button({class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'}, label)
                         .click(() => { this.onClickTab(alias); })
                 }),

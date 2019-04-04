@@ -15450,6 +15450,11 @@ function (_HashBrown$Views$Edit) {
       var _this6 = this;
 
       var activeView = this.activeView || 'wysiwyg';
+
+      if (activeView === 'html' && this.config.isHtmlDisabled || activeView === 'markdown' && this.config.isMarkdownDisabled) {
+        activeView = 'wysiwyg';
+      }
+
       return _.div({
         class: 'field-editor field-editor--rich-text',
         title: this.description || ''
@@ -15460,6 +15465,10 @@ function (_HashBrown$Views$Edit) {
         markdown: 'Markdown',
         html: 'HTML'
       }, function (alias, label) {
+        if (alias === 'html' && _this6.config.isHtmlDisabled || alias === 'markdown' && _this6.config.isMarkdownDisabled) {
+          return;
+        }
+
         return _.button({
           class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'
         }, label).click(function () {
@@ -15526,6 +15535,19 @@ function (_HashBrown$Views$Edit) {
         value: config.isMarkdownDisabled || false,
         onChange: function onChange(newValue) {
           config.isMarkdownDisabled = newValue;
+        }
+      }).$element)), _.div({
+        class: 'editor__field'
+      }, _.div({
+        class: 'editor__field__key'
+      }, 'Disable HTML'), _.div({
+        class: 'editor__field__value'
+      }, new HashBrown.Views.Widgets.Input({
+        type: 'checkbox',
+        tooltip: 'Hides the HTML tab if enabled',
+        value: config.isMarkdownDisabled || false,
+        onChange: function onChange(newValue) {
+          config.isHtmlDisabled = newValue;
         }
       }).$element))];
     }
