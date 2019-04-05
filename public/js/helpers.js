@@ -3897,25 +3897,6 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
-     * Gets Media object by id synchronously
-     *
-     * @param {String} id
-     *
-     * @return {Media} Media object
-     */
-    static getMediaByIdSync(id) {
-        for(let i = 0; i < resources.media.length; i++) {
-            let media = resources.media[i];
-
-            if(media.id == id) {
-                return media;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Gets the Media Url
      */
     static getMediaUrl(id) {
@@ -4730,19 +4711,14 @@ class SchemaHelper extends SchemaHelperCommon {
         // Get parent fields if specified
         if(withParentFields && schema.parentSchemaId) {
             let childSchema = this.getModel(schema);
-            let parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', childSchema.parentSchemaId);
             let mergedSchema = childSchema;
 
-            while(parentSchema) {
-                parentSchema = this.getModel(parentSchema);
-                mergedSchema = this.mergeSchemas(childSchema, parentSchema);
-                childSchema = parentSchema;
+            while(childSchema.parentSchemaId) {
+                let parentSchema = await this.getSchemaById(childSchema.parentSchemaId);
                 
-                if(parentSchema.parentSchemaId) {
-                    parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', parentSchema.parentSchemaId);
-                } else {
-                    parentSchema = null;
-                }
+                mergedSchema = this.mergeSchemas(mergedSchema, parentSchema);
+
+                childSchema = parentSchema;
             }
 
             return mergedSchema;
@@ -4867,7 +4843,7 @@ class SchemaHelper {
             }
         }
 
-        // Overwrite native values 
+        // Overwrite common values 
         mergedSchema.id = childSchema.id;
         mergedSchema.name = childSchema.name;
         mergedSchema.parentSchemaId = childSchema.parentSchemaId;

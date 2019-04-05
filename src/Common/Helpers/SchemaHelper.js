@@ -78,7 +78,7 @@ class SchemaHelper {
             }
         }
 
-        // Overwrite native values 
+        // Overwrite common values 
         mergedSchema.id = childSchema.id;
         mergedSchema.name = childSchema.name;
         mergedSchema.parentSchemaId = childSchema.parentSchemaId;

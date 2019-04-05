@@ -68,6 +68,8 @@ class ViewController extends HashBrown.Controllers.Controller {
         app.get('/dashboard/:tab', (req, res) => {
             ViewController.authenticate(req.cookies.token)
             .then((user) => {
+                user.clearSensitiveData();
+                
                 res.render('dashboard', {
                     tab: req.params.tab,
                     os: OS,

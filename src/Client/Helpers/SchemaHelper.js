@@ -53,19 +53,14 @@ class SchemaHelper extends SchemaHelperCommon {
         // Get parent fields if specified
         if(withParentFields && schema.parentSchemaId) {
             let childSchema = this.getModel(schema);
-            let parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', childSchema.parentSchemaId);
             let mergedSchema = childSchema;
 
-            while(parentSchema) {
-                parentSchema = this.getModel(parentSchema);
-                mergedSchema = this.mergeSchemas(childSchema, parentSchema);
-                childSchema = parentSchema;
+            while(childSchema.parentSchemaId) {
+                let parentSchema = await this.getSchemaById(childSchema.parentSchemaId);
                 
-                if(parentSchema.parentSchemaId) {
-                    parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', parentSchema.parentSchemaId);
-                } else {
-                    parentSchema = null;
-                }
+                mergedSchema = this.mergeSchemas(mergedSchema, parentSchema);
+
+                childSchema = parentSchema;
             }
 
             return mergedSchema;

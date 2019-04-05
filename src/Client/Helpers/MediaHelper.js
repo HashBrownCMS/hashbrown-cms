@@ -34,25 +34,6 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
-     * Gets Media object by id synchronously
-     *
-     * @param {String} id
-     *
-     * @return {Media} Media object
-     */
-    static getMediaByIdSync(id) {
-        for(let i = 0; i < resources.media.length; i++) {
-            let media = resources.media[i];
-
-            if(media.id == id) {
-                return media;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Gets the Media Url
      */
     static getMediaUrl(id) {

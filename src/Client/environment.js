@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Error handling
     window.onerror = UI.errorModal;
    
-    // Resource names
-    HashBrown.Context.resourceNames = ['content', 'connections', 'forms', 'media', 'schemas', 'users'];
-
     // Preload resource cache (only if we're not in media picker mode)
     if(!HashBrown.Context.isMediaPicker) {
         await HashBrown.Helpers.ResourceHelper.preloadAllResources();

@@ -21,51 +21,36 @@ Crisp.Router.route('/schemas/', function() {
 });
 
 // Edit
-Crisp.Router.route('/schemas/:id', () => {
-    if(currentUserHasScope('schemas')) {
-        let schema;
-        let parentSchema;
+Crisp.Router.route('/schemas/:id', async () => {
+    if(!currentUserHasScope('schemas')) { return location.hash = '/'; }
 
-        Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
-       
-        // First get the Schema model
-        HashBrown.Helpers.SchemaHelper.getSchemaById(Crisp.Router.params.id)
-        .then((result) => {
-            schema = HashBrown.Helpers.SchemaHelper.getModel(result);
+    Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
+   
+    // First get the Schema model
+    let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(Crisp.Router.params.id);
 
-            // Then get the parent Schema, if available
-            if(schema.parentSchemaId) {
-                return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId);
-            }
+    // Then get the parent Schema, if available
+    let parentSchema = null;
     
-            return Promise.resolve(null);
-        })
-        .then((result) => {
-            if(result) {
-                parentSchema = HashBrown.Helpers.SchemaHelper.getModel(result);
-            }
-
-            let schemaEditor;
-
-            if(schema instanceof HashBrown.Models.ContentSchema) {
-                schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
-                    model: schema,
-                    parentSchema: parentSchema
-                });
-            } else {
-                schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
-                    model: schema,
-                    parentSchema: parentSchema
-                });
-            }
-            
-            UI.setEditorSpaceContent(schemaEditor.$element);
-        });
-            
-    } else {
-        location.hash = '/';
-
+    if(schema.parentSchemaId) {
+        parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.parentSchemaId, true);
     }
+
+    let schemaEditor;
+
+    if(schema instanceof HashBrown.Models.ContentSchema) {
+        schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
+            model: schema,
+            parentSchema: parentSchema
+        });
+    } else {
+        schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
+            model: schema,
+            parentSchema: parentSchema
+        });
+    }
+        
+    UI.setEditorSpaceContent(schemaEditor.$element);
 });
 
 // Edit (JSON editor)

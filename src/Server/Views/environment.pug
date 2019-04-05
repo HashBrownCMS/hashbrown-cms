@@ -35,14 +35,8 @@ html
         script(src='/lib/codemirror/mode/javascript/javascript.js')
         script(src='/lib/codemirror/mode/markdown/markdown.js')
 
-        script(src='/js/common.js')
-        script(src='/js/helpers.js')
-        script(src='/js/models.js')
-        script(src='/js/routes.js')
-        script(src='/js/utilities.js')
-        script(src='/js/views.js')
-        
         script.
+            window.HashBrown = {};
             HashBrown.Context = {
                 projectName: '#{currentProjectName}',
                 projectId: '#{currentProject}',
@@ -52,5 +46,12 @@ html
                 isMediaPicker: #{isMediaPicker}
             };
 
+        script(src='/js/common.js')
+        script(src='/js/helpers.js')
+        script(src='/js/models.js')
+        script(src='/js/routes.js')
+        script(src='/js/utilities.js')
+        script(src='/js/views.js')
+        
         script(src='/js/environment.js')
         script(src='/js/plugins.js')

@@ -84,19 +84,20 @@
 /******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     submoduleCheck();
 
     // Libraries
     window._ = Crisp.Elements;
-    window.Promise = __webpack_require__(1);
+    window.Promise = __webpack_require__(21);
 
     // Helper shortcuts
     window.debug = HashBrown.Helpers.DebugHelper;
@@ -105,34 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Error handling
     window.onerror = UI.errorModal;
 
-    // Get current user
-    HashBrown.Helpers.RequestHelper.request('get', 'user')
-    .then((user) => {
-        HashBrown.Models.User.current = new HashBrown.Models.User(user);
-
-        return HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
-    })
+    // Init current user
+    HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
 
     // Get projects
-    .then((projects) => {
-        projects = projects || [];
+    let projects = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
+    
+    for(let projectId of projects || []) {
+        let projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
+            modelUrl: '/api/server/projects/' + projectId
+        });
 
-        for(let projectId of projects) {
-            let projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
-                modelUrl: '/api/server/projects/' + projectId
-            });
-
-            $('.page--dashboard__projects__list').prepend(projectEditor.$element);
-        }
-    })
+        $('.page--dashboard__projects__list').prepend(projectEditor.$element);
+    }
 
     // Get users
-    .then(() => {
-        if(!currentUserIsAdmin()) { return Promise.resolve(); }
-
-        return HashBrown.Helpers.RequestHelper.request('get', 'users');
-    })
-    .then((users) => {
+    if(currentUserIsAdmin()) {
+        let users = await HashBrown.Helpers.RequestHelper.request('get', 'users');
+        
         for(let user of users || []) {
             user = new HashBrown.Models.User(user);
 
@@ -154,25 +145,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                     });
                                 },
                                 'Delete': () => {
-                                    if(user.id === HashBrown.Models.User.current.id) { return UI.errorModal(new Error('You cannot delete yourself')); }
+                                    if(user.id === HashBrown.Context.user.id) { return UI.errorModal(new Error('You cannot delete yourself')); }
                                     
                                     UI.confirmModal(
                                         'remove',
                                         'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
                                         'Are you sure you want to remove this user?',
-                                        () => {
-                                            HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
-                                            .then(() => {
-                                                $user.remove();
-                                            })
-                                            .catch(UI.errorModal);
+                                        async () => {
+                                            await HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id);
+
+                                            $user.remove();
                                         }
                                     );
                                 },
                             }
                         }).$element.addClass('page--dashboard__user__menu'),
                         _.h4({class: 'page--dashboard__user__name'},
-                            (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')
+                            (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Context.user.id ? ' (you)' : '')
                         ),
                         _.div({class: 'page--dashboard__user__type'},
                             _.if(user.isAdmin,
@@ -194,169 +183,153 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderUser();
         }
-    })
+    }
 
     // Check for updates
-    .then(() => {
-        let $btnUpdate = _.find('.page--dashboard__update');
-        
-        if(!currentUserIsAdmin() || !$btnUpdate) { return; }
+    let $btnUpdate = _.find('.page--dashboard__update');
+    
+    if(!currentUserIsAdmin() || !$btnUpdate) { return; }
 
-        return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check')
-        .then((update) => {
-            $btnUpdate.removeClass('working');
+    let update = await HashBrown.Helpers.RequestHelper.request('get', 'server/update/check');
+    $btnUpdate.removeClass('working');
 
-            if(update.isBehind) {
-                $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
+    if(update.isBehind) {
+        $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
 
-                $btnUpdate.click(() => {
-                    UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
+        $btnUpdate.click(async () => {
+            UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
-                    HashBrown.Helpers.RequestHelper.request('post', 'server/update/start')
-                    .then(() => {
-                        UI.messageModal('Success', 'HashBrown is restarting...', false);
+            await HashBrown.Helpers.RequestHelper.request('post', 'server/update/start');
+            
+            UI.messageModal('Success', 'HashBrown is restarting...', false);
 
-                        HashBrown.Helpers.RequestHelper.listenForRestart();
-                    })
-                    .catch(UI.errorModal);
-                })
+            HashBrown.Helpers.RequestHelper.listenForRestart();
+        })
 
-            } else {
-                $btnUpdate.attr('disabled', true);
-                $btnUpdate.addClass('disabled');
-                $btnUpdate.attr('title', 'HashBrown is up to date');
-            }
-        });
-    })
-    .catch(UI.errorModal);
+    } else {
+        $btnUpdate.attr('disabled', true);
+        $btnUpdate.addClass('disabled');
+        $btnUpdate.attr('title', 'HashBrown is up to date');
+    }
 
     /**
      * Event: Click restart
      */
-    $('.page--dashboard__restart').click(() => {
+    $('.page--dashboard__restart').click(async () => {
         if(!currentUserIsAdmin()) { return; }
         
-        HashBrown.Helpers.RequestHelper.request('post', 'server/restart')
-        .then(() => {
-            HashBrown.Helpers.RequestHelper.listenForRestart();
-        });
+        await HashBrown.Helpers.RequestHelper.request('post', 'server/restart');
+    
+        HashBrown.Helpers.RequestHelper.listenForRestart();
     });
 
     /**
      * Event: Click invite user
      */
-    $('.page--dashboard__users__add').click(() => {
-        HashBrown.Helpers.RequestHelper.customRequest('get', '/api/users')
-        .then((users) => {
-            /**
-             * Generate password
-             */
-            function generatePassword() {
-                var length = 8,
-                charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-                retVal = "";
-                for (var i = 0, n = charset.length; i < length; ++i) {
-                    retVal += charset.charAt(Math.floor(Math.random() * n));
-                }
-                return retVal;
+    $('.page--dashboard__users__add').click(async () => {
+        let users = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/users');
+
+        /**
+         * Generate password
+         */
+        function generatePassword() {
+            var length = 8,
+            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+            retVal = "";
+            for (var i = 0, n = charset.length; i < length; ++i) {
+                retVal += charset.charAt(Math.floor(Math.random() * n));
+            }
+            return retVal;
+        }
+
+        /**
+         * Event: On submit user changes
+         */
+        function onSubmit() {
+            let username = addUserModal.$element.find('input').val();
+            let currentUsername = HashBrown.Context.user.fullName || HashBrown.Context.user.username;
+
+            // Check if username was email
+            let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            let isEmail = emailRegex.test(username);
+
+            // Check if en existing user has the same information
+            let existingUser = users.filter((user) => {
+                return user.username == username || user.email == username;
+            })[0];
+
+            // The user was found
+            if(existingUser) {
+                UI.errorModal(new Error('User "' + username + '" already exists'));
+                return;
             }
 
-            /**
-             * Event: On submit user changes
-             */
-            function onSubmit() {
-                let username = addUserModal.$element.find('input').val();
-                let currentUsername = HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username;
-
-                // Check if username was email
-                let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                let isEmail = emailRegex.test(username);
-
-                // Check if en existing user has the same information
-                let existingUser = users.filter((user) => {
-                    return user.username == username || user.email == username;
-                })[0];
-
-                // The user was found
-                if(existingUser) {
-                    UI.errorModal(new Error('User "' + username + '" already exists'));
-                    return;
-                }
-
-                // An email was provided, send invitation
-                if(isEmail) {
-                    let modal = UI.confirmModal(
-                        'invite',
-                        'Add user',
-                        'Do you want to invite a new user with email "' + username + '"?',
-                        () => {
-                            HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', {
-                                email: username,
-                            })
-                            .then((token) => {
-                                let subject = 'Invitation to HashBrown';
-                                let url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
-                                let body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
-                                let href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
-
-                                location.href = href;
-
-                                UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', () => {
-                                    location.reload();
-                                });
-                            })
-                            .catch(UI.errorModal);
-
-                            let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
-
-                            return false;
-                        }
-                    );
-
-                    return;
-                }
-
-                // User doesn't exist, create it
-                let $passwd;
-
-                let modal = UI.messageModal(
+            // An email was provided, send invitation
+            if(isEmail) {
+                let modal = UI.confirmModal(
+                    'invite',
                     'Add user',
-                    _.div({class: 'widget-group'},
-                        _.label({class: 'widget widget--label'}, 'Password for new user "' + username + '"'),
-                        $passwd = _.input({required: true, pattern: '.{6,}', class: 'widget widget--input text', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
-                    ),
-                    () => {
-                        let password = $passwd.val() || '';
-                        let scopes = {};
+                    'Do you want to invite a new user with email "' + username + '"?',
+                    async () => {
+                        let token = await HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', { email: username });
 
-                        UI.messageModal('Creating user', 'Creating user "' + username + '"...');
+                        let subject = 'Invitation to HashBrown';
+                        let url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
+                        let body = 'You have been invited by ' + currentUsername + ' to join a HashBrown instance.%0D%0APlease go to this URL to activate your account: %0D%0A' + url;
+                        let href = 'mailto:' + username + '?subject=' + subject + '&body=' + body;
 
-                        HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
-                            username: username,
-                            password: password,
-                            scopes: {}
-                        })
-                        .then(() => {
-                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
-                        })
-                        .catch(UI.errorModal);
+                        location.href = href;
+
+                        UI.messageModal('Created invitation for "' + username + '"', 'Make sure to send the new user this link: <a href="' + url + '">' + url + '</a>', () => {
+                            location.reload();
+                        });
+
+                        let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+                        return false;
                     }
                 );
+
+                return;
             }
 
-            // Renders the modal
-            let addUserModal = UI.messageModal(
+            // User doesn't exist, create it
+            let $passwd;
+
+            let modal = UI.messageModal(
                 'Add user',
                 _.div({class: 'widget-group'},
-                    _.div({class: 'widget widget--label'}, 'Username or email'),
-                    new HashBrown.Views.Widgets.Input({
-                        placeholder: 'Input username or email'
-                    }).$element
+                    _.label({class: 'widget widget--label'}, 'Password for new user "' + username + '"'),
+                    $passwd = _.input({required: true, pattern: '.{6,}', class: 'widget widget--input text', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
                 ),
-                onSubmit
+                async () => {
+                    let password = $passwd.val() || '';
+                    let scopes = {};
+
+                    UI.messageModal('Creating user', 'Creating user "' + username + '"...');
+
+                    await HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
+                        username: username,
+                        password: password,
+                        scopes: {}
+                    });
+
+                    UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
+                }
             );
-        })
-        .catch(UI.errorModal);
+        }
+
+        // Renders the modal
+        let addUserModal = UI.messageModal(
+            'Add user',
+            _.div({class: 'widget-group'},
+                _.div({class: 'widget widget--label'}, 'Username or email'),
+                new HashBrown.Views.Widgets.Input({
+                    placeholder: 'Input username or email'
+                }).$element
+            ),
+            onSubmit
+        );
     });
 
     /**
@@ -374,15 +347,13 @@ document.addEventListener('DOMContentLoaded', () => {
             actions: [
                 {
                     label: 'Create',
-                    onClick: (e) => {
+                    onClick: async (e) => {
                         let name = modal.$element.find('input').val();
 
                         if(name) {
-                            HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name })
-                            .then(() => {
-                                location.reload();
-                            })
-                            .catch(UI.errorModal);
+                            await HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name });
+                                
+                            location.reload();
                         }
 
                         return false;
@@ -395,7 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /***/ }),
-/* 1 */
+
+/***/ 21:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -5723,10 +5695,11 @@ module.exports = ret;
 
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(3), __webpack_require__(4).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(22), __webpack_require__(23), __webpack_require__(24).setImmediate))
 
 /***/ }),
-/* 2 */
+
+/***/ 22:
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -5916,7 +5889,8 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 3 */
+
+/***/ 23:
 /***/ (function(module, exports) {
 
 var g;
@@ -5942,7 +5916,8 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+
+/***/ 24:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -5998,7 +5973,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(5);
+__webpack_require__(25);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -6009,10 +5984,11 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(23)))
 
 /***/ }),
-/* 5 */
+
+/***/ 25:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -6202,8 +6178,9 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(23), __webpack_require__(22)))
 
 /***/ })
-/******/ ]);
+
+/******/ });
 //# sourceMappingURL=dashboard.js.map

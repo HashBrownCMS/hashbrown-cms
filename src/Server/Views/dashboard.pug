@@ -99,11 +99,18 @@ html
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.min.js')
+        script(src='/lib/babel/polyfill.min.js')
+
+        script.
+            window.HashBrown = {};
+            HashBrown.Context = {
+                user: !{JSON.stringify(user)}
+            };
 
         script(src='/js/common.js')
         script(src='/js/helpers.js')
         script(src='/js/models.js')
         script(src='/js/utilities.js')
         script(src='/js/views.js')
-        
+       
         script(src='/js/dashboard.js')
