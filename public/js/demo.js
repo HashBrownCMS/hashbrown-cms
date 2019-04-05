@@ -81,12 +81,17 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */,
-/* 1 */
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */,
+/* 5 */,
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -396,24 +401,24 @@ class DemoApi {
 
             case 'schemas':
                 let schemas = {
-                    'contentBase': __webpack_require__(2),
-                    'page': __webpack_require__(3),
-                    'array': __webpack_require__(4),
-                    'boolean': __webpack_require__(5),
-                    'contentReference': __webpack_require__(6),
-                    'contentSchemaReference': __webpack_require__(7),
-                    'date': __webpack_require__(8),
-                    'dropdown': __webpack_require__(9),
-                    'fieldBase': __webpack_require__(10),
-                    'language': __webpack_require__(11),
-                    'mediaReference': __webpack_require__(12),
-                    'number': __webpack_require__(13),
-                    'resourceReference': __webpack_require__(14),
-                    'richText': __webpack_require__(15),
-                    'string': __webpack_require__(16),
-                    'struct': __webpack_require__(17),
-                    'tags': __webpack_require__(18),
-                    'url': __webpack_require__(19),
+                    'contentBase': __webpack_require__(7),
+                    'page': __webpack_require__(8),
+                    'array': __webpack_require__(9),
+                    'boolean': __webpack_require__(10),
+                    'contentReference': __webpack_require__(11),
+                    'contentSchemaReference': __webpack_require__(12),
+                    'date': __webpack_require__(13),
+                    'dropdown': __webpack_require__(14),
+                    'fieldBase': __webpack_require__(15),
+                    'language': __webpack_require__(16),
+                    'mediaReference': __webpack_require__(17),
+                    'number': __webpack_require__(18),
+                    'resourceReference': __webpack_require__(19),
+                    'richText': __webpack_require__(20),
+                    'string': __webpack_require__(21),
+                    'struct': __webpack_require__(22),
+                    'tags': __webpack_require__(23),
+                    'url': __webpack_require__(24),
                 };
        
                 let result = [];
@@ -662,109 +667,109 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
 
 /***/ }),
-/* 2 */
+/* 7 */
 /***/ (function(module) {
 
 module.exports = {"defaultTabId":"meta","icon":"cogs","name":"Content Base","fields":{"createDate":{"disabled":"true","label":"Created at","schemaId":"date"},"updateDate":{"disabled":"true","label":"Updated at","schemaId":"date"},"createdBy":{"disabled":"true","label":"Created by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"updatedBy":{"disabled":"true","label":"Updated by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"publishOn":{"label":"Publish on","schemaId":"date"},"unpublishOn":{"label":"Unpublish on","schemaId":"date"},"schemaId":{"label":"Schema","schemaId":"contentSchemaReference","config":{"allowedSchemas":"fromParent"}},"properties":{"title":{"label":"Title","schemaId":"string"}}}};
 
 /***/ }),
-/* 3 */
+/* 8 */
 /***/ (function(module) {
 
 module.exports = {"icon":"file","name":"Page","parentSchemaId":"contentBase","tabs":{"content":"Content"},"defaultTabId":"content","fields":{"properties":{"title":{"label":"Title","schemaId":"string","tabId":"content"},"description":{"label":"Description","schemaId":"string","tabId":"content"},"url":{"label":"URL","schemaId":"url","tabId":"content"}}}};
 
 /***/ }),
-/* 4 */
+/* 9 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ArrayEditor","icon":"list-ol","name":"Array"};
 
 /***/ }),
-/* 5 */
+/* 10 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"BooleanEditor","icon":"toggle-on","name":"Boolean"};
 
 /***/ }),
-/* 6 */
+/* 11 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentReferenceEditor","icon":"file","name":"Content Reference"};
 
 /***/ }),
-/* 7 */
+/* 12 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentSchemaReferenceEditor","icon":"gears","name":"Content Schema Reference"};
 
 /***/ }),
-/* 8 */
+/* 13 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"DateEditor","icon":"calendar","name":"Date"};
 
 /***/ }),
-/* 9 */
+/* 14 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"DropdownEditor","icon":"list-alt","name":"Dropdown"};
 
 /***/ }),
-/* 10 */
+/* 15 */
 /***/ (function(module) {
 
 module.exports = {"name":"Field Base","icon":"cogs"};
 
 /***/ }),
-/* 11 */
+/* 16 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"LanguageEditor","icon":"globe","name":"Language"};
 
 /***/ }),
-/* 12 */
+/* 17 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"MediaReferenceEditor","icon":"file-image-o","name":"Media Reference"};
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"NumberEditor","icon":"sort-numeric-asc","name":"Number"};
 
 /***/ }),
-/* 14 */
+/* 19 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"ResourceReferenceEditor","icon":"book","name":"Resource Reference"};
 
 /***/ }),
-/* 15 */
+/* 20 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"RichTextEditor","icon":"font","name":"Rich Text"};
 
 /***/ }),
-/* 16 */
+/* 21 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"StringEditor","icon":"font","name":"String"};
 
 /***/ }),
-/* 17 */
+/* 22 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"StructEditor","icon":"cubes","name":"Struct"};
 
 /***/ }),
-/* 18 */
+/* 23 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"TagsEditor","icon":"tag","name":"Tags"};
 
 /***/ }),
-/* 19 */
+/* 24 */
 /***/ (function(module) {
 
 module.exports = {"parentSchemaId":"fieldBase","editorId":"UrlEditor","icon":"link","name":"Url"};

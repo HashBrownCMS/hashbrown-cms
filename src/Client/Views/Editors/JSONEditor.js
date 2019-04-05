@@ -16,10 +16,6 @@ class JSONEditor extends Crisp.View {
             _.div({class: 'editor__footer__error__body'})
         ).hide();
 
-        if(!this.model && !this.modelUrl) {
-            this.modelUrl = HashBrown.Helpers.RequestHelper.environmentUrl(this.apiPath);
-        }
-
         this.fetch();
     }
 
@@ -28,7 +24,8 @@ class JSONEditor extends Crisp.View {
      */
     async fetch() {
         this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-    
+        this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
+
         super.fetch();
     }
 
@@ -65,17 +62,15 @@ class JSONEditor extends Crisp.View {
     /**
      * Event: Click save. Posts the model to the apiPath
      */
-    onClickSave() {
-        let view = this;
-        
+    async onClickSave() {
+        this.model = JSON.parse(this.value); 
+
         this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
-            HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model)
-            .then(() => {
-                this.$saveBtn.toggleClass('working', false);
-            })
-            .catch(UI.errorModal);
+            await HashBrown.Helpers.ResourceHelper.set(this.resourceCategory, this.modelId, this.model);
+
+            this.$saveBtn.toggleClass('working', false);
        
         } else {
             UI.errorModal('Unable to save', 'Please refer to the error prompt for details');

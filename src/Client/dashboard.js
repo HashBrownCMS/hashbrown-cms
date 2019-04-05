@@ -18,11 +18,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
 
     // Get projects
-    let projects = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
-    
-    for(let projectId of projects || []) {
+    let projects = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
+   
+    $('.page--dashboard__projects__list').empty();
+
+    for(let project of projects || []) {
         let projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
-            modelUrl: '/api/server/projects/' + projectId
+            model: new HashBrown.Models.Project(project)
         });
 
         $('.page--dashboard__projects__list').prepend(projectEditor.$element);

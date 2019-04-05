@@ -60,8 +60,6 @@ class ConnectionHelper extends ConnectionHelperCommon {
         await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
 
         await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-        
-        HashBrown.Views.Navigation.NavbarMain.reload();  
     }
     
     /**

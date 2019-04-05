@@ -55,8 +55,6 @@ class SchemaEditor extends Crisp.View {
         
         this.$saveBtn.toggleClass('working', false);
         
-        HashBrown.Views.Navigation.NavbarMain.reload();
-        
         // If id changed, change the hash
         if(Crisp.Router.params.id != this.model.id) {
             location.hash = '/schemas/' + this.model.id;

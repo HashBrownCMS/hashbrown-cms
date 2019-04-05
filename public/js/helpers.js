@@ -178,8 +178,6 @@ class ConnectionHelper extends ConnectionHelperCommon {
         await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
 
         await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-        
-        HashBrown.Views.Navigation.NavbarMain.reload();  
     }
     
     /**
@@ -4412,6 +4410,8 @@ class ResourceHelper {
            
             $('.page--environment__spinner').toggleClass('hidden', true);
 
+            HashBrown.Helpers.EventHelper.trigger('resource');  
+
         } catch(e) {
             UI.errorModal(e);
 
@@ -4440,7 +4440,7 @@ class ResourceHelper {
 
             await this.getAll(null, category);
 
-            HashBrown.Views.Navigation.NavbarMain.reload();
+            HashBrown.Helpers.EventHelper.trigger('resource');  
 
         } catch(e) {
             UI.errorModal(e);
@@ -4461,9 +4461,9 @@ class ResourceHelper {
         try {
             await this.indexedDbTransaction('delete', category, id);
 
-            HashBrown.Helpers.EventHelper.trigger(category, id);  
-            
             await HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
+            
+            HashBrown.Helpers.EventHelper.trigger('resource');  
 
         } catch(e) {
             UI.errorModal(e);
@@ -4548,7 +4548,7 @@ class ResourceHelper {
         
             await this.reloadResource(category);
 
-            HashBrown.Views.Navigation.NavbarMain.reload();
+            HashBrown.Helpers.EventHelper.trigger('resource');  
         
         } catch(e) {
             UI.errorModal(e);
@@ -4603,16 +4603,20 @@ class ResourceHelper {
      * @returns {Promise} Result
      */
     static async set(category, id, data) {
-        checkParam(category, 'category', String);
-        checkParam(category, 'id', String);
-        checkParam(data, 'data', HashBrown.Models.Resource);
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
+        checkParam(data, 'data', Object, true);
+
+        if(data instanceof HashBrown.Models.Resource) {
+            data = data.getObject();
+        }
 
         try {
             await this.indexedDbTransaction('put', category, id, data);
 
-            await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data.getObject());
+            await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data);
         
-            HashBrown.Helpers.EventHelper.trigger(category, id);  
+            HashBrown.Helpers.EventHelper.trigger('resource');  
         
         } catch(e) {
             UI.errorModal(e);
@@ -4639,7 +4643,7 @@ class ResourceHelper {
         
             await this.indexedDbTransaction('put', category, resource.id, resource);
 
-            HashBrown.Helpers.EventHelper.trigger(category);  
+            HashBrown.Helpers.EventHelper.trigger('resource');  
         
         } catch(e) {
             UI.errorModal(e);
@@ -5700,9 +5704,11 @@ class UIHelper {
             });
 
             // Set styles
+            let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+            let pageX = e.touches ? e.touches[0].pageX : e.pageX;
+
             dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
-            dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX;
+            dropdown.element.setAttribute('style', 'top: ' + pageY + 'px; left: ' + pageX + 'px;');
 
             // Open it
             dropdown.toggle(true);

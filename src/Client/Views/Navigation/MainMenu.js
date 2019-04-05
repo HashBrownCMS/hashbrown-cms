@@ -25,8 +25,6 @@ class MainMenu extends Crisp.View {
 
         await HashBrown.Helpers.ResourceHelper.reloadResource('content');
 
-        HashBrown.Views.Navigation.NavbarMain.reload();
-
         let contentEditor = Crisp.View.get('ContentEditor');
 
         if(contentEditor) {

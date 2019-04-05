@@ -26,8 +26,6 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
         )
         
         await HashBrown.Helpers.ResourceHelper.reloadResource('media');
-        
-        HashBrown.Views.Navigation.NavbarMain.reload();
 
         location.hash = '/media/' + id;
     }
@@ -51,8 +49,6 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 await HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name);
 
                 await HashBrown.Helpers.ResourceHelper.reloadResource('media');
-                
-                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
@@ -83,8 +79,6 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 $element.parent().toggleClass('loading', true);
 
                 await HashBrown.Helpers.ResourceHelper.remove('media', id);
-
-                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 // Cancel the MediaViever view if it was displaying the deleted object
                 if(location.hash == '#/media/' + id) {

@@ -7,8 +7,6 @@ Crisp.Router.route('/', () => {
 
 // Dashboard
 Crisp.Router.route('/content/', () => {
-    Crisp.View.get('NavbarMain').showTab('/content/');
-
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
@@ -23,8 +21,6 @@ Crisp.Router.route('/content/', () => {
                     await HashBrown.Helpers.RequestHelper.request('post', 'content/example');
 
                     await HashBrown.Helper.ResourceHelper.preloadAllResources();
-                
-                    HashBrown.Views.Navigation.NavbarMain.reload();  
                 })
         ],
         'text'
@@ -32,12 +28,10 @@ Crisp.Router.route('/content/', () => {
 });
 
 // Edit (JSON editor)
-Crisp.Router.route('/content/json/:id', () => {
-    Crisp.View.get('NavbarMain').highlightItem('/content/', Crisp.Router.params.id);
-    
+Crisp.Router.route('/content/json/:id', async () => {
     let contentEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('content/' + Crisp.Router.params.id),
-        apiPath: 'content/' + Crisp.Router.params.id
+        modelId: Crisp.Router.params.id,
+        resourceCategory: 'content'
     });
 
     UI.setEditorSpaceContent(contentEditor.$element);

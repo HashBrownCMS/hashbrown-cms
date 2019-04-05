@@ -30,8 +30,6 @@ class ConnectionEditor extends Crisp.View {
         this.$saveBtn.toggleClass('saving', false);
     
         await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-        
-        HashBrown.Views.Navigation.NavbarMain.reload();  
     }
 
     /**

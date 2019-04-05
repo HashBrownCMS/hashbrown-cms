@@ -704,9 +704,11 @@ class UIHelper {
             });
 
             // Set styles
+            let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+            let pageX = e.touches ? e.touches[0].pageX : e.pageX;
+
             dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
-            dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX;
+            dropdown.element.setAttribute('style', 'top: ' + pageY + 'px; left: ' + pageX + 'px;');
 
             // Open it
             dropdown.toggle(true);

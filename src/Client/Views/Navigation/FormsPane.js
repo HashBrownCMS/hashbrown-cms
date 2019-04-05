@@ -15,8 +15,6 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
      */
     static async onClickNewForm() {
         let newForm = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Form, 'forms');
-    
-        HashBrown.Views.Navigation.NavbarMain.reload();
             
         location.hash = '/forms/' + newForm.id;
     }
@@ -37,8 +35,6 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
                 await HashBrown.Helpers.ResourceHelper.remove('forms', form.id);
 
                 debug.log('Removed Form with id "' + form.id + '"', this); 
-
-                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 // Cancel the FormEditor view
                 location.hash = '/forms/';

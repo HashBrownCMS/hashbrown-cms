@@ -16,8 +16,6 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     static async onClickNewConnection() {
         let connection = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Connection, 'connections');
         
-        HashBrown.Views.Navigation.NavbarMain.reload();
-
         location.hash = '/connections/' + connection.id;
     }
 
@@ -30,11 +28,9 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
         let name = $element.data('name');
         
         new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', async () => {
-            await HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id)
+            await HashBrown.Helpers.ResourceHelper.remove('connections', id);
             
             debug.log('Removed connection "' + id + '"', this); 
-
-            HashBrown.Views.Navigation.NavbarMain.reload();
 
             // Cancel the ConnectionEditor view if it was displaying the deleted connection
             if(location.hash == '#/connections/' + id) {

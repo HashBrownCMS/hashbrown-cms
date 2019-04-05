@@ -81,84 +81,12 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 20:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * @namespace HashBrown.Client
- */
-document.addEventListener('DOMContentLoaded', async () => {
-    // Check that all submodules are loaded
-    submoduleCheck();
-    
-    // Libraries
-    window._ = Crisp.Elements;
-    window.Promise = __webpack_require__(21);
-
-    // Helper shortcuts
-    window.debug = HashBrown.Helpers.DebugHelper;
-    window.UI = HashBrown.Helpers.UIHelper;
-
-    // Error handling
-    window.onerror = UI.errorModal;
-   
-    // Preload resource cache (only if we're not in media picker mode)
-    if(!HashBrown.Context.isMediaPicker) {
-        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-    }
-
-    // Get language
-    HashBrown.Context.language = localStorage.getItem('language') || 'en';
-
-    // Init current user
-    HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
-
-    // Init UI
-    new HashBrown.Views.Navigation.NavbarMain();
-    new HashBrown.Views.Navigation.MainMenu();
-
-    // Set router check
-    Crisp.Router.check = (newRoute, cancel, proceed) => {
-        UI.highlight(false);
-
-        let contentEditor = Crisp.View.get('ContentEditor');
-
-        if(
-            (!contentEditor || !contentEditor.model) ||
-            (newRoute.indexOf(contentEditor.model.id) > -1) ||
-            (!contentEditor.dirty)
-        ) {
-            proceed();
-            return;
-        }
-
-        UI.confirmModal(
-            'Discard',
-            'Discard unsaved changes?',
-            'You have made changes to "' + (contentEditor.model.prop('title', HashBrown.Context.language) || contentEditor.model.id) + '"',
-            () => {
-                contentEditor.dirty = false;
-                proceed();
-            },
-            cancel
-        );
-    };
-
-    Crisp.Router.init();
-});
-
-
-/***/ }),
-
-/***/ 21:
+/***/ 1:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -5486,11 +5414,11 @@ module.exports = ret;
 
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(22), __webpack_require__(23), __webpack_require__(24).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(3), __webpack_require__(4).setImmediate))
 
 /***/ }),
 
-/***/ 22:
+/***/ 2:
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -5681,7 +5609,74 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
-/***/ 23:
+/***/ 25:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @namespace HashBrown.Client
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check that all submodules are loaded
+    submoduleCheck();
+    
+    // Libraries
+    window._ = Crisp.Elements;
+    window.Promise = __webpack_require__(1);
+
+    // Helper shortcuts
+    window.debug = HashBrown.Helpers.DebugHelper;
+    window.UI = HashBrown.Helpers.UIHelper;
+
+    // Error handling
+    window.onerror = UI.errorModal;
+   
+    // Get language
+    HashBrown.Context.language = localStorage.getItem('language') || 'en';
+
+    // Init current user
+    HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
+
+    // Init UI
+    new HashBrown.Views.Navigation.NavbarMain();
+    new HashBrown.Views.Navigation.MainMenu();
+
+    // Set router check
+    Crisp.Router.check = (newRoute, cancel, proceed) => {
+        UI.highlight(false);
+
+        let contentEditor = Crisp.View.get('ContentEditor');
+
+        if(
+            (!contentEditor || !contentEditor.model) ||
+            (newRoute.indexOf(contentEditor.model.id) > -1) ||
+            (!contentEditor.dirty)
+        ) {
+            proceed();
+            return;
+        }
+
+        UI.confirmModal(
+            'Discard',
+            'Discard unsaved changes?',
+            'You have made changes to "' + (contentEditor.model.prop('title', HashBrown.Context.language) || contentEditor.model.id) + '"',
+            () => {
+                contentEditor.dirty = false;
+                proceed();
+            },
+            cancel
+        );
+    };
+
+    Crisp.Router.init();
+});
+
+
+/***/ }),
+
+/***/ 3:
 /***/ (function(module, exports) {
 
 var g;
@@ -5708,7 +5703,7 @@ module.exports = g;
 
 /***/ }),
 
-/***/ 24:
+/***/ 4:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -5764,7 +5759,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(25);
+__webpack_require__(5);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -5775,11 +5770,11 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
 
 /***/ }),
 
-/***/ 25:
+/***/ 5:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -5969,7 +5964,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(23), __webpack_require__(22)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(2)))
 
 /***/ })
 

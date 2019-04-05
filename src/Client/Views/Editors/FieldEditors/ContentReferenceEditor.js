@@ -40,11 +40,12 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
      *
      * @returns {Array} List of options
      */
-    getDropdownOptions() {
+    async getDropdownOptions() {
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
         let allowedContent = [];
         let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
 
-        for(let content of resources.content) {
+        for(let content of allContent) {
             if(areRulesDefined) {
                 let isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
                 

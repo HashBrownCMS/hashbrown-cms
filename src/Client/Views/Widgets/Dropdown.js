@@ -192,10 +192,15 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             toggle.checked = isChecked;
 
             let isAtRight = bounds.right >= window.innerWidth - 10;
-            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
+            let bottomDiff = bounds.bottom - window.innerHeight;
+
+            if(bottomDiff > 0) {
+                this.element
+                    .querySelector('.widget--dropdown__options')
+                    .setAttribute('style', 'max-height: ' + (bounds.height - bottomDiff) + 'px');
+            }
 
             this.element.classList.toggle('right', isAtRight);
-            this.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     }
 

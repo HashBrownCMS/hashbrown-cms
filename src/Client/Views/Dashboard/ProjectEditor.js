@@ -9,12 +9,6 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        _.append(this.element,
-            _.div({class: 'widget--spinner embedded'},
-                _.div({class: 'widget--spinner__image fa fa-refresh'})
-            )
-        );
-
         this.fetch();
     }
    
@@ -186,15 +180,6 @@ class ProjectEditor extends Crisp.View {
                 }
             ]
         });
-    }
-
-    /**
-     * Pre render
-     */
-    prerender() {
-        if(this.model instanceof HashBrown.Models.Project === false) {
-            this.model = new HashBrown.Models.Project(this.model);
-        }
     }
 
     /**

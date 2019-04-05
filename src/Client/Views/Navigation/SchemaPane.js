@@ -28,8 +28,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
 
                     debug.log('Removed schema with id "' + id + '"', this); 
 
-                    HashBrown.Views.Navigation.NavbarMain.reload();
-
                     // Cancel the SchemaEditor view if it was displaying the deleted content
                     if(location.hash == '#/schemas/' + id) {
                         location.hash = '/schemas/';
@@ -52,8 +50,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
 
         let newSchema = await HashBrown.Helpers.ResourceHelper.new('schemas', '?parentSchemaId=' + parentId);
 
-        HashBrown.Views.Navigation.NavbarMain.reload();
-
         location.hash = '/schemas/' + newSchema.id;
     }
     
@@ -65,8 +61,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
         let pullId = $('.context-menu-target').data('id');
 
         await HashBrown.Helpers.ResourceHelper.pull('schemas', pullId);
-
-        HashBrown.Views.Navigation.NavbarMain.reload();
            
         location.hash = '/schemas/' + pullId;
 		
@@ -88,8 +82,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
 		$element.parent().addClass('loading');
 
         await HashBrown.Helpers.ResourceHelper.push('schemas', pushId);
-        
-        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**

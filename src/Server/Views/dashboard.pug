@@ -1,3 +1,4 @@
+doctype html
 html
     head
         meta(charset='utf-8')
@@ -47,6 +48,9 @@ html
                                 | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
 
                         .page--dashboard__projects__list
+                            .widget.widget--spinner.embedded.no-background
+                                .widget--spinner__inner
+                                    .widget--spinner__image.fa.fa-refresh
 
                         if(user.isAdmin)
                             button.page--dashboard__projects__add.widget.widget--button.round.right.fa.fa-plus(title='Create project')

@@ -11,9 +11,13 @@ class NavbarMain extends Crisp.View {
 
         this.template = require('Client/Templates/Navigation/NavbarMain');
 
-        this.fetch();
+        HashBrown.Helpers.EventHelper.on(
+            'resource',
+            'navbar',
+            (value) => { this.reload(value); }
+        );  
         
-        $('.page--environment__space--nav').html(this.$element);
+        this.fetch();
     }
   
     /**
@@ -27,6 +31,20 @@ class NavbarMain extends Crisp.View {
         }
 
         super.fetch();
+        
+        $('.page--environment__space--nav').html(this.$element);
+
+        let resourceCategory = location.hash.match(/\#\/([a-z]+)\//)[1];
+
+        if(!resourceCategory) { return; }
+
+        let resourceItem = Crisp.Router.params.id;
+
+        if(resourceItem) {
+            this.highlightItem('/' + resourceCategory + '/', resourceItem);
+        } else {
+            this.showTab('/' + resourceCategory + '/');
+        }
     }
 
     /**
@@ -472,7 +490,7 @@ class NavbarMain extends Crisp.View {
                             $pane.children('.navbar-main__pane__items').prepend($dir); 
                         }
                         
-                        // Attach item context menu
+                        // Attach pane context menu
                         if(pane.settings.getDirContextMenu) {
                             UI.context($dir[0], pane.settings.getDirContextMenu());
                         }

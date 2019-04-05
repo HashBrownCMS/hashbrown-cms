@@ -25,9 +25,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
         content.parentId = parentId;
          
         await HashBrown.Helpers.ResourceHelper.set('content', id, content);
-
-        // Reload UI
-        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**
@@ -46,9 +43,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
         content.parentId = parentId;
          
         await HashBrown.Helpers.ResourceHelper.set('content', id, content);
-
-        // Reload UI
-        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**
@@ -157,8 +151,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                         // Upon success, reload resource and UI elements    
                         await HashBrown.Helpers.ResourceHelper.reloadResource('content');
                             
-                        HashBrown.Views.Navigation.NavbarMain.reload();
-                            
                         location.hash = '/content/' + newContent.id;
                     }
                 );
@@ -184,12 +176,10 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
             content.settings.publishing = newValue;
     
             // API call to save the Content model
-            HashBrown.Helpers.RequestHelper.request('post', 'content/' + content.id, content)
+            HashBrown.Helpers.ResourceHelper.set('content', content.id, content)
             
             // Upon success, reload the UI    
             .then(() => {
-                HashBrown.Views.Navigation.NavbarMain.reload();
-
                 if(Crisp.Router.params.id == content.id) {
                     let contentEditor = Crisp.View.get('ContentEditor');
 
@@ -256,8 +246,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                 }
 
                 await HashBrown.Helpers.ResourceHelper.reloadResource('content');
-
-                HashBrown.Views.Navigation.NavbarMain.reload();
                             
                 let contentEditor = Crisp.View.get('ContentEditor');
                    
@@ -302,8 +290,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                 await HashBrown.Helpers.ContentHelper.setContentById(id, content);
 
                 await HashBrown.Helpers.ResourceHelper.reloadResource('content');
-
-                HashBrown.Views.Navigation.NavbarMain.reload();
 
                 // Update ContentEditor if needed
                 let contentEditor = Crisp.View.get('ContentEditor');

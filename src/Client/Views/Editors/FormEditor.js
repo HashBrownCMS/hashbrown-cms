@@ -28,8 +28,6 @@ class FormEditor extends Crisp.View {
         await HashBrown.Helpers.ResourceHelper.set('forms', this.model.id, this.model);
         
         this.$saveBtn.toggleClass('working', false);
-    
-        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**

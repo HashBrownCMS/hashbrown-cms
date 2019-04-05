@@ -142,8 +142,6 @@ class MediaUploader extends HashBrown.Views.Modals.Modal {
         .then(() => {
             this.setLoading(false);
 
-            HashBrown.Views.Navigation.NavbarMain.reload();
-
             if(typeof this.onSuccess === 'function') {
                 this.onSuccess(uploadedIds);
             }
