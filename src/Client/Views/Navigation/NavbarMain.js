@@ -296,8 +296,8 @@ class NavbarMain extends Crisp.View {
 
             } else if(item.properties.title && typeof item.properties.title === 'object') {
                 // Use the current language title
-                if(item.properties.title[window.language]) {
-                    name = item.properties.title[window.language];
+                if(item.properties.title[HashBrown.Context.language]) {
+                    name = item.properties.title[HashBrown.Context.language];
 
                 // If no title was found, search in other languages
                 } else {

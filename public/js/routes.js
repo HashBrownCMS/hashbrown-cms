@@ -126,12 +126,12 @@ Crisp.Router.route('/content/', () => {
             _.button({class: 'widget widget--button'}, 'Quick tour')
                 .click(HashBrown.Helpers.ContentHelper.startTour),
             _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
-                .click(() => {
-                    HashBrown.Helpers.RequestHelper.request('post', 'content/example')
-                    .then(() => {
-                        location.reload();
-                    })
-                    .catch(UI.errorModal);
+                .click(async () => {
+                    await HashBrown.Helpers.RequestHelper.request('post', 'content/example');
+
+                    await HashBrown.Helper.ResourceHelper.preloadAllResources();
+                
+                    HashBrown.Views.Navigation.NavbarMain.reload();  
                 })
         ],
         'text'
@@ -152,7 +152,9 @@ Crisp.Router.route('/content/json/:id', () => {
 
 // Edit (redirect to default tab)
 Crisp.Router.route('/content/:id', async () => {
-    let content = await HashBrown.Helpers.ContentHelper.getContentById(Crisp.Router.params.id);
+    let id = Crisp.Router.params.id;
+    
+    let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
     
     if(content) {
         let contentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(content.schemaId);
@@ -190,7 +192,7 @@ Crisp.Router.route('/content/:id/:tab', () => {
         UI.setEditorSpaceContent(contentEditor.$element);
     
     } else {
-        contentEditor.fetch(id);
+        contentEditor.fetch();
 
     }
 });

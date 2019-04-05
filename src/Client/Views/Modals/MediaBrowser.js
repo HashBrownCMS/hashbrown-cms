@@ -30,8 +30,7 @@ class MediaBrowser extends HashBrown.Views.Modals.Modal {
             iframe.contentWindow.HashBrown.Helpers.MediaHelper.initMediaPickerMode(
                 (id) => { this.onPickMedia(id); },
                 () => { this.onChangeResource(); },
-                (e) => { UI.errorModal(e); },
-                resources
+                (e) => { UI.errorModal(e); }
             );
         };
     }
@@ -67,10 +66,7 @@ class MediaBrowser extends HashBrown.Views.Modals.Modal {
      * Event: Change resource
      */
     onChangeResource() {
-        HashBrown.Helpers.RequestHelper.reloadResource('media')
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**
@@ -79,7 +75,7 @@ class MediaBrowser extends HashBrown.Views.Modals.Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        return _.iframe({src: '//' + location.host  + '/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '')});
+        return _.iframe({src: '//' + location.host  + '/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/?isMediaPicker=true#/media/' + (this.value || '')});
     }
 }
 

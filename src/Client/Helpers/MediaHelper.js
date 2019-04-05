@@ -98,19 +98,14 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @param {Function} onPickMedia
      * @param {Function} onChangeResource
-     * @param {Object} allResources
      */
-    static initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+    static initMediaPickerMode(onPickMedia, onChangeResource, onError) {
+        // Set the context
+        HashBrown.Context.isMediaPicker = true;
+        
         // Claim debug messages
         UI.errorModal = onError;
         
-        // Use the provided resources instead of reloading them
-        HashBrown.Helpers.RequestHelper.reloadAllResources = () => {
-            resources = allResources;
-
-            return Promise.resolve();
-        };
-
         // Listen for picked Media
         window.addEventListener('hashchange', () => {
             let isMediaView = location.hash.indexOf('#/media/') === 0;

@@ -23,22 +23,17 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
                 'delete',
                 'Delete schema',
                 'Are you sure you want to delete the schema "' + schema.name + '"?',
-                () => {
-                    HashBrown.Helpers.RequestHelper.request('delete', 'schemas/' + id)
-                    .then(() => {
-                        debug.log('Removed schema with id "' + id + '"', this); 
+                async () => {
+                    await HashBrown.Helpers.ResourceHelper.remove('schemas', id);
 
-                        return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-                    })
-                    .then(() => {
-                        HashBrown.Views.Navigation.NavbarMain.reload();
+                    debug.log('Removed schema with id "' + id + '"', this); 
 
-                        // Cancel the SchemaEditor view if it was displaying the deleted content
-                        if(location.hash == '#/schemas/' + id) {
-                            location.hash = '/schemas/';
-                        }
-                    })
-                    .catch(UI.errorModal);
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    // Cancel the SchemaEditor view if it was displaying the deleted content
+                    if(location.hash == '#/schemas/' + id) {
+                        location.hash = '/schemas/';
+                    }
                 }
             );
         } else {
@@ -52,65 +47,49 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click new Schema
      */
-    static onClickNewSchema() {
+    static async onClickNewSchema() {
         let parentId = $('.context-menu-target').data('id');
-        let parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentId);
 
-        HashBrown.Helpers.RequestHelper.request('post', 'schemas/new', parentSchema)
-        .then((newSchema) => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('schemas')
-            .then(() => {
-                HashBrown.Views.Navigation.NavbarMain.reload();
+        let newSchema = await HashBrown.Helpers.ResourceHelper.new('schemas', '?parentSchemaId=' + parentId);
 
-                location.hash = '/schemas/' + newSchema.id;
-            });
-        })
-        .catch(UI.errorModal);
+        HashBrown.Views.Navigation.NavbarMain.reload();
+
+        location.hash = '/schemas/' + newSchema.id;
     }
     
     /**
      * Event: Click pull Schema
      */
-    static onClickPullSchema() {
+    static async onClickPullSchema() {
         let schemaEditor = Crisp.View.get('SchemaEditor');
         let pullId = $('.context-menu-target').data('id');
 
-        HashBrown.Helpers.RequestHelper.request('post', 'schemas/pull/' + pullId, {})
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-           
-			location.hash = '/schemas/' + pullId;
-		
-			let editor = Crisp.View.get('SchemaEditor');
+        await HashBrown.Helpers.ResourceHelper.pull('schemas', pullId);
 
-			if(editor && editor.model.id == pullId) {
-                editor.model = null;
-				editor.fetch();
-			}
-        }) 
-        .catch(UI.errorModal);
+        HashBrown.Views.Navigation.NavbarMain.reload();
+           
+        location.hash = '/schemas/' + pullId;
+		
+        let editor = Crisp.View.get('SchemaEditor');
+
+        if(editor && editor.model.id == pullId) {
+            editor.model = null;
+            editor.fetch();
+        }
     }
     
     /**
      * Event: Click push Schema
      */
-    static onClickPushSchema() {
+    static async onClickPushSchema() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
 
-        HashBrown.Helpers.RequestHelper.request('post', 'schemas/push/' + pushId)
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        }) 
-        .catch(UI.errorModal);
+        await HashBrown.Helpers.ResourceHelper.push('schemas', pushId);
+        
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**

@@ -242,7 +242,7 @@ class FormsController extends require('./ApiController') {
     static postNew(req, res) {
         HashBrown.Helpers.FormHelper.createForm(req.project, req.environment)
         .then((form) => {
-            res.status(200).send(form.id);
+            res.status(200).send(form);
         })
         .catch((e) => {
             res.status(502).send(FormsController.printError(e));

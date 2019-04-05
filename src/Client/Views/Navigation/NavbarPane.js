@@ -36,11 +36,10 @@ class NavbarPane {
      *
      * @param {String} resource
      */
-    static onClickRefreshResource(resource) {
-        HashBrown.Helpers.RequestHelper.reloadResource(resource)
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        });
+    static async onClickRefreshResource(resource) {
+        await HashBrown.Helpers.ResourceHelper.reloadResource(resource);
+
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**

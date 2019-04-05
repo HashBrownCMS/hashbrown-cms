@@ -85,13 +85,13 @@ class ContentHelper extends ContentHelperCommon {
             let oldValue = value;
 
             value = {};
-            value[window.language] = oldValue;
+            value[HashBrown.Context.language] = oldValue;
         }
 
         // If the definition value is not set to multilingual, but the value is an object
         // containing the _multilingual flag, convert it
         if(!definition.multilingual && value && typeof value === 'object' && value._multilingual) {
-            value = value[window.language];
+            value = value[HashBrown.Context.language];
         }
 
         // Update the _multilingual flag

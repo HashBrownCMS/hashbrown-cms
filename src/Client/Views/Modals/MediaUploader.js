@@ -135,7 +135,7 @@ class MediaUploader extends HashBrown.Views.Modals.Modal {
 
         // Then reload the Media resource
         .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('media');
+            return HashBrown.Helpers.ResourceHelper.reloadResource('media');
         })
 
         // Then update the UI and trigger the success callback

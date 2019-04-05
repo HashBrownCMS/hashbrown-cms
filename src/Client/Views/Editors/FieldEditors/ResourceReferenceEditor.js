@@ -39,7 +39,7 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
                         value: config.resource,
-                        options: ['content', 'connections', 'forms', 'media', 'schemas', 'users'],
+                        options: HashBrown.Helpers.ResourceHelper.getResourceNames(),
                         onChange: (newValue) => {
                             config.resource = newValue
                         }

@@ -22,22 +22,14 @@ class FormEditor extends Crisp.View {
     /**
      * Event: Click save. Posts the model to the modelUrl
      */
-    onClickSave() {
+    async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/' + this.model.id, this.model)
-        .then(() => {
-            debug.log('Saved form "' + this.model.id + '"', this);
-            this.$saveBtn.toggleClass('working', false);
+        await HashBrown.Helpers.ResourceHelper.set('forms', this.model.id, this.model);
         
-            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-        })
-        .then(() => {
-            let navbar = Crisp.View.get('NavbarMain');
-            
-            navbar.reload();
-        })
-        .catch(UI.errorModal);
+        this.$saveBtn.toggleClass('working', false);
+    
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**

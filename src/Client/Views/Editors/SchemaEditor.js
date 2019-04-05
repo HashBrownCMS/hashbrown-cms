@@ -49,32 +49,21 @@ class SchemaEditor extends Crisp.View {
     /**
      * Event: Click save. Posts the model to the modelUrl
      */
-    onClickSave() {
-        if(this.jsonEditor && this.jsonEditor.isValid == false) {
-            return;
-        }
+    async onClickSave() {
+        if(this.jsonEditor && this.jsonEditor.isValid == false) { return; }
 
         this.$saveBtn.toggleClass('working', true);
 
-        HashBrown.Helpers.RequestHelper.request('post', 'schemas/' + Crisp.Router.params.id, this.model)
-        .then((schema) => {
-            this.$saveBtn.toggleClass('working', false);
+        await HashBrown.Helpers.ResourceHelper.set('schemas', this.model.id, this.model);
         
-            return HashBrown.Helpers.RequestHelper.reloadResource('schemas');
-        })
-        .then(() => {
-            Crisp.View.get('NavbarMain').reload();
-
-            // If id changed, change the hash
-            if(Crisp.Router.params.id != this.model.id) {
-                location.hash = '/schemas/' + this.model.id;
-            }
-        })
-        .catch((e) => {
-            UI.errorModal(e);
+        this.$saveBtn.toggleClass('working', false);
         
-            this.$saveBtn.toggleClass('working', false);
-        });
+        HashBrown.Views.Navigation.NavbarMain.reload();
+        
+        // If id changed, change the hash
+        if(Crisp.Router.params.id != this.model.id) {
+            location.hash = '/schemas/' + this.model.id;
+        }
     }
 
     /**

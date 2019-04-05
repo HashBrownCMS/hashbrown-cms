@@ -13,24 +13,18 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click create new form
      */
-    static onClickNewForm() {
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/new')
-        .then((newFormId) => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('forms')
-            .then(() => {
-                HashBrown.Views.Navigation.NavbarMain.reload();
-                
-                location.hash = '/forms/' + newFormId;
-            });
-        })
-        .catch(UI.errorModal);
+    static async onClickNewForm() {
+        let newForm = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Form, 'forms');
+    
+        HashBrown.Views.Navigation.NavbarMain.reload();
+            
+        location.hash = '/forms/' + newForm.id;
     }
     
     /**
      * Event: On click remove
      */
     static onClickRemoveForm() {
-        let view = this;
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let form = resources.forms.filter((form) => { return form.id == id; })[0];
@@ -39,20 +33,15 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
             'delete',
             'Delete form',
             'Are you sure you want to delete the form "' + form.title + '"?',
-            () => {
-                HashBrown.Helpers.RequestHelper.request('delete', 'forms/' + form.id)
-                .then(() => {
-                    debug.log('Removed Form with id "' + form.id + '"', view); 
+            async () => {
+                await HashBrown.Helpers.ResourceHelper.remove('forms', form.id);
 
-                    return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+                debug.log('Removed Form with id "' + form.id + '"', this); 
 
-                    // Cancel the FormEditor view
-                    location.hash = '/forms/';
-                })
-                .catch(UI.errorModal);
+                HashBrown.Views.Navigation.NavbarMain.reload();
+
+                // Cancel the FormEditor view
+                location.hash = '/forms/';
             }
         );
     }
@@ -60,50 +49,32 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click pull Form
      */
-    static onClickPullForm() {
+    static async onClickPullForm() {
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Form by id
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/pull/' + pullId, {})
-        
-        // Upon success, reload all Form models    
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-        })
+        await HashBrown.Helpers.RequestHelper.pull('forms', pullId);
 
-        // Reload the UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
+        location.hash = '/forms/' + pullId;
+    
+        let editor = Crisp.View.get('FormEditor');
 
-			location.hash = '/forms/' + pullId;
-		
-			let editor = Crisp.View.get('FormEditor');
-
-			if(editor && editor.model.id == pullId) {
-                editor.model = null;
-				editor.fetch();
-			}
-        }) 
-        .catch(UI.errorModal);
+        if(editor && editor.model.id == pullId) {
+            editor.model = null;
+            editor.fetch();
+        }
     }
     
     /**
      * Event: Click push Form
      */
-    static onClickPushForm() {
+    static async onClickPushForm() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
 
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/push/' + pushId)
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        }) 
-        .catch(UI.errorModal);
+        await HashBrown.Helpers.ResourceHelper.push('forms', pushId);
     }
 
     /**

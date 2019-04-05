@@ -7,13 +7,13 @@
  */
 class ContentEditor extends Crisp.View {
     constructor(id) {
-        super({});
+        super({ modelId: id });
 
         checkParam(id, 'id', String, true);
 
         this.dirty = false;
 
-        this.fetch(id);
+        this.fetch();
     }
 
     /**
@@ -21,10 +21,10 @@ class ContentEditor extends Crisp.View {
      *
      * @param {String} id
      */
-    async fetch(id) {
-        this.model = await HashBrown.Helpers.ContentHelper.getContentById(id);
+    async fetch() {
+        this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
         
-        if(!this.model) { throw new Error('Content by id "' + id + '" was not found'); }
+        if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
         
         this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
         
@@ -136,11 +136,9 @@ class ContentEditor extends Crisp.View {
     reload() {
         this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
 
-        let id = this.model.id;
-
         this.model = null;
 
-        this.fetch(id);
+        this.fetch();
     }
 
     /**
@@ -302,7 +300,7 @@ class ContentEditor extends Crisp.View {
                 // Render the field editor
                 this.renderField(
                     // If the field definition is set to multilingual, pass value from object
-                    fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
+                    fieldDefinition.multilingual ? fieldValues[key][HashBrown.Context.language] : fieldValues[key],
 
                     // Pass the field definition
                     fieldDefinition,
@@ -312,7 +310,7 @@ class ContentEditor extends Crisp.View {
                         // If field definition is set to multilingual, assign flag and value onto object...
                         if(fieldDefinition.multilingual) {
                             fieldValues[key]._multilingual = true;
-                            fieldValues[key][window.language] = newValue;
+                            fieldValues[key][HashBrown.Context.language] = newValue;
 
                         // ...if not, assign the value directly
                         } else {

@@ -19,24 +19,22 @@ class MainMenu extends Crisp.View {
      *
      * @param {String} newLanguage
      */
-    onChangeLanguage(newLanguage) {
+    async onChangeLanguage(newLanguage) {
         localStorage.setItem('language', newLanguage);
+        HashBrown.Context.language = newLanguage;
 
-        window.language = newLanguage;
+        await HashBrown.Helpers.ResourceHelper.reloadResource('content');
 
-        HashBrown.Helpers.RequestHelper.reloadResource('content')
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
+        HashBrown.Views.Navigation.NavbarMain.reload();
 
-            let contentEditor = Crisp.View.get('ContentEditor');
+        let contentEditor = Crisp.View.get('ContentEditor');
 
-            if(contentEditor) {
-                contentEditor.model = null;
-                contentEditor.fetch();
-            }
+        if(contentEditor) {
+            contentEditor.model = null;
+            await contentEditor.fetch();
+        }
 
-            this.fetch();
-        });
+        this.fetch();
     }
     
     /**
@@ -87,7 +85,7 @@ class MainMenu extends Crisp.View {
      * Post render
      */
     postrender() {
-        this.languageDropdown.notify(window.language);
+        this.languageDropdown.notify(HashBrown.Context.language);
     }
 
     /**
@@ -100,7 +98,7 @@ class MainMenu extends Crisp.View {
                 this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
                     tooltip: 'Language',
                     icon: 'flag',
-                    value: window.language,
+                    value: HashBrown.Context.language,
                     options: this.languages,
                     onChange: (newValue) => {
                         this.onChangeLanguage(newValue);

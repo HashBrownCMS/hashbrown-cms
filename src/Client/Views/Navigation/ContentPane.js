@@ -13,117 +13,75 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Change parent
      */
-    static onChangeDirectory(id, parentId) {
+    static async onChangeDirectory(id, parentId) {
         if(parentId == '/') {
             parentId = '';
         }
 
         // Get the Content model
-        HashBrown.Helpers.ContentHelper.getContentById(id)
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
         // API call to apply changes to Content parent
-        .then((content) => {
-            content.parentId = parentId;
+        content.parentId = parentId;
          
-            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
-        })
-
-        // Reload all Content models
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-        })
+        await HashBrown.Helpers.ResourceHelper.set('content', id, content);
 
         // Reload UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        })
-        .catch(UI.errorModal);
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**
      * Event: Change sort index
      */
-    static onChangeSortIndex(id, newIndex, parentId) {
+    static async onChangeSortIndex(id, newIndex, parentId) {
         if(parentId == '/') {
             parentId = '';
         }
         
         // Get the Content model
-        HashBrown.Helpers.ContentHelper.getContentById(id)
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
         // API call to apply changes to Content parent
-        .then((content) => {
-            content.sort = newIndex;
-            content.parentId = parentId;
+        content.sort = newIndex;
+        content.parentId = parentId;
          
-            return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content);
-        })
-
-        // Reload all Content models
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-        })
+        await HashBrown.Helpers.ResourceHelper.set('content', id, content);
 
         // Reload UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        })
-        .catch(UI.errorModal);
+        HashBrown.Views.Navigation.NavbarMain.reload();
     }
 
     /**
      * Event: Click pull content
      */
-    static onClickPullContent() {
+    static async onClickPullContent() {
         let contentEditor = Crisp.View.get('ContentEditor');
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Content by id
-        HashBrown.Helpers.RequestHelper.request('post', 'content/pull/' + pullId, {})
+        await HashBrown.Helpers.ResourceHelper.pull('content', pullId);
         
-        // Upon success, reload all Content models    
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-        })
+        location.hash = '/content/' + pullId;
+    
+        let editor = Crisp.View.get('ContentEditor');
 
-        // Reload the UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-
-			location.hash = '/content/' + pullId;
-		
-			let editor = Crisp.View.get('ContentEditor');
-
-			if(editor && editor.model && editor.model.id == pullId) {
-                editor.model = null;
-				editor.fetch();
-			}
-        }) 
-        .catch(UI.errorModal);
+        if(editor && editor.model && editor.model.id == pullId) {
+            editor.model = null;
+            editor.fetch();
+        }
     }
     
     /**
      * Event: Click push content
      */
-    static onClickPushContent() {
+    static async onClickPushContent() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
 
         // API call to push the Content by id
-        HashBrown.Helpers.RequestHelper.request('post', 'content/push/' + pushId)
-
-        // Upon success, reload all Content models
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-        })
-
-        // Reload the UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        }) 
-        .catch(UI.errorModal);
+        await HashBrown.Helpers.ResourceHelper.push('content', pushId);
     }
 
     /**
@@ -183,12 +141,10 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                     ),
 
                     // Event fired when clicking "OK"
-                    () => {
+                    async () => {
                         if(!schemaId) { return false; }
                        
                         let apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
-
-                        let newContent;
 
                         // Append parent Content id to request URL
                         if(parentId) {
@@ -196,20 +152,14 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                         }
 
                         // API call to create new Content node
-                        HashBrown.Helpers.RequestHelper.request('post', apiUrl)
+                        let newContent = await HashBrown.Helpers.RequestHelper.request('post', apiUrl)
                         
                         // Upon success, reload resource and UI elements    
-                        .then((result) => {
-                            newContent = result;
-
-                            return HashBrown.Helpers.RequestHelper.reloadResource('content');
-                        })
-                        .then(() => {
-                            HashBrown.Views.Navigation.NavbarMain.reload();
+                        await HashBrown.Helpers.ResourceHelper.reloadResource('content');
                             
-                            location.hash = '/content/' + newContent.id;
-                        })
-                        .catch(UI.errorModal);
+                        HashBrown.Views.Navigation.NavbarMain.reload();
+                            
+                        location.hash = '/content/' + newContent.id;
                     }
                 );
             }
@@ -272,82 +222,62 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {Boolean} shouldUnpublish
      */
-    static onClickRemoveContent(shouldUnpublish) {
+    static async onClickRemoveContent(shouldUnpublish) {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
     
-        HashBrown.Helpers.ContentHelper.getContentById(id)
-        .then((content) => {
-            content.settingsSanityCheck('publishing');
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
-            function unpublishConnection() {
-                return HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content)
-                .then(() => {
-                    return onSuccess();
-                });
-            }
-            
-            function onSuccess() {
-                return HashBrown.Helpers.RequestHelper.reloadResource('content')
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
-                            
-                    let contentEditor = Crisp.View.get('ContentEditor');
-                   
-                    // Change the ContentEditor view if it was displaying the deleted content
-                    if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
-                        // The Content was actually deleted
-                        if(shouldUnpublish) {
-                            location.hash = '/content/';
-                        
-                        // The Content still has a synced remote
-                        } else {
-                            contentEditor.model = null;
-                            contentEditor.fetch();
+        content.settingsSanityCheck('publishing');
 
-                        }
+        let shouldDeleteChildren = false;
+        
+        UI.confirmModal(
+            'Remove',
+            'Remove the content "' + name + '"?',
+            _.div({class: 'widget-group'},
+                _.label({class: 'widget widget--label'}, 'Remove child Content too'),
+                new HashBrown.Views.Widgets.Input({
+                    value: shouldDeleteChildren,
+                    type: 'checkbox',
+                    onChange: (newValue) => {
+                        shouldDeleteChildren = newValue;
                     }
-                    
-                    $element.parent().toggleClass('loading', false);
+                }).$element
+            ),
+            async () => {
+                $element.parent().toggleClass('loading', true);
 
-                    return Promise.resolve();
-                });
-            }
-
-            let shouldDeleteChildren = false;
-            
-            UI.confirmModal(
-                'Remove',
-                'Remove the content "' + name + '"?',
-                _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, 'Remove child Content too'),
-                    new HashBrown.Views.Widgets.Input({
-                        value: shouldDeleteChildren,
-                        type: 'checkbox',
-                        onChange: (newValue) => {
-                            shouldDeleteChildren = newValue;
-                        }
-                    }).$element
-                ),
-                () => {
-                    $element.parent().toggleClass('loading', true);
-
-                    HashBrown.Helpers.RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
-                    .then(() => {
-                        if(shouldUnpublish && content.getSettings('publishing').connectionId) {
-                            return unpublishConnection();
-                        } else {
-                            return onSuccess();
-                        }
-                    })
-                    .catch((e) => {
-                        $element.parent().toggleClass('loading', false);
-                        UI.errorModal(e);
-                    });
+                await HashBrown.Helpers.RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
+                
+                if(shouldUnpublish && content.getSettings('publishing').connectionId) {
+                    await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content);
                 }
-            );
-        });
+
+                await HashBrown.Helpers.ResourceHelper.reloadResource('content');
+
+                HashBrown.Views.Navigation.NavbarMain.reload();
+                            
+                let contentEditor = Crisp.View.get('ContentEditor');
+                   
+                // Change the ContentEditor view if it was displaying the deleted content
+                if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
+                    // The Content was actually deleted
+                    if(shouldUnpublish) {
+                        location.hash = '/content/';
+                    
+                    // The Content still has a synced remote
+                    } else {
+                        contentEditor.model = null;
+                        contentEditor.fetch();
+
+                    }
+                }
+                
+                $element.parent().toggleClass('loading', false);
+            }
+        );
     }
 
     /**
@@ -358,33 +288,30 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
         let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
 
         UI.messageModal(
-            'Rename "' + content.getPropertyValue('title', window.language) + '"', 
+            'Rename "' + content.getPropertyValue('title', HashBrown.Context.language) + '"', 
             _.div({class: 'widget-group'}, 
                 _.label({class: 'widget widget--label'}, 'New name'),
                 new HashBrown.Views.Widgets.Input({
-                    value: content.getPropertyValue('title', window.language), 
+                    value: content.getPropertyValue('title', HashBrown.Context.language), 
                     onChange: (newValue) => {
-                        content.setPropertyValue('title', newValue, window.language);
+                        content.setPropertyValue('title', newValue, HashBrown.Context.language);
                     }
                 })
             ),
-            () => {
-                HashBrown.Helpers.ContentHelper.setContentById(id, content)
-                .then(() => {
-                    return HashBrown.Helpers.RequestHelper.reloadResource('content');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+            async () => {
+                await HashBrown.Helpers.ContentHelper.setContentById(id, content);
 
-                    // Update ContentEditor if needed
-                    let contentEditor = Crisp.View.get('ContentEditor');
+                await HashBrown.Helpers.ResourceHelper.reloadResource('content');
 
-                    if(!contentEditor || contentEditor.model.id !== id) { return; }
+                HashBrown.Views.Navigation.NavbarMain.reload();
 
-                    contentEditor.model = null;
-                    contentEditor.fetch();
-                })
-                .catch(UI.errorModal);
+                // Update ContentEditor if needed
+                let contentEditor = Crisp.View.get('ContentEditor');
+
+                if(!contentEditor || contentEditor.model.id !== id) { return; }
+
+                contentEditor.model = null;
+                await contentEditor.fetch();
             }
         );
     }

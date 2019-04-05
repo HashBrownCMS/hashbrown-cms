@@ -21,10 +21,10 @@ html
             .page--environment__space.page--environment__space--nav
             .page--environment__space.page--environment__space--editor
         
-        //- .widget.widget--spinner.page--environment__spinner
-        //-     .widget--spinner__inner
-        //-         img.widget--spinner__image.page--environment__spinner__image(src='/svg/logo_pink.svg')
-        //-         .widget--spinner__messages.page--environment__spinner__messages
+        .widget.widget--spinner.page--environment__spinner.hidden
+            .widget--spinner__inner
+                img.widget--spinner__image.page--environment__spinner__image(src='/svg/logo_pink.svg')
+                .widget--spinner__messages.page--environment__spinner__messages
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.js')
@@ -48,7 +48,8 @@ html
                 projectId: '#{currentProject}',
                 projectSettings: !{JSON.stringify(currentProjectSettings)},
                 environment: '#{currentEnvironment}',
-                user: !{JSON.stringify(user)}
+                user: !{JSON.stringify(user)},
+                isMediaPicker: #{isMediaPicker}
             };
 
         script(src='/js/environment.js')

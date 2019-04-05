@@ -162,9 +162,7 @@ class SchemaController extends require('./ApiController') {
      * @returns {Schema} The created Schema
      */
     static createSchema(req, res) {
-        let parentSchema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
-
-        HashBrown.Helpers.SchemaHelper.createSchema(req.project, req.environment, parentSchema)
+        HashBrown.Helpers.SchemaHelper.createSchema(req.project, req.environment, req.query.parentSchemaId)
         .then((newSchema) => {
             res.status(200).send(newSchema.getObject());
         })

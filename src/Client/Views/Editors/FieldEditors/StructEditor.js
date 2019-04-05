@@ -86,7 +86,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             }
             
             this.value[key]._multilingual = true;
-            this.value[key][window.language] = newValue;
+            this.value[key][HashBrown.Context.language] = newValue;
 
         } else {
             this.value[key] = newValue;
@@ -397,7 +397,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 
                 // Init the field editor
                 let fieldEditorInstance = new fieldEditor({
-                    value: fieldDefinition.multilingual ? value[window.language] : value,
+                    value: fieldDefinition.multilingual ? value[HashBrown.Context.language] : value,
                     disabled: fieldDefinition.disabled || false,
                     config: config,
                     schema: fieldSchema,

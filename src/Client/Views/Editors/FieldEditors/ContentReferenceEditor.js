@@ -52,7 +52,7 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
             }
 
             allowedContent[allowedContent.length] = {
-                title: content.prop('title', window.language) || content.id,
+                title: content.prop('title', HashBrown.Context.language) || content.id,
                 id: content.id
             };
         }

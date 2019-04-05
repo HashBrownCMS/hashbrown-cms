@@ -449,21 +449,22 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Created Schema
      */
-    static createSchema(project, environment, parentSchema) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(parentSchema, 'parentSchema', HashBrown.Models.Schema);
+    static async createSchema(project, environment, parentSchemaId) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(parentSchemaId, 'parentSchemaId', String, true);
 
         let collection = environment + '.schemas';
+        let parentSchema = await this.getSchemaById(parentSchemaId);
         let newSchema = HashBrown.Models.Schema.create(parentSchema);
 
-        return HashBrown.Helpers.DatabaseHelper.insertOne(
+        await HashBrown.Helpers.DatabaseHelper.insertOne(
             project,
             collection,
             newSchema.getObject() 
-        ).then(() => {
-            return Promise.resolve(newSchema);
-        });
+        );
+
+        return newSchema;
     }
 }
 

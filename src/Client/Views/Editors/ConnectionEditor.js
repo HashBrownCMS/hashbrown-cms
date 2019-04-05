@@ -22,16 +22,16 @@ class ConnectionEditor extends Crisp.View {
     /**
      * Event: Click save. Posts the model to the modelUrl
      */
-    onClickSave() {
+    async onClickSave() {
         this.$saveBtn.toggleClass('saving', true);
 
-        HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
-        .then(() => {
-            this.$saveBtn.toggleClass('saving', false);
-       
-            location.reload(); 
-        })
-        .catch(UI.errorModal);
+        await HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
+            
+        this.$saveBtn.toggleClass('saving', false);
+    
+        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
+        
+        HashBrown.Views.Navigation.NavbarMain.reload();  
     }
 
     /**

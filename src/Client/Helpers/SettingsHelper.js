@@ -34,14 +34,7 @@ class SettingsHelper extends SettingsHelperCommon {
             apiUrl += '/' + section;
         }
 
-        return HashBrown.Helpers.RequestHelper.customRequest('get', apiUrl)
-
-        // Cache settings client-side
-        .then((settings) => {
-            this.updateCache(project, environment, section, settings);
-
-            return Promise.resolve(settings || {});
-        });
+        return HashBrown.Helpers.RequestHelper.customRequest('get', apiUrl);
     }
    
     /**

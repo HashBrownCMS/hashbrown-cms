@@ -56,17 +56,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise}
      */
-    static setMediaProvider(id) {
-        return super.setMediaProvider(
-            HashBrown.Helpers.ProjectHelper.currentProject,
-            HashBrown.Helpers.ProjectHelper.currentEnvironment,
-            id
-        ).then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('media');  
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();  
-        });
+    static async setMediaProvider(id) {
+        await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
+
+        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
+        
+        HashBrown.Views.Navigation.NavbarMain.reload();  
     }
     
     /**

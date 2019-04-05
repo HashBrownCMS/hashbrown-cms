@@ -202,20 +202,11 @@ class TestHelper {
         onMessage('Get native schemas');
         return HashBrown.Helpers.SchemaHelper.getNativeSchemas()
         .then((nativeSchemas) => {
-            let contentBase;
-
-            for(let i in nativeSchemas) {
-                if(nativeSchemas[i].id === 'contentBase') {
-                    contentBase = nativeSchemas[i];
-                    break;
-                }
-            }
-
             onMessage('Create schema')
             return HashBrown.Helpers.SchemaHelper.createSchema(
                 project,
                 environment,
-                contentBase
+                'contentBase'
             );
         })
         .then((testSchema) => {

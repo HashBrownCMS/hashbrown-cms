@@ -10,7 +10,7 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
      * Constructor
      */
     constructor(params) {
-        params.title = 'Publishing settings for "' + params.model.prop('title', window.language) + '"';
+        params.title = 'Publishing settings for "' + params.model.prop('title', HashBrown.Context.language) + '"';
         params.actions = [
             {
                 label: 'OK',
@@ -35,7 +35,7 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
             let governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
 
             return _.div({class: 'widget widget--label'},
-                '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)'
+                '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', HashBrown.Context.language) + '</a>)'
             );
         
         } else {

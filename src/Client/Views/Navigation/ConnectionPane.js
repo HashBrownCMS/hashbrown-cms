@@ -13,21 +13,12 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click new connection
      */
-    static onClickNewConnection() {
-        let newConnection;
+    static async onClickNewConnection() {
+        let connection = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Connection, 'connections');
+        
+        HashBrown.Views.Navigation.NavbarMain.reload();
 
-        HashBrown.Helpers.RequestHelper.request('post', 'connections/new')
-        .then((connection) => {
-            newConnection = connection;
-
-            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-
-            location.hash = '/connections/' + newConnection.id;
-        })
-        .catch(UI.errorModal);
+        location.hash = '/connections/' + connection.id;
     }
 
     /**
@@ -38,78 +29,51 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', () => {
-            HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id)
-            .then(() => {
-                debug.log('Removed connection with alias "' + id + '"', this); 
+        new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', async () => {
+            await HashBrown.Helpers.RequestHelper.request('delete', 'connections/' + id)
+            
+            debug.log('Removed connection "' + id + '"', this); 
 
-                return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-            })
-            .then(() => {
-                HashBrown.Views.Navigation.NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
-                // Cancel the ConnectionEditor view if it was displaying the deleted connection
-                if(location.hash == '#/connections/' + id) {
-                    location.hash = '/connections/';
-                }
-            })
-            .catch(UI.errorModal);
+            // Cancel the ConnectionEditor view if it was displaying the deleted connection
+            if(location.hash == '#/connections/' + id) {
+                location.hash = '/connections/';
+            }
         });
     }
     
     /**
      * Event: Click pull connection
      */
-    static onClickPullConnection() {
+    static async onClickPullConnection() {
         let connectionEditor = Crisp.View.get('ConnectionEditor');
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Connection by id
-        HashBrown.Helpers.RequestHelper.request('post', 'connections/pull/' + pullId, {})
+        await HashBrown.Helpers.ResourceHelper.pull('connections', pullId);
         
-        // Upon success, reload all Connection models    
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-        })
-
-        // Reload the UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-
-			location.hash = '/connections/' + pullId;
+        location.hash = '/connections/' + pullId;
 		
-			let editor = Crisp.View.get('ConnectionEditor');
+        let editor = Crisp.View.get('ConnectionEditor');
 
-			if(editor && editor.model.id == pullId) {
-                editor.model = null;
-				editor.fetch();
-			}
-        }) 
-        .catch(UI.errorModal);
+        if(editor && editor.model.id == pullId) {
+            editor.model = null;
+            editor.fetch();
+        }
     }
     
     /**
      * Event: Click push connection
      */
-    static onClickPushConnection() {
+    static async onClickPushConnection() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
 
         // API call to push the Connection by id
-        HashBrown.Helpers.RequestHelper.request('post', 'connections/push/' + pushId)
-
-        // Upon success, reload all Connection models
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('connections');
-        })
-
-        // Reload the UI
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
-        }) 
-        .catch(UI.errorModal);
+        await HashBrown.Helpers.ResourceHelper.push('connections', pushId);
     }
 
     /**

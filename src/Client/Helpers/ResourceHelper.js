@@ -89,6 +89,8 @@ class ResourceHelper {
                         request = objectStore.getAll();
                     } else if(action === 'delete') {
                         request = objectStore.delete(id);
+                    } else if(action === 'clear') {
+                        request = objectStore.clear();
                     }
 
                     request.onsuccess = (e) => {
@@ -106,24 +108,88 @@ class ResourceHelper {
             });
         });
     }
-  
+
+    /**
+     * Preloads all resources
+     */
+    static async preloadAllResources() {
+        try {
+            $('.page--environment__spinner').toggleClass('hidden', false); 
+            $('.page--environment__spinner__messages').empty();
+
+            await this.clearIndexedDb();
+
+            for(let resourceName of this.getResourceNames()) {
+                let $msg = _.div({class: 'widget--spinner__message', 'data-name': resourceName}, resourceName);
+                
+                $('.page--environment__spinner__messages').append($msg);
+            }
+            
+            for(let resourceName of this.getResourceNames()) {
+                await this.getAll(null, resourceName);
+                
+                $('.page--environment__spinner__messages [data-name="' + resourceName + '"]').toggleClass('loaded', true);
+            }
+           
+            $('.page--environment__spinner').toggleClass('hidden', true);
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+
+    /**
+     * Gets a list of all resource names
+     *
+     * @return {Array} Names
+     */
+    static getResourceNames() {
+        return ['content', 'connections', 'forms', 'media', 'schemas', 'users'];
+    }
+   
+    /**
+     * Reloads a resource category
+     *
+     * @param {String} cateogry
+     */
+    static async reloadResource(category) {
+        checkParam(category, 'category', String, true);
+
+        try {
+            await this.indexedDbTransaction('clear', category);
+
+            await this.getAll(null, category);
+
+            HashBrown.Views.Navigation.NavbarMain.reload();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+
     /**
      * Removes a resource
      *
      * @param {String} category
      * @param {String} id
-     *
-     * @returns {Promise} Result
      */
     static async remove(category, id) {
-        checkParam(category, 'category', String);
-        checkParam(id, 'id', String);
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
 
-        await this.indexedDbTransaction('delete', category, id);
+        try {
+            await this.indexedDbTransaction('delete', category, id);
 
-        HashBrown.Helpers.EventHelper.trigger(category, id);  
-        
-        return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
+            HashBrown.Helpers.EventHelper.trigger(category, id);  
+            
+            await HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**
@@ -138,27 +204,77 @@ class ResourceHelper {
         checkParam(model, 'model', HashBrown.Models.Resource);
         checkParam(category, 'category', String);
 
-        let results = await this.indexedDbTransaction('getAll', category);
+        try {
+            let results = await this.indexedDbTransaction('getAll', category);
 
-        if(!results || results.length < 2) {
-            results = await HashBrown.Helpers.RequestHelper.request('get', category);
-            
-            if(!results) { throw new Error('Resource list ' + category + ' not found'); }
-       
-            for(let result of results) {
-                if(!result.id) { continue; }
+            if(!results || results.length < 2) {
+                results = await HashBrown.Helpers.RequestHelper.request('get', category);
+                
+                if(!results) { throw new Error('Resource list ' + category + ' not found'); }
+           
+                for(let result of results) {
+                    if(!result.id) { continue; }
 
-                await this.indexedDbTransaction('put', category, result.id, result);
+                    await this.indexedDbTransaction('put', category, result.id, result);
+                }
             }
-        }
-            
-        if(typeof model === 'function') {
-            for(let i in results) {
-                results[i] = new model(results[i]);
+                
+            if(typeof model === 'function') {
+                for(let i in results) {
+                    results[i] = new model(results[i]);
+                }
             }
-        }
 
-        return results;
+            return results;
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+    
+    /**
+     * Pulls a synced resource
+     *
+     * @param {String} category
+     * @param {String} id
+     */
+    static async pull(category, id) {
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
+
+        try {
+            await HashBrown.Helpers.RequestHelper.request('post', category + '/pull/' + id);
+        
+            await this.reloadResource(category);
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+    
+    /**
+     * Pushes a synced resource
+     *
+     * @param {String} category
+     * @param {String} id
+     */
+    static async push(category, id) {
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
+
+        try {
+            await HashBrown.Helpers.RequestHelper.request('post', category + '/push/' + id);
+        
+            await this.reloadResource(category);
+
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -175,21 +291,27 @@ class ResourceHelper {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
 
-        let result = await this.indexedDbTransaction('get', category, id);
+        try {
+            let result = await this.indexedDbTransaction('get', category, id);
 
-        if(!result) {
-            result = await HashBrown.Helpers.RequestHelper.request('get', category + '/' + id);
+            if(!result) {
+                result = await HashBrown.Helpers.RequestHelper.request('get', category + '/' + id);
+                
+                if(!result) { throw new Error('Resource ' + category + '/' + id + ' not found'); }
             
-            if(!result) { throw new Error('Resource ' + category + '/' + id + ' not found'); }
+                await this.indexedDbTransaction('put', category, id, result);
+            }
+
+            if(typeof model === 'function') {
+                result = new model(result);
+            }
+
+            return result;
         
-            await this.indexedDbTransaction('put', category, id, result);
-        }
+        } catch(e) {
+            UI.errorModal(e);
 
-        if(typeof model === 'function') {
-            result = new model(result);
         }
-
-        return result;
     }
     
     /**
@@ -206,11 +328,44 @@ class ResourceHelper {
         checkParam(category, 'id', String);
         checkParam(data, 'data', HashBrown.Models.Resource);
 
-        await this.indexedDbTransaction('put', category, id, data);
+        try {
+            await this.indexedDbTransaction('put', category, id, data);
 
-        HashBrown.Helpers.EventHelper.trigger(category, id);  
+            await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data.getObject());
+        
+            HashBrown.Helpers.EventHelper.trigger(category, id);  
+        
+        } catch(e) {
+            UI.errorModal(e);
+        
+        }
+    }
+    
+    /**
+     * Creates a new resource
+     *
+     * @param {String} category
+     * @param {Resource} model
+     * @param {String} query
+     *
+     * @returns {Resource} Result
+     */
+    static async new(model, category, query = '') {
+        checkParam(model, 'model', HashBrown.Models.Resource);
+        checkParam(category, 'category', String, true);
+        checkParam(query, 'query', String);
 
-        return HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data.getObject());
+        try {
+            let resource = await HashBrown.Helpers.RequestHelper.request('post', category + '/new' + query);
+        
+            await this.indexedDbTransaction('put', category, resource.id, resource);
+
+            HashBrown.Helpers.EventHelper.trigger(category);  
+        
+        } catch(e) {
+            UI.errorModal(e);
+        
+        }
     }
 }
 

@@ -5632,9 +5632,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Error handling
     window.onerror = UI.errorModal;
-    
-    // Clear resource cache
-    await HashBrown.Helpers.ResourceHelper.clearIndexedDb();
+   
+    // Resource names
+    HashBrown.Context.resourceNames = ['content', 'connections', 'forms', 'media', 'schemas', 'users'];
+
+    // Preload resource cache (only if we're not in media picker mode)
+    if(!HashBrown.Context.isMediaPicker) {
+        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
+    }
 
     // Get language
     HashBrown.Context.language = localStorage.getItem('language') || 'en';
@@ -5664,7 +5669,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         UI.confirmModal(
             'Discard',
             'Discard unsaved changes?',
-            'You have made changes to "' + (contentEditor.model.prop('title', window.language) || contentEditor.model.id) + '"',
+            'You have made changes to "' + (contentEditor.model.prop('title', HashBrown.Context.language) || contentEditor.model.id) + '"',
             () => {
                 contentEditor.dirty = false;
                 proceed();

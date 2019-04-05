@@ -72,7 +72,7 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         let url = '/';
       
         if(this.multilingual) {
-            url += window.language + '/';
+            url += HashBrown.Context.language + '/';
         }
 
         for(let node of nodes) {
@@ -91,8 +91,8 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 // If title is defined in properties (typical)
                 } else if(node.properties && node.properties.title) {
                     // If title is multilingual
-                    if(node.properties.title[window.language]) {
-                        title = node.properties.title[window.language];
+                    if(node.properties.title[HashBrown.Context.language]) {
+                        title = node.properties.title[HashBrown.Context.language];
                     
                     // If title is not multilingual
                     } else if(typeof node.properties.title === 'string') {
@@ -110,7 +110,7 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         for(let content of window.resources.content) {
             if(content.id != contentId) {
-                let thatUrl = content.prop('url', window.language);
+                let thatUrl = content.prop('url', HashBrown.Context.language);
                 let isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
                 let isSameUrl = url == thatUrl || isMatchWithNumber;
 

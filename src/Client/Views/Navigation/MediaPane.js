@@ -15,8 +15,8 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {String} newFolder
      */
-    static onChangeDirectory(id, newFolder) {
-        HashBrown.Helpers.RequestHelper.request(
+    static async onChangeDirectory(id, newFolder) {
+        await HashBrown.Helpers.RequestHelper.request(
             'post',
             'media/tree/' + id,
             newFolder ? {
@@ -24,15 +24,12 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 folder: newFolder
             } : null
         )
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('media');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
+        
+        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+        
+        HashBrown.Views.Navigation.NavbarMain.reload();
 
-            location.hash = '/media/' + id;
-        })
-        .catch(UI.errorModal);
+        location.hash = '/media/' + id;
     }
 
     /**
@@ -50,23 +47,20 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 value: name,
                 onChange: (newValue) => { name = newValue; }
             }),
-            () => {
-                HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name)
-                .then(() => {
-                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+            async () => {
+                await HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name);
 
-                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+                await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+                
+                HashBrown.Views.Navigation.NavbarMain.reload();
 
-                    if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
-                        mediaViewer.model = null;
+                let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
-                        mediaViewer.fetch();
-                    }
-                })
-                .catch(UI.errorModal);
+                if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
+                    mediaViewer.model = null;
+
+                    mediaViewer.fetch();
+                }
             }
         );
 
@@ -85,22 +79,17 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             'delete',
             'Delete media',
             'Are you sure you want to delete the media object "' + name + '"?',
-            () => {
+            async () => {
                 $element.parent().toggleClass('loading', true);
 
-                HashBrown.Helpers.RequestHelper.request('delete', 'media/' + id)
-                .then(() => {
-                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+                await HashBrown.Helpers.ResourceHelper.remove('media', id);
 
-                    // Cancel the MediaViever view if it was displaying the deleted object
-                    if(location.hash == '#/media/' + id) {
-                        location.hash = '/media/';
-                    }
-                })
-                .catch(UI.errorModal);
+                HashBrown.Views.Navigation.NavbarMain.reload();
+
+                // Cancel the MediaViever view if it was displaying the deleted object
+                if(location.hash == '#/media/' + id) {
+                    location.hash = '/media/';
+                }
             }
         );
     }

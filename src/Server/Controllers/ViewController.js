@@ -132,6 +132,7 @@ class ViewController extends HashBrown.Controllers.Controller {
                     currentProjectName: project.settings.info.name,
                     currentProjectSettings: project.settings,
                     currentEnvironment: req.params.environment,
+                    isMediaPicker: !!req.query.isMediaPicker,
                     user: user
                 });
             })
