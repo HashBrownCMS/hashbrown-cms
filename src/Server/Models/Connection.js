@@ -59,38 +59,23 @@ class Connection extends ConnectionCommon {
      * @param {String} project
      * @param {String} environment
      * @param {Content} content
-     *
-     * @returns {Promise} Promise
      */
-    unpublishContent(project, environment, content) {
+    async unpublishContent(project, environment, content) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
         
         debug.log('Unpublishing all localised property sets...', this);
         
-        return this.removePreview(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((languages) => {
-            let next = () => {
-                let language = languages.pop();
+        await this.removePreview(project, environment, content)
+        
+        let languages = await HashBrown.Helpers.LanguageHelper.getLanguages(project);
 
-                // No more languauges to publish for
-                if(!language) {
-                    debug.log('Unpublished all localised property sets successfully!', this);
-                    return Promise.resolve();
-                }
+        for(let language of languages) {
+            await this.removeContent(content.id, language);
+        }
 
-                return this.removeContent(content.id, language)
-                .then(() => {
-                    return next();
-                });
-            };
-
-            return next();
-        });
+        debug.log('Unpublished all localised property sets successfully!', this);
     }
     
     /**
@@ -101,38 +86,23 @@ class Connection extends ConnectionCommon {
      * @param {String} project
      * @param {String} environment
      * @param {Content} content
-     *
-     * @returns {Promise} Preview URL
      */
-    removePreview(project, environment, content) {
+    async removePreview(project, environment, content) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
         
-        if(!content.hasPreview) { return Promise.resolve(); }
+        if(!content.hasPreview) { return; }
 
         content.hasPreview = false;
         
-        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((languages) => {
-            let next = () => {
-                let language = languages.pop();
+        await HashBrown.Helpers.ContentHelper.updateContent(project, environment, content);
 
-                if(!language) {
-                    return Promise.resolve();
-                }
+        let languages = await HashBrown.Helpers.LanguageHelper.getLanguages(project);
 
-                return this.removeContent(content.id + '_preview', language)
-                .then(() => {
-                    return next();  
-                });
-            };
-
-            return next();
-        });
+        for(let language of languages) {
+            await this.removeContent(content.id + '_preview', language);
+        }
     }
 
     /**
@@ -143,28 +113,23 @@ class Connection extends ConnectionCommon {
      * @param {Content} content
      * @param {String} language
      *
-     * @returns {Promise} Preview URL
+     * @returns {String} Preview URL
      */
-    generatePreview(project, environment, content, language) {
+    async generatePreview(project, environment, content, language) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
         checkParam(language, 'language', String);
         
         content.hasPreview = true;
-        
-        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((sets) => {
-            content.setPropertyValue('url', '/preview' + content.getPropertyValue('url', language), language);
+       
+        await HashBrown.Helpers.ContentHelper.updateContent(project, environment, content);
 
-            return this.setContent(content.id + '_preview', content, language)
-            .then(() => {
-                return Promise.resolve(this.url + content.getPropertyValue('url', language));
-            });
-        });
+        content.setPropertyValue('url', '/preview' + content.getPropertyValue('url', language), language);
+
+        await this.setContent(content.id + '_preview', content, language);
+
+        return this.url + content.getPropertyValue('url', language);
     }
 
     /**
@@ -173,38 +138,23 @@ class Connection extends ConnectionCommon {
      * @param {String} project
      * @param {String} environment
      * @param {Content} content
-     *
-     * @returns {Promise} Promise
      */
-    publishContent(project, environment, content) {
+    async publishContent(project, environment, content) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
-        return this.removePreview(project, environment, content)
-        .then(() => {
-            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
-        })
-        .then((languages) => {
-            let next = () => {
-                let language = languages.pop();
+        await this.removePreview(project, environment, content);
 
-                if(!language) {
-                    debug.log('Published all localisations successfully!', this);
-                    
-                    return Promise.resolve();
-                }
+        let languages = await HashBrown.Helpers.LanguageHelper.getLanguages(project);
+        
+        for(let language of languages) { 
+            await this.setContent(content.id, content, language);
+        }
 
-                return this.setContent(content.id, content, language)
-                .then(() => {
-                    return next();
-                })
-            }
-
-            return next(0);
-        });
+        debug.log('Published all localisations successfully!', this);
     }
     
     /**
@@ -213,37 +163,34 @@ class Connection extends ConnectionCommon {
      * @param {String} id
      * @param {Content} content
      * @param {String} language
-     *
-     * @returns {Promise} Result
      */
-    setContent(id, content, language) {
+    async setContent(id, content, language) {
         checkParam(id, 'id', String);
         checkParam(content,  'content', HashBrown.Models.Content);
         checkParam(language, 'language', String);
        
         if(!this.processor || typeof this.processor.process !== 'function') {
-            return Promise.reject(new Error('This Connection has no processor defined'));
+            throw new Error('This Connection has no processor defined');
         }
 
-        return this.processor.process(content, language)
-        .then((result) => {
-            // Convert to string
-            if(typeof result !== 'string') {
-                try {
-                    result = JSON.stringify(result);
-                } catch(e) {
-                    result = result.toString();
-                }
+        if(!this.deployer || typeof this.deployer.setFile !== 'function') {
+            throw new Error('This Connection has no deployer defined');
+        }
+
+        let result = await this.processor.process(content, language);
+
+        // Convert to string
+        if(typeof result !== 'string') {
+            try {
+                result = JSON.stringify(result);
+            } catch(e) {
+                result = result.toString();
             }
+        }
 
-            result = Buffer.from(result, 'utf8').toString('base64');
+        result = Buffer.from(result, 'utf8').toString('base64');
 
-            if(!this.deployer || typeof this.deployer.setFile !== 'function') {
-                return Promise.reject(new Error('This Connection has no deployer defined'));
-            }
-
-            return this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
-        });
+        await this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
     }
     
     /**
@@ -251,67 +198,64 @@ class Connection extends ConnectionCommon {
      *
      * @param {String} id
      * @param {String} language
-     *
-     * @returns {Promise} Result
      */
-    removeContent(id, language) {
+    async removeContent(id, language) {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
         if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
+            throw new Error('This Connection has no deployer defined');
         }
 
-        return this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
+        await this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
     }
     
     /**
      * Gets a list of Media nodes
      *
-     * @returns {Promise} Media
+     * @returns {Array} Media
      */
-    getAllMedia() {
+    async getAllMedia() {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
+            throw new Error('This Connection has no deployer defined');
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media'), 2)
-        .then((folders) => {
-            if(!folders) { return Promise.resolve([]); }
+        let folders = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
+        
+        if(!folders) { return []; }
 
-            let allMedia = [];
+        let allMedia = [];
 
-            for(let folder of folders) {
-                let name = folder.name || folder.filename || folder.path;
+        for(let folder of folders) {
+            let name = folder.name || folder.filename || folder.path;
 
-                if(!name && typeof folder === 'string') {
-                    name = folder;
-                }
-                    
-                name = Path.basename(name);
-
-                let id = folder.path || folder.id;
-                
-                if(!id && typeof folder === 'string') {
-                    id = folder;
-                }
-                
-                // Get last bit of the path, if it's a path
-                if(id.indexOf(Path.sep) > -1) {
-                    id = Path.dirname(id).split(Path.sep).pop();
-                }
-                
-                let media = new HashBrown.Models.Media({
-                    id: id,
-                    url: this.deployer.getPath('media', id + '/' + name, true),
-                    name: name
-                });
-
-                allMedia.push(media);
+            if(!name && typeof folder === 'string') {
+                name = folder;
             }
+                
+            name = Path.basename(name);
 
-            return Promise.resolve(allMedia);
-        });
+            let id = folder.path || folder.id;
+            
+            if(!id && typeof folder === 'string') {
+                id = folder;
+            }
+            
+            // Get last bit of the path, if it's a path
+            if(id.indexOf(Path.sep) > -1) {
+                id = Path.dirname(id).split(Path.sep).pop();
+            }
+            
+            let media = new HashBrown.Models.Media({
+                id: id,
+                url: this.deployer.getPath('media', id + '/' + name, true),
+                name: name
+            });
+
+            allMedia.push(media);
+        }
+
+        return allMedia;
     }
     
     /**
@@ -319,35 +263,34 @@ class Connection extends ConnectionCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise} Media node
+     * @returns {HashBrown.Models.Media} Media node
      */
-    getMedia(id) {
+    async getMedia(id) {
         checkParam(id, 'id', String);
 
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
+            throw new Error('This Connection has no deployer defined');
         }
 
-        return this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1)
-        .then((files) => {
-            if(!files || files.length < 1) { return Promise.reject(new Error('Media "' + id + '" not found')); }
+        let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
-            let file = Array.isArray(files) ? files[0] : files;
+        if(!files || files.length < 1) { throw new Error('Media "' + id + '" not found'); }
 
-            let name = file.name || file.filename || file.url || file.path;
-            
-            if(!name && typeof file === 'string') {
-                name = file;
-            }
+        let file = Array.isArray(files) ? files[0] : files;
 
-            name = Path.basename(name);
+        let name = file.name || file.filename || file.url || file.path;
+        
+        if(!name && typeof file === 'string') {
+            name = file;
+        }
 
-            return Promise.resolve(new HashBrown.Models.Media({
-                id: id,
-                name: name,
-                url: file.url,
-                path: file.path || file
-            }));
+        name = Path.basename(name);
+
+        return new HashBrown.Models.Media({
+            id: id,
+            name: name,
+            url: file.url,
+            path: file.path || file
         });
     }
     
@@ -357,16 +300,17 @@ class Connection extends ConnectionCommon {
      * @param {String} id
      * @param {String} name
      *
-     * @returns {Promise} Media node
+     * @returns {HashBrown.Models.Media} Media node
      */
-    renameMedia(id, name) {
+    async renameMedia(id, name) {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         
-        return this.getMedia(id)
-        .then((media) => {
-            return this.deployer.renameFile(media.path, name);
-        });
+        let media = await this.getMedia(id);
+
+        await this.deployer.renameFile(media.path, name);
+
+        return media;
     }
     
     /**
@@ -376,38 +320,35 @@ class Connection extends ConnectionCommon {
      * @param {String} name
      * @param {String} base64
      *
-     * @returns {Promise} Media node
+     * @returns {HashBrown.Models.Media} Media node
      */
-    setMedia(id, name, base64) {
+    async setMedia(id, name, base64) {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         checkParam(base64, 'base64', String);
         
-        return this.removeMedia(id)
-        .catch((e) => {
+        try {
+            await this.removeMedia(id)
+        } catch(e) {
             // It doesn't matter if the file was not found, we don't want it there anyway
-            return Promise.resolve();
-        })
-        .then(() => {
-            return this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
-        });
+        }
+        
+        await this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
     }
     
     /**
      * Removes a Media node by id
      *
      * @param {String} id
-     *
-     * @returns {Promise} Result
      */
-    removeMedia(id) {
+    async removeMedia(id) {
         checkParam(id, 'id', String);
 
         if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
-            return Promise.reject(new Error('This Connection has no deployer defined'));
+            throw new Error('This Connection has no deployer defined');
         }
 
-        return this.deployer.removeFolder(this.deployer.getPath('media', id));
+        await this.deployer.removeFolder(this.deployer.getPath('media', id));
     }
 }
 

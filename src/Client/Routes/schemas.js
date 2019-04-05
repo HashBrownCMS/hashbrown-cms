@@ -72,15 +72,11 @@ Crisp.Router.route('/schemas/:id', () => {
 Crisp.Router.route('/schemas/json/:id', function() {
     if(currentUserHasScope('schemas')) {
         let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
-            model: HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(this.id),
+            modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('schemas/' + this.id),
             apiPath: 'schemas/' + this.id,
             onSuccess: () => {
-                return HashBrown.Helpers.RequestViewer.reloadResource('schemas')
-                .then(() => {
-                    let navbar = Crisp.View.get('NavbarMain');
-                    
-                    navbar.reload();
-                });
+                let navbar = Crisp.View.get('NavbarMain');
+                navbar.reload();
             }
         });
 

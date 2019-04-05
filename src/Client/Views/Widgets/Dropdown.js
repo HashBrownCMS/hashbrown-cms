@@ -10,22 +10,25 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
      * Constructor
      */
     constructor(params) {
-        if(params.optionsUrl) {
-            params.isAsync = true;
+        super(params);
+    }
+  
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        if(this.options && typeof this.options.then === 'function') {
+            this.options = await this.options;
+        
+        } else if(this.optionsUrl) {
+            this.isAsync = true;
             
-            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl)
-            .then((options) => {
-                this.options = options;
-
-                this.fetch();
-            });
+            this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
         }
                 
-        super(params);
-
-        this.optionIcons = {};
+        super.fetch();
     }
-   
+
     /**
      * Gets option icon
      *

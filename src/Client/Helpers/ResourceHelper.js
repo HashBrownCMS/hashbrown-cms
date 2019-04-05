@@ -7,6 +7,31 @@
  */
 class ResourceHelper {
     /**
+     * Clears the indexedDB
+     *
+     * @return {Promise} Result
+     */
+    static clearIndexedDb() {
+        return new Promise((resolve, reject) => {
+            try {
+                let request = indexedDB.deleteDatabase('hb_' + HashBrown.Context.projectId + '_' + HashBrown.Context.environment);
+
+                request.onsuccess = (e) => {
+                    resolve(e.target.result);
+                };
+                
+                request.onerror = (e) => {
+                    reject(e);
+                };
+
+            } catch(e) {
+                reject(e);
+
+            }
+        });
+    }
+    
+    /**
      * Opens a connection to the indexedDB
      *
      * @param {String} action
@@ -60,6 +85,8 @@ class ResourceHelper {
                         request = objectStore.put(data);
                     } else if(action === 'get') {
                         request = objectStore.get(id);
+                    } else if(action === 'getAll') {
+                        request = objectStore.getAll();
                     } else if(action === 'delete') {
                         request = objectStore.delete(id);
                     }
@@ -88,45 +115,81 @@ class ResourceHelper {
      *
      * @returns {Promise} Result
      */
-    static remove(category, id) {
+    static async remove(category, id) {
         checkParam(category, 'category', String);
         checkParam(id, 'id', String);
+
+        await this.indexedDbTransaction('delete', category, id);
 
         HashBrown.Helpers.EventHelper.trigger(category, id);  
         
         return HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
     }
+    
+    /**
+     * Gets a list of resources
+     *
+     * @param {HashBrown.Models.Resource} model
+     * @param {String} category
+     *
+     * @returns {Array} Result
+     */
+    static async getAll(model, category) {
+        checkParam(model, 'model', HashBrown.Models.Resource);
+        checkParam(category, 'category', String);
+
+        let results = await this.indexedDbTransaction('getAll', category);
+
+        if(!results || results.length < 2) {
+            results = await HashBrown.Helpers.RequestHelper.request('get', category);
+            
+            if(!results) { throw new Error('Resource list ' + category + ' not found'); }
+       
+            for(let result of results) {
+                if(!result.id) { continue; }
+
+                await this.indexedDbTransaction('put', category, result.id, result);
+            }
+        }
+            
+        if(typeof model === 'function') {
+            for(let i in results) {
+                results[i] = new model(results[i]);
+            }
+        }
+
+        return results;
+    }
 
     /**
-     * Gets a resource or a list of resources
+     * Gets a resource
      *
-     * @param {Resource} model
+     * @param {HashBrown.Models.Resource} model
      * @param {String} category
      * @param {String} id
      *
-     * @returns {Promise} Result
+     * @returns {HashBrown.Models.Resource} Result
      */
-    static get(model, category, id = null) {
+    static async get(model, category, id) {
         checkParam(model, 'model', HashBrown.Models.Resource);
-        checkParam(category, 'category', String);
-    
-        return HashBrown.Helpers.RequestHelper.request('get', category + (id ? '/' + id : ''))
-        .then((result) => {
-            if(!result) { throw new Error('Resource ' + category + (id ? '/' + id : '') + ' not found'); }
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
 
-            if(typeof model === 'function') {
-                if(!Array.isArray(result)) {
-                    result = new model(result);
+        let result = await this.indexedDbTransaction('get', category, id);
 
-                } else {
-                    for(let i in result) {
-                        result[i] = new model(result[i]);
-                    }
-                }
-            }
+        if(!result) {
+            result = await HashBrown.Helpers.RequestHelper.request('get', category + '/' + id);
+            
+            if(!result) { throw new Error('Resource ' + category + '/' + id + ' not found'); }
+        
+            await this.indexedDbTransaction('put', category, id, result);
+        }
 
-            return Promise.resolve(result);
-        });
+        if(typeof model === 'function') {
+            result = new model(result);
+        }
+
+        return result;
     }
     
     /**
@@ -138,10 +201,12 @@ class ResourceHelper {
      *
      * @returns {Promise} Result
      */
-    static set(category, id, data) {
+    static async set(category, id, data) {
         checkParam(category, 'category', String);
         checkParam(category, 'id', String);
         checkParam(data, 'data', HashBrown.Models.Resource);
+
+        await this.indexedDbTransaction('put', category, id, data);
 
         HashBrown.Helpers.EventHelper.trigger(category, id);  
 

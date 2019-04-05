@@ -1,6 +1,6 @@
 module.exports = function() {
-    let currentUser = HashBrown.Models.User.current;
-    let currentProject = HashBrown.Helpers.ProjectHelper.currentProject;
+    let currentUser = HashBrown.Context.user;
+    let currentProject = HashBrown.Context.projectId;
 
     let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
     let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');

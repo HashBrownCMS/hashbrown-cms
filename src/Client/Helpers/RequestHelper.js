@@ -58,6 +58,10 @@ class RequestHelper {
      * @returns {Promise} Response
      */
     static customRequest(method, url, data, headers) {
+        if(url.indexOf('/resources') > -1) {
+            console.trace();
+        }
+        
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };

@@ -8,7 +8,7 @@ class FormHelper {
      * Gets all Forms
      */
     static getAllForms() {
-        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms');
+        return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
     }
 }
 

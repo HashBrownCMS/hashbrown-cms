@@ -13,6 +13,17 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        if(this.config.resource && this.value) {
+            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
+        }
+
+        super.fetch();
+    }
+
+    /**
      * Renders the config editor
      *
      * @param {Object} config
@@ -28,7 +39,7 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
                 _.div({class: 'editor__field__value'},
                     new HashBrown.Views.Widgets.Dropdown({
                         value: config.resource,
-                        options: Object.keys(resources),
+                        options: ['content', 'connections', 'forms', 'media', 'schemas', 'users'],
                         onChange: (newValue) => {
                             config.resource = newValue
                         }
@@ -54,43 +65,29 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
      * Renders this editor
      */
     template() {
-        let resource = resources[this.config.resource];
-        let value;
+        let displayValue = '';
 
-        if(resource) {
-            value = resource[this.value];
-
-            if(!value) {
-                for(let i in resource) {
-                    if(resource[i].id == this.value) {
-                        value = resource[i];
-                        break;
-                    }
+        if(this.model) {
+            for(let key of (this.config.resourceKeys || [])) {
+                if(this.model[key]) {
+                    displayValue = this.model[key];
+                    break;    
                 }
             }
 
-            if(value) {
-                for(let key of (this.config.resourceKeys || [])) {
-                    if(value[key]) {
-                        value = value[key];
-                        break;    
-                    }
-                }
+        } else if(this.value) {
+            let singularResourceName = this.config.resource;
 
-            } else if(this.value) {
-                let singularResourceName = this.config.resource;
-
-                if(singularResourceName[singularResourceName.length - 1] == 's') {
-                    singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
-                }
-
-                value = '(' + singularResourceName + ' not found)';
-
+            if(singularResourceName[singularResourceName.length - 1] == 's') {
+                singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
             }
+
+            displayValue = '(' + singularResourceName + ' not found)';
+
         }
         
         return _.div({class: 'field-editor field-editor--resource-reference'},
-            value || '(none)'
+            displayValue || '(none)'
         );
     }
 }

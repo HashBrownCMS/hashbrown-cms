@@ -14,7 +14,31 @@ class SchemaEditor extends Crisp.View {
         
         this.fetch();
     }
-    
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+        super.fetch();
+    }
+
+    /**
+     * Gets a schema synchronously
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Schema} Schema
+     */
+    getSchema(id) {
+        for(let schema of this.allSchemas) {
+            if(schema.id === id) { return schema; }
+        }
+
+        return null;
+    }
+
     /**
      * Event: Click advanced. Routes to the JSON editor
      */
@@ -123,7 +147,7 @@ class SchemaEditor extends Crisp.View {
 
         $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
             value: this.model.parentSchemaId,
-            options: resources.schemas,
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemas(),
             valueKey: 'id',
             labelKey: 'name',
             disabledOptions: [ { id: this.model.id, name: this.model.name } ],

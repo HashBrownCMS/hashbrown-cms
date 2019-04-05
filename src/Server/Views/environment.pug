@@ -21,19 +21,19 @@ html
             .page--environment__space.page--environment__space--nav
             .page--environment__space.page--environment__space--editor
         
-        .widget.widget--spinner.page--environment__spinner
-            .widget--spinner__inner
-                img.widget--spinner__image.page--environment__spinner__image(src='/svg/logo_pink.svg')
-                .widget--spinner__messages.page--environment__spinner__messages
+        //- .widget.widget--spinner.page--environment__spinner
+        //-     .widget--spinner__inner
+        //-         img.widget--spinner__image.page--environment__spinner__image(src='/svg/logo_pink.svg')
+        //-         .widget--spinner__messages.page--environment__spinner__messages
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.js')
+        script(src='/lib/babel/polyfill.min.js')
             
         script(src='/lib/ckeditor/ckeditor.js')
         script(src='/lib/codemirror/lib/codemirror.js')
         script(src='/lib/codemirror/mode/javascript/javascript.js')
         script(src='/lib/codemirror/mode/markdown/markdown.js')
-        script(src='/lib/codemirror/mode/xml/xml.js')
 
         script(src='/js/common.js')
         script(src='/js/helpers.js')
@@ -41,6 +41,15 @@ html
         script(src='/js/routes.js')
         script(src='/js/utilities.js')
         script(src='/js/views.js')
-            
+        
+        script.
+            HashBrown.Context = {
+                projectName: '#{currentProjectName}',
+                projectId: '#{currentProject}',
+                projectSettings: !{JSON.stringify(currentProjectSettings)},
+                environment: '#{currentEnvironment}',
+                user: !{JSON.stringify(user)}
+            };
+
         script(src='/js/environment.js')
         script(src='/js/plugins.js')

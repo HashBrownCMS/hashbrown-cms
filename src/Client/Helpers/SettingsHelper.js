@@ -45,94 +45,6 @@ class SettingsHelper extends SettingsHelperCommon {
     }
    
     /**
-     * Cache update
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     */
-    static cacheSanityCheck(project, environment = null, section = null) {
-        checkParam(project, 'project', String);
-
-        if(environment === '*') { environment = null; }
-
-        this.cache = this.cache || {};
-        this.cache[project] = this.cache[project] || {};
-
-        if(environment) {
-            this.cache[project][environment] = this.cache[project][environment] || {};
-
-            if(section) {
-                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-            }
-     
-        } else if(section) {
-            this.cache[project][section] = this.cache[project][section] || {};
-        
-        }
-    }
-
-    /**
-     * Cache update
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} section
-     * @param {Object} settings
-     */
-    static updateCache(project, environment = null, section = null, settings) {
-        checkParam(project, 'project', String);
-        checkParam(settings, 'settings', Object);
-
-        if(environment === '*') { environment = null; }
-
-        this.cacheSanityCheck(project, environment, section);
-
-        if(environment && !section) {
-            return this.cache[project][environment] = settings;
-        }
-
-        if(!environment && section) {
-            return this.cache[project][section] = settings;
-        }
-        
-        if(environment && section) {
-            return this.cache[project][environment][section] = settings;
-        } 
-        
-        return this.cache[project] = settings;
-    }
-
-    /**
-     * Gets cached settings
-     *
-     * @param {String} section
-     *
-     * @returns {Object} Settings
-     */
-    static getCachedSettings(project, environment = null, section = null) {
-        checkParam(project, 'project', String);
-
-        if(environment === '*') { environment = null; }
-
-        this.cacheSanityCheck(project, environment, section);
-
-        if(environment) {
-            if(section) {
-                return this.cache[project][environment][section];
-            }
-                
-            return this.cache[project][environment];
-        }
-        
-        if(section) {
-            return this.cache[project][section];
-        }
-
-        return this.cache[project];
-    }
-
-    /**
      * Sets all settings
      *
      * @param {String} project
@@ -164,14 +76,7 @@ class SettingsHelper extends SettingsHelperCommon {
             apiUrl += '/' + section;
         }
 
-        return HashBrown.Helpers.RequestHelper.customRequest('post', apiUrl, settings)
-
-        // Cache new settings
-        .then(() => {
-            this.updateCache(project, environment, section, settings);
-
-            return Promise.resolve();
-        })
+        return HashBrown.Helpers.RequestHelper.customRequest('post', apiUrl, settings);
     }
 }
 

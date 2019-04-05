@@ -132,7 +132,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
      */
     static getItemContextMenu(item) {
         let menu = {};
-        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
         menu['This form'] = '---';
 

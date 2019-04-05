@@ -69,7 +69,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
         // Allowed child Schemas
         $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
-            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemas('content'),
             value: this.model.allowedChildSchemas,
             labelKey: 'name',
             valueKey: 'id',
@@ -310,7 +310,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                         _.div({class: 'editor__field__value'},
                                             new HashBrown.Views.Widgets.Dropdown({
                                                 useTypeAhead: true,
-                                                options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                                                options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
                                                 value: fieldValue.schemaId,
                                                 labelKey: 'name',
                                                 valueKey: 'id',
@@ -323,7 +323,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                         )
                                     ),
                                     _.do(() => {
-                                        let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+                                        let schema = this.getSchema(fieldValue.schemaId);
 
                                         if(!schema) { return; }
 
@@ -333,7 +333,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
                                         fieldValue.config = fieldValue.config || {};
 
-                                        return editor.renderConfigEditor(fieldValue.config);
+                                        return editor.renderConfigEditor(fieldValue.config, schema.id);
                                     })
                                 ),
                                 _.div({class: 'editor__field__actions'},

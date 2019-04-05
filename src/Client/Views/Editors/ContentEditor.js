@@ -9,7 +9,7 @@ class ContentEditor extends Crisp.View {
     constructor(id) {
         super({});
 
-        checkParam(id, 'id', String);
+        checkParam(id, 'id', String, true);
 
         this.dirty = false;
 
@@ -21,23 +21,36 @@ class ContentEditor extends Crisp.View {
      *
      * @param {String} id
      */
-    fetch(id) {
-        return HashBrown.Helpers.ContentHelper.getContentById(id)
-        .then((model) => {
-            this.model = model;
+    async fetch(id) {
+        this.model = await HashBrown.Helpers.ContentHelper.getContentById(id);
         
-            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(this.model.schemaId);
-        })
-        .then((schema) => {
-            this.schema = schema;
+        if(!this.model) { throw new Error('Content by id "' + id + '" was not found'); }
+        
+        this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
+        
+        if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
+        
+        this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.model.getSettings('publishing').connectionId);
 
-            return HashBrown.Helpers.ConnectionHelper.getConnectionById(this.model.getSettings('publishing').connectionId);
-        })
-        .then((connection) => {
-            this.connection = connection;
+        this.fieldSchemas = {};
+        
+        for(let key in this.schema.fields) {
+            let fieldSchemaId = this.schema.fields[key].schemaId;
 
-            super.fetch();
-        });
+            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+            
+            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+        }
+        
+        for(let key in this.schema.fields.properties) {
+            let fieldSchemaId = this.schema.fields.properties[key].schemaId;
+
+            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+            
+            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+        }
+
+        super.fetch();
     }
 
     /**
@@ -123,9 +136,11 @@ class ContentEditor extends Crisp.View {
     reload() {
         this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
 
+        let id = this.model.id;
+
         this.model = null;
 
-        this.fetch();
+        this.fetch(id);
     }
 
     /**
@@ -185,52 +200,27 @@ class ContentEditor extends Crisp.View {
      * @return {Object} element
      */
     renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
-        let compiledSchema = HashBrown.Helpers.SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
+        let compiledSchema = this.fieldSchemas[fieldDefinition.schemaId];
 
         if(!compiledSchema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
 
         let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
           
         if(!fieldEditor) {
-            return debug.log('No field editor by id "' + fieldSchema.editorId + '" found', this);
+            return debug.log('No field editor by id "' + compiledSchema.editorId + '" found in schema "' + fieldDefinition.schemaId +  '"', this);
         }
 
         // Get the config
         let config;
 
-        // If the field has a config, check recursively if it's empty
-        // If it isn't, use this config
-        if(fieldDefinition.config) {
-            let isEmpty = true;
-            let checkRecursive = (object) => {
-                if(!object) { return; }
-
-                // We consider a config not empty, if it has a value that is not an object
-                // Remember, null is of type 'object' too
-                if(typeof object !== 'object') { return isEmpty = false; }
-
-                for(let k in object) {
-                    checkRecursive(object[k]);
-                }
-            };
-
-            checkRecursive(fieldDefinition.config);
-
-            if(!isEmpty) {
-                config = fieldDefinition.config;
-            }
-        }
-
-        // If no config was found, and the Schema has one, use it
-        if(!config && compiledSchema.config) {
+        if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+            config = fieldDefinition.config;
+        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
             config = compiledSchema.config;
-        }
-
-        // If still no config was found, assign a placeholder
-        if(!config) {
+        } else {
             config = {};
         }
-
+        
         // Instantiate the field editor
         let fieldEditorInstance = new fieldEditor({
             value: fieldValue,
@@ -359,14 +349,14 @@ class ContentEditor extends Crisp.View {
                         .click(() => {
                             location.hash = '/content/' + this.model.id + '/' + tabId;
 
-                            this.fetch();
+                            this.fetch(this.model.id);
                         });
                 }),
                 _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
                     .click(() => {
                         location.hash = '/content/' + this.model.id + '/meta';
 
-                        this.fetch();
+                        this.fetch(this.model.id);
                     })
             ),
 

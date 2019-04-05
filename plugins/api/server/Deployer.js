@@ -30,10 +30,10 @@ class ApiDeployer extends HashBrown.Models.Deployer {
     /**
      * Tests this deployer
      *
-     * @returns {Promise} Result
+     * @returns {String} Result
      */
-    test() {
-        return HashBrown.Helpers.RequestHelper.request('get', this.getPath('/test'));
+    async test() {
+        return await HashBrown.Helpers.RequestHelper.request('get', this.getPath('/test'));
     }
 
     /**
@@ -41,10 +41,10 @@ class ApiDeployer extends HashBrown.Models.Deployer {
      *
      * @param {String} path
      *
-     * @return {Promise} Promise
+     * @return {Object} File
      */
-    getFile(path) {
-        return HashBrown.Helpers.RequestHelper.request('get', path);
+    async getFile(path) {
+        return await HashBrown.Helpers.RequestHelper.request('get', path);
     }
     
     /**
@@ -52,10 +52,10 @@ class ApiDeployer extends HashBrown.Models.Deployer {
      *
      * @param {String} path
      *
-     * @returns {Promise} Result
+     * @returns {Object} Folder
      */
-    getFolder(path) {
-        return this.getFile(path);
+    async getFolder(path) {
+        return await this.getFile(path);
     }
     
     /**
@@ -66,8 +66,8 @@ class ApiDeployer extends HashBrown.Models.Deployer {
      *
      * @return {Promise} Promise
      */
-    setFile(path, base64) {
-        return HashBrown.Helpers.RequestHelper.request('post', path, base64);
+    async setFile(path, base64) {
+        await HashBrown.Helpers.RequestHelper.request('post', path, base64);
     }
     
     /**
@@ -75,33 +75,27 @@ class ApiDeployer extends HashBrown.Models.Deployer {
      *
      * @param {String} path
      * @param {String} name
-     *
-     * @return {Promise} Promise
      */
-    renameFile(path, name) {
-        return HashBrown.Helpers.RequestHelper.request('post', path, name);
+    async renameFile(path, name) {
+        await HashBrown.Helpers.RequestHelper.request('post', path, name);
     }
    
     /**
      * Removes a file
      *
      * @param {String} path
-     *
-     * @return {Promise} Promise
      */
-    removeFile(path) {
-        return HashBrown.Helpers.RequestHelper.request('delete', path);
+    async removeFile(path) {
+        await HashBrown.Helpers.RequestHelper.request('delete', path);
     }
 
     /**
      * Removes a folder
      *
      * @param {String} path
-     *
-     * @returns {Promise} Result
      */
-    removeFolder(path) {
-        return this.removeFile(path);
+    async removeFolder(path) {
+        await this.removeFile(path);
     }
 }
 

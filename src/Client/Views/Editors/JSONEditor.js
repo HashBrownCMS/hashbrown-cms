@@ -24,6 +24,32 @@ class JSONEditor extends Crisp.View {
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+    
+        super.fetch();
+    }
+
+    /**
+     * Gets a schema synchronously
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Schema} Schema
+     */
+    getSchema(id) {
+        checkParam(id, 'id', String);
+
+        for(let schema of this.allSchemas) {
+            if(schema.id === id) { return schema; }
+        }
+
+        return null;
+    }
+
+    /**
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
@@ -87,20 +113,18 @@ class JSONEditor extends Crisp.View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
-                    if(HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
-                        return;
-                    }
+                    if(this.getSchema(v)) { return; }
 
                     return 'Schema "' + v + '" not found';
                
                 case 'schemaBindings': case 'allowedSchemas': case 'allowedChildSchemas':
                     let invalidSchemas = v.slice(0);
                     
-                    for(let r in resources.schemas) {
-                        let schema = resources.schemas[r];
+                    for(let r in this.allSchemas) {
+                        let schema = this.allSchemas[r];
                         
                         for(let b = invalidSchemas.length - 1; b >= 0; b--) {
-                            if(schema.id == invalidSchemas[b]) {
+                            if(schema.id === invalidSchemas[b]) {
                                 invalidSchemas.splice(b, 1);
                             }
                         }   

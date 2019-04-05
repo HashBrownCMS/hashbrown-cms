@@ -74,7 +74,7 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
             _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
             _.div({class: 'editor__field__value'},
                 new HashBrown.Views.Widgets.Dropdown({
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas('content'),
                     useMultiple: true,
                     value: config.allowedSchemas,
                     useClearButton: true,

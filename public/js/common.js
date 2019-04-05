@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 34);
+/******/ 	return __webpack_require__(__webpack_require__.s = 32);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -89,48 +89,48 @@
 /***/ 3:
 /***/ (function(module, exports) {
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+var g;
 
-var g; // This works in non-strict mode
-
-g = function () {
-  return this;
-}();
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
 
 try {
-  // This works if eval is allowed (see CSP)
-  g = g || new Function("return this")();
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
 } catch (e) {
-  // This works if the window reference is available
-  if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
-} // g can still be undefined, but nothing to do about it...
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
 // We return undefined, instead of nothing here, so it's
 // easier to handle this case. if(!global) { ...}
 
-
 module.exports = g;
+
 
 /***/ }),
 
-/***/ 34:
+/***/ 32:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+let base;
 
-var base;
-
-if (typeof window !== 'undefined') {
-  base = window;
-} else if (typeof global !== 'undefined') {
-  base = global;
+if(typeof window !== 'undefined') {
+    base = window;
+} else if(typeof global !== 'undefined') {
+    base = global;
 }
 
-if (!base) {
-  throw new Error('Base not found');
+if(!base) {
+    throw new Error('Base not found');
 }
+
 /**
  * Handles namespace creation
  *
@@ -138,43 +138,35 @@ if (!base) {
  *
  * @return {Function} Chain
  */
-
-
 base.namespace = function namespace(query) {
-  if (!base.HashBrown) {
-    base.HashBrown = {};
-  }
+    if(!base.HashBrown) { base.HashBrown = {}; }
+    
+    let current = HashBrown;
 
-  var current = HashBrown;
-  query.split('.').forEach(function (ns) {
-    if (!current[ns]) {
-      current[ns] = {};
-    }
+    query.split('.').forEach((ns) => {
+        if(!current[ns]) { current[ns] = {}; }
+        
+        current = current[ns];
+    });
 
-    current = current[ns];
-  });
-
-  var add = function add(module) {
-    current[module.name] = module;
-    return {
-      add: add
+    let add = (module) => {
+        current[module.name] = module;
+        
+        return { add: add };
     };
-  };
 
-  return {
-    add: add
-  };
-};
+    return { add: add };
+}
+
 /**
  * Throws an error if parameter was null (used as a default param hack)
  *
  * @param {String} name
  */
+base.requiredParam = (name) => {
+    throw new Error('Parameter "' + name + '" is required');
+}
 
-
-base.requiredParam = function (name) {
-  throw new Error('Parameter "' + name + '" is required');
-};
 /**
  * Checks a parameter for type
  *
@@ -182,43 +174,36 @@ base.requiredParam = function (name) {
  * @param {String} name
  * @param {Type} type
  */
+base.checkParam = (value, name, type, notNull = false) => {
+    if(value === undefined) {
+        console.trace();
+        throw new Error('Parameter "' + name + '" is required');
+    }
+    
+    if(notNull && (value === null || value === '')) {
+        console.trace();
+        throw new Error('Parameter "' + name + '" cannot be null');
+    }
 
+    if(value === null) { return; }
+    if(value.constructor === type) { return; }
+    if(value.prototype instanceof type) { return; }
+    if(value instanceof type) { return; }
+    if(value === type) { return; }
 
-base.checkParam = function (value, name, type) {
-  if (value === undefined) {
-    throw new Error('Parameter "' + name + '" is required');
-  }
+    let valueTypeName = typeof value;
 
-  if (value === null) {
-    return;
-  }
+    if(value.constructor) {
+        valueTypeName = value.constructor.name;
+    
+    } else if(value.prototype) {
+        valueTypename = value.prototype.name;
 
-  if (value.constructor === type) {
-    return;
-  }
+    }
 
-  if (value.prototype instanceof type) {
-    return;
-  }
+    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
+}
 
-  if (value instanceof type) {
-    return;
-  }
-
-  if (value === type) {
-    return;
-  }
-
-  var valueTypeName = _typeof(value);
-
-  if (value.constructor) {
-    valueTypeName = value.constructor.name;
-  } else if (value.prototype) {
-    valueTypename = value.prototype.name;
-  }
-
-  throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
-};
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
 
 /***/ })

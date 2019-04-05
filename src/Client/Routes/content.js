@@ -18,16 +18,14 @@ Crisp.Router.route('/content/', () => {
                 .click(() => { HashBrown.Views.Navigation.ContentPane.onClickNewContent(); }),
             _.button({class: 'widget widget--button'}, 'Quick tour')
                 .click(HashBrown.Helpers.ContentHelper.startTour),
-            _.if(resources.content.length < 1,
-                _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
-                    .click(() => {
-                        HashBrown.Helpers.RequestHelper.request('post', 'content/example')
-                        .then(() => {
-                            location.reload();
-                        })
-                        .catch(UI.errorModal);
+            _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
+                .click(() => {
+                    HashBrown.Helpers.RequestHelper.request('post', 'content/example')
+                    .then(() => {
+                        location.reload();
                     })
-            )
+                    .catch(UI.errorModal);
+                })
         ],
         'text'
     );
@@ -46,11 +44,11 @@ Crisp.Router.route('/content/json/:id', () => {
 });
 
 // Edit (redirect to default tab)
-Crisp.Router.route('/content/:id', () => {
-    let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(Crisp.Router.params.id);
+Crisp.Router.route('/content/:id', async () => {
+    let content = await HashBrown.Helpers.ContentHelper.getContentById(Crisp.Router.params.id);
     
     if(content) {
-        let contentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(content.schemaId);
+        let contentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(content.schemaId);
 
         if(contentSchema) {
             location.hash = '/content/' + Crisp.Router.params.id + '/' + (contentSchema.defaultTabId || 'meta');
@@ -68,16 +66,25 @@ Crisp.Router.route('/content/:id', () => {
 
 // Edit (with tab specified)
 Crisp.Router.route('/content/:id/:tab', () => {
-    Crisp.View.get('NavbarMain').highlightItem('/content/', Crisp.Router.params.id);
+    let id = Crisp.Router.params.id;
+
+    Crisp.View.get('NavbarMain').highlightItem('/content/', id);
 
     let contentEditor = Crisp.View.get('ContentEditor');
 
-    if(!contentEditor || !contentEditor.model || contentEditor.model.id !== Crisp.Router.params.id) {
-        contentEditor = new HashBrown.Views.Editors.ContentEditor(Crisp.Router.params.id);
-    
+    if(!contentEditor) {
+        contentEditor = new HashBrown.Views.Editors.ContentEditor(id);
         UI.setEditorSpaceContent(contentEditor.$element);
+   
+    } else if(!contentEditor.model || contentEditor.model.id !== id) {
+        contentEditor.remove();
+
+        contentEditor = new HashBrown.Views.Editors.ContentEditor(id);
+        UI.setEditorSpaceContent(contentEditor.$element);
+    
     } else {
-        contentEditor.fetch();
+        contentEditor.fetch(id);
+
     }
 });
 

@@ -110,11 +110,11 @@ class MainMenu extends Crisp.View {
 
             // User dropdown
             this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
-                tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
+                tooltip: 'Logged in as "' + (HashBrown.Context.user.fullName || HashBrown.Context.user.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
                 options: {
-                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Models.User.current }); },
+                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Context.user }); },
                     'Log out': () => {
                         HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout')
                         .then(() => {

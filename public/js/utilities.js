@@ -93,37 +93,36 @@
  * Performs a submodule check
  */
 window.submoduleCheck = function submoduleCheck() {
-  var message = '';
+    let message = '';
+    
+    if(typeof Crisp === 'undefined') {
+        message = 'Git submodule "crisp-ui" not loaded. Please run "git submodule update --init" in the HashBrown root directory and reload this page';
+    }
 
-  if (typeof Crisp === 'undefined') {
-    message = 'Git submodule "crisp-ui" not loaded. Please run "git submodule update --init" in the HashBrown root directory and reload this page';
-  }
+    if(message) {
+        alert(message);
+        throw new Error(message);
+    }
+}
 
-  if (message) {
-    alert(message);
-    throw new Error(message);
-  }
-};
 /**
  * Converts a string from HTML to markdown
  *
  * @return {String} Markdown
  */
-
-
 window.toMarkdown = function toMarkdown(html) {
-  return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
-};
+    return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
+}
+
 /**
  * Checks if the currently logged in user is admin
  *
  * @returns {Boolean} Is admin
  */
-
-
 window.currentUserIsAdmin = function isCurrentUserAdmin() {
-  return HashBrown.Models.User.current.isAdmin;
-};
+    return HashBrown.Context.user.isAdmin;
+}
+
 /**
  * Checks if the currently logged in user has a certain scope
  *
@@ -131,11 +130,10 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  *
  * @returns {Boolean} Has scope
  */
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    return HashBrown.Context.user.hasScope(HashBrown.Context.projectId, scope);
+}
 
-
-window.currentUserHasScope = function currentUsr(scope) {
-  return HashBrown.Models.User.current.hasScope(HashBrown.Helpers.ProjectHelper.currentProject, scope);
-};
 /**
  * Gets a cookie by name
  *
@@ -143,65 +141,65 @@ window.currentUserHasScope = function currentUsr(scope) {
  *
  * @returns {String} value
  */
-
-
 window.getCookie = function getCookie(name) {
-  var value = "; " + document.cookie;
-  var parts = value.split("; " + name + "=");
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
 
-  if (parts.length == 2) {
-    return parts.pop().split(";").shift();
-  }
-};
+    if(parts.length == 2) {
+        return parts.pop().split(";").shift();
+    }
+}
+
 /**
  * Copies string to the clipboard
  *
  * @param {String} string
  */
-
-
 window.copyToClipboard = function copyToClipboard(string) {
-  var text = document.createElement('TEXTAREA');
-  text.innerHTML = string;
-  document.body.appendChild(text);
-  text.select();
+    let text = document.createElement('TEXTAREA');
 
-  try {
-    var success = document.execCommand('copy');
+    text.innerHTML = string;
 
-    if (!success) {
-      UI.errorModal('Your browser does not yet support copying to clipboard');
+    document.body.appendChild(text);
+
+    text.select();
+
+    try {
+        let success = document.execCommand('copy');
+
+        if(!success) {
+            UI.errorModal('Your browser does not yet support copying to clipboard');
+        }
+    } catch(e) {
+            UI.errorModal(e.toString());
     }
-  } catch (e) {
-    UI.errorModal(e.toString());
-  }
 
-  document.body.removeChild(text);
-};
+    document.body.removeChild(text);
+}
+
 /**
  * Clears the workspace
  */
-
-
 window.clearWorkspace = function clearWorkspace() {
-  $('.workspace').empty();
+    $('.workspace').empty();
 };
+
 /**
  * Sets workspace content
  */
-
-
 window.populateWorkspace = function populateWorkspace($html, classes) {
-  var $workspace = $('.page--environment__space--editor');
-  $workspace.empty();
-  $workspace.attr('class', 'page--environment__space--editor');
+    let $workspace = $('.page--environment__space--editor');
 
-  _.append($workspace, $html);
+    $workspace.empty();
+    $workspace.attr('class', 'page--environment__space--editor');
+    
+    _.append($workspace, $html);
 
-  if (classes) {
-    $workspace.addClass(classes);
-  }
+    if(classes) {
+        $workspace.addClass(classes);
+    }
 };
+
 
 /***/ })
 

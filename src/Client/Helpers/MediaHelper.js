@@ -78,7 +78,7 @@ class MediaHelper extends MediaHelperCommon {
      * @return {Promise} Media objects
      */
     static getAllMedia(id) {
-        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media');
+        return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Media, 'media');
     }
 
     /**

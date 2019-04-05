@@ -29,7 +29,7 @@ window.toMarkdown = function toMarkdown(html) {
  * @returns {Boolean} Is admin
  */
 window.currentUserIsAdmin = function isCurrentUserAdmin() {
-    return HashBrown.Models.User.current.isAdmin;
+    return HashBrown.Context.user.isAdmin;
 }
 
 /**
@@ -39,8 +39,8 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  *
  * @returns {Boolean} Has scope
  */
-window.currentUserHasScope = function currentUsr(scope) {
-    return HashBrown.Models.User.current.hasScope(HashBrown.Helpers.ProjectHelper.currentProject, scope);
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    return HashBrown.Context.user.hasScope(HashBrown.Context.projectId, scope);
 }
 
 /**

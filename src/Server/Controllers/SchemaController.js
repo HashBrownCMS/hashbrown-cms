@@ -61,15 +61,7 @@ class SchemaController extends require('./ApiController') {
      * @returns {Schema} Schema
      */
     static getSchema(req, res) {
-        let getter = () => {
-            if(req.query.withParentFields) {
-                return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(req.project, req.environment, req.params.id);
-            } else {
-                return HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, req.params.id);
-            }
-        }
-
-        getter()
+        return HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, req.params.id)
         .then((schema) => {
             res.status(200).send(schema);
         })

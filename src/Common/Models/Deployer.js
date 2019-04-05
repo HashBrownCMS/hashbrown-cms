@@ -59,10 +59,6 @@ class Deployer extends Entity {
     getPath(name, filename = '', ignoreRoot = false) {
         let path = '';
         
-        if(!ignoreRoot) {
-            path = this.getRootPath();
-        }
-       
         if(this.paths[name]) {
             path = Path.join(path, this.paths[name]);
         }
@@ -71,6 +67,16 @@ class Deployer extends Entity {
             path = Path.join(path, filename);
         }
         
+        if(!ignoreRoot) {
+            let rootPath = this.getRootPath();
+        
+            if(rootPath && rootPath[rootPath.length - 1] !== '/') {
+                rootPath += '/';
+            }
+
+            path = rootPath + path;
+        }
+       
         return path;
     }
 

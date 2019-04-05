@@ -9,42 +9,29 @@ const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
  */
 class SchemaHelper extends SchemaHelperCommon {
     /**
-     * Gets a Schema with all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Schema with parent fields
-     */
-    static getSchemaWithParentFields(id) {
-        if(!id) {
-            return Promise.resolve(null);
-        }
-        
-        return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true')
-        .then((schema) => {
-            return Promise.resolve(SchemaHelper.getModel(schema));
-        });
-    }
-    
-    /**
      * Gets a FieldSchema with all parent configs
      *
      * @param {String} id
      *
      * @returns {FieldSchema} Compiled FieldSchema
      */
-    static getFieldSchemaWithParentConfigs(id) {
-        let fieldSchema = this.getSchemaByIdSync(id);
+    static async getFieldSchemaWithParentConfigs(id) {
+        let fieldSchema = await this.getSchemaById(id);
 
         if(!fieldSchema) { return null; }
 
-        let nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
+        let nextSchema = await this.getSchemaById(fieldSchema.parentSchemaId);
+        
         let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
-       
+        
         while(nextSchema) {
             compiledSchema.appendConfig(nextSchema.config);
 
-            nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
+            if(nextSchema.parentSchemaId) {
+                nextSchema = await this.getSchemaById(nextSchema.parentSchemaId);
+            } else {
+                nextSchema = null;
+            }
         }
 
         return compiledSchema;
@@ -54,78 +41,64 @@ class SchemaHelper extends SchemaHelperCommon {
      * Gets a Schema by id
      *
      * @param {String} id
+     * @param {Boolean} withParentFields
      *
-     * @return {Promise} Promise
+     * @return {Schema} Schema
      */
-    static getSchemaById(id) {
-        return HashBrown.Helpers.RequestHelper.request('get', 'schemas/' + id)
-        .then((schema) => {
-            return Promise.resolve(this.getModel(schema));
-        });
-    }
-   
-    /**
-     * Gets all Schemas by type (sync)
-     *
-     * @param {String} type
-     *
-     * @returns {Array} All Schemas
-     */
-    static getAllSchemasSync(type) {
-        if(!type) { return resources.schemas; }
+    static async getSchemaById(id, withParentFields = false) {
+        checkParam(id, 'id', String);
 
-        return resources.schemas.filter((schema) => {
-            if(schema.id == type + 'Base') { return false; }
+        let schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
+       
+        // Get parent fields if specified
+        if(withParentFields && schema.parentSchemaId) {
+            let childSchema = this.getModel(schema);
+            let parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', childSchema.parentSchemaId);
+            let mergedSchema = childSchema;
 
-            return schema.type === type;
-        });
+            while(parentSchema) {
+                parentSchema = this.getModel(parentSchema);
+                mergedSchema = this.mergeSchemas(childSchema, parentSchema);
+                childSchema = parentSchema;
+                
+                if(parentSchema.parentSchemaId) {
+                    parentSchema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', parentSchema.parentSchemaId);
+                } else {
+                    parentSchema = null;
+                }
+            }
+
+            return mergedSchema;
+        }
+        
+        return this.getModel(schema);
     }
     
     /**
      * Gets all Schemas
      *
+     * @param {String} type
+     *
      * @returns {Array} All Schemas
      */
-    static getAllSchemas() {
-        return HashBrown.Helpers.ResourceHelper.get(null, 'schemas')
-        .then((result) => {
-            let schemas = [];
+    static async getAllSchemas(type = null) {
+        let results = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
 
-            for(let schema of result) {
-                if(!schema.parentId) { continue; }
+        let schemas = [];
 
-                if(schema.type === 'content') {
-                    schema = new HashBrown.Models.ContentSchema(schema);
-                } else if(schema.type === 'field') {
-                    schema = new HashBrown.Models.FieldSchema(schema);
-                }
+        for(let schema of results) {
+            if(type && schema.type !== type) { continue; }
 
-                schemas.push(schema);
+            if(schema.type === 'content') {
+                schema = new HashBrown.Models.ContentSchema(schema);
+            } else if(schema.type === 'field') {
+                schema = new HashBrown.Models.FieldSchema(schema);
             }
 
-            return Promise.resolve(schemas);
-        });
-    }
-
-    /**
-     * Gets a Schema by id (sync)
-     *
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-    static getSchemaByIdSync(id) {
-        for(let i in resources.schemas) {
-            let schema = resources.schemas[i];
-
-            if(schema.id == id) {
-                if(schema instanceof HashBrown.Models.ContentSchema || schema instanceof HashBrown.Models.FieldSchema) {
-                    return schema;
-                }
-
-                return this.getModel(schema);
-            }
+            schemas.push(schema);
         }
+
+        return schemas;
     }
 }
 

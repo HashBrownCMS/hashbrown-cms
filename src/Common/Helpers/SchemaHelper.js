@@ -87,7 +87,7 @@ class SchemaHelper {
         // Specific values for schema types
         switch(mergedSchema.type) {
             case 'field':
-                mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+                mergedSchema.editorId = childSchema.editorId || mergedSchema.editorId;
                 
                 // Merge config
                 if(!mergedSchema.config) { mergedSchema.config = {}; }

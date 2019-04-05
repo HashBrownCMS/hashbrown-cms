@@ -19,28 +19,14 @@ class NavbarMain extends Crisp.View {
     /**
      * Fetches content
      */
-    fetch() {
-        let panes = this.getPanes();
+    async fetch() {
+        for(let pane of this.getPanes()) {
+            if(typeof pane.getItems !== 'function') { continue; }
 
-        let next = (i) => {
-            if(!panes[i]) { return Promise.resolve(); }
-
-            if(typeof panes[i].getItems !== 'function') {
-                return next(i+1);
-            }
-
-            return panes[i].getItems()
-            .then((items) => {
-                panes[i].items = items;
-
-                return next(i+1);
-            });
+            pane.items = await pane.getItems();
         }
 
-        return next(0)
-        .then(() => {
-            super.fetch();
-        });
+        super.fetch();
     }
 
     /**
@@ -143,12 +129,10 @@ class NavbarMain extends Crisp.View {
      * @param {String} tabName
      */
     showTab(tabRoute) {
-        this.$element.find('.navbar-main__pane').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-        });
-        
-        this.$element.find('.navbar-main__tab').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+        this.ready(() => {
+            for(let element of Array.from(this.element.querySelectorAll('.navbar-main__pane, .navbar-main__tab'))) {
+                element.classList.toggle('active', element.dataset.route === tabRoute);
+            }
         });
     }
 
@@ -251,13 +235,14 @@ class NavbarMain extends Crisp.View {
      */
     getItemIcon(item, settings) {
         // If this item has a Schema id, fetch the appropriate icon
-        if(item.schemaId) {
-            let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+        // TODO: Find an async solution for this
+        //if(item.schemaId) {
+        //    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
-            if(schema) {
-                return schema.icon;
-            }
-        }
+        //    if(schema) {
+        //        return schema.icon;
+        //    }
+        //}
 
         return item.icon || settings.icon || 'file';
     }

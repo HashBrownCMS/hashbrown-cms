@@ -161,10 +161,10 @@ class RequestHelper {
                 
                 }
             }
-            
+           
             // Parse URL
             url = URL.parse(url);
-
+            
             let headers = {
                 'Accept': '*/*',
                 'User-Agent': 'HashBrown CMS',

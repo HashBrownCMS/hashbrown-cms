@@ -161,7 +161,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
      * Hierarchy logic
      */
     static hierarchy(item, queueItem) {
-        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
 
         queueItem.$element.attr('data-media-id', item.id);
         queueItem.$element.attr('data-remote', true);

@@ -14,7 +14,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @return {Promise} Array of Connections
      */
     static getAllConnections() {
-        return Promise.resolve(resources.connections);
+        return HashBrown.Helpers.RequestHelper.request('get', 'connections');
     }
     
     /**

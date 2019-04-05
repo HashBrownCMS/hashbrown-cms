@@ -118,8 +118,8 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @returns {Promise} Items
      */
-    static getItems() {
-        return HashBrown.Helpers.SchemaHelper.getAllSchemas();
+    static async getItems() {
+        return await HashBrown.Helpers.SchemaHelper.getAllSchemas();
     }
 
     /**
@@ -127,7 +127,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
      */
     static getItemContextMenu(item) {
         let menu = {};
-        let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
+        let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
 
         menu['This schema'] = '---';
         

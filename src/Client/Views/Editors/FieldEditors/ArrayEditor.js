@@ -30,7 +30,41 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         this.fetch();
     }
-   
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.allowedSchemas = [];
+      
+        for(let schemaId of this.config.allowedSchemas || []) {
+            if(!schemaId) { continue; }
+            
+            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId);
+
+            this.allowedSchemas.push(schema);
+        }
+
+        super.fetch();
+    }
+
+    /**
+     * Gets a schema from the list of allowed schemas
+     *
+     * @param {String} id
+     *
+     * @return {FieldSchema} Schema
+     */
+    getAllowedSchema(id) {
+        checkParam(id, 'id', String, true);
+
+        for(let schema of this.allowedSchemas) {
+            if(schema.id === id) { return schema; }
+        }
+
+        return null;
+    }
+
     /**
      * Render key actions
      *
@@ -112,7 +146,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         valueKey: 'id',
                         value: config.allowedSchemas,
                         useClearButton: true,
-                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
                         onChange: (newValue) => { config.allowedSchemas = newValue; }
                     }).$element
                 )
@@ -229,13 +263,11 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 let $field = _.div({class: 'editor__field raised field-editor--array__item'});
 
                 let renderField = () => {
-                    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                    let schema = this.getAllowedSchema(item.schemaId);
 
                     // Schema could not be found, assign first allowed Schema
-                    if(!schema || this.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-                        item.schemaId = this.config.allowedSchemas[0];
-                    
-                        schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                    if(!schema) {
+                        schema = this.allowedSchemas[0];
                     }
 
                     if(!schema) {
@@ -282,7 +314,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
 
                         // Render Schema picker
-                        _.if(this.config.allowedSchemas.length > 1,
+                        _.if(this.allowedSchemas.length > 1,
                             _.div({class: 'field-editor--array__item__toolbar'},
                                 _.div({class: 'widget--label'}, 'Schema'),
                                 new HashBrown.Views.Widgets.Dropdown({
@@ -291,9 +323,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                     valueKey: 'id',
                                     labelKey: 'name',
                                     iconKey: 'icon',
-                                    options: resources.schemas.filter((schema) => {
-                                        return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                    }),
+                                    options: this.allowedSchemas,
                                     onChange: (newSchemaId) => {
                                         item.schemaId = newSchemaId;
                                         item.value = null;
