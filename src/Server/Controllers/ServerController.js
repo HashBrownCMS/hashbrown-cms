@@ -364,17 +364,16 @@ class ServerController extends require('./ApiController') {
     /**
      * Gets a list of all projects
      */
-    static getAllProjects(req, res) {
-        let getProjects = () => {
+    static async getAllProjects(req, res) {
+        try {
+            let projects = [];
+            
             if(req.query.ids) {
-                return HashBrown.Helpers.ProjectHelper.getAllProjectIds();
+                projects = await HashBrown.Helpers.ProjectHelper.getAllProjectIds();
+            } else {
+                projects = await HashBrown.Helpers.ProjectHelper.getAllProjects();
             }
 
-            return HashBrown.Helpers.ProjectHelper.getAllProjects();
-        };
-
-        getProjects()
-        .then((projects) => {
             let scopedProjects = [];
 
             if(!req.user.isAdmin) {
@@ -393,10 +392,11 @@ class ServerController extends require('./ApiController') {
             }
 
             res.status(200).send(scopedProjects);
-        })
-        .catch((e) => {
+
+        } catch(e) {
             res.status(502).send(ServerController.printError(e));   
-        });
+        
+        }
     }
     
     /**

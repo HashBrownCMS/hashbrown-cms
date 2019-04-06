@@ -2510,18 +2510,15 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0 !important;
   cursor: pointer;
   font-weight: 400;
-  background-color: #e70d3b;
-  color: #ffffff;
+  background-color: #dddddd;
+  color: #333333;
   max-width: none !important;
   border-top-right-radius: 0.2rem;
   border-bottom-right-radius: 0.2rem;
   position: absolute;
   white-space: nowrap;
-  left: 4rem;
-  border-left: 2px solid #ffffff;
-}
-.widget--input__checkbox-label:hover {
-  background-color: #b70a2f;
+  left: 1.8rem;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 .widget--input__checkbox-input {
   cursor: pointer;
@@ -2554,8 +2551,9 @@ h1, h2, h3, h4, h5, h6 {
 .widget--input__checkbox-input:checked ~ .widget--input__checkbox-switch {
   transform: translateX(0.8rem);
 }
-.widget--input__checkbox-input:checked ~ .widget--input__checkbox-background {
+.widget--input__checkbox-input:checked ~ .widget--input__checkbox-background, .widget--input__checkbox-input:checked ~ .widget--input__checkbox-label {
   background-color: #e70d3b;
+  color: #ffffff;
 }
 
 /**

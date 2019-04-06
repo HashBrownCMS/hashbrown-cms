@@ -9,75 +9,46 @@ class ProjectHelper {
     /**
      * Gets a list of all available project ids
      *
-     * @returns {Promise} Array of Project names
+     * @returns {Array} Project ids
      */
-    static getAllProjectIds() {
-        return HashBrown.Helpers.DatabaseHelper.listDatabases()
-        .then((allDatabases) => {
-            allDatabases = allDatabases || [];
+    static async getAllProjectIds() {
+        let allDatabases = await HashBrown.Helpers.DatabaseHelper.listDatabases();
 
-            let allProjects = [];
+        let allProjects = [];
 
-            let checkNextProject = () => {
-                let db = allDatabases.pop();
+        for(let db of allDatabases) {
+            if(!await this.projectExists(db)) { continue; }
 
-                if(!db) { return Promise.resolve(allProjects); }
-
-                return this.projectExists(db)
-                .then((projectExists) => {
-                    if(projectExists) {
-                        allProjects.push(db);
-                    }
-
-                    return checkNextProject();
-                });
-            };
-
-            return checkNextProject();
-        });
+            allProjects.push(db);
+        }
+            
+        return allProjects;
     }
     
     /**
      * Gets a list of all available projects
      *
-     * @returns {Promise} Array of Projects
+     * @returns {Array} Projects
      */
-    static getAllProjects() {
-        return HashBrown.Helpers.DatabaseHelper.listDatabases()
-        .then((allDatabases) => {
-            allDatabases = allDatabases || [];
+    static async getAllProjects() {
+        let allDatabases = await HashBrown.Helpers.DatabaseHelper.listDatabases();
 
-            let allProjects = [];
+        let allProjects = [];
 
-            let checkNextProject = () => {
-                let db = allDatabases.pop();
+        for(let db of allDatabases) {
+            let project = await this.getProject(db);
 
-                if(!db) {
-                    allProjects.sort((a, b) => {
-                        if(a.settings.info.name < b.settings.info.name) {
-                            return -1;
-                        }
-                        
-                        if(a.settings.info.name > b.settings.info.name) {
-                            return 1;
-                        }
+            allProjects.push(project);
+        }
 
-                        return 0;
-                    });
-
-                    return Promise.resolve(allProjects);
-                }
-
-                return this.getProject(db)
-                .then((project) => {
-                    allProjects.push(project);
-
-                    return checkNextProject();
-                });
-            };
-
-            return checkNextProject();
+        // Sort by name
+        allProjects.sort((a, b) => {
+            if(a.settings.info.name < b.settings.info.name) { return -1; }
+            if(a.settings.info.name > b.settings.info.name) { return 1; }
+            return 0;
         });
+
+        return allProjects;
     }
 
     /**
@@ -85,12 +56,12 @@ class ProjectHelper {
      *
      * @param {String} project
      *
-     * @returns {Promise} Promise
+     * @returns {Boolean} Whether the project exists
      */
-    static projectExists(project) {
-        if(!project) { return Promise.resolve(false); }
+    static async projectExists(project) {
+        if(!project) { return false; }
 
-        return HashBrown.Helpers.DatabaseHelper.collectionExists(project, 'settings');
+        return await HashBrown.Helpers.DatabaseHelper.collectionExists(project, 'settings');
     }
     
     /**
@@ -99,37 +70,29 @@ class ProjectHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Promise} Promise
+     * @returns {Boolean} Whether the environment exists
      */
-    static environmentExists(project, environment) {
-        if(!environment) {
-            return Promise.resolve(false);
-        }
+    static async environmentExists(project, environment) {
+        if(!environment) { return false; }
         
-        return this.getAllEnvironments(project)
-        .then((environments) => {
-            return Promise.resolve(environments.indexOf(environment) > -1);
-        });
+        let environments = await this.getAllEnvironments(project);
+
+        return environments.indexOf(environment) > -1;
     }
 
     /**
      * Performs a check of the requested project
      *
      * @param {String} project
-     *
-     * @returns {Promise} Result
      */
-    static checkProject(project) {
+    static async checkProject(project) {
         checkParam(project, 'project', String);
 
-        return this.projectExists(project)
-        .then((projectExists) => {
-            if(!projectExists) {
-                return Promise.reject(new Error('Project "' + project + '" could not be found'));
-            }
+        let projectExists = await this.projectExists(project);
 
-            return Promise.resolve();
-        });
+        if(!projectExists) {
+            throw new Error('Project "' + project + '" could not be found');
+        }
     }
 
     /**
@@ -137,33 +100,31 @@ class ProjectHelper {
      *
      * @param {String} id
      * @param {Boolean} isEnabled
-     *
-     * @returns {Promise} Result
      */
-    static toggleProjectSync(id, isEnabled) {
-        checkParam(id, 'id', String);
+    static async toggleProjectSync(id, isEnabled) {
+        checkParam(id, 'id', String, true);
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(id, 'settings', { usedBy: 'project' })
-        .then((projectSettings) => {
-            return Promise.resolve(projectSettings || { usedBy: 'project' });
-        })
-        .then((settings) => {
-            settings.sync = settings.sync || {};
+        let settings = await HashBrown.Helpers.DatabaseHelper.findOne(id, 'settings', { usedBy: 'project' });
 
-            if(typeof isEnabled !== 'boolean') {
-                isEnabled = !settings.sync.enabled;
-            }
+        if(!settings) {
+            settings = { usedBy: 'project' };
+        }
+        
+        settings.sync = settings.sync || {};
 
-            settings.sync.enabled = isEnabled;
-            
-            return HashBrown.Helpers.DatabaseHelper.updateOne(
-                id,
-                'settings',
-                { usedBy: 'project' },
-                settings,
-                { upsert: true }
-            );
-        });
+        if(typeof isEnabled !== 'boolean') {
+            isEnabled = !settings.sync.enabled;
+        }
+
+        settings.sync.enabled = isEnabled;
+        
+        await HashBrown.Helpers.DatabaseHelper.updateOne(
+            id,
+            'settings',
+            { usedBy: 'project' },
+            settings,
+            { upsert: true }
+        );
     }
 
     /**
@@ -171,42 +132,22 @@ class ProjectHelper {
      *
      * @param {String} id
      *
-     * @returns {Promise} Project object
+     * @returns {HashBrown.Models.Project} Project
      */
-    static getProject(id) {
-        let settings;
-        let users;
-        let backups;
+    static async getProject(id) {
+        await this.checkProject(id);
 
-        return this.checkProject(id)
-        .then(() => {
-            return HashBrown.Helpers.SettingsHelper.getSettings(id);
-        })
-        .then((foundSettings) => {
-            settings = foundSettings || {};
+        let settings = await HashBrown.Helpers.SettingsHelper.getSettings(id) || {};
+        let users = await HashBrown.Helpers.UserHelper.getAllUsers(id) || [];
+        let backups = await HashBrown.Helpers.BackupHelper.getBackupsForProject(id) || [];
+        let environments = await this.getAllEnvironments(id) || [];
 
-            return HashBrown.Helpers.UserHelper.getAllUsers(id);
-        })
-        .then((foundUsers) => {
-            users = foundUsers;
-
-            return HashBrown.Helpers.BackupHelper.getBackupsForProject(id);
-        })
-        .then((foundBackups) => {
-            backups = foundBackups;
-
-            return this.getAllEnvironments(id);
-        })
-        .then((foundEnvironments) => {
-            let project = new HashBrown.Models.Project({
-                id: id,
-                backups: backups,
-                settings: settings,
-                environments: foundEnvironments,
-                users: users
-            });
-
-            return Promise.resolve(project);
+        return new HashBrown.Models.Project({
+            id: id,
+            backups: backups,
+            settings: settings,
+            environments: environments,
+            users: users
         });
     }
 
@@ -215,49 +156,34 @@ class ProjectHelper {
      *
      * @param {String} project
      *
-     * @returns {Promise(Array)} environments
+     * @returns {Array} Environments
      */
-    static getAllEnvironments(project) {
-        return this.checkProject(project)
-        .then(() => {
-            // First attempt to get remote environments
-            return HashBrown.Helpers.SyncHelper.getResource(project, null, 'environments')
-        })
-        .then((environments) => {
-            // If remote environments were found, resolve immediately
-            if(environments && Array.isArray(environments)) {
-                return Promise.resolve(environments);
-            }
+    static async getAllEnvironments(project) {
+        await this.checkProject(project);
 
-            // If remote environments were not found, return local ones
-            return HashBrown.Helpers.DatabaseHelper.find(project, 'settings', {})
-            .then((allSettings) => {
-                let names = [];
+        let allSettings = await HashBrown.Helpers.DatabaseHelper.find(project, 'settings', {});
+            
+        let names = [];
 
-                for(let setting of allSettings) {
-                    if(!setting.usedBy || setting.usedBy === 'project') { continue; }
+        for(let setting of allSettings) {
+            if(!setting.usedBy || setting.usedBy === 'project') { continue; }
 
-                    names.push(setting.usedBy);
-                }
+            names.push(setting.usedBy);
+        }
 
-                // If we have some environments, resolve with them
-                if(names.length > 0) {
-                    return Promise.resolve(names);
-                }
+        // If we have some environments, return them
+        if(names.length > 0) { return names; }
 
-                // If we don't, make sure there is a "live" one
-                // NOTE: Using the HashBrown.Helpers.DatabaseHelper directly here, since using the HashBrown.Helpers.SettingsHelper would create a cyclic call stack
-                return HashBrown.Helpers.DatabaseHelper.insertOne(
-                    project,
-                    'settings',
-                    { usedBy: 'live' },
-                    { upsert: true }
-                )
-                .then(() => {
-                    return Promise.resolve(['live']);  
-                });
-            });
-        });
+        // If we don't, make sure there is a "live" one
+        // NOTE: Using the HashBrown.Helpers.DatabaseHelper directly here, since using the HashBrown.Helpers.SettingsHelper would create a cyclic call stack
+        await HashBrown.Helpers.DatabaseHelper.insertOne(
+            project,
+            'settings',
+            { usedBy: 'live' },
+            { upsert: true }
+        );
+
+        return ['live'];  
     }
 
     /**

@@ -22,12 +22,47 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
 
         super(params);
 
-        HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects')
-        .then((projects) => {
-            this.projects = projects;
+        this.fetch();
+    }
 
-            this.fetch();
-        });
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        super.fetch();
+
+        if(currentUserIsAdmin() && !this.hidePermissions) {
+            let body = this.element.querySelector('.modal__body');
+            let $spinner = UI.spinner(body); 
+            
+            this.projects = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects');
+
+            $spinner.remove();
+            
+            _.append(body,
+                this.renderField('Is admin', this.renderAdminEditor()),
+                _.if(!this.model.isAdmin,
+                    _.div({class: 'widget widget--separator'}, 'Projects'),
+                    _.each(this.projects, (i, project) => {
+                        return _.div({class: 'widget-group'},
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'checkbox',
+                                value: this.model.hasScope(project.id),
+                                onChange: (newValue) => {
+                                    if(newValue) {
+                                        this.model.giveScope(project.id);
+                                    } else {
+                                        this.model.removeScope(project.id);
+                                    }
+                                }
+                            }).$element,
+                            _.div({class: 'widget widget--label'}, project.settings.info.name),
+                            this.renderScopesEditor(project.id)
+                        );
+                    })
+                )
+            )
+        }
     }
     
     /**
@@ -217,31 +252,6 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             this.renderField('Email', this.renderEmailEditor()),
             this.renderField('Password', this.renderPasswordEditor()),
             _.div({class: 'widget widget--label warning hidden editor--user__password-warning'}),
-
-            _.if(currentUserIsAdmin() && !this.hidePermissions,
-                this.renderField('Is admin', this.renderAdminEditor()),
-
-                _.if(!this.model.isAdmin,
-                    _.div({class: 'widget widget--separator'}, 'Projects'),
-                    _.each(this.projects, (i, project) => {
-                        return _.div({class: 'widget-group'},
-                            new HashBrown.Views.Widgets.Input({
-                                type: 'checkbox',
-                                value: this.model.hasScope(project.id),
-                                onChange: (newValue) => {
-                                    if(newValue) {
-                                        this.model.giveScope(project.id);
-                                    } else {
-                                        this.model.removeScope(project.id);
-                                    }
-                                }
-                            }).$element,
-                            _.div({class: 'widget widget--label'}, project.settings.info.name),
-                            this.renderScopesEditor(project.id)
-                        );
-                    })
-                )
-            )
         ];
     }
 }

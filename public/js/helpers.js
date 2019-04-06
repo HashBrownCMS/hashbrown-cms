@@ -206,13 +206,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
         
-        let editor = document.querySelector('.editor--content');
+        let editor = document.querySelector('.editor--connection');
 
-        if(!editor) {
+        if(editor) {
+            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+        } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
         }
-            
-        await UI.highlight('.editor--content', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
     }
 }
 
@@ -503,11 +503,11 @@ class ContentHelper extends ContentHelperCommon {
         
         let editor = document.querySelector('.editor--content');
 
-        if(!editor) {
+        if(editor) {
+            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
         }
-            
-        await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
     }
 }
 
@@ -686,6 +686,29 @@ class FormHelper {
      */
     static getAllForms() {
         return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
+    }
+    
+    /**
+     * Starts a tour of the Forms section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('forms/') < 0) {
+            location.hash = '/forms/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/forms/"]', 'This the Forms section, where user submitted content lives.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/forms/"]', 'Here you will find all of your Forms. You can right click here to create a new Form.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--form');
+
+        if(editor) {
+            await UI.highlight('.editor--form', 'This is the Form editor, where you edit Forms.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Form editor will be when you click a Form.', 'left', 'next');
+        }
     }
 }
 
@@ -905,6 +928,38 @@ class DebugHelper {
      */
     static warning(message, sender) {
         this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
+    }
+
+    /**
+     * Starts a timer
+     *
+     * @param {String} id
+     */
+    static startTimer(id) {
+        checkParam(id, 'id', String, true);
+
+        if(!this.timers) { this.timers = {}; }
+
+        this.timers[id] = Date.now();
+        
+        console.log('timer/' + id + ': Start!');
+    }
+
+    /**
+     * Prints the timer duration
+     *
+     * @param {String} id
+     * @param {String} message
+     */
+    static printTimer(id, message) {
+        checkParam(id, 'id', String, true);
+        checkParam(message, 'message', String, true);
+        
+        if(!this.timers || !this.timers[id]) { this.startTimer(id); }
+
+        console.log('timer/' + id + ': ' + message + '(' + (Date.now() - this.timers[id]) + 'ms)');
+        
+        this.timers[id] = Date.now();
     }
 }
 
@@ -5053,6 +5108,30 @@ module.exports = SettingsHelper;
  * @memberof HashBrown.Client.Helpers
  */
 class UIHelper {
+    /**
+     * Renders a spinner
+     *
+     * @param {HTMLElement} element
+     * @param {Boolean} noBackground
+     *
+     * @return {HTMLElement} Spinner
+     */
+    static spinner(element = null, noBackground = false) {
+        let spinner = _.div({class: 'widget widget--spinner ' + (element ? 'embedded ' : '' ) + (noBackground ? 'no-background' : '')},
+            _.div({class: 'widget--spinner__inner'},
+                _.div({class: 'widget--spinner__image fa fa-refresh'})
+            )
+        );
+
+        if(element) {
+            _.append(element, spinner);
+        } else {
+            _.append(document.body, spinner);
+        }
+
+        return spinner;
+    }
+    
     /**
      * Highlights an element with an optional label
      *

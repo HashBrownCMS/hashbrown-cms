@@ -151,6 +151,38 @@ class DebugHelper {
     static warning(message, sender) {
         this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
     }
+
+    /**
+     * Starts a timer
+     *
+     * @param {String} id
+     */
+    static startTimer(id) {
+        checkParam(id, 'id', String, true);
+
+        if(!this.timers) { this.timers = {}; }
+
+        this.timers[id] = Date.now();
+        
+        console.log('timer/' + id + ': Start!');
+    }
+
+    /**
+     * Prints the timer duration
+     *
+     * @param {String} id
+     * @param {String} message
+     */
+    static printTimer(id, message) {
+        checkParam(id, 'id', String, true);
+        checkParam(message, 'message', String, true);
+        
+        if(!this.timers || !this.timers[id]) { this.startTimer(id); }
+
+        console.log('timer/' + id + ': ' + message + '(' + (Date.now() - this.timers[id]) + 'ms)');
+        
+        this.timers[id] = Date.now();
+    }
 }
 
 module.exports = DebugHelper;

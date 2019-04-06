@@ -7,6 +7,30 @@
  */
 class UIHelper {
     /**
+     * Renders a spinner
+     *
+     * @param {HTMLElement} element
+     * @param {Boolean} noBackground
+     *
+     * @return {HTMLElement} Spinner
+     */
+    static spinner(element = null, noBackground = false) {
+        let spinner = _.div({class: 'widget widget--spinner ' + (element ? 'embedded ' : '' ) + (noBackground ? 'no-background' : '')},
+            _.div({class: 'widget--spinner__inner'},
+                _.div({class: 'widget--spinner__image fa fa-refresh'})
+            )
+        );
+
+        if(element) {
+            _.append(element, spinner);
+        } else {
+            _.append(document.body, spinner);
+        }
+
+        return spinner;
+    }
+    
+    /**
      * Highlights an element with an optional label
      *
      * @param {Boolean|HTMLElement} element

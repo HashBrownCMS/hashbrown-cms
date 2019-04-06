@@ -187,11 +187,11 @@ class ContentHelper extends ContentHelperCommon {
         
         let editor = document.querySelector('.editor--content');
 
-        if(!editor) {
+        if(editor) {
+            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
         }
-            
-        await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
     }
 }
 

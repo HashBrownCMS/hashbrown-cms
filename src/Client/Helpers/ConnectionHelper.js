@@ -88,13 +88,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
         
-        let editor = document.querySelector('.editor--content');
+        let editor = document.querySelector('.editor--connection');
 
-        if(!editor) {
+        if(editor) {
+            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+        } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
         }
-            
-        await UI.highlight('.editor--content', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
     }
 }
 

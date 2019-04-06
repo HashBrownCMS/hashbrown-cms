@@ -53,8 +53,8 @@ class MainMenu extends Crisp.View {
                 ]);
                 break;
 
-            case 'forms':
-                UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
+            case'forms':
+                HashBrown.Helpers.FormHelper.startTour();
                 break;
 
             case 'connections':

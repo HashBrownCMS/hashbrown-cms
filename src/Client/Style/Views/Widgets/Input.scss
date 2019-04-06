@@ -180,19 +180,15 @@
             margin-bottom: 0 !important;
             cursor: pointer;
             font-weight: 400;
-            background-color: $primary;
-            color: $primary-text;
+            background-color: $standard-darker;
+            color: $standard-text;
             max-width: none !important;
             border-top-right-radius: 0.2rem;
             border-bottom-right-radius: 0.2rem;
             position: absolute;
             white-space: nowrap;
-            left: 4rem;
-            border-left: 2px solid $primary-text;
-
-            &:hover {
-                background-color: $primary-dark;
-            }
+            left: 1.8rem;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         &-input {
@@ -230,8 +226,10 @@
             transform: translateX(0.8rem);
         }
 
-        &-input:checked ~ &-background {
+        &-input:checked ~ &-background,
+        &-input:checked ~ &-label {
             background-color: $primary;
+            color: $primary-text;
         }
     }
 }

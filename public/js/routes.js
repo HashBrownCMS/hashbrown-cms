@@ -391,6 +391,8 @@ Crisp.Router.route('/forms/', function() {
             _.p('Click on a Form to edit it.'),
             _.button({class: 'widget widget--button'}, 'New Form')
                 .click(() => { HashBrown.Views.Navigation.FormsPane.onClickNewForm(); }),
+            _.button({class: 'widget widget--button'}, 'Quick tour')
+                .click(HashBrown.Helpers.FormHelper.startTour),
         ],
         'text'
     );
