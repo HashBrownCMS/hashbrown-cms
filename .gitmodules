@@ -4,3 +4,6 @@
 [submodule "public/lib/normalize"]
 	path = public/lib/normalize
 	url = https://github.com/necolas/normalize.css.git
+[submodule "plugins"]
+	path = plugins
+	url = https://github.com/HashBrownCMS/plugins.git
