@@ -1,10 +1,4 @@
 module.exports = function() {
-    let currentUser = HashBrown.Context.user;
-    let currentProject = HashBrown.Context.projectId;
-
-    let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
-    let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-     
     return _.nav({class: 'navbar-main'},
         // Buttons
         _.div({class: 'navbar-main__tabs'},

@@ -14180,6 +14180,21 @@ class NavbarMain extends Crisp.View {
 
         this.fetch();
     }
+
+    /**
+     * Fetches content
+     */
+    async fetch() {
+        for(let pane of this.getPanes()) {
+            if(typeof pane.getItems !== 'function') { continue; }
+
+            pane.items = await pane.getItems();
+        }
+
+        super.fetch();
+        
+        this.updateHighlight();
+    }
  
     /**
      * Updates the highlight state
@@ -14196,21 +14211,6 @@ class NavbarMain extends Crisp.View {
         } else {
             this.showTab('/' + resourceCategory + '/');
         }
-    }
-
-    /**
-     * Fetches content
-     */
-    async fetch() {
-        for(let pane of this.getPanes()) {
-            if(typeof pane.getItems !== 'function') { continue; }
-
-            pane.items = await pane.getItems();
-        }
-
-        super.fetch();
-        
-        this.updateHighlight();
     }
 
     /**
@@ -14418,16 +14418,6 @@ class NavbarMain extends Crisp.View {
      * @returns {String} Icon name
      */
     getItemIcon(item, settings) {
-        // If this item has a Schema id, fetch the appropriate icon
-        // TODO: Find an async solution for this
-        //if(item.schemaId) {
-        //    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-
-        //    if(schema) {
-        //        return schema.icon;
-        //    }
-        //}
-
         return item.icon || settings.icon || 'file';
     }
 
@@ -14690,12 +14680,6 @@ module.exports = NavbarMain;
 /***/ (function(module, exports) {
 
 module.exports = function() {
-    let currentUser = HashBrown.Context.user;
-    let currentProject = HashBrown.Context.projectId;
-
-    let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
-    let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
-     
     return _.nav({class: 'navbar-main'},
         // Buttons
         _.div({class: 'navbar-main__tabs'},
@@ -15618,7 +15602,28 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      * @returns {Promise} Items
      */
     static async getItems() {
-        return await HashBrown.Helpers.ContentHelper.getAllContent();
+        // Build an icon cache
+        let icons = {};
+
+        for(let schema of await HashBrown.Helpers.SchemaHelper.getAllSchemas()) {
+            if(!schema.icon) {
+                schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+            }
+
+            icons[schema.id] = schema.icon;
+        }
+
+        // Get the items
+        let items = await HashBrown.Helpers.ContentHelper.getAllContent();
+
+        // Apply the appropriate icon to each item
+        for(let i in items) {
+            items[i] = items[i].getObject();
+
+            items[i].icon = icons[items[i].schemaId];
+        }
+
+        return items;
     }
 
     /**
@@ -16168,7 +16173,21 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
      * @returns {Promise} Items
      */
     static async getItems() {
-        return await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        // Build an icon cache
+        let icons = {};
+
+        let allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+        // Apply the appropriate icon to each item
+        for(let schema of allSchemas) { 
+            if(!schema.icon) {
+                let compiledSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+
+                schema.icon = compiledSchema.icon;
+            }
+        }
+
+        return allSchemas;
     }
 
     /**

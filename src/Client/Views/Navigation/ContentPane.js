@@ -308,7 +308,28 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      * @returns {Promise} Items
      */
     static async getItems() {
-        return await HashBrown.Helpers.ContentHelper.getAllContent();
+        // Build an icon cache
+        let icons = {};
+
+        for(let schema of await HashBrown.Helpers.SchemaHelper.getAllSchemas()) {
+            if(!schema.icon) {
+                schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+            }
+
+            icons[schema.id] = schema.icon;
+        }
+
+        // Get the items
+        let items = await HashBrown.Helpers.ContentHelper.getAllContent();
+
+        // Apply the appropriate icon to each item
+        for(let i in items) {
+            items[i] = items[i].getObject();
+
+            items[i].icon = icons[items[i].schemaId];
+        }
+
+        return items;
     }
 
     /**

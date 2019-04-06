@@ -90,7 +90,21 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
      * @returns {Promise} Items
      */
     static async getItems() {
-        return await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        // Build an icon cache
+        let icons = {};
+
+        let allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+        // Apply the appropriate icon to each item
+        for(let schema of allSchemas) { 
+            if(!schema.icon) {
+                let compiledSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+
+                schema.icon = compiledSchema.icon;
+            }
+        }
+
+        return allSchemas;
     }
 
     /**

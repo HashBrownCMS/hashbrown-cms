@@ -18,6 +18,21 @@ class NavbarMain extends Crisp.View {
 
         this.fetch();
     }
+
+    /**
+     * Fetches content
+     */
+    async fetch() {
+        for(let pane of this.getPanes()) {
+            if(typeof pane.getItems !== 'function') { continue; }
+
+            pane.items = await pane.getItems();
+        }
+
+        super.fetch();
+        
+        this.updateHighlight();
+    }
  
     /**
      * Updates the highlight state
@@ -34,21 +49,6 @@ class NavbarMain extends Crisp.View {
         } else {
             this.showTab('/' + resourceCategory + '/');
         }
-    }
-
-    /**
-     * Fetches content
-     */
-    async fetch() {
-        for(let pane of this.getPanes()) {
-            if(typeof pane.getItems !== 'function') { continue; }
-
-            pane.items = await pane.getItems();
-        }
-
-        super.fetch();
-        
-        this.updateHighlight();
     }
 
     /**
@@ -256,16 +256,6 @@ class NavbarMain extends Crisp.View {
      * @returns {String} Icon name
      */
     getItemIcon(item, settings) {
-        // If this item has a Schema id, fetch the appropriate icon
-        // TODO: Find an async solution for this
-        //if(item.schemaId) {
-        //    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-
-        //    if(schema) {
-        //        return schema.icon;
-        //    }
-        //}
-
         return item.icon || settings.icon || 'file';
     }
 
