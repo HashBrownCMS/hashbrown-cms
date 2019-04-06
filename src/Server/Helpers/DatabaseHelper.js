@@ -306,6 +306,10 @@ class DatabaseHelper {
             client.close();
         }
 
+        if(doc && doc['_id']) {
+            delete doc['_id'];
+        }
+
         return doc;
     }
     

@@ -56,7 +56,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @return {FieldSchema} Schema
      */
     getAllowedSchema(id) {
-        checkParam(id, 'id', String, true);
+        checkParam(id, 'id', String);
 
         for(let schema of this.allowedSchemas) {
             if(schema.id === id) { return schema; }
@@ -71,7 +71,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {
-        if(!this.value || this.value.length < 1 || this.config.useGrid) { return; }
+        if(!this.value || this.value.length < 1 || this.config.isGrid) { return; }
 
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
@@ -143,11 +143,23 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         useMultiple: true,
                         useTypeAhead: true,
                         labelKey: 'name',
+                        tooltip: 'A list of schemas that can be part of this array',
                         valueKey: 'id',
                         value: config.allowedSchemas,
                         useClearButton: true,
                         options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
                         onChange: (newValue) => { config.allowedSchemas = newValue; }
+                    }).$element
+                )
+            ),
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Is grid'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'checkbox',
+                        tooltip: 'When enabled, the array items will display as a grid',
+                        value: config.isGrid,
+                        onChange: (newValue) => { config.isGrid = newValue; }
                     }).$element
                 )
             )
@@ -257,7 +269,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Renders this editor
      */
     template() {
-        return _.div({class: 'field-editor field-editor--array ' + (this.config.useGrid ? 'grid' : '')},
+        return _.div({class: 'field-editor field-editor--array ' + (this.config.isGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
                 // Render field
                 let $field = _.div({class: 'editor__field raised field-editor--array__item'});
@@ -268,6 +280,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     // Schema could not be found, assign first allowed Schema
                     if(!schema) {
                         schema = this.allowedSchemas[0];
+                        item.schemaId = schema.id;
                     }
 
                     if(!schema) {
@@ -325,6 +338,8 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                     iconKey: 'icon',
                                     options: this.allowedSchemas,
                                     onChange: (newSchemaId) => {
+                                        if(newSchemaId === item.schemaId) { return; }
+
                                         item.schemaId = newSchemaId;
                                         item.value = null;
                                         
@@ -341,7 +356,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                         // Render field actions (collapse/expand, remove)
                         _.div({class: 'editor__field__actions'},
-                            _.if(!this.config.useGrid,
+                            _.if(!this.config.isGrid,
                                 _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
                                     .click(() => {
                                         $field.toggleClass('collapsed');

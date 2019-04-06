@@ -191,6 +191,29 @@ class ConnectionHelper extends ConnectionHelperCommon {
             HashBrown.Helpers.ProjectHelper.currentEnvironment
         );
     }
+    
+    /**
+     * Starts a tour of the Connection section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('connections/') < 0) {
+            location.hash = '/connections/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/connections/"]', 'This the Connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--content');
+
+        if(!editor) {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
+        }
+            
+        await UI.highlight('.editor--content', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+    }
 }
 
 module.exports = ConnectionHelper;
@@ -302,11 +325,40 @@ const ContentHelperCommon = __webpack_require__(37);
  */
 class ContentHelper extends ContentHelperCommon {
     /**
+     * Gets all ancestors of a Content node by id
+     *
+     * @param {String} id
+     * @param {Boolean} includeSelf
+     *
+     * @returns {Array} Content node
+     */
+    static async getContentAncestorsById(id, includeSelf = false) {
+        checkParam(id, 'id', String, true);
+
+        let ancestors = [];
+        let ancestorId = id;
+
+        while(ancestorId) {
+            let ancestor = await this.getContentById(ancestorId);
+
+            if(ancestorId !== id || includeSelf) {
+                ancestors.push(ancestor);
+            }
+            
+            ancestorId = ancestor.parentId;
+        }
+
+        ancestors.reverse();
+
+        return ancestors;
+    }
+    
+    /**
      * Gets Content by id
      *
      * @param {String} id
      *
-     * @returns {Promise} Content node
+     * @returns {HashBrown.Models.Content} Content node
      */
     static async getContentById(id) {
         checkParam(id, 'id', String, true);
@@ -317,7 +369,7 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Gets all Content
      *
-     * @returns {Promise} Content node
+     * @returns {Array} Content nodes
      */
     static async getAllContent() {
         return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Content, 'content');
@@ -327,9 +379,7 @@ class ContentHelper extends ContentHelperCommon {
      * Sets Content by id
      *
      * @param {String} id
-     * @param {Content} content
-     *
-     * @returns {Promise} Content node
+     * @param {HashBrown.Models.Content} content
      */
     static setContentById(id, content) {
         checkParam(id, 'id', String);
@@ -371,6 +421,8 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {Object} value
      * @param {Object} definition
+     *
+     * @return {Object} Checked value
      */
     static fieldSanityCheck(value, definition) {
         // If the definition value is set to multilingual, but the value isn't an object, convert it
@@ -405,6 +457,8 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} parentId
      * @param {String} aboveId
      * @param {String} belowId
+     *
+     * @return {Number} New index
      */
     static getNewSortIndex(parentId, aboveId, belowId) {
         if(aboveId) {
@@ -436,31 +490,24 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Starts a tour of the Content section
      */
-    static startTour() {
+    static async startTour() {
         if(location.hash.indexOf('content/') < 0) {
             location.hash = '/content/';
         }
        
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        })
-        .then(() => {
-            return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next')
-        })
-        .then(() => {
-            return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
-        })
-        .then(() => {
-            let editor = document.querySelector('.editor--content');
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
 
-            if(!editor) {
-                return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
-            }
-                
-            return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
-        });
+        await UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--content');
+
+        if(!editor) {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+        }
+            
+        await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
     }
 }
 

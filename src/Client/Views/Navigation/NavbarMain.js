@@ -11,15 +11,31 @@ class NavbarMain extends Crisp.View {
 
         this.template = require('Client/Templates/Navigation/NavbarMain');
 
-        HashBrown.Helpers.EventHelper.on(
-            'resource',
-            'navbar',
-            (value) => { this.reload(value); }
-        );  
+        HashBrown.Helpers.EventHelper.on('resource', 'navbar', () => { this.reload(); });  
+        HashBrown.Helpers.EventHelper.on('route', 'navbar', () => { this.updateHighlight(); });  
         
+        $('.page--environment__space--nav').html(this.$element);
+
         this.fetch();
     }
-  
+ 
+    /**
+     * Updates the highlight state
+     */
+    updateHighlight() {
+        let resourceCategory = location.hash.match(/\#\/([a-z]+)\//)[1];
+
+        if(!resourceCategory) { return; }
+
+        let resourceItem = Crisp.Router.params.id;
+
+        if(resourceItem) {
+            this.highlightItem('/' + resourceCategory + '/', resourceItem);
+        } else {
+            this.showTab('/' + resourceCategory + '/');
+        }
+    }
+
     /**
      * Fetches content
      */
@@ -32,19 +48,7 @@ class NavbarMain extends Crisp.View {
 
         super.fetch();
         
-        $('.page--environment__space--nav').html(this.$element);
-
-        let resourceCategory = location.hash.match(/\#\/([a-z]+)\//)[1];
-
-        if(!resourceCategory) { return; }
-
-        let resourceItem = Crisp.Router.params.id;
-
-        if(resourceItem) {
-            this.highlightItem('/' + resourceCategory + '/', resourceItem);
-        } else {
-            this.showTab('/' + resourceCategory + '/');
-        }
+        this.updateHighlight();
     }
 
     /**
@@ -228,10 +232,10 @@ class NavbarMain extends Crisp.View {
     /**
      * Reloads this view
      */
-    reload() {
+    async reload() {
         this.save();
         
-        this.fetch();
+        await this.fetch();
 
         this.restore();
     }

@@ -109,13 +109,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
 
     // Get projects
-    let projects = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
+    let projectIds = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects?ids=true');
    
     $('.page--dashboard__projects__list').empty();
 
-    for(let project of projects || []) {
+    for(let projectId of projectIds || []) {
         let projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
-            model: new HashBrown.Models.Project(project)
+            modelId: projectId
         });
 
         $('.page--dashboard__projects__list').prepend(projectEditor.$element);

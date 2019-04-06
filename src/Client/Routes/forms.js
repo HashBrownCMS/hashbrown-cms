@@ -2,7 +2,7 @@
 
 // Dashboard
 Crisp.Router.route('/forms/', function() {
-    Crisp.View.get('NavbarMain').showTab('/forms/');
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     UI.setEditorSpaceContent(
         [
@@ -18,7 +18,7 @@ Crisp.Router.route('/forms/', function() {
 
 // Edit
 Crisp.Router.route('/forms/:id', function() {
-    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.FormEditor({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id)
@@ -29,12 +29,12 @@ Crisp.Router.route('/forms/:id', function() {
 
 // Edit (JSON editor)
 Crisp.Router.route('/forms/json/:id', function() {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let formEditor = new HashBrown.Views.Editors.JSONEditor({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
-     
-    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
     UI.setEditorSpaceContent(formEditor.$element);
 });

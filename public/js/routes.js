@@ -114,6 +114,8 @@ Crisp.Router.route('/', () => {
 
 // Dashboard
 Crisp.Router.route('/content/', () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
@@ -136,6 +138,8 @@ Crisp.Router.route('/content/', () => {
 
 // Edit (JSON editor)
 Crisp.Router.route('/content/json/:id', async () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let contentEditor = new HashBrown.Views.Editors.JSONEditor({
         modelId: Crisp.Router.params.id,
         resourceCategory: 'content'
@@ -169,10 +173,9 @@ Crisp.Router.route('/content/:id', async () => {
 
 // Edit (with tab specified)
 Crisp.Router.route('/content/:id/:tab', () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+
     let id = Crisp.Router.params.id;
-
-    Crisp.View.get('NavbarMain').highlightItem('/content/', id);
-
     let contentEditor = Crisp.View.get('ContentEditor');
 
     if(!contentEditor) {
@@ -203,58 +206,48 @@ Crisp.Router.route('/content/:id/:tab', () => {
 
 // Dashboard
 Crisp.Router.route('/connections/', function() {
-    if(currentUserHasScope('connections')) {
-        Crisp.View.get('NavbarMain').showTab('/connections/');
-        
-        UI.setEditorSpaceContent(
-            [
-                _.h1('Connections'),
-                _.p('Right click in the Connections pane to create a new Connection.'),
-                _.p('Click on a Connection to edit it.'),
-                _.button({class: 'widget widget--button'}, 'New Connection')
-                    .click(() => { HashBrown.Views.Navigation.ConnectionPane.onClickNewConnection(); }),
-            ],
-            'text'
-        );
-    
-    } else {
-        location.hash = '/';
+    if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
-    }
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
+    UI.setEditorSpaceContent(
+        [
+            _.h1('Connections'),
+            _.p('Right click in the Connections pane to create a new Connection.'),
+            _.p('Click on a Connection to edit it.'),
+            _.button({class: 'widget widget--button'}, 'New Connection')
+                .click(() => { HashBrown.Views.Navigation.ConnectionPane.onClickNewConnection(); }),
+            _.button({class: 'widget widget--button'}, 'Quick tour')
+                .click(HashBrown.Helpers.ConnectionHelper.startTour),
+        ],
+        'text'
+    );
 });
 
 // Edit
 Crisp.Router.route('/connections/:id', function() {
-    if(currentUserHasScope('connections')) {
-        let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-            modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + this.id)
-        });
-       
-        Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
-        
-        UI.setEditorSpaceContent(connectionEditor.$element);
-    
-    } else {
-        location.hash = '/';
+    if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
-    }
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
+    let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
+        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + this.id)
+    });
+   
+    UI.setEditorSpaceContent(connectionEditor.$element);
 });
 
 // Edit (JSON editor)
 Crisp.Router.route('/connections/json/:id', function() {
-    if(currentUserHasScope('connections')) {
-        let connectionEditor = new HashBrown.Views.Editors.JSONEditor({
-            apiPath: 'connections/' + this.id
-        });
-         
-        Crisp.View.get('NavbarMain').highlightItem('/connections/', this.id);
-        
-        UI.setEditorSpaceContent(connectionEditor.$element);
-    
-    } else {
-        location.hash = '/';
+    if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
-    }
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
+    let connectionEditor = new HashBrown.Views.Editors.JSONEditor({
+        apiPath: 'connections/' + this.id
+    });
+    
+    UI.setEditorSpaceContent(connectionEditor.$element);
 });
 
 
@@ -268,7 +261,7 @@ Crisp.Router.route('/connections/json/:id', function() {
 
 // Dashboard
 Crisp.Router.route('/media/', function() {
-    Crisp.View.get('NavbarMain').showTab('/media/');
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     UI.setEditorSpaceContent(
         [
@@ -297,11 +290,11 @@ Crisp.Router.route('/media/', function() {
 
 // Preview
 Crisp.Router.route('/media/:id', function() {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let mediaViewer = new HashBrown.Views.Editors.MediaViewer({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('media/' + this.id)
     });
-    
-    Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);
     
     UI.setEditorSpaceContent(mediaViewer.$element);
 });
@@ -317,30 +310,26 @@ Crisp.Router.route('/media/:id', function() {
 
 // Dashboard
 Crisp.Router.route('/schemas/', function() {
-    if(currentUserHasScope('schemas')) {
-        Crisp.View.get('NavbarMain').showTab('/schemas/');
-        
-        UI.setEditorSpaceContent(
-            [
-                _.h1('Schemas'),
-                _.p('Right click in the Schemas pane to create a new Schema.'),
-                _.p('Click on a Schema to edit it.')
-            ],
-            'text'
-        );
+    if(!currentUserHasScope('schemas')) { return location.hash = '/'; }
     
-    } else {
-        location.hash = '/';
-
-    }
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
+    UI.setEditorSpaceContent(
+        [
+            _.h1('Schemas'),
+            _.p('Right click in the Schemas pane to create a new Schema.'),
+            _.p('Click on a Schema to edit it.')
+        ],
+        'text'
+    );
 });
 
 // Edit
 Crisp.Router.route('/schemas/:id', async () => {
     if(!currentUserHasScope('schemas')) { return location.hash = '/'; }
 
-    Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
-   
+    HashBrown.Helpers.EventHelper.trigger('route');
+ 
     // First get the Schema model
     let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(Crisp.Router.params.id);
 
@@ -370,18 +359,16 @@ Crisp.Router.route('/schemas/:id', async () => {
 
 // Edit (JSON editor)
 Crisp.Router.route('/schemas/json/:id', function() {
-    if(currentUserHasScope('schemas')) {
-        let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
-            modelId: this.id,
-            resourceCategory: 'schemas'
-        });
+    if(!currentUserHasScope('schemas')) { return location.hash = '/'; }
 
-        UI.setEditorSpaceContent(jsonEditor.$element);
+    HashBrown.Helpers.EventHelper.trigger('route');
     
-    } else {
-        location.hash = '/';
+    let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
+        modelId: this.id,
+        resourceCategory: 'schemas'
+    });
 
-    }
+    UI.setEditorSpaceContent(jsonEditor.$element);
 });
 
 
@@ -395,7 +382,7 @@ Crisp.Router.route('/schemas/json/:id', function() {
 
 // Dashboard
 Crisp.Router.route('/forms/', function() {
-    Crisp.View.get('NavbarMain').showTab('/forms/');
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     UI.setEditorSpaceContent(
         [
@@ -411,7 +398,7 @@ Crisp.Router.route('/forms/', function() {
 
 // Edit
 Crisp.Router.route('/forms/:id', function() {
-    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.FormEditor({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id)
@@ -422,12 +409,12 @@ Crisp.Router.route('/forms/:id', function() {
 
 // Edit (JSON editor)
 Crisp.Router.route('/forms/json/:id', function() {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let formEditor = new HashBrown.Views.Editors.JSONEditor({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
-     
-    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
     UI.setEditorSpaceContent(formEditor.$element);
 });

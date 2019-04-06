@@ -9,9 +9,9 @@ class MainMenu extends Crisp.View {
     constructor(params) {
         super(params);
         
-        this.fetch();
-        
         $('.page--environment__space--menu').html(this.$element);
+        
+        this.fetch();
     }
     
     /**
@@ -43,9 +43,7 @@ class MainMenu extends Crisp.View {
     onClickQuestion(topic) {
         switch(topic) {
             case 'content':
-                let modal = UI.messageModal('Content', [ 
-                    _.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')
-                ]);
+                HashBrown.Helpers.ContentHelper.startTour();
                 break;
 
             case 'media':
@@ -60,10 +58,7 @@ class MainMenu extends Crisp.View {
                 break;
 
             case 'connections':
-                UI.messageModal('Connections', [
-                    _.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'),
-                    _.p('They can also be set up to provide statically hosted media.')
-                ]);
+                HashBrown.Helpers.ConnectionHelper.startTour();
                 break;
 
             case 'schemas':
@@ -73,17 +68,32 @@ class MainMenu extends Crisp.View {
     }
 
     /**
-     * Pre render
+     * Gets the help options
+     *
+     * @return {Object} Options
      */
-    prerender() {
-        this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
+    getHelpOptions() {
+        let helpOptions = {
+            'Connections': () => { this.onClickQuestion('connections'); },
+            'Content': () => { this.onClickQuestion('content'); },
+            'Forms': () => { this.onClickQuestion('forms'); },
+            'Media': () => { this.onClickQuestion('media'); },
+            'Schemas': () => { this.onClickQuestion('schemas'); }
+        };
+
+        if(!currentUserHasScope('connections')) { delete helpOptions['Connections']; }
+        if(!currentUserHasScope('schemas')) { delete helpOptions['Schemas']; }
+
+        return helpOptions;
     }
 
     /**
      * Post render
      */
     postrender() {
-        this.languageDropdown.notify(HashBrown.Context.language);
+        if(this.languageDropdown) {
+            this.languageDropdown.notify(HashBrown.Context.language);
+        }
     }
 
     /**
@@ -91,13 +101,13 @@ class MainMenu extends Crisp.View {
      */
     template() {
         return _.div({class: 'main-menu widget-group'},
-            // Language picker
-            _.if(Array.isArray(this.languages) && this.languages.length > 1,
+            _.if(HashBrown.Context.projectSettings.languages.length > 1,
+                // Language picker
                 this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
                     tooltip: 'Language',
                     icon: 'flag',
                     value: HashBrown.Context.language,
-                    options: this.languages,
+                    options: HashBrown.Context.projectSettings.languages,
                     onChange: (newValue) => {
                         this.onChangeLanguage(newValue);
                     }
@@ -125,13 +135,7 @@ class MainMenu extends Crisp.View {
                 tooltip: 'Get help',
                 icon: 'question-circle',
                 reverseKeys: true,
-                options: {
-                    'Connections': () => { this.onClickQuestion('connections'); },
-                    'Content': () => { this.onClickQuestion('content'); },
-                    'Forms': () => { this.onClickQuestion('forms'); },
-                    'Media': () => { this.onClickQuestion('media'); },
-                    'Schemas': () => { this.onClickQuestion('schemas'); }
-                }
+                options: this.getHelpOptions(),
             })
         );
     }

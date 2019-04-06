@@ -2,7 +2,7 @@
 
 // Dashboard
 Crisp.Router.route('/media/', function() {
-    Crisp.View.get('NavbarMain').showTab('/media/');
+    HashBrown.Helpers.EventHelper.trigger('route');
     
     UI.setEditorSpaceContent(
         [
@@ -31,11 +31,11 @@ Crisp.Router.route('/media/', function() {
 
 // Preview
 Crisp.Router.route('/media/:id', function() {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let mediaViewer = new HashBrown.Views.Editors.MediaViewer({
         modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('media/' + this.id)
     });
-    
-    Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);
     
     UI.setEditorSpaceContent(mediaViewer.$element);
 });

@@ -9,9 +9,27 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
+        _.append(this.element,
+            _.div({class: 'widget widget--spinner embedded no-background'},
+                _.div({class: 'widget--spinner__inner'},
+                    _.div({class: 'widget--spinner__image fa fa-refresh'})
+                )
+            )
+        )
+
         this.fetch();
     }
-   
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
+        this.model = new HashBrown.Models.Project(this.model);
+
+        super.fetch();
+    }
+        
     /**
      * Event: Click remove button
      */ 
@@ -38,12 +56,16 @@ class ProjectEditor extends Crisp.View {
                 {
                     label: 'Delete',
                     class: 'warning disabled',
-                    onClick: () => {
-                        HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id)
-                        .then(() => {
+                    onClick: async () => {
+                        try {
+                            await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id);
+                            
                             location.reload();
-                        })
-                        .catch(UI.errorModal);
+
+                        } catch(e) {
+                            UI.errorModal(e); 
+                        
+                        }
                     }
                 }
             ]
@@ -56,13 +78,17 @@ class ProjectEditor extends Crisp.View {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
-        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', () => {
-            HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
-            .then(() => {
+        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', async () => {
+            try {
+                await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName);
+
                 this.model = null;
                 this.fetch();
-            })
-            .catch(UI.errorModal);
+            
+            } catch(e) {
+                UI.errorModal(e);
+
+            }
         });
     }
     

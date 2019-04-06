@@ -7,6 +7,8 @@ Crisp.Router.route('/', () => {
 
 // Dashboard
 Crisp.Router.route('/content/', () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     UI.setEditorSpaceContent(
         [
             _.h1('Content'),
@@ -29,6 +31,8 @@ Crisp.Router.route('/content/', () => {
 
 // Edit (JSON editor)
 Crisp.Router.route('/content/json/:id', async () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+    
     let contentEditor = new HashBrown.Views.Editors.JSONEditor({
         modelId: Crisp.Router.params.id,
         resourceCategory: 'content'
@@ -62,10 +66,9 @@ Crisp.Router.route('/content/:id', async () => {
 
 // Edit (with tab specified)
 Crisp.Router.route('/content/:id/:tab', () => {
+    HashBrown.Helpers.EventHelper.trigger('route');
+
     let id = Crisp.Router.params.id;
-
-    Crisp.View.get('NavbarMain').highlightItem('/content/', id);
-
     let contentEditor = Crisp.View.get('ContentEditor');
 
     if(!contentEditor) {
