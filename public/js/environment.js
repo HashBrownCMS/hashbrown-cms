@@ -109,6 +109,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Error handling
     window.onerror = UI.errorModal;
    
+    // Preload resources
+    if(!HashBrown.Context.isMediaPicker) {
+        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
+    }
+
     // Get language
     HashBrown.Context.language = localStorage.getItem('language') || 'en';
 
