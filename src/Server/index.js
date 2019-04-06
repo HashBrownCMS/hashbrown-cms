@@ -8,7 +8,6 @@ const HTTP = require('http');
 const Express = require('express');
 const BodyParser = require('body-parser');
 const CookieParser = require('cookie-parser');
-const ExpressWebSockets = require('express-ws');
 const FileSystem = require('fs');
 
 // Express app
@@ -107,9 +106,6 @@ function ready(files) {
 
         debug.log('HTTP server restarted on port ' + port, 'HashBrown');
         
-        // Enable WebSockets
-        ExpressWebSockets(app, server);
-
         // Init controllers
         for(let name in HashBrown.Controllers) {
             HashBrown.Controllers[name].init(app);

@@ -329,19 +329,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} New Connection
      */
-    static createConnection(project, environment) {
+    static async createConnection(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
         let connection = HashBrown.Models.Connection.create();
 
-        return HashBrown.Helpers.DatabaseHelper.insertOne(
-            project,
-            environment + '.connections',
-            connection.getObject()
-        ).then((newConnection) => {
-            return Promise.resolve(connection);
-        });
+        await HashBrown.Helpers.DatabaseHelper.insertOne(project, environment + '.connections', connection.getObject());
+    
+        return connection;
     }    
 
     /**

@@ -86,10 +86,17 @@
 
         // Tab
         &__tab {
+            margin-bottom: 8rem;
+            
             &:not(.active) { 
                 display: none;
             }
         }
+    }
+    
+    // Add margin in bottom
+    &__body > &__field:last-child {
+        margin-bottom: 8rem;
     }
 
     // Footer

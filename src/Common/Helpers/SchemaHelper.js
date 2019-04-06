@@ -7,19 +7,6 @@
  */
 class SchemaHelper {
     /**
-     * Gets all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Schema)} schema
-     */
-    static getSchemaWithParentFields(id) {
-        return new Promise((callback) => {
-            callback();
-        });
-    }
-
-    /**
      * Gets the appropriate model
      *
      * @param {Object} properties

@@ -44,7 +44,7 @@ class SchemaEditor extends Crisp.View {
     }
     
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         if(this.jsonEditor && this.jsonEditor.isValid == false) { return; }

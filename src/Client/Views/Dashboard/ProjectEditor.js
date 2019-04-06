@@ -59,8 +59,8 @@ class ProjectEditor extends Crisp.View {
                     onClick: async () => {
                         try {
                             await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id);
-                            
-                            location.reload();
+
+                            this.remove();
 
                         } catch(e) {
                             UI.errorModal(e); 

@@ -129,29 +129,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
-     * @return {Promise} Array of Connections
+     * @return {Array} Connections
      */
-    static getAllConnections() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'connections');
-    }
-    
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-    static getConnectionByIdSync(id) {
-        checkParam(id, 'id', String);
-
-        for(let i in resources.connections) {
-            let connection = resources.connections[i];
-
-            if(connection.id == id) {
-                return connection;
-            }
-        }
+    static async getAllConnections() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Connection, 'connections');
     }
     
     /**
@@ -159,12 +140,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @param {String} id
      *
-     * @return {Promise} Connection
+     * @return {HashBrown.Models.Connection} Connection
      */
-    static getConnectionById(id) {
-        if(!id) { return Promise.resolve(null); }
-
-        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
+    static async getConnectionById(id) {
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
     }
 
     /**
@@ -427,17 +406,23 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Number} New index
      */
-    static getNewSortIndex(parentId, aboveId, belowId) {
+    static async getNewSortIndex(parentId, aboveId, belowId) {
         if(aboveId) {
-            return this.getContentByIdSync(aboveId).sort + 1;
+            let aboveContent = await this.getContentById(aboveId);
+            
+            return aboveContent.sort + 1;
         }
 
         if(belowId) {
-            return this.getContentByIdSync(belowId).sort - 1;
+            let belowContent = await this.getContentById(belowId);
+            
+            return belowContent.sort + 1;
         }
 
         // Filter out content that doesn't have the same parent
-        let nodes = resources.content.filter((x) => {
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
+        
+        allContent.filter((x) => {
             return x.parentId == parentId || (!x.parentId && !parentId);
         });
 
@@ -445,7 +430,7 @@ class ContentHelper extends ContentHelperCommon {
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
         let newIndex = 10000;
 
-        for(let content of nodes) {
+        for(let content of allContent) {
             if(newIndex - 10000 <= content.sort) {
                 newIndex = content.sort + 10000;
             }
@@ -650,9 +635,22 @@ module.exports = ContentHelper;
 class FormHelper {
     /**
      * Gets all Forms
+     *
+     * @return {Array} Forms
      */
     static getAllForms() {
         return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
+    }
+    
+    /**
+     * Gets a Form by id
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Form} Form
+     */
+    static getFormById(id) {
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms', id);
     }
     
     /**
@@ -697,42 +695,6 @@ const DebugHelperCommon = __webpack_require__(40);
  * @memberof HashBrown.Client.Helpers
  */
 class DebugHelper extends DebugHelperCommon {
-    /**
-     * Start the debug socket
-     */
-    static startSocket() {
-        let debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
-
-        debugSocket.onopen = (ev) => {
-            debug.log('Debug socket open', 'HashBrown');
-        };
-
-        debugSocket.onmessage = (ev) => {
-            this.onSocketMessage(ev);
-        };
-    }
-
-    /**
-     * Event: On debug socket message
-     */
-    static onSocketMessage(ev) {
-        try {
-            let data = JSON.parse(ev.data);
-
-            switch(data.type) {
-                case 'error':
-                    UI.errorModal(new Error(data.sender + ': ' + data.message));
-                    break;
-
-                case 'warning':
-                    UI.errorModal(new Error(data.sender + ': ' + data.message));
-                    break;
-            }
-
-        } catch(e) {
-            UI.errorModal(ev);
-        }
-    }
 }
 
 module.exports = DebugHelper;
@@ -972,19 +934,6 @@ class LanguageHelper extends LanguageHelperCommon {
 
             return Promise.resolve(selected);
         });
-    }
-   
-    /**
-     * Gets all selected languages (sync)
-     *
-     * @param {String} project
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguagesSync(project) {
-        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
-
-        return selectedLanguages[project] || ['en'];
     }
 
     /**
@@ -3941,10 +3890,10 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
-     * @returns {Promise(Object)} tree
+     * @returns {Object} Tree
      */
-    static getTree() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
+    static async getTree() {
+        return await HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
     }
 
     /**
@@ -4222,10 +4171,6 @@ class RequestHelper {
      * @returns {Promise} Response
      */
     static customRequest(method, url, data, headers) {
-        if(url.indexOf('/resources') > -1) {
-            console.trace();
-        }
-        
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };
@@ -4713,6 +4658,12 @@ class ResourceHelper {
             await this.indexedDbTransaction('put', category, resource.id, resource);
 
             HashBrown.Helpers.EventHelper.trigger('resource');  
+
+            if(model) {
+                resource = new model(resource);
+            }
+
+            return resource;
         
         } catch(e) {
             UI.errorModal(e);
@@ -4740,35 +4691,6 @@ const SchemaHelperCommon = __webpack_require__(50);
  */
 class SchemaHelper extends SchemaHelperCommon {
     /**
-     * Gets a FieldSchema with all parent configs
-     *
-     * @param {String} id
-     *
-     * @returns {FieldSchema} Compiled FieldSchema
-     */
-    static async getFieldSchemaWithParentConfigs(id) {
-        let fieldSchema = await this.getSchemaById(id);
-
-        if(!fieldSchema) { return null; }
-
-        let nextSchema = await this.getSchemaById(fieldSchema.parentSchemaId);
-        
-        let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
-        
-        while(nextSchema) {
-            compiledSchema.appendConfig(nextSchema.config);
-
-            if(nextSchema.parentSchemaId) {
-                nextSchema = await this.getSchemaById(nextSchema.parentSchemaId);
-            } else {
-                nextSchema = null;
-            }
-        }
-
-        return compiledSchema;
-    }
-
-    /**
      * Gets a Schema by id
      *
      * @param {String} id
@@ -4777,7 +4699,8 @@ class SchemaHelper extends SchemaHelperCommon {
      * @return {Schema} Schema
      */
     static async getSchemaById(id, withParentFields = false) {
-        checkParam(id, 'id', String);
+        checkParam(id, 'id', String, true);
+        checkParam(withParentFields, 'withParentFields', Boolean, true);
 
         let schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
        
@@ -4844,19 +4767,6 @@ module.exports = SchemaHelper;
  * @memberof HashBrown.Common.Helpers
  */
 class SchemaHelper {
-    /**
-     * Gets all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Schema)} schema
-     */
-    static getSchemaWithParentFields(id) {
-        return new Promise((callback) => {
-            callback();
-        });
-    }
-
     /**
      * Gets the appropriate model
      *

@@ -104,127 +104,29 @@
  */
 class DemoApi {
     /**
-     * Clears the cache
-     */
-    static reset() {
-        localStorage.setItem('demo', null);
-
-        location.hash = '/content/';
-        location.reload();
-    }
-
-    /**
-     * Gets the fake API cache
-     */
-    static getCache(resource, id) {
-        let cache = this.cache;
-        
-        if(!cache) {
-            try {
-                cache = localStorage.getItem('demo') || '{}';
-                cache = JSON.parse(cache);
-            } catch(e) {
-                cache = {};
-            }
-            
-            cache = cache || {};
-        }
-
-        this.cache = cache;
-
-        if(!resource) {
-            return cache;
-        }
-
-        if(!cache[resource] || !Array.isArray(cache[resource])) {
-            cache[resource] = DemoApi.getNativeResource(resource) || [];
-        }
-
-        if(!id) {
-            return cache[resource];
-        }
-
-        for(let i in cache[resource]) {
-            if(cache[resource][i].id === id || cache[resource][i].name === id) {
-                return cache[resource][i];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Sets the fake API
-     */
-    static setCache(resource, id, data) {
-        let cache = DemoApi.getCache();
-
-        if(!cache[resource] || !Array.isArray(cache[resource])) {
-            cache[resource] = DemoApi.getNativeResource(resource) || [];
-        }
-
-        let foundExisting = false;
-
-        for(let i in cache[resource]) {
-            if(cache[resource][i].id == id) {
-                // Update data
-                if(data) {
-                    cache[resource][i] = data;
-
-                // Delete data
-                } else {
-                    cache[resource].splice(i, 1);
-                }
-
-                foundExisting = true;
-                
-                break;
-            }
-        }
-
-        if(!foundExisting && data) {
-            cache[resource].push(data);
-        }
-
-        localStorage.setItem('demo', JSON.stringify(cache));
-
-        return data;
-    }
-
-    /**
      * Request
      */
-    static request(method, url, data) {
-        url = url.replace('/api/demo/live/', '');
-        method = method.toUpperCase();
-
-        debug.log(method + ' ' + url, DemoApi);
-
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(DemoApi.requestSync(method, url, data));
-            }, 100);
-        });
-    }
-
-    static requestSync(method, url, data) {
-        url = url.replace('/api/demo/live/', '');
+    static async request(method, url) {
         method = method.toUpperCase();
         
-        debug.log(method + ' ' + url, DemoApi);
+        if(method !== 'GET') { return Promise.resolve(); }
         
-        switch(method) {
-            case 'GET':
-                return DemoApi.get(url);
+        url = url.replace('/api/demo/live/', '');
+        url = DemoApi.parseUrl(url);
 
-            case 'POST':
-                return DemoApi.post(url, data);
+        let resources = DemoApi.getAll(url.resource);
 
-            case 'DELETE':
-                return DemoApi.delete(url);
+        if(url.id) {
+            for(let resource of resources) {
+                if(resource.id === url.id) {
+                    return resource;
+                }
+            }
+
+            return null;
         }
-
-        return data;
+        
+        return resources;
     }
 
     /**
@@ -245,89 +147,12 @@ class DemoApi {
     }
 
     /**
-     * Delete
-     */
-    static delete(url) {
-        let query = DemoApi.parseUrl(url);
-
-        return DemoApi.setCache(query.resource, query.id, null);
-    }
-
-    /**
-     * Get
-     */
-    static get(url) {
-        let query = DemoApi.parseUrl(url);
-
-        return DemoApi.getCache(query.resource, query.id);
-    }
-
-    /**
-     * Post
-     */
-    static post(url, data) {
-        let query = DemoApi.parseUrl(url);
-
-        // Publish
-        if(url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
-            return Promise.resolve();
-        }
-
-        // Create new
-        if(url.indexOf('content/new') > -1) {
-            let schemaId = url.match(/content\/new\/([a-zA-Z0-9]+)/);
-
-            if(!schemaId) {
-                throw new Error('No Schema id specified');
-            }
-
-            schemaId = schemaId[1];
-
-            let sort = url.match(/\?sort=([0-9]*)/);
-
-            if(sort) {
-                sort = sort[2];
-            }
-            
-            let parentId = url.match(/\&parent=([0-9a-z]*)/);
-
-            if(parentId) {
-                parentId = parentId[1];
-            }
-
-            data = HashBrown.Models.Content.create(schemaId);
-                
-            data.parentId = parentId;
-            data.sort = sort;
-
-            query = {
-                resource: 'content',
-                id: data.id
-            };
-        }
-
-        console.log('--- POST data:', data);
-
-        return DemoApi.setCache(query.resource, query.id, data);
-    }
-
-    /**
      * Gets a native resource
      */
-    static getNativeResource(type) {
-        switch(type) {
+    static getAll(category) {
+        switch(category) {
             case 'users':
-                return [
-                    {
-                        id: '4173f094621d4a882f912ccaf1cc6613a386519e',
-                        isAdmin: true,
-                        isCurrent: true,
-                        username: 'demouser',
-                        fullName: 'Demo User',
-                        email: 'demo@user.com',
-                        scopes: {}
-                    }
-                ];
+                return [ HashBrown.Context.user ];
 
             case 'settings':
                 return [
@@ -360,8 +185,8 @@ class DemoApi {
                         "remote": false,
                         "id": "91f1ec2b984f291377c2dc488be2ebbefb46dd9a",
                         "parentId": "",
-                        "createdBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
-                        "updatedBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
+                        "createdBy": "demouser",
+                        "updatedBy": "demouser",
                         "createDate": "2016-09-05T06:52:17.646Z",
                         "updateDate": "2017-08-03T15:55:10.590Z",
                         "publishOn": null,
@@ -549,121 +374,9 @@ class DemoApi {
     }
 }
 
-HashBrown.DemoApi = DemoApi;
-
-// Add reset button
-_.append(document.body, 
-    _.button({class: 'widget widget--button condensed page--environment__demo__reset'},
-        'Reset demo'
-    ).click(() => {
-        DemoApi.reset();               
-    })
-);
-
 // Override normal api call
 HashBrown.Helpers.RequestHelper.request = DemoApi.request;
 HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
-
-// ----------
-// Debug socket
-// ----------
-debug.startSocket = () => {}
-
-// ----------
-// SchemaHelper
-// ----------
-HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
-    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
-
-    if(schema.parentSchemaId) {
-        return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId)
-        .then((parentSchema) => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    let mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
-
-                    resolve(mergedSchema);
-                }, 100);
-            });
-        });
-    } else {
-        return Promise.resolve(schema);
-    }
-};
-
-// ----------
-// Crisp UI
-// ----------
-Crisp.View.prototype.fetch = function fetch() {
-    let view = this;
-
-    function getModel() {
-        // Get model from URL
-        if(!view.model && typeof view.modelUrl === 'string') {
-            view.model = DemoApi.requestSync('get', view.modelUrl);
-            view._init();
-        
-        // Get model with function
-        } else if(!view.model && typeof view.modelFunction === 'function') {
-            view.modelFunction(function(data) {
-                view.model = data;
-
-                view._init();
-            });
-
-        // Just perform the initialisation
-        } else {
-            view._init();
-        }
-    }
-
-    // Get the model
-    getModel();    
-}
-
-// ----------
-// Resource loading
-// ----------
-HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
-    let model = null;
-    let result = HashBrown.DemoApi.requestSync('get', name);
-    
-    switch(name) {
-        case 'content':
-            model = HashBrown.Models.Content;
-            break;
-
-        case 'users':
-            model = HashBrown.Models.User;
-            break;
-
-        case 'media':
-            model = HashBrown.Models.Media;
-            break;
-
-        case 'connections':
-            model = HashBrown.Models.Connection;
-            break;
-
-        case 'schemas':
-            break;
-    }
-
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            window.resources[name] = result;
-
-            // If a model is specified, use it to initialise every resource
-            if(model) {
-                for(let i in window.resources[name]) {
-                    window.resources[name][i] = new model(window.resources[name][i]);
-                }
-            }
-
-            resolve(result);
-        }, 100);
-    });
-};
 
 
 /***/ }),

@@ -159,7 +159,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Item context menu
      */
-    getItemContextMenu() {
+    static getItemContextMenu() {
         return {
             'This media': '---',
             'Open in new tab': () => { this.onClickOpenInNewTab(); },
@@ -175,9 +175,9 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Dir context menu
+     * Pane context menu
      */
-    static getDirContextMenu() {
+    static getPaneContextMenu() {
         return {
             'Directory': '---',
             'Upload new media': () => { this.onClickUploadMedia(); },

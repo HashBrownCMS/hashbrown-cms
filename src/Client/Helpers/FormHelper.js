@@ -6,9 +6,22 @@
 class FormHelper {
     /**
      * Gets all Forms
+     *
+     * @return {Array} Forms
      */
     static getAllForms() {
         return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
+    }
+    
+    /**
+     * Gets a Form by id
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Form} Form
+     */
+    static getFormById(id) {
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms', id);
     }
     
     /**

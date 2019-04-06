@@ -16,13 +16,12 @@ class MediaViewer extends Crisp.View {
     }
 
     /**
-     * Pre render
+     * Fetches the model
      */
-    prerender() {
-        if(this.model instanceof HashBrown.Models.Media === false) {
-            this.model = new HashBrown.Models.Media(this.model);        
-        }
+    async fetch() {
+        this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
 
+        super.fetch();
     }
 
     /**

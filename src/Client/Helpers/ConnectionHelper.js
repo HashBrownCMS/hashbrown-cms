@@ -11,29 +11,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
-     * @return {Promise} Array of Connections
+     * @return {Array} Connections
      */
-    static getAllConnections() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'connections');
-    }
-    
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-    static getConnectionByIdSync(id) {
-        checkParam(id, 'id', String);
-
-        for(let i in resources.connections) {
-            let connection = resources.connections[i];
-
-            if(connection.id == id) {
-                return connection;
-            }
-        }
+    static async getAllConnections() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Connection, 'connections');
     }
     
     /**
@@ -41,12 +22,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @param {String} id
      *
-     * @return {Promise} Connection
+     * @return {HashBrown.Models.Connection} Connection
      */
-    static getConnectionById(id) {
-        if(!id) { return Promise.resolve(null); }
-
-        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
+    static async getConnectionById(id) {
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
     }
 
     /**

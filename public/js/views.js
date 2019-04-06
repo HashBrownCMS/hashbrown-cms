@@ -361,11 +361,12 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
     updatePositionClasses() {
         setTimeout(() => {
             let toggle = this.element.querySelector('.widget--dropdown__toggle');
+            let options = this.element.querySelector('.widget--dropdown__options');
             let isChecked = toggle.checked;
             
             toggle.checked = true;
 
-            let bounds = this.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
+            let bounds = options.getBoundingClientRect();
             
             toggle.checked = isChecked;
 
@@ -373,9 +374,9 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             let bottomDiff = bounds.bottom - window.innerHeight;
 
             if(bottomDiff > 0) {
-                this.element
-                    .querySelector('.widget--dropdown__options')
-                    .setAttribute('style', 'max-height: ' + (bounds.height - bottomDiff) + 'px');
+                options.setAttribute('style', 'max-height: ' + (bounds.height - bottomDiff) + 'px');
+            } else {
+                options.removeAttribute('style');
             }
 
             this.element.classList.toggle('right', isAtRight);
@@ -1705,9 +1706,20 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
             }
         ];
 
-        params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
-        
         super(params);
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.value = await this.model.getSettings('publishing') || {};
+        
+        if(this.value.governedBy) {
+            this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
+        }
+
+        super.fetch();
     }
 
     /**
@@ -1716,11 +1728,9 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        if(this.value.governedBy) {
-            let governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
-
+        if(this.governingContent) {
             return _.div({class: 'widget widget--label'},
-                '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', HashBrown.Context.language) + '</a>)'
+                '(Settings inherited from <a href="#/content/' + this.governingContent.id + '">' + this.governingContent.prop('title', HashBrown.Context.language) + '</a>)'
             );
         
         } else {
@@ -1741,7 +1751,7 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
                 _.div({class: 'widget-group'},      
                     _.label({class: 'widget widget--label'}, 'Connection'),
                     new HashBrown.Views.Widgets.Dropdown({
-                        options: resources.connections,
+                        options: HashBrown.Helpers.ConnectionHelper.getAllConnections(),
                         value: this.value.connectionId,
                         valueKey: 'id',
                         labelKey: 'title',
@@ -1806,6 +1816,15 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.modelId);
+
+        super.fetch();
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
@@ -1813,16 +1832,16 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
-        this.$saveBtn.toggleClass('saving', true);
+        this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
+        await HashBrown.Helpers.ResourceHelper.set('connections', this.model.id, this.model);
             
         await HashBrown.Helpers.ResourceHelper.reloadResource('media');
         
-        this.$saveBtn.toggleClass('saving', false);
+        this.$saveBtn.toggleClass('working', false);
     }
 
     /**
@@ -2103,7 +2122,22 @@ class ContentEditor extends Crisp.View {
         
         if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
         
-        this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.model.getSettings('publishing').connectionId);
+        let publishingSettings = await this.model.getSettings('publishing');
+       
+        let connectionId = publishingSettings.connectionId
+
+        if(publishingSettings.governedBy) {
+            let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
+            let governingPublishingSettings = await governingContent.getSettings('publishing');
+
+            connectionId = governingPublishingSettings.connectionId;
+        }
+
+        if(connectionId) {
+            this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
+        } else {
+            this.connection = null;
+        }
 
         this.fieldSchemas = {};
         
@@ -2169,7 +2203,7 @@ class ContentEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
@@ -2528,6 +2562,15 @@ class FormEditor extends Crisp.View {
         
         this.fetch();
     }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
+
+        super.fetch();
+    }
     
     /**
      * Event: Click advanced. Routes to the JSON editor
@@ -2537,7 +2580,7 @@ class FormEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
@@ -2928,6 +2971,7 @@ class JSONEditor extends Crisp.View {
      */
     async fetch() {
         this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
         this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
 
         super.fetch();
@@ -3042,8 +3086,8 @@ class JSONEditor extends Crisp.View {
                 case 'connections':
                     let invalidConnections = v.slice(0);
                     
-                    for(let r in resources.connections) {
-                        let connection = resources.connections[r];
+                    for(let r in this.allConnections) {
+                        let connection = this.allConnections[r];
 
                         for(let c = invalidConnections.length - 1; c >= 0; c--) {
                             if(connection.id == invalidConnections[c]) {
@@ -10530,13 +10574,12 @@ class MediaViewer extends Crisp.View {
     }
 
     /**
-     * Pre render
+     * Fetches the model
      */
-    prerender() {
-        if(this.model instanceof HashBrown.Models.Media === false) {
-            this.model = new HashBrown.Models.Media(this.model);        
-        }
+    async fetch() {
+        this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
 
+        super.fetch();
     }
 
     /**
@@ -10894,7 +10937,7 @@ class SchemaEditor extends Crisp.View {
     }
     
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         if(this.jsonEditor && this.jsonEditor.isValid == false) { return; }
@@ -12611,19 +12654,14 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     constructor(params) {
         super(params);
-
-        this.fetch();
-    }
-
-    /**
-     * Prerender
-     */
-    prerender() {
-        let options = HashBrown.Helpers.LanguageHelper.getLanguagesSync();
+       
+        let options = HashBrown.Context.projectSettings.languages;
 
         if(!this.value || options.indexOf(this.value) < 0) {
             this.value = options[0];
         }
+
+        this.fetch();
     }
 
     /**
@@ -12633,7 +12671,7 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         return _.div({class: 'field-editor field-editor--language'},
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
-                options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
+                options: HashBrown.Context.projectSettings.languages,
                 tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
@@ -13102,10 +13140,12 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             .then((media) => {
                 let html = '';
 
+                if(media.url[0] !== '/') { media.url = '/' + media.url; }
+                    
                 if(media.isImage()) {
-                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
+                    html = '<img alt="' + media.name + '" src="' + media.url + '">';
                 } else if(media.isVideo()) {
-                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="' + media.url + '">';
+                    html = '<video alt="' + media.name + '" src="' + media.url + '">';
                 }
 
                 let activeView = this.activeView || 'wysiwyg';
@@ -13134,7 +13174,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Tab content
      */
     getTabContent() {
-        return this.element.querySelector('.field-editor--rich-text__tab__content');
+        return this.element.querySelector('.field-editor--rich-text__body__tab__content');
     }
 
     /**
@@ -13201,101 +13241,95 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        this.wysiwyg = CKEDITOR.replace(
-            this.getTabContent(),
-            {
-                removePlugins: 'contextmenu,liststyle,tabletools',
-                allowedContent: true,
-                height: 400,
-                toolbarGroups: [
-                    { name: 'styles' },
-                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                    { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-                    { name: 'links' },
-                    { name: 'insert' },
-                    { name: 'forms' },
-                    { name: 'tools' },
-                    { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-                    { name: 'others' },
-                ],
-           
-                extraPlugins: 'justify,divarea',
+        this.wysiwyg = new (function(element, value) {
+            this.element = element;
+            this.value = value;
 
-                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+            // Hook up events
+            this.events = { 'change': [] };
 
-                removeDialogTabs: 'image:advanced;link:advanced'
-            }
-        );
-
-        this.wysiwyg.on('change', () => {
-            this.onChange(this.wysiwyg.getData());
-        });
-
-        this.wysiwyg.on('instanceReady', () => {
-            // Strips the style information
-            let stripStyle = (element) => {
-                delete element.attributes.style;
+            this.on = (name, handler) => {
+                this.events[name].push(handler);
             };
 
-            // Filtering rules
-            this.wysiwyg.dataProcessor.dataFilter.addRules({
-                elements: {
-                    // Strip styling from these elements
-                    p: stripStyle,
-                    h1: stripStyle,
-                    h2: stripStyle,
-                    h3: stripStyle,
-                    h4: stripStyle,
-                    h5: stripStyle,
-                    h6: stripStyle,
-                    span: stripStyle,
-                    div: stripStyle,
-                    section: stripStyle,
-                    hr: stripStyle,
-                    header: stripStyle,
-                    aside: stripStyle,
-                    footer: stripStyle,
-                    ul: stripStyle,
-                    li: stripStyle,
-                    blockquote: stripStyle,
-
-                    // Refactor image src url to fit MediaController
-                    img: (element) => {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                        
-                        // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
-                        
-                        }
-                        
-                    },
-                    
-                    // Refactor video src url to fit MediaController
-                    video: (element) => {
-                        stripStyle(element);
-
-                        // Fetch from data attribute
-                        if(element.attributes['data-id']) {
-                            element.attributes.src = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
-                        
-                        // Failing that, use regex
-                        } else {
-                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]+)\/.+/g, '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/$1');
-                        
-                        }
-                        
-                    }
+            this.trigger = (name) => {
+                for(let handler of this.events[name]) {
+                    handler(this.value);
                 }
-            });
+            };
 
-            // Set value initially
-            this.silentChange = true;
-            this.wysiwyg.setData(this.value);
+            // Insert
+            this.insertHtml = (html) => {
+                let selection = window.getSelection();
+
+                let before = this.editor.innerHTML.substring(0, selection.anchorOffset);
+                let after = this.editor.innerHTML.substring(selection.anchorOffset);
+
+                this.editor.innerHTML = before + this.toView(html) + after;
+
+                this.value = this.toValue(this.editor.innerHTML);
+
+                this.trigger('change', this.value);
+            };
+
+            // Parsers
+            this.parserCache = {};
+            
+            this.toView = (html) => {
+                this.parserCache = {};
+                
+                return html ? html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
+                    this.parserCache[id] = filename;
+                
+                    return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
+                }) : '';
+            };
+
+            this.toValue = (html) => {
+                return html ? html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
+                    let filename = this.parserCache[id];
+
+                    if(!filename) { return original; }
+                
+                    return 'src="/media/' + id + '/' + filename + '"';
+                }) : '';
+            };
+            
+            // Init element and value
+            this.element.classList.toggle('field-editor--rich-text__wysiwyg', true);
+
+            _.append(this.element,
+                this.toolbar = _.div({class: 'field-editor--rich-text__wysiwyg__toolbar widget-group'},
+                    _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
+                        .click(() => {
+                            document.execCommand('bold');
+                        }),
+                    _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
+                        .click(() => {
+                            document.execCommand('italic');
+                        }),
+                    _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
+                        .click(() => {
+                            document.execCommand('underline');
+                        }),
+                    _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
+                        .click(() => {
+                            document.execCommand('removeFormat');
+                            document.execCommand('unlink');
+                        })
+                ),
+                this.editor = _.div({class: 'field-editor--rich-text__wysiwyg__editor', contenteditable: true},
+                    this.toView(value)
+                ).on('input', (e) => {
+                    this.value = this.toValue(this.editor.innerHTML);
+
+                    this.trigger('change', this.value);
+                })[0]
+            );
+        })(this.getTabContent(), this.value);
+
+        this.wysiwyg.on('change', (newValue) => {
+            this.value = newValue;
         });
     }
 
@@ -13332,18 +13366,18 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             ),
             _.div({class: 'field-editor--rich-text__body'},
                 _.if(activeView === 'wysiwyg',
-                    _.div({class: 'field-editor--rich-text__tab wysiwyg'},
-                        _.div({class: 'field-editor--rich-text__tab__content', 'contenteditable': true})
+                    _.div({class: 'field-editor--rich-text__body__tab wysiwyg'},
+                        _.div({class: 'field-editor--rich-text__body__tab__content'})
                     )
                 ),
                 _.if(activeView === 'markdown',
-                    _.div({class: 'field-editor--rich-text__tab markdown'},
-                        _.textarea({class: 'field-editor--rich-text__tab__content'})
+                    _.div({class: 'field-editor--rich-text__body__tab markdown'},
+                        _.textarea({class: 'field-editor--rich-text__body__tab__content'})
                     )
                 ),
                 _.if(activeView === 'html',
-                    _.div({class: 'field-editor--rich-text__tab html'},
-                        _.textarea({class: 'field-editor--rich-text__tab__content'})
+                    _.div({class: 'field-editor--rich-text__body__tab html'},
+                        _.textarea({class: 'field-editor--rich-text__body__tab__content'})
                     )
                 )
             )
@@ -14400,6 +14434,8 @@ class NavbarMain extends Crisp.View {
         await this.fetch();
 
         this.restore();
+
+        this.updateHighlight();
     }
     
     /**
@@ -14647,8 +14683,8 @@ class NavbarMain extends Crisp.View {
                         }
                         
                         // Attach pane context menu
-                        if(pane.settings.getDirContextMenu) {
-                            UI.context($dir[0], pane.settings.getDirContextMenu());
+                        if(pane.getPaneContextMenu) {
+                            UI.context($dir[0], pane.getPaneContextMenu());
                         }
                     }
                    
@@ -15377,59 +15413,56 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {String} parentId
      */
-    static onClickNewContent(parentId, asSibling) {
-        // Try to get a parent Schema if it exists
-        return function getParentSchema() {
+    static async onClickNewContent(parentId, asSibling) {
+        try {
+            let parentContent = null;
+            let parentSchema = null;
+            let allowedSchemas = null;
+
+            // Try to get a parent schema if it exists to determine allowed child schemas
             if(parentId) {
-                return HashBrown.Helpers.ContentHelper.getContentById(parentId)
-                .then((parentContent) => {
-                    return HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
-                });
-            } else {
-                return Promise.resolve();
-            }
-        }()
-
-        // Parent Schema logic resolved, move on
-        .then((parentSchema) => {
-            let allowedSchemas = parentSchema ? parentSchema.allowedChildSchemas : null;
-
-            // If allowed child Schemas were found, but none were provided, don't create the Content node
-            if(allowedSchemas && allowedSchemas.length < 1) {
-                return Promise.reject(new Error('No child content schemas are allowed under this parent'));
+                parentContent = await HashBrown.Helpers.ContentHelper.getContentById(parentId);
+                parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
             
-            // Some child Schemas were provided, or no restrictions were defined
-            } else {
-                let schemaId;
-                let sortIndex = HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
-              
-                // Instatiate a new Content Schema reference editor
-                let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
-                    config: {
-                        allowedSchemas: allowedSchemas,
-                        parentSchema: parentSchema
-                    }
-                });
+                allowedSchemas = parentSchema.allowedChildSchemas;
 
-                schemaReference.on('change', (newValue) => {
-                    schemaId = newValue;
-                });
+                // If allowed child Schemas were found, but none were provided, don't create the Content node
+                if(allowedSchemas && allowedSchemas.length < 1) {
+                    throw new Error('No child content schemas are allowed under this parent');
+                }
+            }
+            
+            let schemaId;
+            let sortIndex = await HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
+          
+            // Instatiate a new Content Schema reference editor
+            let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
+                config: {
+                    allowedSchemas: allowedSchemas,
+                    parentSchema: parentSchema
+                }
+            });
 
-                schemaReference.pickFirstSchema();
+            schemaReference.on('change', (newValue) => {
+                schemaId = newValue;
+            });
 
-                schemaReference.$element.addClass('widget');
+            schemaReference.pickFirstSchema();
 
-                // Render the confirmation modal
-                UI.confirmModal(
-                    'OK',
-                    'Create new content',
-                    _.div({class: 'widget-group'},
-                        _.label({class: 'widget widget--label'},'Schema'),
-                        schemaReference.$element
-                    ),
+            schemaReference.$element.addClass('widget');
 
-                    // Event fired when clicking "OK"
-                    async () => {
+            // Render the confirmation modal
+            UI.confirmModal(
+                'OK',
+                'Create new content',
+                _.div({class: 'widget-group'},
+                    _.label({class: 'widget widget--label'},'Schema'),
+                    schemaReference.$element
+                ),
+
+                // Event fired when clicking "OK"
+                async () => {
+                    try {
                         if(!schemaId) { return false; }
                        
                         let apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
@@ -15446,59 +15479,56 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                         await HashBrown.Helpers.ResourceHelper.reloadResource('content');
                             
                         location.hash = '/content/' + newContent.id;
+
+                    } catch(e) {
+                        UI.errorModal(e);
+
                     }
-                );
-            }
-        })
-        .catch(UI.errorModal);
-    }
-
-    /**
-     * Render Content publishing modal
-     *
-     * @param {Content} content
-     */
-    static renderPublishingModal(content) {
-        let modal = new HashBrown.Views.Modals.PublishingSettingsModal({
-            model: content
-        });
-
-        modal.on('change', (newValue) => {
-            if(newValue.governedBy) { return; }
-           
-            // Commit publishing settings to Content model
-            content.settings.publishing = newValue;
-    
-            // API call to save the Content model
-            HashBrown.Helpers.ResourceHelper.set('content', content.id, content)
-            
-            // Upon success, reload the UI    
-            .then(() => {
-                if(Crisp.Router.params.id == content.id) {
-                    let contentEditor = Crisp.View.get('ContentEditor');
-
-                    contentEditor.model = content;
-                    return contentEditor.fetch();
-                
-                } else {
-                    return Promise.resolve();
-
                 }
-            })
-            .catch(UI.errorModal);
-        });
+            );
+        
+        } catch(e) {
+            UI.errorModal(e);
+        
+        }
     }
 
     /**
      * Event: Click Content settings
      */
-    static onClickContentPublishing() {
+    static async onClickContentPublishing() {
         let id = $('.context-menu-target').data('id');
 
-        // Get Content model
-        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
-        this.renderPublishingModal(content);
+        let modal = new HashBrown.Views.Modals.PublishingSettingsModal({
+            model: content
+        });
+
+        modal.on('change', async (newValue) => {
+            if(newValue.governedBy) { return; }
+           
+            // Commit publishing settings to Content model
+            content.settings.publishing = newValue;
+   
+            try {
+                // API call to save the Content model
+                await HashBrown.Helpers.ResourceHelper.set('content', content.id, content);
+                
+                // Upon success, reload the UI    
+                let contentEditor = Crisp.View.get('ContentEditor');
+                
+                if(contentEditor && contentEditor.modelId == content.id) {
+                    contentEditor.model = content;
+                    
+                    await contentEditor.fetch();
+                }
+
+            } catch(e) {
+                UI.errorModal(e);
+            
+            }
+        });
     }
 
     /**
@@ -15565,9 +15595,9 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click rename
      */
-    static onClickRename() {
+    static async onClickRename() {
         let id = $('.context-menu-target').data('id');
-        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
         UI.messageModal(
             'Rename "' + content.getPropertyValue('title', HashBrown.Context.language) + '"', 
@@ -15736,10 +15766,10 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On click remove
      */
-    static onClickRemoveForm() {
+    static async onClickRemoveForm() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let form = resources.forms.filter((form) => { return form.id == id; })[0];
+        let form = await HashBrown.Helpers.FormHelper.getFormById(id);
 
         UI.confirmModal(
             'delete',
@@ -16031,7 +16061,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Item context menu
      */
-    getItemContextMenu() {
+    static getItemContextMenu() {
         return {
             'This media': '---',
             'Open in new tab': () => { this.onClickOpenInNewTab(); },
@@ -16047,9 +16077,9 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Dir context menu
+     * Pane context menu
      */
-    static getDirContextMenu() {
+    static getPaneContextMenu() {
         return {
             'Directory': '---',
             'Upload new media': () => { this.onClickUploadMedia(); },
@@ -16096,10 +16126,10 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click remove schema
      */
-    static onClickRemoveSchema() {
+    static async onClickRemoveSchema() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
+        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(id);
         
         if(!schema.isLocked) {
             UI.confirmModal(
@@ -16791,8 +16821,8 @@ class ProjectEditor extends Crisp.View {
                     onClick: async () => {
                         try {
                             await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id);
-                            
-                            location.reload();
+
+                            this.remove();
 
                         } catch(e) {
                             UI.errorModal(e); 

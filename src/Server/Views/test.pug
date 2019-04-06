@@ -3,11 +3,11 @@ html
         meta(charset='utf-8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge')
         meta(name='viewport', content='width=device-width initial-scale=1')
-        meta(name='description', content="The pluggable CMS")
+        meta(name='description', content="A free and open-source headless CMS")
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
-        
+
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
-        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+        link(href='/lib/normalize/normalize.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
         
@@ -38,8 +38,16 @@ html
 
                 if(user.isAdmin && tab === 'backend')
                     .page--dashboard__backend-test
-                        ul.page--dashboard__backend-test__messages
+                        pre.page--dashboard__backend-test__messages
 
 
         script(src='/lib/jquery/jquery.min.js')
+        script(src='/lib/crisp-ui/crisp-ui.min.js')
+        script(src='/lib/babel/polyfill.min.js')
+        
+        script(src='/js/common.js')
+        script(src='/js/helpers.js')
+        script(src='/js/models.js')
+        script(src='/js/utilities.js')
+        
         script(src='/js/test.js')

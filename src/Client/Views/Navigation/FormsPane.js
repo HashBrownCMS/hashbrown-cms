@@ -22,10 +22,10 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On click remove
      */
-    static onClickRemoveForm() {
+    static async onClickRemoveForm() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let form = resources.forms.filter((form) => { return form.id == id; })[0];
+        let form = await HashBrown.Helpers.FormHelper.getFormById(id);
 
         UI.confirmModal(
             'delete',

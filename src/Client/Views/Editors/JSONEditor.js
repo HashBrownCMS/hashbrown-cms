@@ -24,6 +24,7 @@ class JSONEditor extends Crisp.View {
      */
     async fetch() {
         this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
         this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
 
         super.fetch();
@@ -138,8 +139,8 @@ class JSONEditor extends Crisp.View {
                 case 'connections':
                     let invalidConnections = v.slice(0);
                     
-                    for(let r in resources.connections) {
-                        let connection = resources.connections[r];
+                    for(let r in this.allConnections) {
+                        let connection = this.allConnections[r];
 
                         for(let c = invalidConnections.length - 1; c >= 0; c--) {
                             if(connection.id == invalidConnections[c]) {

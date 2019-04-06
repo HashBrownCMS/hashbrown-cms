@@ -11,6 +11,15 @@ class FormEditor extends Crisp.View {
         
         this.fetch();
     }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
+
+        super.fetch();
+    }
     
     /**
      * Event: Click advanced. Routes to the JSON editor
@@ -20,7 +29,7 @@ class FormEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);

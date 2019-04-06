@@ -27,7 +27,7 @@ Crisp.Router.route('/connections/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + Crisp.Router.params.id)
+        modelId: Crisp.Router.params.id
     });
    
     UI.setEditorSpaceContent(connectionEditor.$element);

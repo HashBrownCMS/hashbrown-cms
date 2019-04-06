@@ -83,59 +83,56 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {String} parentId
      */
-    static onClickNewContent(parentId, asSibling) {
-        // Try to get a parent Schema if it exists
-        return function getParentSchema() {
+    static async onClickNewContent(parentId, asSibling) {
+        try {
+            let parentContent = null;
+            let parentSchema = null;
+            let allowedSchemas = null;
+
+            // Try to get a parent schema if it exists to determine allowed child schemas
             if(parentId) {
-                return HashBrown.Helpers.ContentHelper.getContentById(parentId)
-                .then((parentContent) => {
-                    return HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
-                });
-            } else {
-                return Promise.resolve();
-            }
-        }()
-
-        // Parent Schema logic resolved, move on
-        .then((parentSchema) => {
-            let allowedSchemas = parentSchema ? parentSchema.allowedChildSchemas : null;
-
-            // If allowed child Schemas were found, but none were provided, don't create the Content node
-            if(allowedSchemas && allowedSchemas.length < 1) {
-                return Promise.reject(new Error('No child content schemas are allowed under this parent'));
+                parentContent = await HashBrown.Helpers.ContentHelper.getContentById(parentId);
+                parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
             
-            // Some child Schemas were provided, or no restrictions were defined
-            } else {
-                let schemaId;
-                let sortIndex = HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
-              
-                // Instatiate a new Content Schema reference editor
-                let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
-                    config: {
-                        allowedSchemas: allowedSchemas,
-                        parentSchema: parentSchema
-                    }
-                });
+                allowedSchemas = parentSchema.allowedChildSchemas;
 
-                schemaReference.on('change', (newValue) => {
-                    schemaId = newValue;
-                });
+                // If allowed child Schemas were found, but none were provided, don't create the Content node
+                if(allowedSchemas && allowedSchemas.length < 1) {
+                    throw new Error('No child content schemas are allowed under this parent');
+                }
+            }
+            
+            let schemaId;
+            let sortIndex = await HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
+          
+            // Instatiate a new Content Schema reference editor
+            let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
+                config: {
+                    allowedSchemas: allowedSchemas,
+                    parentSchema: parentSchema
+                }
+            });
 
-                schemaReference.pickFirstSchema();
+            schemaReference.on('change', (newValue) => {
+                schemaId = newValue;
+            });
 
-                schemaReference.$element.addClass('widget');
+            schemaReference.pickFirstSchema();
 
-                // Render the confirmation modal
-                UI.confirmModal(
-                    'OK',
-                    'Create new content',
-                    _.div({class: 'widget-group'},
-                        _.label({class: 'widget widget--label'},'Schema'),
-                        schemaReference.$element
-                    ),
+            schemaReference.$element.addClass('widget');
 
-                    // Event fired when clicking "OK"
-                    async () => {
+            // Render the confirmation modal
+            UI.confirmModal(
+                'OK',
+                'Create new content',
+                _.div({class: 'widget-group'},
+                    _.label({class: 'widget widget--label'},'Schema'),
+                    schemaReference.$element
+                ),
+
+                // Event fired when clicking "OK"
+                async () => {
+                    try {
                         if(!schemaId) { return false; }
                        
                         let apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
@@ -152,59 +149,56 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                         await HashBrown.Helpers.ResourceHelper.reloadResource('content');
                             
                         location.hash = '/content/' + newContent.id;
+
+                    } catch(e) {
+                        UI.errorModal(e);
+
                     }
-                );
-            }
-        })
-        .catch(UI.errorModal);
-    }
-
-    /**
-     * Render Content publishing modal
-     *
-     * @param {Content} content
-     */
-    static renderPublishingModal(content) {
-        let modal = new HashBrown.Views.Modals.PublishingSettingsModal({
-            model: content
-        });
-
-        modal.on('change', (newValue) => {
-            if(newValue.governedBy) { return; }
-           
-            // Commit publishing settings to Content model
-            content.settings.publishing = newValue;
-    
-            // API call to save the Content model
-            HashBrown.Helpers.ResourceHelper.set('content', content.id, content)
-            
-            // Upon success, reload the UI    
-            .then(() => {
-                if(Crisp.Router.params.id == content.id) {
-                    let contentEditor = Crisp.View.get('ContentEditor');
-
-                    contentEditor.model = content;
-                    return contentEditor.fetch();
-                
-                } else {
-                    return Promise.resolve();
-
                 }
-            })
-            .catch(UI.errorModal);
-        });
+            );
+        
+        } catch(e) {
+            UI.errorModal(e);
+        
+        }
     }
 
     /**
      * Event: Click Content settings
      */
-    static onClickContentPublishing() {
+    static async onClickContentPublishing() {
         let id = $('.context-menu-target').data('id');
 
-        // Get Content model
-        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
-        this.renderPublishingModal(content);
+        let modal = new HashBrown.Views.Modals.PublishingSettingsModal({
+            model: content
+        });
+
+        modal.on('change', async (newValue) => {
+            if(newValue.governedBy) { return; }
+           
+            // Commit publishing settings to Content model
+            content.settings.publishing = newValue;
+   
+            try {
+                // API call to save the Content model
+                await HashBrown.Helpers.ResourceHelper.set('content', content.id, content);
+                
+                // Upon success, reload the UI    
+                let contentEditor = Crisp.View.get('ContentEditor');
+                
+                if(contentEditor && contentEditor.modelId == content.id) {
+                    contentEditor.model = content;
+                    
+                    await contentEditor.fetch();
+                }
+
+            } catch(e) {
+                UI.errorModal(e);
+            
+            }
+        });
     }
 
     /**
@@ -271,9 +265,9 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click rename
      */
-    static onClickRename() {
+    static async onClickRename() {
         let id = $('.context-menu-target').data('id');
-        let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(id);
+        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
         UI.messageModal(
             'Rename "' + content.getPropertyValue('title', HashBrown.Context.language) + '"', 

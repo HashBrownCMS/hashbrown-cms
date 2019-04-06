@@ -11,10 +11,10 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
-     * @returns {Promise(Object)} tree
+     * @returns {Object} Tree
      */
-    static getTree() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
+    static async getTree() {
+        return await HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
     }
 
     /**

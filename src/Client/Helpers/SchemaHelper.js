@@ -9,35 +9,6 @@ const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
  */
 class SchemaHelper extends SchemaHelperCommon {
     /**
-     * Gets a FieldSchema with all parent configs
-     *
-     * @param {String} id
-     *
-     * @returns {FieldSchema} Compiled FieldSchema
-     */
-    static async getFieldSchemaWithParentConfigs(id) {
-        let fieldSchema = await this.getSchemaById(id);
-
-        if(!fieldSchema) { return null; }
-
-        let nextSchema = await this.getSchemaById(fieldSchema.parentSchemaId);
-        
-        let compiledSchema = new HashBrown.Models.FieldSchema(fieldSchema.getObject());
-        
-        while(nextSchema) {
-            compiledSchema.appendConfig(nextSchema.config);
-
-            if(nextSchema.parentSchemaId) {
-                nextSchema = await this.getSchemaById(nextSchema.parentSchemaId);
-            } else {
-                nextSchema = null;
-            }
-        }
-
-        return compiledSchema;
-    }
-
-    /**
      * Gets a Schema by id
      *
      * @param {String} id
@@ -46,7 +17,8 @@ class SchemaHelper extends SchemaHelperCommon {
      * @return {Schema} Schema
      */
     static async getSchemaById(id, withParentFields = false) {
-        checkParam(id, 'id', String);
+        checkParam(id, 'id', String, true);
+        checkParam(withParentFields, 'withParentFields', Boolean, true);
 
         let schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
        

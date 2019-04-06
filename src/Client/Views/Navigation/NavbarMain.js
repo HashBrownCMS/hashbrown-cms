@@ -238,6 +238,8 @@ class NavbarMain extends Crisp.View {
         await this.fetch();
 
         this.restore();
+
+        this.updateHighlight();
     }
     
     /**
@@ -485,8 +487,8 @@ class NavbarMain extends Crisp.View {
                         }
                         
                         // Attach pane context menu
-                        if(pane.settings.getDirContextMenu) {
-                            UI.context($dir[0], pane.settings.getDirContextMenu());
+                        if(pane.getPaneContextMenu) {
+                            UI.context($dir[0], pane.getPaneContextMenu());
                         }
                     }
                    

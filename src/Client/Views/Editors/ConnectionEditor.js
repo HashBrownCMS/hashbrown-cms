@@ -13,6 +13,15 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.modelId);
+
+        super.fetch();
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
@@ -20,16 +29,16 @@ class ConnectionEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
-        this.$saveBtn.toggleClass('saving', true);
+        this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
+        await HashBrown.Helpers.ResourceHelper.set('connections', this.model.id, this.model);
             
         await HashBrown.Helpers.ResourceHelper.reloadResource('media');
         
-        this.$saveBtn.toggleClass('saving', false);
+        this.$saveBtn.toggleClass('working', false);
     }
 
     /**

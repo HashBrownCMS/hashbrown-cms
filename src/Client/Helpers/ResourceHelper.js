@@ -367,6 +367,12 @@ class ResourceHelper {
             await this.indexedDbTransaction('put', category, resource.id, resource);
 
             HashBrown.Helpers.EventHelper.trigger('resource');  
+
+            if(model) {
+                resource = new model(resource);
+            }
+
+            return resource;
         
         } catch(e) {
             UI.errorModal(e);

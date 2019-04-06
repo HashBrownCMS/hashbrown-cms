@@ -231,7 +231,7 @@ Crisp.Router.route('/connections/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + Crisp.Router.params.id)
+        modelId: Crisp.Router.params.id
     });
    
     UI.setEditorSpaceContent(connectionEditor.$element);
@@ -290,11 +290,11 @@ Crisp.Router.route('/media/', function() {
 });
 
 // Preview
-Crisp.Router.route('/media/:id', function() {
+Crisp.Router.route('/media/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let mediaViewer = new HashBrown.Views.Editors.MediaViewer({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('media/' + this.id)
+        modelId: Crisp.Router.params.id
     });
     
     UI.setEditorSpaceContent(mediaViewer.$element);
@@ -400,22 +400,22 @@ Crisp.Router.route('/forms/', function() {
 });
 
 // Edit
-Crisp.Router.route('/forms/:id', function() {
+Crisp.Router.route('/forms/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.FormEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id)
+        modelId: Crisp.Router.params.id
     });
    
     UI.setEditorSpaceContent(formEditor.$element);
 });
 
 // Edit (JSON editor)
-Crisp.Router.route('/forms/json/:id', function() {
+Crisp.Router.route('/forms/json/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelId: this.id,
+        modelId: Crisp.Router.params.id,
         resourceCategory: 'forms'
     });
     

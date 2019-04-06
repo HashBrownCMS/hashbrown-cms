@@ -13,10 +13,10 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click remove schema
      */
-    static onClickRemoveSchema() {
+    static async onClickRemoveSchema() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(id);
+        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(id);
         
         if(!schema.isLocked) {
             UI.confirmModal(

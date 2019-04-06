@@ -30,7 +30,22 @@ class ContentEditor extends Crisp.View {
         
         if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
         
-        this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.model.getSettings('publishing').connectionId);
+        let publishingSettings = await this.model.getSettings('publishing');
+       
+        let connectionId = publishingSettings.connectionId
+
+        if(publishingSettings.governedBy) {
+            let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
+            let governingPublishingSettings = await governingContent.getSettings('publishing');
+
+            connectionId = governingPublishingSettings.connectionId;
+        }
+
+        if(connectionId) {
+            this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
+        } else {
+            this.connection = null;
+        }
 
         this.fieldSchemas = {};
         
@@ -96,7 +111,7 @@ class ContentEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);

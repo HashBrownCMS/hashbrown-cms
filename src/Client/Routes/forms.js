@@ -19,22 +19,22 @@ Crisp.Router.route('/forms/', function() {
 });
 
 // Edit
-Crisp.Router.route('/forms/:id', function() {
+Crisp.Router.route('/forms/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.FormEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id)
+        modelId: Crisp.Router.params.id
     });
    
     UI.setEditorSpaceContent(formEditor.$element);
 });
 
 // Edit (JSON editor)
-Crisp.Router.route('/forms/json/:id', function() {
+Crisp.Router.route('/forms/json/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelId: this.id,
+        modelId: Crisp.Router.params.id,
         resourceCategory: 'forms'
     });
     

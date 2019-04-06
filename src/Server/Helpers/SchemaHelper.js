@@ -211,87 +211,45 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
+     * @param {Boolean} withParentFields
      *
      * @return {Promise} Schema
      */
-    static getSchemaById(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
+    static async getSchemaById(project, environment, id, withParentFields = false) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(id, 'id', String, true);
+        checkParam(withParentFields, 'withParentFields', Boolean, true);
 
-        let collection = environment + '.schemas';
-
-        if(!id) {
-            return Promise.reject(new Error('Schema id is null'));
-        }
-
-        let promise = this.isNativeSchema(id) ?
-            this.getNativeSchema(id) :
-            HashBrown.Helpers.DatabaseHelper.findOne(
-                project,
-                collection
-                ,
-                {
-                    id: id
-                }
-            );
+        let schema = null;
         
-        return promise
-        .then((schemaData) => {
-            if(schemaData && Object.keys(schemaData).length > 0) {
-                return Promise.resolve(schemaData);
-            
-            } else {
-                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'schemas', id);
+        if(this.isNativeSchema(id)) {
+            schema = await this.getNativeSchema(id);
+        } else {
+            let collection = environment + '.schemas';
 
+            schema = await HashBrown.Helpers.DatabaseHelper.findOne(project, collection, { id: id });
+        }
+        
+        // Get parent fields if specified
+        if(withParentFields && schema.parentSchemaId) {
+            let childSchema = this.getModel(schema);
+            let mergedSchema = childSchema;
+
+            while(childSchema.parentSchemaId) {
+                let parentSchema = await this.getSchemaById(project, environment, childSchema.parentSchemaId);
+                
+                mergedSchema = this.mergeSchemas(mergedSchema, parentSchema);
+
+                childSchema = parentSchema;
             }
-        })
-        .then((schemaData) => {
-            return Promise.resolve(this.getModel(schemaData));  
-        });
+
+            return mergedSchema;
+        }
+        
+        return this.getModel(schema);
     }
    
-    /**
-     * Gets all parent fields
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {Promise} Schema with all aprent fields
-     */
-    static getSchemaWithParentFields(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-
-        // Get the Schema by id
-        return this.getSchemaById(project, environment, id)
-
-        // Return object along with any parent objects
-        .then((schema) => {
-            if(!schema) {
-                return Promise.reject(new Error('Schema by id "' + id + '" could not be found'));
-            }
-
-            // If this Schema has a parent, merge fields with it
-            if(schema.parentSchemaId) {
-                return this.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
-                .then((parentSchema) => {
-                    let mergedSchema = this.mergeSchemas(schema, parentSchema);
-
-                    return Promise.resolve(mergedSchema);
-                });
-            }
-
-            // If this Schema doesn't have a parent, return this Schema
-            let model = this.getModel(schema);
-            
-            return Promise.resolve(model);
-        });
-    }
-
-    
     /**
      * Removes a Schema object by id
      *
@@ -445,9 +403,9 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Schema} parentSchema
+     * @param {String} parentSchemaId
      *
-     * @returns {Promise} Created Schema
+     * @returns {HashBrown.Models.Schema} Created Schema
      */
     static async createSchema(project, environment, parentSchemaId) {
         checkParam(project, 'project', String, true);
@@ -455,14 +413,10 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(parentSchemaId, 'parentSchemaId', String, true);
 
         let collection = environment + '.schemas';
-        let parentSchema = await this.getSchemaById(parentSchemaId);
+        let parentSchema = await this.getSchemaById(project, environment, parentSchemaId);
         let newSchema = HashBrown.Models.Schema.create(parentSchema);
 
-        await HashBrown.Helpers.DatabaseHelper.insertOne(
-            project,
-            collection,
-            newSchema.getObject() 
-        );
+        await HashBrown.Helpers.DatabaseHelper.insertOne(project, collection, newSchema.getObject());
 
         return newSchema;
     }

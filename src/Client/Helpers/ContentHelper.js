@@ -144,17 +144,23 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Number} New index
      */
-    static getNewSortIndex(parentId, aboveId, belowId) {
+    static async getNewSortIndex(parentId, aboveId, belowId) {
         if(aboveId) {
-            return this.getContentByIdSync(aboveId).sort + 1;
+            let aboveContent = await this.getContentById(aboveId);
+            
+            return aboveContent.sort + 1;
         }
 
         if(belowId) {
-            return this.getContentByIdSync(belowId).sort - 1;
+            let belowContent = await this.getContentById(belowId);
+            
+            return belowContent.sort + 1;
         }
 
         // Filter out content that doesn't have the same parent
-        let nodes = resources.content.filter((x) => {
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
+        
+        allContent.filter((x) => {
             return x.parentId == parentId || (!x.parentId && !parentId);
         });
 
@@ -162,7 +168,7 @@ class ContentHelper extends ContentHelperCommon {
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
         let newIndex = 10000;
 
-        for(let content of nodes) {
+        for(let content of allContent) {
             if(newIndex - 10000 <= content.sort) {
                 newIndex = content.sort + 10000;
             }

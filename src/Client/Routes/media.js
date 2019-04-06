@@ -30,11 +30,11 @@ Crisp.Router.route('/media/', function() {
 });
 
 // Preview
-Crisp.Router.route('/media/:id', function() {
+Crisp.Router.route('/media/:id', () => {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let mediaViewer = new HashBrown.Views.Editors.MediaViewer({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('media/' + this.id)
+        modelId: Crisp.Router.params.id
     });
     
     UI.setEditorSpaceContent(mediaViewer.$element);

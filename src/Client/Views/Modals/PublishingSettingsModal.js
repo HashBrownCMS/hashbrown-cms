@@ -20,9 +20,20 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
             }
         ];
 
-        params.value = JSON.parse(JSON.stringify(params.model.getSettings('publishing'))) || {};
-        
         super(params);
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.value = await this.model.getSettings('publishing') || {};
+        
+        if(this.value.governedBy) {
+            this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
+        }
+
+        super.fetch();
     }
 
     /**
@@ -31,11 +42,9 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        if(this.value.governedBy) {
-            let governor = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.value.governedBy);
-
+        if(this.governingContent) {
             return _.div({class: 'widget widget--label'},
-                '(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', HashBrown.Context.language) + '</a>)'
+                '(Settings inherited from <a href="#/content/' + this.governingContent.id + '">' + this.governingContent.prop('title', HashBrown.Context.language) + '</a>)'
             );
         
         } else {
@@ -56,7 +65,7 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
                 _.div({class: 'widget-group'},      
                     _.label({class: 'widget widget--label'}, 'Connection'),
                     new HashBrown.Views.Widgets.Dropdown({
-                        options: resources.connections,
+                        options: HashBrown.Helpers.ConnectionHelper.getAllConnections(),
                         value: this.value.connectionId,
                         valueKey: 'id',
                         labelKey: 'title',
