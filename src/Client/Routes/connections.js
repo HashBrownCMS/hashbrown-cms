@@ -1,7 +1,7 @@
 'use strict';
 
 // Dashboard
-Crisp.Router.route('/connections/', function() {
+Crisp.Router.route('/connections/', () => {
     if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
     HashBrown.Helpers.EventHelper.trigger('route');
@@ -21,26 +21,27 @@ Crisp.Router.route('/connections/', function() {
 });
 
 // Edit
-Crisp.Router.route('/connections/:id', function() {
+Crisp.Router.route('/connections/:id', () => {
     if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + this.id)
+        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('connections/' + Crisp.Router.params.id)
     });
    
     UI.setEditorSpaceContent(connectionEditor.$element);
 });
 
 // Edit (JSON editor)
-Crisp.Router.route('/connections/json/:id', function() {
+Crisp.Router.route('/connections/json/:id', () => {
     if(!currentUserHasScope('connections')) { return location.hash = '/'; }
 
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let connectionEditor = new HashBrown.Views.Editors.JSONEditor({
-        apiPath: 'connections/' + this.id
+        modelId: Crisp.Router.params.id,
+        resourceCategory: 'connections'
     });
     
     UI.setEditorSpaceContent(connectionEditor.$element);

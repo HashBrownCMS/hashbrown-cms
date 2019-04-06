@@ -59,19 +59,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static async setMediaProvider(id) {
         await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
 
-        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-    }
-    
-    /**
-     * Gets the Media provider
-     *
-     * @returns {Promise} Connection
-     */
-    static getMediaProvider() {
-        return super.getMediaProvider(
-            HashBrown.Helpers.ProjectHelper.currentProject,
-            HashBrown.Helpers.ProjectHelper.currentEnvironment
-        );
+        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
     }
     
     /**
@@ -94,6 +82,21 @@ class ConnectionHelper extends ConnectionHelperCommon {
             await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
         } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
+        }
+    }
+
+    /**
+     * Gets the Media provider
+     *
+     * @return {HashBrown.Models.Connection} Connection object
+     */
+    static async getMediaProvider() {
+        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        
+        if(providers.media) {
+            return await this.getConnectionById(providers.media);
+        } else {
+            return null;
         }
     }
 }

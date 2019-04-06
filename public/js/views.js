@@ -1820,9 +1820,9 @@ class ConnectionEditor extends Crisp.View {
 
         await HashBrown.Helpers.RequestHelper.request('post', 'connections/' + this.model.id, this.model)
             
+        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+        
         this.$saveBtn.toggleClass('saving', false);
-    
-        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
     }
 
     /**

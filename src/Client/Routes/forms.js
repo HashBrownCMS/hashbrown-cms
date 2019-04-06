@@ -34,8 +34,8 @@ Crisp.Router.route('/forms/json/:id', function() {
     HashBrown.Helpers.EventHelper.trigger('route');
     
     let formEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelUrl: HashBrown.Helpers.RequestHelper.environmentUrl('forms/' + this.id),
-        apiPath: 'forms/' + this.id
+        modelId: this.id,
+        resourceCategory: 'forms'
     });
     
     UI.setEditorSpaceContent(formEditor.$element);

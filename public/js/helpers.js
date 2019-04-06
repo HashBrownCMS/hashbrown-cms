@@ -177,19 +177,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static async setMediaProvider(id) {
         await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
 
-        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-    }
-    
-    /**
-     * Gets the Media provider
-     *
-     * @returns {Promise} Connection
-     */
-    static getMediaProvider() {
-        return super.getMediaProvider(
-            HashBrown.Helpers.ProjectHelper.currentProject,
-            HashBrown.Helpers.ProjectHelper.currentEnvironment
-        );
+        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
     }
     
     /**
@@ -212,6 +200,21 @@ class ConnectionHelper extends ConnectionHelperCommon {
             await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
         } else {
             await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
+        }
+    }
+
+    /**
+     * Gets the Media provider
+     *
+     * @return {HashBrown.Models.Connection} Connection object
+     */
+    static async getMediaProvider() {
+        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        
+        if(providers.media) {
+            return await this.getConnectionById(providers.media);
+        } else {
+            return null;
         }
     }
 }
@@ -266,42 +269,6 @@ class ConnectionHelper {
             providers.media = id;
 
             return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers)
-        });
-    }
-
-    /**
-     * Gets the Media provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} Connection object
-     */
-    static getMediaProvider(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
-        
-        // Previously, providers were set project-wide, so retrieve automatically if needed
-        .then((providers) => {
-            if(!providers) {
-                return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
-            
-            } else {
-                return Promise.resolve(providers);
-            }
-        })
-
-        // Return requested provider
-        .then((providers) => {
-            providers = providers || {};
-
-            if(providers.media) {
-                return this.getConnectionById(project, environment, providers.media);
-            } else {
-                return Promise.resolve(null);
-            }
         });
     }
 }
