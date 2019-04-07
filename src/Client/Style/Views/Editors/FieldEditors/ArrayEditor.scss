@@ -9,6 +9,13 @@
             display: flex;
             margin-top: 1rem;
             margin-bottom: 0.5rem;
+            background-color: $standard-dark;
+            padding: 0.5rem;
+
+            .widget--label {
+                flex-grow: 0;
+                flex-basis: 10rem;
+            }
         }
     }
 

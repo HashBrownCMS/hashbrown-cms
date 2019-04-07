@@ -1318,8 +1318,7 @@ h6 {
   cursor: text;
 }
 .editor--wysiwyg__editor *[src] {
-  max-width: 40rem;
-  width: 100%;
+  max-width: 100%;
 }
 
 /**
@@ -1386,6 +1385,12 @@ h6 {
   display: flex;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
+  background-color: #eeeeee;
+  padding: 0.5rem;
+}
+.field-editor--array__item__toolbar .widget--label {
+  flex-grow: 0;
+  flex-basis: 10rem;
 }
 .field-editor--array.grid .field-editor--array__item {
   float: left;
@@ -2267,7 +2272,7 @@ h6 {
 }
 .widget--input.text, .widget--input.textarea, .widget--input.password, .widget--input.number {
   border-radius: 0.2rem;
-  border: 2px solid #eeeeee;
+  border: 1px solid #dddddd;
   padding: 0 0.5rem;
   height: 2rem;
   width: 100%;
@@ -2547,7 +2552,7 @@ h6 {
   background-color: rgba(255, 255, 255, 0.4);
 }
 .widget--highlight__frame {
-  border: 2px solid #e70d3b;
+  border: 1px solid #e70d3b;
   border-radius: 0.2rem;
   box-shadow: 0 0 0 0 #e70d3b;
   animation: highlight-pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
@@ -2556,7 +2561,7 @@ h6 {
   transform-origin: 0% 0%;
   animation: highlight-popup 0.5s once cubic-bezier(0.75, -0.5, 0, 1.75);
   border-radius: 0.2rem;
-  border: 2px solid #e70d3b;
+  border: 1px solid #e70d3b;
   background-color: #ffffff;
   color: #333333;
   font-weight: bold;
@@ -2590,7 +2595,7 @@ h6 {
   flex-grow: 1;
   background-color: #ffffff;
   border-radius: 0.2rem;
-  border: 2px solid #eeeeee;
+  border: 1px solid #dddddd;
   height: 2rem;
   user-select: none;
   color: #333333;
@@ -2749,7 +2754,7 @@ h6 {
   position: absolute;
   line-height: 2rem;
   width: 100%;
-  border: 2px solid #ffffff;
+  border: 1px solid #ffffff;
   border-bottom: 0;
   border-top-right-radius: 0.2rem;
   border-top-left-radius: 0.2rem;
@@ -2797,7 +2802,7 @@ h6 {
   position: absolute;
   top: 2rem;
   left: 0;
-  border: 2px solid #e70d3b;
+  border: 1px solid #e70d3b;
   background-color: #ffffff;
   width: 100%;
   max-height: 10rem;

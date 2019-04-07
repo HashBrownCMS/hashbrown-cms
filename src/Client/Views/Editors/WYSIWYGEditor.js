@@ -149,16 +149,59 @@ class WYSIWYGEditor extends Crisp.View {
                 _.button({class: 'widget widget--button standard small fa fa-link', title: 'Create link'})
                     .click(() => {
                         let selection = window.getSelection();
-                        
-                        if(Math.abs(selection.anchorOffset - selection.focusOffset) < 1) {
+                        let anchorOffset = selection.anchorOffset;
+                        let focusOffset = selection.focusOffset;
+                        let anchorNode = selection.anchorNode;
+                        let url = anchorNode.parentElement.getAttribute('href');
+                        let range = selection.getRangeAt(0);
+                        let text = selection.toString();
+                        let newTab = false;
+
+                        if(Math.abs(anchorOffset - focusOffset) < 1) {
                             return UI.messageModal('Create link', 'Please select some text first');
                         }
 
-                        let url = prompt('Link URL');
+                        let modal = UI.messageModal(
+                            'Create link for selection "' + text + '"',
+                            _.div({class: 'widget-group'},
+                                _.div({class: 'widget widget--label'}, 'URL'),
+                                new HashBrown.Views.Widgets.Input({
+                                    type: 'text',
+                                    value: url,
+                                    onChange: (newValue) => { url = newValue; }
+                                }),
+                                new HashBrown.Views.Widgets.Input({
+                                    type: 'checkbox',
+                                    placeholder: 'New tab',
+                                    onChange: (newValue) => { newTab = newValue; }
+                                })
+                            ),
+                            () => {
+                                if(!url) { return; }
 
-                        if(url) {
-                            document.execCommand('createLink', false, url);
-                        }
+                                selection = window.getSelection();
+                                selection.removeAllRanges();
+                                selection.addRange(range);
+                            
+                                document.execCommand('createLink', false, url);
+
+                                setTimeout(() => {
+                                    let a = selection.anchorNode.parentElement.querySelector('a');
+
+                                    if(!a) { return; }
+
+                                    if(newTab) {
+                                        a.setAttribute('target', '_blank');
+                                    } else {
+                                        a.removeAttribute('target');
+                                    }
+
+                                    this.onChange();
+                                }, 10);
+                            }
+                        );
+
+                        modal.$element.find('input:first-of-type').focus();
                     })
             ),
             this.$editor = _.div({class: 'editor--wysiwyg__editor', contenteditable: true}, this.toView(this.value))

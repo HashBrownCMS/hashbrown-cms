@@ -9,7 +9,7 @@
     flex-grow: 1;
     background-color: $standard;
     border-radius: 0.2rem;
-    border: 2px solid $standard-dark;
+    border: 1px solid $standard-darker;
     height: 2rem;
     user-select: none;
     color: $standard-text;
@@ -215,7 +215,7 @@
         position: absolute;
         line-height: 2rem;
         width: 100%;
-        border: 2px solid $standard;
+        border: 1px solid $standard;
         border-bottom: 0;
         border-top-right-radius: 0.2rem;
         border-top-left-radius: 0.2rem;
@@ -270,7 +270,7 @@
         position: absolute;
         top: 2rem;
         left: 0;
-        border: 2px solid $primary;
+        border: 1px solid $primary;
         background-color: $standard;
         width: 100%;
         max-height: 10rem;
