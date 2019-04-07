@@ -79,7 +79,6 @@ class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     useClearButton: true,
                     options: this.config.options,
                     valueKey: 'value',
-                    tooltip: this.description || '',
                     labelKey: 'label',
                     onChange: (newValue) => {
                         this.value = newValue;

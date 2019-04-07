@@ -106,15 +106,6 @@ window.submoduleCheck = function submoduleCheck() {
 }
 
 /**
- * Converts a string from HTML to markdown
- *
- * @return {String} Markdown
- */
-window.toMarkdown = function toMarkdown(html) {
-    return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
-}
-
-/**
  * Checks if the currently logged in user is admin
  *
  * @returns {Boolean} Is admin

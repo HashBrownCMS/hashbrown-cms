@@ -1269,7 +1269,7 @@ class MarkdownHelper {
      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
      * SOFTWARE.
      */
-    static fromHtml(html) {
+    static toMarkdown(html) {
         function extend (destination) {
             for (var i = 1; i < arguments.length; i++) {
                 var source = arguments[i];

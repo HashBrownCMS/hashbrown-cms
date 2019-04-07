@@ -38,7 +38,7 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
      * Renders this editor
      */
     template() {
-        return _.div({class: 'field-editor field-editor--media-reference', title: this.description || ''},
+        return _.div({class: 'field-editor field-editor--media-reference'},
             _.button({class: 'field-editor--media-reference__pick'},
                 _.do(()=> {
                     if(!this.model) { return _.div({class: 'field-editor--media-reference__empty'}); }

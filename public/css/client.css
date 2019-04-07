@@ -88,33 +88,27 @@ pre {
 }
 
 h1 {
-  font-size: 3rem;
-}
-
-h2 {
-  font-size: 2.5rem;
-}
-
-h3 {
   font-size: 2rem;
 }
 
-h4 {
+h2 {
   font-size: 1.5rem;
 }
 
-h5 {
+h3 {
+  font-size: 1.17rem;
+}
+
+h4 {
   font-size: 1rem;
 }
 
-h6 {
-  font-size: 0.5rem;
+h5 {
+  font-size: 0.83rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  line-height: 1.5;
-  font-weight: 100;
+h6 {
+  font-size: 0.67rem;
 }
 
 /**
@@ -1507,16 +1501,58 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
 }
 .field-editor--rich-text__wysiwyg {
+  background-color: #ffffff;
   height: 100%;
 }
 .field-editor--rich-text__wysiwyg__toolbar {
-  border-bottom: 1px solid #dddddd;
   margin: 0 !important;
+  background-color: #eeeeee;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--button {
+  background-color: transparent !important;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown {
+  max-width: 14rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option:not([data-value=p]) {
+  font-weight: bold;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h1] {
+  font-size: 2rem;
+  line-height: 3rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h2] {
+  font-size: 1.5rem;
+  line-height: 2.5rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h3] {
+  font-size: 1.17rem;
+  line-height: 2.17rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h4] {
+  font-size: 1rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h5] {
+  font-size: 0.83rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option[data-value=h6] {
+  font-size: 0.67rem;
+}
+.field-editor--rich-text__wysiwyg__toolbar .widget--dropdown__option::after {
+  font-size: 1rem;
+  line-height: inherit !important;
 }
 .field-editor--rich-text__wysiwyg__editor {
   height: calc(100% - 2rem);
   overflow: auto;
   padding: 0 1rem;
+}
+.field-editor--rich-text__wysiwyg__editor:focus {
+  outline: none;
+}
+.field-editor--rich-text__wysiwyg__editor *[src] {
+  max-width: 40rem;
+  width: 100%;
 }
 .field-editor--rich-text .CodeMirror {
   min-height: 462px;
@@ -2070,11 +2106,6 @@ h1, h2, h3, h4, h5, h6 {
 .widget--button.right {
   margin-left: auto;
 }
-.widget--button.embedded {
-  color: #e70d3b;
-  background-color: transparent;
-  box-shadow: none;
-}
 .widget--button.low {
   height: 2rem;
   line-height: 2rem;
@@ -2120,6 +2151,11 @@ h1, h2, h3, h4, h5, h6 {
 .widget--button.dashed {
   border-style: dashed;
   border-width: 1px;
+}
+.widget--button.embedded {
+  color: #e70d3b;
+  background-color: transparent;
+  box-shadow: none;
 }
 .widget--button .fa:first-child {
   margin-right: 0.5rem;

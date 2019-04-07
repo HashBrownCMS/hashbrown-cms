@@ -12082,7 +12082,6 @@ class BooleanEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: this.value,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
                     
@@ -12203,7 +12202,6 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
                 useTypeAhead: true,
                 valueKey: 'id',
                 useClearButton: true,
-                tooltip: this.description || '',
                 labelKey: 'title',
                 onChange: (newValue) => {
                     this.value = newValue;
@@ -12385,7 +12383,6 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
                 value: this.value,
                 options: this.contentSchemas,
                 valueKey: 'id',
-                tooltip: this.description || '',
                 labelKey: 'name',
                 iconKey: 'icon',
                 useClearButton: true,
@@ -12509,7 +12506,7 @@ class DateEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     return this.formatDate(this.value);
                 }
                 
-                return _.div({class: 'widget widget-group', title: this.description || ''},
+                return _.div({class: 'widget widget-group'},
                     _.button({class: 'widget widget--button low'}, this.formatDate(this.value))
                         .click(() => { this.onClickOpen(); }),
                     _.div({class: 'widget widget--button small fa fa-remove'})
@@ -12609,7 +12606,6 @@ class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     useClearButton: true,
                     options: this.config.options,
                     valueKey: 'value',
-                    tooltip: this.description || '',
                     labelKey: 'label',
                     onChange: (newValue) => {
                         this.value = newValue;
@@ -12672,7 +12668,6 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: HashBrown.Context.projectSettings.languages,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 
@@ -12731,7 +12726,7 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
      * Renders this editor
      */
     template() {
-        return _.div({class: 'field-editor field-editor--media-reference', title: this.description || ''},
+        return _.div({class: 'field-editor field-editor--media-reference'},
             _.button({class: 'field-editor--media-reference__pick'},
                 _.do(()=> {
                     if(!this.model) { return _.div({class: 'field-editor--media-reference__empty'}); }
@@ -12901,7 +12896,6 @@ class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',
                 step: this.config.step || 'any',
-                tooltip: this.description || '',
                 min: this.config.min || '0',
                 max: this.config.max || '0',
                 onChange: (newValue) => {
@@ -13160,7 +13154,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         break;
                     
                     case 'markdown':
-                        this.markdown.replaceSelection(toMarkdown(html), 'end');
+                        this.markdown.replaceSelection(HashBrown.Helpers.MarkdownHelper.toMarkdown(html), 'end');
                         break;
                 }
             })
@@ -13203,7 +13197,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             // Set value initially
             this.silentChange = true;
-            this.html.getDoc().setValue(this.value);
+            this.html.getDoc().setValue(this.value || '');
         }, 1);
     }
     
@@ -13223,7 +13217,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: 'default',
-                value: toMarkdown(this.value)
+                value: HashBrown.Helpers.MarkdownHelper.toMarkdown(this.value)
             });
 
             // Change event
@@ -13233,7 +13227,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             // Set value initially
             this.silentChange = true;
-            this.markdown.getDoc().setValue(toMarkdown(this.value));
+            this.markdown.getDoc().setValue(HashBrown.Helpers.MarkdownHelper.toMarkdown(this.value || ''));
         }, 1);
     }
 
@@ -13258,6 +13252,12 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 }
             };
 
+            this.onChange = () => {
+                this.value = this.toValue(this.editor.innerHTML);
+
+                this.trigger('change', this.value);
+            }
+
             // Insert
             this.insertHtml = (html) => {
                 let selection = window.getSelection();
@@ -13267,9 +13267,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 this.editor.innerHTML = before + this.toView(html) + after;
 
-                this.value = this.toValue(this.editor.innerHTML);
-
-                this.trigger('change', this.value);
+                this.onChange();
             };
 
             // Parsers
@@ -13300,36 +13298,54 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             _.append(this.element,
                 this.toolbar = _.div({class: 'field-editor--rich-text__wysiwyg__toolbar widget-group'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: 'p',
+                        options: {
+                            p: 'Paragraph',
+                            h1: 'Heading 1',
+                            h2: 'Heading 2',
+                            h3: 'Heading 3',
+                            h4: 'Heading 4',
+                            h5: 'Heading 5',
+                            h6: 'Heading 6'
+                        },
+                        onChange: (newValue) => {
+                            document.execCommand('heading', false, newValue);
+                            this.onChange();
+                        }
+                    }),
                     _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
                         .click(() => {
                             document.execCommand('bold');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
                         .click(() => {
                             document.execCommand('italic');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
                         .click(() => {
                             document.execCommand('underline');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
                         .click(() => {
                             document.execCommand('removeFormat');
                             document.execCommand('unlink');
+                            this.onChange();
                         })
                 ),
                 this.editor = _.div({class: 'field-editor--rich-text__wysiwyg__editor', contenteditable: true},
                     this.toView(value)
                 ).on('input', (e) => {
-                    this.value = this.toValue(this.editor.innerHTML);
-
-                    this.trigger('change', this.value);
+                    this.onChange();
                 })[0]
             );
         })(this.getTabContent(), this.value);
 
         this.wysiwyg.on('change', (newValue) => {
-            this.value = newValue;
+            this.onChange(newValue);
         });
     }
 
@@ -13352,7 +13368,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             activeView = 'wysiwyg';
         }
 
-        return _.div({class: 'field-editor field-editor--rich-text', title: this.description || ''},
+        return _.div({class: 'field-editor field-editor--rich-text'},
             _.div({class: 'field-editor--rich-text__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
                     if((alias === 'html' && this.config.isHtmlDisabled) || (alias === 'markdown' && this.config.isMarkdownDisabled)) { return; }
@@ -13478,7 +13494,6 @@ class StringEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Input({
                 type: this.config.isMultiLine ? 'textarea' : 'text',
                 value: this.value,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 
@@ -13970,7 +13985,6 @@ class TagsEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     template() {
         return _.div({class: 'field-editor field-editor--tags'},
             new HashBrown.Views.Widgets.Chips({
-                tooltip: this.description || '',
                 value: (this.value || '').split(','),
                 onChange: (newValue) => {
                     this.value = newValue.join(',');
@@ -14133,7 +14147,7 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--url'},
-            _.div({class: 'widget-group', title: this.description || ''},
+            _.div({class: 'widget-group'},
                 this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),
                 _.button({class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL'})

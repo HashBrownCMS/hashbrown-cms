@@ -100,7 +100,6 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
                 useTypeAhead: true,
                 valueKey: 'id',
                 useClearButton: true,
-                tooltip: this.description || '',
                 labelKey: 'title',
                 onChange: (newValue) => {
                     this.value = newValue;

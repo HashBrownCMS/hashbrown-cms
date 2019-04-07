@@ -116,7 +116,6 @@ class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',
                 step: this.config.step || 'any',
-                tooltip: this.description || '',
                 min: this.config.min || '0',
                 max: this.config.max || '0',
                 onChange: (newValue) => {

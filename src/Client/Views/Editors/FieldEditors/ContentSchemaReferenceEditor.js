@@ -160,7 +160,6 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
                 value: this.value,
                 options: this.contentSchemas,
                 valueKey: 'id',
-                tooltip: this.description || '',
                 labelKey: 'name',
                 iconKey: 'icon',
                 useClearButton: true,

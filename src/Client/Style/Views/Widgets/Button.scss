@@ -33,12 +33,6 @@
         margin-left: auto;
     }
 
-    &.embedded {
-        color: $primary;
-        background-color: transparent;
-        box-shadow: none;
-    }
-
     &.low {
         height: 2rem;
         line-height: 2rem;
@@ -94,6 +88,12 @@
     &.dashed {
         border-style: dashed;
         border-width: 1px;
+    }
+    
+    &.embedded {
+        color: $primary;
+        background-color: transparent;
+        box-shadow: none;
     }
 
     .fa:first-child {

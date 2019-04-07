@@ -40,7 +40,6 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
                 options: HashBrown.Context.projectSettings.languages,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 

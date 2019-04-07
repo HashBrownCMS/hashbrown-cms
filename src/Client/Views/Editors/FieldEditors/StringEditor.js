@@ -60,7 +60,6 @@ class StringEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Input({
                 type: this.config.isMultiLine ? 'textarea' : 'text',
                 value: this.value,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
 

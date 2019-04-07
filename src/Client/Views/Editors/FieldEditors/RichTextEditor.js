@@ -134,7 +134,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         break;
                     
                     case 'markdown':
-                        this.markdown.replaceSelection(toMarkdown(html), 'end');
+                        this.markdown.replaceSelection(HashBrown.Helpers.MarkdownHelper.toMarkdown(html), 'end');
                         break;
                 }
             })
@@ -177,7 +177,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             // Set value initially
             this.silentChange = true;
-            this.html.getDoc().setValue(this.value);
+            this.html.getDoc().setValue(this.value || '');
         }, 1);
     }
     
@@ -197,7 +197,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 indentUnit: 4,
                 indentWithTabs: true,
                 theme: 'default',
-                value: toMarkdown(this.value)
+                value: HashBrown.Helpers.MarkdownHelper.toMarkdown(this.value)
             });
 
             // Change event
@@ -207,7 +207,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             // Set value initially
             this.silentChange = true;
-            this.markdown.getDoc().setValue(toMarkdown(this.value));
+            this.markdown.getDoc().setValue(HashBrown.Helpers.MarkdownHelper.toMarkdown(this.value || ''));
         }, 1);
     }
 
@@ -232,6 +232,12 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 }
             };
 
+            this.onChange = () => {
+                this.value = this.toValue(this.editor.innerHTML);
+
+                this.trigger('change', this.value);
+            }
+
             // Insert
             this.insertHtml = (html) => {
                 let selection = window.getSelection();
@@ -241,9 +247,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 this.editor.innerHTML = before + this.toView(html) + after;
 
-                this.value = this.toValue(this.editor.innerHTML);
-
-                this.trigger('change', this.value);
+                this.onChange();
             };
 
             // Parsers
@@ -274,36 +278,54 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             _.append(this.element,
                 this.toolbar = _.div({class: 'field-editor--rich-text__wysiwyg__toolbar widget-group'},
+                    new HashBrown.Views.Widgets.Dropdown({
+                        value: 'p',
+                        options: {
+                            p: 'Paragraph',
+                            h1: 'Heading 1',
+                            h2: 'Heading 2',
+                            h3: 'Heading 3',
+                            h4: 'Heading 4',
+                            h5: 'Heading 5',
+                            h6: 'Heading 6'
+                        },
+                        onChange: (newValue) => {
+                            document.execCommand('heading', false, newValue);
+                            this.onChange();
+                        }
+                    }),
                     _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
                         .click(() => {
                             document.execCommand('bold');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
                         .click(() => {
                             document.execCommand('italic');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
                         .click(() => {
                             document.execCommand('underline');
+                            this.onChange();
                         }),
                     _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
                         .click(() => {
                             document.execCommand('removeFormat');
                             document.execCommand('unlink');
+                            this.onChange();
                         })
                 ),
                 this.editor = _.div({class: 'field-editor--rich-text__wysiwyg__editor', contenteditable: true},
                     this.toView(value)
                 ).on('input', (e) => {
-                    this.value = this.toValue(this.editor.innerHTML);
-
-                    this.trigger('change', this.value);
+                    this.onChange();
                 })[0]
             );
         })(this.getTabContent(), this.value);
 
         this.wysiwyg.on('change', (newValue) => {
-            this.value = newValue;
+            this.onChange(newValue);
         });
     }
 
@@ -326,7 +348,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             activeView = 'wysiwyg';
         }
 
-        return _.div({class: 'field-editor field-editor--rich-text', title: this.description || ''},
+        return _.div({class: 'field-editor field-editor--rich-text'},
             _.div({class: 'field-editor--rich-text__header'},
                 _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
                     if((alias === 'html' && this.config.isHtmlDisabled) || (alias === 'markdown' && this.config.isMarkdownDisabled)) { return; }
