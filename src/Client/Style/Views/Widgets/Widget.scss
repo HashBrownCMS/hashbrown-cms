@@ -54,18 +54,19 @@
         }
 
         &__separator {
-            min-width: 2rem !important;
-            padding: 0 0.5rem;
             user-select: none;
             pointer-events: none;
             position: relative;
 
-            &:before {
-                display: block;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+            &:not(.line) {
+                min-width: 2rem !important;
+                padding: 0 0.5rem;
+            }
+
+            &.line {
+                background-color: $standard-darker;
+                width: 1px;
+                height: 2rem;
             }
         }
     }

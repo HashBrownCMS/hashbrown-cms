@@ -11780,16 +11780,37 @@ class WYSIWYGEditor extends Crisp.View {
                     },
                     onChange: (newValue) => { this.onChangeHeading(newValue); }
                 }),
+                _.div({class: 'widget-group__separator line'}),
                 _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
                     .click(() => { this.onChangeStyle('bold'); }),
                 _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
                     .click(() => { this.onChangeStyle('italic'); }),
                 _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
                     .click(() => { this.onChangeStyle('underline'); }),
-                _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
-                    .click(() => { this.onRemoveFormat(); }),
+                _.div({class: 'widget-group__separator line'}),
+                _.button({class: 'widget widget--button standard small fa fa-list-ol', title: 'Ordered list'})
+                    .click(() => { this.onChangeStyle('insertOrderedList'); }),
+                _.button({class: 'widget widget--button standard small fa fa-list-ul', title: 'Unordered list'})
+                    .click(() => { this.onChangeStyle('insertUnorderedList'); }),
+                _.div({class: 'widget-group__separator line'}),
+                _.button({class: 'widget widget--button standard small fa fa-indent', title: 'Indent'})
+                    .click(() => { this.onChangeStyle('indent'); }),
+                _.button({class: 'widget widget--button standard small fa fa-outdent', title: 'Outdent'})
+                    .click(() => { this.onChangeStyle('outdent'); }),
+                _.button({class: 'widget widget--button standard small fa fa-align-left', title: 'Left'})
+                    .click(() => { this.onChangeStyle('justifyLeft'); }),
+                _.button({class: 'widget widget--button standard small fa fa-align-center', title: 'Center'})
+                    .click(() => { this.onChangeStyle('justifyCenter'); }),
+                _.button({class: 'widget widget--button standard small fa fa-align-justify', title: 'Justify'})
+                    .click(() => { this.onChangeStyle('justifyFull'); }),
+                _.button({class: 'widget widget--button standard small fa fa-align-right', title: 'Right'})
+                    .click(() => { this.onChangeStyle('justifyRight'); }),
+                _.div({class: 'widget-group__separator line'}),
                 _.button({class: 'widget widget--button standard small fa fa-link', title: 'Create link'})
-                    .click(() => { this.onCreateLink(); })
+                    .click(() => { this.onCreateLink(); }),
+                _.div({class: 'widget-group__separator line'}),
+                _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
+                    .click(() => { this.onRemoveFormat(); })
             ),
             this.$editor = _.div({class: 'editor--wysiwyg__editor', contenteditable: true}, this.toView(this.value))
                 .on('input', (e) => { this.onChange(); })

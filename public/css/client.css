@@ -1897,18 +1897,18 @@ h6 {
   border-bottom-right-radius: 0.2rem !important;
 }
 .widget-group__separator {
-  min-width: 2rem !important;
-  padding: 0 0.5rem;
   user-select: none;
   pointer-events: none;
   position: relative;
 }
-.widget-group__separator:before {
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.widget-group__separator:not(.line) {
+  min-width: 2rem !important;
+  padding: 0 0.5rem;
+}
+.widget-group__separator.line {
+  background-color: #dddddd;
+  width: 1px;
+  height: 2rem;
 }
 .widget__notifier {
   position: absolute;
