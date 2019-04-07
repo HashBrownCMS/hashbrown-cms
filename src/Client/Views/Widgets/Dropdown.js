@@ -30,6 +30,27 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
     }
 
     /**
+     * Sets the value silently
+     *
+     * @param {String} value
+     */
+    setValueSilently(newValue) {
+        this.sanityCheck();
+
+        this.value = newValue;
+
+        // Update classes
+        this.updateSelectedClasses();
+       
+        // Update value label
+        let divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if(divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+    }
+
+    /**
      * Gets option icon
      *
      * @param {String} label

@@ -13,6 +13,7 @@ namespace('Views.Editors')
 .add(require('./SchemaEditor'))
 .add(require('./ContentSchemaEditor'))
 .add(require('./FieldSchemaEditor'))
+.add(require('./WYSIWYGEditor'))
 
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');

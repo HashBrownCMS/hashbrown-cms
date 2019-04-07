@@ -177,32 +177,31 @@
             min-height: 0 !important;
             padding-left: 0.5rem !important;
             padding-right: 0.5rem;
+            margin-right: 2.1rem;
             margin-bottom: 0 !important;
             cursor: pointer;
             font-weight: 400;
-            background-color: $standard-darker;
+            background-color: transparent;
             color: $standard-text;
             max-width: none !important;
-            border-top-right-radius: 0.2rem;
-            border-bottom-right-radius: 0.2rem;
-            position: absolute;
             white-space: nowrap;
-            left: 1.8rem;
-            transition: background-color 0.25s ease, color 0.25s ease;
+            transition: color 0.25s ease;
+            position: relative;
+            z-index: 10;
         }
 
         &-input {
             cursor: pointer;
             opacity: 0;
             top: 0;
-            left: 0;
+            right: 0;
             width: 100%;
             height: 100%;
         }
 
         &-background {
             top: 0;
-            left: 0;
+            right: 0;
             width: 100%;
             height: 100%;
             background-color: $standard-darker;
@@ -213,7 +212,7 @@
 
         &-switch {
             top: 0.2rem;
-            left: 0.2rem;
+            right: 1rem;
             width: 0.8rem;
             height: 1.6rem;
             pointer-events: none;
@@ -225,11 +224,13 @@
         &-input:checked ~ &-switch {
             transform: translateX(0.8rem);
         }
-
-        &-input:checked ~ &-background,
+        
         &-input:checked ~ &-label {
-            background-color: $primary;
             color: $primary-text;
+        }
+
+        &-input:checked ~ &-background {
+            background-color: $primary;
         }
     }
 }

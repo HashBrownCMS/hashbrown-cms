@@ -97,8 +97,8 @@
 __webpack_require__(229);
 __webpack_require__(234);
 __webpack_require__(244);
-__webpack_require__(275);
-__webpack_require__(285);
+__webpack_require__(276);
+__webpack_require__(286);
 
 
 /***/ }),
@@ -205,6 +205,27 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
         }
                 
         super.fetch();
+    }
+
+    /**
+     * Sets the value silently
+     *
+     * @param {String} value
+     */
+    setValueSilently(newValue) {
+        this.sanityCheck();
+
+        this.value = newValue;
+
+        // Update classes
+        this.updateSelectedClasses();
+       
+        // Update value label
+        let divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if(divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
     }
 
     /**
@@ -1789,11 +1810,12 @@ namespace('Views.Editors')
 .add(__webpack_require__(255))
 .add(__webpack_require__(256))
 .add(__webpack_require__(257))
+.add(__webpack_require__(258))
 
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');
 
-__webpack_require__(258)
+__webpack_require__(259)
 
 
 /***/ }),
@@ -11537,6 +11559,184 @@ module.exports = FieldSchemaEditor;
 
 /***/ }),
 /* 258 */
+/***/ (function(module, exports) {
+
+/**
+ * A standalone WYSIWYG editor
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+class WYSIWYGEditor extends Crisp.View {
+    constructor(params) {
+        super(params);
+
+        this.fetch();
+    }
+
+    /**
+     * Event: Value changed
+     */
+    onChange() {
+        this.value = this.toValue(this.$editor.html());
+
+        this.trigger('change', this.value);
+    }
+
+    /**
+     * Insert HTML
+     *
+     * @param {String} html
+     */
+    insertHtml(html) {
+        if(!html) { return; }
+
+        this.$editor[0].innerHTML += this.toView(html);
+
+        this.onChange();
+    };
+
+    /**
+     * Updates the paragraph picker and selection tag
+     */
+    updateElementTag () {
+        let selection = window.getSelection();
+
+        if(!selection) { return; }
+
+        let textNode = selection.anchorNode;
+
+        if(!textNode) { return; }
+        
+        let parentElement = textNode.parentElement;
+       
+        if(!parentElement) { return; }
+        
+        let parentElementTagName = parentElement.tagName.toLowerCase();
+
+        // If the parent tag is not a heading or a paragraph, default to paragraph
+        if(!this.paragraphPicker.options[parentElementTagName]) {
+            parentElementTagName = 'p';
+        }
+
+        this.paragraphPicker.setValueSilently(parentElementTagName);
+    }
+
+    /**
+     * Converts HTML to view format, replacing media references
+     *
+     * @param {String} html
+     *
+     * @return {String} HTML
+     */
+    toView(html) {
+        this._parserCache = {};
+        
+        if(!html) { return ''; }
+
+        return html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
+            this._parserCache[id] = filename;
+        
+            return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
+        });
+    }
+
+    /**
+     * Converts HTML to value format, replacing media references
+     *
+     * @param {String} html
+     *
+     * @return {String} HTML
+     */
+    toValue(html) {
+        if(!html) { return ''; }
+        
+        // Replace media references
+        html = html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
+            let filename = this._parserCache ? this._parserCache[id] : null;
+
+            if(!filename) { return original; }
+        
+            return 'src="/media/' + id + '/' + filename + '"';
+        });
+
+        // Replace empty divs with pararaphs
+        html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
+
+        return html;
+    }
+
+    /**
+     * Renders this view
+     */
+    template() {
+        return _.div({class: 'editor editor--wysiwyg'},
+            this.$toolbar = _.div({class: 'editor--wysiwyg__toolbar widget-group'},
+                this.paragraphPicker = new HashBrown.Views.Widgets.Dropdown({
+                    value: 'p',
+                    options: {
+                        p: 'Paragraph',
+                        h1: 'Heading 1',
+                        h2: 'Heading 2',
+                        h3: 'Heading 3',
+                        h4: 'Heading 4',
+                        h5: 'Heading 5',
+                        h6: 'Heading 6'
+                    },
+                    onChange: (newValue) => {
+                        document.execCommand('heading', false, newValue);
+                        this.$editor.focus();
+                        this.onChange();
+                    }
+                }),
+                _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
+                    .click(() => {
+                        document.execCommand('bold');
+                        this.onChange();
+                    }),
+                _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
+                    .click(() => {
+                        document.execCommand('italic');
+                        this.onChange();
+                    }),
+                _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
+                    .click(() => {
+                        document.execCommand('underline');
+                        this.onChange();
+                    }),
+                _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
+                    .click(() => {
+                        document.execCommand('removeFormat');
+                        document.execCommand('unlink');
+                        this.onChange();
+                    }),
+                _.button({class: 'widget widget--button standard small fa fa-link', title: 'Create link'})
+                    .click(() => {
+                        let selection = window.getSelection();
+                        
+                        if(Math.abs(selection.anchorOffset - selection.focusOffset) < 1) {
+                            return UI.messageModal('Create link', 'Please select some text first');
+                        }
+
+                        let url = prompt('Link URL');
+
+                        if(url) {
+                            document.execCommand('createLink', false, url);
+                        }
+                    })
+            ),
+            this.$editor = _.div({class: 'editor--wysiwyg__editor', contenteditable: true}, this.toView(this.value))
+                .on('input', (e) => { this.onChange(); })
+                .on('click', (e) => { this.updateElementTag(); })
+                .on('keyup', (e) => { this.updateElementTag(); })
+        )
+    }
+}
+
+module.exports = WYSIWYGEditor;
+
+
+/***/ }),
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11546,7 +11746,6 @@ module.exports = FieldSchemaEditor;
  * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 namespace('Views.Editors.FieldEditors')
-.add(__webpack_require__(259))
 .add(__webpack_require__(260))
 .add(__webpack_require__(261))
 .add(__webpack_require__(262))
@@ -11561,11 +11760,12 @@ namespace('Views.Editors.FieldEditors')
 .add(__webpack_require__(271))
 .add(__webpack_require__(272))
 .add(__webpack_require__(273))
-.add(__webpack_require__(274));
+.add(__webpack_require__(274))
+.add(__webpack_require__(275));
 
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11615,7 +11815,7 @@ module.exports = FieldEditor;
 
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12025,7 +12225,7 @@ module.exports = ArrayEditor;
 
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12096,7 +12296,7 @@ module.exports = BooleanEditor;
 
 
 /***/ }),
-/* 262 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12217,7 +12417,7 @@ module.exports = ContentReferenceEditor;
 
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12400,7 +12600,7 @@ module.exports = ContentSchemaReferenceEditor;
 
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12521,7 +12721,7 @@ module.exports = DateEditor;
 
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12622,7 +12822,7 @@ module.exports = DropdownEditor;
 
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12682,7 +12882,7 @@ module.exports = LanguageEditor;
 
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12774,7 +12974,7 @@ module.exports = MediaReferenceEditor;
 
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12912,7 +13112,7 @@ module.exports = NumberEditor;
 
 
 /***/ }),
-/* 269 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13014,7 +13214,7 @@ module.exports = ResourceReferenceEditor;
 
 
 /***/ }),
-/* 270 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13176,7 +13376,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     initHtmlEditor() {
         setTimeout(() => {
-            // Kepp reference to editor
+            // Keep reference to editor
             this.html = CodeMirror.fromTextArea(this.getTabContent(), {
                 lineNumbers: false,
                 mode: {
@@ -13235,118 +13435,15 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        this.wysiwyg = new (function(element, value) {
-            this.element = element;
-            this.value = value;
-
-            // Hook up events
-            this.events = { 'change': [] };
-
-            this.on = (name, handler) => {
-                this.events[name].push(handler);
-            };
-
-            this.trigger = (name) => {
-                for(let handler of this.events[name]) {
-                    handler(this.value);
-                }
-            };
-
-            this.onChange = () => {
-                this.value = this.toValue(this.editor.innerHTML);
-
-                this.trigger('change', this.value);
-            }
-
-            // Insert
-            this.insertHtml = (html) => {
-                let selection = window.getSelection();
-
-                let before = this.editor.innerHTML.substring(0, selection.anchorOffset);
-                let after = this.editor.innerHTML.substring(selection.anchorOffset);
-
-                this.editor.innerHTML = before + this.toView(html) + after;
-
-                this.onChange();
-            };
-
-            // Parsers
-            this.parserCache = {};
-            
-            this.toView = (html) => {
-                this.parserCache = {};
-                
-                return html ? html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
-                    this.parserCache[id] = filename;
-                
-                    return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
-                }) : '';
-            };
-
-            this.toValue = (html) => {
-                return html ? html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
-                    let filename = this.parserCache[id];
-
-                    if(!filename) { return original; }
-                
-                    return 'src="/media/' + id + '/' + filename + '"';
-                }) : '';
-            };
-            
-            // Init element and value
-            this.element.classList.toggle('field-editor--rich-text__wysiwyg', true);
-
-            _.append(this.element,
-                this.toolbar = _.div({class: 'field-editor--rich-text__wysiwyg__toolbar widget-group'},
-                    new HashBrown.Views.Widgets.Dropdown({
-                        value: 'p',
-                        options: {
-                            p: 'Paragraph',
-                            h1: 'Heading 1',
-                            h2: 'Heading 2',
-                            h3: 'Heading 3',
-                            h4: 'Heading 4',
-                            h5: 'Heading 5',
-                            h6: 'Heading 6'
-                        },
-                        onChange: (newValue) => {
-                            document.execCommand('heading', false, newValue);
-                            this.onChange();
-                        }
-                    }),
-                    _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
-                        .click(() => {
-                            document.execCommand('bold');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
-                        .click(() => {
-                            document.execCommand('italic');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
-                        .click(() => {
-                            document.execCommand('underline');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
-                        .click(() => {
-                            document.execCommand('removeFormat');
-                            document.execCommand('unlink');
-                            this.onChange();
-                        })
-                ),
-                this.editor = _.div({class: 'field-editor--rich-text__wysiwyg__editor', contenteditable: true},
-                    this.toView(value)
-                ).on('input', (e) => {
-                    this.onChange();
-                })[0]
-            );
-        })(this.getTabContent(), this.value);
+        this.wysiwyg = new HashBrown.Views.Editors.WYSIWYGEditor({
+            value: this.value
+        });
 
         this.wysiwyg.on('change', (newValue) => {
             this.onChange(newValue);
         });
+        
+        _.replace(this.getTabContent().parentElement, this.wysiwyg.element);
     }
 
     /**
@@ -13428,7 +13525,7 @@ module.exports = RichTextEditor;
 
 
 /***/ }),
-/* 271 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13508,7 +13605,7 @@ module.exports = StringEditor;
 
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13947,7 +14044,7 @@ module.exports = StructEditor;
 
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14000,7 +14097,7 @@ module.exports = TagsEditor;
 
 
 /***/ }),
-/* 274 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14183,7 +14280,7 @@ module.exports = UrlEditor;
 
 
 /***/ }),
-/* 275 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14193,18 +14290,18 @@ module.exports = UrlEditor;
  * @namespace HashBrown.Client.Views.Navigation
  */
 namespace('Views.Navigation')
-.add(__webpack_require__(276))
-.add(__webpack_require__(278))
+.add(__webpack_require__(277))
 .add(__webpack_require__(279))
 .add(__webpack_require__(280))
 .add(__webpack_require__(281))
 .add(__webpack_require__(282))
 .add(__webpack_require__(283))
-.add(__webpack_require__(284));
+.add(__webpack_require__(284))
+.add(__webpack_require__(285));
 
 
 /***/ }),
-/* 276 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14219,7 +14316,7 @@ class NavbarMain extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.template = __webpack_require__(277);
+        this.template = __webpack_require__(278);
 
         HashBrown.Helpers.EventHelper.on('resource', 'navbar', () => { this.reload(); });  
         HashBrown.Helpers.EventHelper.on('route', 'navbar', () => { this.updateHighlight(); });  
@@ -14726,7 +14823,7 @@ module.exports = NavbarMain;
 
 
 /***/ }),
-/* 277 */
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -14867,7 +14964,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 278 */
+/* 279 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15018,7 +15115,7 @@ module.exports = MainMenu;
 
 
 /***/ }),
-/* 279 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15193,7 +15290,7 @@ module.exports = NavbarPane;
 
 
 /***/ }),
-/* 280 */
+/* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15338,7 +15435,7 @@ module.exports = ConnectionPane;
 
 
 /***/ }),
-/* 281 */
+/* 282 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15752,7 +15849,7 @@ module.exports = ContentPane;
 
 
 /***/ }),
-/* 282 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15910,7 +16007,7 @@ module.exports = FormsPane;
 
 
 /***/ }),
-/* 283 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16121,7 +16218,7 @@ module.exports = MediaPane;
 
 
 /***/ }),
-/* 284 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16306,7 +16403,7 @@ module.exports = SchemaPane;
 
 
 /***/ }),
-/* 285 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16316,16 +16413,16 @@ module.exports = SchemaPane;
  * @namespace HashBrown.Client.Views.Dashboard
  */
 namespace('Views.Dashboard')
-.add(__webpack_require__(286))
 .add(__webpack_require__(287))
 .add(__webpack_require__(288))
 .add(__webpack_require__(289))
 .add(__webpack_require__(290))
-.add(__webpack_require__(291));
+.add(__webpack_require__(291))
+.add(__webpack_require__(292));
 
 
 /***/ }),
-/* 286 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16503,7 +16600,7 @@ module.exports = BackupEditor;
 
 
 /***/ }),
-/* 287 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16572,7 +16669,7 @@ module.exports = InfoEditor;
 
 
 /***/ }),
-/* 288 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16646,7 +16743,7 @@ module.exports = LanguageEditor;
 
 
 /***/ }),
-/* 289 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16770,7 +16867,7 @@ module.exports = MigrationEditor;
 
 
 /***/ }),
-/* 290 */
+/* 291 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17043,7 +17140,7 @@ module.exports = ProjectEditor;
 
 
 /***/ }),
-/* 291 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

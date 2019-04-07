@@ -156,7 +156,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     initHtmlEditor() {
         setTimeout(() => {
-            // Kepp reference to editor
+            // Keep reference to editor
             this.html = CodeMirror.fromTextArea(this.getTabContent(), {
                 lineNumbers: false,
                 mode: {
@@ -215,118 +215,15 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        this.wysiwyg = new (function(element, value) {
-            this.element = element;
-            this.value = value;
-
-            // Hook up events
-            this.events = { 'change': [] };
-
-            this.on = (name, handler) => {
-                this.events[name].push(handler);
-            };
-
-            this.trigger = (name) => {
-                for(let handler of this.events[name]) {
-                    handler(this.value);
-                }
-            };
-
-            this.onChange = () => {
-                this.value = this.toValue(this.editor.innerHTML);
-
-                this.trigger('change', this.value);
-            }
-
-            // Insert
-            this.insertHtml = (html) => {
-                let selection = window.getSelection();
-
-                let before = this.editor.innerHTML.substring(0, selection.anchorOffset);
-                let after = this.editor.innerHTML.substring(selection.anchorOffset);
-
-                this.editor.innerHTML = before + this.toView(html) + after;
-
-                this.onChange();
-            };
-
-            // Parsers
-            this.parserCache = {};
-            
-            this.toView = (html) => {
-                this.parserCache = {};
-                
-                return html ? html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
-                    this.parserCache[id] = filename;
-                
-                    return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
-                }) : '';
-            };
-
-            this.toValue = (html) => {
-                return html ? html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
-                    let filename = this.parserCache[id];
-
-                    if(!filename) { return original; }
-                
-                    return 'src="/media/' + id + '/' + filename + '"';
-                }) : '';
-            };
-            
-            // Init element and value
-            this.element.classList.toggle('field-editor--rich-text__wysiwyg', true);
-
-            _.append(this.element,
-                this.toolbar = _.div({class: 'field-editor--rich-text__wysiwyg__toolbar widget-group'},
-                    new HashBrown.Views.Widgets.Dropdown({
-                        value: 'p',
-                        options: {
-                            p: 'Paragraph',
-                            h1: 'Heading 1',
-                            h2: 'Heading 2',
-                            h3: 'Heading 3',
-                            h4: 'Heading 4',
-                            h5: 'Heading 5',
-                            h6: 'Heading 6'
-                        },
-                        onChange: (newValue) => {
-                            document.execCommand('heading', false, newValue);
-                            this.onChange();
-                        }
-                    }),
-                    _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
-                        .click(() => {
-                            document.execCommand('bold');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
-                        .click(() => {
-                            document.execCommand('italic');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
-                        .click(() => {
-                            document.execCommand('underline');
-                            this.onChange();
-                        }),
-                    _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
-                        .click(() => {
-                            document.execCommand('removeFormat');
-                            document.execCommand('unlink');
-                            this.onChange();
-                        })
-                ),
-                this.editor = _.div({class: 'field-editor--rich-text__wysiwyg__editor', contenteditable: true},
-                    this.toView(value)
-                ).on('input', (e) => {
-                    this.onChange();
-                })[0]
-            );
-        })(this.getTabContent(), this.value);
+        this.wysiwyg = new HashBrown.Views.Editors.WYSIWYGEditor({
+            value: this.value
+        });
 
         this.wysiwyg.on('change', (newValue) => {
             this.onChange(newValue);
         });
+        
+        _.replace(this.getTabContent().parentElement, this.wysiwyg.element);
     }
 
     /**
