@@ -11613,6 +11613,16 @@ class WYSIWYGEditor extends Crisp.View {
         
         let parentElementTagName = parentElement.tagName.toLowerCase();
 
+        // If a media objects is involved, use it as reference
+        if(textNode.children) {
+            for(let i = 0; i < textNode.children.length; i++) {
+                if(textNode.children[i].hasAttribute('src')) {
+                    parentElementTagName = textNode.children[i].parentElement.tagName.toLowerCase();
+                    break;
+                }
+            }
+        }
+
         // If the parent tag is not a heading or a paragraph, default to paragraph
         if(!this.paragraphPicker.options[parentElementTagName]) {
             parentElementTagName = 'p';
@@ -11666,6 +11676,92 @@ class WYSIWYGEditor extends Crisp.View {
     }
 
     /**
+     * Event: Change heading
+     */
+    onChangeHeading(newValue) {
+        document.execCommand('heading', false, newValue);
+        this.$editor.focus();
+        this.onChange();
+    }
+
+    /**
+     * Event: On change style
+     */
+    onChangeStyle(newValue) {
+        document.execCommand(newValue);
+        this.onChange();
+    }
+
+    /**
+     * Event: On remove format
+     */
+    onRemoveFormat() {
+        document.execCommand('removeFormat');
+        document.execCommand('unlink');
+        this.onChange();
+    }
+
+    /**
+     * Event: Create link
+     */
+    onCreateLink() {
+        let selection = window.getSelection();
+        let anchorOffset = selection.anchorOffset;
+        let focusOffset = selection.focusOffset;
+        let anchorNode = selection.anchorNode;
+        let url = anchorNode.parentElement.getAttribute('href');
+        let range = selection.getRangeAt(0);
+        let text = selection.toString();
+        let newTab = false;
+
+        if(Math.abs(anchorOffset - focusOffset) < 1) {
+            return UI.messageModal('Create link', 'Please select some text first');
+        }
+
+        let modal = UI.messageModal(
+            'Create link for selection "' + text + '"',
+            _.div({class: 'widget-group'},
+                _.div({class: 'widget widget--label'}, 'URL'),
+                new HashBrown.Views.Widgets.Input({
+                    type: 'text',
+                    value: url,
+                    onChange: (newValue) => { url = newValue; }
+                }),
+                new HashBrown.Views.Widgets.Input({
+                    type: 'checkbox',
+                    placeholder: 'New tab',
+                    onChange: (newValue) => { newTab = newValue; }
+                })
+            ),
+            () => {
+                if(!url) { return; }
+
+                selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                document.execCommand('createLink', false, url);
+
+                setTimeout(() => {
+                    let a = selection.anchorNode.parentElement.querySelector('a');
+
+                    if(!a) { return; }
+
+                    if(newTab) {
+                        a.setAttribute('target', '_blank');
+                    } else {
+                        a.removeAttribute('target');
+                    }
+
+                    this.onChange();
+                }, 10);
+            }
+        );
+
+        modal.$element.find('input:first-of-type').focus();
+    }
+
+    /**
      * Renders this view
      */
     template() {
@@ -11682,90 +11778,18 @@ class WYSIWYGEditor extends Crisp.View {
                         h5: 'Heading 5',
                         h6: 'Heading 6'
                     },
-                    onChange: (newValue) => {
-                        document.execCommand('heading', false, newValue);
-                        this.$editor.focus();
-                        this.onChange();
-                    }
+                    onChange: (newValue) => { this.onChangeHeading(newValue); }
                 }),
                 _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
-                    .click(() => {
-                        document.execCommand('bold');
-                        this.onChange();
-                    }),
+                    .click(() => { this.onChangeStyle('bold'); }),
                 _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
-                    .click(() => {
-                        document.execCommand('italic');
-                        this.onChange();
-                    }),
+                    .click(() => { this.onChangeStyle('italic'); }),
                 _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
-                    .click(() => {
-                        document.execCommand('underline');
-                        this.onChange();
-                    }),
+                    .click(() => { this.onChangeStyle('underline'); }),
                 _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
-                    .click(() => {
-                        document.execCommand('removeFormat');
-                        document.execCommand('unlink');
-                        this.onChange();
-                    }),
+                    .click(() => { this.onRemoveFormat(); }),
                 _.button({class: 'widget widget--button standard small fa fa-link', title: 'Create link'})
-                    .click(() => {
-                        let selection = window.getSelection();
-                        let anchorOffset = selection.anchorOffset;
-                        let focusOffset = selection.focusOffset;
-                        let anchorNode = selection.anchorNode;
-                        let url = anchorNode.parentElement.getAttribute('href');
-                        let range = selection.getRangeAt(0);
-                        let text = selection.toString();
-                        let newTab = false;
-
-                        if(Math.abs(anchorOffset - focusOffset) < 1) {
-                            return UI.messageModal('Create link', 'Please select some text first');
-                        }
-
-                        let modal = UI.messageModal(
-                            'Create link for selection "' + text + '"',
-                            _.div({class: 'widget-group'},
-                                _.div({class: 'widget widget--label'}, 'URL'),
-                                new HashBrown.Views.Widgets.Input({
-                                    type: 'text',
-                                    value: url,
-                                    onChange: (newValue) => { url = newValue; }
-                                }),
-                                new HashBrown.Views.Widgets.Input({
-                                    type: 'checkbox',
-                                    placeholder: 'New tab',
-                                    onChange: (newValue) => { newTab = newValue; }
-                                })
-                            ),
-                            () => {
-                                if(!url) { return; }
-
-                                selection = window.getSelection();
-                                selection.removeAllRanges();
-                                selection.addRange(range);
-                            
-                                document.execCommand('createLink', false, url);
-
-                                setTimeout(() => {
-                                    let a = selection.anchorNode.parentElement.querySelector('a');
-
-                                    if(!a) { return; }
-
-                                    if(newTab) {
-                                        a.setAttribute('target', '_blank');
-                                    } else {
-                                        a.removeAttribute('target');
-                                    }
-
-                                    this.onChange();
-                                }, 10);
-                            }
-                        );
-
-                        modal.$element.find('input:first-of-type').focus();
-                    })
+                    .click(() => { this.onCreateLink(); })
             ),
             this.$editor = _.div({class: 'editor--wysiwyg__editor', contenteditable: true}, this.toView(this.value))
                 .on('input', (e) => { this.onChange(); })
