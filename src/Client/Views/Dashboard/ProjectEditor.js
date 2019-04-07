@@ -232,7 +232,7 @@ class ProjectEditor extends Crisp.View {
                     }).$element.addClass('page--dashboard__project__menu')
                 ),
                 _.div({class: 'page--dashboard__project__info'},
-                    _.h4(this.model.settings.info.name || this.model.id),
+                    _.h3({class: 'page--dashboard__project__info__name'}, this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')
                 ),

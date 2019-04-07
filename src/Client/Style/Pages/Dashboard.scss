@@ -98,6 +98,12 @@
         }
     }
 
+    &__user {
+        &__name {
+            margin: 0;
+        }
+    }
+
     // Projects
     &__projects {
         padding-bottom: 4rem;

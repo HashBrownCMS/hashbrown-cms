@@ -280,6 +280,9 @@ h6 {
 .page--dashboard__users__add {
   margin-top: 1rem;
 }
+.page--dashboard__user__name {
+  margin: 0;
+}
 .page--dashboard__projects {
   padding-bottom: 4rem;
 }
@@ -2995,6 +2998,9 @@ h6 {
     flex-basis: 0;
     width: auto;
   }
+}
+.page--dashboard__project__info__name {
+  margin: 0;
 }
 .page--dashboard__project__remove {
   padding: 0rem;

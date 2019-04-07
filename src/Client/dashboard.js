@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 },
                             }
                         }).$element.addClass('page--dashboard__user__menu'),
-                        _.h4({class: 'page--dashboard__user__name'},
+                        _.h3({class: 'page--dashboard__user__name'},
                             (user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Context.user.id ? ' (you)' : '')
                         ),
                         _.div({class: 'page--dashboard__user__type'},
