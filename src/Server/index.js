@@ -108,6 +108,12 @@ function ready(files) {
         
         // Init controllers
         for(let name in HashBrown.Controllers) {
+            if(
+                name === 'ResourceController' ||
+                name === 'ApiController' ||
+                name === 'Controller'
+            ) { continue; }
+
             HashBrown.Controllers[name].init(app);
         }
 

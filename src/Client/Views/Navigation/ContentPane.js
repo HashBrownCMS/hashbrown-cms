@@ -135,19 +135,16 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                     try {
                         if(!schemaId) { return false; }
                        
-                        let apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
+                        let query = '?schemaId=' + schemaId + '&sort=' + sortIndex;
 
                         // Append parent Content id to request URL
                         if(parentId) {
-                            apiUrl += '&parent=' + parentId;
+                            apiUrl += '&parentId=' + parentId;
                         }
 
                         // API call to create new Content node
-                        let newContent = await HashBrown.Helpers.RequestHelper.request('post', apiUrl)
+                        let newContent = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Content, 'content', query)
                         
-                        // Upon success, reload resource and UI elements    
-                        await HashBrown.Helpers.ResourceHelper.reloadResource('content');
-                            
                         location.hash = '/content/' + newContent.id;
 
                     } catch(e) {

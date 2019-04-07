@@ -9,15 +9,6 @@ const MediaHelperCommon = require('Common/Helpers/MediaHelper');
  */
 class MediaHelper extends MediaHelperCommon {
     /**
-     * Gets the Media tree
-     *
-     * @returns {Object} Tree
-     */
-    static async getTree() {
-        return await HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
-    }
-
-    /**
      * Gets whether the Media provider exists
      *
      * @returns {Promise} Promise
@@ -60,18 +51,6 @@ class MediaHelper extends MediaHelperCommon {
      */
     static getAllMedia(id) {
         return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Media, 'media');
-    }
-
-    /**
-     * Sets a Media tree item
-     *
-     * @param {String} id
-     * @param {Object} item
-     *
-     * @returns {Promise} promise
-     */
-    static setTreeItem(id, item) {
-        return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
     }
 
     /**

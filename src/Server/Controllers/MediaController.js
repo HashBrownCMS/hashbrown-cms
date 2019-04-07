@@ -7,7 +7,7 @@ const FileSystem = require('fs');
  *
  * @memberof HashBrown.Server.Controllers
  */
-class MediaController extends require('./ApiController') {
+class MediaController extends HashBrown.Controllers.ApiController {
     /**
      * Initiates this controller
      */

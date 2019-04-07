@@ -485,9 +485,9 @@ class ContentHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * @return {Promise} promise
+     * @return {Array} Content
      */
-    static getAllContents(project, environment) {
+    static getAllContent(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
@@ -3888,15 +3888,6 @@ const MediaHelperCommon = __webpack_require__(45);
  */
 class MediaHelper extends MediaHelperCommon {
     /**
-     * Gets the Media tree
-     *
-     * @returns {Object} Tree
-     */
-    static async getTree() {
-        return await HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
-    }
-
-    /**
      * Gets whether the Media provider exists
      *
      * @returns {Promise} Promise
@@ -3939,18 +3930,6 @@ class MediaHelper extends MediaHelperCommon {
      */
     static getAllMedia(id) {
         return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Media, 'media');
-    }
-
-    /**
-     * Sets a Media tree item
-     *
-     * @param {String} id
-     * @param {Object} item
-     *
-     * @returns {Promise} promise
-     */
-    static setTreeItem(id, item) {
-        return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
     }
 
     /**

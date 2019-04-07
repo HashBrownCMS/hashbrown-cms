@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ConfigController extends require('./ApiController') {
+class ConfigController extends HashBrown.Controllers.ApiController {
     /**
      * Initialises this controller
      */

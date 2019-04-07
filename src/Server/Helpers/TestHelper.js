@@ -145,9 +145,9 @@ class TestHelper {
         
         await HashBrown.Helpers.ContentHelper.removeContentById(project, environment, testContent.id);
             
-        onMessage('Get all contents');
+        onMessage('Get all content');
         
-        await HashBrown.Helpers.ContentHelper.getAllContents(project, environment)
+        await HashBrown.Helpers.ContentHelper.getAllContent(project, environment)
     }
     
     /**

@@ -12,9 +12,9 @@ class ContentHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * @return {Promise} promise
+     * @return {Array} Content
      */
-    static getAllContents(project, environment) {
+    static getAllContent(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
