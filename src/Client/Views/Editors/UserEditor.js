@@ -68,20 +68,24 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
     /**
      * Event: Click save.
      */
-    onClickSave() {
-        let newUserObject = this.model.getObject();
+    async onClickSave() {
+        try {
+            let newUserObject = this.model.getObject();
 
-        if(this.newPassword) {
-            newUserObject.password = this.newPassword;
-        }
+            if(this.newPassword) {
+                newUserObject.password = this.newPassword;
+            }
 
-        HashBrown.Helpers.RequestHelper.request('post', 'user/' + this.model.id, newUserObject)
-        .then(() => {
+            await HashBrown.Helpers.ResourceHelper.set('users', this.model.id, newUserObject);
+            
             this.close();
 
             this.trigger('save', this.model);
-        })
-        .catch(UI.errorModal);
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
      
     /**
@@ -117,8 +121,6 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
             ],
             onChange: (newValue) => {
                 this.model.scopes[project] = newValue;
-
-                this.fetch();
             }
         }).$element;
     }

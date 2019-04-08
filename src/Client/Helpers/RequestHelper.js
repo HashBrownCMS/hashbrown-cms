@@ -16,7 +16,7 @@ class RequestHelper {
      * @returns {Promise} Response
      */
     static request(method, url, data) {
-        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
+        return RequestHelper.customRequest(method, this.environmentUrl(url), data);
     }
 
     /**
@@ -31,7 +31,7 @@ class RequestHelper {
     static uploadFile(url, type, data) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: RequestHelper.environmentUrl(url),
+                url: this.environmentUrl(url),
                 type: 'POST',
                 data: data,
                 processData: false,
@@ -44,7 +44,6 @@ class RequestHelper {
                 }
             })
         });
-        //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
     }
 
     /**
@@ -132,12 +131,12 @@ class RequestHelper {
     static environmentUrl(url) {
         let newUrl = '/api/';
 
-        if(HashBrown.Helpers.ProjectHelper.currentProject) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        if(HashBrown.Context.projectId) {
+            newUrl += HashBrown.Context.projectId + '/';
         }
 
-        if(HashBrown.Helpers.ProjectHelper.currentEnvironment) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        if(HashBrown.Context.environment) {
+            newUrl += HashBrown.Context.environment + '/';
         }
 
         newUrl += url;

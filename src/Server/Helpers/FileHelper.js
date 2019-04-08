@@ -2,9 +2,9 @@
 
 const FileSystem = require('fs');
 const Path = require('path');
+const Util = require('util');
 
 // TODO: Make these GIT submodules
-const RimRaf = require('rimraf');
 const Glob = require('glob');
 
 /**
@@ -155,16 +155,20 @@ class FileHelper {
      *
      * @return {Promise} Result
      */
-    static remove(path) {
+    static async remove(path) {
         checkParam(path, 'path', String);
+      
+        if(FileSystem.lstatSync(path).isDirectory()) {
+            for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
+                await unlink(Path.join(path, filename));
+            }
         
-        return new Promise((resolve, reject) => {
-            RimRaf(path, (err) => {
-                if(err) { return reject(err); }
+            await Util.promisify(FileSystem.rmdir)(path);
 
-                resolve();
-            });
-        });
+        } else {
+            await Util.promisify(FileSystem.unlink)(path);
+
+        }
     }
 
     /**

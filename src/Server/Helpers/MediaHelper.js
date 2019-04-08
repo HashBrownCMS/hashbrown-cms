@@ -3,11 +3,6 @@
 const Path = require('path');
 const FileSystem = require('fs');
 
-// TODO: Make these GIT submodules
-const RimRaf = require('rimraf');
-const Multer = require('multer');
-const Glob = require('glob');
-
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
 const WATCH_CACHE_INTERVAL = 1000 * 60; // One minute
@@ -28,75 +23,6 @@ class MediaHelper extends MediaHelperCommon {
         }, WATCH_CACHE_INTERVAL);
 
         this.cleanCache();
-    }
-    
-    /**
-     * Gets the upload handler
-     *
-     * @param {Boolean} isSingleFile
-     *
-     * @return {Function} handler
-     */
-    static getUploadHandler(isSingleFile) {
-        let handler = Multer({
-            storage: Multer.diskStorage({
-                destination: (req, file, resolve) => {
-                    let path = MediaHelper.getTempPath(req.project);
-                   
-                    debug.log('Handling file upload to temp storage...', this);
-
-                    if(!FileSystem.existsSync(path)){
-                        this.mkdirRecursively(path, () => {
-                            resolve(null, path);
-                        });
-                    
-                    } else {
-                        resolve(null, path);
-
-                    }
-                },
-                filename: (req, file, resolve) => {
-                    resolve(null, file.originalname);
-                }
-            })
-        })
-       
-        if(isSingleFile) {
-            return handler.single('media');
-        } else {
-            return handler.array('media', 100);
-        }
-    }
-
-    /**
-     * Makes a directory recursively
-     *
-     * @param {String} dirPath
-     * @param {Function} callback
-     * @param {Number} position
-     */
-    static mkdirRecursively(dirPath, callback = null, position = 0) {
-        checkParam(dirPath, 'dirPath', String);
-        
-        let parts = Path.normalize(dirPath).split(Path.sep);
-        
-        if(position >= parts.length) {      
-            if(callback) {
-                callback();
-            }
-            
-            return;
-        }
-        
-        let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
-          
-        if(currentDirPath) {
-            if(!FileSystem.existsSync(currentDirPath)) {
-                FileSystem.mkdirSync(currentDirPath);
-            }
-        }
-        
-        MediaHelper.mkdirRecursively(dirPath, callback, position + 1);
     }
     
     /**
@@ -122,59 +48,6 @@ class MediaHelper extends MediaHelperCommon {
         });
     }
     
-    /**
-     * Uploads a file from temp storage
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     * @param {String} tempPath
-     *
-     * @returns {Promise} Result
-     */
-    static uploadFromTemp(project, environment, id, tempPath) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-        checkParam(tempPath, 'tempPath', String);
-
-        let connection;
-        let filename = Path.basename(tempPath);
-
-        // Get Media provider
-        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
-        .then((provider) => {
-            connection = provider;
-
-            // Read the file from temp
-            debug.log('Reading file from temp dir ' + tempPath + '...', this);
-
-            return new Promise((resolve, reject)  => {
-                FileSystem.readFile(tempPath, (err, fileData) => {
-                    if(err) { return reject(err); }
-
-                    resolve(fileData);
-                });
-            });
-        })
-        .then((fileData) => {
-            // Upload the data
-            debug.log('Uploading file...', this);
-            
-            return connection.setMedia(id, filename, fileData.toString('base64'));
-        })
-        .then(() => {
-            // Remove the file from temp storage
-            debug.log('Removing temp file...', this);
-            
-            return new Promise((resolve, reject)  => {
-                FileSystem.unlink(tempPath, (err) => {
-                    resolve();
-                });
-            });
-        });
-    }
-
     /**
      * Gets the Media tree
      *
@@ -271,19 +144,6 @@ class MediaHelper extends MediaHelperCommon {
                 );
             }
         })
-    }
-    
-    /**
-     * Gets the media temp path
-     *
-     * @param {String} project
-     *
-     * @returns {String} path
-     */
-    static getTempPath(project) {
-        checkParam(project, 'project', String);
-
-        return Path.join(APP_ROOT, 'storage', project, 'temp');
     }
 
     /**

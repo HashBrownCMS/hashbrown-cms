@@ -57,49 +57,49 @@ class ResourceController extends HashBrown.Controllers.ApiController {
      * Gets all resources
      */
     static async getAll(req, res) {
-        throw new Error('The "getAll" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::getAll');
     }
 
     /**
      * Gets a resource item
      */
     static async get(req, res) {
-        throw new Error('The "get" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::get');
     }
     
     /**
      * Creates a new resource item
      */
     static async new(req, res) {
-        throw new Error('The "new" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::new');
     }
 
     /**
      * Pulls a resource item from remote
      */
     static async pull(req, res) {
-        throw new Error('The "pull" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::pull');
     }
 
     /**
      * Pushes a resource item to remote
      */
     static async push(req, res) {
-        throw new Error('The "push" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::push');
     }
     
     /**
      * Updates a resource item
      */
     static async set(req, res) {
-        throw new Error('The "set" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::set');
     }
 
     /**
      * Removes a resource item
      */
     static async remove(req, res) {
-        throw new Error('The "remove" method must be overridden');
+        res.status(404).send('No method defined for ' + this.name + '::remove');
     }
 }
 

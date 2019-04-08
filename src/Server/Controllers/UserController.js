@@ -10,23 +10,29 @@ class UserController extends HashBrown.Controllers.ApiController {
      * Initialises this controller
      */
     static init(app) {
+        // Current user
         app.get('/api/user', this.getCurrentUser);
         app.get('/api/user/scopes', this.getScopes);
-        app.get('/api/user/:id', this.middleware({needsAdmin: true, setProject: false}), this.getUser);
+        
+        app.post('/api/user/login', this.login);
+        app.post('/api/user/logout', this.logout);
+        
+        // Dashboard
+        app.get('/api/users/:id', this.middleware({needsAdmin: true, setProject: false}), this.getUser);
         app.get('/api/users', this.middleware({needsAdmin: true, setProject: false}), this.getUsers);
+        app.post('/api/users/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
+        app.post('/api/users/activate', this.postActivate);
+        app.post('/api/users/first', this.createFirstAdmin);
+        app.post('/api/users/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
+        app.post('/api/users/:id', this.middleware({setProject: false}), this.postUser);
+        
+        app.delete('/api/users/:id', this.middleware({setProject: false, needsAdmin: true}), this.deleteUser);
+        
+        // Environment
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
         app.get('/api/:project/:environment/users/:id', this.middleware(), this.getUser);
         
-        app.post('/api/user/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
-        app.post('/api/user/activate', this.postActivate);
-        app.post('/api/user/login', this.login);
-        app.post('/api/user/logout', this.logout);
-        app.post('/api/user/first', this.createFirstAdmin);
-        app.post('/api/user/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
-        app.post('/api/user/:id', this.middleware({setProject: false}), this.postUser);
-        app.post('/api/:project/:environment/user/:id', this.middleware(), this.postUser);
-        
-        app.delete('/api/user/:id', this.middleware({setProject: false, needsAdmin: true}), this.deleteUser);
+        app.post('/api/:project/:environment/users/:id', this.middleware(), this.postUser);
     }    
     
     /**

@@ -2,6 +2,9 @@
 
 const FileSystem = require('fs');
 
+// TODO: Make these GIT submodules
+const Multer = require('multer');
+
 /**
  * The Media controller
  *
@@ -12,25 +15,79 @@ class MediaController extends HashBrown.Controllers.ApiController {
      * Initiates this controller
      */
     static init(app) {
-        app.get('/media/:project/:environment/:id', this.middleware({ authenticate: false }), this.serveMedia);
+        app.get('/media/:project/:environment/:id', this.middleware({ authenticate: false }), this.serve);
         
-        app.get('/api/:project/:environment/media/tree', this.middleware(), this.getMediaTree);
-        app.get('/api/:project/:environment/media/:id', this.middleware(), this.getSingleMedia);
-        app.get('/api/:project/:environment/media', this.middleware(), this.getMedia);
+        app.get('/api/:project/:environment/media/tree', this.middleware(), this.getTree);
+        app.get('/api/:project/:environment/media/:id', this.middleware(), this.get);
+        app.get('/api/:project/:environment/media', this.middleware(), this.getAll);
         
-        app.post('/api/:project/:environment/media/new', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(), this.createMedia);
-        app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setMediaTreeItem);
-        app.post('/api/:project/:environment/media/:id', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(), this.setMedia);
-        app.post('/api/:project/:environment/media/rename/:id', this.middleware(), this.renameMedia);
-        app.post('/api/:project/:environment/media/replace/:id', this.middleware(), HashBrown.Helpers.MediaHelper.getUploadHandler(true), this.setMedia);
+        app.post('/api/:project/:environment/media/new', this.middleware(), this.upload(), this.new);
+        app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setTree);
+        app.post('/api/:project/:environment/media/:id', this.middleware(), this.upload(), this.set);
+        app.post('/api/:project/:environment/media/rename/:id', this.middleware(), this.rename);
+        app.post('/api/:project/:environment/media/replace/:id', this.middleware(), this.upload(true), this.set);
         
-        app.delete('/api/:project/:environment/media/:id', this.middleware(), this.deleteMedia);
+        app.delete('/api/:project/:environment/media/:id', this.middleware(), this.remove);
     }
+    
+    /**
+     * Uploads a file from temp storage
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {String} tempPath
+     *
+     * @returns {Promise} Result
+     */
+    static uploadFromTemp(project, environment, id, tempPath) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(tempPath, 'tempPath', String);
+
+        let connection;
+        let filename = Path.basename(tempPath);
+
+        // Get Media provider
+        return HashBrown.Helpers.ConnectionHelper.getMediaProvider(project, environment)
+        .then((provider) => {
+            connection = provider;
+
+            // Read the file from temp
+            debug.log('Reading file from temp dir ' + tempPath + '...', this);
+
+            return new Promise((resolve, reject)  => {
+                FileSystem.readFile(tempPath, (err, fileData) => {
+                    if(err) { return reject(err); }
+
+                    resolve(fileData);
+                });
+            });
+        })
+        .then((fileData) => {
+            // Upload the data
+            debug.log('Uploading file...', this);
+            
+            return connection.setMedia(id, filename, fileData.toString('base64'));
+        })
+        .then(() => {
+            // Remove the file from temp storage
+            debug.log('Removing temp file...', this);
+            
+            return new Promise((resolve, reject)  => {
+                FileSystem.unlink(tempPath, (err) => {
+                    resolve();
+                });
+            });
+        });
+    }
+
 
     /**
      * Serves Media content
      */
-    static async serveMedia(req, res) {
+    static async serve(req, res) {
         let id = req.params.id;
 
         if(id.indexOf('?') > -1) {
@@ -56,6 +113,38 @@ class MediaController extends HashBrown.Controllers.ApiController {
     }
     
     /**
+     * Gets the upload handler
+     *
+     * @param {Boolean} isSingleFile
+     *
+     * @return {Function} handler
+     */
+    static upload(isSingleFile) {
+        let handler = Multer({
+            storage: Multer.diskStorage({
+                destination: async (req, file, resolve) => {
+                    let path = Path.join(APP_ROOT, 'storage', req.params.project, 'temp');
+                   
+                    debug.log('Handling file upload to temp storage...', this);
+
+                    await HashBrown.Helpers.FileHelper.makeDirectory(path);
+                    
+                    resolve(null, path);
+                },
+                filename: (req, file, resolve) => {
+                    resolve(null, file.originalname);
+                }
+            })
+        })
+       
+        if(isSingleFile) {
+            return handler.single('media');
+        } else {
+            return handler.array('media', 100);
+        }
+    }
+
+    /**
      * @example GET /api/:project/:environment/media/tree
      *
      * @apiGroup Media
@@ -65,14 +154,16 @@ class MediaController extends HashBrown.Controllers.ApiController {
      *
      * @returns {Object} Media tree
      */
-    static getMediaTree(req, res) {
-        HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment)
-        .then((tree) => {
+    static async getTree(req, res) {
+        try {
+            let tree = await HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
+            
             res.status(200).send(tree);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(404).send(MediaController.printError(e));
-        });            
+        
+        }     
     }
     
     /**
@@ -88,17 +179,19 @@ class MediaController extends HashBrown.Controllers.ApiController {
      *
      * @returns {Object} Media tree item
      */
-    static setMediaTreeItem(req, res) {
+    static async setTree(req, res) {
         let id = req.params.id;
         let item = req.body;
 
-        HashBrown.Helpers.MediaHelper.setTreeItem(req.project, req.environment, id, item)
-        .then(() => {
+        try {
+            await HashBrown.Helpers.MediaHelper.setTreeItem(req.project, req.environment, id, item);
+            
             res.status(200).send(item);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(502).send(MediaController.printError(e));
-        });            
+        
+        }
     }
     
     /**
@@ -111,33 +204,26 @@ class MediaController extends HashBrown.Controllers.ApiController {
      
      * @returns {Array} All Media nodes
      */
-    static getMedia(req, res) {
-        let media;
-        let tree;
+    static async getAll(req, res) {
+        try {
+            let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-        .then((connection) => {
-            if(!connection) { return Promise.resolve([]); }
+            if(!connection) { return []; }
 
-            return connection.getAllMedia();
-        })
-        .then((result) => {
-            media = result;
-            
-            return HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
-        })
-        .then((result) => {
-            let tree = result;
+            let media = await connection.getAllMedia();
+                
+            let tree = await HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
 
             for(let i in media) {
                 media[i].applyFolderFromTree(tree);  
             }
 
             res.status(200).send(media);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(404).send(MediaController.printError(e, false));    
-        });            
+        
+        }
     }
     
     /**
@@ -151,28 +237,28 @@ class MediaController extends HashBrown.Controllers.ApiController {
      
      * @returns {Media} Media
      */
-    static getSingleMedia(req, res) {
-        let id = req.params.id;
+    static async get(req, res) {
+        try {
+            let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-        .then((connection) => {
-            return connection.getMedia(id)
-            .then((media) => {
-                if(!media) {
-                    return Promise.reject(new Error('Connection "' + connection.id + '" failed to fetch media "' + id + '"'));
-                }
+            let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
 
-                return HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment)
-                .then((tree) => {
-                    media.applyFolderFromTree(tree);
+            let media = await connection.getMedia(id);
+            
+            if(!media) {
+                throw new Error('Connection "' + connection.id + '" failed to fetch media "' + id + '"');
+            }
 
-                    res.status(200).send(media);
-                })
-            })
-        })
-        .catch((e) => {
+            let tree = await HashBrown.Helpers.MediaHelper.getTree(req.project, req.environment);
+
+            media.applyFolderFromTree(tree);
+
+            res.status(200).send(media);
+        
+        } catch(e) {
             res.status(404).send(MediaController.printError(e));    
-        });            
+        
+        }     
     }
     
     /**
@@ -184,22 +270,22 @@ class MediaController extends HashBrown.Controllers.ApiController {
      * @param {String} environment
      * @param {String} id
      */
-    static deleteMedia(req, res) {
-        let id = req.params.id;
+    static async remove(req, res) {
+        try {
+            let id = req.params.id;
 
-        HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
-        .then(() => {
-            return HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment)
-        })
-        .then((connection) => {
-            return connection.removeMedia(id);
-        })
-        .then(() => {
+            await HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id);
+
+            let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
+
+            await connection.removeMedia(id);
+            
             res.sendStatus(200);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(404).send(MediaController.printError(e));
-        });            
+        
+        }    
     }
     
     /**
@@ -212,17 +298,19 @@ class MediaController extends HashBrown.Controllers.ApiController {
      * @param {String} id
      * @param {String} name
      */
-    static renameMedia(req, res) {
-        let id = req.params.id;
-        let name = req.query.name;
+    static async rename(req, res) {
+        try {
+            let id = req.params.id;
+            let name = req.query.name;
 
-        HashBrown.Helpers.MediaHelper.renameMedia(req.project, req.environment, id, name)
-        .then(() => {
+            await HashBrown.Helpers.MediaHelper.renameMedia(req.project, req.environment, id, name);
+            
             res.status(200).send(id);
-        })            
-        .catch((e) => {
+
+        } catch(e) {
             res.status(400).send(MediaController.printError(e));
-        });            
+        
+        }
     }
     
     /**
@@ -236,29 +324,27 @@ class MediaController extends HashBrown.Controllers.ApiController {
      *
      * @param {FileData} Binary Media data
      */
-    static setMedia(req, res) {
-        let file = req.file;
-        let files = req.files;
-        let id = req.params.id;
+    static async set(req, res) {
+        try {
+            let file = req.file;
+            let files = req.files;
+            let id = req.params.id;
 
-        if(!file && files && files.length > 0) {
-            file = files[0];
-        }
+            if(!file && files && files.length > 0) {
+                file = files[0];
+            }
 
-        if(file) {
-            HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id)
-            .then(() => {
-                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, id, file.path)
-            })
-            .then(() => {
-                res.status(200).send(id);
-            })            
-            .catch((e) => {
-                res.status(400).send(MediaController.printError(e));
-            });            
+            if(!file) { throw new Error('File was null'); }
 
-        } else {
-            res.status(400).send(MediaController.printError(new Error('File was null')));
+            await HashBrown.Helpers.MediaHelper.removeCachedMedia(req.project, id);
+
+            await this.uploadFromTemp(req.project, req.environment, id, file.path);
+            
+            res.status(200).send(id);
+
+        } catch(e) {
+            res.status(500).send(MediaController.printError(e));    
+
         }
     }
 
@@ -274,39 +360,27 @@ class MediaController extends HashBrown.Controllers.ApiController {
      *
      * @returns {String} Created Media id
      */
-    static createMedia(req, res) {
-        let files = req.files || [ req.file ];
+    static async new(req, res) {
+        try {
+            let files = req.files || [ req.file ];
 
-        if(files && files.length > 0) {
+            if(!files || files.length < 1) { throw new Error('File was not provided'); }
+
             let ids = [];
 
-            let next = () => {
-                let file = files.pop();
-
-                if(!file) {
-                    return Promise.resolve();
-                }
-                
+            for(let file of files) {
                 let media = HashBrown.Models.Media.create();
 
-                return HashBrown.Helpers.MediaHelper.uploadFromTemp(req.project, req.environment, media.id, file.path)
-                .then(() => {
-                    ids.push(media.id);
-                    
-                    return next();
-                });
-            };
+                await this.uploadFromTemp(req.project, req.environment, media.id, file.path)
+                
+                ids.push(media.id);
+            }
 
-            next()
-            .then(() => {
-                res.status(200).send(ids);
-            })
-            .catch((e) => {
-                res.status(500).send(MediaController.printError(e));    
-            });
-
-        } else {
-            res.status(400).send('File was not provided');    
+            res.status(200).send(ids);
+        
+        } catch(e) {
+            res.status(500).send(MediaController.printError(e));    
+        
         }
     }
 }

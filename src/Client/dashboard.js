@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
                                         'Are you sure you want to remove this user?',
                                         async () => {
-                                            await HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id);
+                                            await HashBrown.Helpers.ResourceHelper.remove('users', user.id);
 
                                             $user.remove();
                                         }
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Add user',
                     'Do you want to invite a new user with email "' + username + '"?',
                     async () => {
-                        let token = await HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', { email: username });
+                        let token = await HashBrown.Helpers.RequestHelper.customRequest('post', '/api/users/invite', { email: username });
 
                         let subject = 'Invitation to HashBrown';
                         let url = location.protocol + '//' + location.host + '/login?inviteToken=' + token;
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     UI.messageModal('Creating user', 'Creating user "' + username + '"...');
 
-                    await HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
+                    await HashBrown.Helpers.ResourceHelper.new('users', '', {
                         username: username,
                         password: password,
                         scopes: {}
