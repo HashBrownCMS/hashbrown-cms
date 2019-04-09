@@ -98,13 +98,15 @@ async function initUsers() {
  * Init server view
  */
 async function initServer() {
-    if(!currentUserIsAdmin() || !$btnUpdate) { return; }
+    if(!currentUserIsAdmin()) { return; }
 
     // Restart server
     $('.page--dashboard__restart').click(onClickRestart);
     
     // Check for updates
     let $btnUpdate = _.find('.page--dashboard__update');
+    
+    if(!$btnUpdate) { return; }
     
     let update = await HashBrown.Helpers.RequestHelper.request('get', 'server/update/check');
     $btnUpdate.removeClass('working');
