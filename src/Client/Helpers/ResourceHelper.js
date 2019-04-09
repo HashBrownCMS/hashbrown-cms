@@ -142,7 +142,11 @@ class ResourceHelper {
         }
         
         for(let resourceName of this.getResourceNames()) {
-            await this.getAll(null, resourceName);
+            try {
+                await this.getAll(null, resourceName);
+            } catch(e) {
+                debug.log(e.message, this);
+            }
             
             $('.page--environment__spinner__messages [data-name="' + resourceName + '"]').toggleClass('loaded', true);
         }

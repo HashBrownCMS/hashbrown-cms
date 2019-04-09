@@ -208,7 +208,7 @@ class MediaController extends HashBrown.Controllers.ApiController {
         try {
             let connection = await HashBrown.Helpers.ConnectionHelper.getMediaProvider(req.project, req.environment);
 
-            if(!connection) { return []; }
+            if(!connection) { return res.status(404).send('No connection set as media provider'); }
 
             let media = await connection.getAllMedia();
                 
@@ -221,7 +221,7 @@ class MediaController extends HashBrown.Controllers.ApiController {
             res.status(200).send(media);
         
         } catch(e) {
-            res.status(404).send(MediaController.printError(e, false));    
+            res.status(404).send(MediaController.printError(e));    
         
         }
     }

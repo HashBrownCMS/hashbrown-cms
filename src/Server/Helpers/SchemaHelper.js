@@ -358,7 +358,11 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(json, 'json', Object);
-        
+       
+        let getId = (type) => {
+            return type[0].toLowerCase() + type.substring(1);
+        }
+
         let getFields = (json, i18n) => {
             let fields = {};
            
@@ -367,23 +371,40 @@ class SchemaHelper extends SchemaHelperCommon {
 
                 let info = i18n[key] || {};
                 let type = json[key];
+
+                if(!type) { throw new Error('Type for key "' + key + '" was null'); }
+
                 let def = {
                     label: info['@name'] || '(no name)',
                     description: info['@description'] || '(no description)'
                 };
 
                 if(Array.isArray(type)) {
+                    let allowedSchemas = [];
+
+                    for(let t of type) {
+                        allowedSchemas.push(getId(t));
+                    }
+
                     def.schemaId = 'array';
                     def.config = {
-                        allowedSchemas: type 
+                        allowedSchemas: allowedSchemas 
                     };
+
                 } else if(typeof type === 'string') {
-                    def.schemaId = type;
-                } else {
+                    // Special cases
+                    if(json['@type'] === 'Image') {
+                        type = 'mediaReference';
+                    }
+
+                    def.schemaId = getId(type);
+                
+                } else if(typeof type === 'object') {
                     def.schemaId = 'struct';
                     def.config = {
                         struct: getFields(type, i18n[key] || {})
                     };
+                
                 }
 
                 fields[key] = def;
@@ -393,9 +414,9 @@ class SchemaHelper extends SchemaHelperCommon {
         }
 
         let uiSchema = new HashBrown.Models.FieldSchema({
-            id: json['@type'],
+            id: getId(json['@type']),
             name: json['@i18n'][language]['@name'],
-            parentSchemaId: 'struct',
+            parentSchemaId: json['@parent'] ? getId(json['@parent']) : 'struct',
             editorId: 'StructEditor',
             config: {
                 struct: getFields(json, json['@i18n'][language])

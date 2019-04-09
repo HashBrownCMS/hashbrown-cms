@@ -30,7 +30,7 @@ Crisp.Router.route('/schemas/', function() {
                         async () => {
                             await HashBrown.Helpers.RequestHelper.request('post', 'schemas/import?url=' + url);
                             
-                            await HashBrown.ResourceHelper.reloadResource('schemas');
+                            await HashBrown.Helpers.ResourceHelper.reloadResource('schemas');
                         }
                     );
 

@@ -26,7 +26,12 @@ class NavbarMain extends Crisp.View {
         for(let pane of this.getPanes()) {
             if(typeof pane.getItems !== 'function') { continue; }
 
-            pane.items = await pane.getItems();
+            try {
+                pane.items = await pane.getItems();
+            } catch(e) {
+                debug.log(e.message, this);
+                pane.items = [];
+            }
         }
 
         super.fetch();

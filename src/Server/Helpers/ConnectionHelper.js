@@ -354,7 +354,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         let providers = await HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers');
         
-        if(providers.media) {
+        if(providers && providers.media) {
             return await this.getConnectionById(project, environment, providers.media);
         } else {
             return null;

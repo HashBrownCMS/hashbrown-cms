@@ -81,11 +81,11 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 29);
 /******/ })
 /************************************************************************/
-/******/ (Array(33).concat([
-/* 33 */
+/******/ (Array(29).concat([
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -95,30 +95,30 @@
  * @namespace HashBrown.Client.Helpers
  */
 namespace('Helpers')
+.add(__webpack_require__(30))
+.add(__webpack_require__(32))
 .add(__webpack_require__(34))
-.add(__webpack_require__(36))
-.add(__webpack_require__(38))
+.add(__webpack_require__(35))
+.add(__webpack_require__(37))
 .add(__webpack_require__(39))
-.add(__webpack_require__(41))
+.add(__webpack_require__(40))
+.add(__webpack_require__(42))
 .add(__webpack_require__(43))
 .add(__webpack_require__(44))
-.add(__webpack_require__(46))
+.add(__webpack_require__(45))
 .add(__webpack_require__(47))
-.add(__webpack_require__(48))
 .add(__webpack_require__(49))
-.add(__webpack_require__(51))
-.add(__webpack_require__(53))
-.add(__webpack_require__(54));
+.add(__webpack_require__(50));
 
 
 /***/ }),
-/* 34 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const ConnectionHelperCommon = __webpack_require__(35);
+const ConnectionHelperCommon = __webpack_require__(31);
 
 /**
  * The client side connection helper
@@ -202,7 +202,7 @@ module.exports = ConnectionHelper;
 
 
 /***/ }),
-/* 35 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -256,13 +256,13 @@ module.exports = ConnectionHelper;
 
 
 /***/ }),
-/* 36 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const ContentHelperCommon = __webpack_require__(37);
+const ContentHelperCommon = __webpack_require__(33);
 
 /**
  * The client side content helper
@@ -467,7 +467,7 @@ module.exports = ContentHelper;
 
 
 /***/ }),
-/* 37 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -623,7 +623,7 @@ module.exports = ContentHelper;
 
 
 /***/ }),
-/* 38 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -681,13 +681,13 @@ module.exports = FormHelper;
 
 
 /***/ }),
-/* 39 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const DebugHelperCommon = __webpack_require__(40);
+const DebugHelperCommon = __webpack_require__(36);
 
 /**
  * The client side debug helper
@@ -701,7 +701,7 @@ module.exports = DebugHelper;
 
 
 /***/ }),
-/* 40 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -896,13 +896,13 @@ module.exports = DebugHelper;
 
 
 /***/ }),
-/* 41 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const LanguageHelperCommon = __webpack_require__(42);
+const LanguageHelperCommon = __webpack_require__(38);
 
 let selectedLanguages = {};
 
@@ -960,7 +960,7 @@ module.exports = LanguageHelper;
 
 
 /***/ }),
-/* 42 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1228,7 +1228,7 @@ module.exports = LanguageHelper;
 
 
 /***/ }),
-/* 43 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3873,13 +3873,13 @@ module.exports = MarkdownHelper;
 
 
 /***/ }),
-/* 44 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const MediaHelperCommon = __webpack_require__(45);
+const MediaHelperCommon = __webpack_require__(41);
 
 /**
  * The client side media helper
@@ -3972,7 +3972,7 @@ module.exports = MediaHelper;
 
 
 /***/ }),
-/* 45 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4043,7 +4043,7 @@ module.exports = MediaHelper;
 
 
 /***/ }),
-/* 46 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4086,7 +4086,7 @@ module.exports = ProjectHelper;
 
 
 /***/ }),
-/* 47 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4263,7 +4263,7 @@ module.exports = RequestHelper;
 
 
 /***/ }),
-/* 48 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4411,7 +4411,11 @@ class ResourceHelper {
         }
         
         for(let resourceName of this.getResourceNames()) {
-            await this.getAll(null, resourceName);
+            try {
+                await this.getAll(null, resourceName);
+            } catch(e) {
+                debug.log(e.message, this);
+            }
             
             $('.page--environment__spinner__messages [data-name="' + resourceName + '"]').toggleClass('loaded', true);
         }
@@ -4619,13 +4623,13 @@ module.exports = ResourceHelper;
 
 
 /***/ }),
-/* 49 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const SchemaHelperCommon = __webpack_require__(50);
+const SchemaHelperCommon = __webpack_require__(46);
 
 /**
  * The client side Schema helper
@@ -4698,7 +4702,7 @@ module.exports = SchemaHelper;
 
 
 /***/ }),
-/* 50 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4815,13 +4819,13 @@ module.exports = SchemaHelper;
 
 
 /***/ }),
-/* 51 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const SettingsHelperCommon = __webpack_require__(52);
+const SettingsHelperCommon = __webpack_require__(48);
 
 /**
  * The client side settings helper
@@ -4898,7 +4902,7 @@ module.exports = SettingsHelper;
 
 
 /***/ }),
-/* 52 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4916,7 +4920,7 @@ module.exports = SettingsHelper;
 
 
 /***/ }),
-/* 53 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5694,7 +5698,7 @@ module.exports = UIHelper;
 
 
 /***/ }),
-/* 54 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
