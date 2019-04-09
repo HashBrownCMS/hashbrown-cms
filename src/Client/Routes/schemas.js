@@ -10,7 +10,32 @@ Crisp.Router.route('/schemas/', function() {
         [
             _.h1('Schemas'),
             _.p('Right click in the Schemas pane to create a new Schema.'),
-            _.p('Click on a Schema to edit it.')
+            _.p('Click on a Schema to edit it.'),
+            _.button({class: 'widget widget--button'}, 'Import schemas')
+                .click(() => {
+                    let url = '';
+
+                    let modal = UI.messageModal(
+                        'Import schemas',
+                        _.div({class: 'widget-group'},
+                            _.div({class: 'widget widget--label'}, 'URL to uischema.org instance'),
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'text',
+                                placeholder: 'https://uischema.org',
+                                onChange: (newValue) => {
+                                    url = newValue;
+                                }
+                            })
+                        ),
+                        async () => {
+                            await HashBrown.Helpers.RequestHelper.request('post', 'schemas/import?url=' + url);
+                            
+                            await HashBrown.ResourceHelper.reloadResource('schemas');
+                        }
+                    );
+
+                    modal.$element.find('input').focus();
+                })
         ],
         'text'
     );

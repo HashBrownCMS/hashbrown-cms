@@ -347,6 +347,65 @@ class SchemaHelper extends SchemaHelperCommon {
     }
 
     /**
+     * Imports a uischema.org schema
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Object} json
+     * @param {String} language
+     */
+    static async importSchema(project, environment, json, language = 'en') {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(json, 'json', Object);
+        
+        let getFields = (json, i18n) => {
+            let fields = {};
+           
+            for(let key in json) {
+                if(key[0] === '@') { continue; }
+
+                let info = i18n[key] || {};
+                let type = json[key];
+                let def = {
+                    label: info['@name'] || '(no name)',
+                    description: info['@description'] || '(no description)'
+                };
+
+                if(Array.isArray(type)) {
+                    def.schemaId = 'array';
+                    def.config = {
+                        allowedSchemas: type 
+                    };
+                } else if(typeof type === 'string') {
+                    def.schemaId = type;
+                } else {
+                    def.schemaId = 'struct';
+                    def.config = {
+                        struct: getFields(type, i18n[key] || {})
+                    };
+                }
+
+                fields[key] = def;
+            }
+
+            return fields;
+        }
+
+        let uiSchema = new HashBrown.Models.FieldSchema({
+            id: json['@type'],
+            name: json['@i18n'][language]['@name'],
+            parentSchemaId: 'struct',
+            editorId: 'StructEditor',
+            config: {
+                struct: getFields(json, json['@i18n'][language])
+            }
+        });
+        
+        await this.setSchemaById(project, environment, uiSchema.id, uiSchema, true);
+    }
+
+    /**
      * Sets a Schema by id
      *
      * @param {String} project

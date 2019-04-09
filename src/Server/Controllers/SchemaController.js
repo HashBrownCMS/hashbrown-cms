@@ -1,5 +1,7 @@
 'use strict';
 
+const Url = require('url');
+
 /**
  * The Controller for Schemas
  *
@@ -7,7 +9,38 @@
  */
 class SchemaController extends HashBrown.Controllers.ResourceController {
     static get category() { return 'schemas'; }
-    
+
+    /**
+     * Initialises this controller
+     */
+    static init(app) {
+        app.post('/api/:project/:environment/schemas/import', this.middleware(), this.getHandler('import'));
+
+        super.init(app);
+    }
+
+    /**
+     * @example POST /api/:project/:environment/import
+     *
+     * @apiGroup Schema
+     *
+     * @param {String} project
+     * @param {String} environment
+     */
+    static async import(req, res) {
+        let url = req.query.url || 'https://uischema.org';
+        url = Url.parse(url);
+        url = url.protocol + '//' + url.host + '/all.json';
+
+        let uiSchemas = await HashBrown.Helpers.RequestHelper.request('get', url);
+
+        for(let json of uiSchemas) {
+            await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, json);
+        }
+
+        return uiSchemas;
+    }
+
     /**
      * @example GET /api/:project/:environment/schemas
      *
