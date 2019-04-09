@@ -87,7 +87,7 @@ $('.page--login__login').each(function() {
             fullName: fullName
         };
 
-        let apiPath = '/api/user/login?persist=true';
+        let apiPath = '/api/user/login';
         let inviteToken = $login.attr('data-invite-token');
 
         if(inviteToken) {

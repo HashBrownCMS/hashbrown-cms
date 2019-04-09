@@ -23,31 +23,30 @@ class Controller {
      *
      * @returns {Promise} User object
      */
-    static authenticate(token, project, scope, needsAdmin) {
-        if(!token) {
-            return Promise.reject(new Error('You need to be logged in to do that'));
+    static async authenticate(token, project, scope, needsAdmin) {
+        // No token was provided
+        if(!token) { 
+            throw new Error('You need to be logged in to do that');
         }
     
-        return HashBrown.Helpers.UserHelper.findToken(token)
-        .then((user) => {
-            // If no user was found, return error
-            if(!user) {
-                return Promise.reject(new Error('Found no user with token "' + token + '"'));
-            }
+        let user = await HashBrown.Helpers.UserHelper.findToken(token);
+        
+        // No user was found
+        if(!user) {
+            throw new Error('Found no user with token "' + token + '"');
+        }
             
-            // If admin is required, and user isn't admin, return error
-            if(needsAdmin && !user.isAdmin) {
-                return Promise.reject(new Error('User "' + user.username + '" is not an admin'))
-            }
+        // Admin is required, and user isn't admin
+        if(needsAdmin && !user.isAdmin) {
+            throw new Error('User "' + user.username + '" is not an admin');
+        }
 
-            // If a scope is defined, and the user deosn't have it, return error
-            if(project && scope && !user.hasScope(project, scope)) {
-                return Promise.reject(new Error('User "' + user.username + '" does not have scope "' + scope + '"'));
-            }
+        // A scope is defined, and the user deosn't have it
+        if(project && scope && !user.hasScope(project, scope)) {
+            throw new Error('User "' + user.username + '" does not have scope "' + scope + '"');
+        }
            
-            // If all requirements have been met, resolve
-            return Promise.resolve(user);
-        });
+        return user;
     }
 
     /**
