@@ -119,7 +119,10 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
             schemaReference.pickFirstSchema();
 
-            schemaReference.$element.addClass('widget');
+            // Make the editor behave like a widget, as it's inside a widget group
+            schemaReference.ready(() => {
+                schemaReference.$element.addClass('widget');
+            });
 
             // Render the confirmation modal
             UI.confirmModal(

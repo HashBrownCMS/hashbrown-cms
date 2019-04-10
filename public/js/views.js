@@ -769,7 +769,8 @@ class Input extends HashBrown.Views.Widgets.Widget {
             type: this.type || 'text',
             class: 'widget widget--input ' + (this.type || 'text'),
             value: this.value,
-            name: this.name
+            name: this.name,
+            required: this.isRequired
         };
 
         if(this.type === 'number' || this.type === 'range') {
@@ -781,7 +782,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
         switch(this.type) {
             case 'range':
                 return _.div({class: config.class, title: config.title},
-                    _.input({class: 'widget--input__range-input', type: 'range', value: this.value, min: config.min, max: config.max, step: config.step})
+                    _.input({class: 'widget--input__range-input', type: 'range', required: this.isRequired, value: this.value, min: config.min, max: config.max, step: config.step})
                         .on('input', (e) => {
                             this.onChangeInternal(e.currentTarget.value);
 
@@ -792,7 +793,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
 
             case 'checkbox':
                 return _.div({class: config.class, title: config.title},
-                    _.input({id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value})
+                    _.input({id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', required: this.isRequired, checked: this.value})
                         .on('change', (e) => {
                             this.onChangeInternal(e.currentTarget.checked);
                         }),
@@ -806,7 +807,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
             case 'file':
                 return _.form({class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title},
                     _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button expanded'}, this.placeholder || 'Browse...'), 
-                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
+                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', required: this.isRequired, name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
                         .on('change', (e) => {
                             let names = [];
                             let files = e.currentTarget.files;
@@ -10976,7 +10977,7 @@ class SchemaEditor extends Crisp.View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.ResourceHelper.set('schemas', this.model.id, this.model);
+        await HashBrown.Helpers.ResourceHelper.set('schemas', this.modelId, this.model);
         
         this.$saveBtn.toggleClass('working', false);
         
@@ -11959,7 +11960,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         for(let schemaId of this.config.allowedSchemas || []) {
             if(!schemaId) { continue; }
             
-            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId);
+            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
 
             this.allowedSchemas.push(schema);
         }
@@ -12298,7 +12299,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 return $field;
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
-                .click(() => {
+                .click(async () => {
                     let index = this.value.length;
 
                     if(this.config.maxItems && index >= this.config.maxItems) {
@@ -12310,10 +12311,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                     this.trigger('change', this.value);
 
-                    // Restore the scroll position with 100ms delay
-                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
+                    await this.fetch();
                     
-                    this.fetch();
+                    // Restore the scroll position
+                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
                 })
         );
     }    
@@ -14123,14 +14124,18 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 });
 
                 // Return the DOM element
-                return _.div({class: 'editor__field'},
+                return _.div({class: 'editor__field' + (config.struct ? ' struct' : '')},
                     _.div({class: 'editor__field__key'},
                         _.div({class: 'editor__field__key__label'}, fieldDefinition.label),
                         _.if(fieldDefinition.description,
                             _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
                         ),
                         fieldEditorInstance.renderKeyActions()
-                    ),
+                    ).click((e) => {
+                        if(!config.struct) { return; }
+
+                        e.currentTarget.parentElement.classList.toggle('expanded');
+                    }),
                     fieldEditorInstance.$element
                 );
             })    
@@ -15663,7 +15668,10 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
             schemaReference.pickFirstSchema();
 
-            schemaReference.$element.addClass('widget');
+            // Make the editor behave like a widget, as it's inside a widget group
+            schemaReference.ready(() => {
+                schemaReference.$element.addClass('widget');
+            });
 
             // Render the confirmation modal
             UI.confirmModal(
@@ -16372,7 +16380,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     static async onClickNewSchema() {
         let parentId = $('.context-menu-target').data('id');
 
-        let newSchema = await HashBrown.Helpers.ResourceHelper.new('schemas', '?parentSchemaId=' + parentId);
+        let newSchema = await HashBrown.Helpers.ResourceHelper.new(null, 'schemas', '?parentSchemaId=' + parentId);
 
         location.hash = '/schemas/' + newSchema.id;
     }

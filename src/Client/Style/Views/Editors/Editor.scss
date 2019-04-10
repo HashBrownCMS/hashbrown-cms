@@ -177,6 +177,51 @@
             border-bottom: 0;
         }
 
+        // Nested struct field
+        &.struct {
+            display: block;
+        }
+        
+        &.struct > & {
+            &__key {
+                display: flex;
+                cursor: pointer;
+                line-height: 2rem;
+                padding: 0;
+
+                &::before {
+                    font-family: 'FontAwesome';
+                    content: '\f0d7';
+                    display: block;
+                    line-height: 2rem;
+                    text-align: center;
+                    color: $primary;
+                    margin-right: 1rem;
+                }
+            }
+            
+            &__key &__key__description {
+                margin: 0 0 0 1rem;
+            }
+        
+            &__value {
+                padding-left: 2rem;
+            }
+        }
+
+        
+        &.struct:not(.expanded) > & {
+            &__key {
+                &::before {
+                    content: '\f0da';
+                }
+            }
+            
+            &__value {
+                display: none;
+            }
+        }
+
         // Tablet mode
         @media($sm) {
             display: block;

@@ -313,7 +313,15 @@ class ResourceHelper {
             data = data.getObject();
         }
 
-        await this.indexedDbTransaction('put', category, id, data);
+        // Id has been changed, delete old reference
+        if(data.id !== id) {
+            await this.indexedDbTransaction('delete', category, id, data);
+
+        // Id is unchanged, put the content
+        } else {
+            await this.indexedDbTransaction('put', category, id, data);
+        
+        }
 
         await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data);
     

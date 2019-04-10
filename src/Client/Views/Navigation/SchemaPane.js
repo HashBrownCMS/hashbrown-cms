@@ -48,7 +48,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     static async onClickNewSchema() {
         let parentId = $('.context-menu-target').data('id');
 
-        let newSchema = await HashBrown.Helpers.ResourceHelper.new('schemas', '?parentSchemaId=' + parentId);
+        let newSchema = await HashBrown.Helpers.ResourceHelper.new(null, 'schemas', '?parentSchemaId=' + parentId);
 
         location.hash = '/schemas/' + newSchema.id;
     }

@@ -392,12 +392,28 @@ class SchemaHelper extends SchemaHelperCommon {
                     };
 
                 } else if(typeof type === 'string') {
-                    // Special cases
-                    if(json['@type'] === 'Image') {
-                        type = 'mediaReference';
-                    }
+                    if(json['@type'] === 'Image' && key === 'src') {
+                        def.schemaId = 'mediaReference';
+                    
+                    } else if(type === 'int') {
+                        def.schemaId = 'number';
+                        def.config = {
+                            step: 0
+                        };
+                   
+                    } else if(type === 'float') {
+                        def.schemaId = 'number';
+                        def.config = {
+                            step: false
+                        };
+                    
+                    } else if(type === 'bool') {
+                        def.schemaId = 'boolean';
+                    
+                    } else {
+                        def.schemaId = getId(type);
 
-                    def.schemaId = getId(type);
+                    }
                 
                 } else if(typeof type === 'object') {
                     def.schemaId = 'struct';
@@ -419,6 +435,7 @@ class SchemaHelper extends SchemaHelperCommon {
             parentSchemaId: json['@parent'] ? getId(json['@parent']) : 'struct',
             editorId: 'StructEditor',
             config: {
+                label: json['@label'] || '',
                 struct: getFields(json, json['@i18n'][language])
             }
         });

@@ -40,7 +40,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         for(let schemaId of this.config.allowedSchemas || []) {
             if(!schemaId) { continue; }
             
-            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId);
+            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
 
             this.allowedSchemas.push(schema);
         }
@@ -379,7 +379,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 return $field;
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
-                .click(() => {
+                .click(async () => {
                     let index = this.value.length;
 
                     if(this.config.maxItems && index >= this.config.maxItems) {
@@ -391,10 +391,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                     this.trigger('change', this.value);
 
-                    // Restore the scroll position with 100ms delay
-                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
+                    await this.fetch();
                     
-                    this.fetch();
+                    // Restore the scroll position
+                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
                 })
         );
     }    

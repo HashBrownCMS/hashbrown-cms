@@ -322,24 +322,34 @@ Crisp.Router.route('/schemas/', function() {
             _.p('Click on a Schema to edit it.'),
             _.button({class: 'widget widget--button'}, 'Import schemas')
                 .click(() => {
-                    let url = '';
+                    let url = 'https://uischema.org/all.json';
 
                     let modal = UI.messageModal(
                         'Import schemas',
                         _.div({class: 'widget-group'},
-                            _.div({class: 'widget widget--label'}, 'URL to uischema.org instance'),
+                            _.div({class: 'widget widget--label'}, 'URL to uischema.org definitions'),
                             new HashBrown.Views.Widgets.Input({
                                 type: 'text',
-                                placeholder: 'https://uischema.org',
+                                value: url,
+                                isRequired: true,
+                                placeholder: 'E.g. https://uischema.org/all.json',
                                 onChange: (newValue) => {
                                     url = newValue;
                                 }
                             })
                         ),
                         async () => {
-                            await HashBrown.Helpers.RequestHelper.request('post', 'schemas/import?url=' + url);
-                            
-                            await HashBrown.Helpers.ResourceHelper.reloadResource('schemas');
+                            try {
+                                if(!url) { throw new Error('Please specify a URL'); }
+
+                                await HashBrown.Helpers.RequestHelper.request('post', 'schemas/import?url=' + url);
+                                
+                                await HashBrown.Helpers.ResourceHelper.reloadResource('schemas');
+
+                            } catch(e) {
+                                UI.errorModal(e);
+    
+                            }
                         }
                     );
 
@@ -370,11 +380,13 @@ Crisp.Router.route('/schemas/:id', async () => {
 
     if(schema instanceof HashBrown.Models.ContentSchema) {
         schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
+            modelId: schema.id,
             model: schema,
             parentSchema: parentSchema
         });
     } else {
         schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
+            modelId: schema.id,
             model: schema,
             parentSchema: parentSchema
         });

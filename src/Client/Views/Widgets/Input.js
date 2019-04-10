@@ -29,7 +29,8 @@ class Input extends HashBrown.Views.Widgets.Widget {
             type: this.type || 'text',
             class: 'widget widget--input ' + (this.type || 'text'),
             value: this.value,
-            name: this.name
+            name: this.name,
+            required: this.isRequired
         };
 
         if(this.type === 'number' || this.type === 'range') {
@@ -41,7 +42,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
         switch(this.type) {
             case 'range':
                 return _.div({class: config.class, title: config.title},
-                    _.input({class: 'widget--input__range-input', type: 'range', value: this.value, min: config.min, max: config.max, step: config.step})
+                    _.input({class: 'widget--input__range-input', type: 'range', required: this.isRequired, value: this.value, min: config.min, max: config.max, step: config.step})
                         .on('input', (e) => {
                             this.onChangeInternal(e.currentTarget.value);
 
@@ -52,7 +53,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
 
             case 'checkbox':
                 return _.div({class: config.class, title: config.title},
-                    _.input({id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', checked: this.value})
+                    _.input({id: 'checkbox-' + this.guid, class: 'widget--input__checkbox-input', type: 'checkbox', required: this.isRequired, checked: this.value})
                         .on('change', (e) => {
                             this.onChangeInternal(e.currentTarget.checked);
                         }),
@@ -66,7 +67,7 @@ class Input extends HashBrown.Views.Widgets.Widget {
             case 'file':
                 return _.form({class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title},
                     _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button expanded'}, this.placeholder || 'Browse...'), 
-                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
+                    _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', required: this.isRequired, name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
                         .on('change', (e) => {
                             let names = [];
                             let files = e.currentTarget.files;

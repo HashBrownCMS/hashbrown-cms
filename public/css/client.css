@@ -980,6 +980,36 @@ h6 {
 .editor__field:last-of-type {
   border-bottom: 0;
 }
+.editor__field.struct {
+  display: block;
+}
+.editor__field.struct > .editor__field__key {
+  display: flex;
+  cursor: pointer;
+  line-height: 2rem;
+  padding: 0;
+}
+.editor__field.struct > .editor__field__key::before {
+  font-family: "FontAwesome";
+  content: "";
+  display: block;
+  line-height: 2rem;
+  text-align: center;
+  color: #e70d3b;
+  margin-right: 1rem;
+}
+.editor__field.struct > .editor__field__key .editor__field__key__description {
+  margin: 0 0 0 1rem;
+}
+.editor__field.struct > .editor__field__value {
+  padding-left: 2rem;
+}
+.editor__field.struct:not(.expanded) > .editor__field__key::before {
+  content: "";
+}
+.editor__field.struct:not(.expanded) > .editor__field__value {
+  display: none;
+}
 @media (max-width: 991px) {
   .editor__field {
     display: block;

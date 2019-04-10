@@ -51,7 +51,7 @@ class SchemaEditor extends Crisp.View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.ResourceHelper.set('schemas', this.model.id, this.model);
+        await HashBrown.Helpers.ResourceHelper.set('schemas', this.modelId, this.model);
         
         this.$saveBtn.toggleClass('working', false);
         

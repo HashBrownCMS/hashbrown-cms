@@ -28,17 +28,21 @@ class SchemaController extends HashBrown.Controllers.ResourceController {
      * @param {String} environment
      */
     static async import(req, res) {
-        let url = req.query.url || 'https://uischema.org';
-        url = Url.parse(url);
-        url = url.protocol + '//' + url.host + '/all.json';
+        if(!req.query.url) { throw new Error('URL was not provided'); }
 
-        let uiSchemas = await HashBrown.Helpers.RequestHelper.request('get', url);
+        let url = req.query.url;
 
-        for(let json of uiSchemas) {
-            await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, json);
+        let response = await HashBrown.Helpers.RequestHelper.request('get', url);
+
+        if(Array.isArray(response)) {
+            for(let json of response) {
+                await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, json);
+            }
+        } else {
+            await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, response);
         }
 
-        return uiSchemas;
+        return response;
     }
 
     /**

@@ -339,7 +339,7 @@ class DatabaseHelper {
         } catch(e) {
             debug.error(e, this);
         } finally {
-            client.close();
+            if(client) { client.close(); }
         }
 
         return docs;
