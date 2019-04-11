@@ -272,7 +272,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         return _.div({class: 'field-editor field-editor--array ' + (this.config.isGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
                 // Render field
-                let $field = _.div({class: 'editor__field raised field-editor--array__item'});
+                let $field = _.div({class: 'editor__field field-editor--array__item collapsible collapsed'});
 
                 let renderField = () => {
                     let schema = this.getAllowedSchema(item.schemaId);
@@ -316,21 +316,41 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     // Hook up the change event
                     editorInstance.on('change', (newValue) => {
                         item.value = newValue;
+
+                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
                     });
                     
                     editorInstance.on('silentchange', (newValue) => {
                         item.value = newValue;
+
+                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
                     });
 
                     _.append($field.empty(),
-                        // Render sort key
-                        _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
+                        // Render field key
+                        _.div({class: 'editor__field__key'},
+                            _.div({class: 'editor__field__key__label'}, this.getItemLabel(item, schema))
+                                .click((e) => {
+                                    e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
+                                }),
+                            _.div({class: 'editor__field__key__actions'},
+                                _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove item'})
+                                    .click(() => {
+                                        this.value.splice(i, 1);
+                                
+                                        this.trigger('change', this.value);
+
+                                        this.fetch();
+                                    })
+                            )
+                        ),
 
                         // Render Schema picker
                         _.if(this.allowedSchemas.length > 1,
-                            _.div({class: 'field-editor--array__item__toolbar'},
-                                _.div({class: 'widget--label'}, 'Schema'),
+                            _.div({class: 'editor__field__toolbar'},
+                                _.div({class: 'editor__field__toolbar__label'}, 'Schema'),
                                 new HashBrown.Views.Widgets.Dropdown({
+                                    className: 'editor__field__toolbar__widget',
                                     value: item.schemaId,
                                     placeholder: 'Schema',
                                     valueKey: 'id',
@@ -352,24 +372,8 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         ),
                 
                         // Render field editor instance
-                        editorInstance.$element,
-
-                        // Render field actions (collapse/expand, remove)
-                        _.div({class: 'editor__field__actions'},
-                            _.if(!this.config.isGrid,
-                                _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
-                                    .click(() => {
-                                        $field.toggleClass('collapsed');
-                                    })
-                            ),
-                            _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove item'})
-                                .click(() => {
-                                    this.value.splice(i, 1);
-                            
-                                    this.trigger('change', this.value);
-
-                                    this.fetch();
-                                })
+                        _.div({class: 'editor__field__value'},
+                            editorInstance.$element
                         )
                     );
                 };
@@ -378,7 +382,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 return $field;
             }),
-            _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
+            _.button({title: 'Add an item', class: 'field-editor--array__add widget widget--button round fa fa-plus'})
                 .click(async () => {
                     let index = this.value.length;
 

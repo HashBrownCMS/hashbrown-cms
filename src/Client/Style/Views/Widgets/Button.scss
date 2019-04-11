@@ -94,6 +94,10 @@
         color: $primary;
         background-color: transparent;
         box-shadow: none;
+
+        &:hover {
+            color: $primary-dark;
+        }
     }
 
     .fa:first-child {

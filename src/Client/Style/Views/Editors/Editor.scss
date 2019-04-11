@@ -170,115 +170,69 @@
         display: flex;
         padding: 1rem 0;
         position: relative;
-        transition: background-color 0.5s ease, transform 0.5s ease;
         border-bottom: 1px solid $standard-darker;
-
+        
         &:last-of-type {
             border-bottom: 0;
+            padding-bottom: 0;
         }
 
-        // Nested struct field
-        &.struct {
+        // Collapsible field
+        &.collapsible {
             display: block;
         }
         
-        &.struct > & {
+        &.collapsible > & {
             &__key {
                 display: flex;
-                cursor: pointer;
                 line-height: 2rem;
                 padding: 0;
-
-                &::before {
-                    font-family: 'FontAwesome';
-                    content: '\f0d7';
-                    display: block;
-                    line-height: 2rem;
-                    text-align: center;
-                    color: $primary;
-                    margin-right: 1rem;
-                }
             }
             
-            &__key &__key__description {
-                margin: 0 0 0 1rem;
+            &__value, &__toolbar {
+                margin-left: 2rem;
             }
+        }
         
-            &__value {
-                padding-left: 2rem;
+        &.collapsible > &__key > &__key__label {
+            cursor: pointer;
+            display: flex;
+            
+            &::before {
+                font-family: 'FontAwesome';
+                content: '\f0d7';
+                display: block;
+                line-height: 2rem;
+                text-align: left;
+                width: 1rem;
+                color: $primary;
             }
         }
 
+        &.collapsible > &__key > &__key__description {
+            margin: 0 0 0 1rem;
+        }
         
-        &.struct:not(.expanded) > & {
-            &__key {
-                &::before {
-                    content: '\f0da';
-                }
-            }
-            
-            &__value {
+        &.collapsible > &__key > &__key__actions {
+            left: auto;
+            right: 0;
+        }
+        
+        &.collapsible.collapsed > & {
+            &__value, &__toolbar {
                 display: none;
+            }
+        }
+
+        &.collapsible.collapsed > &__key > &__key__label {
+            &::before {
+                content: '\f0da';
             }
         }
 
         // Tablet mode
         @media($sm) {
             display: block;
-        }
-
-        // Raised
-        &.raised {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-            background-color: $standard;
-
-            // Nested
-            & & {
-                box-shadow: none;
-                border: 1px dashed $standard-darker;
-            }
-
-            & & & {
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-                border: none;
-            }
-
-            & & & & {
-                box-shadow: none;
-                border: 1px dashed $standard-darker;
-            }
-
-            & & & & & {
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-                border: none;
-            }
-        }
-
-        // Collapsed & sorting mode
-        .editor__field__value.collapsed &,
-        .editor__field__value.sorting &,
-        &.collapsed {
-            height: 4rem;
-            border-radius: 0.2rem;
-
-            &:not(:first-of-type) {
-                margin-top: 1rem !important;
-            }
-
-            &:last-of-type {
-                margin-bottom: 0 !important;
-            }
-
-            .editor__field__sort-key {
-                display: block;
-            }
-
-            .editor__field__key,
-            .editor__field__value {
-                display: none;
-            }
         }
 
         // Vertical mode
@@ -294,6 +248,27 @@
             margin-left: 1rem;
         }
 
+        // Toolbar
+        &__toolbar {
+            display: flex;
+            margin: 0;
+            border-bottom: 1px solid $standard-darker;
+            padding: 1rem 0;
+
+            &__label {
+                line-height: 2rem;
+                flex-grow: 0;
+                flex-basis: 10rem;
+                margin-right: 1rem;
+                padding: 0;
+                background-color: transparent;
+            }
+
+            &__remove {
+                margin-left: auto;
+            }
+        }
+
         // Key
         &__key {
             flex-basis: 10rem;
@@ -301,6 +276,7 @@
             margin-right: 1rem;
             padding-top: 0.25rem;
             line-height: 1.5rem;
+            transition: color 0.3s ease;
 
             // Following state
             &.following &__actions {
@@ -403,7 +379,7 @@
                         content: '\f065';
                     }
                 }
-                
+
                 // Collapse
                 &--collapse {
                     &:before {
@@ -418,50 +394,7 @@
             flex-grow: 1;
             border: 0 dashed transparent;
             border-radius: 0.2rem;
-            transition: border 0.5s ease, padding 0.5s ease;
             position: relative;
-
-            // Sorting mode
-            &.sorting {
-                padding: 1rem;
-                border: 0.15rem dashed $standard-darker;
-        
-                // Hide the add button
-                .editor__field__add {
-                    display: none;
-                }
-
-                // Style the sort key
-                .editor__field__sort-key {
-                    color: $primary-text;
-                }
-                
-                // Hide the action buttons
-                .editor__field__action {
-                    display: none;
-                }
-
-                // Style the items inside
-                .editor__field {
-                    background-color: $primary;
-                    cursor: move;
-
-                    // Dragging state
-                    &.dragging {
-                        background-color: transparent;
-                        border: 2px dashed $primary;
-
-                        .editor__field__sort-key {
-                            color: $primary;
-                        }
-                    }
-
-                    &__collapse,
-                    &__remove {
-                        display: none;
-                    }
-                }
-            }
 
             // Lock
             &__lock {
@@ -512,58 +445,6 @@
                     font-family: 'FontAwesome';
                     content: '\f071';
                     margin-right: 0.5rem;
-                }
-            }
-        }
-
-        // Actions
-        &__actions {
-            display: flex;
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-        &__action {
-            background-color: transparent;
-            line-height: 2rem;
-            height: 2rem;
-            width: 2rem;
-            border: 0;
-            display: block;
-            cursor: pointer;
-            z-index: 90;
-            color: $primary;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            border-radius: 0.2rem;
-
-            &:hover {
-                background-color: $primary;
-                color: $primary-text;
-            }
-
-            // Icon
-            &:after {
-                font-family: 'FontAwesome';
-            }
-
-            // Collapse button
-            &--collapse {
-                &:after {
-                    content: '\f2d1';
-                }
-            }
-
-            .editor__field.collapsed > .editor__field__actions > &--collapse {
-                &:after {
-                    content: '\f2d0';
-                }
-            }
-
-            // Remove button
-            &--remove {
-                &:after {
-                    content: '\f00d';
                 }
             }
         }

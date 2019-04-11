@@ -974,87 +974,53 @@ h6 {
   display: flex;
   padding: 1rem 0;
   position: relative;
-  transition: background-color 0.5s ease, transform 0.5s ease;
   border-bottom: 1px solid #dddddd;
 }
 .editor__field:last-of-type {
   border-bottom: 0;
+  padding-bottom: 0;
 }
-.editor__field.struct {
+.editor__field.collapsible {
   display: block;
 }
-.editor__field.struct > .editor__field__key {
+.editor__field.collapsible > .editor__field__key {
   display: flex;
-  cursor: pointer;
   line-height: 2rem;
   padding: 0;
 }
-.editor__field.struct > .editor__field__key::before {
+.editor__field.collapsible > .editor__field__value, .editor__field.collapsible > .editor__field__toolbar {
+  margin-left: 2rem;
+}
+.editor__field.collapsible > .editor__field__key > .editor__field__key__label {
+  cursor: pointer;
+  display: flex;
+}
+.editor__field.collapsible > .editor__field__key > .editor__field__key__label::before {
   font-family: "FontAwesome";
   content: "";
   display: block;
   line-height: 2rem;
-  text-align: center;
+  text-align: left;
+  width: 1rem;
   color: #e70d3b;
-  margin-right: 1rem;
 }
-.editor__field.struct > .editor__field__key .editor__field__key__description {
+.editor__field.collapsible > .editor__field__key > .editor__field__key__description {
   margin: 0 0 0 1rem;
 }
-.editor__field.struct > .editor__field__value {
-  padding-left: 2rem;
+.editor__field.collapsible > .editor__field__key > .editor__field__key__actions {
+  left: auto;
+  right: 0;
 }
-.editor__field.struct:not(.expanded) > .editor__field__key::before {
-  content: "";
-}
-.editor__field.struct:not(.expanded) > .editor__field__value {
+.editor__field.collapsible.collapsed > .editor__field__value, .editor__field.collapsible.collapsed > .editor__field__toolbar {
   display: none;
+}
+.editor__field.collapsible.collapsed > .editor__field__key > .editor__field__key__label::before {
+  content: "";
 }
 @media (max-width: 991px) {
   .editor__field {
     display: block;
   }
-}
-.editor__field.raised {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-}
-.editor__field.raised .editor__field.raised {
-  box-shadow: none;
-  border: 1px dashed #dddddd;
-}
-.editor__field.raised .editor__field.raised .editor__field.raised {
-  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-  border: none;
-}
-.editor__field.raised .editor__field.raised .editor__field.raised .editor__field.raised {
-  box-shadow: none;
-  border: 1px dashed #dddddd;
-}
-.editor__field.raised .editor__field.raised .editor__field.raised .editor__field.raised .editor__field.raised {
-  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-  border: none;
-}
-.editor__field__value.collapsed .editor__field, .editor__field__value.sorting .editor__field, .editor__field.collapsed {
-  height: 4rem;
-  border-radius: 0.2rem;
-}
-.editor__field__value.collapsed .editor__field:not(:first-of-type), .editor__field__value.sorting .editor__field:not(:first-of-type), .editor__field.collapsed:not(:first-of-type) {
-  margin-top: 1rem !important;
-}
-.editor__field__value.collapsed .editor__field:last-of-type, .editor__field__value.sorting .editor__field:last-of-type, .editor__field.collapsed:last-of-type {
-  margin-bottom: 0 !important;
-}
-.editor__field__value.collapsed .editor__field .editor__field__sort-key, .editor__field__value.sorting .editor__field .editor__field__sort-key, .editor__field.collapsed .editor__field__sort-key {
-  display: block;
-}
-.editor__field__value.collapsed .editor__field .editor__field__key,
-.editor__field__value.collapsed .editor__field .editor__field__value, .editor__field__value.sorting .editor__field .editor__field__key,
-.editor__field__value.sorting .editor__field .editor__field__value, .editor__field.collapsed .editor__field__key,
-.editor__field.collapsed .editor__field__value {
-  display: none;
 }
 .editor__field.vertical {
   flex-direction: column;
@@ -1065,12 +1031,30 @@ h6 {
 .editor__field.vertical > .editor__field__value {
   margin-left: 1rem;
 }
+.editor__field__toolbar {
+  display: flex;
+  margin: 0;
+  border-bottom: 1px solid #dddddd;
+  padding: 1rem 0;
+}
+.editor__field__toolbar__label {
+  line-height: 2rem;
+  flex-grow: 0;
+  flex-basis: 10rem;
+  margin-right: 1rem;
+  padding: 0;
+  background-color: transparent;
+}
+.editor__field__toolbar__remove {
+  margin-left: auto;
+}
 .editor__field__key {
   flex-basis: 10rem;
   flex-shrink: 0;
   margin-right: 1rem;
   padding-top: 0.25rem;
   line-height: 1.5rem;
+  transition: color 0.3s ease;
 }
 .editor__field__key.following .editor__field__key__actions {
   position: fixed;
@@ -1151,35 +1135,7 @@ h6 {
   flex-grow: 1;
   border: 0 dashed transparent;
   border-radius: 0.2rem;
-  transition: border 0.5s ease, padding 0.5s ease;
   position: relative;
-}
-.editor__field__value.sorting {
-  padding: 1rem;
-  border: 0.15rem dashed #dddddd;
-}
-.editor__field__value.sorting .editor__field__add {
-  display: none;
-}
-.editor__field__value.sorting .editor__field__sort-key {
-  color: #ffffff;
-}
-.editor__field__value.sorting .editor__field__action {
-  display: none;
-}
-.editor__field__value.sorting .editor__field {
-  background-color: #e70d3b;
-  cursor: move;
-}
-.editor__field__value.sorting .editor__field.dragging {
-  background-color: transparent;
-  border: 2px dashed #e70d3b;
-}
-.editor__field__value.sorting .editor__field.dragging .editor__field__sort-key {
-  color: #e70d3b;
-}
-.editor__field__value.sorting .editor__field__collapse, .editor__field__value.sorting .editor__field__remove {
-  display: none;
 }
 .editor__field__value__lock {
   position: absolute;
@@ -1224,41 +1180,6 @@ h6 {
   font-family: "FontAwesome";
   content: "";
   margin-right: 0.5rem;
-}
-.editor__field__actions {
-  display: flex;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.editor__field__action {
-  background-color: transparent;
-  line-height: 2rem;
-  height: 2rem;
-  width: 2rem;
-  border: 0;
-  display: block;
-  cursor: pointer;
-  z-index: 90;
-  color: #e70d3b;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  border-radius: 0.2rem;
-}
-.editor__field__action:hover {
-  background-color: #e70d3b;
-  color: #ffffff;
-}
-.editor__field__action:after {
-  font-family: "FontAwesome";
-}
-.editor__field__action--collapse:after {
-  content: "";
-}
-.editor__field.collapsed > .editor__field__actions > .editor__field__action--collapse:after {
-  content: "";
-}
-.editor__field__action--remove:after {
-  content: "";
 }
 .editor__field__sort-key {
   background-color: transparent;
@@ -1407,31 +1328,60 @@ h6 {
   max-height: 90vh;
 }
 
-.field-editor--array__item {
-  flex-wrap: wrap;
+.field-editor--array {
+  margin-top: -1rem;
+  transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
 }
-.field-editor--array__item.collapsed .field-editor--array__item__toolbar {
+.field-editor--array.sorting {
+  padding: 1rem;
+  border: 0.15rem dashed #dddddd;
+  margin-top: 0;
+}
+.field-editor--array.sorting .field-editor--array__add {
   display: none;
 }
-.field-editor--array__item__toolbar {
-  flex-basis: 100%;
-  display: flex;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  background-color: #eeeeee;
-  padding: 0.5rem;
+.field-editor--array.sorting .field-editor--array__item {
+  background-color: #e70d3b;
+  cursor: move;
+  padding: 1rem;
+  border-radius: 0.5rem;
 }
-.field-editor--array__item__toolbar .widget--label {
-  flex-grow: 0;
-  flex-basis: 10rem;
+.field-editor--array.sorting .field-editor--array__item:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+.field-editor--array.sorting .field-editor--array__item.dragging {
+  background-color: transparent;
+  border: 2px dashed #e70d3b;
+}
+.field-editor--array.sorting .field-editor--array__item.dragging .editor__field__key {
+  color: #e70d3b;
+}
+.field-editor--array.sorting .field-editor--array__item .editor__field__add {
+  display: none;
+}
+.field-editor--array.sorting .field-editor--array__item .editor__field__key {
+  color: #ffffff;
+}
+.field-editor--array.sorting .field-editor--array__item .editor__field__key .editor__field__key__label::before {
+  display: none;
+}
+.field-editor--array.sorting .field-editor--array__item .editor__field__toolbar,
+.field-editor--array.sorting .field-editor--array__item .editor__field__value {
+  display: none;
+}
+.field-editor--array__item {
+  flex-wrap: wrap;
+  transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
+}
+.field-editor--array__add {
+  clear: both;
+  margin-top: 1rem;
+  margin-left: auto;
 }
 .field-editor--array.grid .field-editor--array__item {
   float: left;
   margin: 0.5rem;
   width: calc(100% / 3 - 1rem);
-}
-.field-editor--array.sorting .field-editor--array__item__toolbar {
-  display: none;
 }
 
 /**
@@ -2199,6 +2149,9 @@ h6 {
   color: #e70d3b;
   background-color: transparent;
   box-shadow: none;
+}
+.widget--button.embedded:hover {
+  color: #b70a2f;
 }
 .widget--button .fa:first-child {
   margin-right: 0.5rem;

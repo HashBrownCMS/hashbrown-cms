@@ -414,18 +414,19 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 });
 
                 // Return the DOM element
-                return _.div({class: 'editor__field' + (config.struct ? ' struct' : '')},
+                return _.div({class: 'editor__field' + (config.struct ? ' collapsible collapsed' : '')},
                     _.div({class: 'editor__field__key'},
-                        _.div({class: 'editor__field__key__label'}, fieldDefinition.label),
+                        _.div({class: 'editor__field__key__label'}, fieldDefinition.label)
+                            .click((e) => {
+                                if(!config.struct) { return; }
+
+                                e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
+                            }),
                         _.if(fieldDefinition.description,
                             _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
                         ),
                         fieldEditorInstance.renderKeyActions()
-                    ).click((e) => {
-                        if(!config.struct) { return; }
-
-                        e.currentTarget.parentElement.classList.toggle('expanded');
-                    }),
+                    ),
                     fieldEditorInstance.$element
                 );
             })    

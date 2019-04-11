@@ -1,22 +1,70 @@
 .field-editor--array {
-    &__item {
-        flex-wrap: wrap;
+    // Counteract the first item's top padding
+    margin-top: -1rem; 
+    transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
 
-        &.collapsed &__toolbar { display: none; }
+    &.sorting {
+        padding: 1rem;
+        border: 0.15rem dashed $standard-darker;
+        margin-top: 0;
+    }
 
-        &__toolbar {
-            flex-basis: 100%;
-            display: flex;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-            background-color: $standard-dark;
-            padding: 0.5rem;
+    &.sorting &__add {
+        display: none;
+    }
 
-            .widget--label {
-                flex-grow: 0;
-                flex-basis: 10rem;
+    &.sorting &__item {
+        background-color: $primary;
+        cursor: move;
+        padding: 1rem;
+        border-radius: 0.5rem;
+
+        &:not(:last-of-type) {
+            margin-bottom: 1rem;
+        }
+        
+        // Dragging state
+        &.dragging {
+            background-color: transparent;
+            border: 2px dashed $primary;
+
+            .editor__field__key {
+                color: $primary;
             }
         }
+        
+        // Hide the add button
+        .editor__field__add {
+            display: none;
+        }
+
+        // Style the sort key
+        .editor__field__key {
+            color: $primary-text;
+
+            .editor__field__key__label::before {
+                display: none;
+            }
+        }
+
+        // Hide the toolbar and value
+        .editor__field__toolbar,
+        .editor__field__value {
+            display: none;
+        }
+    }
+
+    // Array item
+    &__item {
+        flex-wrap: wrap;
+        transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
+    }
+            
+    // Add button
+    &__add {
+        clear: both;
+        margin-top: 1rem;
+        margin-left: auto;
     }
 
     // Grid
@@ -24,10 +72,5 @@
         float: left;
         margin: 0.5rem;
         width: calc(100% / 3 - 1rem);
-    }
-
-    // Sorting
-    &.sorting &__item__toolbar {
-        display: none;
     }
 }
