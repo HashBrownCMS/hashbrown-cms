@@ -5090,13 +5090,13 @@ class UIHelper {
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let itemSortKeyElement = element.querySelector('.editor__field__sort-key');
+            let itemSortKeyElement = element.querySelector('.editor__field__key__label');
             let itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
             let itemValue = object[itemKey];
 
             // Try to get the next key
             let nextKey = '';
-            let nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
+            let nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__key__label') : null;
 
             if(nextSortKeyElement) {
                 nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;

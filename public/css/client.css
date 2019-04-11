@@ -1,10 +1,4 @@
 @charset "UTF-8";
-/* Primary */
-/* Secondary */
-/* Warning */
-/* Success */
-/* Standard */
-/* Fancy backgrounds */
 html, body {
   height: 100%;
   font-family: "Roboto", sans-serif;
@@ -975,6 +969,7 @@ h6 {
   padding: 1rem 0;
   position: relative;
   border-bottom: 1px solid #dddddd;
+  transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
 }
 .editor__field:last-of-type {
   border-bottom: 0;
@@ -1132,10 +1127,48 @@ h6 {
   content: "";
 }
 .editor__field__value {
+  transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
   flex-grow: 1;
   border: 0 dashed transparent;
   border-radius: 0.2rem;
   position: relative;
+}
+.editor__field__value.sorting {
+  padding: 1rem;
+  border: 0.15rem dashed #dddddd;
+  margin-top: 0;
+}
+.editor__field__value.sorting > .editor__field__add {
+  display: none;
+}
+.editor__field__value.sorting > .editor__field {
+  background-color: #e70d3b;
+  cursor: move;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+.editor__field__value.sorting > .editor__field:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+.editor__field__value.sorting > .editor__field.dragging {
+  background-color: transparent;
+  border: 2px dashed #e70d3b;
+}
+.editor__field__value.sorting > .editor__field.dragging .editor__field__key {
+  color: #e70d3b;
+}
+.editor__field__value.sorting > .editor__field .editor__field__add {
+  display: none;
+}
+.editor__field__value.sorting > .editor__field .editor__field__key {
+  color: #ffffff;
+}
+.editor__field__value.sorting > .editor__field .editor__field__key .editor__field__key__label::before {
+  display: none;
+}
+.editor__field__value.sorting > .editor__field .editor__field__toolbar,
+.editor__field__value.sorting > .editor__field .editor__field__value {
+  display: none;
 }
 .editor__field__value__lock {
   position: absolute;
@@ -1181,20 +1214,9 @@ h6 {
   content: "";
   margin-right: 0.5rem;
 }
-.editor__field__sort-key {
-  background-color: transparent;
-  font-weight: bold;
-  border: 0;
-  pointer-events: none;
-  line-height: 2rem;
-  height: 2rem;
-  display: none;
-  flex-grow: 1;
-}
 .editor__field__add {
   clear: both;
   margin-top: 1rem;
-  margin-left: auto;
 }
 
 /**
@@ -1328,55 +1350,18 @@ h6 {
   max-height: 90vh;
 }
 
+/**
+ * The array field editor
+ */
 .field-editor--array {
-  margin-top: -1rem;
-  transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
-}
-.field-editor--array.sorting {
-  padding: 1rem;
-  border: 0.15rem dashed #dddddd;
-  margin-top: 0;
-}
-.field-editor--array.sorting .field-editor--array__add {
-  display: none;
-}
-.field-editor--array.sorting .field-editor--array__item {
-  background-color: #e70d3b;
-  cursor: move;
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
-.field-editor--array.sorting .field-editor--array__item:not(:last-of-type) {
-  margin-bottom: 1rem;
-}
-.field-editor--array.sorting .field-editor--array__item.dragging {
-  background-color: transparent;
-  border: 2px dashed #e70d3b;
-}
-.field-editor--array.sorting .field-editor--array__item.dragging .editor__field__key {
-  color: #e70d3b;
-}
-.field-editor--array.sorting .field-editor--array__item .editor__field__add {
-  display: none;
-}
-.field-editor--array.sorting .field-editor--array__item .editor__field__key {
-  color: #ffffff;
-}
-.field-editor--array.sorting .field-editor--array__item .editor__field__key .editor__field__key__label::before {
-  display: none;
-}
-.field-editor--array.sorting .field-editor--array__item .editor__field__toolbar,
-.field-editor--array.sorting .field-editor--array__item .editor__field__value {
-  display: none;
+  min-height: 10rem;
 }
 .field-editor--array__item {
   flex-wrap: wrap;
-  transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
 }
 .field-editor--array__add {
   clear: both;
   margin-top: 1rem;
-  margin-left: auto;
 }
 .field-editor--array.grid .field-editor--array__item {
   float: left;

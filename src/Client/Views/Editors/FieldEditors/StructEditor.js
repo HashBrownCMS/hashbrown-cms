@@ -217,12 +217,23 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                             fieldValue.config = fieldValue.config || {};
                             fieldValue.schemaId = fieldValue.schemaId || 'array';
 
-                            let $field = _.div({class: 'editor__field raised'});
+                            let $field = _.div({class: 'editor__field collapsible collapsed'});
 
                             let renderField = () => {
                                 _.append($field.empty(),
-                                    _.div({class: 'editor__field__sort-key'},
-                                        fieldKey
+                                    _.div({class: 'editor__field__key'},
+                                        _.div({class: 'editor__field__key__label'}, fieldKey)
+                                            .click((e) => {
+                                                e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
+                                            }),
+                                        _.div({class: 'editor__field__key__actions'},
+                                            _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove field'})
+                                                .click(() => {
+                                                    delete config.struct[fieldKey];
+
+                                                    renderEditor();
+                                                })
+                                        )
                                     ),
                                     _.div({class: 'editor__field__value'},
                                         _.div({class: 'editor__field'},
@@ -324,14 +335,6 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                                             return editor.renderConfigEditor(fieldValue.config, schema.id);
                                         })
-                                    ),
-                                    _.div({class: 'editor__field__actions'},
-                                        _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
-                                            .click(() => {
-                                                delete config.struct[fieldKey];
-
-                                                renderEditor();
-                                            })
                                     )
                                 )
                             };

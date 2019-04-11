@@ -252,17 +252,31 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @return {String} Label
      */
     getItemLabel(item, schema) {
-        if(schema.config) {
-            if(schema.config.label && item.value && item.value[schema.config.label]) {
-                return item.value[schema.config.label];
-            }
+        let label = '';
+        
+        // Use the schema config
+        if(schema.config && schema.config.label && item.value && item.value[schema.config.label]) {
+            label = item.value[schema.config.label];
+
+        // Or try the value as a string
+        } else if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
+            label = (item.value || '').toString();
+
+        // Or use the schema name
+        } else {
+            label = schema.name;
+        
         }
 
-        if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
-            return item.value;
+        // Strip HTML
+        label = new DOMParser().parseFromString(label, 'text/html').body.textContent || '';
+
+        // Limit characters
+        if(label.length > 80) {
+            label = label.substring(0, 77) + '...';
         }
 
-        return schema.name;
+        return label;
     }
 
     /**
@@ -382,7 +396,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 return $field;
             }),
-            _.button({title: 'Add an item', class: 'field-editor--array__add widget widget--button round fa fa-plus'})
+            _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
                 .click(async () => {
                     let index = this.value.length;
 

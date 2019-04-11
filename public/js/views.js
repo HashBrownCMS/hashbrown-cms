@@ -2238,25 +2238,32 @@ class ContentEditor extends Crisp.View {
      * Event: Click save
      */
     async onClickSave() {
-        this.$saveBtn.toggleClass('working', true);
-        
-        await HashBrown.Helpers.ContentHelper.setContentById(this.model.id, this.model);
+        try {
+            this.$saveBtn.toggleClass('working', true);
+            
+            await HashBrown.Helpers.ContentHelper.setContentById(this.model.id, this.model);
 
-        let saveAction = this.$element.find('.editor__footer__buttons select').val();
+            let saveAction = this.$element.find('.editor__footer__buttons select').val();
 
-        // Unpublish
-        if(this.connection && saveAction === 'unpublish') {
-            await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
+            // Unpublish
+            if(this.connection && saveAction === 'unpublish') {
+                await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
 
-        // Publish
-        } else if(this.connection && saveAction === 'publish') {
-            await HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
+            // Publish
+            } else if(this.connection && saveAction === 'publish') {
+                await HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
+
+            }
+            
+            this.dirty = false;
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        } finally {
+            this.$saveBtn.toggleClass('working', false);
 
         }
-        
-        this.$saveBtn.toggleClass('working', false);
-            
-        this.dirty = false;
     }
 
     /**
@@ -11342,7 +11349,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                         if(isValidTab && fieldValue.tabId !== this.currentTab) { return; }
                         if(!isValidTab && this.currentTab !== 'meta') { return; }
 
-                        let $field = _.div({class: 'editor__field raised'});
+                        let $field = _.div({class: 'editor__field collapsible collapsed'});
 
                         // Sanity check
                         fieldValue.config = fieldValue.config || {};
@@ -11350,8 +11357,19 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
                         let renderField = () => {
                             _.append($field.empty(),
-                                _.div({class: 'editor__field__sort-key'},
-                                    fieldKey
+                                _.div({class: 'editor__field__key'},
+                                    _.div({class: 'editor__field__key__label'}, fieldKey)
+                                        .click((e) => {
+                                            e.currentTarget.parentElement.parentElement.classList.toggle('collapsed')
+                                        }),
+                                    _.div({class: 'editor__field__key__actions'},
+                                        _.button({class: 'widget widget--button embedded small fa fa-remove', title: 'Remove field'})
+                                            .click(() => {
+                                                delete this.model.fields.properties[fieldKey];
+
+                                                renderFieldProperties();
+                                            })
+                                    )
                                 ),
                                 _.div({class: 'editor__field__value'},
                                     _.div({class: 'editor__field'},
@@ -11470,14 +11488,6 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
                                         return editor.renderConfigEditor(fieldValue.config, schema.id);
                                     })
-                                ),
-                                _.div({class: 'editor__field__actions'},
-                                    _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
-                                        .click(() => {
-                                            delete this.model.fields.properties[fieldKey];
-
-                                            renderFieldProperties();
-                                        })
                                 )
                             );
                         };
@@ -12181,17 +12191,31 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @return {String} Label
      */
     getItemLabel(item, schema) {
-        if(schema.config) {
-            if(schema.config.label && item.value && item.value[schema.config.label]) {
-                return item.value[schema.config.label];
-            }
+        let label = '';
+        
+        // Use the schema config
+        if(schema.config && schema.config.label && item.value && item.value[schema.config.label]) {
+            label = item.value[schema.config.label];
+
+        // Or try the value as a string
+        } else if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
+            label = (item.value || '').toString();
+
+        // Or use the schema name
+        } else {
+            label = schema.name;
+        
         }
 
-        if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
-            return item.value;
+        // Strip HTML
+        label = new DOMParser().parseFromString(label, 'text/html').body.textContent || '';
+
+        // Limit characters
+        if(label.length > 80) {
+            label = label.substring(0, 77) + '...';
         }
 
-        return schema.name;
+        return label;
     }
 
     /**
@@ -12311,7 +12335,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 return $field;
             }),
-            _.button({title: 'Add an item', class: 'field-editor--array__add widget widget--button round fa fa-plus'})
+            _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
                 .click(async () => {
                     let index = this.value.length;
 
@@ -13940,12 +13964,23 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                             fieldValue.config = fieldValue.config || {};
                             fieldValue.schemaId = fieldValue.schemaId || 'array';
 
-                            let $field = _.div({class: 'editor__field raised'});
+                            let $field = _.div({class: 'editor__field collapsible collapsed'});
 
                             let renderField = () => {
                                 _.append($field.empty(),
-                                    _.div({class: 'editor__field__sort-key'},
-                                        fieldKey
+                                    _.div({class: 'editor__field__key'},
+                                        _.div({class: 'editor__field__key__label'}, fieldKey)
+                                            .click((e) => {
+                                                e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
+                                            }),
+                                        _.div({class: 'editor__field__key__actions'},
+                                            _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove field'})
+                                                .click(() => {
+                                                    delete config.struct[fieldKey];
+
+                                                    renderEditor();
+                                                })
+                                        )
                                     ),
                                     _.div({class: 'editor__field__value'},
                                         _.div({class: 'editor__field'},
@@ -14047,14 +14082,6 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                                             return editor.renderConfigEditor(fieldValue.config, schema.id);
                                         })
-                                    ),
-                                    _.div({class: 'editor__field__actions'},
-                                        _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
-                                            .click(() => {
-                                                delete config.struct[fieldKey];
-
-                                                renderEditor();
-                                            })
                                     )
                                 )
                             };

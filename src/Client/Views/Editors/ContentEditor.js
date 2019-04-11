@@ -114,25 +114,32 @@ class ContentEditor extends Crisp.View {
      * Event: Click save
      */
     async onClickSave() {
-        this.$saveBtn.toggleClass('working', true);
-        
-        await HashBrown.Helpers.ContentHelper.setContentById(this.model.id, this.model);
+        try {
+            this.$saveBtn.toggleClass('working', true);
+            
+            await HashBrown.Helpers.ContentHelper.setContentById(this.model.id, this.model);
 
-        let saveAction = this.$element.find('.editor__footer__buttons select').val();
+            let saveAction = this.$element.find('.editor__footer__buttons select').val();
 
-        // Unpublish
-        if(this.connection && saveAction === 'unpublish') {
-            await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
+            // Unpublish
+            if(this.connection && saveAction === 'unpublish') {
+                await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', this.model);
 
-        // Publish
-        } else if(this.connection && saveAction === 'publish') {
-            await HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
+            // Publish
+            } else if(this.connection && saveAction === 'publish') {
+                await HashBrown.Helpers.RequestHelper.request('post', 'content/publish', this.model);
+
+            }
+            
+            this.dirty = false;
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        } finally {
+            this.$saveBtn.toggleClass('working', false);
 
         }
-        
-        this.$saveBtn.toggleClass('working', false);
-            
-        this.dirty = false;
     }
 
     /**

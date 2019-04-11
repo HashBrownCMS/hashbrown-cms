@@ -171,6 +171,7 @@
         padding: 1rem 0;
         position: relative;
         border-bottom: 1px solid $standard-darker;
+        transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
         
         &:last-of-type {
             border-bottom: 0;
@@ -391,10 +392,63 @@
 
         // Value
         &__value {
+            transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
             flex-grow: 1;
             border: 0 dashed transparent;
             border-radius: 0.2rem;
             position: relative;
+        
+            // Sorting mode
+            &.sorting {
+                padding: 1rem;
+                border: 0.15rem dashed $standard-darker;
+                margin-top: 0;
+            }
+                
+            &.sorting > .editor__field__add {
+                display: none;
+            }
+
+            &.sorting > .editor__field {
+                background-color: $primary;
+                cursor: move;
+                padding: 1rem;
+                border-radius: 0.5rem;
+
+                &:not(:last-of-type) {
+                    margin-bottom: 1rem;
+                }
+                
+                // Dragging state
+                &.dragging {
+                    background-color: transparent;
+                    border: 2px dashed $primary;
+
+                    .editor__field__key {
+                        color: $primary;
+                    }
+                }
+                
+                // Hide the add button
+                .editor__field__add {
+                    display: none;
+                }
+
+                // Style the sort key
+                .editor__field__key {
+                    color: $primary-text;
+
+                    .editor__field__key__label::before {
+                        display: none;
+                    }
+                }
+
+                // Hide the toolbar and value
+                .editor__field__toolbar,
+                .editor__field__value {
+                    display: none;
+                }
+            }
 
             // Lock
             &__lock {
@@ -449,23 +503,10 @@
             }
         }
 
-        // Sort key
-        &__sort-key {
-            background-color: transparent;
-            font-weight: bold;
-            border: 0;
-            pointer-events: none;
-            line-height: 2rem;
-            height: 2rem;
-            display: none;
-            flex-grow: 1;
-        }
-            
         // Add button
         &__add {
             clear: both;
             margin-top: 1rem;
-            margin-left: auto;
         }
     }
 }
