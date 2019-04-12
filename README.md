@@ -25,7 +25,7 @@ Configuring MongoDB:
   - `MONGODB_PORT`: port(s), split by comma
   - `MONGODB_USERNAME`: username
   - `MONGODB_PASSWORD`: password
-  - `MONGODB_PREFIX`: date base name prefix
+  - `MONGODB_PREFIX`: date base name prefix, default value is `hb_`
   - `MONGODB_OPTIONS`: connection options, JSON string containing key/value pairs.
 
 - or by `/config/database.cfg`
