@@ -32,12 +32,12 @@ Configuring MongoDB:
 
 ```
 {
-  "MONGODB_HOST": "host" | ["host1", "host2"] | "host1,host2",
-  "MONGODB_PORT": "port" | [port1, port2] | "port1,port2",
-  "MONGODB_USERNAME": "<username>",
-  "MONGODB_PASSWORD": "<password>",
-  "MONGODB_PREFIX": "<data base name prefix>",
-  "MONGODB_OPTIONS": {
+  "host": "host" | ["host1", "host2"] | "host1,host2",
+  "port": "port" | [port1, port2] | "port1,port2",
+  "username": "<username>",
+  "password": "<password>",
+  "prefix": "<database name prefix>",
+  "options": {
     "<key>": "<value>",
     ...
   }
