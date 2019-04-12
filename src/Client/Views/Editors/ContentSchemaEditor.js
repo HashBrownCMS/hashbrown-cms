@@ -276,7 +276,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                                     this.model.fields.properties = newProperties;
 
                                                     // Update the sort key
-                                                    $field.find('.editor__field__sort-key').html(fieldKey);
+                                                    $field.find('.editor__field__key__label').html(fieldKey);
                                                 }
                                             }).$element
                                         )

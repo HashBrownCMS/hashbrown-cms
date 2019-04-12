@@ -230,7 +230,9 @@ class SchemaHelper extends SchemaHelperCommon {
 
             schema = await HashBrown.Helpers.DatabaseHelper.findOne(project, collection, { id: id });
         }
-        
+       
+        if(!schema) { throw new Error('Schema "' + id + '" could not be found'); }
+
         // Get parent fields if specified
         if(withParentFields && schema.parentSchemaId) {
             let childSchema = this.getModel(schema);
@@ -243,10 +245,10 @@ class SchemaHelper extends SchemaHelperCommon {
 
                 childSchema = parentSchema;
             }
-
+            
             return mergedSchema;
         }
-        
+            
         return this.getModel(schema);
     }
    

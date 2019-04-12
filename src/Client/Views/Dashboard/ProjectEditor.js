@@ -24,10 +24,16 @@ class ProjectEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
-        this.model = new HashBrown.Models.Project(this.model);
+        try {
+            this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
+            this.model = new HashBrown.Models.Project(this.model);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
         
     /**

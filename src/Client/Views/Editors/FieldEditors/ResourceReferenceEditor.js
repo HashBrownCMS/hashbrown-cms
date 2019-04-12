@@ -16,11 +16,18 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
      * Fetches the model
      */
     async fetch() {
-        if(this.config.resource && this.value) {
-            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
-        }
+        try {
+            if(this.config.resource && this.value) {
+                this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
+            }
 
-        super.fetch();
+        } catch(e) {
+            debug.log(e.message, this);
+        
+        } finally {
+            super.fetch();
+
+        }
     }
 
     /**

@@ -171,8 +171,8 @@
         padding: 1rem 0;
         position: relative;
         border-bottom: 1px solid $standard-darker;
-        transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
-        
+        transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+
         &:last-of-type {
             border-bottom: 0;
             padding-bottom: 0;
@@ -229,6 +229,10 @@
             &::before {
                 content: '\f0da';
             }
+        }
+
+        &:not(.collapsible) > &__value:nth-child(2) > &:first-child {
+            padding-top: 0;
         }
 
         // Tablet mode
@@ -412,7 +416,7 @@
             &.sorting > .editor__field {
                 background-color: $primary;
                 cursor: move;
-                padding: 1rem;
+                padding: 1rem !important;
                 border-radius: 0.5rem;
 
                 &:not(:last-of-type) {

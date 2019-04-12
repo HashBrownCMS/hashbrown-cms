@@ -27,13 +27,19 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
      * Fetches the model
      */
     async fetch() {
-        this.value = await this.model.getSettings('publishing') || {};
-        
-        if(this.value.governedBy) {
-            this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
-        }
+        try {
+            this.value = await this.model.getSettings('publishing') || {};
+            
+            if(this.value.governedBy) {
+                this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
+            }
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

@@ -40,9 +40,15 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         for(let schemaId of this.config.allowedSchemas || []) {
             if(!schemaId) { continue; }
             
-            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
+            try {
+                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
 
-            this.allowedSchemas.push(schema);
+                this.allowedSchemas.push(schema);
+
+            } catch(e) {
+                debug.log(e.message, this);
+
+            }
         }
 
         super.fetch();
@@ -71,7 +77,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {
-        if(!this.value || this.value.length < 1 || this.config.isGrid) { return; }
+        if(this.config.isGrid) { return; }
 
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
@@ -330,14 +336,20 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     // Hook up the change event
                     editorInstance.on('change', (newValue) => {
                         item.value = newValue;
+                        
+                        let key = $field[0].children[0];
 
-                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__actions .fa-remove').title = 'Remove "' + this.getItemLabel(item, schema) + '"';
                     });
                     
                     editorInstance.on('silentchange', (newValue) => {
                         item.value = newValue;
 
-                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
+                        let key = $field[0].children[0];
+                        
+                        key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__actions .fa-remove').title = 'Remove "' + this.getItemLabel(item, schema) + '"';
                     });
 
                     _.append($field.empty(),
@@ -348,7 +360,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                     e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
                                 }),
                             _.div({class: 'editor__field__key__actions'},
-                                _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove item'})
+                                _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove "' + this.getItemLabel(item, schema) + '"'})
                                     .click(() => {
                                         this.value.splice(i, 1);
                                 
@@ -386,9 +398,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         ),
                 
                         // Render field editor instance
-                        _.div({class: 'editor__field__value'},
-                            editorInstance.$element
-                        )
+                        editorInstance.$element
                     );
                 };
 

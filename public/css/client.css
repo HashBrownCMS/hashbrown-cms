@@ -969,7 +969,7 @@ h6 {
   padding: 1rem 0;
   position: relative;
   border-bottom: 1px solid #dddddd;
-  transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease, padding 0.3s ease;
 }
 .editor__field:last-of-type {
   border-bottom: 0;
@@ -1011,6 +1011,9 @@ h6 {
 }
 .editor__field.collapsible.collapsed > .editor__field__key > .editor__field__key__label::before {
   content: "";
+}
+.editor__field:not(.collapsible) > .editor__field__value:nth-child(2) > .editor__field:first-child {
+  padding-top: 0;
 }
 @media (max-width: 991px) {
   .editor__field {
@@ -1144,7 +1147,7 @@ h6 {
 .editor__field__value.sorting > .editor__field {
   background-color: #e70d3b;
   cursor: move;
-  padding: 1rem;
+  padding: 1rem !important;
   border-radius: 0.5rem;
 }
 .editor__field__value.sorting > .editor__field:not(:last-of-type) {

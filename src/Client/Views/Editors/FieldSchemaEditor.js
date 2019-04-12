@@ -10,8 +10,12 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      * Pre render
      */
     prerender() {
-        if(!this.model.editorId && this.parentSchema) { 
+        if(this.model.parentSchemaId !== 'fieldBase') {
             this.model.editorId = this.parentSchema.editorId;
+        
+            if(!this.model.editorId) {
+                UI.errorModal(new Error('Could not find a field editor for this schema'));     
+            }
         }
     }
 
@@ -25,9 +29,7 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
         if(!editor) { return; }
 
-        return _.div({class: 'config'},
-            editor.renderConfigEditor(this.model.config, this.model.id)
-        );
+        return editor.renderConfigEditor(this.model.config, this.model.id);
     }
 
     /**
@@ -35,20 +37,22 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      */
     renderFields() {
         let $element = super.renderFields();
-        
-        $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
-            useTypeahead: true,
-            value: this.model.editorId,
-            options: HashBrown.Views.Editors.FieldEditors,
-            valueKey: 'name',
-            labelKey: 'name',
-            onChange: (newEditor) => {
-                this.model.editorId = newEditor;
+       
+        if(this.model.parentSchemaId === 'fieldBase') {
+            $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
+                useTypeahead: true,
+                value: this.model.editorId,
+                options: HashBrown.Views.Editors.FieldEditors,
+                valueKey: 'name',
+                labelKey: 'name',
+                onChange: (newEditor) => {
+                    this.model.editorId = newEditor;
 
-                this.fetch();
-            }
-        }).$element));
-        
+                    this.fetch();
+                }
+            }).$element));
+        }
+
         $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
 
         return $element;

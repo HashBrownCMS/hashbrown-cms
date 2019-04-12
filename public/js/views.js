@@ -204,16 +204,22 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
      * Fetches the model
      */
     async fetch() {
-        if(this.options && typeof this.options.then === 'function') {
-            this.options = await this.options;
-        
-        } else if(this.optionsUrl) {
-            this.isAsync = true;
+        try {
+            if(this.options && typeof this.options.then === 'function') {
+                this.options = await this.options;
             
-            this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
-        }
+            } else if(this.optionsUrl) {
+                this.isAsync = true;
                 
-        super.fetch();
+                this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
+            }
+                    
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -1744,13 +1750,19 @@ class PublishingSettingsModal extends HashBrown.Views.Modals.Modal {
      * Fetches the model
      */
     async fetch() {
-        this.value = await this.model.getSettings('publishing') || {};
-        
-        if(this.value.governedBy) {
-            this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
-        }
+        try {
+            this.value = await this.model.getSettings('publishing') || {};
+            
+            if(this.value.governedBy) {
+                this.governingContent = await HashBrown.Helpers.ContentHelper.getContentById(this.value.governedBy);
+            }
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -1851,9 +1863,15 @@ class ConnectionEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.modelId);
+        try {
+            this.model = await HashBrown.Helpers.ConnectionHelper.getConnectionById(this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -2146,50 +2164,56 @@ class ContentEditor extends Crisp.View {
      * @param {String} id
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
-        
-        if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
-        
-        this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
-        
-        if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
-        
-        let publishingSettings = await this.model.getSettings('publishing');
-       
-        let connectionId = publishingSettings.connectionId
-
-        if(publishingSettings.governedBy) {
-            let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
-            let governingPublishingSettings = await governingContent.getSettings('publishing');
-
-            connectionId = governingPublishingSettings.connectionId;
-        }
-
-        if(connectionId) {
-            this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
-        } else {
-            this.connection = null;
-        }
-
-        this.fieldSchemas = {};
-        
-        for(let key in this.schema.fields) {
-            let fieldSchemaId = this.schema.fields[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+        try {
+            this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
-        
-        for(let key in this.schema.fields.properties) {
-            let fieldSchemaId = this.schema.fields.properties[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+            if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
+            this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
+            
+            if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
+            
+            let publishingSettings = await this.model.getSettings('publishing');
+           
+            let connectionId = publishingSettings.connectionId
 
-        super.fetch();
+            if(publishingSettings.governedBy) {
+                let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
+                let governingPublishingSettings = await governingContent.getSettings('publishing');
+
+                connectionId = governingPublishingSettings.connectionId;
+            }
+
+            if(connectionId) {
+                this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
+            } else {
+                this.connection = null;
+            }
+
+            this.fieldSchemas = {};
+            
+            for(let key in this.schema.fields) {
+                let fieldSchemaId = this.schema.fields[key].schemaId;
+
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+            
+            for(let key in this.schema.fields.properties) {
+                let fieldSchemaId = this.schema.fields.properties[key].schemaId;
+
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+
+            super.fetch();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -2606,9 +2630,15 @@ class FormEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
+        try {
+            this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**
@@ -3017,11 +3047,17 @@ class JSONEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-        this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
-        this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
+        try {
+            this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+            this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
+            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -10624,9 +10660,15 @@ class MediaViewer extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
+        try {
+            this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -10703,39 +10745,45 @@ class UserEditor extends HashBrown.Views.Modals.Modal {
      * Fetches the model
      */
     async fetch() {
-        super.fetch();
+        try {
+            super.fetch();
 
-        if(currentUserIsAdmin() && !this.hidePermissions) {
-            let body = this.element.querySelector('.modal__body');
-            let $spinner = UI.spinner(body); 
-            
-            this.projects = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects');
+            if(currentUserIsAdmin() && !this.hidePermissions) {
+                let body = this.element.querySelector('.modal__body');
+                let $spinner = UI.spinner(body); 
+                
+                this.projects = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/projects');
 
-            $spinner.remove();
-            
-            _.append(body,
-                this.renderField('Is admin', this.renderAdminEditor()),
-                _.if(!this.model.isAdmin,
-                    _.div({class: 'widget widget--separator'}, 'Projects'),
-                    _.each(this.projects, (i, project) => {
-                        return _.div({class: 'widget-group'},
-                            new HashBrown.Views.Widgets.Input({
-                                type: 'checkbox',
-                                value: this.model.hasScope(project.id),
-                                onChange: (newValue) => {
-                                    if(newValue) {
-                                        this.model.giveScope(project.id);
-                                    } else {
-                                        this.model.removeScope(project.id);
+                $spinner.remove();
+                
+                _.append(body,
+                    this.renderField('Is admin', this.renderAdminEditor()),
+                    _.if(!this.model.isAdmin,
+                        _.div({class: 'widget widget--separator'}, 'Projects'),
+                        _.each(this.projects, (i, project) => {
+                            return _.div({class: 'widget-group'},
+                                new HashBrown.Views.Widgets.Input({
+                                    type: 'checkbox',
+                                    value: this.model.hasScope(project.id),
+                                    onChange: (newValue) => {
+                                        if(newValue) {
+                                            this.model.giveScope(project.id);
+                                        } else {
+                                            this.model.removeScope(project.id);
+                                        }
                                     }
-                                }
-                            }).$element,
-                            _.div({class: 'widget widget--label'}, project.settings.info.name),
-                            this.renderScopesEditor(project.id)
-                        );
-                    })
+                                }).$element,
+                                _.div({class: 'widget widget--label'}, project.settings.info.name),
+                                this.renderScopesEditor(project.id)
+                            );
+                        })
+                    )
                 )
-            )
+            }
+
+        } catch(e) {
+            UI.errorModal(e);
+        
         }
     }
     
@@ -10958,9 +11006,17 @@ class SchemaEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        try {
+            this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        
+            this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -11026,17 +11082,22 @@ class SchemaEditor extends Crisp.View {
      *
      * @param {String} label
      * @param {HTMLElement} content
-     * @param {Boolean} isVertical
+     * @param {Boolean} isCollapsible
      * @param {Boolean} isLocked
      *
      * @return {HTMLElement} Editor element
      */
-    renderField(label, $content, isVertical, isLocked) {
+    renderField(label, $content, isCollapsible, isLocked) {
         if(!$content) { return; }
 
-        return _.div({class: 'editor__field ' + (isVertical ? 'vertical' : '')},
+        return _.div({class: 'editor__field ' + (isCollapsible ? 'collapsible collapsed' : '')},
             _.div({class: 'editor__field__key'},
-                label
+                _.div({class: 'editor__field__key__label'}, label)
+                    .click((e) => {
+                        if(!isCollapsible) { return; }
+
+                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
+                    })
             ),
             _.div({class: 'editor__field__value'},
                 _.if(isLocked,
@@ -11418,7 +11479,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                                     this.model.fields.properties = newProperties;
 
                                                     // Update the sort key
-                                                    $field.find('.editor__field__sort-key').html(fieldKey);
+                                                    $field.find('.editor__field__key__label').html(fieldKey);
                                                 }
                                             }).$element
                                         )
@@ -11539,8 +11600,12 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      * Pre render
      */
     prerender() {
-        if(!this.model.editorId && this.parentSchema) { 
+        if(this.model.parentSchemaId !== 'fieldBase') {
             this.model.editorId = this.parentSchema.editorId;
+        
+            if(!this.model.editorId) {
+                UI.errorModal(new Error('Could not find a field editor for this schema'));     
+            }
         }
     }
 
@@ -11554,9 +11619,7 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
         if(!editor) { return; }
 
-        return _.div({class: 'config'},
-            editor.renderConfigEditor(this.model.config, this.model.id)
-        );
+        return editor.renderConfigEditor(this.model.config, this.model.id);
     }
 
     /**
@@ -11564,20 +11627,22 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      */
     renderFields() {
         let $element = super.renderFields();
-        
-        $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
-            useTypeahead: true,
-            value: this.model.editorId,
-            options: HashBrown.Views.Editors.FieldEditors,
-            valueKey: 'name',
-            labelKey: 'name',
-            onChange: (newEditor) => {
-                this.model.editorId = newEditor;
+       
+        if(this.model.parentSchemaId === 'fieldBase') {
+            $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
+                useTypeahead: true,
+                value: this.model.editorId,
+                options: HashBrown.Views.Editors.FieldEditors,
+                valueKey: 'name',
+                labelKey: 'name',
+                onChange: (newEditor) => {
+                    this.model.editorId = newEditor;
 
-                this.fetch();
-            }
-        }).$element));
-        
+                    this.fetch();
+                }
+            }).$element));
+        }
+
         $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
 
         return $element;
@@ -11979,9 +12044,15 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         for(let schemaId of this.config.allowedSchemas || []) {
             if(!schemaId) { continue; }
             
-            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
+            try {
+                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
 
-            this.allowedSchemas.push(schema);
+                this.allowedSchemas.push(schema);
+
+            } catch(e) {
+                debug.log(e.message, this);
+
+            }
         }
 
         super.fetch();
@@ -12010,7 +12081,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Actions
      */
     renderKeyActions() {
-        if(!this.value || this.value.length < 1 || this.config.isGrid) { return; }
+        if(this.config.isGrid) { return; }
 
         return [
             _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
@@ -12269,14 +12340,20 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     // Hook up the change event
                     editorInstance.on('change', (newValue) => {
                         item.value = newValue;
+                        
+                        let key = $field[0].children[0];
 
-                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__actions .fa-remove').title = 'Remove "' + this.getItemLabel(item, schema) + '"';
                     });
                     
                     editorInstance.on('silentchange', (newValue) => {
                         item.value = newValue;
 
-                        $field[0].children[0].children[0].innerHTML = this.getItemLabel(item, schema);
+                        let key = $field[0].children[0];
+                        
+                        key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+                        key.querySelector('.editor__field__key__actions .fa-remove').title = 'Remove "' + this.getItemLabel(item, schema) + '"';
                     });
 
                     _.append($field.empty(),
@@ -12287,7 +12364,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                     e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
                                 }),
                             _.div({class: 'editor__field__key__actions'},
-                                _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove item'})
+                                _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove "' + this.getItemLabel(item, schema) + '"'})
                                     .click(() => {
                                         this.value.splice(i, 1);
                                 
@@ -12325,9 +12402,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         ),
                 
                         // Render field editor instance
-                        _.div({class: 'editor__field__value'},
-                            editorInstance.$element
-                        )
+                        editorInstance.$element
                     );
                 };
 
@@ -12589,40 +12664,45 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
      * Fetches the model
      */
     async fetch() {
-        // Get dropdown options 
-        this.contentSchemas = [];
+        try {
+            // Get dropdown options 
+            this.contentSchemas = [];
 
-        let allSchemas = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
+            let allSchemas = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
 
-        for(let schema of allSchemas) {
-            let isNative = schema.id == 'page' || schema.id == 'contentBase';
+            for(let schema of allSchemas) {
+                let isNative = schema.id == 'page' || schema.id == 'contentBase';
 
-            if(
-                schema.type == 'content' &&
-                !isNative &&
-                (
-                    !this.config ||
-                    !this.config.allowedSchemas ||
-                    !Array.isArray(this.config.allowedSchemas) ||
-                    this.config.allowedSchemas.indexOf(schema.id) > -1
-                )
-            ) {
-                this.contentSchemas.push({
-                    name: schema.name,
-                    id: schema.id
-                });
+                if(
+                    schema.type == 'content' &&
+                    !isNative &&
+                    (
+                        !this.config ||
+                        !this.config.allowedSchemas ||
+                        !Array.isArray(this.config.allowedSchemas) ||
+                        this.config.allowedSchemas.indexOf(schema.id) > -1
+                    )
+                ) {
+                    this.contentSchemas.push({
+                        name: schema.name,
+                        id: schema.id
+                    });
+                }
             }
+
+            // Adopt allowed Schemas from parent if applicable
+            let parentSchema = await this.getParentSchema();
+
+            if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
+                this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+            }
+
+            super.fetch();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
         }
-
-        // Adopt allowed Schemas from parent if applicable
-        let parentSchema = await this.getParentSchema();
-
-        if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
-            this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-        }
-
-
-        super.fetch();
     }
 
     /**
@@ -13051,11 +13131,17 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
      * Fetches the model
      */
     async fetch() {
-        if(this.value) {
-            this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.value);
-        }
+        try {
+            if(this.value) {
+                this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.value);
+            }
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -13270,11 +13356,18 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
      * Fetches the model
      */
     async fetch() {
-        if(this.config.resource && this.value) {
-            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
-        }
+        try {
+            if(this.config.resource && this.value) {
+                this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
+            }
 
-        super.fetch();
+        } catch(e) {
+            debug.log(e.message, this);
+        
+        } finally {
+            super.fetch();
+
+        }
     }
 
     /**
@@ -13795,17 +13888,23 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Fetches the model
      */
     async fetch() {
-        this.fieldSchemas = {};
-        
-        for(let key in this.getStruct()) {
-            let fieldSchemaId = this.getStruct()[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+        try {
+            this.fieldSchemas = {};
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
+            for(let key in this.getStruct()) {
+                let fieldSchemaId = this.getStruct()[key].schemaId;
 
-        super.fetch();
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**
@@ -14014,7 +14113,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                                         config.struct = newStruct;
                                                     
                                                         // Update the sort key
-                                                        $field.find('.editor__field__sort-key').html(fieldKey);
+                                                        $field.find('.editor__field__key__label').html(fieldKey);
                                                     }
                                                 })
                                             )
@@ -17046,10 +17145,16 @@ class ProjectEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
-        this.model = new HashBrown.Models.Project(this.model);
+        try {
+            this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
+            this.model = new HashBrown.Models.Project(this.model);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
         
     /**

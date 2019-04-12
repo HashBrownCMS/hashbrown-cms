@@ -23,11 +23,17 @@ class JSONEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-        this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
-        this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
+        try {
+            this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+            this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
+            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

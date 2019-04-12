@@ -27,11 +27,17 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
      * Fetches the model
      */
     async fetch() {
-        if(this.value) {
-            this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.value);
-        }
+        try {
+            if(this.value) {
+                this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.value);
+            }
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

@@ -22,50 +22,56 @@ class ContentEditor extends Crisp.View {
      * @param {String} id
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
-        
-        if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
-        
-        this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
-        
-        if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
-        
-        let publishingSettings = await this.model.getSettings('publishing');
-       
-        let connectionId = publishingSettings.connectionId
-
-        if(publishingSettings.governedBy) {
-            let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
-            let governingPublishingSettings = await governingContent.getSettings('publishing');
-
-            connectionId = governingPublishingSettings.connectionId;
-        }
-
-        if(connectionId) {
-            this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
-        } else {
-            this.connection = null;
-        }
-
-        this.fieldSchemas = {};
-        
-        for(let key in this.schema.fields) {
-            let fieldSchemaId = this.schema.fields[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+        try {
+            this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
-        
-        for(let key in this.schema.fields.properties) {
-            let fieldSchemaId = this.schema.fields.properties[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+            if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
+            this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
+            
+            if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
+            
+            let publishingSettings = await this.model.getSettings('publishing');
+           
+            let connectionId = publishingSettings.connectionId
 
-        super.fetch();
+            if(publishingSettings.governedBy) {
+                let governingContent = await HashBrown.Helpers.ContentHelper.getContentById(publishingSettings.governedBy);
+                let governingPublishingSettings = await governingContent.getSettings('publishing');
+
+                connectionId = governingPublishingSettings.connectionId;
+            }
+
+            if(connectionId) {
+                this.connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(connectionId);
+            } else {
+                this.connection = null;
+            }
+
+            this.fieldSchemas = {};
+            
+            for(let key in this.schema.fields) {
+                let fieldSchemaId = this.schema.fields[key].schemaId;
+
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+            
+            for(let key in this.schema.fields.properties) {
+                let fieldSchemaId = this.schema.fields.properties[key].schemaId;
+
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+
+            super.fetch();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

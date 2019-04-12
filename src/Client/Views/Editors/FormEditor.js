@@ -16,9 +16,15 @@ class FormEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
+        try {
+            this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**

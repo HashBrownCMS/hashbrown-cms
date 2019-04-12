@@ -19,9 +19,15 @@ class MediaViewer extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
+        try {
+            this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.modelId);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

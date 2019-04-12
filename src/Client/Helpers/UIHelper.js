@@ -576,10 +576,8 @@ class UIHelper {
         if(error instanceof String) {
             error = new Error(error);
         
-        } else if(error instanceof Object) {
-            if(error.responseText) {
-                error = new Error(error.responseText);
-            }
+        } else if(error.responseText) {
+            error = new Error(error.responseText);
         
         } else if(error instanceof Error === false) {
             error = new Error(error.toString());
@@ -587,6 +585,7 @@ class UIHelper {
         }
        
         debug.log(error.message + ': ' + error.stack, 'HashBrown');
+        console.trace();
 
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }

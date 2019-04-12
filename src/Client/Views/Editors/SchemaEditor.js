@@ -16,9 +16,17 @@ class SchemaEditor extends Crisp.View {
      * Fetches the model
      */
     async fetch() {
-        this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        try {
+            this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+        
+            this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
 
-        super.fetch();
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -84,17 +92,22 @@ class SchemaEditor extends Crisp.View {
      *
      * @param {String} label
      * @param {HTMLElement} content
-     * @param {Boolean} isVertical
+     * @param {Boolean} isCollapsible
      * @param {Boolean} isLocked
      *
      * @return {HTMLElement} Editor element
      */
-    renderField(label, $content, isVertical, isLocked) {
+    renderField(label, $content, isCollapsible, isLocked) {
         if(!$content) { return; }
 
-        return _.div({class: 'editor__field ' + (isVertical ? 'vertical' : '')},
+        return _.div({class: 'editor__field ' + (isCollapsible ? 'collapsible collapsed' : '')},
             _.div({class: 'editor__field__key'},
-                label
+                _.div({class: 'editor__field__key__label'}, label)
+                    .click((e) => {
+                        if(!isCollapsible) { return; }
+
+                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
+                    })
             ),
             _.div({class: 'editor__field__value'},
                 _.if(isLocked,

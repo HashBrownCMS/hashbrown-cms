@@ -460,22 +460,16 @@ class UserHelper {
      *
      * @returns {Promise} User object
      */
-    static getUserById(id) {
+    static async getUserById(id) {
+        checkParam(id, 'id', String);
+        
         let query = {};
 
-        debug.log('Getting user "' + id + '"...', this, 3);
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id }, { tokens: 0, password: 0 });
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                id: id
-            },
-            {
-                tokens: 0,
-                password: 0
-            }
-        );
+        if(!user) { throw new Error('User "' + id + '" could not be found'); }
+
+        return user;
     }
     
     /**

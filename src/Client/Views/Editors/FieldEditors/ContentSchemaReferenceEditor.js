@@ -30,40 +30,45 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
      * Fetches the model
      */
     async fetch() {
-        // Get dropdown options 
-        this.contentSchemas = [];
+        try {
+            // Get dropdown options 
+            this.contentSchemas = [];
 
-        let allSchemas = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
+            let allSchemas = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
 
-        for(let schema of allSchemas) {
-            let isNative = schema.id == 'page' || schema.id == 'contentBase';
+            for(let schema of allSchemas) {
+                let isNative = schema.id == 'page' || schema.id == 'contentBase';
 
-            if(
-                schema.type == 'content' &&
-                !isNative &&
-                (
-                    !this.config ||
-                    !this.config.allowedSchemas ||
-                    !Array.isArray(this.config.allowedSchemas) ||
-                    this.config.allowedSchemas.indexOf(schema.id) > -1
-                )
-            ) {
-                this.contentSchemas.push({
-                    name: schema.name,
-                    id: schema.id
-                });
+                if(
+                    schema.type == 'content' &&
+                    !isNative &&
+                    (
+                        !this.config ||
+                        !this.config.allowedSchemas ||
+                        !Array.isArray(this.config.allowedSchemas) ||
+                        this.config.allowedSchemas.indexOf(schema.id) > -1
+                    )
+                ) {
+                    this.contentSchemas.push({
+                        name: schema.name,
+                        id: schema.id
+                    });
+                }
             }
+
+            // Adopt allowed Schemas from parent if applicable
+            let parentSchema = await this.getParentSchema();
+
+            if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
+                this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+            }
+
+            super.fetch();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
         }
-
-        // Adopt allowed Schemas from parent if applicable
-        let parentSchema = await this.getParentSchema();
-
-        if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
-            this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-        }
-
-
-        super.fetch();
     }
 
     /**

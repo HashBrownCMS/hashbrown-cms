@@ -48,17 +48,23 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Fetches the model
      */
     async fetch() {
-        this.fieldSchemas = {};
-        
-        for(let key in this.getStruct()) {
-            let fieldSchemaId = this.getStruct()[key].schemaId;
-
-            if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+        try {
+            this.fieldSchemas = {};
             
-            this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
-        }
+            for(let key in this.getStruct()) {
+                let fieldSchemaId = this.getStruct()[key].schemaId;
 
-        super.fetch();
+                if(!fieldSchemaId || this.fieldSchemas[fieldSchemaId]) { continue; }
+                
+                this.fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);            
+            }
+
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**
@@ -267,7 +273,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                                         config.struct = newStruct;
                                                     
                                                         // Update the sort key
-                                                        $field.find('.editor__field__sort-key').html(fieldKey);
+                                                        $field.find('.editor__field__key__label').html(fieldKey);
                                                     }
                                                 })
                                             )

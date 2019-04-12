@@ -17,16 +17,22 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
      * Fetches the model
      */
     async fetch() {
-        if(this.options && typeof this.options.then === 'function') {
-            this.options = await this.options;
-        
-        } else if(this.optionsUrl) {
-            this.isAsync = true;
+        try {
+            if(this.options && typeof this.options.then === 'function') {
+                this.options = await this.options;
             
-            this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
-        }
+            } else if(this.optionsUrl) {
+                this.isAsync = true;
                 
-        super.fetch();
+                this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
+            }
+                    
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**

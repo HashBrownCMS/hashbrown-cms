@@ -60,26 +60,17 @@ Crisp.Router.route('/schemas/:id', async () => {
     // First get the Schema model
     let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(Crisp.Router.params.id);
 
-    // Then get the parent Schema, if available
-    let parentSchema = null;
-    
-    if(schema.parentSchemaId) {
-        parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.parentSchemaId, true);
-    }
-
     let schemaEditor;
 
     if(schema instanceof HashBrown.Models.ContentSchema) {
         schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
             modelId: schema.id,
-            model: schema,
-            parentSchema: parentSchema
+            model: schema
         });
     } else {
         schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
             modelId: schema.id,
-            model: schema,
-            parentSchema: parentSchema
+            model: schema
         });
     }
         
