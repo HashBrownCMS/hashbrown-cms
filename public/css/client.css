@@ -1365,7 +1365,7 @@ h6 {
  * The array field editor
  */
 .field-editor--array {
-  min-height: 10rem;
+  min-height: 11rem;
 }
 .field-editor--array__item {
   flex-wrap: wrap;

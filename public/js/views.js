@@ -97,8 +97,8 @@
 __webpack_require__(228);
 __webpack_require__(233);
 __webpack_require__(243);
-__webpack_require__(275);
-__webpack_require__(285);
+__webpack_require__(276);
+__webpack_require__(286);
 
 
 /***/ }),
@@ -1823,26 +1823,74 @@ module.exports = PublishingSettingsModal;
  * @namespace HashBrown.Client.Views.Editors
  */
 namespace('Views.Editors')
-.add(__webpack_require__(292))
 .add(__webpack_require__(244))
 .add(__webpack_require__(245))
 .add(__webpack_require__(246))
 .add(__webpack_require__(247))
-.add(__webpack_require__(252))
+.add(__webpack_require__(248))
 .add(__webpack_require__(253))
 .add(__webpack_require__(254))
 .add(__webpack_require__(255))
 .add(__webpack_require__(256))
 .add(__webpack_require__(257))
+.add(__webpack_require__(258))
 
 namespace('Views.Editors.DeployerEditors');
 namespace('Views.Editors.ProcessorEditors');
 
-__webpack_require__(258)
+__webpack_require__(259)
 
 
 /***/ }),
 /* 244 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A basic editor that other editors inherit from
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+class Editor extends Crisp.View {
+    constructor(params) {
+        super(params);
+
+        this.fetch();
+    }
+
+    /**
+     * Renders a field
+     *
+     * @param {Object|String} key
+     * @param {HTMLElement|Array} value
+     *
+     * @return {HTMLElement} Element
+     */
+    field(key, ...value) {
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'},
+                _.div({class: 'editor__field__key__label'}, key.label || key),
+                _.if(key.description,
+                    _.div({class: 'editor__field__key__description'}, key.description)
+                ),
+                _.if(key.actions,
+                    _.div({class: 'editor__field__key__actions'}, key.actions)
+                )
+            ),
+            _.div({class: 'editor__field__value'},
+                value
+            )
+        );
+    }
+}
+
+module.exports = Editor;
+
+
+/***/ }),
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2071,7 +2119,7 @@ module.exports = ConnectionEditor;
 
 
 /***/ }),
-/* 245 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2543,7 +2591,7 @@ module.exports = ContentEditor;
 
 
 /***/ }),
-/* 246 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2953,13 +3001,13 @@ module.exports = FormEditor;
 
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const beautify = __webpack_require__(248).js_beautify;
+const beautify = __webpack_require__(249).js_beautify;
 
 /**
  * A basic JSON editor for any object
@@ -3259,7 +3307,7 @@ module.exports = JSONEditor;
 
 
 /***/ }),
-/* 248 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3332,9 +3380,9 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 if (true) {
   // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
   !(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-    __webpack_require__(249),
     __webpack_require__(250),
-    __webpack_require__(251)
+    __webpack_require__(251),
+    __webpack_require__(252)
   ], __WEBPACK_AMD_DEFINE_RESULT__ = (function(js_beautify, css_beautify, html_beautify) {
     return get_beautify(js_beautify, css_beautify, html_beautify);
   }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -3342,7 +3390,7 @@ if (true) {
 } else {}
 
 /***/ }),
-/* 249 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* AUTO-GENERATED. DO NOT MODIFY. */
@@ -6759,7 +6807,7 @@ if (true) {
 
 
 /***/ }),
-/* 250 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* AUTO-GENERATED. DO NOT MODIFY. */
@@ -8145,7 +8193,7 @@ if (true) {
 
 
 /***/ }),
-/* 251 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* AUTO-GENERATED. DO NOT MODIFY. */
@@ -10553,9 +10601,9 @@ var style_html = legacy_beautify_html;
 /* Footer */
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(249), __webpack_require__(250)], __WEBPACK_AMD_DEFINE_RESULT__ = (function(requireamd) {
-        var js_beautify = __webpack_require__(249);
-        var css_beautify = __webpack_require__(250);
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(250), __webpack_require__(251)], __WEBPACK_AMD_DEFINE_RESULT__ = (function(requireamd) {
+        var js_beautify = __webpack_require__(250);
+        var css_beautify = __webpack_require__(251);
 
         return {
             html_beautify: function(html_source, options) {
@@ -10570,7 +10618,7 @@ if (true) {
 
 
 /***/ }),
-/* 252 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10645,7 +10693,7 @@ module.exports = MediaViewer;
 
 
 /***/ }),
-/* 253 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10919,7 +10967,7 @@ module.exports = UserEditor;
 
 
 /***/ }),
-/* 254 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11132,7 +11180,7 @@ module.exports = SchemaEditor;
 
 
 /***/ }),
-/* 255 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11519,7 +11567,7 @@ module.exports = ContentSchemaEditor;
 
 
 /***/ }),
-/* 256 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11588,7 +11636,7 @@ module.exports = FieldSchemaEditor;
 
 
 /***/ }),
-/* 257 */
+/* 258 */
 /***/ (function(module, exports) {
 
 /**
@@ -11854,7 +11902,7 @@ module.exports = WYSIWYGEditor;
 
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11864,7 +11912,6 @@ module.exports = WYSIWYGEditor;
  * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 namespace('Views.Editors.FieldEditors')
-.add(__webpack_require__(259))
 .add(__webpack_require__(260))
 .add(__webpack_require__(261))
 .add(__webpack_require__(262))
@@ -11879,11 +11926,12 @@ namespace('Views.Editors.FieldEditors')
 .add(__webpack_require__(271))
 .add(__webpack_require__(272))
 .add(__webpack_require__(273))
-.add(__webpack_require__(274));
+.add(__webpack_require__(274))
+.add(__webpack_require__(275));
 
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11933,7 +11981,7 @@ module.exports = FieldEditor;
 
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12371,7 +12419,7 @@ module.exports = ArrayEditor;
 
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12442,7 +12490,7 @@ module.exports = BooleanEditor;
 
 
 /***/ }),
-/* 262 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12563,7 +12611,7 @@ module.exports = ContentReferenceEditor;
 
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12751,7 +12799,7 @@ module.exports = ContentSchemaReferenceEditor;
 
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12872,7 +12920,7 @@ module.exports = DateEditor;
 
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12973,7 +13021,7 @@ module.exports = DropdownEditor;
 
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13033,7 +13081,7 @@ module.exports = LanguageEditor;
 
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13131,7 +13179,7 @@ module.exports = MediaReferenceEditor;
 
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13269,7 +13317,7 @@ module.exports = NumberEditor;
 
 
 /***/ }),
-/* 269 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13378,7 +13426,7 @@ module.exports = ResourceReferenceEditor;
 
 
 /***/ }),
-/* 270 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13689,7 +13737,7 @@ module.exports = RichTextEditor;
 
 
 /***/ }),
-/* 271 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13769,7 +13817,7 @@ module.exports = StringEditor;
 
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14224,7 +14272,7 @@ module.exports = StructEditor;
 
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14277,7 +14325,7 @@ module.exports = TagsEditor;
 
 
 /***/ }),
-/* 274 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14460,7 +14508,7 @@ module.exports = UrlEditor;
 
 
 /***/ }),
-/* 275 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14470,18 +14518,18 @@ module.exports = UrlEditor;
  * @namespace HashBrown.Client.Views.Navigation
  */
 namespace('Views.Navigation')
-.add(__webpack_require__(276))
-.add(__webpack_require__(278))
+.add(__webpack_require__(277))
 .add(__webpack_require__(279))
 .add(__webpack_require__(280))
 .add(__webpack_require__(281))
 .add(__webpack_require__(282))
 .add(__webpack_require__(283))
-.add(__webpack_require__(284));
+.add(__webpack_require__(284))
+.add(__webpack_require__(285));
 
 
 /***/ }),
-/* 276 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14496,7 +14544,7 @@ class NavbarMain extends Crisp.View {
     constructor(params) {
         super(params);
 
-        this.template = __webpack_require__(277);
+        this.template = __webpack_require__(278);
 
         HashBrown.Helpers.EventHelper.on('resource', 'navbar', () => { this.reload(); });  
         HashBrown.Helpers.EventHelper.on('route', 'navbar', () => { this.updateHighlight(); });  
@@ -15008,7 +15056,7 @@ module.exports = NavbarMain;
 
 
 /***/ }),
-/* 277 */
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -15149,7 +15197,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 278 */
+/* 279 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15300,7 +15348,7 @@ module.exports = MainMenu;
 
 
 /***/ }),
-/* 279 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15475,7 +15523,7 @@ module.exports = NavbarPane;
 
 
 /***/ }),
-/* 280 */
+/* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15620,7 +15668,7 @@ module.exports = ConnectionPane;
 
 
 /***/ }),
-/* 281 */
+/* 282 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16034,7 +16082,7 @@ module.exports = ContentPane;
 
 
 /***/ }),
-/* 282 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16192,7 +16240,7 @@ module.exports = FormsPane;
 
 
 /***/ }),
-/* 283 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16403,7 +16451,7 @@ module.exports = MediaPane;
 
 
 /***/ }),
-/* 284 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16588,7 +16636,7 @@ module.exports = SchemaPane;
 
 
 /***/ }),
-/* 285 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16598,16 +16646,16 @@ module.exports = SchemaPane;
  * @namespace HashBrown.Client.Views.Dashboard
  */
 namespace('Views.Dashboard')
-.add(__webpack_require__(286))
 .add(__webpack_require__(287))
 .add(__webpack_require__(288))
 .add(__webpack_require__(289))
 .add(__webpack_require__(290))
-.add(__webpack_require__(291));
+.add(__webpack_require__(291))
+.add(__webpack_require__(292));
 
 
 /***/ }),
-/* 286 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16785,7 +16833,7 @@ module.exports = BackupEditor;
 
 
 /***/ }),
-/* 287 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16854,7 +16902,7 @@ module.exports = InfoEditor;
 
 
 /***/ }),
-/* 288 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16928,7 +16976,7 @@ module.exports = LanguageEditor;
 
 
 /***/ }),
-/* 289 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17052,7 +17100,7 @@ module.exports = MigrationEditor;
 
 
 /***/ }),
-/* 290 */
+/* 291 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17331,7 +17379,7 @@ module.exports = ProjectEditor;
 
 
 /***/ }),
-/* 291 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17537,54 +17585,6 @@ class SyncEditor extends HashBrown.Views.Modals.Modal {
 }
 
 module.exports = SyncEditor;
-
-
-/***/ }),
-/* 292 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A basic editor that other editors inherit from
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-class Editor extends Crisp.View {
-    constructor(params) {
-        super(params);
-
-        this.fetch();
-    }
-
-    /**
-     * Renders a field
-     *
-     * @param {Object|String} key
-     * @param {HTMLElement|Array} value
-     *
-     * @return {HTMLElement} Element
-     */
-    field(key, ...value) {
-        return _.div({class: 'editor__field'},
-            _.div({class: 'editor__field__key'},
-                _.div({class: 'editor__field__key__label'}, key.label || key),
-                _.if(key.description,
-                    _.div({class: 'editor__field__key__description'}, key.description)
-                ),
-                _.if(key.actions,
-                    _.div({class: 'editor__field__key__actions'}, key.actions)
-                )
-            ),
-            _.div({class: 'editor__field__value'},
-                value
-            )
-        );
-    }
-}
-
-module.exports = Editor;
 
 
 /***/ })
