@@ -30,6 +30,9 @@ class DatabaseHelper {
                     return 'hb_';
                 case 'options':
                     let options = {};
+                    if(!process.env.MONGODB_OPTIONS) {
+                        return options;
+                    }
                     try {
                         options = JSON.parse(process.env.MONGODB_OPTIONS);
                     } catch (e) {
