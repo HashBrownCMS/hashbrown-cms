@@ -292,7 +292,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setConnectionById(project, environment, id, connection, create = false) {
+    static async setConnectionById(project, environment, id, connection, create = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -306,19 +306,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
             hasRemote: false
         };
         
-        return HashBrown.Helpers.DatabaseHelper.updateOne(
-            project,
-            environment + '.connections',
-            {
-                id: id
-            },
-            connection.getObject(),
-            {
-                upsert: create
-            }
-        ).then(() => {
-            return Promise.resolve(connection);  
-        });
+        await HashBrown.Helpers.DatabaseHelper.updateOne(project, environment + '.connections', { id: id }, connection.getObject(), { upsert: create });
+        
+        return connection;
     }
     
     /**

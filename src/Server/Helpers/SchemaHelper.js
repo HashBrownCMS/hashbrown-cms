@@ -456,7 +456,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @return {Promise} Resulting Schema
      */
-    static setSchemaById(project, environment, id, schema, create = false) {
+    static async setSchemaById(project, environment, id, schema, create = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -475,26 +475,15 @@ class SchemaHelper extends SchemaHelperCommon {
             hasRemote: false
         };
 
-        return this.duplicateIdCheck(project, environment, id, schema.id)
-        .then((isDuplicate) => {
-            if(isDuplicate) {
-                return Promise.reject(new Error('The Schema id "' + schema.id + '" already exists.'));
-            }   
+        let isDuplicate = await this.duplicateIdCheck(project, environment, id, schema.id);
+        
+        if(isDuplicate) {
+            throw new Error('The Schema id "' + schema.id + '" already exists.');
+        }   
 
-            return HashBrown.Helpers.DatabaseHelper.updateOne(
-                project,
-                collection,
-                {
-                    id: id
-                },
-                schema,
-                {
-                    upsert: create // Creates a schema if none existed
-                }
-            );
-        }).then(() => {
-            return Promise.resolve(this.getModel(schema));
-        });
+        await HashBrown.Helpers.DatabaseHelper.updateOne(project, collection, { id: id }, schema, { upsert: create });
+        
+        return this.getModel(schema);
     }
 
     /**

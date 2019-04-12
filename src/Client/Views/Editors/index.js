@@ -4,6 +4,7 @@
  * @namespace HashBrown.Client.Views.Editors
  */
 namespace('Views.Editors')
+.add(require('./Editor'))
 .add(require('./ConnectionEditor'))
 .add(require('./ContentEditor'))
 .add(require('./FormEditor'))

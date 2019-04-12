@@ -336,7 +336,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                     _.do(() => {
                                         let schema = this.getSchema(fieldValue.schemaId);
 
-                                        if(!schema) { return; }
+                                        if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
 
                                         let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 

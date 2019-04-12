@@ -123,7 +123,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 if(fieldSchemas[fieldSchemaId]) { continue; }
 
-                fieldSchemas[fieldSchemaId] = HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId);
+                fieldSchemas[fieldSchemaId] = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId);
             }
 
             // Get the parent struct fields
@@ -333,11 +333,13 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                         _.do(() => {
                                             let schema = fieldSchemas[fieldValue.schemaId];
 
-                                            if(!schema) { return; }
+                                            if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
 
                                             let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
 
                                             if(!editor) { return; }
+                                        
+                                            fieldValue.config = fieldValue.config || {};
 
                                             return editor.renderConfigEditor(fieldValue.config, schema.id);
                                         })

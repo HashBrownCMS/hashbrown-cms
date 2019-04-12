@@ -86,7 +86,7 @@ class ConnectionController extends HashBrown.Controllers.ResourceController {
         let connection = req.body;
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        await HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection), shouldCreate);
+        return await HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection), shouldCreate);
     }
     
     /**

@@ -43,7 +43,7 @@ class ResourceController extends HashBrown.Controllers.ApiController {
                 let response = await this[name](req, res);
 
                 if(response !== false) {
-                    res.status(200).send(response);
+                    res.status(200).send(response || 'OK');
                 
                 } else if(response === null || response === undefined) {
                     res.status(404).send('Not found');
