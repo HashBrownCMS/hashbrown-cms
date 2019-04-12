@@ -88,7 +88,7 @@ class DatabaseHelper {
         }
         
         if(options && Object.keys(options).length > 0) {
-            connectionString += '?' + QueryString.stringify(this.getConfig('options'));
+            connectionString += '?' + QueryString.stringify(options);
         }
 
         return connectionString;
