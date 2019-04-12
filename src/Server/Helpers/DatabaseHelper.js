@@ -22,13 +22,46 @@ class DatabaseHelper {
      * @return {String} Value
      */
     static getConfig(key) {
-        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+        let value = process.env['MONGODB_' + key.toUpperCase()];
 
-        if(!config[key] && key === 'prefix') {
-            return 'hb_';
+        // Config value was found in the environment variables, return it
+        if(value) {
+            if(key === 'options') {
+                try {
+                    return JSON.parse(value);
+
+                } catch(e) {
+                    debug.log('JSON parse error: ' + e.message, this);
+
+                    return {};
+                }
+            }
+
+            return value;
         }
 
-        return config[key];
+        // Get config value from disk
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+
+        if(config[key]) { return config[key]; }
+
+        // No value found, return default ones
+        switch(key) {
+            case 'host':
+                return 'localhost';
+
+            case 'port':
+                return '27017';
+
+            case 'prefix':
+                return 'hb_';
+
+            case 'options':
+                return {};
+        }
+
+        // Absolutely no results, return an empty string
+        return '';
     }
 
     /**
@@ -41,10 +74,15 @@ class DatabaseHelper {
     static getConnectionString(databaseName) {
         let connectionString = 'mongodb://';
       
-        let username = process.env.MONGODB_USERNAME || this.getConfig('username');
-        let password = process.env.MONGODB_PASSWORD || this.getConfig('password');
-        let host = process.env.MONGODB_HOST || this.getConfig('host') || this.getConfig('url') || 'localhost';
-        let port = process.env.MONGODB_PORT || this.getConfig('port');
+        let username = this.getConfig('username');
+        let password = this.getConfig('password');
+        let host = this.getConfig('host');
+        let port = this.getConfig('port');
+        let prefix = this.getConfig('prefix');
+        let options = this.getConfig('options');
+
+        let hosts = Array.isArray(host) ? host : host.split(',');
+        let ports = Array.isArray(port) ? port : port.split(',');
 
         if(username) {
             connectionString += username;
@@ -56,21 +94,26 @@ class DatabaseHelper {
             connectionString += '@';
         }
 
-        connectionString += host;
+        hosts.forEach((host, index) => {
+            let port = ports[index] || ports[0];
         
-        if(port) {
-            connectionString += ':' + port;
-        }
-        
+            connectionString += `${host}:${port}`;
+            
+            if(index !== hosts.length - 1) {
+                connectionString += ',';
+            }
+        });
+
         if(databaseName) {
-            connectionString += '/' + this.getConfig('prefix') + databaseName;
+            connectionString += '/' + prefix + databaseName;
 
         } else {
             connectionString += '/';
+        
         }
         
-        if(this.getConfig('options') && Object.keys(this.getConfig('options')).length > 0) {
-            connectionString += '?' + QueryString.stringify(this.getConfig('options'));
+        if(options && Object.keys(options).length > 0) {
+            connectionString += '?' + QueryString.stringify(options);
         }
 
         return connectionString;
