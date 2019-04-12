@@ -1,6 +1,7 @@
 # Development files
 *.swp
 *.swo
+.idea
 node_modules/*
 package-lock.json
 .sass-cache/*
