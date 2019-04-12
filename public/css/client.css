@@ -1173,6 +1173,14 @@ h6 {
 .editor__field__value.sorting > .editor__field .editor__field__value {
   display: none;
 }
+.editor__field__value.cluster {
+  display: flex;
+  flex-wrap: wrap;
+}
+.editor__field__value.cluster > * {
+  display: block;
+  margin: 0 0.5rem 0.5rem 0;
+}
 .editor__field__value__lock {
   position: absolute;
   top: 0;

@@ -14019,7 +14019,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                             _.div({class: 'editor__field__key__label'}, 'Parent struct'),
                             _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this struct')
                         ),
-                        _.div({class: 'editor__field__value flex'},
+                        _.div({class: 'editor__field__value cluster'},
                             _.each(parentStruct, (fieldKey, fieldValue) => {
                                 return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
                                     .click(() => {

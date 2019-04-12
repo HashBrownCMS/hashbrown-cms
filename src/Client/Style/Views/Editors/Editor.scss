@@ -454,6 +454,17 @@
                 }
             }
 
+            // Cluster mode
+            &.cluster {
+                display: flex;
+                flex-wrap: wrap;
+
+                & > * {
+                    display: block;
+                    margin: 0 0.5rem 0.5rem 0;
+                }
+            }
+
             // Lock
             &__lock {
                 position: absolute;
