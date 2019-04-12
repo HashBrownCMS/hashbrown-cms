@@ -22,27 +22,46 @@ class DatabaseHelper {
      * @return {String} Value
      */
     static getConfig(key) {
-        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+        let value = process.env['MONGODB_' + key.toUpperCase()];
 
-        if(!config[key] && key === 'prefix') {
-            switch (key) {
-                case 'prefix':
-                    return 'hb_';
-                case 'options':
-                    let options = {};
-                    if(!process.env.MONGODB_OPTIONS) {
-                        return options;
-                    }
-                    try {
-                        options = JSON.parse(process.env.MONGODB_OPTIONS);
-                    } catch (e) {
-                        console.log('JSON parse error:', e);
-                    }
-                    return options;
+        // Config value was found in the environment variables, return it
+        if(value) {
+            if(key === 'options') {
+                try {
+                    return JSON.parse(value);
+
+                } catch(e) {
+                    debug.log('JSON parse error: ' + e.message, this);
+
+                    return {};
+                }
             }
+
+            return value;
         }
 
-        return config[key];
+        // Get config value from disk
+        let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
+
+        if(config[key]) { return config[key]; }
+
+        // No value found, return default ones
+        switch(key) {
+            case 'host':
+                return 'localhost';
+
+            case 'port':
+                return '27017';
+
+            case 'prefix':
+                return 'hb_';
+
+            case 'options':
+                return {};
+        }
+
+        // Absolutely no results, return an empty string
+        return '';
     }
 
     /**
@@ -55,15 +74,15 @@ class DatabaseHelper {
     static getConnectionString(databaseName) {
         let connectionString = 'mongodb://';
       
-        const username = process.env.MONGODB_USERNAME || this.getConfig('username');
-        const password = process.env.MONGODB_PASSWORD || this.getConfig('password');
-        const host = process.env.MONGODB_HOST || this.getConfig('host') || this.getConfig('url') || 'localhost';
-        const port = process.env.MONGODB_PORT || this.getConfig('port');
-        const prefix = process.env.MONGODB_PREFIX || this.getConfig('prefix');
-        const options = this.getConfig('options');
+        let username = this.getConfig('username');
+        let password = this.getConfig('password');
+        let host = this.getConfig('host');
+        let port = this.getConfig('port');
+        let prefix = this.getConfig('prefix');
+        let options = this.getConfig('options');
 
-        const hosts = Array.isArray(host) ? host : host.split(',');
-        const ports = Array.isArray(port) ? port : port.split(',');
+        let hosts = Array.isArray(host) ? host : host.split(',');
+        let ports = Array.isArray(port) ? port : port.split(',');
 
         if(username) {
             connectionString += username;
@@ -76,8 +95,10 @@ class DatabaseHelper {
         }
 
         hosts.forEach((host, index) => {
-            const port = ports[index] || ports[0];
+            let port = ports[index] || ports[0];
+        
             connectionString += `${host}:${port}`;
+            
             if(index !== hosts.length - 1) {
                 connectionString += ',';
             }
@@ -88,6 +109,7 @@ class DatabaseHelper {
 
         } else {
             connectionString += '/';
+        
         }
         
         if(options && Object.keys(options).length > 0) {
