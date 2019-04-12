@@ -17,6 +17,33 @@ cd ./hashbrown-cms
 npm install --production
 ```
 
+Configuring MongoDB:
+
+- by environment variables:
+
+  - `MONGODB_HOST`: host(s), split by comma, default value is `localhost`
+  - `MONGODB_PORT`: port(s), split by comma
+  - `MONGODB_USERNAME`: username
+  - `MONGODB_PASSWORD`: password
+  - `MONGODB_PREFIX`: date base name prefix
+  - `MONGODB_OPTIONS`: connection options, JSON string containing key/value pairs.
+
+- or by `/config/database.cfg`
+
+```
+{
+  "MONGODB_HOST": "host" | ["host1", "host2"] | "host1,host2",
+  "MONGODB_PORT": "port" | [port1, port2] | "port1,port2",
+  "MONGODB_USERNAME": "<username>",
+  "MONGODB_PASSWORD": "<password>",
+  "MONGODB_PREFIX": "<data base name prefix>",
+  "MONGODB_OPTIONS": {
+    "<key>": "<value>",
+    ...
+  }
+}
+```
+
 Running with docker:
 ```
 docker-compose up --build -d

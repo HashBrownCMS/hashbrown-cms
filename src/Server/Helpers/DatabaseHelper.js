@@ -25,7 +25,18 @@ class DatabaseHelper {
         let config = HashBrown.Helpers.ConfigHelper.getSync('database') || {};
 
         if(!config[key] && key === 'prefix') {
-            return 'hb_';
+            switch (key) {
+                case 'prefix':
+                    return 'hb_';
+                case 'options':
+                    let options = {};
+                    try {
+                        options = JSON.parse(process.env.MONGODB_OPTIONS);
+                    } catch (e) {
+                        console.log('JSON parse error:', e);
+                    }
+                    return options;
+            }
         }
 
         return config[key];
@@ -41,10 +52,15 @@ class DatabaseHelper {
     static getConnectionString(databaseName) {
         let connectionString = 'mongodb://';
       
-        let username = process.env.MONGODB_USERNAME || this.getConfig('username');
-        let password = process.env.MONGODB_PASSWORD || this.getConfig('password');
-        let host = process.env.MONGODB_HOST || this.getConfig('host') || this.getConfig('url') || 'localhost';
-        let port = process.env.MONGODB_PORT || this.getConfig('port');
+        const username = process.env.MONGODB_USERNAME || this.getConfig('username');
+        const password = process.env.MONGODB_PASSWORD || this.getConfig('password');
+        const host = process.env.MONGODB_HOST || this.getConfig('host') || this.getConfig('url') || 'localhost';
+        const port = process.env.MONGODB_PORT || this.getConfig('port');
+        const prefix = process.env.MONGODB_PREFIX || this.getConfig('prefix');
+        const options = this.getConfig('options');
+
+        const hosts = Array.isArray(host) ? host : host.split(',');
+        const ports = Array.isArray(port) ? port : port.split(',');
 
         if(username) {
             connectionString += username;
@@ -56,20 +72,22 @@ class DatabaseHelper {
             connectionString += '@';
         }
 
-        connectionString += host;
-        
-        if(port) {
-            connectionString += ':' + port;
-        }
-        
+        hosts.forEach((host, index) => {
+            const port = ports[index] || ports[0];
+            connectionString += `${host}:${port}`;
+            if(index !== hosts.length - 1) {
+                connectionString += ',';
+            }
+        });
+
         if(databaseName) {
-            connectionString += '/' + this.getConfig('prefix') + databaseName;
+            connectionString += '/' + prefix + databaseName;
 
         } else {
             connectionString += '/';
         }
         
-        if(this.getConfig('options') && Object.keys(this.getConfig('options')).length > 0) {
+        if(options && Object.keys(options).length > 0) {
             connectionString += '?' + QueryString.stringify(this.getConfig('options'));
         }
 
