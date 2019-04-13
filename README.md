@@ -14,7 +14,7 @@ Then clone the code and install the dependencies:
 ```
 git clone https://github.com/HashBrownCMS/hashbrown-cms.git -b stable --single-branch --recursive
 cd ./hashbrown-cms
-npm install --production
+npm install
 ```
 
 Running with docker:
@@ -33,7 +33,7 @@ To update the core HashBrown version and all of its dependencies:
 cd /to/your/hashbrown/dir
 git pull
 git submodule update --recursive --init
-npm install --production
+npm install
 ```
 
 ## Getting started

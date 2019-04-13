@@ -6,7 +6,7 @@
   "main": "hashbrown.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "webpack && docker-compose up --build -d",
+    "start": "webpack && docker-compose up --build -d",
     "dev-client": "webpack --watch --watch-poll --progress --no-babel",
     "dev-server": "sudo docker-compose up --build -d && sudo docker-compose logs -f node"
   },
@@ -23,14 +23,13 @@
     "multer": "^1.4.1",
     "pug": "^2.0.3",
     "semver": "^5.6.0",
-    "webpack": "^4.28.1"
-  },
-  "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/polyfill": "^7.4.3",
     "@babel/preset-env": "^7.2.3",
     "babel-loader": "^8.0.5",
     "json-loader": "^0.5.4",
-    "sass": "^1.16.0"
+    "sass": "^1.16.0",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.3.0"
   }
 }
