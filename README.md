@@ -9,6 +9,7 @@ First make sure you have these dependencies met:
 - node.js
 - mongodb
 - imagemagick  
+- docker & docker-compose (optional, but recommended)
 
 Then clone the code and install the dependencies:  
 ```
@@ -17,14 +18,14 @@ cd ./hashbrown-cms
 npm install
 ```
 
-Running with docker:
+Starting the server:
 ```
-docker-compose up --build -d
+npm start
 ```
 
-Running standalone:
+Stopping the server:
 ```
-node hashbrown.js
+npm stop
 ```
 
 ## Updating HashBrown

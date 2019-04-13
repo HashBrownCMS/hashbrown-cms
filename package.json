@@ -6,7 +6,7 @@
   "main": "hashbrown.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack && cd ./docker && docker-compose up --build -d",
+    "start": "webpack --progress && cd ./docker && sudo docker-compose up --build -d",
     "stop": "cd docker && sudo docker-compose down",
     "dev-client": "webpack --watch --watch-poll --progress --no-babel",
     "dev-server": "cd ./docker && sudo docker-compose up --build -d && sudo docker-compose logs -f node"
