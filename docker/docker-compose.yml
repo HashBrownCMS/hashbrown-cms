@@ -18,7 +18,7 @@ services:
         environment:
             - MONGODB_HOST=mongodb
         volumes:
-            - "./:/opt/hashbrown-cms"
+            - "../:/opt/hashbrown-cms"
             - "./remote:/remote"
 
     mongodb:

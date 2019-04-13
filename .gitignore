@@ -4,11 +4,11 @@
 node_modules/*
 package-lock.json
 .sass-cache/*
-/remote
+/docker/db/*
+/docker/remote
 
 # Storage directories
 /storage/*
-/db/*
 
 # Config directories
 /config/*

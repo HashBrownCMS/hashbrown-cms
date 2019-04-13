@@ -1,7 +1,6 @@
 'use strict';
 
-const Glob = require('glob');
-const FileSystem = require('fs');
+const Path = require('path');
 
 /**
  * The controller for serving plugin content
@@ -26,7 +25,9 @@ class PluginController extends HashBrown.Controllers.Controller {
         let compiledJs = '';
 
         for(let path of paths) {
-            compiledJs += await HashBrown.Helpers.FileHelper.read(path).toString('utf8');
+            let file = await HashBrown.Helpers.FileHelper.read(path);
+            
+            compiledJs += file.toString('utf8');
         }
 
         res.set('Content-Type', 'text/javascript');
@@ -42,7 +43,9 @@ class PluginController extends HashBrown.Controllers.Controller {
         let compiledCss = '';
 
         for(let path of paths) {
-            compiledCss += await HashBrown.Helpers.FileHelper.read(path).toString('utf8');
+            let file = await HashBrown.Helpers.FileHelper.read(path);
+            
+            compiledCss += file.toString('utf8');
         }
 
         res.set('Content-Type', 'text/css');
