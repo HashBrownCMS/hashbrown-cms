@@ -20,33 +20,33 @@ class PluginController extends HashBrown.Controllers.Controller {
     /**
      * Serves JS files
      */
-    static getJs(req, res) {
-        Glob(APP_ROOT + '/plugins/*/client/**/*.js', (err, paths) => {
-            let compiledJs = '';
+    static async getJs(req, res) {
+        let paths = await HashBrown.Helpers.FileHelper.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.js'));
+    
+        let compiledJs = '';
 
-            for(let path of paths) {
-                compiledJs += FileSystem.readFileSync(path, 'utf8');
-            }
+        for(let path of paths) {
+            compiledJs += await HashBrown.Helpers.FileHelper.read(path).toString('utf8');
+        }
 
-            res.set('Content-Type', 'text/javascript');
-            res.send(compiledJs);
-        });
+        res.set('Content-Type', 'text/javascript');
+        res.send(compiledJs);
     }
     
     /**
      * Serves CSS files
      */
-    static getCss(req, res) {
-        Glob(APP_ROOT + '/plugins/*/client/**/*.css', (err, paths) => {
-            let compiledCss = '';
+    static async getCss(req, res) {
+        let paths = await HashBrown.Helpers.FileHelper.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.css'));
+    
+        let compiledCss = '';
 
-            for(let path of paths) {
-                compiledCss += FileSystem.readFileSync(path, 'utf8');
-            }
+        for(let path of paths) {
+            compiledCss += await HashBrown.Helpers.FileHelper.read(path).toString('utf8');
+        }
 
-            res.set('Content-Type', 'text/css');
-            res.send(compiledCss);
-        });
+        res.set('Content-Type', 'text/css');
+        res.send(compiledCss);
     }
 }
 

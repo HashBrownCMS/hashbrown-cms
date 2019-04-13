@@ -5,7 +5,10 @@
   "description": "A free and open-source headless CMS",
   "main": "hashbrown.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prod": "webpack && docker-compose up --build -d",
+    "dev-client": "webpack --watch --watch-poll --progress --no-babel",
+    "dev-server": "sudo docker-compose up --build -d && sudo docker-compose logs -f node"
   },
   "author": "Putaitu",
   "license": "MIT",

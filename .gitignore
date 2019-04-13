@@ -7,8 +7,15 @@ package-lock.json
 /remote
 
 # Storage directories
-storage/*
-db/*
+/storage/*
+/db/*
 
 # Config directories
-config/*
+/config/*
+
+# Generated files
+/public/css/*
+/public/js/*
+!/public/js/login.js
+!/public/js/setup.js
+!/public/js/test.js
