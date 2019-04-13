@@ -108,10 +108,6 @@
         display: block;
         z-index: 2;
         
-        &[data-route="about"] {
-            font-weight: bold;
-        }
-
         &.active {
             background-color: $primary;
             color: $primary-text;
@@ -211,7 +207,6 @@
         &.select-dir &__item[data-is-directory="true"]:not(.moving-item) > &__item__content:hover {
             &:after {
                 opacity: 1;
-                font-weight: bold;
                 font-family: 'FontAwesome';
                 content: '\f060';
                 display: block;
@@ -245,7 +240,6 @@
                     opacity: 1;
                     background-color: $primary;
                     text-align: center;
-                    font-weight: bold;
                     color: $primary-text;
                     font-family: 'FontAwesome';
                     content: '\f060';
@@ -284,7 +278,6 @@
 
             // Active state
             &.active > &__content {
-                font-weight: 700;
                 color: $primary-text;
                 background-color: $primary;
 
@@ -294,7 +287,8 @@
                 }
             }
 
-            &.active > &__content &__toggle-children {
+            &.active > &__content &__toggle-children,
+            &.active > &__content &__context {
                 color: $primary-text;
             }
 
@@ -376,7 +370,6 @@
 
                 &:hover {
                     background-color: $standard-darker;
-                    font-weight: 700;
                 }
 
                 &:after {
@@ -399,8 +392,9 @@
                 flex-grow: 1;
             }
 
-            // Toggle children button
-            &__toggle-children {
+            // Toggle children & context buttons
+            &__toggle-children,
+            &__context {
                 height: 100%;
                 width: 3rem;
                 flex-shrink: 0;

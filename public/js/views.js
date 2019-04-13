@@ -407,15 +407,10 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             toggle.checked = isChecked;
 
             let isAtRight = bounds.right >= window.innerWidth - 10;
-            let bottomDiff = bounds.bottom - window.innerHeight;
-
-            if(bottomDiff > 0) {
-                options.setAttribute('style', 'max-height: ' + (bounds.height - bottomDiff) + 'px');
-            } else {
-                options.removeAttribute('style');
-            }
+            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
 
             this.element.classList.toggle('right', isAtRight);
+            this.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     }
 
@@ -511,8 +506,6 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             isOpen = !toggle.checked;
         }
 
-        toggle.checked = isOpen;
-
         if(!isOpen) {
             this.trigger('cancel');
         } else {
@@ -523,6 +516,10 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
         
         this.updatePositionClasses();
         this.updateSelectedClasses();
+        
+        setTimeout(() => {
+            toggle.checked = isOpen;
+        }, 2);
     }
 
     /**
@@ -10991,8 +10988,10 @@ class SchemaEditor extends Crisp.View {
     async fetch() {
         try {
             this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-        
-            this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
+       
+            if(this.model.parentSchemaId) {
+                this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
+            }
 
             super.fetch();
 
@@ -11583,12 +11582,12 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      * Pre render
      */
     prerender() {
-        if(this.model.parentSchemaId !== 'fieldBase') {
-            this.model.editorId = this.parentSchema.editorId;
-        
-            if(!this.model.editorId) {
-                UI.errorModal(new Error('Could not find a field editor for this schema'));     
-            }
+        if(!this.parentSchema || !this.parentSchema.id === 'fieldBase') { return; }
+
+        this.model.editorId = this.parentSchema.editorId;
+    
+        if(!this.model.editorId) {
+            UI.errorModal(new Error('Could not find a field editor for this schema'));     
         }
     }
 
@@ -15125,6 +15124,8 @@ module.exports = function() {
                             let queueItem = {};
                             let hasRemote = item.sync ? item.sync.hasRemote : false;
                             let isRemote = item.sync ? item.sync.isRemote : false;
+            
+                            let contextButton = null;
 
                             let $item = _.div(
                                 {
@@ -15144,7 +15145,8 @@ module.exports = function() {
                                     class: 'navbar-main__pane__item__content'
                                 },
                                     _.div({class: 'navbar-main__pane__item__icon fa fa-' + icon}),
-                                    _.div({class: 'navbar-main__pane__item__label'}, name)
+                                    _.div({class: 'navbar-main__pane__item__label'}, name),
+                                    contextButton = _.button({class: 'navbar-main__pane__item__context fa fa-ellipsis-v'})
                                 ),
                                 _.div({class: 'navbar-main__pane__item__children'}),
                                 _.div({class: 'navbar-main__pane__item__insert-below'})
@@ -15152,10 +15154,10 @@ module.exports = function() {
 
                             // Attach item context menu
                             if(pane.getItemContextMenu) {
-                                UI.context($item.find('a')[0], pane.getItemContextMenu(item));
+                                UI.context($item.find('a')[0], pane.getItemContextMenu(item), contextButton[0]);
 
                             } else if(pane.itemContextMenu) {
-                                UI.context($item.find('a')[0], pane.itemContextMenu);
+                                UI.context($item.find('a')[0], pane.itemContextMenu, contextButton[0]);
 
                             }
                             

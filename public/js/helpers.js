@@ -5607,17 +5607,21 @@ class UIHelper {
 
     /**
      * Creates a context menu
+     *
+     * @param {HTMLElement} element
+     * @param {Object} items
+     * @param {HTMLElement} button
      */
-    static context(element, items) {
+    static context(element, items, button) {
         let openContextMenu = (e) => {
             // Find any existing context menu targets and remove their classes
             let clearTargets = () => {
                 let targets = document.querySelectorAll('.context-menu-target');
             
-                if(targets) {
-                    for(let i = 0; i < targets.length; i++) {
-                        targets[i].classList.remove('context-menu-target');
-                    }
+                if(!targets) { return; }
+            
+                for(let i = 0; i < targets.length; i++) {
+                    targets[i].classList.remove('context-menu-target');
                 }
             };
 
@@ -5655,9 +5659,7 @@ class UIHelper {
                 dropdown.remove();
 
                 // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
-                setTimeout(() => {
-                    clearTargets();
-                }, 100);
+                setTimeout(clearTargets, 100);
             });
 
             // Set styles
@@ -5681,15 +5683,6 @@ class UIHelper {
             openContextMenu(e);
         });
 
-        element.addEventListener('click', (e) => {
-            if(e.which === 3 || e.ctrlKey) {
-                e.preventDefault();
-                e.stopPropagation();
-            
-                openContextMenu(e);
-            }
-        });
-        
         element.addEventListener('touchstart', (e) => {
             if(e.touchTargets && e.touchTargets.length > 1) {
                 e.preventDefault();
@@ -5698,6 +5691,15 @@ class UIHelper {
                 openContextMenu(e);
             }
         });
+
+        if(button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            
+                openContextMenu(e);
+            });
+        }
     }
 }
 

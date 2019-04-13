@@ -33,7 +33,7 @@
     // Right + bottom modes
     &.right {
         .widget--dropdown__options {
-            transform: translateX(calc(-100% + 3rem));
+            transform: translateX(-100%);
         }
     }
 

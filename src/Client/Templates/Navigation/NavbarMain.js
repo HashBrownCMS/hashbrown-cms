@@ -64,6 +64,8 @@ module.exports = function() {
                             let queueItem = {};
                             let hasRemote = item.sync ? item.sync.hasRemote : false;
                             let isRemote = item.sync ? item.sync.isRemote : false;
+            
+                            let contextButton = null;
 
                             let $item = _.div(
                                 {
@@ -83,7 +85,8 @@ module.exports = function() {
                                     class: 'navbar-main__pane__item__content'
                                 },
                                     _.div({class: 'navbar-main__pane__item__icon fa fa-' + icon}),
-                                    _.div({class: 'navbar-main__pane__item__label'}, name)
+                                    _.div({class: 'navbar-main__pane__item__label'}, name),
+                                    contextButton = _.button({class: 'navbar-main__pane__item__context fa fa-ellipsis-v'})
                                 ),
                                 _.div({class: 'navbar-main__pane__item__children'}),
                                 _.div({class: 'navbar-main__pane__item__insert-below'})
@@ -91,10 +94,10 @@ module.exports = function() {
 
                             // Attach item context menu
                             if(pane.getItemContextMenu) {
-                                UI.context($item.find('a')[0], pane.getItemContextMenu(item));
+                                UI.context($item.find('a')[0], pane.getItemContextMenu(item), contextButton[0]);
 
                             } else if(pane.itemContextMenu) {
-                                UI.context($item.find('a')[0], pane.itemContextMenu);
+                                UI.context($item.find('a')[0], pane.itemContextMenu, contextButton[0]);
 
                             }
                             

@@ -220,15 +220,10 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             toggle.checked = isChecked;
 
             let isAtRight = bounds.right >= window.innerWidth - 10;
-            let bottomDiff = bounds.bottom - window.innerHeight;
-
-            if(bottomDiff > 0) {
-                options.setAttribute('style', 'max-height: ' + (bounds.height - bottomDiff) + 'px');
-            } else {
-                options.removeAttribute('style');
-            }
+            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
 
             this.element.classList.toggle('right', isAtRight);
+            this.element.classList.toggle('bottom', isAtBottom);
         }, 1);
     }
 
@@ -324,8 +319,6 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             isOpen = !toggle.checked;
         }
 
-        toggle.checked = isOpen;
-
         if(!isOpen) {
             this.trigger('cancel');
         } else {
@@ -336,6 +329,10 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
         
         this.updatePositionClasses();
         this.updateSelectedClasses();
+        
+        setTimeout(() => {
+            toggle.checked = isOpen;
+        }, 2);
     }
 
     /**

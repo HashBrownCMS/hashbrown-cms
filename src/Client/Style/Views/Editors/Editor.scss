@@ -235,8 +235,8 @@
             padding-top: 0;
         }
 
-        // Tablet mode
-        @media($sm) {
+        // Mobile mode
+        @media($xs) {
             display: block;
         }
 
@@ -317,8 +317,14 @@
             &__actions {
                 position: absolute;
                 line-height: 2rem;
+                z-index: 200;
 
                 &.hidden {
+                    display: none;
+                }
+                
+                // Hide below tablet mode
+                @media($sm) {
                     display: none;
                 }
             }

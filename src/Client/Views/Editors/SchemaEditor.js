@@ -18,8 +18,10 @@ class SchemaEditor extends Crisp.View {
     async fetch() {
         try {
             this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-        
-            this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
+       
+            if(this.model.parentSchemaId) {
+                this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
+            }
 
             super.fetch();
 
