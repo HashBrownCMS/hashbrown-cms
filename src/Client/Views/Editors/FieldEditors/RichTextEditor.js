@@ -26,11 +26,7 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         }
 
         // Make sure the string is HTML
-        try {
-            this.value = HashBrown.Helpers.MarkdownHelper.toHtml(this.value);
-        } catch(e) {
-            // Catch this silly exception that marked does sometimes
-        }
+        this.value = HashBrown.Helpers.MarkdownHelper.toHtml(this.value);
         
         this.fetch();
     }

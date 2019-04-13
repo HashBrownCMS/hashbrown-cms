@@ -2,6 +2,7 @@
 
 const FileSystem = require('fs');
 const OS = require('os');
+const Path = require('path');
 
 /**
  * The controller for views
@@ -21,6 +22,20 @@ class ViewController extends HashBrown.Controllers.Controller {
         // Root
         app.get(['/', '/dashboard'], (req, res) => {
             res.redirect('/dashboard/projects');
+        });
+        
+        // Readme
+        app.get('/readme', async (req, res) => {
+            try {
+                let markdown = await HashBrown.Helpers.FileHelper.read(Path.join(APP_ROOT, 'README.md'));
+                let html = HashBrown.Helpers.MarkdownHelper.toHtml(markdown.toString('utf8'));
+
+                res.status(200).send(html);
+
+            } catch(e) {
+                res.status(500).send(e.message);
+
+            }
         });
         
         // First time setup

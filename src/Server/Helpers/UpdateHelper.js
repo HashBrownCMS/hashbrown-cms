@@ -102,7 +102,7 @@ class UpdateHelper {
                     if(code == 0 || code == '0') {
                         resolve();
                     } else {
-                        reject(new Error('Failed to check out the "stable" branch with GIT'));
+                        reject(new Error('Failed to upgrade automatically. Please refer to the <a href="/readme">readme</a> for manual upgrade instructions.'));
                     }
                 });
             })

@@ -6,11 +6,11 @@ Ever wonder why you have to run a completely separate CMS for every single proje
 
 ## Installing and running HashBrown
 First make sure you have these dependencies met:  
-- node.js >= v10 
-- mongodb >= v4
+- node.js
+- mongodb
 - imagemagick  
 
-Then checkout the code and install the dependencies:  
+Then clone the code and install the dependencies:  
 ```
 git clone https://github.com/HashBrownCMS/hashbrown-cms.git -b stable --single-branch --recursive
 cd ./hashbrown-cms
@@ -44,7 +44,6 @@ npm install --production
 If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/HashBrownCMS/hashbrown-cms) or contact us about becoming a collaborator
 
 ## Talk to us
-
 Matrix: #hashbrowncms:matrix.org
 
 ## Report issues

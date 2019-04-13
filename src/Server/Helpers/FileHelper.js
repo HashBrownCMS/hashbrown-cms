@@ -156,11 +156,11 @@ class FileHelper {
      * @return {Promise} Result
      */
     static async remove(path) {
-        checkParam(path, 'path', String);
+        checkParam(path, 'path', String, true);
       
         if(FileSystem.lstatSync(path).isDirectory()) {
             for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
-                await unlink(Path.join(path, filename));
+                await this.remove(Path.join(path, filename));
             }
         
             await Util.promisify(FileSystem.rmdir)(path);

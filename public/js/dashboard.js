@@ -202,17 +202,23 @@ async function initServer() {
     let update = await HashBrown.Helpers.RequestHelper.request('get', 'server/update/check');
     $btnUpdate.removeClass('working');
 
-    if(update.isBehind) {
+    if(update.isBehind || true) {
         $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
 
         $btnUpdate.click(async () => {
-            UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
+            try {
+                UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
-            await HashBrown.Helpers.RequestHelper.request('post', 'server/update/start');
-            
-            UI.messageModal('Success', 'HashBrown is restarting...', false);
+                await HashBrown.Helpers.RequestHelper.request('post', 'server/update/start');
+                
+                UI.messageModal('Success', 'HashBrown is restarting...', false);
 
-            HashBrown.Helpers.RequestHelper.listenForRestart();
+                HashBrown.Helpers.RequestHelper.listenForRestart();
+
+            } catch(e) {
+                UI.errorModal(e);
+
+            }
         })
 
     } else {

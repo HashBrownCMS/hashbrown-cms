@@ -84,8 +84,9 @@
 /******/ 	return __webpack_require__(__webpack_require__.s = 29);
 /******/ })
 /************************************************************************/
-/******/ (Array(29).concat([
-/* 29 */
+/******/ ({
+
+/***/ 29:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -100,1135 +101,20 @@ namespace('Helpers')
 .add(__webpack_require__(34))
 .add(__webpack_require__(35))
 .add(__webpack_require__(37))
+.add(__webpack_require__(292))
 .add(__webpack_require__(39))
-.add(__webpack_require__(40))
+.add(__webpack_require__(41))
 .add(__webpack_require__(42))
 .add(__webpack_require__(43))
 .add(__webpack_require__(44))
-.add(__webpack_require__(45))
-.add(__webpack_require__(47))
-.add(__webpack_require__(49))
-.add(__webpack_require__(50));
+.add(__webpack_require__(46))
+.add(__webpack_require__(48))
+.add(__webpack_require__(49));
 
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const ConnectionHelperCommon = __webpack_require__(31);
-
-/**
- * The client side connection helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-class ConnectionHelper extends ConnectionHelperCommon {
-    /**
-     * Gets all connections
-     *
-     * @return {Array} Connections
-     */
-    static async getAllConnections() {
-        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Connection, 'connections');
-    }
-    
-    /**
-     * Gets a Connection by id
-     *
-     * @param {String} id
-     *
-     * @return {HashBrown.Models.Connection} Connection
-     */
-    static async getConnectionById(id) {
-        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
-    }
-
-    /**
-     * Sets the Media provider
-     *
-     * @param {String} id
-     *
-     * @returns {Promise}
-     */
-    static async setMediaProvider(id) {
-        await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
-
-        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
-    }
-    
-    /**
-     * Starts a tour of the Connection section
-     */
-    static async startTour() {
-        if(location.hash.indexOf('connections/') < 0) {
-            location.hash = '/connections/';
-        }
-       
-        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
-            
-        await UI.highlight('.navbar-main__tab[data-route="/connections/"]', 'This the Connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
-
-        await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
-        
-        let editor = document.querySelector('.editor--connection');
-
-        if(editor) {
-            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
-        }
-    }
-
-    /**
-     * Gets the Media provider
-     *
-     * @return {HashBrown.Models.Connection} Connection object
-     */
-    static async getMediaProvider() {
-        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
-        
-        if(providers.media) {
-            return await this.getConnectionById(providers.media);
-        } else {
-            return null;
-        }
-    }
-}
-
-module.exports = ConnectionHelper;
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * The helper class for Connections
- *
- * @memberof HashBrown.Common.Helpers
- */
-class ConnectionHelper {
-    /**
-     * Gets all connections
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Promise(Array)} connections
-     */
-    static getAllConnections(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        return Promise.resolve();
-    }
-    
-    /**
-     * Sets the Media provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-    static setMediaProvider(project, environment, id = null) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
-        .then((providers) => {
-            providers = providers || {};
-            providers.media = id;
-
-            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers)
-        });
-    }
-}
-
-module.exports = ConnectionHelper;
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const ContentHelperCommon = __webpack_require__(33);
-
-/**
- * The client side content helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-class ContentHelper extends ContentHelperCommon {
-    /**
-     * Gets all ancestors of a Content node by id
-     *
-     * @param {String} id
-     * @param {Boolean} includeSelf
-     *
-     * @returns {Array} Content node
-     */
-    static async getContentAncestorsById(id, includeSelf = false) {
-        checkParam(id, 'id', String, true);
-
-        let ancestors = [];
-        let ancestorId = id;
-
-        while(ancestorId) {
-            let ancestor = await this.getContentById(ancestorId);
-
-            if(ancestorId !== id || includeSelf) {
-                ancestors.push(ancestor);
-            }
-            
-            ancestorId = ancestor.parentId;
-        }
-
-        ancestors.reverse();
-
-        return ancestors;
-    }
-    
-    /**
-     * Gets Content by id
-     *
-     * @param {String} id
-     *
-     * @returns {HashBrown.Models.Content} Content node
-     */
-    static async getContentById(id) {
-        checkParam(id, 'id', String, true);
-
-        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content', id);
-    }
-    
-    /**
-     * Gets all Content
-     *
-     * @returns {Array} Content nodes
-     */
-    static async getAllContent() {
-        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Content, 'content');
-    }
-    
-    /**
-     * Sets Content by id
-     *
-     * @param {String} id
-     * @param {HashBrown.Models.Content} content
-     */
-    static setContentById(id, content) {
-        checkParam(id, 'id', String);
-        checkParam(content, 'content', HashBrown.Models.Content);
-
-        return HashBrown.Helpers.ResourceHelper.set('content', id, content);
-    }
-
-    /**
-     * A check for field definitions
-     *
-     * @param {Object} definition
-     *
-     * @return {Boolean} Whether or not the definition is empty
-     */
-    static isFieldDefinitionEmpty(definition) {
-        if(!definition) { return true; }
-
-        let isEmpty = true;
-        let checkRecursive = (object) => {
-            if(!object) { return; }
-
-            // We consider a definition not empty, if it has a value that is not an object
-            // Remember, null is of type 'object' too
-            if(typeof object !== 'object') { return isEmpty = false; }
-
-            for(let k in object) {
-                checkRecursive(object[k]);
-            }
-        };
-            
-        checkRecursive(definition);
-
-        return isEmpty;
-    }
-
-    /**
-     * A sanity check for fields
-     *
-     * @param {Object} value
-     * @param {Object} definition
-     *
-     * @return {Object} Checked value
-     */
-    static fieldSanityCheck(value, definition) {
-        // If the definition value is set to multilingual, but the value isn't an object, convert it
-        if(definition.multilingual && (!value || typeof value !== 'object')) {
-            let oldValue = value;
-
-            value = {};
-            value[HashBrown.Context.language] = oldValue;
-        }
-
-        // If the definition value is not set to multilingual, but the value is an object
-        // containing the _multilingual flag, convert it
-        if(!definition.multilingual && value && typeof value === 'object' && value._multilingual) {
-            value = value[HashBrown.Context.language];
-        }
-
-        // Update the _multilingual flag
-        if(definition.multilingual && value && !value._multilingual) {
-            value._multilingual = true;    
-        
-        } else if(!definition.multilingual && value && value._multilingual) {
-            delete value._multilingual;
-
-        }
-
-        return value;
-    }
-
-    /**
-     * Get new sort index
-     *
-     * @param {String} parentId
-     * @param {String} aboveId
-     * @param {String} belowId
-     *
-     * @return {Number} New index
-     */
-    static async getNewSortIndex(parentId, aboveId, belowId) {
-        if(aboveId) {
-            let aboveContent = await this.getContentById(aboveId);
-            
-            return aboveContent.sort + 1;
-        }
-
-        if(belowId) {
-            let belowContent = await this.getContentById(belowId);
-            
-            return belowContent.sort + 1;
-        }
-
-        // Filter out content that doesn't have the same parent
-        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
-        
-        allContent.filter((x) => {
-            return x.parentId == parentId || (!x.parentId && !parentId);
-        });
-
-        // Find new index
-        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-        let newIndex = 10000;
-
-        for(let content of allContent) {
-            if(newIndex - 10000 <= content.sort) {
-                newIndex = content.sort + 10000;
-            }
-        }
-
-        return newIndex;
-    }
-
-    /**
-     * Starts a tour of the Content section
-     */
-    static async startTour() {
-        if(location.hash.indexOf('content/') < 0) {
-            location.hash = '/content/';
-        }
-       
-        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
-            
-        await UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
-
-        await UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
-        
-        let editor = document.querySelector('.editor--content');
-
-        if(editor) {
-            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
-        }
-    }
-}
-
-module.exports = ContentHelper;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper class for Content
- *
- * @memberof HashBrown.Common.Helpers
- */
-class ContentHelper {
-    /**
-     * Gets all Content objects
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Array} Content
-     */
-    static getAllContent(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        return Promise.resolve();
-    }
-
-    /**
-     * Gets a URL-friendly version of a string
-     *
-     * @param {String} string
-     *
-     * @param {String} slug
-     */
-    static getSlug(string) {
-        return (string || '')
-            .toLowerCase()
-            .replace(/[æ|ä]/g, 'ae')
-            .replace(/[ø|ö]/g, 'oe')
-            .replace(/å/g, 'aa')
-            .replace(/ü/g, 'ue')
-            .replace(/ß/g, 'ss')
-            .replace(/[^\w ]+/g, '')
-            .replace(/ +/g, '-')
-            ;
-    }
-
-    /**
-     * Gets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @return {Promise} promise
-     */
-    static getContentById(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-
-        return Promise.resolve();
-    }
-    
-    /**
-     * Sets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     * @param {Content} content
-     *
-     * @return {Promise} promise
-     */
-    static setContentById(project, environment, id, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-        checkParam(content, 'content', HashBrown.Models.Content);
-
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
-
-    /**
-     * Checks if a Schema type is allowed as a child of a Content object
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} parentId
-     * @param {String} childSchemaId
-     *
-     * @returns {Promise} Is the Content node allowed as a child
-     */
-    static isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(parentId, 'parentId', String);
-        checkParam(childSchemaId, 'childSchemaId', String);
-
-        // No parent ID means root, and all Schemas are allowed there
-        if(!parentId) {
-            return Promise.resolve();
-
-        } else {
-            return this.getContentById(project, environment, parentId)
-            .then((parentContent) => {
-                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
-            })
-            .then((parentSchema) => {
-                // The Schema was not an allowed child
-                if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId)
-                    .then((childSchema) => {
-                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
-                    });
-                
-                // The Schema was an allowed child, resolve
-                } else {
-                    return Promise.resolve();
-
-                }
-            });
-        }
-    }
-
-    /**
-     * Creates a new content object
-     *
-     * @return {Promise} promise
-     */
-    static createContent() {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
-    
-    /**
-     * Removes a content object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-    static removeContentById(id) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
-}
-
-module.exports = ContentHelper;
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * The client side helper class for Forms
- */
-class FormHelper {
-    /**
-     * Gets all Forms
-     *
-     * @return {Array} Forms
-     */
-    static getAllForms() {
-        return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
-    }
-    
-    /**
-     * Gets a Form by id
-     *
-     * @param {String} id
-     *
-     * @return {HashBrown.Models.Form} Form
-     */
-    static getFormById(id) {
-        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms', id);
-    }
-    
-    /**
-     * Starts a tour of the Forms section
-     */
-    static async startTour() {
-        if(location.hash.indexOf('forms/') < 0) {
-            location.hash = '/forms/';
-        }
-       
-        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
-            
-        await UI.highlight('.navbar-main__tab[data-route="/forms/"]', 'This the Forms section, where user submitted content lives.', 'right', 'next');
-
-        await UI.highlight('.navbar-main__pane[data-route="/forms/"]', 'Here you will find all of your Forms. You can right click here to create a new Form.', 'right', 'next');
-        
-        let editor = document.querySelector('.editor--form');
-
-        if(editor) {
-            await UI.highlight('.editor--form', 'This is the Form editor, where you edit Forms.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Form editor will be when you click a Form.', 'left', 'next');
-        }
-    }
-}
-
-module.exports = FormHelper;
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const DebugHelperCommon = __webpack_require__(36);
-
-/**
- * The client side debug helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-class DebugHelper extends DebugHelperCommon {
-}
-
-module.exports = DebugHelper;
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper for debugging
- *
- * @memberof HashBrown.Common.Helpers
- */
-class DebugHelper {
-    /**
-     * Event: Log
-     *
-     * @param {String} dateString
-     * @param {String} senderString
-     * @param {String} message
-     * @param {String} type
-     */
-    static onLog(dateString, senderString, message, type) {
-        if(type) {
-            message = '[' + type.toUpperCase() + '] ' + message;
-        }
-
-        console.log(dateString + ' | ' + senderString + ' | ' + message);
-    }
-
-    /**
-     * Gets the date string
-     *
-     * @returns {String} date
-     */
-    static getDateString() {
-        let date = new Date();
-
-        let monthString = (date.getMonth() + 1);
-
-        if(monthString < 10) {
-            monthString = '0' + monthString;
-        }
-
-        let dateString = date.getDate();
-
-        if(dateString < 10) {
-            dateString = '0' + dateString;
-        }
-        
-        let hoursString = date.getHours();
-
-        if(hoursString < 10) {
-            hoursString = '0' + hoursString;
-        }
-        
-        let minutesString = date.getMinutes();
-
-        if(minutesString < 10) {
-            minutesString = '0' + minutesString;
-        }
-        
-        let secondsString = date.getSeconds();
-
-        if(secondsString < 10) {
-            secondsString = '0' + secondsString;
-        }
-
-        let output =
-            date.getFullYear() + '.' +
-            monthString + '.' +
-            dateString + ' ' +
-            hoursString + ':' + 
-            minutesString + ':' + 
-            secondsString;
-
-        return output;
-    }
-    
-    /**
-     * Parse sender
-     *
-     * @param {Object} sender
-     *
-     * @returns {String} name
-     */
-    static parseSender(sender, ignoreLast) {
-        let senderName = '';
-
-        if(sender) {
-            if(typeof sender === 'string') {
-                senderName = sender;
-
-            } else if(typeof sender === 'function') {
-                senderName = sender.name;
-
-            } else if(sender.constructor) {
-                senderName = sender.constructor.name;
-            
-            } else {
-                senderName = sender.toString();
-
-            }
-        }
-
-        return senderName;
-    }
-   
-    /**
-     * Gets the debug verbosity
-     *
-     * @returns {Number} Verbosity
-     */
-    static getDebugVerbosity() {
-        return 1;
-    }
-
-    /**
-     * Logs a message
-     *
-     * @param {String} message
-     * @param {Object} sender
-     * @param {Number} verbosity
-     */
-    static log(message, sender, verbosity = 1) {
-        if(verbosity == 0) {
-            this.error('Verbosity cannot be set to 0', this);
-
-        } else if(!verbosity) {
-            verbosity = 1;
-        }
-
-        if(this.getDebugVerbosity() >= verbosity) {
-            this.onLog(this.getDateString(), this.parseSender(sender), message);
-        }
-    }
-
-    /**
-     * Shows an error
-     *
-     * @param {String|Error} error
-     * @param {Object} sender
-     */
-    static error(error, sender) {
-        if(error instanceof Error !== true) {
-            error = new Error(error);
-        }
-
-        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
-    
-        throw error;
-    }
-
-    /**
-     * Shows a warning
-     */
-    static warning(message, sender) {
-        this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
-    }
-
-    /**
-     * Starts a timer
-     *
-     * @param {String} id
-     */
-    static startTimer(id) {
-        checkParam(id, 'id', String, true);
-
-        if(!this.timers) { this.timers = {}; }
-
-        this.timers[id] = Date.now();
-        
-        console.log('timer/' + id + ': Start!');
-    }
-
-    /**
-     * Prints the timer duration
-     *
-     * @param {String} id
-     * @param {String} message
-     */
-    static printTimer(id, message) {
-        checkParam(id, 'id', String, true);
-        checkParam(message, 'message', String, true);
-        
-        if(!this.timers || !this.timers[id]) { this.startTimer(id); }
-
-        console.log('timer/' + id + ': ' + message + '(' + (Date.now() - this.timers[id]) + 'ms)');
-        
-        this.timers[id] = Date.now();
-    }
-}
-
-module.exports = DebugHelper;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const LanguageHelperCommon = __webpack_require__(38);
-
-let selectedLanguages = {};
-
-/**
- * The client side language helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-class LanguageHelper extends LanguageHelperCommon {
-    /**
-     * Gets all selected languages
-     *
-     * @param {String} project
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguages(project) {
-        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
-
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages')
-        .then((selected) => {
-            if(!selected || !Array.isArray(selected)) {
-                selected = ['en'];
-            }
-
-            selected.sort();
-
-            selectedLanguages[project] = selected;
-
-            return Promise.resolve(selected);
-        });
-    }
-
-    /**
-     * Sets all languages
-     *
-     * @param {String} project
-     * @param {Array} languages
-     *
-     * @returns {Promise} promise
-     */
-    static setLanguages(project, languages) {
-        checkParam(project, 'project', String);
-        checkParam(languages, 'languages', Array);
-
-        if(!Array.isArray(languages)) {
-            return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
-        }
-
-        return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
-    }
-}
-
-module.exports = LanguageHelper;
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper for language
- *
- * @memberof HashBrown.Common.Helpers
- */
-class LanguageHelper {
-    /**
-     * Gets all selected languages
-     *
-     * @param {String} project
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguages(project) {
-        checkParam(project, 'project', String);
-
-        return Promise.resolve([]);
-    }
-    
-    /**
-     * Sets all languages
-     *
-     * @param {String} project
-     * @param {Array} languages
-     *
-     * @returns {Promise} Promise
-     */
-    static setLanguages(project, languages) {
-        checkParam(project, 'project', String);
-        checkParam(languages, 'languages', Array);
-
-        return Promise.resolve();
-    }
-
-    /**
-     * Gets localised sets of properties for a Content object
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     *
-     * @return {Promise} Properties
-     */
-    static getAllLocalizedPropertySets(project, environment, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Models.Content);
-
-        return this.getLanguages(project)
-        .then((languages) => {
-            let sets = {};
-
-            for(let language of languages) {
-                let properties = content.getLocalizedProperties(language);
-                
-                sets[language] = properties;
-            }
-
-            return Promise.resolve(sets);
-        });
-    }
-    
-    /**
-     * Gets all languages
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguageOptions() {
-        return [
-            "aa",
-            "ab",
-            "ae",
-            "af",
-            "ak",
-            "am",
-            "an",
-            "ar",
-            "as",
-            "av",
-            "ay",
-            "az",
-            "ba",
-            "be",
-            "bg",
-            "bh",
-            "bi",
-            "bm",
-            "bn",
-            "bo",
-            "br",
-            "bs",
-            "ca",
-            "ce",
-            "ch",
-            "co",
-            "cr",
-            "cs",
-            "cu",
-            "cv",
-            "cy",
-            "da",
-            "de",
-            "dv",
-            "dz",
-            "ee",
-            "el",
-            "en",
-            "eo",
-            "es",
-            "et",
-            "eu",
-            "fa",
-            "ff",
-            "fi",
-            "fj",
-            "fo",
-            "fr",
-            "fy",
-            "ga",
-            "gd",
-            "gl",
-            "gn",
-            "gu",
-            "gv",
-            "ha",
-            "he",
-            "hi",
-            "ho",
-            "hr",
-            "ht",
-            "hu",
-            "hy",
-            "hz",
-            "ia",
-            "id",
-            "ie",
-            "ig",
-            "ii",
-            "ik",
-            "io",
-            "is",
-            "it",
-            "iu",
-            "ja",
-            "jv",
-            "ka",
-            "kg",
-            "ki",
-            "kj",
-            "kk",
-            "kl",
-            "km",
-            "kn",
-            "ko",
-            "kr",
-            "ks",
-            "ku",
-            "kv",
-            "kw",
-            "ky",
-            "la",
-            "lb",
-            "lg",
-            "li",
-            "ln",
-            "lo",
-            "lt",
-            "lu",
-            "lv",
-            "mg",
-            "mh",
-            "mi",
-            "mk",
-            "ml",
-            "mn",
-            "mr",
-            "ms",
-            "mt",
-            "my",
-            "na",
-            "nb",
-            "nd",
-            "ne",
-            "ng",
-            "nl",
-            "nn",
-            "no",
-            "nr",
-            "nv",
-            "ny",
-            "oc",
-            "oj",
-            "om",
-            "or",
-            "os",
-            "pa",
-            "pi",
-            "pl",
-            "ps",
-            "pt",
-            "qu",
-            "rc",
-            "rm",
-            "rn",
-            "ro",
-            "ru",
-            "rw",
-            "sa",
-            "sc",
-            "sd",
-            "se",
-            "sg",
-            "si",
-            "sk",
-            "sl",
-            "sm",
-            "sn",
-            "so",
-            "sq",
-            "sr",
-            "ss",
-            "st",
-            "su",
-            "sv",
-            "sw",
-            "ta",
-            "te",
-            "tg",
-            "th",
-            "ti",
-            "tk",
-            "tl",
-            "tn",
-            "to",
-            "tr",
-            "ts",
-            "tt",
-            "tw",
-            "ty",
-            "ug",
-            "uk",
-            "ur",
-            "uz",
-            "ve",
-            "vi",
-            "vo",
-            "wa",
-            "wo",
-            "xh",
-            "yi",
-            "yo",
-            "za",
-            "zh",
-            "zu"
-        ];
-    }
-}
-
-module.exports = LanguageHelper;
-
-
-/***/ }),
-/* 39 */
+/***/ 292:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3873,13 +2759,1139 @@ module.exports = MarkdownHelper;
 
 
 /***/ }),
-/* 40 */
+
+/***/ 30:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const MediaHelperCommon = __webpack_require__(41);
+const ConnectionHelperCommon = __webpack_require__(31);
+
+/**
+ * The client side connection helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+class ConnectionHelper extends ConnectionHelperCommon {
+    /**
+     * Gets all connections
+     *
+     * @return {Array} Connections
+     */
+    static async getAllConnections() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Connection, 'connections');
+    }
+    
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Connection} Connection
+     */
+    static async getConnectionById(id) {
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
+    }
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+    static async setMediaProvider(id) {
+        await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
+
+        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+    }
+    
+    /**
+     * Starts a tour of the Connection section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('connections/') < 0) {
+            location.hash = '/connections/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/connections/"]', 'This the Connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--connection');
+
+        if(editor) {
+            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
+        }
+    }
+
+    /**
+     * Gets the Media provider
+     *
+     * @return {HashBrown.Models.Connection} Connection object
+     */
+    static async getMediaProvider() {
+        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        
+        if(providers.media) {
+            return await this.getConnectionById(providers.media);
+        } else {
+            return null;
+        }
+    }
+}
+
+module.exports = ConnectionHelper;
+
+
+/***/ }),
+
+/***/ 31:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * The helper class for Connections
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class ConnectionHelper {
+    /**
+     * Gets all connections
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise(Array)} connections
+     */
+    static getAllConnections(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
+        return Promise.resolve();
+    }
+    
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static setMediaProvider(project, environment, id = null) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
+        .then((providers) => {
+            providers = providers || {};
+            providers.media = id;
+
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers)
+        });
+    }
+}
+
+module.exports = ConnectionHelper;
+
+
+/***/ }),
+
+/***/ 32:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const ContentHelperCommon = __webpack_require__(33);
+
+/**
+ * The client side content helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+class ContentHelper extends ContentHelperCommon {
+    /**
+     * Gets all ancestors of a Content node by id
+     *
+     * @param {String} id
+     * @param {Boolean} includeSelf
+     *
+     * @returns {Array} Content node
+     */
+    static async getContentAncestorsById(id, includeSelf = false) {
+        checkParam(id, 'id', String, true);
+
+        let ancestors = [];
+        let ancestorId = id;
+
+        while(ancestorId) {
+            let ancestor = await this.getContentById(ancestorId);
+
+            if(ancestorId !== id || includeSelf) {
+                ancestors.push(ancestor);
+            }
+            
+            ancestorId = ancestor.parentId;
+        }
+
+        ancestors.reverse();
+
+        return ancestors;
+    }
+    
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {HashBrown.Models.Content} Content node
+     */
+    static async getContentById(id) {
+        checkParam(id, 'id', String, true);
+
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content', id);
+    }
+    
+    /**
+     * Gets all Content
+     *
+     * @returns {Array} Content nodes
+     */
+    static async getAllContent() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Content, 'content');
+    }
+    
+    /**
+     * Sets Content by id
+     *
+     * @param {String} id
+     * @param {HashBrown.Models.Content} content
+     */
+    static setContentById(id, content) {
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return HashBrown.Helpers.ResourceHelper.set('content', id, content);
+    }
+
+    /**
+     * A check for field definitions
+     *
+     * @param {Object} definition
+     *
+     * @return {Boolean} Whether or not the definition is empty
+     */
+    static isFieldDefinitionEmpty(definition) {
+        if(!definition) { return true; }
+
+        let isEmpty = true;
+        let checkRecursive = (object) => {
+            if(!object) { return; }
+
+            // We consider a definition not empty, if it has a value that is not an object
+            // Remember, null is of type 'object' too
+            if(typeof object !== 'object') { return isEmpty = false; }
+
+            for(let k in object) {
+                checkRecursive(object[k]);
+            }
+        };
+            
+        checkRecursive(definition);
+
+        return isEmpty;
+    }
+
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Object} definition
+     *
+     * @return {Object} Checked value
+     */
+    static fieldSanityCheck(value, definition) {
+        // If the definition value is set to multilingual, but the value isn't an object, convert it
+        if(definition.multilingual && (!value || typeof value !== 'object')) {
+            let oldValue = value;
+
+            value = {};
+            value[HashBrown.Context.language] = oldValue;
+        }
+
+        // If the definition value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if(!definition.multilingual && value && typeof value === 'object' && value._multilingual) {
+            value = value[HashBrown.Context.language];
+        }
+
+        // Update the _multilingual flag
+        if(definition.multilingual && value && !value._multilingual) {
+            value._multilingual = true;    
+        
+        } else if(!definition.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+
+        }
+
+        return value;
+    }
+
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
+     *
+     * @return {Number} New index
+     */
+    static async getNewSortIndex(parentId, aboveId, belowId) {
+        if(aboveId) {
+            let aboveContent = await this.getContentById(aboveId);
+            
+            return aboveContent.sort + 1;
+        }
+
+        if(belowId) {
+            let belowContent = await this.getContentById(belowId);
+            
+            return belowContent.sort + 1;
+        }
+
+        // Filter out content that doesn't have the same parent
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
+        
+        allContent.filter((x) => {
+            return x.parentId == parentId || (!x.parentId && !parentId);
+        });
+
+        // Find new index
+        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+        let newIndex = 10000;
+
+        for(let content of allContent) {
+            if(newIndex - 10000 <= content.sort) {
+                newIndex = content.sort + 10000;
+            }
+        }
+
+        return newIndex;
+    }
+
+    /**
+     * Starts a tour of the Content section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--content');
+
+        if(editor) {
+            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+        }
+    }
+}
+
+module.exports = ContentHelper;
+
+
+/***/ }),
+
+/***/ 33:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Content
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class ContentHelper {
+    /**
+     * Gets all Content objects
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Array} Content
+     */
+    static getAllContent(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
+        return Promise.resolve();
+    }
+
+    /**
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
+     */
+    static getSlug(string) {
+        return (string || '')
+            .toLowerCase()
+            .replace(/[æ|ä]/g, 'ae')
+            .replace(/[ø|ö]/g, 'oe')
+            .replace(/å/g, 'aa')
+            .replace(/ü/g, 'ue')
+            .replace(/ß/g, 'ss')
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-')
+            ;
+    }
+
+    /**
+     * Gets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} promise
+     */
+    static getContentById(project, environment, id) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+
+        return Promise.resolve();
+    }
+    
+    /**
+     * Sets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     * @param {Content} content
+     *
+     * @return {Promise} promise
+     */
+    static setContentById(project, environment, id, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(id, 'id', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+
+    /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
+    static isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(parentId, 'parentId', String);
+        checkParam(childSchemaId, 'childSchemaId', String);
+
+        // No parent ID means root, and all Schemas are allowed there
+        if(!parentId) {
+            return Promise.resolve();
+
+        } else {
+            return this.getContentById(project, environment, parentId)
+            .then((parentContent) => {
+                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+            })
+            .then((parentSchema) => {
+                // The Schema was not an allowed child
+                if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId)
+                    .then((childSchema) => {
+                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+                    });
+                
+                // The Schema was an allowed child, resolve
+                } else {
+                    return Promise.resolve();
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
+    static createContent() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+    
+    /**
+     * Removes a content object
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+    static removeContentById(id) {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+}
+
+module.exports = ContentHelper;
+
+
+/***/ }),
+
+/***/ 34:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * The client side helper class for Forms
+ */
+class FormHelper {
+    /**
+     * Gets all Forms
+     *
+     * @return {Array} Forms
+     */
+    static getAllForms() {
+        return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Form, 'forms');
+    }
+    
+    /**
+     * Gets a Form by id
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Form} Form
+     */
+    static getFormById(id) {
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Form, 'forms', id);
+    }
+    
+    /**
+     * Starts a tour of the Forms section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('forms/') < 0) {
+            location.hash = '/forms/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/forms/"]', 'This the Forms section, where user submitted content lives.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/forms/"]', 'Here you will find all of your Forms. You can right click here to create a new Form.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--form');
+
+        if(editor) {
+            await UI.highlight('.editor--form', 'This is the Form editor, where you edit Forms.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Form editor will be when you click a Form.', 'left', 'next');
+        }
+    }
+}
+
+module.exports = FormHelper;
+
+
+/***/ }),
+
+/***/ 35:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const DebugHelperCommon = __webpack_require__(36);
+
+/**
+ * The client side debug helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+class DebugHelper extends DebugHelperCommon {
+}
+
+module.exports = DebugHelper;
+
+
+/***/ }),
+
+/***/ 36:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper for debugging
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class DebugHelper {
+    /**
+     * Event: Log
+     *
+     * @param {String} dateString
+     * @param {String} senderString
+     * @param {String} message
+     * @param {String} type
+     */
+    static onLog(dateString, senderString, message, type) {
+        if(type) {
+            message = '[' + type.toUpperCase() + '] ' + message;
+        }
+
+        console.log(dateString + ' | ' + senderString + ' | ' + message);
+    }
+
+    /**
+     * Gets the date string
+     *
+     * @returns {String} date
+     */
+    static getDateString() {
+        let date = new Date();
+
+        let monthString = (date.getMonth() + 1);
+
+        if(monthString < 10) {
+            monthString = '0' + monthString;
+        }
+
+        let dateString = date.getDate();
+
+        if(dateString < 10) {
+            dateString = '0' + dateString;
+        }
+        
+        let hoursString = date.getHours();
+
+        if(hoursString < 10) {
+            hoursString = '0' + hoursString;
+        }
+        
+        let minutesString = date.getMinutes();
+
+        if(minutesString < 10) {
+            minutesString = '0' + minutesString;
+        }
+        
+        let secondsString = date.getSeconds();
+
+        if(secondsString < 10) {
+            secondsString = '0' + secondsString;
+        }
+
+        let output =
+            date.getFullYear() + '.' +
+            monthString + '.' +
+            dateString + ' ' +
+            hoursString + ':' + 
+            minutesString + ':' + 
+            secondsString;
+
+        return output;
+    }
+    
+    /**
+     * Parse sender
+     *
+     * @param {Object} sender
+     *
+     * @returns {String} name
+     */
+    static parseSender(sender, ignoreLast) {
+        let senderName = '';
+
+        if(sender) {
+            if(typeof sender === 'string') {
+                senderName = sender;
+
+            } else if(typeof sender === 'function') {
+                senderName = sender.name;
+
+            } else if(sender.constructor) {
+                senderName = sender.constructor.name;
+            
+            } else {
+                senderName = sender.toString();
+
+            }
+        }
+
+        return senderName;
+    }
+   
+    /**
+     * Gets the debug verbosity
+     *
+     * @returns {Number} Verbosity
+     */
+    static getDebugVerbosity() {
+        return 1;
+    }
+
+    /**
+     * Logs a message
+     *
+     * @param {String} message
+     * @param {Object} sender
+     * @param {Number} verbosity
+     */
+    static log(message, sender, verbosity = 1) {
+        if(verbosity == 0) {
+            this.error('Verbosity cannot be set to 0', this);
+
+        } else if(!verbosity) {
+            verbosity = 1;
+        }
+
+        if(this.getDebugVerbosity() >= verbosity) {
+            this.onLog(this.getDateString(), this.parseSender(sender), message);
+        }
+    }
+
+    /**
+     * Shows an error
+     *
+     * @param {String|Error} error
+     * @param {Object} sender
+     */
+    static error(error, sender) {
+        if(error instanceof Error !== true) {
+            error = new Error(error);
+        }
+
+        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
+    
+        throw error;
+    }
+
+    /**
+     * Shows a warning
+     */
+    static warning(message, sender) {
+        this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
+    }
+
+    /**
+     * Starts a timer
+     *
+     * @param {String} id
+     */
+    static startTimer(id) {
+        checkParam(id, 'id', String, true);
+
+        if(!this.timers) { this.timers = {}; }
+
+        this.timers[id] = Date.now();
+        
+        console.log('timer/' + id + ': Start!');
+    }
+
+    /**
+     * Prints the timer duration
+     *
+     * @param {String} id
+     * @param {String} message
+     */
+    static printTimer(id, message) {
+        checkParam(id, 'id', String, true);
+        checkParam(message, 'message', String, true);
+        
+        if(!this.timers || !this.timers[id]) { this.startTimer(id); }
+
+        console.log('timer/' + id + ': ' + message + '(' + (Date.now() - this.timers[id]) + 'ms)');
+        
+        this.timers[id] = Date.now();
+    }
+}
+
+module.exports = DebugHelper;
+
+
+/***/ }),
+
+/***/ 37:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const LanguageHelperCommon = __webpack_require__(38);
+
+let selectedLanguages = {};
+
+/**
+ * The client side language helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+class LanguageHelper extends LanguageHelperCommon {
+    /**
+     * Gets all selected languages
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+    static getLanguages(project) {
+        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages')
+        .then((selected) => {
+            if(!selected || !Array.isArray(selected)) {
+                selected = ['en'];
+            }
+
+            selected.sort();
+
+            selectedLanguages[project] = selected;
+
+            return Promise.resolve(selected);
+        });
+    }
+
+    /**
+     * Sets all languages
+     *
+     * @param {String} project
+     * @param {Array} languages
+     *
+     * @returns {Promise} promise
+     */
+    static setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', Array);
+
+        if(!Array.isArray(languages)) {
+            return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
+        }
+
+        return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
+    }
+}
+
+module.exports = LanguageHelper;
+
+
+/***/ }),
+
+/***/ 38:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper for language
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class LanguageHelper {
+    /**
+     * Gets all selected languages
+     *
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
+     */
+    static getLanguages(project) {
+        checkParam(project, 'project', String);
+
+        return Promise.resolve([]);
+    }
+    
+    /**
+     * Sets all languages
+     *
+     * @param {String} project
+     * @param {Array} languages
+     *
+     * @returns {Promise} Promise
+     */
+    static setLanguages(project, languages) {
+        checkParam(project, 'project', String);
+        checkParam(languages, 'languages', Array);
+
+        return Promise.resolve();
+    }
+
+    /**
+     * Gets localised sets of properties for a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     *
+     * @return {Promise} Properties
+     */
+    static getAllLocalizedPropertySets(project, environment, content) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(content, 'content', HashBrown.Models.Content);
+
+        return this.getLanguages(project)
+        .then((languages) => {
+            let sets = {};
+
+            for(let language of languages) {
+                let properties = content.getLocalizedProperties(language);
+                
+                sets[language] = properties;
+            }
+
+            return Promise.resolve(sets);
+        });
+    }
+    
+    /**
+     * Gets all languages
+     *
+     * @returns {Array} List of language names
+     */
+    static getLanguageOptions() {
+        return [
+            "aa",
+            "ab",
+            "ae",
+            "af",
+            "ak",
+            "am",
+            "an",
+            "ar",
+            "as",
+            "av",
+            "ay",
+            "az",
+            "ba",
+            "be",
+            "bg",
+            "bh",
+            "bi",
+            "bm",
+            "bn",
+            "bo",
+            "br",
+            "bs",
+            "ca",
+            "ce",
+            "ch",
+            "co",
+            "cr",
+            "cs",
+            "cu",
+            "cv",
+            "cy",
+            "da",
+            "de",
+            "dv",
+            "dz",
+            "ee",
+            "el",
+            "en",
+            "eo",
+            "es",
+            "et",
+            "eu",
+            "fa",
+            "ff",
+            "fi",
+            "fj",
+            "fo",
+            "fr",
+            "fy",
+            "ga",
+            "gd",
+            "gl",
+            "gn",
+            "gu",
+            "gv",
+            "ha",
+            "he",
+            "hi",
+            "ho",
+            "hr",
+            "ht",
+            "hu",
+            "hy",
+            "hz",
+            "ia",
+            "id",
+            "ie",
+            "ig",
+            "ii",
+            "ik",
+            "io",
+            "is",
+            "it",
+            "iu",
+            "ja",
+            "jv",
+            "ka",
+            "kg",
+            "ki",
+            "kj",
+            "kk",
+            "kl",
+            "km",
+            "kn",
+            "ko",
+            "kr",
+            "ks",
+            "ku",
+            "kv",
+            "kw",
+            "ky",
+            "la",
+            "lb",
+            "lg",
+            "li",
+            "ln",
+            "lo",
+            "lt",
+            "lu",
+            "lv",
+            "mg",
+            "mh",
+            "mi",
+            "mk",
+            "ml",
+            "mn",
+            "mr",
+            "ms",
+            "mt",
+            "my",
+            "na",
+            "nb",
+            "nd",
+            "ne",
+            "ng",
+            "nl",
+            "nn",
+            "no",
+            "nr",
+            "nv",
+            "ny",
+            "oc",
+            "oj",
+            "om",
+            "or",
+            "os",
+            "pa",
+            "pi",
+            "pl",
+            "ps",
+            "pt",
+            "qu",
+            "rc",
+            "rm",
+            "rn",
+            "ro",
+            "ru",
+            "rw",
+            "sa",
+            "sc",
+            "sd",
+            "se",
+            "sg",
+            "si",
+            "sk",
+            "sl",
+            "sm",
+            "sn",
+            "so",
+            "sq",
+            "sr",
+            "ss",
+            "st",
+            "su",
+            "sv",
+            "sw",
+            "ta",
+            "te",
+            "tg",
+            "th",
+            "ti",
+            "tk",
+            "tl",
+            "tn",
+            "to",
+            "tr",
+            "ts",
+            "tt",
+            "tw",
+            "ty",
+            "ug",
+            "uk",
+            "ur",
+            "uz",
+            "ve",
+            "vi",
+            "vo",
+            "wa",
+            "wo",
+            "xh",
+            "yi",
+            "yo",
+            "za",
+            "zh",
+            "zu"
+        ];
+    }
+}
+
+module.exports = LanguageHelper;
+
+
+/***/ }),
+
+/***/ 39:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const MediaHelperCommon = __webpack_require__(40);
 
 /**
  * The client side media helper
@@ -3972,7 +3984,8 @@ module.exports = MediaHelper;
 
 
 /***/ }),
-/* 41 */
+
+/***/ 40:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4043,7 +4056,8 @@ module.exports = MediaHelper;
 
 
 /***/ }),
-/* 42 */
+
+/***/ 41:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4086,7 +4100,8 @@ module.exports = ProjectHelper;
 
 
 /***/ }),
-/* 43 */
+
+/***/ 42:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4263,7 +4278,8 @@ module.exports = RequestHelper;
 
 
 /***/ }),
-/* 44 */
+
+/***/ 43:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4631,13 +4647,14 @@ module.exports = ResourceHelper;
 
 
 /***/ }),
-/* 45 */
+
+/***/ 44:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const SchemaHelperCommon = __webpack_require__(46);
+const SchemaHelperCommon = __webpack_require__(45);
 
 /**
  * The client side Schema helper
@@ -4710,7 +4727,8 @@ module.exports = SchemaHelper;
 
 
 /***/ }),
-/* 46 */
+
+/***/ 45:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4827,13 +4845,14 @@ module.exports = SchemaHelper;
 
 
 /***/ }),
-/* 47 */
+
+/***/ 46:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const SettingsHelperCommon = __webpack_require__(48);
+const SettingsHelperCommon = __webpack_require__(47);
 
 /**
  * The client side settings helper
@@ -4910,7 +4929,8 @@ module.exports = SettingsHelper;
 
 
 /***/ }),
-/* 48 */
+
+/***/ 47:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4928,7 +4948,8 @@ module.exports = SettingsHelper;
 
 
 /***/ }),
-/* 49 */
+
+/***/ 48:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5707,7 +5728,8 @@ module.exports = UIHelper;
 
 
 /***/ }),
-/* 50 */
+
+/***/ 49:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5774,5 +5796,6 @@ module.exports = EventHelper;
 
 
 /***/ })
-/******/ ]));
+
+/******/ });
 //# sourceMappingURL=helpers.js.map
