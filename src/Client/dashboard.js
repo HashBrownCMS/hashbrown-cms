@@ -111,7 +111,7 @@ async function initServer() {
     let update = await HashBrown.Helpers.RequestHelper.request('get', 'server/update/check');
     $btnUpdate.removeClass('working');
 
-    if(update.isBehind || true) {
+    if(update.isBehind) {
         $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
 
         $btnUpdate.click(async () => {
