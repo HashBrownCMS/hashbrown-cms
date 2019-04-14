@@ -8,8 +8,10 @@ Ever wonder why you have to run a completely separate CMS for every single proje
 First make sure you have these dependencies met:  
 - node.js
 - mongodb
-- imagemagick  
-- docker & docker-compose (optional, but recommended)
+- imagemagick
+- optional:
+  - docker & docker-compose
+  - nodemon
 
 Then clone the code and install the dependencies:  
 ```
@@ -18,14 +20,26 @@ cd ./hashbrown-cms
 npm install
 ```
 
-Starting the server:
+Building and starting the server for production:
 ```
 npm start
 ```
 
-Stopping the server:
+Building for development and production:
 ```
-npm stop
+npm run build:dev
+npm run build
+```
+
+Using Docker:
+```
+npm run start:docker
+npm run stop:docker
+```
+
+Using nodemon:
+```
+npm run start:nodemon
 ```
 
 ## Updating HashBrown
