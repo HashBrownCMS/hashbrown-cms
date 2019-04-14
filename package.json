@@ -6,9 +6,13 @@
   "main": "hashbrown.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --progress && cd ./docker && sudo docker-compose up --build -d",
-    "stop": "cd docker && sudo docker-compose down",
-    "dev-client": "webpack --watch --watch-poll --progress --no-babel",
+    "build": "webpack --progress",
+    "build:dev": "webpack --watch --watch-poll --progress --no-babel",
+    "start": "npm run build && node hashbrown.js",
+    "start:dev": "nodemon hashbrown.js",
+    "start:docker": "npm run build && cd ./docker && sudo docker-compose up --build -d",
+    "stop:docker": "cd docker && sudo docker-compose down",
+    "dev-client": "npm run build:dev",
     "dev-server": "cd ./docker && sudo docker-compose up --build -d && sudo docker-compose logs -f node"
   },
   "author": "Putaitu",
@@ -32,5 +36,8 @@
     "sass": "^1.16.0",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
   }
 }
