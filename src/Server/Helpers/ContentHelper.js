@@ -332,9 +332,10 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @returns {Promise} Result
      */
-    static createExampleContent(project, environment, user = requiredParam('user')) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
+    static createExampleContent(project, environment, user) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(user, 'user', HashBrown.Models.User, true);
 
         // Example page Schema
         let examplePageSchemaId = HashBrown.Models.ContentSchema.createId();

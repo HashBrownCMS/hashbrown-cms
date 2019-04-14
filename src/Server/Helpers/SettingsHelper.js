@@ -31,9 +31,9 @@ class SettingsHelper extends SettingsHelperCommon {
 
         delete settings['usedBy'];
         
-        if(section) { return settings[section]; }
+        if(section) { return settings[section] || {}; }
 
-        return settings;
+        return settings || {};
     }
     
     /**

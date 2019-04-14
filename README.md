@@ -25,21 +25,22 @@ Building and starting the server for production:
 npm start
 ```
 
-Building for development and production:
+Building/watching frontend files:
 ```
-npm run build:dev
-npm run build
+npm run build:frontend
+npm run watch:frontend
 ```
 
 Using Docker:
 ```
 npm run start:docker
+npm run watch:docker
 npm run stop:docker
 ```
 
 Using nodemon:
 ```
-npm run start:nodemon
+npm run watch:nodemon
 ```
 
 ## Updating HashBrown

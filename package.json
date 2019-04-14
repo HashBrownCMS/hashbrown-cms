@@ -6,12 +6,13 @@
   "main": "hashbrown.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --progress",
-    "build:dev": "webpack --watch --watch-poll --progress --no-babel",
-    "start": "npm run build && node hashbrown.js",
-    "start:nodemon": "nodemon hashbrown.js",
+    "build:frontend": "webpack --progress",
+    "watch:frontend": "webpack --watch --watch-poll --progress --no-babel",
+    "start": "npm run build:frontend && node hashbrown.js",
+    "watch:nodemon": "nodemon hashbrown.js",
     "start:docker": "cd ./docker && sudo docker-compose up --build -d",
-    "stop:docker": "cd ./docker && sudo docker-compose down"
+    "stop:docker": "cd ./docker && sudo docker-compose down",
+    "watch:docker": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && sudo docker-compose logs -f node"
   },
   "author": "Putaitu",
   "license": "MIT",

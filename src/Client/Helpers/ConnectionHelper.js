@@ -72,7 +72,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static async getMediaProvider() {
         let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
         
-        if(providers.media) {
+        if(providers && providers.media) {
             return await this.getConnectionById(providers.media);
         } else {
             return null;

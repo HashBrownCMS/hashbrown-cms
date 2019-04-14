@@ -40,15 +40,6 @@ base.namespace = function namespace(query) {
 }
 
 /**
- * Throws an error if parameter was null (used as a default param hack)
- *
- * @param {String} name
- */
-base.requiredParam = (name) => {
-    throw new Error('Parameter "' + name + '" is required');
-}
-
-/**
  * Checks a parameter for type
  *
  * @param {Anything} value

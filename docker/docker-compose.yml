@@ -14,7 +14,7 @@ services:
         networks:
             - hashbrown-cms--network
         restart: unless-stopped
-        command: "node /opt/hashbrown-cms"
+        command: "node /opt/hashbrown-cms/hashbrown.js"
         environment:
             - MONGODB_HOST=mongodb
         volumes:
