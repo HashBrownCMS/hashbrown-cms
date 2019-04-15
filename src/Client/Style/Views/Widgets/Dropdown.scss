@@ -30,25 +30,6 @@
         width: 2rem;
     }
 
-    // Right + bottom modes
-    &.right {
-        .widget--dropdown__options {
-            transform: translateX(-100%);
-        }
-    }
-
-    &.bottom {
-        .widget--dropdown__options {
-            transform: translateY(-100%);
-        }
-    }
-
-    &.bottom.right {
-        .widget--dropdown__options {
-            transform: translate(-100%, -100%);
-        }
-    }
-
     // Icon mode
     &.has-icon {
         min-width: 0;
@@ -99,7 +80,7 @@
             top: 3.5rem;
             left: -0.5rem;
             max-height: none;
-            overflow: visible;
+            overflow-y: auto;
             width: 10rem;
             border-top-left-radius: 0.2rem;
             border-top-right-radius: 0.2rem;
@@ -135,7 +116,6 @@
 
         .widget--dropdown__options {
             top: 0;
-            max-height: none;
             padding: 1rem;
         }
     }
@@ -273,7 +253,6 @@
         border: 1px solid $primary;
         background-color: $standard;
         width: 100%;
-        max-height: 10rem;
         overflow-y: auto;
         user-select: none;
     }

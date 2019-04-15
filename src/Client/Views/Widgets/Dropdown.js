@@ -207,23 +207,48 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
     /**
      * Updates all position classes
      */
-    updatePositionClasses() {
+    updatePositionStyling() {
         setTimeout(() => {
             let toggle = this.element.querySelector('.widget--dropdown__toggle');
             let options = this.element.querySelector('.widget--dropdown__options');
             let isChecked = toggle.checked;
-            
+            let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
+
             toggle.checked = true;
 
             let bounds = options.getBoundingClientRect();
-            
+            let left = bounds.left;
+            let top = bounds.top;
+            let width = bounds.width;
+            let height = bounds.height;
+            let maxHeight = height;
+
             toggle.checked = isChecked;
 
-            let isAtRight = bounds.right >= window.innerWidth - 10;
-            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
+            if(left < margin) {
+                left = margin;
+            }
+            
+            if(left + width > window.innerWidth - margin) {
+                left -= width;
+            }
+            
+            if(top + height > window.innerHeight - margin) {
+                top -= height;
+            }
+            
+            if(top < margin) {
+                top = margin;
+            }
+          
+            if(top + height > window.innerHeight - margin) {
+                maxHeight = window.innerHeight - top - margin;
+            }
 
-            this.element.classList.toggle('right', isAtRight);
-            this.element.classList.toggle('bottom', isAtBottom);
+            this.element.style.left = left + 'px';
+            this.element.style.top = top + 'px';
+            options.style.maxHeight = maxHeight + 'px';
+
         }, 1);
     }
 
@@ -327,7 +352,7 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             }
         }
         
-        this.updatePositionClasses();
+        this.updatePositionStyling();
         this.updateSelectedClasses();
         
         setTimeout(() => {
