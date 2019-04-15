@@ -213,6 +213,7 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             let options = this.element.querySelector('.widget--dropdown__options');
             let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
             let isChecked = toggle.checked;
+            let isContext = this.element.classList.contains('context-menu');
 
             toggle.checked = true;
 
@@ -220,7 +221,7 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
         
             let bounds = this.element.getBoundingClientRect();
             let left = bounds.left;
-            let top = bounds.top;
+            let top = bounds.bottom;
             let width = options.offsetWidth;
             let height = options.offsetHeight;
 
@@ -233,13 +234,15 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             if(left + width > window.innerWidth - margin) {
                 left -= width;
             }
-            
-            if(top + height > window.innerHeight - margin) {
-                top -= (top + height) - (window.innerHeight - margin);
-            }
-            
-            if(top < margin) {
-                top = margin;
+           
+            if(isContext) {
+                if(top + height > window.innerHeight - margin) {
+                    top -= (top + height) - (window.innerHeight - margin);
+                }
+                
+                if(top < margin) {
+                    top = margin;
+                }
             }
           
             if(top + height > window.innerHeight - margin) {
