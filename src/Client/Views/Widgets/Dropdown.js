@@ -208,54 +208,51 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
      * Updates all position classes
      */
     updatePositionStyling() {
-        setTimeout(() => {
-            let toggle = this.element.querySelector('.widget--dropdown__toggle');
-            let options = this.element.querySelector('.widget--dropdown__options');
-            let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
-            let isChecked = toggle.checked;
-            let isContext = this.element.classList.contains('context-menu');
+        let toggle = this.element.querySelector('.widget--dropdown__toggle');
+        let options = this.element.querySelector('.widget--dropdown__options');
+        let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        let isChecked = toggle.checked;
+        let isContext = this.element.classList.contains('context-menu');
 
-            toggle.checked = true;
+        toggle.checked = true;
 
-            options.removeAttribute('style');
+        options.removeAttribute('style');
+    
+        let bounds = this.element.getBoundingClientRect();
+        let left = bounds.left;
+        let top = bounds.bottom;
+        let width = options.offsetWidth;
+        let height = options.offsetHeight;
+
+        toggle.checked = isChecked;
+
+        if(left < margin) {
+            left = margin;
+        }
         
-            let bounds = this.element.getBoundingClientRect();
-            let left = bounds.left;
-            let top = bounds.bottom;
-            let width = options.offsetWidth;
-            let height = options.offsetHeight;
-
-            toggle.checked = isChecked;
-
-            if(left < margin) {
-                left = margin;
+        if(left + width > window.innerWidth - margin) {
+            left -= width;
+        }
+       
+        if(isContext) {
+            if(top + height > window.innerHeight - margin) {
+                top -= (top + height) - (window.innerHeight - margin);
             }
             
-            if(left + width > window.innerWidth - margin) {
-                left -= width;
+            if(top < margin) {
+                top = margin;
             }
-           
-            if(isContext) {
-                if(top + height > window.innerHeight - margin) {
-                    top -= (top + height) - (window.innerHeight - margin);
-                }
-                
-                if(top < margin) {
-                    top = margin;
-                }
-            }
-          
-            if(top + height > window.innerHeight - margin) {
-                height = window.innerHeight - top - margin;
-            }
-         
-            options.style.position = 'fixed';
-            options.style.width = width + 'px';
-            options.style.left = left + 'px';
-            options.style.top = top + 'px';
-            options.style.height = height + 'px';
-
-        }, 1);
+        }
+      
+        if(top + height > window.innerHeight - margin) {
+            height = window.innerHeight - top - margin;
+        }
+     
+        options.style.position = 'fixed';
+        options.style.width = width + 'px';
+        options.style.left = left + 'px';
+        options.style.top = top + 'px';
+        options.style.height = height + 'px';
     }
 
     /**

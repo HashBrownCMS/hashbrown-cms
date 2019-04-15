@@ -711,6 +711,8 @@ class UIHelper {
                     pickedItem();
                 }
             });
+                
+            dropdown.toggle(false);
 
             // Prevent the toggle button from blocking new context menu events
             let toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
@@ -728,20 +730,22 @@ class UIHelper {
                 // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
                 setTimeout(clearTargets, 100);
             });
-
-            // Set styles
-            let pageY = e.touches ? e.touches[0].pageY : e.pageY;
-            let pageX = e.touches ? e.touches[0].pageX : e.pageX;
-
-            dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.style.top = pageY + 'px';
-            dropdown.element.style.left = pageX + 'px';
-
-            // Open it
-            dropdown.toggle(true);
-
+            
             // Append to body
             document.body.appendChild(dropdown.element);
+
+            setTimeout(() => {
+                // Set styles
+                let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+                let pageX = e.touches ? e.touches[0].pageX : e.pageX;
+
+                dropdown.element.classList.toggle('context-menu', true);
+                dropdown.element.style.top = pageY + 'px';
+                dropdown.element.style.left = pageX + 'px';
+
+                // Open it
+                dropdown.toggle(true);
+            }, 1);
         };
         
         element.addEventListener('contextmenu', (e) => {
