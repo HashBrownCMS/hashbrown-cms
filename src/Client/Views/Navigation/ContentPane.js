@@ -142,7 +142,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
                         // Append parent Content id to request URL
                         if(parentId) {
-                            apiUrl += '&parentId=' + parentId;
+                            query += '&parentId=' + parentId;
                         }
 
                         // API call to create new Content node

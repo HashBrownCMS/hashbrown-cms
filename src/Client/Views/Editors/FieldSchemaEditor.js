@@ -15,7 +15,7 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
         this.model.editorId = this.parentSchema.editorId;
     
         if(!this.model.editorId) {
-            UI.errorModal(new Error('Could not find a field editor for this schema'));     
+            UI.errorModal(new Error('Could not find a field editor for the schema "' + this.model.id + '"'));     
         }
     }
 

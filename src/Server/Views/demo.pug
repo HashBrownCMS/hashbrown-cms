@@ -20,13 +20,7 @@ html
         .page--environment__spaces
             .page--environment__space.page--environment__space--menu
             .page--environment__space.page--environment__space--nav
-                .widget.widget--spinner.embedded.no-background
-                    .widget--spinner__inner
-                        .widget--spinner__image.fa.fa-refresh
             .page--environment__space.page--environment__space--editor
-                .widget.widget--spinner.embedded.no-background
-                    .widget--spinner__inner
-                        .widget--spinner__image.fa.fa-refresh
         
         .widget.widget--spinner.page--environment__spinner.hidden
             .widget--spinner__inner
@@ -37,7 +31,6 @@ html
         script(src='/lib/crisp-ui/crisp-ui.js')
         script(src='/lib/babel/polyfill.min.js')
             
-        script(src='/lib/ckeditor/ckeditor.js')
         script(src='/lib/codemirror/lib/codemirror.js')
         script(src='/lib/codemirror/mode/javascript/javascript.js')
         script(src='/lib/codemirror/mode/markdown/markdown.js')
@@ -50,7 +43,8 @@ html
                 projectSettings: {info:{name:'Demo'},languages:['en'],sync:{}},
                 environment: 'live',
                 user: {id:'demouser',isAdmin:true,isCurrent:true,username:'demouser',fullName:'Demo user',scopes:{}},
-                isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1
+                isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1,
+                isDemo: true
             };
 
         script(src='/js/common.js')
@@ -61,5 +55,5 @@ html
         script(src='/js/views.js')
         
         script(src='/js/environment.js')
-        script(src='/js/demo.js')
         script(src='/js/plugins.js')
+        script(src='/js/demo.js')

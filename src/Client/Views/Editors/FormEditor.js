@@ -311,7 +311,7 @@ class FormEditor extends Crisp.View {
      * @return {Object} element
      */
     renderFields() {
-        let postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
+        let postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
         
         return _.div({class: 'editor__body'},
             _.div({class: 'editor__field'},

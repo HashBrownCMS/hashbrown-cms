@@ -376,6 +376,7 @@
                     font-family: 'FontAwesome';
                     opacity: 0.25;
                     flex-shrink: 0;
+                    text-align: center;
                     line-height: 4rem;
                     display: block;
                     width: 2rem;
@@ -396,7 +397,7 @@
             &__toggle-children,
             &__context {
                 height: 100%;
-                width: 3rem;
+                width: 2rem;
                 flex-shrink: 0;
                 padding: 0;
                 background-color: transparent;

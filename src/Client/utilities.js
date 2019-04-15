@@ -78,6 +78,20 @@ window.copyToClipboard = function copyToClipboard(string) {
 }
 
 /**
+ * Gets a URL query parameter
+ *
+ * @param {String} name
+ * @param {String} string
+ *
+ * @return {String} Value
+ */
+window.getQueryParam = function getQueryParam(name, string) {
+    if(!string) { string = location.search; }
+
+    return new URLSearchParams(string).get(name);
+};
+
+/**
  * Clears the workspace
  */
 window.clearWorkspace = function clearWorkspace() {

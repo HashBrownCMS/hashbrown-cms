@@ -157,7 +157,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                         _.div({class: 'editor__field__key__label'}, 'Parent properties'),
                         _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this Schema')
                     ),
-                    _.div({class: 'editor__field__value'},
+                    _.div({class: 'editor__field__value cluster'},
                         _.each(this.getParentProperties(this.currentTab), (fieldKey, fieldValue) => {
                             if(this.model.fields.properties[fieldKey]) { return; }
 
