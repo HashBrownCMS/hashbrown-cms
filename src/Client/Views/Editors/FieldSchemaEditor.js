@@ -10,9 +10,11 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      * Pre render
      */
     prerender() {
-        if(!this.parentSchema || !this.parentSchema.id === 'fieldBase') { return; }
+        // This check isn't relevant for schemas without a "real" parent
+        if(!this.parentSchema || this.parentSchema.id === 'fieldBase') { return; }
 
-        this.model.editorId = this.parentSchema.editorId;
+        // Make sure the model has an editor id
+        this.model.editorId = this.model.editorId || this.parentSchema.editorId;
     
         if(!this.model.editorId) {
             UI.errorModal(new Error('Could not find a field editor for the schema "' + this.model.id + '"'));     

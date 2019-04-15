@@ -211,17 +211,18 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
         setTimeout(() => {
             let toggle = this.element.querySelector('.widget--dropdown__toggle');
             let options = this.element.querySelector('.widget--dropdown__options');
-            let isChecked = toggle.checked;
             let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            let isChecked = toggle.checked;
 
             toggle.checked = true;
 
-            let bounds = options.getBoundingClientRect();
+            options.removeAttribute('style');
+        
+            let bounds = this.element.getBoundingClientRect();
             let left = bounds.left;
             let top = bounds.top;
-            let width = bounds.width;
-            let height = bounds.height;
-            let maxHeight = height;
+            let width = options.offsetWidth;
+            let height = options.offsetHeight;
 
             toggle.checked = isChecked;
 
@@ -234,7 +235,7 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             }
             
             if(top + height > window.innerHeight - margin) {
-                top -= height;
+                top -= (top + height) - (window.innerHeight - margin);
             }
             
             if(top < margin) {
@@ -242,12 +243,14 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             }
           
             if(top + height > window.innerHeight - margin) {
-                maxHeight = window.innerHeight - top - margin;
+                height = window.innerHeight - top - margin;
             }
-
-            this.element.style.left = left + 'px';
-            this.element.style.top = top + 'px';
-            options.style.maxHeight = maxHeight + 'px';
+         
+            options.style.position = 'fixed';
+            options.style.width = width + 'px';
+            options.style.left = left + 'px';
+            options.style.top = top + 'px';
+            options.style.height = height + 'px';
 
         }, 1);
     }

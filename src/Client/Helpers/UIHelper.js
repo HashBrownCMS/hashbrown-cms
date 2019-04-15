@@ -714,6 +714,7 @@ class UIHelper {
 
             // Prevent the toggle button from blocking new context menu events
             let toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
+            let options = dropdown.element.querySelector('.widget--dropdown__options');
 
             toggle.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
@@ -733,7 +734,8 @@ class UIHelper {
             let pageX = e.touches ? e.touches[0].pageX : e.pageX;
 
             dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.setAttribute('style', 'top: ' + pageY + 'px; left: ' + pageX + 'px;');
+            dropdown.element.style.top = pageY + 'px';
+            dropdown.element.style.left = pageX + 'px';
 
             // Open it
             dropdown.toggle(true);

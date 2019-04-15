@@ -104,17 +104,18 @@
     // Context menu mode
     &.context-menu {
         min-width: 0;
-        width: 16rem;
-        position: absolute;
-        z-index: 1200;
         border: 0;
         background-color: transparent;
+        position: absolute;
 
         .widget--dropdown__value {
             display: none;
         }
 
         .widget--dropdown__options {
+            z-index: 1200;
+            max-height: none;
+            width: 16rem;
             top: 0;
             padding: 1rem;
         }
@@ -255,6 +256,7 @@
         width: 100%;
         overflow-y: auto;
         user-select: none;
+        max-height: 20rem;
     }
 
     // Option
