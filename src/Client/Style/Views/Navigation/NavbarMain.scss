@@ -205,6 +205,9 @@
         }
 
         &.select-dir &__item[data-is-directory="true"]:not(.moving-item) > &__item__content:hover {
+            color: $primary-text;
+            background-color: $primary;
+            
             &:after {
                 opacity: 1;
                 font-family: 'FontAwesome';
@@ -248,7 +251,7 @@
                     position: absolute;
                     height: 2rem;
                     line-height: 2rem;
-                    width: 3rem;
+                    width: 2rem;
                     right: 0;
                     top: 0;
                 } 
@@ -285,11 +288,6 @@
                     color: $primary-text !important;
                     opacity: 0.5;
                 }
-            }
-
-            &.active > &__content &__toggle-children,
-            &.active > &__content &__context {
-                color: $primary-text;
             }
 
             // Open state
@@ -339,8 +337,8 @@
             // Insert below placeholder
             &__insert-below {
                 position: absolute;
-                height: 0.5rem;
-                width: calc(100% - 1rem);
+                height: 2px;
+                width: 100%;
                 bottom: 0;
                 z-index: 20;
                 background-color: transparent;
@@ -402,6 +400,7 @@
                 padding: 0;
                 background-color: transparent;
                 border: none;
+                color: inherit;
 
                 &:focus {
                     outline: none;
