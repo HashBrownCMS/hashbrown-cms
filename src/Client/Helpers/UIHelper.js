@@ -679,6 +679,8 @@ class UIHelper {
      * @param {HTMLElement} button
      */
     static context(element, items, button) {
+        if(!element) { return; }
+        
         let openContextMenu = (e) => {
             // Find any existing context menu targets and remove their classes
             let clearTargets = () => {

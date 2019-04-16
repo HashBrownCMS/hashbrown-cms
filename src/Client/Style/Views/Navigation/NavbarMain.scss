@@ -1,10 +1,10 @@
 @keyframes navbar-main__pane__item__spinner {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: rotate(0deg);
     }
     
     100% {
-        transform: translate(-50%, -50%) rotate(359deg);
+        transform: rotate(359deg);
     }
 }
 /**
@@ -309,29 +309,19 @@
             }
 
             // Locked state
-            &[data-locked="true"] > &__content:after {
+            &[data-locked="true"] > &__content > &__label:after {
                 content: '\f023';
             }
             
             // Remote state
-            &[data-remote="true"] > &__content:after {
+            &[data-remote="true"] > &__content > &__label:after {
                 content: '\f14c';
             }
 
             // Loading state
-            &.loading > &__content:after {
-                content: '\f1ce';
-                color: $primary;
-                animation: navbar-main__pane__item__spinner 1s linear infinite;
-                opacity: 1;
-                top: 50%;
-                right: -0.5rem;
-                position: absolute;
-                display: block;
-                height: 2rem;
-                line-height: 2rem;
-                width: 2rem;
-                text-align: center;
+            &.loading > &__content > &__label:after {
+                content: '\f110';
+                animation: navbar-main__pane__item__spinner 1s steps(8, end) infinite;
             }
             
             // Insert below placeholder
@@ -372,7 +362,6 @@
 
                 &:after {
                     font-family: 'FontAwesome';
-                    opacity: 0.25;
                     flex-shrink: 0;
                     text-align: center;
                     line-height: 4rem;
@@ -389,6 +378,14 @@
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 flex-grow: 1;
+
+                &:after {
+                    margin-left: 0.75rem;
+                    font-family: 'FontAwesome';
+                    text-align: center;
+                    opacity: 0.25;
+                    display: inline-block;
+                }
             }
 
             // Toggle children & context buttons

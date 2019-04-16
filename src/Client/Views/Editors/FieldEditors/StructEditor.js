@@ -89,6 +89,9 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     static renderConfigEditor(config, fieldSchemaId) {
         config.struct = config.struct || {};
 
+        // Cache the struct state before editing
+        let originalStruct = JSON.parse(JSON.stringify(config.struct));
+
         let $element = _.div({class: 'editor--schema__struct'});
 
         let renderEditor = async () => {
@@ -100,7 +103,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             if(compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
                 for(let key in compiledFieldSchema.config.struct) {
                     // We only want parent struct values
-                    if(config.struct[key]) { continue; }
+                    if(originalStruct[key]) { continue; }
 
                     parentStruct[key]  = compiledFieldSchema.config.struct[key];
                 }
@@ -193,7 +196,18 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                             let $field = _.div({class: 'editor__field collapsible collapsed'});
 
-                            let renderField = () => {
+                            let renderField = async () => {
+                                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldValue.schemaId);
+
+                                if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
+
+                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+                                let configEditor = null;
+
+                                if(editor) {
+                                    configEditor = await editor.renderConfigEditor(fieldValue.config, schema.id);
+                                }
+                            
                                 _.append($field.empty(),
                                     _.div({class: 'editor__field__key'},
                                         _.div({class: 'editor__field__key__label'}, fieldKey)
@@ -298,29 +312,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                                 }).$element
                                             )
                                         ),
-                                        _.do(() => {
-                                            let fetch = async () => {
-                                                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldValue.schemaId);
-
-                                                if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
-
-                                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                                                if(!editor) { return; }
-                                            
-                                                fieldValue.config = fieldValue.config || {};
-
-                                                let $element = editor.renderConfigEditor(fieldValue.config, schema.id);
-
-                                                $placeholder.replaceWith($element);
-                                            };
-                                            
-                                            let $placeholder = _.div({class: 'cr-placeholder'});
-
-                                            fetch();
-                                            
-                                            return $placeholder;
-                                        })
+                                        configEditor
                                     )
                                 )
                             };
@@ -329,8 +321,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                             return $field;
                         }),
-                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property'},
-                            ).click(() => {
+                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property'})
+                            .click(() => {
                                 if(config.struct.newField) { return; }
                             
                                 config.struct.newField = {
@@ -351,81 +343,88 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
+     * Renders a field editor
+     *
+     * @param {HTMLElement} placeholder
+     * @param {String} fieldName
+     * @param {Object} fieldDefinition
+     */
+    async renderField($placeholder, fieldName, fieldDefinition) {
+        let value = this.value[fieldName];
+
+        if(!fieldDefinition || !fieldDefinition.schemaId) { throw new Error('Schema id not set for key "' + fieldName + '"'); }
+
+        let fieldSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldDefinition.schemaId);
+
+        if(!fieldSchema) { throw new Error('FieldSchema "' + fieldDefinition.schemaId + '" could not be found for key "' + fieldName + '"'); }
+
+        let fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId);
+        
+        if(!fieldEditor) { throw new Error('FieldEditor ' + fieldSchema.editorId + ' could not be found for FieldSchema ' + fieldSchema.id); }
+
+        // Sanity check
+        value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, fieldDefinition);
+        this.value[fieldName] = value;
+
+        // Get the config
+        let config;
+
+        if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+            config = fieldDefinition.config;
+        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldSchema.config)) {
+            config = fieldSchema.config;
+        } else {
+            config = {};
+        }
+        
+        // Init the field editor
+        let fieldEditorInstance = new fieldEditor({
+            value: fieldDefinition.multilingual ? value[HashBrown.Context.language] : value,
+            disabled: fieldDefinition.disabled || false,
+            config: config,
+            schema: fieldSchema,
+            className: 'editor__field__value'
+        });
+
+        // Hook up the change event
+        fieldEditorInstance.on('change', (newValue) => {
+            this.onChange(newValue, fieldName, fieldDefinition);
+        });
+        
+        fieldEditorInstance.on('silentchange', (newValue) => {
+            this.onChange(newValue, fieldName, fieldDefinition, true);
+        });
+
+        // Return the DOM element
+        let $field = _.div({class: 'editor__field' + (config.struct ? ' collapsible collapsed' : '')},
+            _.div({class: 'editor__field__key'},
+                _.div({class: 'editor__field__key__label'}, fieldDefinition.label)
+                    .click((e) => {
+                        if(!config.struct) { return; }
+
+                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
+                    }),
+                _.if(fieldDefinition.description,
+                    _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
+                ),
+                fieldEditorInstance.renderKeyActions()
+            ),
+            fieldEditorInstance.$element
+        );
+
+        $placeholder.replaceWith($field);
+    }
+
+    /**
      * Renders this editor
      */
     template() {
         return _.div({class: 'field-editor field-editor--struct'},
             // Loop through each key in the struct
             _.each(this.getStruct(), (fieldName, fieldDefinition) => {
-                let fetch = async () => {
-                    let value = this.value[fieldName];
-
-                    if(!fieldDefinition || !fieldDefinition.schemaId) { throw new Error('Schema id not set for key "' + fieldName + '"'); }
-
-                    let fieldSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldDefinition.schemaId);
-
-                    if(!fieldSchema) { throw new Error('FieldSchema "' + fieldDefinition.schemaId + '" could not be found for key "' + fieldName + '"'); }
-
-                    let fieldEditor = HashBrown.Views.Editors.ContentEditor.getFieldEditor(fieldSchema.editorId);
-                    
-                    if(!fieldEditor) { throw new Error('FieldEditor ' + fieldSchema.editorId + ' could not be found for FieldSchema ' + fieldSchema.id); }
-
-                    // Sanity check
-                    value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(value, fieldDefinition);
-                    this.value[fieldName] = value;
-
-                    // Get the config
-                    let config;
-
-                    if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
-                        config = fieldDefinition.config;
-                    } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldSchema.config)) {
-                        config = fieldSchema.config;
-                    } else {
-                        config = {};
-                    }
-                    
-                    // Init the field editor
-                    let fieldEditorInstance = new fieldEditor({
-                        value: fieldDefinition.multilingual ? value[HashBrown.Context.language] : value,
-                        disabled: fieldDefinition.disabled || false,
-                        config: config,
-                        schema: fieldSchema,
-                        className: 'editor__field__value'
-                    });
-
-                    // Hook up the change event
-                    fieldEditorInstance.on('change', (newValue) => {
-                        this.onChange(newValue, fieldName, fieldDefinition);
-                    });
-                    
-                    fieldEditorInstance.on('silentchange', (newValue) => {
-                        this.onChange(newValue, fieldName, fieldDefinition, true);
-                    });
-
-                    // Return the DOM element
-                    let $element = _.div({class: 'editor__field' + (config.struct ? ' collapsible collapsed' : '')},
-                        _.div({class: 'editor__field__key'},
-                            _.div({class: 'editor__field__key__label'}, fieldDefinition.label)
-                                .click((e) => {
-                                    if(!config.struct) { return; }
-
-                                    e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
-                                }),
-                            _.if(fieldDefinition.description,
-                                _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
-                            ),
-                            fieldEditorInstance.renderKeyActions()
-                        ),
-                        fieldEditorInstance.$element
-                    );
-
-                    $placeholder.replaceWith($element);
-                };
-
                 let $placeholder = _.div({class: 'cr-placeholder'});
-
-                fetch();
+                
+                this.renderField($placeholder, fieldName, fieldDefinition);
 
                 return $placeholder;
             })    
