@@ -390,6 +390,10 @@
 
                 // Expand
                 &--expand {
+                    &:after {
+                        content: 'Expand all'
+                    }
+                    
                     &:before {
                         content: '\f065';
                     }
@@ -397,6 +401,10 @@
 
                 // Collapse
                 &--collapse {
+                    &:after {
+                        content: 'Collapse all'
+                    }
+                    
                     &:before {
                         content: '\f066';
                     }

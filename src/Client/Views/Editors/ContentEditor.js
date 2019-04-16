@@ -5,15 +5,11 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ContentEditor extends Crisp.View {
+class ContentEditor extends HashBrown.Views.Editors.Editor {
     constructor(id) {
         super({ modelId: id });
 
-        checkParam(id, 'id', String, true);
-
         this.dirty = false;
-
-        this.fetch();
     }
 
     /**
@@ -216,53 +212,8 @@ class ContentEditor extends Crisp.View {
      * @return {Object} element
      */
     renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
-        let compiledSchema = this.fieldSchemas[fieldDefinition.schemaId];
 
-        if(!compiledSchema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
-
-        let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
-          
-        if(!fieldEditor) {
-            return debug.log('No field editor by id "' + compiledSchema.editorId + '" found in schema "' + fieldDefinition.schemaId +  '"', this);
-        }
-
-        // Get the config
-        let config;
-
-        if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
-            config = fieldDefinition.config;
-        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
-            config = compiledSchema.config;
-        } else {
-            config = {};
-        }
         
-        // Instantiate the field editor
-        let fieldEditorInstance = new fieldEditor({
-            value: fieldValue,
-            disabled: fieldDefinition.disabled || false,
-            config: config,
-            description: fieldDefinition.description || '',
-            schema: compiledSchema.getObject(),
-            multilingual: fieldDefinition.multilingual === true,
-            $keyActions: $keyActions,
-            className: 'editor__field__value'
-        });
-
-        fieldEditorInstance.on('change', (newValue) => {
-            if(this.model.isLocked) { return; }
-            
-            this.dirty = true;
-
-            onChange(newValue);
-        });
-
-        fieldEditorInstance.on('silentchange', (newValue) => {
-            if(this.model.isLocked) { return; }
-            
-            onChange(newValue);
-        });
-            
         return fieldEditorInstance.$element;
     }
 
@@ -299,56 +250,80 @@ class ContentEditor extends Crisp.View {
 
         // Render all fields
         return _.each(tabFieldDefinitions, (key, fieldDefinition) => {
+            // On change function
+            let onChange = (newValue) => {
+                // If field definition is set to multilingual, assign flag and value onto object...
+                if(fieldDefinition.multilingual) {
+                    fieldValues[key]._multilingual = true;
+                    fieldValues[key][HashBrown.Context.language] = newValue;
+
+                // ...if not, assign the value directly
+                } else {
+                    fieldValues[key] = newValue;
+                }
+            };
+            
+            // Get schema
+            let compiledSchema = this.fieldSchemas[fieldDefinition.schemaId];
+
+            if(!compiledSchema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
+
             // Field value sanity check
             fieldValues[key] = HashBrown.Helpers.ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
+            
+            // If the field definition is set to multilingual, pass value from object
+            let fieldValue = fieldDefinition.multilingual ? fieldValues[key][HashBrown.Context.language] : fieldValues[key];
+            
+            // Get the config
+            let config;
 
-            // Render the field actions container
-            let $keyActions;
+            if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
+                config = fieldDefinition.config;
+            } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
+                config = compiledSchema.config;
+            } else {
+                config = {};
+            }
 
-            return _.div({class: 'editor__field', 'data-key': key},
-                // Render the label and icon
-                _.div({class: 'editor__field__key', title: fieldDefinition.description || ''},
-                    _.div({class: 'editor__field__key__label'}, fieldDefinition.label || key),
-                    _.if(fieldDefinition.description,
-                        _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
-                    ),
-                    $keyActions = _.div({class: 'editor__field__key__actions'})
-                ),
+            // Instantiate field editor
+            let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+              
+            if(!fieldEditor) { throw new Error('No field editor by id "' + compiledSchema.editorId + '" found in schema "' + fieldDefinition.schemaId +  '"'); }
+            
+            let fieldEditorInstance = new fieldEditor({
+                value: fieldValue,
+                disabled: fieldDefinition.disabled || false,
+                config: config,
+                description: fieldDefinition.description || '',
+                schema: compiledSchema,
+                multilingual: fieldDefinition.multilingual === true,
+                className: 'editor__field__value'
+            });
 
-                // Render the field editor
-                this.renderField(
-                    // If the field definition is set to multilingual, pass value from object
-                    fieldDefinition.multilingual ? fieldValues[key][HashBrown.Context.language] : fieldValues[key],
+            fieldEditorInstance.on('change', (newValue) => {
+                if(this.model.isLocked) { return; }
+                
+                this.dirty = true;
 
-                    // Pass the field definition
-                    fieldDefinition,
+                onChange(newValue);
+            });
 
-                    // On change function
-                    (newValue) => {
-                        // If field definition is set to multilingual, assign flag and value onto object...
-                        if(fieldDefinition.multilingual) {
-                            fieldValues[key]._multilingual = true;
-                            fieldValues[key][HashBrown.Context.language] = newValue;
-
-                        // ...if not, assign the value directly
-                        } else {
-                            fieldValues[key] = newValue;
-                        }
-                    },
-
-                    // Pass the key actions container, so the field editor can populate it
-                    $keyActions
-                )
+            fieldEditorInstance.on('silentchange', (newValue) => {
+                if(this.model.isLocked) { return; }
+                
+                onChange(newValue);
+            });
+            
+            return this.field(
+                {
+                    label: fieldDefinition.label || key,
+                    key: key,
+                    description: fieldDefinition.description,
+                    actions: fieldEditorInstance.getKeyActions()
+                },
+                fieldEditorInstance 
             );
         });
-    }
-
-    /**
-     * Event: Click tab
-     *
-     * @param {String} tab
-     */
-    onClickTab(tab) {
     }
 
     /**

@@ -13,8 +13,14 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
         try {
             this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
        
-            if(this.model.parentSchemaId) {
-                this.parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.parentSchemaId, true);
+            for(let i in this.allSchemas) {
+                let id = this.allSchemas[i].id;
+                
+                this.allSchemas[i] = await HashBrown.Helpers.SchemaHelper.getSchemaById(id, true);
+
+                if(this.model.parentSchemaId === id) {
+                    this.parentSchema = this.allSchemas[i];
+                }
             }
 
             super.fetch();
@@ -51,8 +57,6 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
      * Event: Click save
      */
     async onClickSave() {
-        if(this.jsonEditor && this.jsonEditor.isValid == false) { return; }
-
         this.$saveBtn.toggleClass('working', true);
 
         await HashBrown.Helpers.ResourceHelper.set('schemas', this.modelId, this.model);
@@ -66,21 +70,16 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
     }
 
     /**
-     * Renders the icon editor
-     *  
-     * @return {Object} element
+     * Event: Change icon
      */
-    renderIconEditor() {
-        return _.button({class: 'widget small widget--button fa fa-' + this.getIcon()})
-            .click((e) => {
-                let modal = new HashBrown.Views.Modals.IconModal();
+    onClickChangeIcon() {
+        let modal = new HashBrown.Views.Modals.IconModal();
 
-                modal.on('change', (newIcon) => {
-                    this.model.icon = newIcon;
+        modal.on('change', (newIcon) => {
+            this.model.icon = newIcon;
 
-                    e.currentTarget.className = 'widget small widget--button fa fa-' + this.model.icon;
-                });
-            });
+            this.update();
+        });
     }
 
     /**
@@ -98,6 +97,27 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
         }
 
         return 'cogs';
+    }
+
+    /**
+     * Renders a config editor based on a schema id
+     *
+     * @param {String} schemaId
+     * @param {Object} config
+     * @param {Boolean} onlyCustom
+     *
+     * @return {HTMLElement} Config editor
+     */
+    renderConfigEditor(schemaId, config, onlyCustom) {
+        let schema = this.getSchema(schemaId);
+
+        if(!schema || (onlyCustom && schema.parentSchemaId !== 'fieldBase')) { return null; }
+
+        let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+          
+        if(!editor) { return null; }
+
+        return editor.renderConfigEditor.call(this, config, schema.id);
     }
 
     /**
@@ -123,13 +143,14 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
             ),
             this.field(
                 'Icon',
-                this.renderIconEditor()
+                _.button({class: 'widget small widget--button fa fa-' + this.getIcon()})
+                    .click(() => { this.onClickChangeIcon(); })
             ),   
             this.field(
                 'Parent',
                 new HashBrown.Views.Widgets.Dropdown({
                     value: this.model.parentSchemaId,
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas(),
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas(this.model.type),
                     valueKey: 'id',
                     labelKey: 'name',
                     disabledOptions: [ { id: this.model.id, name: this.model.name } ],

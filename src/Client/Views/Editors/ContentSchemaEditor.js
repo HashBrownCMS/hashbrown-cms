@@ -60,11 +60,11 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
         return parentProperties;
     }
-
+    
     /**
-     * Renders the editor fields
+     * Pre render
      */
-    renderBody() {
+    prerender() {
         if(!this.model.defaultTabId && this.parentSchema) {
             this.model.defaultTabId = this.parentSchema.defaultTabId;
         }
@@ -73,6 +73,12 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
             this.currentTab = Object.keys(this.getAllTabs())[0] || 'meta';
         }
         
+    }
+
+    /**
+     * Renders the editor fields
+     */
+    renderBody() {
         let $element = super.renderBody();
         let defaultTabEditor;
 
@@ -208,6 +214,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                         {
                             label: fieldKey,
                             isCollapsible: true,
+                            isCollapsed: true,
                             actions: {
                                 remove: (e) => {
                                     delete this.model.fields.properties[fieldKey];
@@ -307,19 +314,7 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                 }
                             })
                         ),
-                        _.do(() => {
-                            let schema = this.getSchema(fieldValue.schemaId);
-
-                            if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
-
-                            let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                            if(!editor) { return; }
-
-                            fieldValue.config = fieldValue.config || {};
-
-                            return editor.renderConfigEditor(fieldValue.config, schema.id);
-                        })
+                        this.renderConfigEditor(fieldValue.schemaId, fieldValue.config)
                     );
                 }),
                 _.button({title: 'Add a Content property', class: 'editor__field__add widget widget--button round fa fa-plus'})

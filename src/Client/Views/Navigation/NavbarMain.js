@@ -455,6 +455,8 @@ class NavbarMain extends Crisp.View {
 
                     // Create it if not found
                     if($dir.length < 1) {
+                        let contextButton;
+
                         $dir = _.div({class: 'navbar-main__pane__item', 'data-is-directory': true},
                             _.a({
                                 class: 'navbar-main__pane__item__content'
@@ -464,7 +466,8 @@ class NavbarMain extends Crisp.View {
                                 
                                 // Toggle button
                                 _.button({class: 'navbar-main__pane__item__toggle-children'})
-                                    .click((e) => { this.onClickToggleChildren(e); })
+                                    .click((e) => { this.onClickToggleChildren(e); }),
+                                contextButton = _.button({class: 'navbar-main__pane__item__context fa fa-ellipsis-v'})
                             ),
                             _.div({class: 'navbar-main__pane__item__children'})
                         );
@@ -493,7 +496,7 @@ class NavbarMain extends Crisp.View {
                         
                         // Attach pane context menu
                         if(pane.getPaneContextMenu) {
-                            UI.context($dir[0], pane.getPaneContextMenu());
+                            UI.context($dir[0], pane.getPaneContextMenu(), contextButton[0]);
                         }
                     }
                    
@@ -507,8 +510,10 @@ class NavbarMain extends Crisp.View {
             }
 
             // Add expand/collapse buttons
-            if($parentDir.children('.navbar-main__pane__item__content').children('.navbar-main__pane__item__toggle-children').length < 1) {
-                $parentDir.children('.navbar-main__pane__item__content').append(
+            let $content = $parentDir.children('.navbar-main__pane__item__content');
+
+            if($content.children('.navbar-main__pane__item__toggle-children').length < 1) {
+                $content.children('.navbar-main__pane__item__context').before(
                     _.button({class: 'navbar-main__pane__item__toggle-children'})
                         .click((e) => { this.onClickToggleChildren(e); })
                 );

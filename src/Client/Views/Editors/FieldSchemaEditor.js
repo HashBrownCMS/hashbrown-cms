@@ -13,8 +13,11 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
         // This check isn't relevant for schemas without a "real" parent
         if(!this.parentSchema || this.parentSchema.id === 'fieldBase') { return; }
 
-        // Make sure the model has an editor id
+        // Make sure the model follows the parent editor id
         this.model.editorId = this.parentSchema.editorId;
+
+        // Make sure this model has a config
+        this.model.config = this.model.config || {};
     }
 
     /**
@@ -22,7 +25,8 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
      */
     renderBody() {
         let $element = super.renderBody();
-      
+        let $configEditor = this.renderConfigEditor(this.model.id, this.model.config);
+        
         _.append($element,
             _.if(this.model.parentSchemaId === 'fieldBase',
                 this.field(
@@ -36,25 +40,17 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                         onChange: (newEditor) => {
                             this.model.editorId = newEditor;
 
-                            this.fetch();
+                            this.update();
                         }
                     })
                 )
             ),
-            _.do(() => {
-                let editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-                if(!editor) { return; }
-                
-                let configEditor = editor.renderConfigEditor(this.model.config, this.model.id);
-
-                if(!configEditor) { return; }
-
-                return this.field(
-                    { label: 'Config', isCollapsible: true },
-                    configEditor
-                );
-            })
+            _.if($configEditor,
+                this.field(
+                    { label: 'Config', isCollapsible: true, isCollapsed: false },
+                    $configEditor
+                )
+            )
         );
 
         return $element;

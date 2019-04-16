@@ -92,254 +92,200 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         // Cache the struct state before editing
         let originalStruct = JSON.parse(JSON.stringify(config.struct));
 
-        let $element = _.div({class: 'editor--schema__struct'});
+        let compiledFieldSchema = this.getSchema(fieldSchemaId);
+        
+        // Get the parent struct fields
+        let parentStruct = {};
 
-        let renderEditor = async () => {
-            let compiledFieldSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldSchemaId, true);
-            
-            // Get the parent struct fields
-            let parentStruct = {};
+        if(compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
+            for(let key in compiledFieldSchema.config.struct) {
+                // We only want parent struct values
+                if(originalStruct[key]) { continue; }
 
-            if(compiledFieldSchema && compiledFieldSchema.config && compiledFieldSchema.config.struct) {
-                for(let key in compiledFieldSchema.config.struct) {
-                    // We only want parent struct values
-                    if(originalStruct[key]) { continue; }
-
-                    parentStruct[key]  = compiledFieldSchema.config.struct[key];
-                }
+                parentStruct[key]  = compiledFieldSchema.config.struct[key];
             }
-           
-            // Compile the label options
-            let labelOptions = {};
-            
-            for(let key in parentStruct) {
-                if(!parentStruct[key]) { continue; }
+        }
+       
+        // Compile the label options
+        let labelOptions = {};
+        
+        for(let key in parentStruct) {
+            if(!parentStruct[key]) { continue; }
 
-                labelOptions[key] = parentStruct[key].label;
-            }
+            labelOptions[key] = parentStruct[key].label;
+        }
 
-            for(let key in config.struct) {
-                if(!config.struct[key]) { continue; }
+        for(let key in config.struct) {
+            if(!config.struct[key]) { continue; }
 
-                labelOptions[key] = config.struct[key].label;
-            }
+            labelOptions[key] = config.struct[key].label;
+        }
 
-            // Render everything
-            _.append($element.empty(),
-                // Render the label picker
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'},
-                        _.div({class: 'editor__field__key__label'}, 'Label'),
-                        _.div({class: 'editor__field__key__description'}, 'The value of the field picked here will represent this struct when collapsed')
-                    ),
-                    _.div({class: 'editor__field__value'},
-                        new HashBrown.Views.Widgets.Dropdown({
-                            options: labelOptions,
-                            value: config.label,
-                            onChange: (newLabel) => {
-                                config.label = newLabel;
-                            }
-                        })
-                    )
-                ),
+        // Render everything
+        return [    
+            // Render the label picker
+            this.field(
+                { label: 'Label', description: 'The value of the field picked here will represent this struct when collapsed' },
+                new HashBrown.Views.Widgets.Dropdown({
+                    options: labelOptions,
+                    value: config.label,
+                    onChange: (newLabel) => {
+                        config.label = newLabel;
+                    }
+                })
+            ),
 
-                // Render the parent struct
-                _.if(Object.keys(parentStruct).length > 0,
-                    _.div({class: 'editor__field'},
-                        _.div({class: 'editor__field__key'},
-                            _.div({class: 'editor__field__key__label'}, 'Parent struct'),
-                            _.div({class: 'editor__field__key__description'}, 'Properties that are inherited and can be changed if you add them to this struct')
-                        ),
-                        _.div({class: 'editor__field__value cluster'},
-                            _.each(parentStruct, (fieldKey, fieldValue) => {
-                                return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
-                                    .click(() => {
-                                        let newProperties = {};
-
-                                        newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
-
-                                        for(let key in config.struct) {
-                                            newProperties[key] = config.struct[key];
-                                        }
-
-                                        config.struct = newProperties;
-
-                                        renderEditor();
-                                    });
-                            })
-                        )
-                    )
-                ),
-
-                // Render this struct
-                _.div({class: 'editor__field'},
-                    _.div({class: 'editor__field__key'},
-                        'Struct',
-                        _.div({class: 'editor__field__key__actions'},
-                            _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
-                                .click((e) => {
-                                    HashBrown.Helpers.UIHelper.fieldSortableObject(
-                                        config.struct,
-                                        $(e.currentTarget).parents('.editor__field')[0],
-                                        (newStruct) => {
-                                            config.struct = newStruct;
-                                        }
-                                    );
-                                })
-                        )
-                    ),
-                    _.div({class: 'editor__field__value'},
-                        _.each(config.struct, (fieldKey, fieldValue) => {
-                            // Sanity check
-                            fieldValue.config = fieldValue.config || {};
-                            fieldValue.schemaId = fieldValue.schemaId || 'array';
-
-                            let $field = _.div({class: 'editor__field collapsible collapsed'});
-
-                            let renderField = async () => {
-                                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldValue.schemaId);
-
-                                if(!schema || schema.parentSchemaId !== 'fieldBase') { return; }
-
-                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-                                let configEditor = null;
-
-                                if(editor) {
-                                    configEditor = await editor.renderConfigEditor(fieldValue.config, schema.id);
-                                }
-                            
-                                _.append($field.empty(),
-                                    _.div({class: 'editor__field__key'},
-                                        _.div({class: 'editor__field__key__label'}, fieldKey)
-                                            .click((e) => {
-                                                e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');  
-                                            }),
-                                        _.div({class: 'editor__field__key__actions'},
-                                            _.button({class: 'widget widget--button small embedded fa fa-remove', title: 'Remove field'})
-                                                .click(() => {
-                                                    delete config.struct[fieldKey];
-
-                                                    renderEditor();
-                                                })
-                                        )
-                                    ),
-                                    _.div({class: 'editor__field__value'},
-                                        _.div({class: 'editor__field'},
-                                            _.div({class: 'editor__field__key'}, 'Key'),
-                                            _.div({class: 'editor__field__value'},
-                                                new HashBrown.Views.Widgets.Input({
-                                                    type: 'text',
-                                                    placeholder: 'A variable name, e.g. "myField"',
-                                                    tooltip: 'The field variable name',
-                                                    value: fieldKey,
-                                                    onChange: (newKey) => {
-                                                        if(!newKey) { return; }
-
-                                                        let newStruct = {};
-
-                                                        // Insert the changed key into the correct place in the struct
-                                                        for(let key in config.struct) {
-                                                            if(key === fieldKey) {
-                                                                newStruct[newKey] = config.struct[fieldKey];
-                                                            
-                                                            } else {
-                                                                newStruct[key] = config.struct[key];
-
-                                                            }
-                                                        }
-
-                                                        // Change internal reference to new key
-                                                        fieldKey = newKey;
-
-                                                        // Reassign the struct object
-                                                        config.struct = newStruct;
-                                                    
-                                                        // Update the sort key
-                                                        $field.find('.editor__field__key__label').html(fieldKey);
-                                                    }
-                                                })
-                                            )
-                                        ),
-                                        _.div({class: 'editor__field'},
-                                            _.div({class: 'editor__field__key'}, 'Label'),
-                                            _.div({class: 'editor__field__value'},
-                                                new HashBrown.Views.Widgets.Input({
-                                                    type: 'text',
-                                                    placeholder: 'A label, e.g. "My field"',
-                                                    tooltip: 'The field label',
-                                                    value: fieldValue.label,
-                                                    onChange: (newValue) => { fieldValue.label = newValue; }
-                                                }).$element
-                                            )
-                                        ),
-                                        _.div({class: 'editor__field'},
-                                            _.div({class: 'editor__field__key'}, 'Description'),
-                                            _.div({class: 'editor__field__value'},
-                                                new HashBrown.Views.Widgets.Input({
-                                                    type: 'text',
-                                                    placeholder: 'A description',
-                                                    tooltip: 'The field description',
-                                                    value: fieldValue.description,
-                                                    onChange: (newValue) => { fieldValue.description = newValue; }
-                                                }).$element
-                                            )
-                                        ),
-                                        _.div({class: 'editor__field'},
-                                            _.div({class: 'editor__field__key'}, 'Multilingual'),
-                                            _.div({class: 'editor__field__value'},
-                                                new HashBrown.Views.Widgets.Input({
-                                                    type: 'checkbox',
-                                                    tooltip: 'Whether or not this field should support multiple languages',
-                                                    value: fieldValue.multilingual || false,
-                                                    onChange: (newValue) => { fieldValue.multilingual = newValue; }
-                                                }).$element
-                                            )
-                                        ),
-                                        _.div({class: 'editor__field'},
-                                            _.div({class: 'editor__field__key'}, 'Schema'),
-                                            _.div({class: 'editor__field__value'},
-                                                new HashBrown.Views.Widgets.Dropdown({
-                                                    useTypeAhead: true,
-                                                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
-                                                    value: fieldValue.schemaId,
-                                                    labelKey: 'name',
-                                                    valueKey: 'id',
-                                                    onChange: (newValue) => {
-                                                        fieldValue.schemaId = newValue;
-
-                                                        renderField();
-                                                    }
-                                                }).$element
-                                            )
-                                        ),
-                                        configEditor
-                                    )
-                                )
-                            };
-
-                            renderField();
-
-                            return $field;
-                        }),
-                        _.button({class: 'editor__field__add widget widget--button round fa fa-plus', title: 'Add a struct property'})
+            // Render the parent struct
+            _.if(Object.keys(parentStruct).length > 0,
+                this.field(
+                    { label: 'Parent struct', description: 'Properties that are inherited and can be changed if you add them to this struct', isCluster: true },
+                    _.each(parentStruct, (fieldKey, fieldValue) => {
+                        return _.button({class: 'widget widget--button condensed', title: 'Change the "' + (fieldValue.label || fieldKey) + '" property for this Schema'}, _.span({class: 'fa fa-plus'}), fieldValue.label || fieldKey)
                             .click(() => {
-                                if(config.struct.newField) { return; }
-                            
-                                config.struct.newField = {
-                                    label: 'New field',
-                                    schemaId: 'string'
-                                };
+                                let newProperties = {};
+
+                                newProperties[fieldKey] = JSON.parse(JSON.stringify(fieldValue));
+
+                                for(let key in config.struct) {
+                                    newProperties[key] = config.struct[key];
+                                }
+
+                                config.struct = newProperties;
 
                                 renderEditor();
-                            })
-                    )
+                            });
+                    })
                 )
-            );
-        };
+            ),
 
-        renderEditor();
+            // Render this struct
+            this.field(
+                {
+                    label: 'Struct',
+                    actions: {
+                        sort: () => { 
+                            HashBrown.Helpers.UIHelper.fieldSortableObject(
+                                config.struct,
+                                this.getField('Struct'),
+                                (newStruct) => {
+                                    config.struct = newStruct;
+                                }
+                            );
+                        }
+                    }
+                },
+                _.each(config.struct, (fieldKey, fieldValue) => {
+                    // Sanity check
+                    fieldValue.config = fieldValue.config || {};
+                    fieldValue.schemaId = fieldValue.schemaId || 'array';
+                    
+                    return this.field(
+                        {
+                            label: fieldKey,
+                            isCollapsible: true,
+                            isCollapsed: true,
+                            actions: {
+                                remove: () => {
+                                    delete config.struct[fieldKey];
 
-        return $element;
+                                    this.update();
+                                }
+                            }
+                        },
+                        this.field(
+                            'Key',
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'text',
+                                placeholder: 'A variable name, e.g. "myField"',
+                                tooltip: 'The field variable name',
+                                value: fieldKey,
+                                onChange: (newKey) => {
+                                    if(!newKey) { return; }
+
+                                    let newStruct = {};
+
+                                    // Insert the changed key into the correct place in the struct
+                                    for(let key in config.struct) {
+                                        if(key === fieldKey) {
+                                            newStruct[newKey] = config.struct[fieldKey];
+                                        
+                                        } else {
+                                            newStruct[key] = config.struct[key];
+
+                                        }
+                                    }
+                                
+                                    // Update the sort key
+                                    this.changeFieldLabel(fieldKey, newKey);
+
+                                    // Change internal reference to new key
+                                    fieldKey = newKey;
+
+                                    // Reassign the struct object
+                                    config.struct = newStruct;
+                                }
+                            })
+                        ),
+                        this.field(
+                            'Label',
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'text',
+                                placeholder: 'A label, e.g. "My field"',
+                                tooltip: 'The field label',
+                                value: fieldValue.label,
+                                onChange: (newValue) => { fieldValue.label = newValue; }
+                            })
+                        ),
+                        this.field(
+                            'Description',
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'text',
+                                placeholder: 'A description',
+                                tooltip: 'The field description',
+                                value: fieldValue.description,
+                                onChange: (newValue) => { fieldValue.description = newValue; }
+                            })
+                        ),
+                        this.field(
+                            'Multilingual',
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'checkbox',
+                                tooltip: 'Whether or not this field should support multiple languages',
+                                value: fieldValue.multilingual || false,
+                                onChange: (newValue) => { fieldValue.multilingual = newValue; }
+                            })
+                        ),
+                        this.field(
+                            'Schema',
+                            new HashBrown.Views.Widgets.Dropdown({
+                                useTypeAhead: true,
+                                options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
+                                value: fieldValue.schemaId,
+                                labelKey: 'name',
+                                valueKey: 'id',
+                                onChange: (newValue) => {
+                                    fieldValue.schemaId = newValue;
+
+                                    this.update();
+                                }
+                            })
+                        ),
+                        this.renderConfigEditor(fieldValue.schemaId, fieldValue.config, true)
+                    );
+                }),
+                _.button({class: 'editor__field__add widget widget--button round fa fa-plus', title: 'Add a struct property'})
+                    .click(() => {
+                        if(config.struct.newField) { return; }
+                    
+                        config.struct.newField = {
+                            label: 'New field',
+                            schemaId: 'string'
+                        };
+
+                        this.update();
+                    })
+            )
+        ];
     }
 
     /**
@@ -396,20 +342,15 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         });
 
         // Return the DOM element
-        let $field = _.div({class: 'editor__field' + (config.struct ? ' collapsible collapsed' : '')},
-            _.div({class: 'editor__field__key'},
-                _.div({class: 'editor__field__key__label'}, fieldDefinition.label)
-                    .click((e) => {
-                        if(!config.struct) { return; }
-
-                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
-                    }),
-                _.if(fieldDefinition.description,
-                    _.div({class: 'editor__field__key__description'}, fieldDefinition.description)
-                ),
-                fieldEditorInstance.renderKeyActions()
-            ),
-            fieldEditorInstance.$element
+        let $field = this.field(
+            {
+                label: fieldDefinition.label,
+                description: fieldDefinition.description,
+                isCollapsible: true,
+                isCollapsed: true,
+                actions: fieldEditorInstance.getKeyActions()
+            },
+            fieldEditorInstance
         );
 
         $placeholder.replaceWith($field);

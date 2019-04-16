@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class FieldEditor extends Crisp.View {
+class FieldEditor extends HashBrown.Views.Editors.Editor {
     /**
      * Renders the config editor
      *
@@ -25,17 +25,18 @@ class FieldEditor extends Crisp.View {
     renderKeyActions() {}
 
     /**
+     * Gets the key actions
+     *
+     * @returns {Object} Key actions
+     */
+    getKeyActions() {}
+
+    /**
      * Post render
      */
     postrender() {
         if(this.className) {
             this.element.classList.toggle(this.className, true);
-        }
-        
-        if(this.$keyActions) {
-            _.append(this.$keyActions.empty(),
-                this.renderKeyActions()
-            );
         }
     }
 }

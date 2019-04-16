@@ -16,11 +16,17 @@ class Editor extends Crisp.View {
      * Updates this view
      */
     update() {
-        let scrollTop = this.element.querySelector('.editor__body').scrollTop; 
+        if(this instanceof HashBrown.Views.Editors.FieldEditors.FieldEditor) {
+            super.update();
         
-        super.update();
-        
-        this.element.querySelector('.editor__body').scrollTop = scrollTop; 
+        } else {
+            let scrollTop = this.element.querySelector('.editor__body').scrollTop; 
+            
+            super.update();
+            
+            this.element.querySelector('.editor__body').scrollTop = scrollTop; 
+
+        }
     }
 
     /**
@@ -65,7 +71,7 @@ class Editor extends Crisp.View {
             config = { label: config };
         }
 
-        return _.div({class: 'editor__field' + (config.isCollapsible ? ' collapsible collapsed' : '')},
+        return _.div({class: 'editor__field' + (config.isCollapsible ? ' collapsible' : '') + (config.isCollapsed ? ' collapsed' : ''), 'data-key': config.key },
             _.div({class: 'editor__field__key'},
                 _.div({class: 'editor__field__key__label'}, config.label)
                     .click((e) => {
@@ -85,12 +91,24 @@ class Editor extends Crisp.View {
                     )
                 )
             ),
-            _.div({class: 'editor__field__value' + (config.isCluster ? ' cluster' : '')},
-                _.if(config.isLocked,
-                    _.input({class: 'editor__field__value__lock', title: 'Only edit this field if you know what you\'re doing', type: 'checkbox', checked: true})
-                ),
-                value
-            )
+            _.each(config.toolbar, (label, content) => {
+                return _.div({class: 'editor__field__toolbar'},
+                    _.div({class: 'editor__field__toolbar__label'}, label),
+                    content
+                );
+            }),
+            _.do(() => {
+                if(value[0] && value[0] instanceof HashBrown.Views.Editors.FieldEditors.FieldEditor) {
+                    return value;
+                }
+                
+                return _.div({class: 'editor__field__value' + (config.isCluster ? ' cluster' : '')},
+                    _.if(config.isLocked,
+                        _.input({class: 'editor__field__value__lock', title: 'Only edit this field if you know what you\'re doing', type: 'checkbox', checked: true})
+                    ),
+                    value
+                );
+            })
         );
     }
 }
