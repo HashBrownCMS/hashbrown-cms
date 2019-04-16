@@ -15,23 +15,35 @@ class Editor extends Crisp.View {
     /**
      * Renders a field
      *
-     * @param {Object|String} key
+     * @param {Object} config
      * @param {HTMLElement|Array} value
      *
      * @return {HTMLElement} Element
      */
-    field(key, ...value) {
-        return _.div({class: 'editor__field'},
+    field(config, ...value) {
+        if(typeof config == 'string') {
+            config = { label: config };
+        }
+
+        return _.div({class: 'editor__field' + (config.isCollapsible ? ' collapsible collapsed' : '')},
             _.div({class: 'editor__field__key'},
-                _.div({class: 'editor__field__key__label'}, key.label || key),
-                _.if(key.description,
-                    _.div({class: 'editor__field__key__description'}, key.description)
+                _.div({class: 'editor__field__key__label'}, config.label)
+                    .click((e) => {
+                        if(!config.isCollapsible) { return; }
+
+                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
+                    }),
+                _.if(config.description,
+                    _.div({class: 'editor__field__key__description'}, config.description)
                 ),
-                _.if(key.actions,
-                    _.div({class: 'editor__field__key__actions'}, key.actions)
+                _.if(config.actions,
+                    _.div({class: 'editor__field__key__actions'}, config.actions)
                 )
             ),
             _.div({class: 'editor__field__value'},
+                _.if(config.isLocked,
+                    _.input({class: 'editor__field__value__lock', title: 'Only edit this field if you know what you\'re doing', type: 'checkbox', checked: true})
+                ),
                 value
             )
         );

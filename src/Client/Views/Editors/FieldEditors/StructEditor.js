@@ -321,7 +321,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                             return $field;
                         }),
-                        _.button({class: 'editor__field__add widget widget--button round right fa fa-plus', title: 'Add a struct property'})
+                        _.button({class: 'editor__field__add widget widget--button round fa fa-plus', title: 'Add a struct property'})
                             .click(() => {
                                 if(config.struct.newField) { return; }
                             

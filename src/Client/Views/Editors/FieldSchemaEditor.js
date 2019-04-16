@@ -14,48 +14,48 @@ class FieldSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
         if(!this.parentSchema || this.parentSchema.id === 'fieldBase') { return; }
 
         // Make sure the model has an editor id
-        this.model.editorId = this.model.editorId || this.parentSchema.editorId;
-    
-        if(!this.model.editorId) {
-            UI.errorModal(new Error('Could not find a field editor for the schema "' + this.model.id + '"'));     
-        }
-    }
-
-    /**
-     * Renders the field config editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-    renderFieldConfigEditor() {
-        let editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-        if(!editor) { return; }
-
-        return editor.renderConfigEditor(this.model.config, this.model.id);
+        this.model.editorId = this.parentSchema.editorId;
     }
 
     /**
      * Renders the editor fields
      */
-    renderFields() {
-        let $element = super.renderFields();
-       
-        if(this.model.parentSchemaId === 'fieldBase') {
-            $element.append(this.renderField('Field editor', new HashBrown.Views.Widgets.Dropdown({
-                useTypeahead: true,
-                value: this.model.editorId,
-                options: HashBrown.Views.Editors.FieldEditors,
-                valueKey: 'name',
-                labelKey: 'name',
-                onChange: (newEditor) => {
-                    this.model.editorId = newEditor;
+    renderBody() {
+        let $element = super.renderBody();
+      
+        _.append($element,
+            _.if(this.model.parentSchemaId === 'fieldBase',
+                this.field(
+                    'Field editor',
+                    new HashBrown.Views.Widgets.Dropdown({
+                        useTypeahead: true,
+                        value: this.model.editorId,
+                        options: HashBrown.Views.Editors.FieldEditors,
+                        valueKey: 'name',
+                        labelKey: 'name',
+                        onChange: (newEditor) => {
+                            this.model.editorId = newEditor;
 
-                    this.fetch();
-                }
-            }).$element));
-        }
+                            this.fetch();
+                        }
+                    })
+                )
+            ),
+            _.do(() => {
+                let editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
 
-        $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
+                if(!editor) { return; }
+                
+                let configEditor = editor.renderConfigEditor(this.model.config, this.model.id);
+
+                if(!configEditor) { return; }
+
+                return this.field(
+                    { label: 'Config', isCollapsible: true },
+                    configEditor
+                );
+            })
+        );
 
         return $element;
     }

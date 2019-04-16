@@ -5,13 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class SchemaEditor extends Crisp.View {
-    constructor(params) {
-        super(params);
-        
-        this.fetch();
-    }
-
+class SchemaEditor extends HashBrown.Views.Editors.Editor {
     /**
      * Fetches the model
      */
@@ -90,78 +84,6 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     * @param {Boolean} isCollapsible
-     * @param {Boolean} isLocked
-     *
-     * @return {HTMLElement} Editor element
-     */
-    renderField(label, $content, isCollapsible, isLocked) {
-        if(!$content) { return; }
-
-        return _.div({class: 'editor__field ' + (isCollapsible ? 'collapsible collapsed' : '')},
-            _.div({class: 'editor__field__key'},
-                _.div({class: 'editor__field__key__label'}, label)
-                    .click((e) => {
-                        if(!isCollapsible) { return; }
-
-                        e.currentTarget.parentElement.parentElement.classList.toggle('collapsed');
-                    })
-            ),
-            _.div({class: 'editor__field__value'},
-                _.if(isLocked,
-                    _.input({class: 'editor__field__value__lock', title: 'Only edit this field if you know what you\'re doing', type: 'checkbox', checked: true})
-                ),
-                $content
-            )
-        );
-    }
-
-    /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-    renderFields() {
-        let id = parseInt(this.model.id);
-
-        let $element = _.div({class: 'editor__body'});
-        
-        $element.empty();
-        
-        $element.append(this.renderField('Id', new HashBrown.Views.Widgets.Input({
-            value: this.model.id,
-            onChange: (newValue) => { this.model.id = newValue; }
-        }).$element, false, true)); 
-
-        $element.append(this.renderField('Name', new HashBrown.Views.Widgets.Input({
-            value: this.model.name,
-            onChange: (newValue) => { this.model.name = newValue; }
-        }).$element)); 
-
-        $element.append(this.renderField('Icon', this.renderIconEditor()));   
-
-        $element.append(this.renderField('Parent', new HashBrown.Views.Widgets.Dropdown({
-            value: this.model.parentSchemaId,
-            options: HashBrown.Helpers.SchemaHelper.getAllSchemas(),
-            valueKey: 'id',
-            labelKey: 'name',
-            disabledOptions: [ { id: this.model.id, name: this.model.name } ],
-            onChange: (newParent) => {
-                this.model.parentSchemaId = newParent;
-
-                this.fetch();
-            }
-        }).$element));
-        
-
-        return $element;
-    }
-
-    /**
      * Gets the schema icon
      *
      * @returns {String} Icon
@@ -179,6 +101,49 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
+     * Renders the body
+     *
+     * @return {HTMLElement} body
+     */
+    renderBody() {
+        return _.div({class: 'editor__body'},
+            this.field(
+                { isLocked: true, label: 'Id' },
+                new HashBrown.Views.Widgets.Input({
+                    value: this.model.id,
+                    onChange: (newValue) => { this.model.id = newValue; }
+                })
+            ),
+            this.field(
+                'Name',
+                new HashBrown.Views.Widgets.Input({
+                    value: this.model.name,
+                    onChange: (newValue) => { this.model.name = newValue; }
+                })
+            ),
+            this.field(
+                'Icon',
+                this.renderIconEditor()
+            ),   
+            this.field(
+                'Parent',
+                new HashBrown.Views.Widgets.Dropdown({
+                    value: this.model.parentSchemaId,
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas(),
+                    valueKey: 'id',
+                    labelKey: 'name',
+                    disabledOptions: [ { id: this.model.id, name: this.model.name } ],
+                    onChange: (newParent) => {
+                        this.model.parentSchemaId = newParent;
+
+                        this.fetch();
+                    }
+                })
+            )
+        );
+    }
+
+    /**
      * Renders this editor
      */
     template() {
@@ -187,7 +152,7 @@ class SchemaEditor extends Crisp.View {
                 _.span({class: 'editor__header__icon fa fa-' + this.getIcon()}),
                 _.h4({class: 'editor__header__title'}, this.model.name)
             ),
-            this.renderFields(),
+            this.renderBody(),
             _.div({class: 'editor__footer'}, 
                 _.div({class: 'editor__footer__buttons'},
                     _.button({class: 'widget widget--button embedded'},

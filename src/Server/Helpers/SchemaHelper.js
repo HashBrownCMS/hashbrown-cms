@@ -5,9 +5,6 @@ const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
 const FileSystem = require('fs');
 const Path = require('path');
 
-// TODO: Make this a GIT submodule
-const Glob = require('glob');
-
 /**
  * The helpers class for Schemas
  *
@@ -19,75 +16,40 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Array of Schemas
      */
-    static getNativeSchemas() {
-        return new Promise((resolve, reject) => {
-            Glob(APP_ROOT + '/src/Common/Schemas/*/*.json', function(err, paths) {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
-                    let queue = paths || [];
+    static async getNativeSchemas() {
+        let path = Path.join(APP_ROOT, 'src', 'Common', 'Schemas', '*', '*.json');
+        let paths = await HashBrown.Helpers.FileHelper.list(path);
+        
+        // Native Schemas output
+        let nativeSchemas = [];
 
-                    // Native Schemas output
-                    let nativeSchemas = [];
+        for(let schemaPath of paths) {
+            let data = await HashBrown.Helpers.FileHelper.read(schemaPath);
 
-                    if(queue.length > 0) {
-                        let readNextSchema = () => {
-                            let schemaPath = queue[0];
+            let properties = JSON.parse(data);
+            let parentDirName = Path.dirname(schemaPath).split('/').pop();
+            let id = Path.basename(schemaPath, '.json');
 
-                            FileSystem.readFile(schemaPath, (err, data) => {
-                                if(err) {
-                                    throw err;
-                                }
+            let schema = null;
+            
+            switch(parentDirName) {
+                case 'Content':
+                    schema = new HashBrown.Models.ContentSchema(properties);
+                    break;
+                case 'Field':
+                    schema = new HashBrown.Models.FieldSchema(properties);
+                    break;
+            }
 
-                                let properties = JSON.parse(data);
-                                let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                                let id = Path.basename(schemaPath, '.json');
+            // Generated values, will be overwritten every time
+            schema.id = id;
+            schema.isLocked = true;
 
-                                // Generated values, will be overwritten every time
-                                properties.id = id;
+            // Add the loaded schema to the output array
+            nativeSchemas.push(schema);
+        }
 
-                                let schema;
-                                
-                                switch(parentDirName) {
-                                    case 'Content':
-                                        schema = new HashBrown.Models.ContentSchema(properties);
-                                        break;
-                                    case 'Field':
-                                        schema = new HashBrown.Models.FieldSchema(properties);
-                                        break;
-                                }
-
-                                // Make sure the 'locked' flag is true
-                                schema.isLocked = true;
-
-                                // Add the loaded schema to the output array
-                                nativeSchemas.push(schema);
-
-                                // Shift the queue (removes the first element of the array)
-                                queue.shift();
-
-                                // If the queue still has items in it, we should continue reading...
-                                if(queue.length > 0) {
-                                    readNextSchema();
-
-                                // ...if not, we'll return all the loaded schemas
-                                } else {
-                                    resolve(nativeSchemas);
-                                
-                                }
-                            });
-                        }
-
-                        readNextSchema();
-
-                    } else {
-                        resolve([]);
-
-                    }
-                }
-            }); 
-        });
+        return nativeSchemas;
     }
     
     /**
@@ -98,25 +60,20 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Array of Schemas
      */
-    static getCustomSchemas(project, environment) {
+    static async getCustomSchemas(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
         let collection = environment + '.schemas';
         let result = [];
        
-        return HashBrown.Helpers.DatabaseHelper.find(
-            project,
-            collection,
-            {}
-        )
-        .then((schemas) => {
-            for(let i in schemas) {
-                schemas[i] = this.getModel(schemas[i]);
-            }
+        let schemas = await HashBrown.Helpers.DatabaseHelper.find(project, collection, {})
+        
+        for(let i in schemas) {
+            schemas[i] = this.getModel(schemas[i]);
+        }
 
-            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
-        });
+        return await HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
     }
 
     /**
@@ -127,44 +84,14 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Array of Schemas
      */
-    static getAllSchemas(project, environment) {
+    static async getAllSchemas(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
-        return this.getNativeSchemas()
-        .then((nativeSchemas) => {
-            return this.getCustomSchemas(project, environment)
-            .then((customSchemas) => {
-                return Promise.resolve(nativeSchemas.concat(customSchemas));
-            });
-        });
-    }
-
-    /**
-     * Checks whether a Schema id belongs to a native schema
-     *
-     * @param {String} id
-     *
-     * @returns {Boolean} isNative
-     */
-    static isNativeSchema(id) {
-        let fieldPath = APP_ROOT + '/src/Common/Schemas/Field/' + id + '.json';
-        let contentPath = APP_ROOT + '/src/Common/Schemas/Content/' + id + '.json';
-    
-        try {
-            FileSystem.statSync(fieldPath);
-            return true;
+        let nativeSchemas = await this.getNativeSchemas();
+        let customSchemas = await this.getCustomSchemas(project, environment);
         
-        } catch(e) {
-            try {
-                FileSystem.statSync(contentPath);
-                return true;
-
-            } catch(e) {
-                return false;
-
-            }
-        }
+        return nativeSchemas.concat(customSchemas);
     }
 
     /**
@@ -174,35 +101,21 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Promise} Schema
      */
-    static getNativeSchema(id) {
-        return new Promise((resolve, reject) => {
-            Glob(APP_ROOT + '/src/Common/Schemas/*/' + id + '.json', function(err, paths) {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
-                    let schemaPath = paths[0];
+    static async getNativeSchema(id) {
+        let path = Path.join(APP_ROOT, 'src', 'Common', 'Schemas', '*', id + '.json');
+        let paths = await HashBrown.Helpers.FileHelper.list(path);
 
-                    FileSystem.readFile(schemaPath, (err, data) => {
-                        if(err) {
-                            reject(new Error(err));
-                        
-                        } else {
-                            let properties = JSON.parse(data);
-                            let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                            let id = Path.basename(schemaPath, '.json');
+        let schemaPath = paths[0];
+        let data = await HashBrown.Helpers.FileHelper.read(schemaPath);
+        let properties = JSON.parse(data);
+        let parentDirName = Path.dirname(schemaPath).split('/').pop();
 
-                            // Generated values, will be overwritten every time
-                            properties.id = id;
-                            properties.type = parentDirName.toLowerCase();
-                            properties.isLocked = true;
+        // Generated values, will be overwritten every time
+        properties.id = id;
+        properties.type = parentDirName.toLowerCase();
+        properties.isLocked = true;
 
-                            resolve(properties);
-                        }
-                    });
-                }
-            });
-        });
+        return properties;
     }
 
     /**
@@ -222,15 +135,13 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(withParentFields, 'withParentFields', Boolean, true);
 
         let schema = null;
-        
-        if(this.isNativeSchema(id)) {
-            schema = await this.getNativeSchema(id);
-        } else {
-            let collection = environment + '.schemas';
-
-            schema = await HashBrown.Helpers.DatabaseHelper.findOne(project, collection, { id: id });
-        }
        
+        try {
+            schema = await this.getNativeSchema(id);
+        } catch(e) {
+            schema = await HashBrown.Helpers.DatabaseHelper.findOne(project, environment + '.schemas', { id: id });
+        }
+
         if(!schema) { throw new Error('Schema "' + id + '" could not be found'); }
 
         // Get parent fields if specified
@@ -331,21 +242,21 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @return {Promise} Check result
      */
-    static duplicateIdCheck(project, environment, oldId, newId) { 
+    static async duplicateIdCheck(project, environment, oldId, newId) { 
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(oldId, 'oldId', String);
         checkParam(newId, 'newId', String);
         
-        // If the id wasn't updated, skip the check{
-        if(oldId === newId) {
-            return Promise.resolve(false);
-        }
+        // If the id wasn't updated, skip the check
+        if(oldId === newId) { return false; }
 
-        return this.getSchemaById(project, environment, newId)
-        .then((existingSchema) => {
-            return Promise.resolve(!!existingSchema);
-        });
+        try {
+            await this.getSchemaById(project, environment, newId);
+            return true;
+        } catch(e) {
+            return false;
+        }
     }
 
     /**
