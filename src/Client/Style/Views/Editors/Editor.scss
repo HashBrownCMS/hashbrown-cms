@@ -195,7 +195,7 @@
             }
         }
         
-        &.collapsible > &__key > &__key__label {
+        &.collapsible > &__key &__key__label {
             cursor: pointer;
             display: flex;
             
@@ -210,15 +210,19 @@
             }
         }
 
-        &.collapsible > &__key > &__key__description {
+        &.collapsible > &__key &__key__description {
             margin: 0 0 0 1rem;
         }
         
-        &.collapsible > &__key > &__key__actions {
+        &.collapsible > &__key &__key__actions {
             left: auto;
             right: 0;
         }
         
+        &.collapsible > &__key &__key__action {
+            margin-top: 0;
+        }
+
         &.collapsible.collapsed > & {
             &__value, &__toolbar {
                 display: none;
@@ -397,6 +401,14 @@
                         content: '\f066';
                     }
                 }
+
+                // Remove
+                &--remove {
+                    &:before {
+                        content: '\f00d';
+                        margin: 0;
+                    }
+                }
             }
         }
 
@@ -449,6 +461,10 @@
                     color: $primary-text;
 
                     .editor__field__key__label::before {
+                        display: none;
+                    }
+
+                    .editor__field__key__actions {
                         display: none;
                     }
                 }
