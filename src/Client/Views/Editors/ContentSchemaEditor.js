@@ -300,6 +300,15 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                             })
                         ),
                         this.field(
+                            'Collapsed',
+                            new HashBrown.Views.Widgets.Input({
+                                type: 'checkbox',
+                                tooltip: 'Whether or not this field should be collapsed by default',
+                                value: fieldValue.config.isCollapsed,
+                                onChange: (newValue) => { fieldValue.config.isCollapsed = newValue; }
+                            })
+                        ),
+                        this.field(
                             'Schema',
                             new HashBrown.Views.Widgets.Dropdown({
                                 useTypeAhead: true,

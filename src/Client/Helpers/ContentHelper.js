@@ -87,7 +87,6 @@ class ContentHelper extends ContentHelperCommon {
             if(!object) { return; }
 
             // We consider a definition not empty, if it has a value that is not an object
-            // Remember, null is of type 'object' too
             if(typeof object !== 'object') { return isEmpty = false; }
 
             for(let k in object) {

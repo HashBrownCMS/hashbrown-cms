@@ -37,19 +37,15 @@ class StringEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Element
      */
     static renderConfigEditor(config) {
-        return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Is multi-line'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'checkbox',
-                        tooltip: 'Whether or not this string uses line breaks',
-                        value: config.isMultiLine || false,
-                        onChange: (newValue) => { config.isMultiLine = newValue; }
-                    }).$element
-                )
-            )
-        ];
+        return this.field(
+            'Is multi-line',
+            new HashBrown.Views.Widgets.Input({
+                type: 'checkbox',
+                tooltip: 'Whether or not this string uses line breaks',
+                value: config.isMultiLine || false,
+                onChange: (newValue) => { config.isMultiLine = newValue; }
+            })
+        );
     }
     
     /**

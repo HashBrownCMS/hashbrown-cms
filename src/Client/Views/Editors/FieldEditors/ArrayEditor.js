@@ -46,6 +46,54 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
+     * Event: Click add item
+     */
+    onClickAddItem() {
+        let index = this.value.length;
+
+        if(this.config.maxItems && index >= this.config.maxItems) {
+            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+            return;
+        }
+
+        this.value[index] = { value: null, schemaId: null };
+
+        this.trigger('change', this.value);
+
+        this.update();
+    }
+
+    /**
+     * Event: Change item schema
+     *
+     * @param {String} newSchemaId
+     * @param {Object} item
+     */
+    onChangeItemSchema(newSchemaId, item) {
+        if(newSchemaId === item.schemaId) { return; }
+
+        item.schemaId = newSchemaId;
+        item.value = null;
+
+        this.update();
+
+        this.trigger('change', this.value);
+    }
+
+    /**
+     * Event: Click remove item
+     *
+     * @param {Number} index
+     */
+    onClickRemoveItem(index) {
+        this.value.splice(index, 1);
+
+        this.trigger('change', this.value);
+
+        this.update();
+    }
+
+    /**
      * Updates this view
      */
     update() {
@@ -341,13 +389,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         isCollapsed: true,
                         label: this.getItemLabel(item, schema),
                         actions: {
-                            remove: () => {
-                                this.value.splice(i, 1);
-                        
-                                this.trigger('change', this.value);
-
-                                this.update();
-                            }
+                            remove: () => { this.onClickRemoveItem(i); }
                         },
                         toolbar: {
                             Schema: new HashBrown.Views.Widgets.Dropdown({
@@ -358,16 +400,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                 labelKey: 'name',
                                 iconKey: 'icon',
                                 options: this.allowedSchemas,
-                                onChange: (newSchemaId) => {
-                                    if(newSchemaId === item.schemaId) { return; }
-
-                                    item.schemaId = newSchemaId;
-                                    item.value = null;
-                                    
-                                    this.update();
-
-                                    this.trigger('change', this.value);
-                                }
+                                onChange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
                             })
                         }
                     },
@@ -377,23 +410,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 );
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
-                .click(async () => {
-                    let index = this.value.length;
-
-                    if(this.config.maxItems && index >= this.config.maxItems) {
-                        UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
-                        return;
-                    }
-
-                    this.value[index] = { value: null, schemaId: null };
-
-                    this.trigger('change', this.value);
-
-                    await this.fetch();
-                    
-                    // Restore the scroll position
-                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
-                })
+                .click(() => { this.onClickAddItem() })
         );
     }    
 }

@@ -327,9 +327,11 @@
                     display: none;
                 }
                 
-                // Hide below tablet mode
+                // Tablet mode
                 @media($sm) {
-                    display: none;
+                    top: 0.5rem;
+                    right: 0;
+                    display: flex;
                 }
             }
 
@@ -369,7 +371,7 @@
                 // Sort
                 &--sort {
                     &:after {
-                        content: 'Sort items'
+                        content: 'Sort';
                     }
 
                     &:before {
@@ -379,19 +381,20 @@
                     // Sorting state
                     &.sorting {
                         &:after {
-                            content: 'Done sorting'
+                            content: 'Done';
                         }
 
                         &:before {
                             content: '\f00c';
                         }
                     }
+                
                 }
 
                 // Expand
                 &--expand {
                     &:after {
-                        content: 'Expand all'
+                        content: 'Expand';
                     }
                     
                     &:before {
@@ -402,7 +405,7 @@
                 // Collapse
                 &--collapse {
                     &:after {
-                        content: 'Collapse all'
+                        content: 'Collapse';
                     }
                     
                     &:before {

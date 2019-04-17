@@ -18,18 +18,46 @@ class FieldEditor extends HashBrown.Views.Editors.Editor {
     }
 
     /**
-     * Renders key actions
-     *
-     * @returns {HTMLElement} Actions
-     */
-    renderKeyActions() {}
-
-    /**
      * Gets the key actions
      *
      * @returns {Object} Key actions
      */
     getKeyActions() {}
+    
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Object} definition
+     *
+     * @return {Object} Checked value
+     */
+    static fieldSanityCheck(value, definition) {
+        // If the definition value is set to multilingual, but the value isn't an object, convert it
+        if(definition.multilingual && (!value || typeof value !== 'object')) {
+            let oldValue = value;
+
+            value = {};
+            value[HashBrown.Context.language] = oldValue;
+        }
+
+        // If the definition value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if(!definition.multilingual && value && typeof value === 'object' && value._multilingual) {
+            value = value[HashBrown.Context.language];
+        }
+
+        // Update the _multilingual flag
+        if(definition.multilingual && value && !value._multilingual) {
+            value._multilingual = true;    
+        
+        } else if(!definition.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+
+        }
+
+        return value;
+    }
 
     /**
      * Post render

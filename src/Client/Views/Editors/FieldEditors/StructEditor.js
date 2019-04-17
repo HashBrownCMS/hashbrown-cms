@@ -322,7 +322,12 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         } else {
             config = {};
         }
-        
+       
+        // Structs are always collapsed by default
+        if(config.isCollapsed === undefined) {
+            config.isCollapsed = !!config.struct;
+        }
+
         // Init the field editor
         let fieldEditorInstance = new fieldEditor({
             value: fieldDefinition.multilingual ? value[HashBrown.Context.language] : value,
@@ -346,8 +351,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             {
                 label: fieldDefinition.label,
                 description: fieldDefinition.description,
-                isCollapsible: true,
-                isCollapsed: true,
+                isCollapsible: config.isCollapsed,
+                isCollapsed: config.isCollapsed,
                 actions: fieldEditorInstance.getKeyActions()
             },
             fieldEditorInstance

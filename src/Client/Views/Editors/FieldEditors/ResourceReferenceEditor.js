@@ -41,29 +41,25 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
         config.resourceKeys = config.resourceKeys || [];
 
         return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Resource'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Dropdown({
-                        value: config.resource,
-                        options: HashBrown.Helpers.ResourceHelper.getResourceNames(),
-                        onChange: (newValue) => {
-                            config.resource = newValue
-                        }
-                    }).$element
-                )
+            this.field(
+                'Resource',
+                new HashBrown.Views.Widgets.Dropdown({
+                    value: config.resource,
+                    options: HashBrown.Helpers.ResourceHelper.getResourceNames(),
+                    onChange: (newValue) => {
+                        config.resource = newValue
+                    }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Resource keys'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Chips({
-                        value: config.resourceKeys,
-                        placeholder: 'keyName',
-                        onChange: (newValue) => {
-                            config.resourceKeys = newValue;
-                        }
-                    }).$element
-                )
+            this.field(
+                'Resource keys',
+                new HashBrown.Views.Widgets.Chips({
+                    value: config.resourceKeys,
+                    placeholder: 'keyName',
+                    onChange: (newValue) => {
+                        config.resourceKeys = newValue;
+                    }
+                })
             )
         ];
     }

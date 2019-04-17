@@ -40,27 +40,23 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     static renderConfigEditor(config) {
         return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Disable markdown'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'checkbox',
-                        tooltip: 'Hides the markdown tab if enabled',
-                        value: config.isMarkdownDisabled || false,
-                        onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
-                    }).$element
-                )
+            this.field(
+                'Disable markdown',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'checkbox',
+                    tooltip: 'Hides the markdown tab if enabled',
+                    value: config.isMarkdownDisabled || false,
+                    onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Disable HTML'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'checkbox',
-                        tooltip: 'Hides the HTML tab if enabled',
-                        value: config.isMarkdownDisabled || false,
-                        onChange: (newValue) => { config.isHtmlDisabled = newValue; }
-                    }).$element
-                )
+            this.field(
+                'Disable HTML',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'checkbox',
+                    tooltip: 'Hides the HTML tab if enabled',
+                    value: config.isMarkdownDisabled || false,
+                    onChange: (newValue) => { config.isHtmlDisabled = newValue; }
+                })
             )
         ];
     }

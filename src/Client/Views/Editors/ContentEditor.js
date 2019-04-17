@@ -145,43 +145,6 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
     }
 
     /**
-     * Reload this view
-     */
-    reload() {
-        this.lastScrollPos = this.$element.find('.editor__body')[0].scrollTop; 
-
-        this.model = null;
-
-        this.fetch();
-    }
-
-    /**
-     * Restores the scroll position
-     *
-     * @param {Number} delay
-     */
-    restoreScrollPos(delay) {
-        let newScrollPos = this.lastScrollPos || 0;
-
-        setTimeout(() => {
-            this.$element.find('.editor__body')[0].scrollTop = newScrollPos;
-        }, delay || 0);
-    }
-
-    /**
-     * Static version of the restore scroll position method
-     *
-     * @param {Number} delay
-     */
-    static restoreScrollPos(delay) {
-        let editor = Crisp.View.get('ContentEditor');
-
-        if(editor) {
-            editor.restoreScrollPos(delay);
-        }
-    }
-
-    /**
      * Gets a field editor for a Schema
      *
      * @param {string} editorId
@@ -191,30 +154,7 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
     static getFieldEditor(editorId) {
         if(!editorId) { return; }
 
-        // Backwards compatible check
-        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
-        
-        if(editorId.indexOf('Editor') < 0) {
-            editorId += 'Editor';
-        }
-
         return HashBrown.Views.Editors.FieldEditors[editorId];
-    }
-
-    /**
-     * Renders a field view
-     *
-     * @param {Object} fieldValue The field value to inject into the field editor
-     * @param {FieldSchema} fieldDefinition The field definition
-     * @param {Function} onChange The change event
-     * @param {HTMLElement} keyActions The key content container
-     *
-     * @return {Object} element
-     */
-    renderField(fieldValue, fieldDefinition, onChange, $keyActions) {
-
-        
-        return fieldEditorInstance.$element;
     }
 
     /**
@@ -226,7 +166,7 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
      *
      * @returns {Array} A list of HTMLElements to render
      */
-    renderFields(tabId, fieldDefinitions, fieldValues) {
+    renderTabContent(tabId, fieldDefinitions, fieldValues) {
         let tabFieldDefinitions = {};
 
         // Map out field definitions to render
@@ -285,6 +225,11 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
                 config = {};
             }
 
+            // Structs are always collapsed by default
+            if(config.isCollapsed === undefined) {
+                config.isCollapsed = !!config.struct;
+            }
+            
             // Instantiate field editor
             let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
               
@@ -313,11 +258,13 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
                 
                 onChange(newValue);
             });
-            
+           
             return this.field(
                 {
                     label: fieldDefinition.label || key,
                     key: key,
+                    isCollapsible: config.isCollapsed,
+                    isCollapsed: config.isCollapsed,
                     description: fieldDefinition.description,
                     actions: fieldEditorInstance.getKeyActions()
                 },
@@ -358,15 +305,15 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
                     if(tabId !== activeTab) { return; }
 
                     return _.div({class: 'editor__body__tab active'},
-                        this.renderFields(tabId, this.schema.fields.properties, this.model.properties)
+                        this.renderTabContent(tabId, this.schema.fields.properties, this.model.properties)
                     );
                 }),
 
                 // Render meta properties
                 _.if(activeTab === 'meta',
                     _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
-                        this.renderFields('meta', this.schema.fields, this.model),
-                        this.renderFields('meta', this.schema.fields.properties, this.model.properties)
+                        this.renderTabContent('meta', this.schema.fields, this.model),
+                        this.renderTabContent('meta', this.schema.fields.properties, this.model.properties)
                     )
                 )
             ).on('scroll', (e) => {
@@ -427,13 +374,6 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
                 )
             )
         );
-    }
-
-    /**
-     * Post render
-     */
-    postrender() {
-        this.restoreScrollPos();
     }
 }
 
