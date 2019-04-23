@@ -47,6 +47,9 @@ class DatabaseHelper {
 
         // No value found, return default ones
         switch(key) {
+            case 'protocol':
+                return 'mongodb';
+            
             case 'host':
                 return 'localhost';
 
@@ -72,7 +75,7 @@ class DatabaseHelper {
      * @returns {String} Connection string
      */
     static getConnectionString(databaseName) {
-        let connectionString = 'mongodb://';
+        let connectionString = this.getConfig('protocol') + '://';
       
         let username = this.getConfig('username');
         let password = this.getConfig('password');
