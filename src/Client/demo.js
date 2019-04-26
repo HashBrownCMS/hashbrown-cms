@@ -361,7 +361,6 @@ class DemoApi {
                             "sections": {
                                 "tabId": "content",
                                 "label": "Sections",
-                                "tabId": "content",
                                 "schemaId": "array",
                                 "config": {
                                     "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
