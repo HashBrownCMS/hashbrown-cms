@@ -113,6 +113,13 @@ class WYSIWYGEditor extends Crisp.View {
     }
 
     /**
+     * Event: Change font color
+     */
+    onChangeFontColor(color) {
+        document.execCommand('foreColor', false, color);
+    }
+
+    /**
      * Event: Change heading
      */
     onChangeHeading(newValue) {
@@ -224,6 +231,10 @@ class WYSIWYGEditor extends Crisp.View {
                     .click(() => { this.onChangeStyle('italic'); }),
                 _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
                     .click(() => { this.onChangeStyle('underline'); }),
+                _.div({class: 'widget widget--button standard small fa fa-paint-brush', title: 'Font color'},
+                    _.input({class: 'widget--button__input', type: 'color'})
+                        .change((e) => { this.onChangeFontColor(e.currentTarget.value); })
+                ),
                 _.div({class: 'widget-group__separator line'}),
                 _.button({class: 'widget widget--button standard small fa fa-list-ol', title: 'Ordered list'})
                     .click(() => { this.onChangeStyle('insertOrderedList'); }),
