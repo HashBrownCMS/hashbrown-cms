@@ -39,7 +39,18 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @returns {HTMLElement} Element
      */
     static renderConfigEditor(config) {
+        if(!config.wysiwygToolbar) { config.wysiwygToolbar = {}; }
+
         return [
+            this.field(
+                'Disable media',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'checkbox',
+                    tooltip: 'Hides the media picker if enabled',
+                    value: config.isMediaDisabled || false,
+                    onChange: (newValue) => { config.isMediaDisabled = newValue; }
+                })
+            ),
             this.field(
                 'Disable markdown',
                 new HashBrown.Views.Widgets.Input({
@@ -56,6 +67,32 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     tooltip: 'Hides the HTML tab if enabled',
                     value: config.isMarkdownDisabled || false,
                     onChange: (newValue) => { config.isHtmlDisabled = newValue; }
+                })
+            ),
+            this.field(
+                {
+                    label: 'WYSIWYG',
+                    isCollapsible: true,
+                    isCollapsed: true
+                },
+                _.each({ paragraphs: 'Paragraphs', style: 'Style', lists: 'Lists', positioning: 'Positioning'  }, (categoryKey, categoryLabel) => {
+                    return this.field(
+                        {
+                            label: categoryLabel,
+                            isCollapsible: true,
+                            isCollapsed: true
+                        },
+                        _.each(HashBrown.Views.Editors.WYSIWYGEditor.getToolbarElements(categoryKey), (key, label) => {
+                            return this.field(
+                                label,
+                                new HashBrown.Views.Widgets.Input({
+                                    type: 'checkbox',
+                                    value: config.wysiwygToolbar[key] !== false,
+                                    onChange: (newValue) => { config.wysiwygToolbar[key] = newValue; }
+                                })
+                            );
+                        })
+                    );
                 })
             )
         ];
@@ -208,7 +245,8 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     initWYSIWYGEditor() {
         this.wysiwyg = new HashBrown.Views.Editors.WYSIWYGEditor({
-            value: this.value
+            value: this.value,
+            toolbar: this.config.wysiwygToolbar || {}
         });
 
         this.wysiwyg.on('change', (newValue) => {
@@ -245,9 +283,11 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     return _.button({class: (activeView === alias ? 'active ' : '') + 'field-editor--rich-text__header__tab'}, label)
                         .click(() => { this.onClickTab(alias); })
                 }),
-                _.button({class: 'field-editor--rich-text__header__add-media'},
-                    'Add media'
-                ).click(() => { this.onClickInsertMedia(); })
+                _.if(!this.config.isMediaDisabled,
+                    _.button({class: 'field-editor--rich-text__header__add-media'},
+                        'Add media'
+                    ).click(() => { this.onClickInsertMedia(); })
+                )
             ),
             _.div({class: 'field-editor--rich-text__body'},
                 _.if(activeView === 'wysiwyg',

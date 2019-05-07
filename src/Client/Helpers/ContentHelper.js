@@ -84,7 +84,7 @@ class ContentHelper extends ContentHelperCommon {
 
         let isEmpty = true;
         let checkRecursive = (object) => {
-            if(!object) { return; }
+            if(object == undefined) { return; }
 
             // We consider a definition not empty, if it has a value that is not an object
             if(typeof object !== 'object') { return isEmpty = false; }
