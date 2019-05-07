@@ -4,3 +4,4 @@ services:
     node:
         environment:
             - WATCH=true
+            - DEBUG_VERBOSITY=5 

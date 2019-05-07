@@ -11,15 +11,8 @@ class ContentHelper {
      *
      * @param {String} project
      * @param {String} environment
-     *
-     * @return {Array} Content
      */
-    static getAllContent(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        return Promise.resolve();
-    }
+    static async getAllContent(project, environment) {}
 
     /**
      * Gets a URL-friendly version of a string
@@ -37,8 +30,7 @@ class ContentHelper {
             .replace(/ü/g, 'ue')
             .replace(/ß/g, 'ss')
             .replace(/[^\w ]+/g, '')
-            .replace(/ +/g, '-')
-            ;
+            .replace(/ +/g, '-');
     }
 
     /**
@@ -47,16 +39,8 @@ class ContentHelper {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
-     *
-     * @return {Promise} promise
      */
-    static getContentById(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-
-        return Promise.resolve();
-    }
+    static async getContentById(project, environment, id) {}
     
     /**
      * Sets a Content object by id
@@ -65,19 +49,8 @@ class ContentHelper {
      * @param {String} environment
      * @param {String} id
      * @param {Content} content
-     *
-     * @return {Promise} promise
      */
-    static setContentById(project, environment, id, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-        checkParam(content, 'content', HashBrown.Models.Content);
-
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
+    static async setContentById(project, environment, id, content) {}
 
     /**
      * Checks if a Schema type is allowed as a child of a Content object
@@ -89,61 +62,32 @@ class ContentHelper {
      *
      * @returns {Promise} Is the Content node allowed as a child
      */
-    static isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
+    static async isSchemaAllowedAsChild(project, environment, parentId, childSchemaId) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(parentId, 'parentId', String);
         checkParam(childSchemaId, 'childSchemaId', String);
 
-        // No parent ID means root, and all Schemas are allowed there
-        if(!parentId) {
-            return Promise.resolve();
+        // No parent id means root, and all schemas are allowed there
+        if(!parentId) { return true; }
 
-        } else {
-            return this.getContentById(project, environment, parentId)
-            .then((parentContent) => {
-                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
-            })
-            .then((parentSchema) => {
-                // The Schema was not an allowed child
-                if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId)
-                    .then((childSchema) => {
-                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
-                    });
-                
-                // The Schema was an allowed child, resolve
-                } else {
-                    return Promise.resolve();
+        let parentContent = await HashBrown.Helpers.ContentHelper.getContentById(project, environment, parentId);
+        let parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
 
-                }
-            });
-        }
+        return parentSchema.allowedChildSchemas.indexOf(childSchemaId) > -1;
     }
 
     /**
      * Creates a new content object
-     *
-     * @return {Promise} promise
      */
-    static createContent() {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
+    static async createContent() {}
     
     /**
      * Removes a content object
      *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
+     * @param {String} id
      */
-    static removeContentById(id) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
+    static async removeContentById(id) {}
 }
 
 module.exports = ContentHelper;

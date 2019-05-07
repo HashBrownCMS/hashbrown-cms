@@ -16,6 +16,7 @@ class ContentController extends HashBrown.Controllers.ResourceController {
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.getHandler('unpublish'));
         app.post('/api/:project/:environment/content/preview', this.middleware(), this.getHandler('preview'));
         app.post('/api/:project/:environment/content/example', this.middleware(), this.getHandler('example'));
+        app.post('/api/:project/:environment/content/insert', this.middleware(), this.getHandler('insert'));
         
         super.init(app);
     }
@@ -79,6 +80,7 @@ class ContentController extends HashBrown.Controllers.ResourceController {
      */
     static async preview(req, res) {
         let content = new HashBrown.Models.Content(req.body);
+
         return await HashBrown.Helpers.ConnectionHelper.previewContent(req.project, req.environment, content, req.user, req.query.language || 'en');
     }
 
@@ -90,7 +92,6 @@ class ContentController extends HashBrown.Controllers.ResourceController {
      * @param {String} project
      * @param {String} environment
      * @param {String} schemaId
-     * @param {String} sort A sorting index (optional)
      * @param {String} parentId A parent id (optional)
      * @param {Content} content The Content model to create (optional)
      *
@@ -98,7 +99,6 @@ class ContentController extends HashBrown.Controllers.ResourceController {
      */
     static async new(req, res) {
         let parentId = req.query.parentId;
-        let sortIndex = req.query.sort;
         let schemaId = req.query.schemaId;
         let properties = req.body;
 
@@ -107,7 +107,7 @@ class ContentController extends HashBrown.Controllers.ResourceController {
             properties = properties.properties;
         }
         
-        return await HashBrown.Helpers.ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties, sortIndex);
+        return await HashBrown.Helpers.ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties);
     }
 
     /**
@@ -128,7 +128,27 @@ class ContentController extends HashBrown.Controllers.ResourceController {
         let content = new HashBrown.Models.Content(req.body);
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
         
-        return HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, content, req.user, shouldCreate);
+        return await HashBrown.Helpers.ContentHelper.setContentById(req.project, req.environment, id, content, req.user, shouldCreate);
+    }
+    
+    /**
+     * @example POST /api/:project/:environment/content/insert
+     *
+     * @apiGroup Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} contentId
+     * @param {String} otherId
+     * @param {String} parentId
+     * @param {String} method Either "before" or "after"
+     *
+     * @param {Content} content The Content model to update
+     *
+     * @returns {Content} The created Content node
+     */
+    static async insert(req, res) {
+        return await HashBrown.Helpers.ContentHelper.insertContent(req.project, req.environment, req.user, req.query.contentId, req.query.otherId, req.query.parentId, req.query.method);
     }
    
     /**

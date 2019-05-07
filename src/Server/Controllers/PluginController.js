@@ -13,7 +13,7 @@ class PluginController extends HashBrown.Controllers.Controller {
      */
     static init(app) {
         app.get('/js/plugins.js', this.getJs);
-        app.get('/css/plugins.cs', this.getCss);
+        app.get('/css/plugins.css', this.getCss);
     }
     
     /**

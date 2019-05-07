@@ -16,40 +16,28 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Array} Content
      */
-    static getAllContent(project, environment) {
+    static async getAllContent(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
         let collection = environment + '.content';
 
-        return HashBrown.Helpers.DatabaseHelper.find(
-            project,
-            collection,
-            {},
-            {},
-            {
-                sort: 1
-            }
-        ).then((results) => {
-            let contentList = [];
+        let results = await HashBrown.Helpers.DatabaseHelper.find(project, collection, {}, {}, { sort: 1 });
 
-            for(let i in results) {
-                let content = new HashBrown.Models.Content(results[i]);
+        let contentList = [];
 
-                // Make sure runaway publish dates are not included
-                content.publishOn = null;
-                content.unpublishOn = null;
-                
-                contentList[contentList.length] = content;
+        for(let i in results) {
+            let content = new HashBrown.Models.Content(results[i]);
 
-            }
+            // Make sure runaway publish dates are not included
+            content.publishOn = null;
+            content.unpublishOn = null;
+            
+            contentList[contentList.length] = content;
 
-            contentList.sort((a, b) => {
-                return a.sort > b.sort;
-            });
+        }
 
-            return HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'content', contentList);
-        });
+        return await HashBrown.Helpers.SyncHelper.mergeResource(project, environment, 'content', contentList);
     }
 
     /**
@@ -62,49 +50,30 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} Promise
      */
-    static getContentById(project, environment, id, localOnly = false) {
+    static async getContentById(project, environment, id, localOnly = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
 
-        let collection = environment + '.content';
-        let content;
+        let result = await HashBrown.Helpers.DatabaseHelper.findOne(project, environment + '.content', { id: id });
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            project,
-            collection,
-            {
-                id: id
-            }
-        ).then((result) => {
-            if(!result) {
-                if(localOnly) {
-                    return Promise.reject(new Error('Content by id "' + id + '" was not found'));
-                }
+        if(!result && !localOnly) {
+            result = await HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'content', id);
+        }
 
-                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'content', id);
-            }
-            
-            return Promise.resolve(result);
+        if(!result) { throw new Error('Content by id "' + id + '" was not found'); }
 
-        }).then((result) => {
-            if(!result) {
-                return Promise.reject(new Error('Content by id "' + id + '" was not found'));
-            }
+        let content = new HashBrown.Models.Content(result);
 
-            content = new HashBrown.Models.Content(result);
+        // Make sure runaway publish dates are not included
+        content.publishOn = null;
+        content.unpublishOn = null;
 
-            // Make sure runaway publish dates are not included
-            content.publishOn = null;
-            content.unpublishOn = null;
+        let tasks = await HashBrown.Helpers.ScheduleHelper.getTasks(null, content.id);
+        
+        content.adoptTasks(tasks);
 
-            return HashBrown.Helpers.ScheduleHelper.getTasks(null, content.id);
-        })
-        .then((tasks) => {
-            content.adoptTasks(tasks);
-
-            return Promise.resolve(content);
-        });
+        return content;
     }
    
     /**
@@ -114,17 +83,12 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} environment
      * @param {Content} content
      */
-    static updateContent(project, environment, content) {
+    static async updateContent(project, environment, content) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
-        return HashBrown.Helpers.DatabaseHelper.updateOne(
-            project,
-            environment + '.content',
-            { id: content.id },
-            content.getObject()
-        );
+        return await HashBrown.Helpers.DatabaseHelper.updateOne(project, environment + '.content', { id: content.id }, content.getObject());
     }
 
     /**
@@ -137,9 +101,9 @@ class ContentHelper extends ContentHelperCommon {
      * @param {User} user
      * @param {Boolean} create
      *
-     * @return {Promise} Promise
+     * @return {Content} Modified content
      */
-    static setContentById(project, environment, id, content, user, create = false) {
+    static async setContentById(project, environment, id, content, user, create = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -147,73 +111,118 @@ class ContentHelper extends ContentHelperCommon {
         checkParam(user, 'user', HashBrown.Models.User);
 
         // Check for empty Content object
-        if(!content || Object.keys(content).length < 1) {
-            return Promise.reject(new Error('Posted content with id "' + id + '" is empty'));
-        }
+        if(!content || Object.keys(content).length < 1) { throw new Error('Posted content with id "' + id + '" is empty'); }
 
         // Check for self parent
-        if(content.parentId == content.id) {
-            return Promise.reject(new Error('Content "' + content.id + '" cannot be a child of itself'));
+        if(content.parentId == id) { throw new Error('Content "' + id + '" cannot be a child of itself'); }
+
+        // Check for allowed Schemas
+        if(content.parentId) {
+            let isAllowed = await this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId);
+
+            if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
         }
 
-        return (() => {
-            // If no parent id was specified, let the content trough
-            // TODO: Check if allowed at root
-            if(!content.parentId) { return Promise.resolve(); }
+        // If sort value is negative or 0, assign the highest possible number
+        if(content.sort <= 0) {
+            content.sort = await this.getBottomSortIndex(project, environment, content.parentId);
+        }
 
-            // Check for allowed Schemas
-            return this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId);
-        })()
-        .then(() => {
-            // Unset automatic flags
-            content.isLocked = false;
+        // Unset automatic flags
+        content.isLocked = false;
 
-            content.sync = {
-                isRemote: false,
-                hasRemote: false
-            };
+        content.sync = {
+            isRemote: false,
+            hasRemote: false
+        };
 
-            // Content update data
-            content.updatedBy = user.id;
-            content.updateDate = Date.now();
-            
-            // Fallback in case of no "created by" user
-            if(!content.createdBy) {
-                content.createdBy = content.updatedBy;
-            }
-            
-            // Handle scheduled publish task
-            if(content.publishOn) {
-                return HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
-            } else {
-                return HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'publish', id);
-            }
-        })
-        .then(() => {
-            // Handle scheduled unpublish task
-            if(content.unpublishOn) {
-                return HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
-            } else {
-                return HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'unpublish', id);
-            }
-        })
-        .then(() => {
-            // Insert into database
-            return HashBrown.Helpers.DatabaseHelper.updateOne(
-                project,
-                environment + '.content',
-                { id: id },
-                content,
-                { upsert: create } // Whether or not to create the node if it doesn't already exist
-            );
-        })
-        .then(() => {
-            debug.log('Done updating content "' + id + '"', this);
+        // Content update data
+        content.updatedBy = user.id;
+        content.updateDate = Date.now();
+        
+        // Fallback in case of no "created by" user
+        if(!content.createdBy) {
+            content.createdBy = content.updatedBy;
+        }
+        
+        // Handle scheduled publish task
+        if(content.publishOn) {
+            await HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
+        } else {
+            await HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'publish', id);
+        }
+        
+        // Handle scheduled unpublish task
+        if(content.unpublishOn) {
+            await HashBrown.Helpers.ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
+        } else {
+            await HashBrown.Helpers.ScheduleHelper.removeTask(project, environment, 'unpublish', id);
+        }
+        
+        // Insert into database
+        await HashBrown.Helpers.DatabaseHelper.updateOne(project, environment + '.content', { id: id }, content, { upsert: create });
 
-            return Promise.resolve(content);
-        });
+        debug.log('Done updating content "' + id + '"', this);
+
+        return content;
     }
 
+    /**
+     * Inserts content before/after another node
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} contentId
+     * @param {String} otherId
+     */
+    static async insertContent(project, environment, user, contentId, otherId, parentId = '', method = 'after') {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(user, 'user', HashBrown.Models.User, true);
+        checkParam(contentId, 'contentId', String, true);
+        checkParam(otherId, 'otherId', String, true);
+        checkParam(parentId, 'parentId', String);
+        checkParam(method, 'method', String, true);
+        
+        if(method !== 'before' && method !== 'after') { throw new Error('Insert method "' + method + '" not recognised'); }
+
+        let content = await this.getContentById(project, environment, contentId);
+        let nodes = await HashBrown.Helpers.DatabaseHelper.find(project, environment + '.content', { parentId: parentId }, {}, { sort: 1 });
+
+        if(!nodes || nodes.length < 1) { throw new Error('Could not find sibling content'); }
+
+        var newSortIndex = 1;
+
+        for(var node of nodes) {
+            if(node.id === contentId) { continue; }
+
+            if(method === 'after') {
+                node.sort = newSortIndex;
+                    
+                this.setContentById(project, environment, node.id, new HashBrown.Models.Content(node), user);
+
+                newSortIndex++;
+            }
+
+            if(node.id === otherId) {
+                content.parentId = parentId;
+                content.sort = newSortIndex;
+
+                this.setContentById(project, environment, content.id, content, user);
+
+                newSortIndex++;
+            }
+
+            if(method === 'before') {
+                node.sort = newSortIndex;
+                    
+                this.setContentById(project, environment, node.id, new HashBrown.Models.Content(node), user);
+
+                newSortIndex++;
+            }
+        }
+    }
+    
     /**
      * Creates a new content object
      *
@@ -223,48 +232,65 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} parentId
      * @param {User} user
      * @param {Object} properties
-     * @param {Number} sortIndex
      *
-     * @return {Promise} New Content object
+     * @return {Content} New Content object
      */
-    static createContent(project, environment, schemaId, parentId = null, user, properties = null, sortIndex = 10000) {
+    static async createContent(project, environment, schemaId, parentId = null, user, properties = null) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(schemaId, 'schemaId', String);
         checkParam(user, 'user', HashBrown.Models.User);
 
-        return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
-        .then(() => {
-            return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, schemaId);
-        })
-        .then((schema) => {
-            let content = HashBrown.Models.Content.create(schema.id, properties);
-            let collection = environment + '.content';
+        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, schemaId);
+            
+        let content = HashBrown.Models.Content.create(schema.id, properties);
+        let collection = environment + '.content';
 
-            debug.log('Creating content "' + content.id + '"...', this);
+        debug.log('Creating content "' + content.id + '"...', this);
 
-            content.createdBy = user.id;
-            content.updatedBy = content.createdBy;
+        content.createdBy = user.id;
+        content.updatedBy = content.createdBy;
 
-            if(parentId) {
-                content.parentId = parentId;
-            }
+        if(parentId) {
+            let isAllowed = await this.isSchemaAllowedAsChild(project, environment, parentId, content.schemaId);
 
-            content.sort = sortIndex;
+            if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
 
-            return HashBrown.Helpers.DatabaseHelper.insertOne(
-                project,
-                collection,
-                content.getObject()
-            )
-            .then(() => {
-                debug.log('Content "' + content.id + '" created and inserted into "' + project + '.' + collection + '"', this);
+            content.parentId = parentId;
+            content.sort = await this.getBottomSortIndex(project, environment, parentId);
+        }
 
-                return Promise.resolve(content);
-            });
-        });
+        await HashBrown.Helpers.DatabaseHelper.insertOne(project, collection, content.getObject());
+
+        debug.log('Content "' + content.id + '" created and inserted into "' + project + '.' + collection + '"', this);
+
+        return content;
     }
-    
+   
+    /**
+     * Gets the next available sorting index (the highest plus one)
+     * 
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     *
+     * @return {Number} Index
+     */
+    static async getBottomSortIndex(project, environment, parentId = '') {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+        checkParam(parentId, 'parentId', String);
+
+        let nodes = await HashBrown.Helpers.DatabaseHelper.find(project, environment + '.content', { parentId: parentId });
+
+        if(nodes.length < 1) { return 1; }
+
+        let lastNode = nodes.pop();
+
+        return lastNode.sort + 1;
+    }
+
+
     /**
      * Removes a content object
      *
@@ -275,7 +301,7 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} promise
      */
-    static removeContentById(project, environment, id, removeChildren = false) {
+    static async removeContentById(project, environment, id, removeChildren = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -284,43 +310,18 @@ class ContentHelper extends ContentHelperCommon {
 
         let collection = environment + '.content';
         
-        return HashBrown.Helpers.DatabaseHelper.removeOne(
-            project,
-            collection,
-            {
-                id: id
-            }
-        )
-        .then(() => {
-            // Remove children if specified
-            if(removeChildren) {
-                return HashBrown.Helpers.DatabaseHelper.remove(
-                    project,
-                    collection,
-                    {
-                        parentId: id
-                    }
-                );
+        await HashBrown.Helpers.DatabaseHelper.removeOne(project, collection, { id: id });
+        
+        // Remove children if specified
+        if(removeChildren) {
+            await HashBrown.Helpers.DatabaseHelper.remove(project, collection, { parentId: id });
 
-            // If not removing children, we should unset their parent
-            } else {
-                return HashBrown.Helpers.DatabaseHelper.update(
-                    project,
-                    collection,
-                    {
-                        parentId: id
-                    },
-                    {
-                        parentId: null
-                    }
-                );
-            }
-        })
-        .then(() => {
-            debug.log('Successfully removed content "' + id + '"...', this);
-
-            return Promise.resolve();  
-        });
+        // If not removing children, we should unset their parent
+        } else {
+            await HashBrown.Helpers.DatabaseHelper.update(project, collection, { parentId: id }, { parentId: null });
+        }
+        
+        debug.log('Successfully removed content "' + id + '"...', this);
     }
     
     /**
@@ -332,7 +333,7 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @returns {Promise} Result
      */
-    static createExampleContent(project, environment, user) {
+    static async createExampleContent(project, environment, user) {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(user, 'user', HashBrown.Models.User, true);
@@ -485,7 +486,7 @@ class ContentHelper extends ContentHelperCommon {
             createDate: Date.now(),
             updateDate: Date.now(),
             schemaId: examplePageSchema.id,
-            sort: 10000,
+            sort: 1,
             properties: {
                 url: '/my-example-page/',
                 title: 'My Example Page',
@@ -494,21 +495,8 @@ class ContentHelper extends ContentHelperCommon {
         });
 
         // Create example page
-        return HashBrown.Helpers.SchemaHelper.setSchemaById(
-            project,
-            environment,
-            examplePageSchema.id,
-            examplePageSchema,
-            true
-        )
-        .then(ContentHelper.setContentById(
-            project,
-            environment,
-            examplePageContent.id,
-            examplePageContent,
-            user,
-            true
-        ))
+        await HashBrown.Helpers.SchemaHelper.setSchemaById(project, environment, examplePageSchema.id, examplePageSchema, true);
+        await this.setContentById(project, environment, examplePageContent.id, examplePageContent, user, true);
     }
 }
 

@@ -356,6 +356,30 @@ class ResourceHelper {
 
         return resource;
     }
+
+    /**
+     * Performs a custom query
+     *
+     * @param {String} method
+     * @param {String} category
+     * @param {String} action
+     * @param {String} query
+     * @param {Object} data
+     *
+     * @returns {*} Result
+     */
+    static async query(method, category, action, query, data) {
+        checkParam(method, 'method', String, true);
+        checkParam(category, 'category', String, true);
+        checkParam(action, 'action', String, true);
+        checkParam(query, 'query', String, true);
+
+        let result = await HashBrown.Helpers.RequestHelper.request(method, category + '/' + action + query, data);
+
+        await this.reloadResource(category);
+
+        return result;
+    }
 }
 
 module.exports = ResourceHelper;

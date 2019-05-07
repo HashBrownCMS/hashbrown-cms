@@ -23,6 +23,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
         // API call to apply changes to Content parent
         content.parentId = parentId;
+        content.sort = -1;
          
         await HashBrown.Helpers.ResourceHelper.set('content', id, content);
     }
@@ -30,19 +31,11 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Change sort index
      */
-    static async onChangeSortIndex(id, newIndex, parentId) {
-        if(parentId == '/') {
-            parentId = '';
-        }
+    static async onChangeSortIndex(contentId, otherId, parentId, method) {
+        if(parentId == '/') { parentId = ''; }
         
-        // Get the Content model
-        let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
-
         // API call to apply changes to Content parent
-        content.sort = newIndex;
-        content.parentId = parentId;
-         
-        await HashBrown.Helpers.ResourceHelper.set('content', id, content);
+        await HashBrown.Helpers.ResourceHelper.query('post', 'content', 'insert', '?contentId=' + contentId + '&otherId=' + otherId + (parentId ? '&parentId=' + parentId : '') + '&method=' + method);
     }
 
     /**
@@ -103,7 +96,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
             }
             
             let schemaId;
-            let sortIndex = await HashBrown.Helpers.ContentHelper.getNewSortIndex(parentId);
           
             // Instatiate a new Content Schema reference editor
             let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
@@ -138,7 +130,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                     try {
                         if(!schemaId) { return false; }
                        
-                        let query = '?schemaId=' + schemaId + '&sort=' + sortIndex;
+                        let query = '?schemaId=' + schemaId;
 
                         // Append parent Content id to request URL
                         if(parentId) {

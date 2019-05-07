@@ -380,7 +380,11 @@ class DatabaseHelper {
 
         try {
             client = await this.connect(databaseName);
-            docs = await client.db().collection(collectionName).find(query, { sort: sort, projection: projection }).toArray();
+            docs = await client.db().collection(collectionName).find(query, { projection: projection })
+
+            if(sort) { docs = await docs.sort(sort); }
+
+            docs = docs.toArray();
 
         } catch(e) {
             debug.error(e, this);

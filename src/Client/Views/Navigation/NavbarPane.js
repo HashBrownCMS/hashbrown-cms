@@ -107,21 +107,14 @@ class NavbarPane {
             e.preventDefault();
             e.stopPropagation();
 
-            // Create new sort index based on the container we clicked below
-            let $container = $(e.target).parent();
-            let containerIndex = parseInt($container.data('sort') || 0)
-
-            let newIndex = containerIndex + 1;
+            let parentId = $(e.target).parent().parents('.navbar-main__pane__item').attr('data-content-id');
+            let otherId = $(e.target).parent().attr('data-content-id');
 
             // Reset the move state
             reset();
 
-            // Fetch the parent id as well, in case that changed
-            let $parentItem = $container.parents('.navbar-main__pane__item');
-            let newPath = $parentItem.length > 0 ? ($parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id')) : null;
-
             // Trigger sort change event
-            this.onChangeSortIndex(id, newIndex, newPath);
+            this.onChangeSortIndex(id, otherId, parentId, 'after');
         });
 
         // Click "move to root" button

@@ -48,12 +48,10 @@ base.namespace = function namespace(query) {
  */
 base.checkParam = (value, name, type, notNull = false) => {
     if(value === undefined) {
-        console.trace();
         throw new Error('Parameter "' + name + '" is required');
     }
     
     if(notNull && (value === null || value === '')) {
-        console.trace();
         throw new Error('Parameter "' + name + '" cannot be null');
     }
 
