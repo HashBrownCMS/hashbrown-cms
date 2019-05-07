@@ -1,8 +1,8 @@
 # HashBrown CMS
 A free and open-source headless CMS built with Node.js and MongoDB
 
-## The centralised approach
-Ever wonder why you have to run a completely separate CMS for every single project? We did too, and that's why HashBrown exists today. This is the new central brain for your extended project structure.
+## NOTICE: Updating from v1.1 to v1.2
+The `/db` folder for the `mongodb` docker volume has been moved, along with all other docker related files, to the `/docker` folder. After you pull the latest changes, make sure to manually move your `/db` folder to `/docker/db` before you restart the container.
 
 ## Installing and running HashBrown
 First make sure you have these dependencies met:  
