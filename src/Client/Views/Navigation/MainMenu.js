@@ -49,7 +49,7 @@ class MainMenu extends Crisp.View {
             case 'media':
                 UI.messageModal('Media', [
                     _.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'),
-                    _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')
+                    _.p('The contents of this gallery depends on which <a href="#/connections/">Connection</a> has been set up as the Media provider')
                 ]);
                 break;
 
