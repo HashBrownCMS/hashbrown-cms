@@ -171,7 +171,7 @@
         padding: 1rem 0;
         position: relative;
         border-bottom: 1px solid $standard-darker;
-        transition: background-color 0.3s ease, transform 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        transition: background-color 0.3s ease, border-radius 0.3s ease, transform 0.3s ease, margin 0.3s ease, padding 0.3s ease;
 
         &:last-of-type {
             border-bottom: 0;

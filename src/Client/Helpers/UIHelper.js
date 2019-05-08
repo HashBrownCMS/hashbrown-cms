@@ -108,38 +108,29 @@ class UIHelper {
      * @param {Function} onChange
      */
     static fieldSortableArray(array, field, onChange) {
-        array = array || [];
+        let oldArray = JSON.parse(JSON.stringify(array || []));
 
-        // Set indices on all elements
-        let items = field.querySelector('.editor__field__value').children;
+        // Map all elements
+        let mappings = [];
 
-        for(let i = 0; i < items.length; i++) {
-            if(items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) { continue; }
-
-            items[i].dataset.index = i;
+        for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+            mappings.push({element: element, value: oldArray.shift() });
         }
 
         // Init the sortable context
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let oldIndex = element.dataset.index;
-            let newIndex = 0;
+            // Rebuild array using mappings
+            let newArray = [];
 
-            // Discover new index
-            let items = field.querySelector('.editor__field__value').children;
+            for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+                let mapping = mappings.filter((x) => { return x.element === element; })[0];
 
-            for(let i = 0; i < items.length; i++) {
-                if(items[i] === element) {
-                    newIndex = i;
-                    break;
-                }
+                newArray.push(mapping.value);
             }
 
-            // Swap indices
-            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
-
-            onChange(array);
+            onChange(newArray);
         });
     }
 
@@ -151,48 +142,21 @@ class UIHelper {
      * @param {Function} onChange
      */
     static fieldSortableObject(object, field, onChange) {
-        object = object || {};
-
+        let oldObject = JSON.parse(JSON.stringify(object || {}));
+        
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let itemSortKeyElement = element.querySelector('.editor__field__key__label');
-            let itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
-            let itemValue = object[itemKey];
-
-            // Try to get the next key
-            let nextKey = '';
-            let nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__key__label') : null;
-
-            if(nextSortKeyElement) {
-                nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
-            }
-
-            // Construct a new object based on the old one
+            // Rebuild object
             let newObject = {};
 
-            for(let fieldKey in object) {
-                // Omit existing key
-                if(fieldKey === itemKey) { continue; }
+            for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+                let itemSortKeyElement = element.querySelector('.editor__field__key__label');
+                let itemKey = itemSortKeyElement.dataset.sortKey || itemSortKeyElement.value || itemSortKeyElement.innerHTML;
+                let itemValue = object[itemKey];
 
-                let fieldValue = object[fieldKey];
-
-                // If there is a next key, and it's the same as this field key,
-                // the sorted item should be inserted just before it
-                if(nextKey === fieldKey) {
-                    newObject[itemKey] = itemValue;
-                }
-
-                newObject[fieldKey] = fieldValue;
-            }
-
-            // If the item wasn't reinserted, insert it now
-            if(!newObject[itemKey]) {
                 newObject[itemKey] = itemValue;
             }
-
-            // Assign the new object to the old one
-            object = newObject;
 
             // Fire the change event
             onChange(newObject);
@@ -278,8 +242,9 @@ class UIHelper {
                         sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
 
                         setTimeout(() => {
-                            currentDraggedChild.removeAttribute('style');
-                            sibling.removeAttribute('style');
+                            if(currentDraggedChild) { currentDraggedChild.removeAttribute('style'); }
+                            if(sibling) { sibling.removeAttribute('style'); }
+
                             canSort = true;
                         }, 100);
                     }

@@ -212,7 +212,8 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
 
                     return this.field(
                         {
-                            label: fieldKey,
+                            label: fieldValue.label,
+                            sortKey: fieldKey,
                             isCollapsible: true,
                             isCollapsed: true,
                             actions: {
@@ -259,9 +260,6 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                         }
                                     }
 
-                                    // Update the sort key
-                                    this.changeFieldLabel(fieldKey, newKey);
-
                                     // Change internal reference to new key
                                     fieldKey = newKey;
 
@@ -277,7 +275,11 @@ class ContentSchemaEditor extends HashBrown.Views.Editors.SchemaEditor {
                                 placeholder: 'A label, e.g. "My field"',
                                 tooltip: 'The field label',
                                 value: fieldValue.label,
-                                onChange: (newValue) => { fieldValue.label = newValue; }
+                                onChange: (newValue) => { 
+                                    this.changeFieldLabel(fieldValue.label, newValue);
+                                    
+                                    fieldValue.label = newValue;
+                                }
                             })
                         ),
                         this.field(

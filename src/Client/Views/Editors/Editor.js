@@ -13,20 +13,72 @@ class Editor extends Crisp.View {
     }
 
     /**
+     * Saves the scroll position
+     */
+    saveScrollPosition() {
+        let editorBody = this.element.querySelector('.editor__body');
+
+        if(!editorBody) { return; }
+
+        this._scrollTopCache = editorBody.scrollTop; 
+    }
+    
+    /**
+     * Restores the scroll position
+     */
+    restoreScrollPosition() {
+        if(!this._scrollTopCache) { return; }
+
+        let editorBody = this.element.querySelector('.editor__body');
+
+        if(!editorBody) { return; }
+
+        editorBody.scrollTop = this._scrollTopCache; 
+    }
+
+    /**
+     * Saves the collapsed fields states
+     */
+    saveCollapsibleFieldStates() {
+        this._collapsibleFieldStatesCache = [];
+        
+        let firstCollapsibleField = this.element.querySelector('.editor__field .collapsible');
+
+        if(!firstCollapsibleField) { return; }
+
+        for(let collapsibleField of firstCollapsibleField.parentElement.children) {
+            if(!collapsibleField.classList.contains('collapsible')) { continue; }
+
+            this._collapsibleFieldStatesCache.push(collapsibleField.classList.contains('collapsed'));
+        }
+    }
+    
+    /**
+     * Restores the collapsed fields states
+     */
+    restoreCollapsibleFieldStates() {
+        let firstCollapsibleField = this.element.querySelector('.editor__field .collapsible');
+
+        if(!firstCollapsibleField) { return; }
+        
+        for(let collapsibleField of firstCollapsibleField.parentElement.children) {
+            if(!collapsibleField.classList.contains('collapsible')) { continue; }
+        
+            collapsibleField.classList.toggle('collapsed', this._collapsibleFieldStatesCache.shift());
+        }
+    }
+
+    /**
      * Updates this view
      */
     update() {
-        if(this instanceof HashBrown.Views.Editors.FieldEditors.FieldEditor) {
-            super.update();
-        
-        } else {
-            let scrollTop = this.element.querySelector('.editor__body').scrollTop; 
-            
-            super.update();
-            
-            this.element.querySelector('.editor__body').scrollTop = scrollTop; 
+        this.saveScrollPosition();
+        this.saveCollapsibleFieldStates();
 
-        }
+        super.update();
+        
+        this.restoreCollapsibleFieldStates();
+        this.restoreScrollPosition();
     }
 
     /**
@@ -73,7 +125,7 @@ class Editor extends Crisp.View {
 
         return _.div({class: 'editor__field' + (config.isCollapsible ? ' collapsible' : '') + (config.isCollapsed ? ' collapsed' : ''), 'data-key': config.key },
             _.div({class: 'editor__field__key'},
-                _.div({class: 'editor__field__key__label'}, config.label)
+                _.div({class: 'editor__field__key__label', 'data-sort-key': config.sortKey}, config.label)
                     .click((e) => {
                         if(!config.isCollapsible) { return; }
 

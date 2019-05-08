@@ -152,7 +152,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                                 config.struct = newProperties;
 
-                                renderEditor();
+                                this.update();
                             });
                     })
                 )
@@ -161,7 +161,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             // Render this struct
             this.field(
                 {
-                    label: 'Struct',
+                    label: 'Fields',
                     actions: {
                         sort: () => { 
                             HashBrown.Helpers.UIHelper.fieldSortableObject(
@@ -181,7 +181,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     
                     return this.field(
                         {
-                            label: fieldKey,
+                            label: fieldValue.label,
+                            sortKey: fieldKey,
                             isCollapsible: true,
                             isCollapsed: true,
                             actions: {
@@ -215,9 +216,6 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                         }
                                     }
                                 
-                                    // Update the sort key
-                                    this.changeFieldLabel(fieldKey, newKey);
-
                                     // Change internal reference to new key
                                     fieldKey = newKey;
 
@@ -233,7 +231,11 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                                 placeholder: 'A label, e.g. "My field"',
                                 tooltip: 'The field label',
                                 value: fieldValue.label,
-                                onChange: (newValue) => { fieldValue.label = newValue; }
+                                onChange: (newValue) => {
+                                    this.changeFieldLabel(fieldValue.label, newValue);
+
+                                    fieldValue.label = newValue;
+                                }
                             })
                         ),
                         this.field(
