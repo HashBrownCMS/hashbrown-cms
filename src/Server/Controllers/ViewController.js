@@ -19,6 +19,13 @@ class ViewController extends HashBrown.Controllers.Controller {
             res.sendStatus(404);
         });
 
+        // Inform users with old browsers
+        app.get('/update-browser', (req, res) => {
+            res.status(400).render('error', {
+                message: 'Your browser is out-of-date. Please upgrade to a more recent version.'
+            });
+        });
+
         // Root
         app.get(['/', '/dashboard'], (req, res) => {
             res.redirect('/dashboard/projects');

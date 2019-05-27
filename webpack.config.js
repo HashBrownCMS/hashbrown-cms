@@ -24,32 +24,12 @@ let entry = {
     views: './src/Client/Views'
 }
 
-// Compilation rules
-let rules = [
-    // Babel.js
-    {
-        test: /\.js$/,
-        use: {
-            loader: 'babel-loader',
-            options: {
-                presets: [
-                    ['@babel/preset-env']
-                ]
-            }
-        }
-    }
-];
-
 // Process input arguments
 if(Array.isArray(process.argv)) {
     for(let arg of process.argv) {
         // Watching
         if(arg === '--watch') {
             isWatching = true;
-        
-        // Exclude Babel
-        } else if(arg === '--no-babel') {
-            rules = [];
         
         // Files
         } else if(arg.indexOf('--files') === 0) {
@@ -82,11 +62,6 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'public/js'),
         filename: '[name].js'
-    },
-
-    // Define loaders
-    module: {
-        rules: rules
     },
 
     // Automatically accept these extensions
