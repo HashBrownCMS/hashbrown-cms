@@ -120,7 +120,7 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 window.updateCheck = async function updateCheck() {
     let update = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/update/check');
     
-    if(update.isBehind || true) {
+    if(update.isBehind) {
         UI.notify('Update available', 'HashBrown can be updated to ' + update.remoteVersion + '. Please check the <a href="/readme">readme</a> for instructions.'); 
     }
 }
