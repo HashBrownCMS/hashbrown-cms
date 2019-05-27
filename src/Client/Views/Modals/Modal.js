@@ -49,8 +49,7 @@ class Modal extends Crisp.View {
     }
 
     /**
-     * Close this modal
-     *
+     * Closes this modal
      */
     close() {
         this.element.classList.toggle('in', false);

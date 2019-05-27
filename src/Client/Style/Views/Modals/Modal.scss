@@ -20,7 +20,7 @@
     }
 
     &.in &__dialog {
-        transform: none;
+        transform: none !important;
     }
 
     // Dialog
@@ -40,7 +40,6 @@
     // Close button
     &__close {
         border: 0;
-        background-color: transparent;
         position: absolute;
         line-height: 2rem;
         height: 2rem;
@@ -91,6 +90,57 @@
 
         .widget {
             margin-left: 0.5rem;
+        }
+    }
+
+    // Notification type
+    &.notification {
+        background-color: transparent;
+        height: auto;
+        overflow-y: visible;
+        top: auto;
+        bottom: 0;
+    }
+
+    &.notification & {
+        &__dialog {
+            transform: translateY(2rem);
+            width: auto;
+            margin: 1rem;
+            background-color: $primary;
+            color: $primary-text;
+            padding: 1rem;
+        }
+
+        &__header {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        &__title {
+            line-height: 1;
+            height: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        &__close {
+            background-color: $primary-dark;
+            top: 0;
+            right: 0;
+        }
+
+        &__body {
+            padding: 0;
+            background-color: transparent;
+       
+            a {
+                color: inherit;
+                text-decoration: underline;
+            }
+        }
+
+        &__footer {
+            display: none;
         }
     }
 }

@@ -568,6 +568,22 @@ class UIHelper {
     }
 
     /**
+     * Brings up a notification
+     *
+     * @param {String} title
+     * @param {String} body
+     */
+    static notify(title, body) {
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: title,
+            body: body,
+            group : 'notification'
+        });
+
+        return modal;
+    }
+
+    /**
      * Brings up a message modal
      *
      * @param {String} title

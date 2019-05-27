@@ -46,10 +46,16 @@ npm run watch:nodemon
 ## Updating HashBrown
 To update the core HashBrown version and all of its dependencies:
 ```
+npm run update
+```
+
+Or manually:
+```
 cd /to/your/hashbrown/dir
 git pull
 git submodule update --recursive --init
 npm install
+webpack 
 ```
 
 ## Getting started

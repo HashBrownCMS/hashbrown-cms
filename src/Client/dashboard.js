@@ -95,61 +95,6 @@ async function initUsers() {
 }
 
 /**
- * Init server view
- */
-async function initServer() {
-    if(!currentUserIsAdmin()) { return; }
-
-    // Restart server
-    $('.page--dashboard__restart').click(onClickRestart);
-    
-    // Check for updates
-    let $btnUpdate = _.find('.page--dashboard__update');
-    
-    if(!$btnUpdate) { return; }
-    
-    let update = await HashBrown.Helpers.RequestHelper.request('get', 'server/update/check');
-    $btnUpdate.removeClass('working');
-
-    if(update.isBehind) {
-        $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
-
-        $btnUpdate.click(async () => {
-            try {
-                UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
-
-                await HashBrown.Helpers.RequestHelper.request('post', 'server/update/start');
-                
-                UI.messageModal('Success', 'HashBrown is restarting...', false);
-
-                HashBrown.Helpers.RequestHelper.listenForRestart();
-
-            } catch(e) {
-                UI.errorModal(e);
-
-            }
-        })
-
-    } else {
-        $btnUpdate.attr('disabled', true);
-        $btnUpdate.addClass('disabled');
-        $btnUpdate.attr('title', 'HashBrown is up to date');
-    }
-}
-
-
-/**
- * Event: Click restart
- */
-async function onClickRestart() {
-    if(!currentUserIsAdmin()) { return; }
-    
-    await HashBrown.Helpers.RequestHelper.request('post', 'server/restart');
-
-    HashBrown.Helpers.RequestHelper.listenForRestart();
-}
-
-/**
  * Event: Click invite user
  */
 async function onClickInviteUser() {
@@ -312,5 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run init functions
     initProjects();
     initUsers();
-    initServer();
+
+    // Check for updates
+    updateCheck();
 });

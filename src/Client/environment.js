@@ -60,4 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     Crisp.Router.init();
+    
+    // Check for updates
+    updateCheck();
 });

@@ -5,14 +5,14 @@
   "description": "A free and open-source headless CMS",
   "main": "hashbrown.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build:frontend": "webpack --progress",
     "watch:frontend": "webpack --watch --watch-poll --progress",
     "start": "npm run build:frontend && node hashbrown.js",
     "watch:nodemon": "nodemon hashbrown.js",
     "start:docker": "npm run build:frontend && cd ./docker && docker-compose up --build -d",
     "stop:docker": "cd ./docker && docker-compose down",
-    "watch:docker": "cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && docker-compose logs -f node"
+    "watch:docker": "cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && docker-compose logs -f node",
+    "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend"
   },
   "author": "Putaitu",
   "license": "MIT",
