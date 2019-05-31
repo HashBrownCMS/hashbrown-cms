@@ -20,3 +20,4 @@ package-lock.json
 !/public/js/login.js
 !/public/js/setup.js
 !/public/js/test.js
+!/public/js/browser-check.js
