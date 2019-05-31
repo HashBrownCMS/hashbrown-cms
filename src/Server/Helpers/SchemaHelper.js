@@ -352,7 +352,13 @@ class SchemaHelper extends SchemaHelperCommon {
                 struct: getFields(json, json['@i18n'][language])
             }
         });
-        
+      
+        try {
+            await this.getSchemaById(project, environment, uiSchema.parentSchemaId);
+        } catch(e) {
+            throw new Error('Schema "' + uiSchema.name + '" depends on "' + json['@parent'] + '", which failed with the following error: ' + e.message);
+        }
+
         await this.setSchemaById(project, environment, uiSchema.id, uiSchema, true);
     }
 
