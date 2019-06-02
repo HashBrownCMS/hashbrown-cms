@@ -160,7 +160,11 @@ class ConnectionController extends HashBrown.Controllers.ResourceController {
      * @returns {Connection} Connection
      */
     static async remove(req, res) {
+        let id = req.params.id;
+        
         await HashBrown.Helpers.ConnectionHelper.removeConnectionById(req.project, req.environment, id);
+
+        return 'Connection with id "' + id + '" deleted successfully';
     }
 }
 

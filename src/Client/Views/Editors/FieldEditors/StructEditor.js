@@ -298,6 +298,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * @param {Object} fieldDefinition
      */
     async renderField($placeholder, fieldName, fieldDefinition) {
+        this.value = this.value || {};
+
         let value = this.value[fieldName];
 
         if(!fieldDefinition || !fieldDefinition.schemaId) { throw new Error('Schema id not set for key "' + fieldName + '"'); }

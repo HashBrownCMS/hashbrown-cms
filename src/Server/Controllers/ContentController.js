@@ -252,7 +252,7 @@ class ContentController extends HashBrown.Controllers.ResourceController {
 
         await HashBrown.Helpers.ContentHelper.removeContentById(req.project, req.environment, id, removeChildren)
         
-        return id;
+        return 'Content with id "' + id + '" deleted successfully';
     }
 }
 

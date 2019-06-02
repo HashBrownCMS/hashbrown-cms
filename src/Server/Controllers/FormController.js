@@ -66,7 +66,11 @@ class FormController extends HashBrown.Controllers.ResourceController {
      * @param {String} id
      */
     static async remove(req, res) {
-        await HashBrown.Helpers.FormHelper.deleteForm(req.project, req.environment, req.params.id)
+        let id = req.params.id;
+        
+        await HashBrown.Helpers.FormHelper.deleteForm(req.project, req.environment, id)
+
+        return 'Form with id "' + id + '" deleted successfully';
     }
     
     /**
