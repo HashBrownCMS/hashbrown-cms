@@ -139,16 +139,15 @@ class ContentController extends HashBrown.Controllers.ResourceController {
      * @param {String} project
      * @param {String} environment
      * @param {String} contentId
-     * @param {String} otherId
+     * @param {String} afterId
      * @param {String} parentId
-     * @param {String} method Either "before" or "after"
      *
      * @param {Content} content The Content model to update
      *
      * @returns {Content} The created Content node
      */
     static async insert(req, res) {
-        return await HashBrown.Helpers.ContentHelper.insertContent(req.project, req.environment, req.user, req.query.contentId, req.query.otherId, req.query.parentId, req.query.method);
+        return await HashBrown.Helpers.ContentHelper.insertContent(req.project, req.environment, req.user, req.query.contentId, req.query.otherId, req.query.parentId);
     }
    
     /**

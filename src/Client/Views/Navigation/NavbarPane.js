@@ -90,7 +90,7 @@ class NavbarPane {
 
         // Click existing directory
         $pane.find('.navbar-main__pane__item[data-is-directory="true"]:not(.moving-item)').each((i, element) => {
-            $(element).children('.navbar-main__pane__item__content').on('click', (e) => {
+            $(element).children('.navbar-main__pane__item__content').on('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -98,12 +98,12 @@ class NavbarPane {
 
                 reset(newPath);
 
-                this.onChangeDirectory(id, newPath);
+                await this.onChangeDirectory(id, newPath);
             });
         }); 
 
         // Click below item
-        $pane.find('.navbar-main__pane__item__insert-below').click((e) => {
+        $pane.find('.navbar-main__pane__item__insert-below').click(async (e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -114,7 +114,13 @@ class NavbarPane {
             reset();
 
             // Trigger sort change event
-            this.onChangeSortIndex(id, otherId, parentId, 'after');
+            try {
+                await this.onChangeSortIndex(id, otherId, parentId);
+
+            } catch(e) {
+                UI.errorModal(e);
+
+            }
         });
 
         // Click "move to root" button
@@ -129,9 +135,10 @@ class NavbarPane {
         $pane.find('.navbar-main__pane__move-button--new-dir').toggle(this.canCreateDirectory == true);
 
         if(this.canCreateDirectory) {
-            $pane.find('.navbar-main__pane__move-button--new-dir').on('click', () => {
-                HashBrown.Helpers.MediaHelper.getMediaById(id)
-                .then((item) => {
+            $pane.find('.navbar-main__pane__move-button--new-dir').on('click', async () => {
+                try {
+                    let item = await HashBrown.Helpers.MediaHelper.getMediaById(id);
+
                     let messageModal = new HashBrown.Views.Modals.Modal({
                         title: 'Move item',
                         body: _.div({class: 'widget-group'},
@@ -151,8 +158,11 @@ class NavbarPane {
                             }
                         ]
                     });
-                })
-                .catch(UI.errorModal);
+
+                } catch(e) {
+                    UI.errorModal(e);
+
+                }
             });
         }
     }

@@ -25,17 +25,23 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
         content.parentId = parentId;
         content.sort = -1;
          
-        await HashBrown.Helpers.ResourceHelper.set('content', id, content);
+        try {
+            await HashBrown.Helpers.ResourceHelper.set('content', id, content);
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
      * Event: Change sort index
      */
-    static async onChangeSortIndex(contentId, otherId, parentId, method) {
+    static async onChangeSortIndex(contentId, otherId, parentId) {
         if(parentId == '/') { parentId = ''; }
         
         // API call to apply changes to Content parent
-        await HashBrown.Helpers.ResourceHelper.query('post', 'content', 'insert', '?contentId=' + contentId + '&otherId=' + otherId + (parentId ? '&parentId=' + parentId : '') + '&method=' + method);
+        await HashBrown.Helpers.ResourceHelper.query('post', 'content', 'insert', '?contentId=' + contentId + '&otherId=' + otherId + (parentId ? '&parentId=' + parentId : ''));
     }
 
     /**

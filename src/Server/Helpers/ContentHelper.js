@@ -175,51 +175,60 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} contentId
      * @param {String} otherId
      */
-    static async insertContent(project, environment, user, contentId, otherId, parentId = '', method = 'after') {
+    static async insertContent(project, environment, user, contentId, otherId, parentId = '') {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(user, 'user', HashBrown.Models.User, true);
         checkParam(contentId, 'contentId', String, true);
         checkParam(otherId, 'otherId', String, true);
         checkParam(parentId, 'parentId', String);
-        checkParam(method, 'method', String, true);
         
-        if(method !== 'before' && method !== 'after') { throw new Error('Insert method "' + method + '" not recognised'); }
-
-        let content = await this.getContentById(project, environment, contentId);
-        let nodes = await HashBrown.Helpers.DatabaseHelper.find(project, environment + '.content', { parentId: parentId }, {}, { sort: 1 });
+        let nodes = await this.getAllContent(project, environment);
 
         if(!nodes || nodes.length < 1) { throw new Error('Could not find sibling content'); }
+        
+        // Remove irrelevant nodes
+        nodes = nodes.filter((x) => { return x.id !== contentId && (x.parentId === parentId || !x.parentId === !parentId); });
+      
+        // Find the index of the other node
+        let otherNode = nodes.filter((x) => { return x.id === otherId; }).pop();
+        
+        if(!otherNode) {
+            throw new Error('Content "' + otherId + '" was not found under the parent "' + parentId + '"');
+        }
 
-        var newSortIndex = 1;
+        let otherIndex = nodes.indexOf(otherNode);
 
-        for(var node of nodes) {
-            if(node.id === contentId) { continue; }
+        if(otherIndex < 0) {
+            throw new Error('Content "' + otherId + '" returned invalid index "' + otherIndex + '"');
+        }
 
-            if(method === 'after') {
-                node.sort = newSortIndex;
-                    
-                this.setContentById(project, environment, node.id, new HashBrown.Models.Content(node), user);
+        // Get the node model
+        let node = await this.getContentById(project, environment, contentId);
 
-                newSortIndex++;
-            }
+        // Assign new parent
+        if(parentId) {
+            let isAllowed = await this.isSchemaAllowedAsChild(project, environment, parentId, node.schemaId);
 
-            if(node.id === otherId) {
-                content.parentId = parentId;
-                content.sort = newSortIndex;
+            if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
+        }
 
-                this.setContentById(project, environment, content.id, content, user);
+        node.parentId = parentId;
 
-                newSortIndex++;
-            }
+        // Assign the new position
+        if(otherIndex < nodes.length - 1) {
+            nodes.splice(otherIndex + 1, 0, node);
+        
+        } else {
+            nodes.push(node);
+        
+        }
 
-            if(method === 'before') {
-                node.sort = newSortIndex;
-                    
-                this.setContentById(project, environment, node.id, new HashBrown.Models.Content(node), user);
+        // Update all nodes with their new sort index
+        for(let i = 0; i < nodes.length; i++) {
+            nodes[i].sort = i + 1;
 
-                newSortIndex++;
-            }
+            await this.setContentById(project, environment, nodes[i].id, nodes[i], user);
         }
     }
     
