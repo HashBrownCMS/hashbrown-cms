@@ -1,11 +1,17 @@
 'use strict';
 
-function isSupported(feature) {
-    var scriptElement = document.createElement('script');
+function isSupported(evalString) {
+    try {
+        eval(evalString);
+        
+        return true;
 
-    return feature in scriptElement;
+    } catch(e) {
+        return false;
+    
+    }
 }
-
-if(!isSupported('async')) {
+    
+if(!isSupported('async () => {}')) {
     location = '/update-browser';
 }
