@@ -27,7 +27,7 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        new UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', async () => {
+        UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', async () => {
             await HashBrown.Helpers.ResourceHelper.remove('connections', id);
             
             debug.log('Removed connection "' + id + '"', this); 
