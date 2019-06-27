@@ -91,7 +91,7 @@ $('.page--login__login').each(function() {
         let inviteToken = $login.attr('data-invite-token');
 
         if(inviteToken) {
-            apiPath = '/api/user/activate';
+            apiPath = '/api/users/activate';
             
             data.inviteToken = inviteToken;
         }

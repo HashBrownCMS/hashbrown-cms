@@ -70,6 +70,7 @@ base.checkParam = (value, name, type, notNull = false) => {
         valueTypename = value.prototype.name;
 
     }
-
+    
+    console.trace();
     throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
 }

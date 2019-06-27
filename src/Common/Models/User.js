@@ -1,13 +1,11 @@
 'use strict';
 
-let Entity = require('./Entity');
-
 /**
  * A model for Users
  *
  * @memberof HashBrown.Common.Models
  */
-class User extends Entity {
+class User extends HashBrown.Models.Resource {
     constructor(params) {
         super(params);
     }

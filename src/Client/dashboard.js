@@ -124,7 +124,7 @@ async function onClickInviteUser() {
         let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         let isEmail = emailRegex.test(username);
 
-        // Check if en existing user has the same information
+        // Check if an existing user has the same information
         let existingUser = users.filter((user) => {
             return user.username == username || user.email == username;
         })[0];
@@ -175,15 +175,16 @@ async function onClickInviteUser() {
             ),
             async () => {
                 let password = $passwd.val() || '';
-                let scopes = {};
-
-                UI.messageModal('Creating user', 'Creating user "' + username + '"...');
-
-                await HashBrown.Helpers.ResourceHelper.new('users', '', {
+                let newUser = {
                     username: username,
-                    password: password,
-                    scopes: {}
-                });
+                    password: password
+                };
+
+                modal.setLoading(true);
+
+                await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.User, 'users', '', newUser);
+
+                modal.close();
 
                 UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
             }
