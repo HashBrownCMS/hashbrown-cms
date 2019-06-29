@@ -23,29 +23,6 @@
  */
 class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
-     * Fetches the model
-     */
-    async fetch() {
-        this.allowedSchemas = [];
-      
-        for(let schemaId of this.config.allowedSchemas || []) {
-            if(!schemaId) { continue; }
-            
-            try {
-                let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId, true);
-
-                this.allowedSchemas.push(schema);
-
-            } catch(e) {
-                debug.log(e.message, this);
-
-            }
-        }
-
-        super.fetch();
-    }
-
-    /**
      * Event: Click add item
      */
     onClickAddItem() {
@@ -94,6 +71,25 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
+     * Gets all allowed schemas
+     *
+     * @return {Array} Schemas
+     */
+    async getAllowedSchemas() {
+        let allowedSchemas = [];
+
+        for(let schemaId of this.config.allowedSchemas) {
+            if(!schemaId) { continue; }
+
+            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId);
+
+            allowedSchemas.push(schema);
+        }
+
+        return allowedSchemas;
+    }
+
+    /**
      * Updates this view
      */
     update() {
@@ -112,23 +108,6 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
             this.element.children[i].classList.toggle('collapsed', false);
         }
-    }
-
-    /**
-     * Gets a schema from the list of allowed schemas
-     *
-     * @param {String} id
-     *
-     * @return {FieldSchema} Schema
-     */
-    getAllowedSchema(id) {
-        checkParam(id, 'id', String);
-
-        for(let schema of this.allowedSchemas) {
-            if(schema.id === id) { return schema; }
-        }
-
-        return null;
     }
 
     /**
@@ -335,79 +314,95 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
+     * Renders an array item
+     *
+     * @param {HTMLElement} placeholder
+     * @param {Object} item
+     */
+    async renderItem($placeholder, item) {
+        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(item.schemaId, true);
+
+        // Schema could not be found, assign first allowed Schema
+        if(!schema) {
+            schema = await HashBrown.Helpers.SchemaHelper(this.config.allowedSchemas[0]);
+            item.schemaId = schema.id;
+        }
+
+        if(!schema) { throw new Error('Item #' + i + ' has no available Schemas'); }
+
+        // Obtain the field editor
+        let fieldEditor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+        if(!fieldEditor) { throw new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'); }
+
+        // Perform sanity check on item value
+        item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema);
+
+        // Init the field editor
+        let editorInstance = new fieldEditor({
+            value: item.value,
+            config: schema.config,
+            schema: schema,
+            className: 'editor__field__value'
+        });
+
+        // Hook up the change event
+        editorInstance.on('change', (newValue) => {
+            item.value = newValue;
+
+            let key = editorInstance.element.parentElement.children[0];
+
+            key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+        });
+
+        editorInstance.on('silentchange', (newValue) => {
+            item.value = newValue;
+
+            let key = editorInstance.element.parentElement.children[0];
+
+            key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
+        });
+
+        let $field = this.field(
+            {
+                isCollapsible: true,
+                isCollapsed: true,
+                label: this.getItemLabel(item, schema),
+                actions: {
+                    remove: () => { this.onClickRemoveItem(i); }
+                },
+                toolbar: {
+                    Schema: new HashBrown.Views.Widgets.Dropdown({
+                        className: 'editor__field__toolbar__widget',
+                        value: item.schemaId,
+                        placeholder: 'Schema',
+                        valueKey: 'id',
+                        labelKey: 'name',
+                        iconKey: 'icon',
+                        options: this.getAllowedSchemas(),
+                        onChange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
+                    })
+                }
+            },
+
+            // Render field editor instance
+            editorInstance
+        );
+
+        $placeholder.replaceWith($field);
+    }
+
+    /**
      * Renders this editor
      */
     template() {
         return _.div({class: 'field-editor field-editor--array ' + (this.config.isGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
-                let schema = this.getAllowedSchema(item.schemaId);
+                let $placeholder = _.div({class: 'editor__field loading'});
 
-                // Schema could not be found, assign first allowed Schema
-                if(!schema) {
-                    schema = this.allowedSchemas[0];
-                    item.schemaId = schema.id;
-                }
+                this.renderItem($placeholder, item);
 
-                if(!schema) { throw new Error('Item #' + i + ' has no available Schemas'); }
-
-                // Obtain the field editor
-                let fieldEditor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                if(!fieldEditor) { throw new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'); }
-                
-                // Perform sanity check on item value
-                item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema);
-
-                // Init the field editor
-                let editorInstance = new fieldEditor({
-                    value: item.value,
-                    config: schema.config,
-                    schema: schema,
-                    className: 'editor__field__value'
-                });
-
-                // Hook up the change event
-                editorInstance.on('change', (newValue) => {
-                    item.value = newValue;
-                    
-                    let key = editorInstance.element.parentElement.children[0];
-
-                    key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
-                });
-                
-                editorInstance.on('silentchange', (newValue) => {
-                    item.value = newValue;
-
-                    let key = editorInstance.element.parentElement.children[0];
-                    
-                    key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
-                });
-
-                return this.field(
-                    {
-                        isCollapsible: true,
-                        isCollapsed: true,
-                        label: this.getItemLabel(item, schema),
-                        actions: {
-                            remove: () => { this.onClickRemoveItem(i); }
-                        },
-                        toolbar: {
-                            Schema: new HashBrown.Views.Widgets.Dropdown({
-                                className: 'editor__field__toolbar__widget',
-                                value: item.schemaId,
-                                placeholder: 'Schema',
-                                valueKey: 'id',
-                                labelKey: 'name',
-                                iconKey: 'icon',
-                                options: this.allowedSchemas,
-                                onChange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
-                            })
-                        }
-                    },
-            
-                    // Render field editor instance
-                    editorInstance
-                );
+                return $placeholder;
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
                 .click(() => { this.onClickAddItem() })

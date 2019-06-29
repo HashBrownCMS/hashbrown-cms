@@ -15,18 +15,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.UI = HashBrown.Helpers.UIHelper;
 
     // Error handling
-    window.onerror = UI.errorModal;
+    window.addEventListener('error', UI.errorModal);
    
-    // Preload resources
-    if(!HashBrown.Context.isMediaPicker) {
-        await HashBrown.Helpers.ResourceHelper.preloadAllResources();
-    }
-
-    // Get language
+    // Set context variables
     HashBrown.Context.language = localStorage.getItem('language') || 'en';
-
-    // Init current user
     HashBrown.Context.user = new HashBrown.Models.User(HashBrown.Context.user);
+
+    // Preload schemas
+    let spinner = UI.spinner(null, false, '/svg/logo_pink.svg');
+    UI.setSpinnerMessage(spinner, 0, 'Loading schemas...');
+
+    await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+    UI.setSpinnerMessage(spinner, 0, 'Schemas loaded!', true);
+    UI.hideSpinner(spinner);
 
     // Init UI
     new HashBrown.Views.Navigation.NavbarMain();
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(
             (!contentEditor || !contentEditor.model) ||
             (newRoute.indexOf(contentEditor.model.id) > -1) ||
-            (!contentEditor.dirty)
+            (!contentEditor.isDirty)
         ) {
             proceed();
             return;
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'Discard unsaved changes?',
             'You have made changes to "' + (contentEditor.model.prop('title', HashBrown.Context.language) || contentEditor.model.id) + '"',
             () => {
-                contentEditor.dirty = false;
+                contentEditor.isDirty = false;
                 proceed();
             },
             cancel

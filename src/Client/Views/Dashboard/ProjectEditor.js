@@ -9,13 +9,7 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        _.append(this.element,
-            _.div({class: 'widget widget--spinner embedded no-background'},
-                _.div({class: 'widget--spinner__inner'},
-                    _.div({class: 'widget--spinner__image fa fa-refresh'})
-                )
-            )
-        )
+        UI.spinner(this.element, true);
 
         this.fetch();
     }

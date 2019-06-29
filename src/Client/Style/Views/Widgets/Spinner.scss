@@ -1,13 +1,13 @@
 /**
  * A spinner for loading
  */
-@keyframes widget--spinner__image {
+@keyframes widget--spinner {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: rotate(0deg);
     }
     
     100% {
-        transform: translate(-50%, -50%) rotate(359deg);
+        transform: rotate(359deg);
     }
 }
 
@@ -35,10 +35,6 @@
         position: absolute;
     }
 
-    &.embedded &__image {
-        left: 50%;
-    }
-
     &__inner {
         position: absolute;
         top: 0%;
@@ -56,17 +52,16 @@
         line-height: 8rem;
         color: $secondary;
         font-size: 2rem;
-        top: 50%;
-        left: calc(50% - 8rem);
-        transform: translate(-50%, -50%);
-        animation-name: widget--spinner__image;
+        top: calc(50% - 4rem);
+        left: calc(50% - 4rem);
+        animation-name: widget--spinner;
         animation-duration: 2s;
         animation-timing-function: linear;
         animation-iteration-count: infinite;
     }
 
     &__messages {
-        left: calc(50% - 3rem);
+        left: calc(50% + 4rem);
         top: 50%;
         position: absolute;
         transform: translate(0%, -50%);

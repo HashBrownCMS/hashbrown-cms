@@ -6,6 +6,11 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class NavbarPane {
+    static get route() { return ''; }
+    static get label() { return ''; }
+    static get scope() { return ''; }
+    static get icon() { return ''; }
+
     /**
      * Init
      */

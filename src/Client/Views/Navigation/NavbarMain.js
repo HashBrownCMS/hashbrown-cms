@@ -9,6 +9,8 @@ class NavbarMain extends Crisp.View {
     constructor(params) {
         super(params);
 
+        UI.spinner(this.element, true);
+        
         this.template = require('Client/Templates/Navigation/NavbarMain');
 
         HashBrown.Helpers.EventHelper.on('resource', 'navbar', () => { this.reload(); });  
@@ -29,7 +31,7 @@ class NavbarMain extends Crisp.View {
             try {
                 pane.items = await pane.getItems();
             } catch(e) {
-                debug.log(e.message, this);
+                UI.errorModal(e);
                 pane.items = [];
             }
         }
@@ -66,7 +68,9 @@ class NavbarMain extends Crisp.View {
         
         for(let name in HashBrown.Views.Navigation) {
             let pane = HashBrown.Views.Navigation[name];
-            
+         
+            if(pane.scope && !HashBrown.Context.user.hasScope(pane.scope)) { continue; }
+
             if(pane.prototype instanceof HashBrown.Views.Navigation.NavbarPane) {
                 panes.push(pane);
             }

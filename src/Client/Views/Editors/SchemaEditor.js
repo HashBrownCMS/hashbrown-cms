@@ -59,7 +59,7 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.ResourceHelper.set('schemas', this.modelId, this.model);
+        await HashBrown.Helpers.SchemaHelper.setSchemaById(this.modelId, this.model);
         
         this.$saveBtn.toggleClass('working', false);
         

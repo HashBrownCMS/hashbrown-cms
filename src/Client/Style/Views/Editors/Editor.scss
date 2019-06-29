@@ -14,7 +14,7 @@
         opacity: 0.75;
         user-select: none;
     }
-    
+
     // Header
     &__header {
         background-color: $secondary;
@@ -176,6 +176,24 @@
         &:last-of-type {
             border-bottom: 0;
             padding-bottom: 0;
+        }
+
+        // Loading
+        &.loading {
+            position: relative;
+
+            * {
+                display: none;
+            }
+
+            &:after {
+                content: '\f110';
+                display: block;
+                margin: 0 auto;
+                text-align: center;
+                font-family: 'FontAwesome';
+                animation: widget--spinner 0.5s steps(8, end) infinite;
+            }
         }
 
         // Collapsible field

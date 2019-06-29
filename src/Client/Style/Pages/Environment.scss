@@ -11,6 +11,13 @@
         }
     }
 
+    // Spinner
+    &__spinner {
+        &__image {
+            left: calc(50% - 12rem) !important;
+        }
+    }
+
     // Demo reset button
     &__demo__reset {
         position: fixed !important;

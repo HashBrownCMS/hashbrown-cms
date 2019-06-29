@@ -9,6 +9,8 @@ class Editor extends Crisp.View {
     constructor(params) {
         super(params);
 
+        UI.spinner(this.element, true);
+
         this.fetch();
     }
 

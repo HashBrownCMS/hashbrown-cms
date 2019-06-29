@@ -8,6 +8,7 @@
 class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     static get route() { return '/connections/'; }
     static get label() { return 'Connections'; }
+    static get scope() { return 'connections'; }
     static get icon() { return 'exchange'; }
     
     /**

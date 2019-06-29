@@ -8,6 +8,7 @@
 class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     static get route() { return '/schemas/'; }
     static get label() { return 'Schemas'; }
+    static get scope() { return 'schemas'; }
     static get icon() { return 'gears'; }
     
     /**
@@ -24,9 +25,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
                 'Delete schema',
                 'Are you sure you want to delete the schema "' + schema.name + '"?',
                 async () => {
-                    await HashBrown.Helpers.ResourceHelper.remove('schemas', id);
-
-                    debug.log('Removed schema with id "' + id + '"', this); 
+                    await HashBrown.Helpers.SchemaHelper.removeSchemaById(id);
 
                     // Cancel the SchemaEditor view if it was displaying the deleted content
                     if(location.hash == '#/schemas/' + id) {

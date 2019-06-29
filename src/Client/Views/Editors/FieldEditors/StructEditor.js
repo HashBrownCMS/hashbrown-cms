@@ -327,11 +327,6 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             config = {};
         }
        
-        // Structs are always collapsed by default
-        if(config.isCollapsed === undefined) {
-            config.isCollapsed = !!config.struct;
-        }
-
         // Init the field editor
         let fieldEditorInstance = new fieldEditor({
             value: fieldDefinition.multilingual ? value[HashBrown.Context.language] : value,
@@ -370,9 +365,8 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--struct'},
-            // Loop through each key in the struct
             _.each(this.getStruct(), (fieldName, fieldDefinition) => {
-                let $placeholder = _.div({class: 'cr-placeholder'});
+                let $placeholder = _.div({class: 'editor__field loading'});
                 
                 this.renderField($placeholder, fieldName, fieldDefinition);
 

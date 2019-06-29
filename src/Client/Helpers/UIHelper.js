@@ -11,13 +11,22 @@ class UIHelper {
      *
      * @param {HTMLElement} element
      * @param {Boolean} noBackground
+     * @param {String} icon
      *
      * @return {HTMLElement} Spinner
      */
-    static spinner(element = null, noBackground = false) {
+    static spinner(element = null, noBackground = false, icon = 'refresh') {
+        let iconIsImage = icon.indexOf('.svg') > -1 || icon.indexOf('.png') > -1;
+
         let spinner = _.div({class: 'widget widget--spinner ' + (element ? 'embedded ' : '' ) + (noBackground ? 'no-background' : '')},
             _.div({class: 'widget--spinner__inner'},
-                _.div({class: 'widget--spinner__image fa fa-refresh'})
+                _.if(iconIsImage,
+                    _.img({class: 'widget--spinner__image', src: icon})
+                ),
+                _.if(!iconIsImage,
+                    _.div({class: 'widget--spinner__image fa fa-' + icon})
+                ),
+                _.div({class: 'widget--spinner__messages'})
             )
         );
 
@@ -29,7 +38,39 @@ class UIHelper {
 
         return spinner;
     }
-    
+   
+    /**
+     * Attaches a message to a spinner
+     *
+     * @param {HTMLElement} spinner
+     * @param {Number} index
+     * @param {String} message
+     * @param {Boolean} isLoaded
+     */
+    static setSpinnerMessage($spinner, index, message, isLoaded = false) {
+        let $messages = $spinner.find('.widget--spinner__messages');
+        let $message = $messages.children().eq(index);
+        
+        if(!$message || $message.length < 1) {
+            $message = _.div({class: 'widget--spinner__message'});
+            $messages.append($message);
+        }
+
+        $message.html(message);
+        $message.toggleClass('loaded', isLoaded);
+    }
+
+    /**
+     * Hides a spinner
+     *
+     * @param {HTMLElement} spinner
+     */
+    static hideSpinner($spinner) {
+        $spinner.toggleClass('hidden', true);
+
+        setTimeout(() => { $spinner.remove(); }, 1000);
+    }
+
     /**
      * Highlights an element with an optional label
      *
@@ -543,6 +584,12 @@ class UIHelper {
         
         } else if(error.responseText) {
             error = new Error(error.responseText);
+        
+        } else if(error instanceof ErrorEvent) {
+            error = error.error;
+
+        } else if(error instanceof Event) {
+            error = error.target.error;
         
         } else if(error instanceof Error === false) {
             error = new Error(error.toString());

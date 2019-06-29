@@ -1,6 +1,10 @@
 'use strict';
 
+const CACHE_EXPIRATION_TIME = 1000 * 60;
+
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
+
+let cachedSchemas = {};
 
 /**
  * The client side Schema helper
@@ -8,6 +12,70 @@ const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
  * @memberof HashBrown.Client.Helpers
  */
 class SchemaHelper extends SchemaHelperCommon {
+    /**
+     * Adds a schema to the cache
+     *
+     * @param {Schema} schema
+     */
+    static setCached(id, schema) {
+        checkParam(id, 'id', String, true);
+        checkParam(schema, 'schema', HashBrown.Models.Schema);
+        
+        if(schema) {
+            cachedSchemas[id] = {
+                expires: Date.now() + CACHE_EXPIRATION_TIME,
+                data: schema
+            };
+
+        } else {
+            delete cachedSchemas[id];
+        
+        }
+    }
+
+    /**
+     * Gets a schema from the cache
+     *
+     * @param {String} id
+     *
+     * @return {Schema} Schema
+     */
+    static getCached(id) {
+        checkParam(id, 'id', String, true);
+        
+        if(!cachedSchemas[id]) { return null; }
+        
+        if(Date.now() > cachedSchemas[id].expires) {
+            this.setCached(id, null);
+            return null;
+        }
+
+        return cachedSchemas[id].data;
+    }
+
+    /**
+     * Sets a schema by id
+     */
+    static async setSchemaById(id, schema) {
+        checkParam(id, 'id', String, true);
+        checkParam(schema, 'schema', HashBrown.Models.Schema);
+        
+        await HashBrown.Helpers.ResourceHelper.set('schemas', id, schema);
+        
+        this.setCached(id, schema);
+    }
+
+    /**
+     * Removes a schema by id
+     */
+    static async removeSchemaById(id) {
+        checkParam(id, 'id', String, true);
+        
+        await HashBrown.Helpers.ResourceHelper.remove('schemas', id);
+
+        this.setCached(id, null);
+    }
+
     /**
      * Gets a Schema by id
      *
@@ -18,7 +86,11 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static async getSchemaById(id, withParentFields = false) {
         checkParam(id, 'id', String, true);
-        checkParam(withParentFields, 'withParentFields', Boolean, true);
+        checkParam(withParentFields, 'withParentFields', Boolean);
+
+        let cached = this.getCached(id);
+
+        if(cached) { return cached; }
 
         let schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
        
@@ -38,7 +110,11 @@ class SchemaHelper extends SchemaHelperCommon {
             return mergedSchema;
         }
         
-        return this.getModel(schema);
+        schema = this.getModel(schema);
+
+        this.setCached(id, schema);
+
+        return schema;
     }
     
     /**
@@ -61,6 +137,8 @@ class SchemaHelper extends SchemaHelperCommon {
             } else if(schema.type === 'field') {
                 schema = new HashBrown.Models.FieldSchema(schema);
             }
+
+            this.setCached(schema.id, schema); 
 
             schemas.push(schema);
         }

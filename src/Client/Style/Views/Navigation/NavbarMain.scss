@@ -1,12 +1,3 @@
-@keyframes navbar-main__pane__item__spinner {
-    0% {
-        transform: rotate(0deg);
-    }
-    
-    100% {
-        transform: rotate(359deg);
-    }
-}
 /**
  * The navigation bar
  */
@@ -321,7 +312,7 @@
             // Loading state
             &.loading > &__content > &__label:after {
                 content: '\f110';
-                animation: navbar-main__pane__item__spinner 1s steps(8, end) infinite;
+                animation: widget--spinner 1s steps(8, end) infinite;
             }
             
             // Insert below placeholder
