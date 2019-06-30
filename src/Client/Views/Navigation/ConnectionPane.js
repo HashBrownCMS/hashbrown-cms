@@ -12,9 +12,18 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     static get icon() { return 'exchange'; }
     
     /**
+     * Gets all items
+     */
+    async fetch() {
+        this.items = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
+
+        super.fetch();
+    }
+
+    /**
      * Event: Click new connection
      */
-    static async onClickNewConnection() {
+    async onClickNewConnection() {
         let connection = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Connection, 'connections');
         
         location.hash = '/connections/' + connection.id;
@@ -23,7 +32,7 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On click remove connection
      */
-    static onClickRemoveConnection() {
+    onClickRemoveConnection() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -43,7 +52,7 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click pull connection
      */
-    static async onClickPullConnection() {
+    async onClickPullConnection() {
         let connectionEditor = Crisp.View.get('ConnectionEditor');
         let pullId = $('.context-menu-target').data('id');
 
@@ -63,7 +72,7 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click push connection
      */
-    static async onClickPushConnection() {
+    async onClickPushConnection() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
@@ -74,18 +83,9 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Gets all items
-     *
-     * @returns {Promise} Items
-     */
-    static getItems() {
-        return HashBrown.Helpers.ConnectionHelper.getAllConnections();
-    }
-
-    /**
      * Item context menu
      */
-    static getItemContextMenu(item) {
+    getItemContextMenu(item) {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
@@ -119,7 +119,6 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
         
         menu['General'] = '---';
         menu['New connection'] = () => { this.onClickNewConnection(); };
-        menu['Refresh'] = () => { this.onClickRefreshResource('connections'); };
 
         return menu;
     }
@@ -127,11 +126,10 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * General context menu
      */
-    static getPaneContextMenu() {
+    getPaneContextMenu() {
         return {
             'Connections': '---',
-            'New connection': () => { this.onClickNewConnection(); },
-            'Refresh': () => { this.onClickRefreshResource('connections'); }
+            'New connection': () => { this.onClickNewConnection(); }
         };
     }
 }

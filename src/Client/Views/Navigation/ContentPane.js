@@ -9,11 +9,39 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     static get route() { return '/content/'; }
     static get label() { return 'Content'; }
     static get icon() { return 'file'; }
+
+    /**
+     * Gets all items
+     */
+    async fetch() {
+        // Build an icon cache
+        let icons = {};
+
+        for(let schema of await HashBrown.Helpers.SchemaHelper.getAllSchemas()) {
+            if(!schema.icon) {
+                schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+            }
+
+            icons[schema.id] = schema.icon;
+        }
+
+        // Get the items
+        this.items = await HashBrown.Helpers.ContentHelper.getAllContent();
+
+        // Apply the appropriate icon to each item
+        for(let i in this.items) {
+            this.items[i] = this.items[i].getObject();
+
+            this.items[i].icon = icons[this.items[i].schemaId];
+        }
+
+        super.fetch();
+    }
     
     /**
      * Event: Change parent
      */
-    static async onChangeDirectory(id, parentId) {
+    async onChangeDirectory(id, parentId) {
         if(parentId == '/') {
             parentId = '';
         }
@@ -37,7 +65,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Change sort index
      */
-    static async onChangeSortIndex(contentId, otherId, parentId) {
+    async onChangeSortIndex(contentId, otherId, parentId) {
         if(parentId == '/') { parentId = ''; }
         
         // API call to apply changes to Content parent
@@ -47,7 +75,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click pull content
      */
-    static async onClickPullContent() {
+    async onClickPullContent() {
         let contentEditor = Crisp.View.get('ContentEditor');
         let pullId = $('.context-menu-target').data('id');
 
@@ -67,7 +95,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click push content
      */
-    static async onClickPushContent() {
+    async onClickPushContent() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
@@ -82,7 +110,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {String} parentId
      */
-    static async onClickNewContent(parentId, asSibling) {
+    async onClickNewContent(parentId, asSibling) {
         try {
             let parentContent = null;
             let parentSchema = null;
@@ -164,7 +192,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click Content settings
      */
-    static async onClickContentPublishing() {
+    async onClickContentPublishing() {
         let id = $('.context-menu-target').data('id');
 
         let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
@@ -204,7 +232,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      *
      * @param {Boolean} shouldUnpublish
      */
-    static async onClickRemoveContent(shouldUnpublish) {
+    async onClickRemoveContent(shouldUnpublish) {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -263,7 +291,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click rename
      */
-    static async onClickRename() {
+    async onClickRename() {
         let id = $('.context-menu-target').data('id');
         let content = await HashBrown.Helpers.ContentHelper.getContentById(id);
 
@@ -295,39 +323,9 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Gets all items
-     *
-     * @returns {Promise} Items
-     */
-    static async getItems() {
-        // Build an icon cache
-        let icons = {};
-
-        for(let schema of await HashBrown.Helpers.SchemaHelper.getAllSchemas()) {
-            if(!schema.icon) {
-                schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
-            }
-
-            icons[schema.id] = schema.icon;
-        }
-
-        // Get the items
-        let items = await HashBrown.Helpers.ContentHelper.getAllContent();
-
-        // Apply the appropriate icon to each item
-        for(let i in items) {
-            items[i] = items[i].getObject();
-
-            items[i].icon = icons[items[i].schemaId];
-        }
-
-        return items;
-    }
-
-    /**
      * Item context menu
      */
-    static getItemContextMenu(item) {
+    getItemContextMenu(item) {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
@@ -376,7 +374,6 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
         menu['General'] = '---';
         menu['New content'] = () => { this.onClickNewContent(); };  
-        menu['Refresh'] = () => { this.onClickRefreshResource('content'); };
 
         return menu;
     }
@@ -384,18 +381,17 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Pane context menu
      */
-    static getPaneContextMenu() {
+    getPaneContextMenu() {
         return {
             'Content': '---',
-            'New content': () => { this.onClickNewContent(); },
-            'Refresh': () => { this.onClickRefreshResource('content'); }
+            'New content': () => { this.onClickNewContent(); }
         };
     }
 
     /**
      * Hierarchy logic
      */
-    static hierarchy(item, queueItem) {
+    hierarchy(item, queueItem) {
         // Set id data attributes
         queueItem.$element.attr('data-content-id', item.id);
         queueItem.parentDirAttr = {'data-content-id': item.parentId };

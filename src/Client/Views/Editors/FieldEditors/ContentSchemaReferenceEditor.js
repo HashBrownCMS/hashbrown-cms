@@ -34,7 +34,7 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
             // Get dropdown options 
             this.contentSchemas = [];
 
-            let allSchemas = await HashBrown.Helpers.ResourceHelper.getAll(null, 'schemas');
+            let allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
 
             for(let schema of allSchemas) {
                 let isNative = schema.id == 'page' || schema.id == 'contentBase';

@@ -143,18 +143,14 @@
 
     // Individual pane
     &__pane {
-        display: none;
+        display: flex;
+        flex-direction: column;
         height: 100%;
 
-        &.active {
-            display: flex;
-            flex-direction: column;
-        }
-      
         // Filter/sort bar
         &__filter-sort-bar {
             margin: 0 !important;
-            padding: 0.5rem;
+            padding: 1rem 0.5rem;
             background-color: $secondary;
 
             // Tablet mode

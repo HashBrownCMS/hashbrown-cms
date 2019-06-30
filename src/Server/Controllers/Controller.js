@@ -25,25 +25,21 @@ class Controller {
      */
     static async authenticate(token, project, scope, needsAdmin) {
         // No token was provided
-        if(!token) { 
-            throw new Error('You need to be logged in to do that');
-        }
+        if(!token) { return null; }
     
         let user = await HashBrown.Helpers.UserHelper.findToken(token);
         
         // No user was found
-        if(!user) {
-            throw new Error('Found no user with token "' + token + '"');
-        }
+        if(!user) { return null; }
             
         // Admin is required, and user isn't admin
         if(needsAdmin && !user.isAdmin) {
-            throw new Error('User "' + user.username + '" is not an admin');
+            throw new Error('You need to be admin to do that');
         }
 
-        // A scope is defined, and the user deosn't have it
+        // A scope is defined, and the user doesn't have it
         if(project && scope && !user.hasScope(project, scope)) {
-            throw new Error('User "' + user.username + '" does not have scope "' + scope + '"');
+            throw new Error('You need the "' + scope + '" scope to do that');
         }
            
         return user;

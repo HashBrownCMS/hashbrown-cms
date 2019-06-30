@@ -12,7 +12,7 @@ Crisp.Router.route('/connections/', () => {
             _.p('Right click in the Connections pane to create a new Connection.'),
             _.p('Click on a Connection to edit it.'),
             _.button({class: 'widget widget--button'}, 'New Connection')
-                .click(() => { HashBrown.Views.Navigation.ConnectionPane.onClickNewConnection(); }),
+                .click(() => { Crisp.View.get('ConnectionPane').onClickNewConnection(); }),
             _.button({class: 'widget widget--button'}, 'Quick tour')
                 .click(HashBrown.Helpers.ConnectionHelper.startTour),
         ],

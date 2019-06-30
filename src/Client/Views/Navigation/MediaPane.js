@@ -9,13 +9,23 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     static get route() { return '/media/'; }
     static get label() { return 'Media'; }
     static get icon() { return 'file-image-o'; }
+    static get hasFolders() { return true; }
+
+    /**
+     * Gets all items
+     */
+    async fetch() {
+        this.items = await HashBrown.Helpers.MediaHelper.getAllMedia();
+
+        super.fetch();
+    }
     
     /**
      * Event: On change folder path
      *
      * @param {String} newFolder
      */
-    static async onChangeDirectory(id, newFolder) {
+    async onChangeDirectory(id, newFolder) {
         await HashBrown.Helpers.RequestHelper.request(
             'post',
             'media/tree/' + id,
@@ -33,7 +43,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click rename media
      */
-    static onClickRenameMedia() {
+    onClickRenameMedia() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -66,7 +76,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click remove media
      */
-    static onClickRemoveMedia() {
+    onClickRemoveMedia() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -91,7 +101,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click replace media
      */
-    static onClickReplaceMedia() {
+    onClickReplaceMedia() {
         let id = $('.context-menu-target').data('id');
 
         this.onClickUploadMedia(id);
@@ -100,7 +110,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click upload media
      */
-    static onClickUploadMedia(replaceId) {
+    onClickUploadMedia(replaceId) {
         let folder = $('.context-menu-target').data('media-folder') || '/';
 
         new HashBrown.Views.Modals.MediaUploader({
@@ -130,20 +140,11 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             folder: folder
         });
     }
-   
-    /**
-     * Gets all items
-     *
-     * @returns {Promise} items
-     */
-    static getItems() {
-        return HashBrown.Helpers.MediaHelper.getAllMedia();
-    }
 
     /**
      * Hierarchy logic
      */
-    static hierarchy(item, queueItem) {
+    hierarchy(item, queueItem) {
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
 
         queueItem.$element.attr('data-media-id', item.id);
@@ -159,7 +160,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Item context menu
      */
-    static getItemContextMenu() {
+    getItemContextMenu() {
         return {
             'This media': '---',
             'Open in new tab': () => { this.onClickOpenInNewTab(); },
@@ -169,36 +170,19 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             'Replace': () => { this.onClickReplaceMedia(); },
             'Copy id': () => { this.onClickCopyItemId(); },
             'General': '---',
-            'Upload new media': () => { this.onClickUploadMedia(); },
-            'Refresh': () => { this.onClickRefreshResource('media'); }
+            'Upload new media': () => { this.onClickUploadMedia(); }
         };
     }
 
     /**
      * Pane context menu
      */
-    static getPaneContextMenu() {
+    getPaneContextMenu() {
         return {
             'Directory': '---',
-            'Upload new media': () => { this.onClickUploadMedia(); },
-            'General': '---',
-            'Refresh': () => { this.onClickRefreshResource('media'); }
-        };
-    }
-
-    /**
-     * General context menu
-     */
-    static getPaneContextMenu() {
-        return {
-            'Media': '---',
-            'Upload new media': () => { this.onClickUploadMedia(); },
-            'Refresh': () => { this.onClickRefreshResource('media'); }
+            'Upload new media': () => { this.onClickUploadMedia(); }
         };
     }
 }
-
-// Settings
-MediaPane.canCreateDirectory = true;
 
 module.exports = MediaPane;

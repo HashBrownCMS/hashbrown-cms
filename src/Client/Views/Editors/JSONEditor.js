@@ -57,13 +57,7 @@ class JSONEditor extends Crisp.View {
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
-        let url = $('.navbar-main__pane__item.active > a').attr('href');
-    
-        if(url) {
-            location = url;
-        } else {
-            debug.log('Invalid url "' + url + '"', this);
-        }
+        location.hash = location.hash.replace('/json', '');
     }
 
     /**

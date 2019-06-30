@@ -24,8 +24,6 @@
         flex-shrink: 0;
         flex-basis: 4rem;
 
-        @include background('secondary');
-
         &__title {
             margin: 0px;
             display: inline-block;

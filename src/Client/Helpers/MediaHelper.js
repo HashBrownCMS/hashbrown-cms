@@ -9,19 +9,39 @@ const MediaHelperCommon = require('Common/Helpers/MediaHelper');
  */
 class MediaHelper extends MediaHelperCommon {
     /**
-     * Gets whether the Media provider exists
+     * Converts a file to base64
      *
-     * @returns {Promise} Promise
+     * @param {File} file
+     *
+     * @return {String} Base64
      */
-    static checkMediaProvider() {
-        return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers')
-        .then((result) => {
-            if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
-            }  
+    static async convertFileToBase64(file) {
+        checkParam(file, 'file', File, true);
 
-            return Promise.resolve();
-        }); 
+        return await new Promise((resolve) => {
+            let reader = new FileReader();
+           
+            reader.onload = (e) => {
+                let base64 = e.target.result;
+
+                base64 = base64.replace('data:' + file.type + ';base64,', '');
+
+                resolve(base64);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Checks whether the Media provider exists
+     */
+    static async checkMediaProvider() {
+        let result = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers')
+        
+        if(!result || !result.media) {
+            throw new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.');
+        }  
     }
     
     /**

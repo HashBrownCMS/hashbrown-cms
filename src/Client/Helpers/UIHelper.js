@@ -16,16 +16,17 @@ class UIHelper {
      * @return {HTMLElement} Spinner
      */
     static spinner(element = null, noBackground = false, icon = 'refresh') {
-        let iconIsImage = icon.indexOf('.svg') > -1 || icon.indexOf('.png') > -1;
+        let iconIsImage = icon.indexOf('/') === 0;
 
         let spinner = _.div({class: 'widget widget--spinner ' + (element ? 'embedded ' : '' ) + (noBackground ? 'no-background' : '')},
             _.div({class: 'widget--spinner__inner'},
-                _.if(iconIsImage,
-                    _.img({class: 'widget--spinner__image', src: icon})
-                ),
-                _.if(!iconIsImage,
-                    _.div({class: 'widget--spinner__image fa fa-' + icon})
-                ),
+                _.do(() => {
+                    if(iconIsImage) {
+                        return _.img({class: 'widget--spinner__image', src: icon});
+                    }
+                    
+                    return _.div({class: 'widget--spinner__image fa fa-' + icon});
+                }),
                 _.div({class: 'widget--spinner__messages'})
             )
         );

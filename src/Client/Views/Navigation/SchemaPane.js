@@ -12,9 +12,30 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     static get icon() { return 'gears'; }
     
     /**
+     * Gets all items
+     */
+    async fetch() {
+        // Build an icon cache
+        let icons = {};
+
+        this.items = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+        // Apply the appropriate icon to each item
+        for(let schema of this.items) { 
+            if(!schema.icon) {
+                let compiledSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
+
+                schema.icon = compiledSchema.icon;
+            }
+        }
+
+        super.fetch();
+    }
+    
+    /**
      * Event: Click remove schema
      */
-    static async onClickRemoveSchema() {
+    async onClickRemoveSchema() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(id);
@@ -44,7 +65,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click new Schema
      */
-    static async onClickNewSchema() {
+    async onClickNewSchema() {
         let parentId = $('.context-menu-target').data('id');
 
         let newSchema = await HashBrown.Helpers.ResourceHelper.new(null, 'schemas', '?parentSchemaId=' + parentId);
@@ -55,7 +76,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click pull Schema
      */
-    static async onClickPullSchema() {
+    async onClickPullSchema() {
         let schemaEditor = Crisp.View.get('SchemaEditor');
         let pullId = $('.context-menu-target').data('id');
 
@@ -74,7 +95,7 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click push Schema
      */
-    static async onClickPushSchema() {
+    async onClickPushSchema() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
@@ -84,32 +105,9 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Gets all items
-     *
-     * @returns {Promise} Items
-     */
-    static async getItems() {
-        // Build an icon cache
-        let icons = {};
-
-        let allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
-
-        // Apply the appropriate icon to each item
-        for(let schema of allSchemas) { 
-            if(!schema.icon) {
-                let compiledSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schema.id, true);
-
-                schema.icon = compiledSchema.icon;
-            }
-        }
-
-        return allSchemas;
-    }
-
-    /**
      * Item context menu
      */
-    static getItemContextMenu(item) {
+    getItemContextMenu(item) {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
 
@@ -143,26 +141,13 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
             }
         }
 
-        menu['General'] = '---';
-        menu['Refresh'] = () => { this.onClickRefreshResource('schemas'); };
-
         return menu;
     }
     
     /**
-     * Set general context menu items
-     */
-    static getPaneContextMenu() {
-        return {
-            'Schemas': '---',
-            'Refresh': () => { this.onClickRefreshResource('schemas'); }
-        };
-    }
-
-    /**
      * Hierarchy logic
      */
-    static hierarchy(item, queueItem) {
+    hierarchy(item, queueItem) {
         queueItem.$element.attr('data-schema-id', item.id);
       
         if(item.parentSchemaId) {

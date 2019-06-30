@@ -34,6 +34,10 @@ class ViewController extends HashBrown.Controllers.Controller {
         // Readme
         app.get('/readme', async (req, res) => {
             try {
+                let user = await this.authenticate(req.cookies.token);
+
+                if(!user) { return res.redirect('/login?path=/readme'); }
+                
                 let markdown = await HashBrown.Helpers.FileHelper.read(Path.join(APP_ROOT, 'README.md'));
                 let html = HashBrown.Helpers.MarkdownHelper.toHtml(markdown.toString('utf8'));
 
@@ -89,8 +93,10 @@ class ViewController extends HashBrown.Controllers.Controller {
         // Dashboard
         app.get('/dashboard/:tab', async (req, res) => {
             try {
-                let user = await ViewController.authenticate(req.cookies.token);
+                let user = await this.authenticate(req.cookies.token);
 
+                if(!user) { return res.redirect('/login?path=/dashboard/' + req.params.tab); }
+                
                 user.clearSensitiveData();
                 
                 res.render('dashboard', {
@@ -111,8 +117,10 @@ class ViewController extends HashBrown.Controllers.Controller {
 
         app.get('/test/:tab', async (req, res) => {
             try {
-                let user = await ViewController.authenticate(req.cookies.token, null, null, true);
-
+                let user = await this.authenticate(req.cookies.token, null, null, true);
+                
+                if(!user) { return res.redirect('/login?path=test/' + req.params.tab); }
+                
                 res.render('test', {
                     user: user,
                     tab: req.params.tab
@@ -130,12 +138,10 @@ class ViewController extends HashBrown.Controllers.Controller {
         // Environment
         app.get('/:project/:environment/', async (req, res) => {
             try {
-                let user = await ViewController.authenticate(req.cookies.token);
-                
-                if(!user.isAdmin && !user.scopes[req.params.project]) {
-                    throw new Error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes');
-                }  
-                
+                let user = await this.authenticate(req.cookies.token, req.params.project);
+
+                if(!user) { return res.redirect('/login?path=/' + req.params.project + '/' + req.params.environment + '/'); }
+
                 let project = await HashBrown.Helpers.ProjectHelper.getProject(req.params.project);
 
                 if(project.environments.indexOf(req.params.environment) < 0) {

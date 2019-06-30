@@ -22,11 +22,11 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
             this.model = await HashBrown.Helpers.ContentHelper.getContentById(this.modelId);
             
             if(!this.model) { throw new Error('Content by id "' + this.modelId + '" was not found'); }
-            
+
             this.schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.model.schemaId, true);
-            
+
             if(!this.schema) { throw new Error('Schema by id "' + this.model.schemaId + '" was not found'); }
-            
+
             let publishingSettings = await this.model.getSettings('publishing');
            
             let connectionId = publishingSettings.connectionId
@@ -154,27 +154,29 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
         let onChange = (newValue) => {
             // If field definition is set to multilingual, assign flag and value onto object...
             if(fieldDefinition.multilingual) {
-                fieldValues[key]._multilingual = true;
-                fieldValues[key][HashBrown.Context.language] = newValue;
+                fieldValue = fieldValue || {};
+
+                fieldValue._multilingual = true;
+                fieldValue[HashBrown.Context.language] = newValue;
 
             // ...if not, assign the value directly
             } else {
-                fieldValues[key] = newValue;
+                fieldValue = newValue;
             }
         };
         
         // Get schema
-        let compiledSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldDefinition.schemaId);
+        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(fieldDefinition.schemaId, true);
 
-        if(!compiledSchema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
+        if(!schema) { throw new Error('FieldSchema ' + fieldDefinition.schemaId + ' not found'); }
 
         // Get the config
         let config;
 
         if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(fieldDefinition.config)) {
             config = fieldDefinition.config;
-        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(compiledSchema.config)) {
-            config = compiledSchema.config;
+        } else if(!HashBrown.Helpers.ContentHelper.isFieldDefinitionEmpty(schema.config)) {
+            config = schema.config;
         } else {
             config = {};
         }
@@ -185,16 +187,16 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
         }
         
         // Instantiate field editor
-        let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+        let fieldEditor = ContentEditor.getFieldEditor(schema.editorId);
           
-        if(!fieldEditor) { throw new Error('No field editor by id "' + compiledSchema.editorId + '" found in schema "' + fieldDefinition.schemaId +  '"'); }
+        if(!fieldEditor) { throw new Error('No field editor by id "' + schema.editorId + '" found in schema "' + fieldDefinition.schemaId +  '"'); }
         
         let fieldEditorInstance = new fieldEditor({
-            value: fieldValue,
+            value: fieldDefinition.multilingual ? fieldValue[HashBrown.Context.language] : fieldValue,
             disabled: fieldDefinition.disabled || false,
             config: config,
             description: fieldDefinition.description || '',
-            schema: compiledSchema,
+            schema: schema,
             multilingual: fieldDefinition.multilingual === true,
             className: 'editor__field__value'
         });
@@ -266,33 +268,37 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
             // Field value sanity check
             fieldValues[key] = HashBrown.Helpers.ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
             
-            // If the field definition is set to multilingual, pass value from object
-            let fieldValue = fieldDefinition.multilingual ? fieldValues[key][HashBrown.Context.language] : fieldValues[key];
-        
-            this.renderField(key, fieldDefinition, fieldValue, $placeholder);
+            this.renderField(key, fieldDefinition, fieldValues[key], $placeholder);
 
             return $placeholder;
         });
     }
 
     /**
+     * Gets the currently active tab
+     *
+     * @return {String} Tab
+     */
+    getActiveTab() {
+        return Crisp.Router.params.tab || this.schema.defaultTabId || 'meta';
+    }
+
+    /**
      * Render this editor
      */
     template() {
-        let activeTab = Crisp.Router.params.tab || this.schema.defaultTabId || 'meta';
-
         return _.div({class: 'editor editor--content' + (this.model.isLocked ? ' locked' : '')},
             // Header
             _.div({class: 'editor__header'}, 
                 _.each(this.schema.tabs, (tabId, tabName) => {
-                    return _.button({class: 'editor__header__tab' + (tabId === activeTab ? ' active' : '')}, tabName)
+                    return _.button({class: 'editor__header__tab' + (tabId === this.getActiveTab() ? ' active' : '')}, tabName)
                         .click(() => {
                             location.hash = '/content/' + this.model.id + '/' + tabId;
 
                             this.fetch(this.model.id);
                         });
                 }),
-                _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === activeTab ? ' active' : '')}, 'Meta')
+                _.button({'data-id': 'meta', class: 'editor__header__tab' + ('meta' === this.getActiveTab() ? ' active' : '')}, 'Meta')
                     .click(() => {
                         location.hash = '/content/' + this.model.id + '/meta';
 
@@ -304,7 +310,7 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
             _.div({class: 'editor__body'},
                 // Render content properties
                 _.each(this.schema.tabs, (tabId, tabName) => {
-                    if(tabId !== activeTab) { return; }
+                    if(tabId !== this.getActiveTab()) { return; }
 
                     return _.div({class: 'editor__body__tab active'},
                         this.renderTabContent(tabId, this.schema.fields.properties, this.model.properties)
@@ -312,8 +318,8 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
                 }),
 
                 // Render meta properties
-                _.if(activeTab === 'meta',
-                    _.div({class: 'editor__body__tab' + ('meta' === activeTab ? 'active' : ''), 'data-id': 'meta'},
+                _.if(this.getActiveTab() === 'meta',
+                    _.div({class: 'editor__body__tab' + ('meta' === this.getActiveTab() ? 'active' : ''), 'data-id': 'meta'},
                         this.renderTabContent('meta', this.schema.fields, this.model),
                         this.renderTabContent('meta', this.schema.fields.properties, this.model.properties)
                     )

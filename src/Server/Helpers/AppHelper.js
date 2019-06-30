@@ -39,7 +39,7 @@ class AppHelper {
             });
 
             process.on('exit', (code) => {
-                if(code == 0 || code == '0') {
+                if(code === 0 || code === '0') {
                     resolve(result);
                 } else {
                     reject(new Error('Process "' + cmd + '" in "' + cwd + '" exited with code ' + code + ': ' + message));

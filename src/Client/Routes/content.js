@@ -15,7 +15,7 @@ Crisp.Router.route('/content/', () => {
             _.p('Right click in the Content pane to create new Content.'),
             _.p('Click on a Content node to edit it.'),
             _.button({class: 'widget widget--button'}, 'New Content')
-                .click(() => { HashBrown.Views.Navigation.ContentPane.onClickNewContent(); }),
+                .click(() => { Crisp.View.get('ContentPane').onClickNewContent(); }),
             _.button({class: 'widget widget--button'}, 'Quick tour')
                 .click(HashBrown.Helpers.ContentHelper.startTour),
             _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')

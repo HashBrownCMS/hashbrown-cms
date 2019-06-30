@@ -186,17 +186,15 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @param {String} project
      * @param {String} id
-     * 
-     * @return {Promise} Result
      */
-    static removeCachedMedia(project, id) {
+    static async removeCachedMedia(project, id) {
         checkParam(project, 'project', String);
         checkParam(id, 'id', String);
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
         let cachedPath = Path.join(cacheFolder, id);
      
-        return HashBrown.Helpers.FileHelper.remove(cachedPath + '*');
+        HashBrown.Helpers.FileHelper.remove(cachedPath + '*');
     }
 
 
@@ -210,10 +208,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @returns {Promise} Media
      */
-    static async getCachedMedia(project, media, width = 0, height = 0) {
+    static async getCachedMedia(project, media, width, height = 0) {
         checkParam(project, 'project', String);
         checkParam(media, 'media', HashBrown.Models.Media);
-        checkParam(width, 'width', Number);
+        checkParam(width, 'width', Number, true);
         checkParam(height, 'height', Number);
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
@@ -245,13 +243,14 @@ class MediaHelper extends MediaHelperCommon {
             // Copy from file system
             } else {
                 await HashBrown.Helpers.FileHelper.copy(media.path, cachedPath);
-               
-                // Resize file
-                if(width && media.isImage() && !media.isSvg()) { 
-                    await HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
-                }
+            
             }
 
+            // Resize file
+            if(width && media.isImage() && !media.isSvg()) { 
+                await HashBrown.Helpers.AppHelper.exec('convert ' + cachedPath + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cachedPath);
+            }
+            
             // Read file
             data = await HashBrown.Helpers.FileHelper.read(cachedPath);
         }

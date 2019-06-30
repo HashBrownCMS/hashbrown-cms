@@ -50,7 +50,10 @@ class SchemaHelper extends SchemaHelperCommon {
             return null;
         }
 
-        return cachedSchemas[id].data;
+        let schema = cachedSchemas[id].data;
+        let copy = this.getModel(schema.getObject());
+
+        return copy;
     }
 
     /**
@@ -88,12 +91,14 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(id, 'id', String, true);
         checkParam(withParentFields, 'withParentFields', Boolean);
 
-        let cached = this.getCached(id);
+        let schema = this.getCached(id);
 
-        if(cached) { return cached; }
-
-        let schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
-       
+        if(!schema) {
+            schema = await HashBrown.Helpers.ResourceHelper.get(null, 'schemas', id);
+            schema = this.getModel(schema);
+            this.setCached(id, schema);
+        }
+        
         // Get parent fields if specified
         if(withParentFields && schema.parentSchemaId) {
             let childSchema = this.getModel(schema);
@@ -101,7 +106,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
             while(childSchema.parentSchemaId) {
                 let parentSchema = await this.getSchemaById(childSchema.parentSchemaId);
-                
+            
                 mergedSchema = this.mergeSchemas(mergedSchema, parentSchema);
 
                 childSchema = parentSchema;
@@ -110,10 +115,6 @@ class SchemaHelper extends SchemaHelperCommon {
             return mergedSchema;
         }
         
-        schema = this.getModel(schema);
-
-        this.setCached(id, schema);
-
         return schema;
     }
     

@@ -11,9 +11,18 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     static get icon() { return 'wpforms'; }
     
     /**
+     * Gets all items
+     */
+    async fetch() {
+        this.items = await HashBrown.Helpers.FormHelper.getAllForms();
+
+        super.fetch();
+    }
+
+    /**
      * Event: Click create new form
      */
-    static async onClickNewForm() {
+    async onClickNewForm() {
         let newForm = await HashBrown.Helpers.ResourceHelper.new(HashBrown.Models.Form, 'forms');
             
         location.hash = '/forms/' + newForm.id;
@@ -22,7 +31,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On click remove
      */
-    static async onClickRemoveForm() {
+    async onClickRemoveForm() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let form = await HashBrown.Helpers.FormHelper.getFormById(id);
@@ -45,7 +54,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click pull Form
      */
-    static async onClickPullForm() {
+    async onClickPullForm() {
         let pullId = $('.context-menu-target').data('id');
 
         // API call to pull the Form by id
@@ -64,7 +73,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click push Form
      */
-    static async onClickPushForm() {
+    async onClickPushForm() {
 		let $element = $('.context-menu-target');
         let pushId = $element.data('id');
 
@@ -72,20 +81,11 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
 
         await HashBrown.Helpers.ResourceHelper.push('forms', pushId);
     }
-
-    /**
-     * Gets all items
-     *
-     * @returns {Promise} Items
-     */
-    static getItems() {
-        return HashBrown.Helpers.FormHelper.getAllForms();
-    }
-
+    
     /**
      * Hierarchy logic
      */
-    static hierarchy(item, queueItem) {
+    hierarchy(item, queueItem) {
         queueItem.$element.attr('data-form-id', item.id);
        
         if(item.folder) {
@@ -97,7 +97,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Item context menu
      */
-    static getItemContextMenu(item) {
+    getItemContextMenu(item) {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
@@ -131,7 +131,6 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
         
         menu['General'] = '---';
         menu['New form'] = () => { this.onClickNewForm(); };
-        menu['Refresh'] = () => { this.onClickRefreshResource('forms'); };
 
         return menu;
     }
@@ -139,11 +138,10 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * General context menu
      */
-    static getPaneContextMenu() {
+    getPaneContextMenu() {
         return {
             'Forms': '---',
-            'New form': () => { this.onClickNewForm(); },
-            'Refresh': () => { this.onClickRefreshResource('forms'); }
+            'New form': () => { this.onClickNewForm(); }
         }
     }
 }

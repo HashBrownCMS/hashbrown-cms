@@ -30,10 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     UI.setSpinnerMessage(spinner, 0, 'Schemas loaded!', true);
     UI.hideSpinner(spinner);
 
-    // Init UI
-    new HashBrown.Views.Navigation.NavbarMain();
-    new HashBrown.Views.Navigation.MainMenu();
-
     // Set router check
     Crisp.Router.check = (newRoute, cancel, proceed) => {
         UI.highlight(false);
@@ -60,7 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             cancel
         );
     };
+    
+    // Init navigation UI
+    new HashBrown.Views.Navigation.NavbarMain();
+    new HashBrown.Views.Navigation.MainMenu();
 
+    // Init router
     Crisp.Router.init();
     
     // Check for updates

@@ -157,16 +157,22 @@ class FileHelper {
      */
     static async remove(path) {
         checkParam(path, 'path', String, true);
-      
-        if(FileSystem.lstatSync(path).isDirectory()) {
-            for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
-                await this.remove(Path.join(path, filename));
+     
+        try {
+            if(FileSystem.lstatSync(path).isDirectory()) {
+                for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
+                    await this.remove(Path.join(path, filename));
+                }
+            
+                await Util.promisify(FileSystem.rmdir)(path);
+
+            } else {
+                await Util.promisify(FileSystem.unlink)(path);
+
             }
         
-            await Util.promisify(FileSystem.rmdir)(path);
-
-        } else {
-            await Util.promisify(FileSystem.unlink)(path);
+        } catch(e) {
+            // We don't really mind if a file we're trying to delete isn't there...
 
         }
     }
@@ -176,19 +182,18 @@ class FileHelper {
      *
      * @param {String|Object} content
      * @param {String} path
-     *
-     * @return {Promise} Result
      */
     static write(content, path) {
         if(!content) { return Promise.resolve(); }
 
         checkParam(path, 'path', String);
 
-        return new Promise((resolve, reject) => {
-            if(typeof content === 'object') {
-                content = JSON.stringify(content);
-            }
+        // Automatically turn objects into string
+        if(content instanceof Buffer === false && content instanceof Object) {
+            content = JSON.stringify(content);
+        }
 
+        return new Promise((resolve, reject) => {
             FileSystem.writeFile(path, content, (err) => {
                 if(err) { return reject(err); }
 

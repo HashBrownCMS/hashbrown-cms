@@ -27,132 +27,89 @@ class MediaUploader extends HashBrown.Views.Modals.Modal {
     /**
      * Event: Change file
      */
-    onChangeFile(files) {
+    async onChangeFile(files) {
         let numFiles = files ? files.length : 1;
        
-        // In the case of a single file selected 
-        if(numFiles == 1) {
-            let file = files[0];
+        let $preview = this.$element.find('.modal--media-uploader__preview');
 
-            let isImage =
-                file.type == 'image/png' ||
-                file.type == 'image/jpeg' ||
-                file.type == 'image/gif';
+        $preview.empty();
+     
+        if(!files || files.length < 1) { return; }
+        
+        this.setLoading(true);
 
-            let isVideo =
-                file.type == 'video/mpeg' ||
-                file.type == 'video/mp4' ||
-                file.type == 'video/quicktime' ||
-                file.type == 'video/x-matroska';
+        $preview.attr('data-file-count', files.length);
+
+        for(let file of files) {
+            let isImage = file.type.indexOf('image') === 0;
+            let isVideo = file.type.indexOf('video') === 0;
 
             if(isImage) {
-                let reader = new FileReader();
-               
-                this.setLoading(true);
-
-                reader.onload = (e) => {
-                    this.$element.find('.modal--media-uploader__preview').html(
-                        _.img({src: e.target.result})
-                    );
-
-
-                    this.setLoading(false);
-                }
+                let base64 = await HashBrown.Helpers.MediaHelper.convertFileToBase64(file);
                 
-                reader.readAsDataURL(file);
+                $preview.append(
+                    _.img({src: 'data:' + file.type + ';base64,' + base64})
+                );
             }
                     
             if(isVideo) {
-                this.$element.find('.modal--media-uploader__preview').html(
+                $preview.append(
                     _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
                 );
             }
-
-            debug.log('Previewing data of file type ' + file.type + '...', this);
-        
-        // Multiple files selected
-        } else if(numFiles > 1) {
-            this.$element.find('.media-preview').html(
-                '(Multiple files selected)'
-            );
-        
-        // No files selected
-        } else if(numFiles == 0) {
-            this.$element.find('.media-preview').html(
-                '(No files selected)'
-            );
         }
+
+        this.setLoading(false);
     }
     
     /**
      * Event: Submit
      *
-     * @param {FormData} content
      * @param {Array} files
      */
-    onSubmit(content, files) {
-        if(!content || !files || files.length < 1) { return; }
+    async onSubmit(files) {
+        if(!files || files.length < 1) { return; }
 
         this.setLoading(true);
 
-        let type = files[0].type;
-        let apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
-        let uploadedIds = [];
+        try {
+            let apiPath = 'media/' + (this.replaceId ? this.replaceId : 'new');
 
-        // First upload the Media files
-        return HashBrown.Helpers.RequestHelper.uploadFile(apiPath, type, content)
+            let apiData = { files: [] };
 
-        // Then update the Media tree
-        .then((ids) => {
-            uploadedIds = ids;
+            for(let file of files) {
+                let fileData = {
+                    filename: file.name,
+                    base64: await HashBrown.Helpers.MediaHelper.convertFileToBase64(file)
+                };
 
-            if(!uploadedIds || uploadedIds.length < 1) {
-                return Promise.reject(new Error('File upload failed'));
+                apiData.files.push(fileData);
             }
 
-            if(!this.folder || this.folder === '/') {
-                return Promise.resolve();
+            let ids = await HashBrown.Helpers.RequestHelper.request('post', apiPath, apiData);
+
+            if(this.folder && this.folder !== '/') {
+                for(let id of ids) {
+                    await HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, { id: id, folder: this.folder });
+                }
             }
 
-            let queue = uploadedIds.slice(0);
+            await HashBrown.Helpers.ResourceHelper.reloadResource('media');
 
-            let putNextMediaIntoTree = () => {
-                let id = queue.pop();
-
-                if(!id) { return Promise.resolve(); }
-
-                return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, {
-                    id: id,
-                    folder: this.folder
-                })
-                .then(() => {
-                    return putNextMediaIntoTree();
-                });
-            };
-
-            return putNextMediaIntoTree();
-        })
-
-        // Then reload the Media resource
-        .then(() => {
-            return HashBrown.Helpers.ResourceHelper.reloadResource('media');
-        })
-
-        // Then update the UI and trigger the success callback
-        .then(() => {
             this.setLoading(false);
-
-            if(typeof this.onSuccess === 'function') {
-                this.onSuccess(uploadedIds);
-            }
             
+            if(typeof this.onSuccess === 'function') {
+                this.onSuccess(ids);
+            }
+                
             this.close();
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             UI.errorModal(e);
 
             this.setLoading(false);  
-        });
+        
+        }
     }
 
     /**
@@ -171,7 +128,7 @@ class MediaUploader extends HashBrown.Views.Modals.Modal {
                     this.onChangeFile(newValue);
                 },
                 onSubmit: (newValue, newFiles) => {
-                    this.onSubmit(newValue, newFiles);
+                    this.onSubmit(newFiles);
                 }
             }).$element
         ];
