@@ -254,6 +254,15 @@ class NavbarPane extends Crisp.View {
     }
 
     /**
+     * Reloads this view
+     */
+    async reload() {
+        this.saveState();
+
+        await this.fetch();
+    }
+
+    /**
      * Highlights an item
      *
      * @param {String} itemId
@@ -478,7 +487,7 @@ class NavbarPane extends Crisp.View {
         };
         
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let key = element.dataset.routingPath || element.dataset.mediaFolder;
+            let key = element.dataset.routingPath;
 
             this._savedState.items[key] = element.className.replace('loading', '');
         });
@@ -492,7 +501,7 @@ class NavbarPane extends Crisp.View {
         
         // Restore pane items
         this.$element.find('.navbar-main__pane__item').each((i, element) => {
-            let key = element.dataset.routingPath || element.dataset.mediaFolder;
+            let key = element.dataset.routingPath;
 
             if(key && this._savedState.items[key]) {
                 element.className = this._savedState.items[key];
@@ -500,7 +509,7 @@ class NavbarPane extends Crisp.View {
         });
 
         // Restore scroll position
-        $('.navbar-main__pane.active .navbar-main__pane__items').scrollTop(this._savedState.scroll || 0);
+        this.$element.find('.navbar-main__pane__items').scrollTop(this._savedState.scroll || 0);
 
         this._savedState = null;
     }
@@ -616,6 +625,7 @@ class NavbarPane extends Crisp.View {
     postrender() {
         this.applyFolders();
         this.applySorting();
+        this.restoreState();
 
         // Attach pane context menu
         if(this.getPaneContextMenu) {

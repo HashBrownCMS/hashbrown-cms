@@ -121,11 +121,7 @@ class NavbarMain extends Crisp.View {
 
         if(!pane) { return; }
 
-        pane.saveState();
-
-        await pane.fetch();
-
-        pane.restoreState();
+        await pane.reload();
 
         this.updateHighlight();
     }
