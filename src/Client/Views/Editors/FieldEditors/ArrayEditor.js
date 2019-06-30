@@ -52,9 +52,9 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         item.schemaId = newSchemaId;
         item.value = null;
 
-        this.update();
-
         this.trigger('change', this.value);
+        
+        this.update();
     }
 
     /**
@@ -67,7 +67,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         this.trigger('change', this.value);
 
-        this.update();
+        this.element.removeChild(this.element.children[index]);
     }
 
     /**
@@ -93,23 +93,32 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      * Updates this view
      */
     update() {
-        let expandedIndices = [];
+        this._expandedItems = [];
 
         for(let i = 0; i < this.element.children.length; i++) {
             if(!this.element.children[i].classList.contains('collapsed')) {
-                expandedIndices.push(i);
+                this._expandedItems.push(i);
             }
         }
         
         super.update();
-    
-        for(let i of expandedIndices) {
-            if(!this.element.children[i]) { continue; }
-
-            this.element.children[i].classList.toggle('collapsed', false);
-        }
     }
 
+    /**
+     * Gets whether an item is expandend (used when reloading the view)
+     *
+     * @param {Number} index
+     *
+     * @return {Boolean} Is expanded
+     */
+    isItemExpanded(index) {
+        checkParam(index, 'index', Number, true);
+
+        if(!this._expandedItems) { return false; }
+
+        return this._expandedItems.indexOf(index) > -1;
+    }
+    
     /**
      * Render key actions
      *
@@ -125,7 +134,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     this.element.parentElement,
                     (newArray) => {
                         this.value = newArray;
-
+                
                         this.trigger('change', this.value);
                     }
                 );
@@ -318,13 +327,18 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      *
      * @param {HTMLElement} placeholder
      * @param {Object} item
+     * @param {Number} index
      */
-    async renderItem($placeholder, item) {
-        let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(item.schemaId, true);
+    async renderItem($placeholder, item, index) {
+        let schema = null;
+
+        if(item.schemaId) {
+            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(item.schemaId, true);
+        }
 
         // Schema could not be found, assign first allowed Schema
         if(!schema) {
-            schema = await HashBrown.Helpers.SchemaHelper(this.config.allowedSchemas[0]);
+            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.config.allowedSchemas[0]);
             item.schemaId = schema.id;
         }
 
@@ -366,10 +380,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         let $field = this.field(
             {
                 isCollapsible: true,
-                isCollapsed: true,
+                isCollapsed: !this.isItemExpanded(index),
                 label: this.getItemLabel(item, schema),
                 actions: {
-                    remove: () => { this.onClickRemoveItem(i); }
+                    remove: () => { this.onClickRemoveItem(index); }
                 },
                 toolbar: {
                     Schema: new HashBrown.Views.Widgets.Dropdown({
@@ -398,9 +412,11 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     template() {
         return _.div({class: 'field-editor field-editor--array ' + (this.config.isGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
+                if(!item) { return; }
+
                 let $placeholder = _.div({class: 'editor__field loading'});
 
-                this.renderItem($placeholder, item);
+                this.renderItem($placeholder, item, parseInt(i));
 
                 return $placeholder;
             }),

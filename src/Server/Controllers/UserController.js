@@ -171,7 +171,7 @@ class UserController extends HashBrown.Controllers.ApiController {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(404).send(UserController.printError(e));   
+            res.status(404).send(e.message);   
         });
     }
 

@@ -152,10 +152,12 @@ class UIHelper {
     static fieldSortableArray(array, field, onChange) {
         let oldArray = JSON.parse(JSON.stringify(array || []));
 
+        let itemParent = field.querySelector('.editor__field__value');
+        
         // Map all elements
         let mappings = [];
 
-        for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+        for(let element of Array.from(itemParent.children).filter((x) => { return x.classList.contains('editor__field'); })) {
             mappings.push({element: element, value: oldArray.shift() });
         }
 
@@ -166,7 +168,7 @@ class UIHelper {
             // Rebuild array using mappings
             let newArray = [];
 
-            for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+            for(let element of Array.from(itemParent.children).filter((x) => { return x.classList.contains('editor__field'); })) {
                 let mapping = mappings.filter((x) => { return x.element === element; })[0];
 
                 newArray.push(mapping.value);

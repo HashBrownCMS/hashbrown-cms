@@ -108,8 +108,8 @@ class NavbarPane extends Crisp.View {
             e.preventDefault();
             e.stopPropagation();
 
-            let parentId = $(e.target).parent().parents('.navbar-main__pane__item').attr('data-content-id');
-            let otherId = $(e.target).parent().attr('data-content-id');
+            let parentId = $(e.target).parent().parents('.navbar-main__pane__item').attr('data-routing-path');
+            let otherId = $(e.target).parent().attr('data-routing-path');
 
             // Reset the move state
             reset();
