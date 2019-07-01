@@ -122,8 +122,6 @@ class ConnectionEditor extends HashBrown.Views.Editors.Editor {
                         new HashBrown.Views.Widgets.Dropdown({
                             value: this.model.processor.alias,
                             optionsUrl: 'connections/processors', 
-                            valueKey: 'alias',
-                            labelKey: 'name',
                             placeholder: 'Type',
                             onChange: (newValue) => {
                                 this.model.processor.alias = newValue;
@@ -158,8 +156,6 @@ class ConnectionEditor extends HashBrown.Views.Editors.Editor {
                         new HashBrown.Views.Widgets.Dropdown({
                             value: this.model.deployer.alias,
                             optionsUrl: 'connections/deployers', 
-                            valueKey: 'alias',
-                            labelKey: 'name',
                             placeholder: 'Type',
                             onChange: (newValue) => {
                                 this.model.deployer.alias = newValue;

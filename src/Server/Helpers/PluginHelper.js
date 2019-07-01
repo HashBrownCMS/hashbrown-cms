@@ -1,7 +1,6 @@
 'use strict';
 
-// TODO: Make this a GIT submodule
-const Glob = require('glob');
+const Path = require('path');
 
 /**
  * The helper class for plugins
@@ -13,21 +12,15 @@ class PluginHelper {
      * Initialises all plugins located at /plugins/:name/server/index.js
      *
      * @param {Object} app Express.js server instance
-     *
-     * @returns {Promise} Client side file URLs
      */
-    static init(app) {
-        return new Promise((resolve, reject) => {
-            Glob(APP_ROOT + '/plugins/*', (err, paths) => {
-                for(let path of paths) {
-                    let plugin = require(path + '/index.js');
-                    
-                    plugin.init(app);
-                }
-
-                resolve();
-            });
-        });
+    static async init(app) {
+        let paths = await HashBrown.Helpers.FileHelper.list(Path.join(APP_ROOT, 'plugins', '*'));
+        
+        for(let path of paths) {
+            let plugin = require(Path.join(path, 'index.js'));
+            
+            plugin.init(app);
+        }
     }
 }
 

@@ -10,8 +10,7 @@ const Entity = require('./Entity');
  * @memberof HashBrown.Common.Models
  */
 class Deployer extends Entity {
-    // Name and alias
-    static get name() { return 'Deployer'; }
+    static get title() { return 'Deployer'; }
     static get alias() { return 'deployer'; }
     
     /**
@@ -20,17 +19,30 @@ class Deployer extends Entity {
     constructor(params) {
         super(params);
 
-        this.name = this.constructor.name;
+        this.title = this.constructor.title;
         this.alias = this.constructor.alias;
 
         if(!this.paths) { this.paths = {}; }
     }
-    
+   
+    /**
+     * Parameter sanity check
+     */
+    static paramsCheck(params) {
+        params = params || {};
+
+        delete params.title;
+        delete params.name;
+        delete params.alias;
+
+        return params;
+    }
+
     /**
      * Structure
      */
     structure() {
-        this.def(String, 'name');
+        this.def(String, 'title');
         this.def(String, 'alias');
         this.def(Object, 'paths', {
             media: '',

@@ -24,16 +24,13 @@ class ConnectionController extends HashBrown.Controllers.ResourceController {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Array} Deployers
+     * @returns {Object} Deployers
      */
     static async deployers(req, res) {
-        let deployers = [];
+        let deployers = {};
 
         for(let deployer of HashBrown.Helpers.ConnectionHelper.deployers) {
-            deployers.push({
-                alias: deployer.alias,
-                name: deployer.name
-            });
+            deployers[deployer.alias] = deployer.title;
         }
 
         return deployers;
@@ -45,16 +42,13 @@ class ConnectionController extends HashBrown.Controllers.ResourceController {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Array} Processors
+     * @returns {Object} Processors
      */
     static processors(req, res) {
-        let processors = [];
+        let processors = {};
 
         for(let processor of HashBrown.Helpers.ConnectionHelper.processors) {
-            processors.push({
-                alias: processor.alias,
-                name: processor.name
-            });
+            processors[processor.alias] = processor.title;
         }
 
         return processors;

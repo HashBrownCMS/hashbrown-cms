@@ -36,9 +36,19 @@ require('Server/Helpers');
 require('Server/Models');
 require('Server/Controllers');
 
+// Register native processors
+HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.JsonProcessor);
+HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.UISchemaProcessor);
+
+// Register native deployers
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.ApiDeployer);
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.FileSystemDeployer);
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.GitDeployer);
+
+// Helper shortcuts
 global.debug = HashBrown.Helpers.DebugHelper;
 
-async function init() {
+async function main() {
     // Check CLI input
     await HashBrown.Helpers.AppHelper.processInput();
    
@@ -74,4 +84,4 @@ async function init() {
     }
 }
 
-init();
+main();
