@@ -35,7 +35,7 @@ Crisp.Router.route('/schemas/', function() {
 
                                 await HashBrown.Helpers.RequestHelper.request('post', 'schemas/import?url=' + url);
                                 
-                                await HashBrown.Helpers.ResourceHelper.reloadResource('schemas');
+                                HashBrown.Helpers.EventHelper.trigger('resource');  
 
                             } catch(e) {
                                 UI.errorModal(e);
@@ -64,13 +64,11 @@ Crisp.Router.route('/schemas/:id', async () => {
 
     if(schema instanceof HashBrown.Models.ContentSchema) {
         schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
-            modelId: schema.id,
-            model: schema
+            modelId: schema.id
         });
     } else {
         schemaEditor = new HashBrown.Views.Editors.FieldSchemaEditor({
-            modelId: schema.id,
-            model: schema
+            modelId: schema.id
         });
     }
         

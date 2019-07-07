@@ -112,6 +112,27 @@ class NavbarMain extends Crisp.View {
         let $panes = _.find('.navbar-main__panes');
         _.replace($panes[0], new newPaneConstructor());
     }
+    
+    /**
+     * Flags an item in the bar as loading
+     *
+     * @param {String} category
+     * @param {String} id
+     */
+    async setItemLoading(category, id) {
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
+
+        let pane = this.getCurrentPaneInstance();
+
+        if(!pane || '/' + category + '/' !== pane.constructor.route) { return; }
+
+        let element = pane.getItemElement(id);
+
+        if(!element) { return; }
+
+        element.classList.toggle('loading', true);
+    }
 
     /**
      * Reloads this view
@@ -125,7 +146,20 @@ class NavbarMain extends Crisp.View {
 
         this.updateHighlight();
     }
-    
+   
+    /**
+     * Static version of the setItemLoading method
+     *
+     * @param {String} category
+     * @param {String} id
+     */
+    static setItemLoading(category, id) {
+        checkParam(category, 'category', String, true);
+        checkParam(id, 'id', String, true);
+
+        Crisp.View.get('NavbarMain').setItemLoading(category, id);
+    }
+
     /**
      * Static version of the reload method
      */

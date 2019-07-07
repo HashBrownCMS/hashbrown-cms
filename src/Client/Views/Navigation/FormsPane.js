@@ -32,8 +32,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
      * Event: On click remove
      */
     async onClickRemoveForm() {
-        let $element = $('.context-menu-target'); 
-        let id = $element.data('id');
+        let id = $('.context-menu-target').data('id');
         let form = await HashBrown.Helpers.FormHelper.getFormById(id);
 
         UI.confirmModal(
@@ -41,12 +40,7 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
             'Delete form',
             'Are you sure you want to delete the form "' + form.title + '"?',
             async () => {
-                await HashBrown.Helpers.ResourceHelper.remove('forms', form.id);
-
-                debug.log('Removed Form with id "' + form.id + '"', this); 
-
-                // Cancel the FormEditor view
-                location.hash = '/forms/';
+                await HashBrown.Helpers.ResourceHelper.remove('forms', id);
             }
         );
     }
@@ -55,43 +49,18 @@ class FormsPane extends HashBrown.Views.Navigation.NavbarPane {
      * Event: Click pull Form
      */
     async onClickPullForm() {
-        let pullId = $('.context-menu-target').data('id');
+        let id = $('.context-menu-target').data('id');
 
-        // API call to pull the Form by id
-        await HashBrown.Helpers.RequestHelper.pull('forms', pullId);
-
-        location.hash = '/forms/' + pullId;
-    
-        let editor = Crisp.View.get('FormEditor');
-
-        if(editor && editor.model.id == pullId) {
-            editor.model = null;
-            editor.fetch();
-        }
+        await HashBrown.Helpers.ResourceHelper.pull('forms', id);
     }
     
     /**
      * Event: Click push Form
      */
     async onClickPushForm() {
-		let $element = $('.context-menu-target');
-        let pushId = $element.data('id');
+        let id = $('.context-menu-target').data('id');
 
-		$element.parent().addClass('loading');
-
-        await HashBrown.Helpers.ResourceHelper.push('forms', pushId);
-    }
-    
-    /**
-     * Hierarchy logic
-     */
-    hierarchy(item, queueItem) {
-        queueItem.$element.attr('data-form-id', item.id);
-       
-        if(item.folder) {
-            queueItem.createDir = true;
-            queueItem.parentDirAttr = {'data-form-folder': item.folder };
-        }
+        await HashBrown.Helpers.ResourceHelper.push('forms', id);
     }
     
     /**

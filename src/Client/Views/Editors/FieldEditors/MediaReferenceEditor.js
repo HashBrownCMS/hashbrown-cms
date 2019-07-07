@@ -70,13 +70,11 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
             
                     if(this.model.isAudio()) {
                         return _.div({class: 'field-editor--media-reference__preview fa fa-file-audio-o'});
-                    }
 
-                    if(this.model.isVideo()) {
+                    } else if(this.model.isVideo()) {
                         return _.div({class: 'field-editor--media-reference__preview fa fa-file-video-o'});
-                    }
 
-                    if(this.model.isImage()) {
+                    } else if(this.model.isImage()) {
                         return _.img({class: 'field-editor--media-reference__preview', src: '/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + this.model.id + '?width=200'});
                     }
                 })

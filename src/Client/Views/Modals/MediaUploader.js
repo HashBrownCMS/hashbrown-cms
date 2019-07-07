@@ -94,7 +94,7 @@ class MediaUploader extends HashBrown.Views.Modals.Modal {
                 }
             }
 
-            await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+            HashBrown.Helpers.EventHelper.trigger('resource');  
 
             this.setLoading(false);
             

@@ -99,11 +99,15 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise} Schema
+     * @returns {Schema} Schema
      */
     static async getNativeSchema(id) {
+        checkParam(id, 'id', String, true);
+        
         let path = Path.join(APP_ROOT, 'src', 'Common', 'Schemas', '*', id + '.json');
         let paths = await HashBrown.Helpers.FileHelper.list(path);
+
+        if(paths.length < 1) { throw new Error('Native schema "' + id + '" could not be found'); }
 
         let schemaPath = paths[0];
         let data = await HashBrown.Helpers.FileHelper.read(schemaPath);
@@ -126,7 +130,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {String} id
      * @param {Boolean} withParentFields
      *
-     * @return {Promise} Schema
+     * @return {Schema} Schema
      */
     static async getSchemaById(project, environment, id, withParentFields = false) {
         checkParam(project, 'project', String, true);
@@ -169,67 +173,32 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
-     *
-     * @return {Promise} Promise
      */
-    static removeSchemaById(project, environment, id) {
+    static async removeSchemaById(project, environment, id) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
 
         let collection = environment + '.schemas';
-        let thisSchema;
       
         // First get the Schema object
-        return this.getSchemaById(project, environment, id)
+        let thisSchema = await this.getSchemaById(project, environment, id)
 
         // Then get all custom Schemas
-        .then((result) => {
-            thisSchema = result;
-
-            return this.getCustomSchemas(project, environment);
-        })
+        let customSchemas = await this.getCustomSchemas(project, environment);
         
         // Then check if any custom Schemas use this one as a parent
-        .then((customSchemas) => {
-            let checkNext = () => {
-                // Get next Schema
-                let customSchema;
-                
-                for(let id in customSchemas) {
-                    customSchema = customSchemas[id];
-                    delete customSchemas[id];
-                    break;
-                }
+        for(let customSchema of customSchemas) {
+            if(customSchema.parentSchemaId != thisSchema.id) { continue; }
 
-                // If there are no more Schemas to check, resolve
-                if(!customSchema) { return Promise.resolve(); }
+            // If it does use this schema as a parent, make it use its grandparent instead
+            customSchema.parentSchemaId = thisSchema.parentSchemaId;
 
-                // If this custom Schema does not use the parent Schema, proceed to next
-                if(customSchema.parentSchemaId != thisSchema.id) { return checkNext(); }
-
-                // If it does use this parent, make it use its grandparent instead
-                customSchema.parentSchemaId = thisSchema.parentSchemaId;
-
-                return this.setSchemaById(project, environment, customSchema.id, customSchema)
-                .then(() => {
-                    return checkNext();  
-                });
-            };
-
-            return checkNext();
-        })
+            await this.setSchemaById(project, environment, customSchema.id, customSchema);
+        }
 
         // Then remove the requested Schema
-        .then(() => {
-            return HashBrown.Helpers.DatabaseHelper.removeOne(
-                project,
-                collection,
-                {
-                    id: id
-                }
-            );
-        });
+        await HashBrown.Helpers.DatabaseHelper.removeOne(project, collection, { id: id });
     }
     
     /**

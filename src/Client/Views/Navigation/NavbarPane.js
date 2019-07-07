@@ -263,6 +263,19 @@ class NavbarPane extends Crisp.View {
     }
 
     /**
+     * Gets an item element by routing path
+     *
+     * @param {String} routingPath
+     *
+     * @return {HTMLElement} Item
+     */
+    getItemElement(routingPath) {
+        checkParam(routingPath, 'routingPath', String, true);
+
+        return this.element.querySelector('div[data-routing-path="' + routingPath + '"]');
+    }
+
+    /**
      * Highlights an item
      *
      * @param {String} itemId

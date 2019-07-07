@@ -11,6 +11,21 @@ class Editor extends Crisp.View {
 
         UI.spinner(this.element, true);
 
+        HashBrown.Helpers.EventHelper.on('resource', 'editor', (id) => { this.onResourceChanged(id); });
+
+        this.fetch();
+    }
+
+    /**
+     * Event: Resource changed
+     *
+     * @param {String} id
+     */
+    onResourceChanged(id) {
+        if(!id || id !== this.modelId) { return; }
+    
+        debug.log('Resource "' + id + '" changed, reloading...', this);
+        
         this.fetch();
     }
 

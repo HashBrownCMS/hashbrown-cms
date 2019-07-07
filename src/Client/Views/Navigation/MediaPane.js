@@ -35,7 +35,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             } : null
         )
         
-        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+        HashBrown.Helpers.EventHelper.trigger('resource');  
 
         location.hash = '/media/' + id;
     }
@@ -58,7 +58,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             async () => {
                 await HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name);
 
-                await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+                HashBrown.Helpers.EventHelper.trigger('resource');  
 
                 let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 

@@ -55,9 +55,36 @@ class SchemaHelper extends SchemaHelperCommon {
 
         return copy;
     }
+    
+    /**
+     * Pulls a schema by id
+     *
+     * @param {String} id
+     */
+    static async pullSchemaById(id) {
+        checkParam(id, 'id', String, true);
+        
+        this.setCached(id, null);
+        
+        await HashBrown.Helpers.ResourceHelper.pull('schemas', id);
+    }
+    
+    /**
+     * Pushes a schema by id
+     *
+     * @param {String} id
+     */
+    static async pushSchemaById(id) {
+        checkParam(id, 'id', String, true);
+        
+        await HashBrown.Helpers.ResourceHelper.push('schemas', id);
+    }
 
     /**
      * Sets a schema by id
+     *
+     * @param {String} id
+     * @param {Schema} schema
      */
     static async setSchemaById(id, schema) {
         checkParam(id, 'id', String, true);
@@ -73,10 +100,10 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static async removeSchemaById(id) {
         checkParam(id, 'id', String, true);
-        
-        await HashBrown.Helpers.ResourceHelper.remove('schemas', id);
 
         this.setCached(id, null);
+        
+        await HashBrown.Helpers.ResourceHelper.remove('schemas', id);
     }
 
     /**

@@ -15,9 +15,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
      * Gets all items
      */
     async fetch() {
-        // Build an icon cache
-        let icons = {};
-
         this.items = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
 
         // Apply the appropriate icon to each item
@@ -33,27 +30,26 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
     
     /**
+     * Event: Click new Schema
+     */
+    async onClickNewSchema() {
+        let parentId = $('.context-menu-target').data('id');
+        let newSchema = await HashBrown.Helpers.ResourceHelper.new(null, 'schemas', '?parentSchemaId=' + parentId);
+
+        location.hash = '/schemas/' + newSchema.id;
+    }
+    
+    /**
      * Event: Click remove schema
      */
     async onClickRemoveSchema() {
-        let $element = $('.context-menu-target'); 
-        let id = $element.data('id');
+        let id = $('.context-menu-target').data('id');
         let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(id);
-        
+		
         if(!schema.isLocked) {
-            UI.confirmModal(
-                'delete',
-                'Delete schema',
-                'Are you sure you want to delete the schema "' + schema.name + '"?',
-                async () => {
-                    await HashBrown.Helpers.SchemaHelper.removeSchemaById(id);
-
-                    // Cancel the SchemaEditor view if it was displaying the deleted content
-                    if(location.hash == '#/schemas/' + id) {
-                        location.hash = '/schemas/';
-                    }
-                }
-            );
+            UI.confirmModal('delete', 'Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', async () => {
+                await HashBrown.Helpers.SchemaHelper.removeSchemaById(id);
+            });
         } else {
             UI.messageModal(
                 'Delete schema',
@@ -63,45 +59,21 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
     }
 
     /**
-     * Event: Click new Schema
-     */
-    async onClickNewSchema() {
-        let parentId = $('.context-menu-target').data('id');
-
-        let newSchema = await HashBrown.Helpers.ResourceHelper.new(null, 'schemas', '?parentSchemaId=' + parentId);
-
-        location.hash = '/schemas/' + newSchema.id;
-    }
-    
-    /**
      * Event: Click pull Schema
      */
     async onClickPullSchema() {
-        let schemaEditor = Crisp.View.get('SchemaEditor');
-        let pullId = $('.context-menu-target').data('id');
-
-        await HashBrown.Helpers.ResourceHelper.pull('schemas', pullId);
-           
-        location.hash = '/schemas/' + pullId;
+        let id = $('.context-menu-target').data('id');
 		
-        let editor = Crisp.View.get('SchemaEditor');
-
-        if(editor && editor.model.id == pullId) {
-            editor.model = null;
-            editor.fetch();
-        }
+        await HashBrown.Helpers.SchemaHelper.pullSchemaById(id);
     }
     
     /**
      * Event: Click push Schema
      */
     async onClickPushSchema() {
-		let $element = $('.context-menu-target');
-        let pushId = $element.data('id');
+		let id = $('.context-menu-target').data('id');
 
-		$element.parent().addClass('loading');
-
-        await HashBrown.Helpers.ResourceHelper.push('schemas', pushId);
+        await HashBrown.Helpers.SchemaHelper.pushSchemaById(id);
     }
 
     /**
@@ -142,20 +114,6 @@ class SchemaPane extends HashBrown.Views.Navigation.NavbarPane {
         }
 
         return menu;
-    }
-    
-    /**
-     * Hierarchy logic
-     */
-    hierarchy(item, queueItem) {
-        queueItem.$element.attr('data-schema-id', item.id);
-      
-        if(item.parentSchemaId) {
-            queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
-
-        } else {
-            queueItem.parentDirAttr = {'data-schema-type': item.type};
-        }
     }
 }
 

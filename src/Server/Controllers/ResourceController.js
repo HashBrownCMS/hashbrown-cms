@@ -14,7 +14,7 @@ class ResourceController extends HashBrown.Controllers.ApiController {
         app.get('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('get'));
 
         app.post('/api/:project/:environment/' + this.category + '/new', this.middleware(), this.getHandler('new'));
-        app.post('/api/:project/:environment/' + this.cetegory + '/pull/:id', this.middleware(), this.getHandler('pull'));
+        app.post('/api/:project/:environment/' + this.category + '/pull/:id', this.middleware(), this.getHandler('pull'));
         app.post('/api/:project/:environment/' + this.category + '/push/:id', this.middleware(), this.getHandler('push'));
         app.post('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('set'));
 

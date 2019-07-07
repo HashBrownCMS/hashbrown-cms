@@ -38,7 +38,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static async setMediaProvider(id) {
         await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
 
-        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+        HashBrown.Helpers.EventHelper.trigger('resource');  
     }
     
     /**

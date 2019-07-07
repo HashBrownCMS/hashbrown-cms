@@ -296,17 +296,29 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     getItemLabel(item, schema) {
         let label = '';
-        
+       
         // Use the schema config
         if(schema.config && schema.config.label && item.value && item.value[schema.config.label]) {
-            label = item.value[schema.config.label];
+            if(item.value[schema.config.label]._multilingual) {
+                label = item.value[schema.config.label][HashBrown.Context.language];
+            
+            } else {
+                label = item.value[schema.config.label];
+
+            }
+        }
 
         // Or try the value as a string
-        } else if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
-            label = (item.value || '').toString();
+        if(!label && item.value !== null && item.value !== undefined) {
+            let value = item.value._multilingual ? item.value[HashBrown.Context.language] : item.value;
+
+            if(typeof value === 'string' || typeof value === 'number') {
+                label = value.toString();
+            }
+        }
 
         // Or use the schema name
-        } else {
+        if(!label) {
             label = schema.name;
         
         }

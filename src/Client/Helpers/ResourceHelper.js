@@ -16,19 +16,6 @@ class ResourceHelper {
     }
    
     /**
-     * Reloads a resource category
-     *
-     * @param {String} cateogry
-     */
-    static async reloadResource(category) {
-        checkParam(category, 'category', String, true);
-
-        await this.getAll(null, category);
-
-        HashBrown.Helpers.EventHelper.trigger('resource');  
-    }
-
-    /**
      * Removes a resource
      *
      * @param {String} category
@@ -37,9 +24,16 @@ class ResourceHelper {
     static async remove(category, id) {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
+        
+        HashBrown.Views.Navigation.NavbarMain.setItemLoading(category, id);
 
         await HashBrown.Helpers.RequestHelper.request('delete', category + '/' + id);
-        
+       
+        // Cancel any editor instances displaying the deleted content
+        if(location.hash == '#/' + category + '/' + id) {
+            location.hash = '/' + category + '/';
+        } 
+
         HashBrown.Helpers.EventHelper.trigger('resource');  
     }
     
@@ -77,10 +71,14 @@ class ResourceHelper {
     static async pull(category, id) {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
+        
+        HashBrown.Views.Navigation.NavbarMain.setItemLoading(category, id);
 
         await HashBrown.Helpers.RequestHelper.request('post', category + '/pull/' + id);
     
-        await this.reloadResource(category);
+        HashBrown.Helpers.EventHelper.trigger('resource', id);  
+
+        location.hash = '/' + category + '/' + id;
     }
     
     /**
@@ -93,11 +91,11 @@ class ResourceHelper {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
 
+        HashBrown.Views.Navigation.NavbarMain.setItemLoading(category, id);
+
         await HashBrown.Helpers.RequestHelper.request('post', category + '/push/' + id);
     
-        await this.reloadResource(category);
-
-        HashBrown.Helpers.EventHelper.trigger('resource');  
+        HashBrown.Helpers.EventHelper.trigger('resource', id);  
     }
 
     /**
@@ -142,10 +140,12 @@ class ResourceHelper {
         if(data instanceof HashBrown.Models.Resource) {
             data = data.getObject();
         }
+        
+        HashBrown.Views.Navigation.NavbarMain.setItemLoading(category, id);
 
         await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data);
     
-        HashBrown.Helpers.EventHelper.trigger('resource');  
+        HashBrown.Helpers.EventHelper.trigger('resource', id);  
     }
     
     /**
@@ -194,7 +194,7 @@ class ResourceHelper {
 
         let result = await HashBrown.Helpers.RequestHelper.request(method, category + '/' + action + query, data);
 
-        await this.reloadResource(category);
+        HashBrown.Helpers.EventHelper.trigger('resource');  
 
         return result;
     }

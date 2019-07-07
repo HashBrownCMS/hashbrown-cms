@@ -76,33 +76,18 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
      * Event: Click pull content
      */
     async onClickPullContent() {
-        let contentEditor = Crisp.View.get('ContentEditor');
-        let pullId = $('.context-menu-target').data('id');
+        let id = $('.context-menu-target').data('id');
 
-        // API call to pull the Content by id
-        await HashBrown.Helpers.ResourceHelper.pull('content', pullId);
-        
-        location.hash = '/content/' + pullId;
-    
-        let editor = Crisp.View.get('ContentEditor');
-
-        if(editor && editor.model && editor.model.id == pullId) {
-            editor.model = null;
-            editor.fetch();
-        }
+        await HashBrown.Helpers.ResourceHelper.pull('content', id);
     }
     
     /**
      * Event: Click push content
      */
     async onClickPushContent() {
-		let $element = $('.context-menu-target');
-        let pushId = $element.data('id');
+        let id = $('.context-menu-target').data('id');
 
-		$element.parent().addClass('loading');
-
-        // API call to push the Content by id
-        await HashBrown.Helpers.ResourceHelper.push('content', pushId);
+        await HashBrown.Helpers.ResourceHelper.push('content', id);
     }
 
     /**
@@ -145,7 +130,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
 
             schemaReference.pickFirstSchema();
 
-            // Make the editor behave like a widget, as it's inside a widget group
+            // Make the editor behave like a widget, since it's inside a widget group
             schemaReference.ready(() => {
                 schemaReference.$element.addClass('widget');
             });
@@ -265,7 +250,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
                     await HashBrown.Helpers.RequestHelper.request('post', 'content/unpublish', content);
                 }
 
-                await HashBrown.Helpers.ResourceHelper.reloadResource('content');
+                HashBrown.Helpers.EventHelper.trigger('resource');  
                             
                 let contentEditor = Crisp.View.get('ContentEditor');
                    
@@ -309,7 +294,7 @@ class ContentPane extends HashBrown.Views.Navigation.NavbarPane {
             async () => {
                 await HashBrown.Helpers.ContentHelper.setContentById(id, content);
 
-                await HashBrown.Helpers.ResourceHelper.reloadResource('content');
+                HashBrown.Helpers.EventHelper.trigger('resource');  
 
                 // Update ContentEditor if needed
                 let contentEditor = Crisp.View.get('ContentEditor');

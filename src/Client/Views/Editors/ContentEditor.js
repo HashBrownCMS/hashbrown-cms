@@ -321,7 +321,7 @@ class ContentEditor extends HashBrown.Views.Editors.Editor {
 
                 // Render meta properties
                 _.if(this.getActiveTab() === 'meta',
-                    _.div({class: 'editor__body__tab' + ('meta' === this.getActiveTab() ? 'active' : ''), 'data-id': 'meta'},
+                    _.div({class: 'editor__body__tab ' + ('meta' === this.getActiveTab() ? 'active' : ''), 'data-id': 'meta'},
                         this.renderTabContent('meta', this.model, this.schema.fields),
                         this.renderTabContent('meta', this.model.properties, this.schema.fields.properties)
                     )

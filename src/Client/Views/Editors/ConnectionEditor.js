@@ -40,10 +40,16 @@ class ConnectionEditor extends HashBrown.Views.Editors.Editor {
     async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        await HashBrown.Helpers.ResourceHelper.set('connections', this.model.id, this.model);
-            
-        await HashBrown.Helpers.ResourceHelper.reloadResource('media');
+        try {
+            await HashBrown.Helpers.ResourceHelper.set('connections', this.model.id, this.model);
+                
+            HashBrown.Helpers.EventHelper.trigger('resource');  
         
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+
         this.$saveBtn.toggleClass('working', false);
     }
 

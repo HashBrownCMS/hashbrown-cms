@@ -32,20 +32,12 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: On click remove connection
      */
-    onClickRemoveConnection() {
-        let $element = $('.context-menu-target'); 
-        let id = $element.data('id');
-        let name = $element.data('name');
-        
-        UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove the connection "' + name + '"?', async () => {
-            await HashBrown.Helpers.ResourceHelper.remove('connections', id);
-            
-            debug.log('Removed connection "' + id + '"', this); 
+    async onClickRemoveConnection() {
+        let id = $('.context-menu-target').data('id');
+        let connection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(id);
 
-            // Cancel the ConnectionEditor view if it was displaying the deleted connection
-            if(location.hash == '#/connections/' + id) {
-                location.hash = '/connections/';
-            }
+        UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove this connection "' + connection.title + '"?', async () => {
+            await HashBrown.Helpers.ResourceHelper.remove('connections', id);
         });
     }
     
@@ -53,33 +45,18 @@ class ConnectionPane extends HashBrown.Views.Navigation.NavbarPane {
      * Event: Click pull connection
      */
     async onClickPullConnection() {
-        let connectionEditor = Crisp.View.get('ConnectionEditor');
-        let pullId = $('.context-menu-target').data('id');
+        let id = $('.context-menu-target').data('id');
 
-        // API call to pull the Connection by id
-        await HashBrown.Helpers.ResourceHelper.pull('connections', pullId);
-        
-        location.hash = '/connections/' + pullId;
-		
-        let editor = Crisp.View.get('ConnectionEditor');
-
-        if(editor && editor.model.id == pullId) {
-            editor.model = null;
-            editor.fetch();
-        }
+        await HashBrown.Helpers.ResourceHelper.pull('connections', id);    
     }
     
     /**
      * Event: Click push connection
      */
     async onClickPushConnection() {
-		let $element = $('.context-menu-target');
-        let pushId = $element.data('id');
+        let id = $('.context-menu-target').data('id');
 
-		$element.parent().addClass('loading');
-
-        // API call to push the Connection by id
-        await HashBrown.Helpers.ResourceHelper.push('connections', pushId);
+        await HashBrown.Helpers.ResourceHelper.push('connections', id);
     }
 
     /**

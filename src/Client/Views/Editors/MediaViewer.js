@@ -47,19 +47,21 @@ class MediaViewer extends Crisp.View {
                 )
             ),
             _.div({class: 'editor__body'},
-                _.if(this.model.isImage(),
-                    _.img({class: 'editor--media__preview', src: mediaSrc})
-                ),
-                _.if(this.model.isVideo(),
-                    _.video({class: 'editor--media__preview', controls: true},
-                        _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
-                    )
-                ),
-                _.if(this.model.isAudio(),
-                    _.audio({class: 'editor--media__preview', controls: true},
-                        _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
-                    )
-                )
+                _.do(() => {
+                    if(this.model.isImage()) {
+                        return _.img({class: 'editor--media__preview', src: mediaSrc});
+                    
+                    } else if(this.model.isVideo()) {
+                        return _.video({class: 'editor--media__preview', controls: true},
+                            _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
+                        );
+                    
+                    } else if(this.model.isAudio()) {
+                        return _.audio({class: 'editor--media__preview', controls: true},
+                            _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
+                        );
+                    }
+                })
             )
         );
     }

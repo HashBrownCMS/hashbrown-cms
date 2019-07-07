@@ -11,6 +11,8 @@ class SchemaEditor extends HashBrown.Views.Editors.Editor {
      */
     async fetch() {
         try {
+            this.model = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.modelId);
+
             this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
        
             for(let i in this.allSchemas) {

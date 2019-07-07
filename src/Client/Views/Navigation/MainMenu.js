@@ -23,7 +23,7 @@ class MainMenu extends Crisp.View {
         localStorage.setItem('language', newLanguage);
         HashBrown.Context.language = newLanguage;
 
-        await HashBrown.Helpers.ResourceHelper.reloadResource('content');
+        HashBrown.Helpers.EventHelper.trigger('resource');  
 
         let contentEditor = Crisp.View.get('ContentEditor');
 
