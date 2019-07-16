@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ContentEditor extends HashBrown.Views.Editors.Editor {
+class ContentEditor extends HashBrown.Views.Editors.ResourceEditor {
     constructor(id) {
         super({ modelId: id });
 

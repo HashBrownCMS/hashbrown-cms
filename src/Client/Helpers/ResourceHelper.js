@@ -145,7 +145,7 @@ class ResourceHelper {
 
         await HashBrown.Helpers.RequestHelper.request('post', category + '/' + id, data);
     
-        HashBrown.Helpers.EventHelper.trigger('resource', id);  
+        HashBrown.Helpers.EventHelper.triggerById('resource', 'navbar', id);  
     }
     
     /**
@@ -166,7 +166,7 @@ class ResourceHelper {
 
         let resource = await HashBrown.Helpers.RequestHelper.request('post', category + '/new' + query, data);
     
-        HashBrown.Helpers.EventHelper.trigger('resource');  
+        HashBrown.Helpers.EventHelper.triggerById('resource', 'navbar');  
 
         if(model) {
             resource = new model(resource);
@@ -194,7 +194,7 @@ class ResourceHelper {
 
         let result = await HashBrown.Helpers.RequestHelper.request(method, category + '/' + action + query, data);
 
-        HashBrown.Helpers.EventHelper.trigger('resource');  
+        HashBrown.Helpers.EventHelper.trigger('resource', 'navbar');  
 
         return result;
     }

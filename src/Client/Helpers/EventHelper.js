@@ -1,7 +1,5 @@
 'use strict';
 
-const EVENTS = {};
-
 /**
  * A helper class for triggering and registering EVENTS
  *
@@ -20,9 +18,10 @@ class EventHelper {
         checkParam(id, 'id', String);
         checkParam(callback, 'callback', Function);
 
-        if(!EVENTS[type]) { EVENTS[type] = {}; }
+        if(!this.events) { this.events = {}; }
+        if(!this.events[type]) { this.events[type] = {}; }
 
-        EVENTS[type][id] = callback;
+        this.events[type][id] = callback;
     }
 
     /**
@@ -35,9 +34,9 @@ class EventHelper {
         checkParam(type, 'type', String);
         checkParam(id, 'id', String);
 
-        if(!EVENTS[type]) { return; }
+        if(!this.events || !this.events[type]) { return; }
 
-        delete EVENTS[type][id];
+        delete this.events[type][id];
     }
 
     /**
@@ -47,13 +46,30 @@ class EventHelper {
      * @param {*} value
      */
     static trigger(type, value) {
-        if(!EVENTS[type]) { return; }
+        checkParam(type, 'type', String);
+        
+        if(!this.events || !this.events[type]) { return; }
 
-        for(let id in EVENTS[type]) {
-            if(typeof EVENTS[type][id] !== 'function') { continue; }
+        for(let id in this.events[type]) {
+            if(typeof this.events[type][id] !== 'function') { continue; }
 
-            EVENTS[type][id](value);
+            this.events[type][id](value);
         }
+    }
+    
+    /**
+     * Triggers a specific event
+     *
+     * @param {String} type
+     * @param {String} id
+     * @param {*} value
+     */
+    static triggerById(type, id, value) {
+        checkParam(type, 'type', String);
+        
+        if(!this.events || !this.events[type] || typeof this.events[type][id] !== 'function') { return; }
+
+        this.events[type][id](value);
     }
 }
 

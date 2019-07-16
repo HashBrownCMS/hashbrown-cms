@@ -23,7 +23,32 @@ class FieldEditor extends HashBrown.Views.Editors.Editor {
      * @returns {Object} Key actions
      */
     getKeyActions() {}
-    
+
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        let label = '';
+        
+        if(this.value !== null && this.value !== undefined && (typeof this.value === 'string' || typeof this.value === 'number')) {
+            label = this.value.toString();
+        }
+
+        if(!label) {
+            label = this.schema.name;
+        }
+        
+        label = new DOMParser().parseFromString(label, 'text/html').body.textContent || '';
+        
+        if(label.length > 80) {
+            label = label.substring(0, 77) + '...';
+        }
+        
+        return label;
+    }
+
     /**
      * A sanity check for fields
      *

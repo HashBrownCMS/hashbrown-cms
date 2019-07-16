@@ -52,6 +52,23 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     getStruct() {
         return this.config.struct || this.schema.config.struct || {};
     }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        if(this.config && this.config.label && this.value && this.value[this.config.label]) {
+            if(this.value[this.config.label]._multilingual) {
+                return this.value[this.config.label][HashBrown.Context.language];
+            }
+
+            return this.value[this.config.label];
+        }
+
+        return super.getFieldLabel();
+    }
 
     /**
      * Event: Change value

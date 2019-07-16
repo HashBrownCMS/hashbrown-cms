@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class FormEditor extends HashBrown.Views.Editors.Editor {
+class FormEditor extends HashBrown.Views.Editors.ResourceEditor {
     constructor(params) {
         super(params);
         

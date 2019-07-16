@@ -63,18 +63,19 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
             )
         ];
     }
-
+    
     /**
-     * Renders this editor
+     * Gets the field label
+     *
+     * @return {String} Label
      */
-    template() {
-        let displayValue = '';
+    getFieldLabel() {
+        let label = '';
 
         if(this.model) {
             for(let key of (this.config.resourceKeys || [])) {
                 if(this.model[key]) {
-                    displayValue = this.model[key];
-                    break;    
+                    return this.model[key];
                 }
             }
 
@@ -85,12 +86,18 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
                 singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
             }
 
-            displayValue = '(' + singularResourceName + ' not found)';
-
+            return '(' + singularResourceName + ' not found)';
         }
-        
+       
+        return super.getFieldLabel();
+    }
+
+    /**
+     * Renders this editor
+     */
+    template() { 
         return _.div({class: 'field-editor field-editor--resource-reference'},
-            displayValue || '(none)'
+            this.getFieldLabel()
         );
     }
 }

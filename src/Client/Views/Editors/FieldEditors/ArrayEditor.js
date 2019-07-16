@@ -287,54 +287,6 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
-     * Gets the label of an item
-     *
-     * @param {Object} item
-     * @param {Schema} schema
-     *
-     * @return {String} Label
-     */
-    getItemLabel(item, schema) {
-        let label = '';
-       
-        // Use the schema config
-        if(schema.config && schema.config.label && item.value && item.value[schema.config.label]) {
-            if(item.value[schema.config.label]._multilingual) {
-                label = item.value[schema.config.label][HashBrown.Context.language];
-            
-            } else {
-                label = item.value[schema.config.label];
-
-            }
-        }
-
-        // Or try the value as a string
-        if(!label && item.value !== null && item.value !== undefined) {
-            let value = item.value._multilingual ? item.value[HashBrown.Context.language] : item.value;
-
-            if(typeof value === 'string' || typeof value === 'number') {
-                label = value.toString();
-            }
-        }
-
-        // Or use the schema name
-        if(!label) {
-            label = schema.name;
-        
-        }
-
-        // Strip HTML
-        label = new DOMParser().parseFromString(label, 'text/html').body.textContent || '';
-
-        // Limit characters
-        if(label.length > 80) {
-            label = label.substring(0, 77) + '...';
-        }
-
-        return label;
-    }
-
-    /**
      * Renders an array item
      *
      * @param {HTMLElement} placeholder
@@ -372,28 +324,11 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             className: 'editor__field__value'
         });
 
-        // Hook up the change event
-        editorInstance.on('change', (newValue) => {
-            item.value = newValue;
-
-            let key = editorInstance.element.parentElement.children[0];
-
-            key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
-        });
-
-        editorInstance.on('silentchange', (newValue) => {
-            item.value = newValue;
-
-            let key = editorInstance.element.parentElement.children[0];
-
-            key.querySelector('.editor__field__key__label').innerHTML = this.getItemLabel(item, schema);
-        });
-
         let $field = this.field(
             {
                 isCollapsible: true,
                 isCollapsed: !this.isItemExpanded(index),
-                label: this.getItemLabel(item, schema),
+                label: editorInstance.getFieldLabel(),
                 actions: {
                     remove: () => { this.onClickRemoveItem(index); }
                 },
@@ -414,6 +349,22 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             // Render field editor instance
             editorInstance
         );
+
+        let $label = $field.children('.editor__field__key').children('.editor__field__key__label');
+
+        // Hook up the ready event
+        editorInstance.on('ready', () => {
+            $label.html(editorInstance.getFieldLabel());
+        });
+
+        // Hook up the change event
+        editorInstance.on('change', (newValue) => {
+            $label.html(editorInstance.getFieldLabel());
+        });
+
+        editorInstance.on('silentchange', (newValue) => {
+            $label.html(editorInstance.getFieldLabel());
+        });
 
         $placeholder.replaceWith($field);
     }

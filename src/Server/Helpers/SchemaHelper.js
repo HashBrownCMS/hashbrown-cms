@@ -145,6 +145,10 @@ class SchemaHelper extends SchemaHelperCommon {
         } catch(e) {
             schema = await HashBrown.Helpers.DatabaseHelper.findOne(project, environment + '.schemas', { id: id });
         }
+        
+        if(!schema) {
+            schema = await HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'schemas', id);
+        }
 
         if(!schema) { throw new Error('Schema "' + id + '" could not be found'); }
 

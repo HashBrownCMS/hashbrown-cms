@@ -41,6 +41,17 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
             
         super.fetch();
     }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        if(this.model && this.model.name) { return this.model.name; }
+
+        return super.getFieldLabel();
+    }
 
     /**
      * Event: Click select
@@ -80,7 +91,7 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
                 })
             ).click(() => { this.onClickSelect() }),
             _.div({class: 'field-editor--media-reference__footer'},
-                _.label({class: 'field-editor--media-reference__name'}, this.model ? this.model.name : ''),
+                _.label({class: 'field-editor--media-reference__name'}, this.getFieldLabel()),
                 _.button({class: 'field-editor--media-reference__remove', title: 'Clear the Media selection'})
                     .click(() => {
                         this.value = null;

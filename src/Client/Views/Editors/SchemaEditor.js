@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class SchemaEditor extends HashBrown.Views.Editors.Editor {
+class SchemaEditor extends HashBrown.Views.Editors.ResourceEditor {
     /**
      * Fetches the model
      */

@@ -90,9 +90,9 @@ class SchemaHelper extends SchemaHelperCommon {
         checkParam(id, 'id', String, true);
         checkParam(schema, 'schema', HashBrown.Models.Schema);
         
-        await HashBrown.Helpers.ResourceHelper.set('schemas', id, schema);
-        
         this.setCached(id, schema);
+        
+        await HashBrown.Helpers.ResourceHelper.set('schemas', id, schema);
     }
 
     /**

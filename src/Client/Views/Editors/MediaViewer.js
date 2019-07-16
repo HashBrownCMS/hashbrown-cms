@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class MediaViewer extends Crisp.View {
+class MediaViewer extends HashBrown.Views.Editors.ResourceEditor {
     /**
      * Constructor
      */

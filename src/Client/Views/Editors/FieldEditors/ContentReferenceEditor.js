@@ -60,6 +60,19 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
 
         return allowedContent;
     }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        if(this.model && this.model.prop('title', HashBrown.Context.language)) {
+            return this.model.prop('title', HashBrown.Context.language); 
+        }
+
+        return super.getFieldLabel();
+    }
 
     /**
      * Renders the config editor

@@ -5,6 +5,7 @@
  */
 namespace('Views.Editors')
 .add(require('./Editor'))
+.add(require('./ResourceEditor'))
 .add(require('./ConnectionEditor'))
 .add(require('./ContentEditor'))
 .add(require('./FormEditor'))
