@@ -108,13 +108,16 @@ class FileSystemDeployer extends HashBrown.Models.Deployer {
     async setFile(path, base64) {
         let dirPath = Path.dirname(path);
 
-        HashBrown.Helpers.FileHelper.makeDirectory(dirPath);
+        await HashBrown.Helpers.FileHelper.makeDirectory(dirPath);
 
         debug.log('Writing file "' + path + '"...', this);
 
         let fileData = Buffer.from(base64, 'base64');
 
         await HashBrown.Helpers.FileHelper.write(fileData, path);
+
+        debug.log('...done writing file.', this);
+
     }
    
     /**
