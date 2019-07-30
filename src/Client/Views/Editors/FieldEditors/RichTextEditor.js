@@ -138,36 +138,34 @@ class RichTextEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     onClickInsertMedia() {
         let mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
-        mediaBrowser.on('select', (id) => {
-            HashBrown.Helpers.MediaHelper.getMediaById(id)
-            .then((media) => {
-                let html = '';
+        mediaBrowser.on('select', async (id) => {
+            let media = await HashBrown.Helpers.MediaHelper.getMediaById(id);
+            
+            if(!media) { return; }
 
-                if(media.url[0] !== '/') { media.url = '/' + media.url; }
-                    
-                if(media.isImage()) {
-                    html = '<img alt="' + media.name + '" src="' + media.url + '">';
-                } else if(media.isVideo()) {
-                    html = '<video alt="' + media.name + '" src="' + media.url + '">';
-                }
+            let html = '';
 
-                let activeView = this.activeView || 'wysiwyg';
+            if(media.isImage()) {
+                html = '<img alt="' + media.name + '" src="/media/' + id + '/' + media.name + '">';
+            } else if(media.isVideo()) {
+                html = '<video alt="' + media.name + '" src="/media/' + id + '/' + media.name + '">';
+            }
 
-                switch(activeView) {
-                    case 'wysiwyg':
-                        this.wysiwyg.insertHtml(html);
-                        break;
-                    
-                    case 'html':
-                        this.html.replaceSelection(html, 'end');
-                        break;
-                    
-                    case 'markdown':
-                        this.markdown.replaceSelection(HashBrown.Helpers.MarkdownHelper.toMarkdown(html), 'end');
-                        break;
-                }
-            })
-            .catch(UI.errorModal);
+            let activeView = this.activeView || 'wysiwyg';
+
+            switch(activeView) {
+                case 'wysiwyg':
+                    this.wysiwyg.insertHtml(html);
+                    break;
+                
+                case 'html':
+                    this.html.replaceSelection(html, 'end');
+                    break;
+                
+                case 'markdown':
+                    this.markdown.replaceSelection(HashBrown.Helpers.MarkdownHelper.toMarkdown(html), 'end');
+                    break;
+            }
         });
     }
     
