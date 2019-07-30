@@ -311,8 +311,11 @@ class UserHelper {
         let userModels = [];
         
         users = users.sort((a, b) => {
-            a = a.fullName || a.username || a.email;
-            b = b.fullName || b.username || b.email;
+            a = a.fullName || a.username || a.email || '';
+            b = b.fullName || b.username || b.email || '';
+
+            a = a.toLowerCase();
+            b = b.toLowerCase();
 
             if(a < b) { return -1; }
             if(a > b) { return 1; }

@@ -12,17 +12,14 @@ class ProjectHelper {
      * @returns {Array} Project ids
      */
     static async getAllProjectIds() {
-        let allDatabases = await HashBrown.Helpers.DatabaseHelper.listDatabases();
+        let allProjectIds = [];
+        let allProjects = await this.getAllProjects();
 
-        let allProjects = [];
-
-        for(let db of allDatabases) {
-            if(!await this.projectExists(db)) { continue; }
-
-            allProjects.push(db);
+        for(let project of allProjects) {
+            allProjectIds.push(project.id);
         }
             
-        return allProjects;
+        return allProjectIds;
     }
     
     /**
@@ -43,8 +40,8 @@ class ProjectHelper {
 
         // Sort by name
         allProjects.sort((a, b) => {
-            if(a.settings.info.name < b.settings.info.name) { return -1; }
-            if(a.settings.info.name > b.settings.info.name) { return 1; }
+            if(a.settings.info.name < b.settings.info.name) { return 1; }
+            if(a.settings.info.name > b.settings.info.name) { return -1; }
             return 0;
         });
 

@@ -157,7 +157,11 @@ class NavbarMain extends Crisp.View {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
 
-        Crisp.View.get('NavbarMain').setItemLoading(category, id);
+        let navbarMain = Crisp.View.get('NavbarMain');
+
+        if(!navbarMain) { return; }
+
+        navbarMain.setItemLoading(category, id);
     }
 
     /**
