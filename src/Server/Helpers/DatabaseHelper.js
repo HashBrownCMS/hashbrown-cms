@@ -47,12 +47,9 @@ class DatabaseHelper {
 
         // No value found, return default ones
         switch(key) {
-<<<<<<< HEAD
-=======
             case 'protocol':
                 return 'mongodb';
             
->>>>>>> v1.2
             case 'host':
                 return 'localhost';
 

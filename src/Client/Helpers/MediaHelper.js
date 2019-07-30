@@ -45,10 +45,16 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
-     * Gets the Media Url
+     * Gets the URL of a media object
+     *
+     * @param {String} id
+     *
+     * @return {String} URL
      */
     static getMediaUrl(id) {
-        return '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+        checkParam(id, 'id', String, true);
+
+        return '/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id;
     } 
 
     /**
