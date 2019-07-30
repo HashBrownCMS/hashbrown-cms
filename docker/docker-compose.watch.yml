@@ -1,0 +1,7 @@
+version: "3.4"
+
+services:
+    node:
+        environment:
+            - WATCH=true
+            - DEBUG_VERBOSITY=5 

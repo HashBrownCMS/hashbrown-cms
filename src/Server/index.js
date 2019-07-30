@@ -3,13 +3,20 @@
 /**
  * @namespace HashBrown.Server
  */
-// Libs
+
 const HTTP = require('http');
+const FileSystem = require('fs');
+const Path = require('path');
+
+// Libs
 const Express = require('express');
 const BodyParser = require('body-parser');
 const CookieParser = require('cookie-parser');
-const ExpressWebSockets = require('express-ws');
-const FileSystem = require('fs');
+const AppModulePath = require('app-module-path'); 
+
+// Make sure we can require our source files conveniently
+AppModulePath.addPath(APP_ROOT);
+AppModulePath.addPath(Path.join(APP_ROOT, 'src'));
 
 // Express app
 const app = Express();
@@ -29,113 +36,52 @@ require('Server/Helpers');
 require('Server/Models');
 require('Server/Controllers');
 
+// Register native processors
+HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.JsonProcessor);
+HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.UISchemaProcessor);
+
+// Register native deployers
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.ApiDeployer);
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.FileSystemDeployer);
+HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.GitDeployer);
+
+// Helper shortcuts
 global.debug = HashBrown.Helpers.DebugHelper;
 
-// Init
-HashBrown.Helpers.PluginHelper.init(app)
-.then(ready)
-.catch((e) => {
-    throw e;
-});
+async function main() {
+    // Check CLI input
+    await HashBrown.Helpers.AppHelper.processInput();
+   
+    // Init plugins
+    await HashBrown.Helpers.PluginHelper.init(app);
 
-// Check args
-function checkArgs() {
-    let cmd = process.argv[2];
-    let args = {};
+    // Start HTTP server
+    let port = process.env.PORT || 8080;
+    let server = HTTP.createServer(app).listen(port);
+
+    debug.log('HTTP server restarted on port ' + port, 'HashBrown');
     
-    for(let k in process.argv) {
-        let v = process.argv[k];
+    // Init controllers
+    for(let name in HashBrown.Controllers) {
+        if(
+            name === 'ResourceController' ||
+            name === 'ApiController' ||
+            name === 'Controller'
+        ) { continue; }
 
-        let matches = v.match(/(\w+)=(.+)/);
-
-        if(matches) {
-            args[matches[1]] = matches[2];
-        }
+        HashBrown.Controllers[name].init(app);
     }
 
-    switch(cmd) {
-        case 'create-user':
-            return HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin === 'true');
-       
-        case 'make-user-admin':
-            return HashBrown.Helpers.UserHelper.makeUserAdmin(args.u);
-
-        case 'revoke-tokens':
-            return HashBrown.Helpers.UserHelper.revokeTokens(args.u);
+    // Start watching schedule
+    HashBrown.Helpers.ScheduleHelper.startWatching();
     
-        case 'set-user-scopes':
-            return HashBrown.Helpers.UserHelper.findUser(args.u)
-            .then((user) => {
-                let obj = user.getObject();
-                
-                if(!obj.scopes[args.p]) {
-                    obj.scopes[args.p] = [];
-                }
-
-                obj.scopes[args.p] = args.s.split(',');
-
-                return HashBrown.Helpers.UserHelper.updateUser(args.u, obj);
-            });
-
-        case 'set-user-password':
-            return HashBrown.Helpers.UserHelper.findUser(args.u)
-            .then((user) => {
-                user.setPassword(args.p);
-
-                return HashBrown.Helpers.UserHelper.updateUser(args.u, user.getObject());
-            });
-
-        default:
-            return Promise.resolve('proceed');  
+    // Start watching media cache
+    HashBrown.Helpers.MediaHelper.startWatchingCache();
+    
+    // Start watching for file changes
+    if(process.env.WATCH) {
+        HashBrown.Helpers.DebugHelper.startWatching();
     }
 }
 
-// Ready callback
-function ready(files) {
-    // Check for args, and close the app if any were run
-    checkArgs()
-    .then((result) => {
-        if(result != 'proceed') {
-            process.exit();
-            return;
-        }
-        
-        // Start HTTP server
-        let port = process.env.PORT || 8080;
-        
-        global.server = HTTP.createServer(app).listen(port);
-
-        debug.log('HTTP server restarted on port ' + port, 'HashBrown');
-        
-        // Enable WebSockets
-        ExpressWebSockets(app, server);
-
-        // Init controllers
-        for(let name in HashBrown.Controllers) {
-            HashBrown.Controllers[name].init(app);
-        }
-
-        // Start schedule helper
-        HashBrown.Helpers.ScheduleHelper.startWatching();
-        
-        // Start Media cache watcher
-        HashBrown.Helpers.MediaHelper.startWatchingCache();
-        
-        // Watch the package.json for changes
-        FileSystem.watchFile(APP_ROOT + '/package.json', () => {
-            debug.log('package.json changed, reloading...', 'HashBrown');
-
-            process.exit();
-        });
-
-        debug.log('Watching package.json for changes', 'HashBrown');
-
-        return Promise.resolve();   
-    })
-
-    // Catch errors
-    .catch((e) => {
-        throw e;
-    });
-}
-
+main();

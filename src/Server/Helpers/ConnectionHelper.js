@@ -235,33 +235,25 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} Connection
      */
-    static getConnectionById(project, environment, id) {
+    static async getConnectionById(project, environment, id) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
 
         let collection = environment + '.connections';
        
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            project,
-            collection,
-            {
-                id: id
-            }
-        ).then((data) => {
-            if(!data) {
-                return HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'connections', id)
-                .then((resourceItem) => {
-                    if(!resourceItem) {
-                        return Promise.reject(new Error('Connection by id "' + id + '" was not found'));
-                    }
+        let data = await HashBrown.Helpers.DatabaseHelper.findOne(project, collection, { id: id });
 
-                    return Promise.resolve(new HashBrown.Models.Connection(resourceItem));
-                });
-            } 
+        if(!data) {
+            data = await HashBrown.Helpers.SyncHelper.getResourceItem(project, environment, 'connections', id);
+
+            if(!data) {
+                throw new Error('Connection by id "' + id + '" was not found');
+            }
+
+        } 
             
-            return Promise.resolve(new HashBrown.Models.Connection(data));
-        });
+        return new HashBrown.Models.Connection(data);
     }
     
     /**
@@ -300,7 +292,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setConnectionById(project, environment, id, connection, create = false) {
+    static async setConnectionById(project, environment, id, connection, create = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -314,19 +306,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
             hasRemote: false
         };
         
-        return HashBrown.Helpers.DatabaseHelper.updateOne(
-            project,
-            environment + '.connections',
-            {
-                id: id
-            },
-            connection.getObject(),
-            {
-                upsert: create
-            }
-        ).then(() => {
-            return Promise.resolve(connection);  
-        });
+        await HashBrown.Helpers.DatabaseHelper.updateOne(project, environment + '.connections', { id: id }, connection.getObject(), { upsert: create });
+        
+        return connection;
     }
     
     /**
@@ -337,20 +319,37 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @return {Promise} New Connection
      */
-    static createConnection(project, environment) {
+    static async createConnection(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
         let connection = HashBrown.Models.Connection.create();
 
-        return HashBrown.Helpers.DatabaseHelper.insertOne(
-            project,
-            environment + '.connections',
-            connection.getObject()
-        ).then((newConnection) => {
-            return Promise.resolve(connection);
-        });
+        await HashBrown.Helpers.DatabaseHelper.insertOne(project, environment + '.connections', connection.getObject());
+    
+        return connection;
     }    
+
+    /**
+     * Gets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
+    static async getMediaProvider(project, environment) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
+
+        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers');
+        
+        if(providers && providers.media) {
+            return await this.getConnectionById(project, environment, providers.media);
+        } else {
+            return null;
+        }
+    }
 }
 
 module.exports = ConnectionHelper;

@@ -3,12 +3,11 @@
 /**
  * @namespace HashBrown.Common.Helpers
  */
-module.exports = {
-    ConnectionHelper: require('./ConnectionHelper'),
-    ContentHelper: require('./ContentHelper'),
-    DebugHelper: require('./DebugHelper'),
-    LanguageHelper: require('./LanguageHelper'),
-    MediaHelper: require('./MediaHelper'),
-    SchemaHelper: require('./SchemaHelper'),
-    SettingsHelper: require('./SettingsHelper')
-};
+namespace('Helpers')
+.add(require('./ConnectionHelper'))
+.add(require('./ContentHelper'))
+.add(require('./DebugHelper'))
+.add(require('./LanguageHelper'))
+.add(require('./MediaHelper'))
+.add(require('./SchemaHelper'))
+.add(require('./SettingsHelper'));

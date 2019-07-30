@@ -13,7 +13,7 @@
     transform-origin: center;
     transition: transform 0.25s ease;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-    
+   
     @media($sm) {
         flex-basis: calc(50% - 1rem);
         width: calc(50% - 1rem);
@@ -23,6 +23,12 @@
         flex-basis: 0;
         width: auto;
     }
+
+    &__info {
+        &__name {
+            margin: 0;
+        }
+    }   
 
     &__remove {
         padding: 0rem;

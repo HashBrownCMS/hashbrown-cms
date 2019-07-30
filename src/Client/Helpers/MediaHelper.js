@@ -9,49 +9,41 @@ const MediaHelperCommon = require('Common/Helpers/MediaHelper');
  */
 class MediaHelper extends MediaHelperCommon {
     /**
-     * Gets the Media tree
+     * Converts a file to base64
      *
-     * @returns {Promise(Object)} tree
+     * @param {File} file
+     *
+     * @return {String} Base64
      */
-    static getTree() {
-        return HashBrown.Helpers.RequestHelper.request('get', 'media/tree');
+    static async convertFileToBase64(file) {
+        checkParam(file, 'file', File, true);
+
+        return await new Promise((resolve) => {
+            let reader = new FileReader();
+           
+            reader.onload = (e) => {
+                let base64 = e.target.result;
+
+                base64 = base64.replace('data:' + file.type + ';base64,', '');
+
+                resolve(base64);
+            }
+            
+            reader.readAsDataURL(file);
+        });
     }
 
     /**
-     * Gets whether the Media provider exists
-     *
-     * @returns {Promise} Promise
+     * Checks whether the Media provider exists
      */
-    static checkMediaProvider() {
-        return HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers')
-        .then((result) => {
-            if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.'));
-            }  
-
-            return Promise.resolve();
-        }); 
+    static async checkMediaProvider() {
+        let result = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Helpers.ProjectHelper.currentProject, HashBrown.Helpers.ProjectHelper.currentEnvironment, 'providers')
+        
+        if(!result || !result.media) {
+            throw new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.');
+        }  
     }
     
-    /**
-     * Gets Media object by id synchronously
-     *
-     * @param {String} id
-     *
-     * @return {Media} Media object
-     */
-    static getMediaByIdSync(id) {
-        for(let i = 0; i < resources.media.length; i++) {
-            let media = resources.media[i];
-
-            if(media.id == id) {
-                return media;
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Gets the Media Url
      */
@@ -67,30 +59,18 @@ class MediaHelper extends MediaHelperCommon {
      * @return {Promise} Media object
      */
     static getMediaById(id) {
-        return new Promise((resolve, reject) => {
-            for(let i = 0; i < resources.media.length; i++) {
-                let media = resources.media[i];
-
-                if(media.id == id) {
-                    resolve(media);
-                    return;
-                }
-            }
-
-            reject(new Error('Media with id "' + id + '" not found'));
-        });
+        if(!id) { return Promise.resolve(null); }
+        
+        return HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Media, 'media', id);
     }
-
+    
     /**
-     * Sets a Media tree item
+     * Gets all Media objects
      *
-     * @param {String} id
-     * @param {Object} item
-     *
-     * @returns {Promise} promise
+     * @return {Promise} Media objects
      */
-    static setTreeItem(id, item) {
-        return HashBrown.Helpers.RequestHelper.request('post', 'media/tree/' + id, item);
+    static getAllMedia(id) {
+        return HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Media, 'media');
     }
 
     /**
@@ -98,19 +78,14 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @param {Function} onPickMedia
      * @param {Function} onChangeResource
-     * @param {Object} allResources
      */
-    static initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+    static initMediaPickerMode(onPickMedia, onChangeResource, onError) {
+        // Set the context
+        HashBrown.Context.isMediaPicker = true;
+        
         // Claim debug messages
         UI.errorModal = onError;
         
-        // Use the provided resources instead of reloading them
-        HashBrown.Helpers.RequestHelper.reloadAllResources = () => {
-            resources = allResources;
-
-            return Promise.resolve();
-        };
-
         // Listen for picked Media
         window.addEventListener('hashchange', () => {
             let isMediaView = location.hash.indexOf('#/media/') === 0;

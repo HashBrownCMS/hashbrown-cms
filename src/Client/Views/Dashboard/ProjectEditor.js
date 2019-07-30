@@ -9,15 +9,27 @@ class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
-        _.append(this.element,
-            _.div({class: 'widget--spinner embedded'},
-                _.div({class: 'widget--spinner__image fa fa-refresh'})
-            )
-        );
+        UI.spinner(this.element, true);
 
         this.fetch();
     }
-   
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            this.model = await HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + this.modelId);
+            this.model = new HashBrown.Models.Project(this.model);
+
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+        
     /**
      * Event: Click remove button
      */ 
@@ -44,12 +56,16 @@ class ProjectEditor extends Crisp.View {
                 {
                     label: 'Delete',
                     class: 'warning disabled',
-                    onClick: () => {
-                        HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id)
-                        .then(() => {
-                            location.reload();
-                        })
-                        .catch(UI.errorModal);
+                    onClick: async () => {
+                        try {
+                            await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id);
+
+                            this.remove();
+
+                        } catch(e) {
+                            UI.errorModal(e); 
+                        
+                        }
                     }
                 }
             ]
@@ -62,13 +78,17 @@ class ProjectEditor extends Crisp.View {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
-        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', () => {
-            HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
-            .then(() => {
+        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', async () => {
+            try {
+                await HashBrown.Helpers.RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName);
+
                 this.model = null;
                 this.fetch();
-            })
-            .catch(UI.errorModal);
+            
+            } catch(e) {
+                UI.errorModal(e);
+
+            }
         });
     }
     
@@ -189,15 +209,6 @@ class ProjectEditor extends Crisp.View {
     }
 
     /**
-     * Pre render
-     */
-    prerender() {
-        if(this.model instanceof HashBrown.Models.Project === false) {
-            this.model = new HashBrown.Models.Project(this.model);
-        }
-    }
-
-    /**
      * Renders this editor
      */
     template() {
@@ -221,7 +232,7 @@ class ProjectEditor extends Crisp.View {
                     }).$element.addClass('page--dashboard__project__menu')
                 ),
                 _.div({class: 'page--dashboard__project__info'},
-                    _.h4(this.model.settings.info.name || this.model.id),
+                    _.h3({class: 'page--dashboard__project__info__name'}, this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')
                 ),

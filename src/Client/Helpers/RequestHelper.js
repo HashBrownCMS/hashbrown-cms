@@ -16,7 +16,7 @@ class RequestHelper {
      * @returns {Promise} Response
      */
     static request(method, url, data) {
-        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
+        return RequestHelper.customRequest(method, this.environmentUrl(url), data);
     }
 
     /**
@@ -31,7 +31,7 @@ class RequestHelper {
     static uploadFile(url, type, data) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: RequestHelper.environmentUrl(url),
+                url: this.environmentUrl(url),
                 type: 'POST',
                 data: data,
                 processData: false,
@@ -44,7 +44,6 @@ class RequestHelper {
                 }
             })
         });
-        //return RequestHelper.customRequest('POST', RequestHelper.environmentUrl(url), data, { 'Content-Type': type });
     }
 
     /**
@@ -132,12 +131,12 @@ class RequestHelper {
     static environmentUrl(url) {
         let newUrl = '/api/';
 
-        if(HashBrown.Helpers.ProjectHelper.currentProject) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        if(HashBrown.Context.projectId) {
+            newUrl += HashBrown.Context.projectId + '/';
         }
 
-        if(HashBrown.Helpers.ProjectHelper.currentEnvironment) {
-            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        if(HashBrown.Context.environment) {
+            newUrl += HashBrown.Context.environment + '/';
         }
 
         newUrl += url;
@@ -166,107 +165,6 @@ class RequestHelper {
 
         poke();
     };
-
-    /**
-     * Reloads a resource
-     */
-    static reloadResource(name) {
-        return RequestHelper.request('get', name)
-        .then((result) => {
-            window.resources[name] = result;
-
-            // Apply correct model
-            for(let i in window.resources[name]) {
-                let object = window.resources[name][i];
-                let model = null;
-
-                switch(name) {
-                    case 'connections':
-                        model = new HashBrown.Models.Connection(object);
-                        break;
-
-                    case 'content':
-                        model = new HashBrown.Models.Content(object);
-                        break;
-
-                    case 'forms':
-                        model = new HashBrown.Models.Form(object);
-                        break;
-
-                    case 'users':
-                        model = new HashBrown.Models.User(object);
-                        break;
-
-                    case 'media':
-                        model = new HashBrown.Models.Media(object);
-                        break;
-
-                    case 'schemas':
-                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
-                        break;
-
-                    default:
-                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
-                }
-                
-                window.resources[name][i] = model;
-            }
-
-            return Promise.resolve(result);
-        })
-        .catch((e) => {
-            // If the error is a 404, it's an intended response from the controller
-            if(e.statusCode !== 404) {
-                UI.errorModal(e);
-            }
-            
-            window.resources[name] = [];
-
-            return Promise.resolve([]);
-        });
-    };
-
-    /**
-     * Reloads all resources
-     */
-    static reloadAllResources() {
-        $('.page--environment__spinner__messages').empty();
-        
-        let queue = [
-            'content',
-            'schemas',
-            'media',
-            'connections',
-            'forms',
-            'users'
-        ];
-
-        for(let item of queue) {
-            let $msg = _.div({class: 'widget--spinner__message', 'data-name': item}, item);
-            
-            $('.page--environment__spinner__messages').append($msg);
-        }
-
-        let processQueue = () => {
-            let name = queue.shift();
-
-            return RequestHelper.reloadResource(name)
-            .then(() => {
-                $('.page--environment__spinner__messages [data-name="' + name + '"]').toggleClass('loaded', true);
-                
-                if(queue.length < 1) {
-                    return Promise.resolve();
-
-                } else {
-                    return processQueue();
-
-                }
-            });
-        }
-
-        return processQueue();
-    };
-
 }
 
 module.exports = RequestHelper;

@@ -1,13 +1,11 @@
 'use strict';
 
-let Entity = require('./Entity');
-
 /**
  * A model for Users
  *
  * @memberof HashBrown.Common.Models
  */
-class User extends Entity {
+class User extends HashBrown.Models.Resource {
     constructor(params) {
         super(params);
     }
@@ -21,7 +19,22 @@ class User extends Entity {
         this.def(String, 'email');
         this.def(Object, 'scopes', {});
     }
-    
+
+    /**
+     * Checks the parameters before they're committed
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = params || {};
+
+        delete params.sync; // This is the only resource type that can't be synced
+
+        return params;
+    }
+
     /**
      * Gets all project scopes
      *

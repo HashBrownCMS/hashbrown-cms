@@ -10,48 +10,9 @@ class Controller {
      * Initialises this controller
      */
     static init(app) {
-        for(let method of this.getAllMethods()) {
-            let path = '/api/:project/:environment/' + this.getPrefix() + '/' + method.name.replace(/post|get/,'').toLowerCase();
-            let isGet = method.name.substring(0, 3).toLowerCase() === 'get';
-            let isPost = method.name.substring(0, 4).toLowerCase() === 'post';
-
-            if(isGet) {
-                app.get(path, method);
-            } else if(isPost) {
-                app.post(path, method);
-            }
-        }
+        throw new Error('The "init" method must be overridden');
     }
 
-    /**
-     * Gets a list of all methods
-     *
-     * @returns {Array} methods
-     */
-    static getAllMethods() {
-        let methods = [];
-
-        for(let name of Object.getOwnPropertyNames(this)) {
-            if(typeof this[name] === 'function') {
-                methods[methods.length] = this[name];
-            }
-        }
-
-        return methods;
-    }
-
-    /**
-     * Gets the prefix for this controller
-     *
-     * @return {String} prefix
-     */
-    static getPrefix() {
-        let name = this.name.replace('Controller', '').toLowerCase();
-        let prefix = name;
-
-        return prefix;
-    }
-    
     /**
      * Authenticates a request
      *
@@ -62,31 +23,26 @@ class Controller {
      *
      * @returns {Promise} User object
      */
-    static authenticate(token, project, scope, needsAdmin) {
-        if(!token) {
-            return Promise.reject(new Error('You need to be logged in to do that'));
-        }
+    static async authenticate(token, project, scope, needsAdmin) {
+        // No token was provided
+        if(!token) { return null; }
     
-        return HashBrown.Helpers.UserHelper.findToken(token)
-        .then((user) => {
-            // If no user was found, return error
-            if(!user) {
-                return Promise.reject(new Error('Found no user with token "' + token + '"'));
-            }
+        let user = await HashBrown.Helpers.UserHelper.findToken(token);
+        
+        // No user was found
+        if(!user) { return null; }
             
-            // If admin is required, and user isn't admin, return error
-            if(needsAdmin && !user.isAdmin) {
-                return Promise.reject(new Error('User "' + user.username + '" is not an admin'))
-            }
+        // Admin is required, and user isn't admin
+        if(needsAdmin && !user.isAdmin) {
+            throw new Error('You need to be admin to do that');
+        }
 
-            // If a scope is defined, and the user deosn't have it, return error
-            if(project && scope && !user.hasScope(project, scope)) {
-                return Promise.reject(new Error('User "' + user.username + '" does not have scope "' + scope + '"'));
-            }
+        // A scope is defined, and the user doesn't have it
+        if(project && scope && !user.hasScope(project, scope)) {
+            throw new Error('You need the "' + scope + '" scope to do that');
+        }
            
-            // If all requirements have been met, resolve
-            return Promise.resolve(user);
-        });
+        return user;
     }
 
     /**

@@ -1,15 +1,11 @@
 'use strict';
 
-const Path = require('path');
-
-const Resource = require('./Resource');
-
 /**
  * The base class for all Media objects
  *
  * @memberof HashBrown.Common.Models
  */
-class Media extends Resource {
+class Media extends HashBrown.Models.Resource {
     /**
      * Checks the format of the params
      *
@@ -42,27 +38,6 @@ class Media extends Resource {
         this.def(String, 'path');
         this.def(String, 'folder', '/');
         this.def(Date, 'updateDate');
-    }
-
-    /**
-     * Read from file path
-     *
-     * @param {String} filePath
-     */
-    readFromFilePath(filePath) {
-        let name = Path.basename(filePath);
-        let id = filePath;
-       
-        // Trim file path for id 
-        id = id.replace('/' + name, '');
-        id = id.substring(id.lastIndexOf('/') + 1);
-        
-        // Remove file extension
-        name = name.replace(/\.[^/.]+$/, '');
-     
-        this.id = id;
-        this.name = name;
-        this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
     }
 
     /**

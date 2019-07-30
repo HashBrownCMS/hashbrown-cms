@@ -64,24 +64,6 @@ module.exports = {
         filename: '[name].js'
     },
 
-    // Define loaders
-    module: {
-        rules: [
-            // Babel.js
-            {
-                test: /\.js$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            ['@babel/preset-env']
-                        ]
-                    }
-                }
-            }
-        ]
-    },
-
     // Automatically accept these extensions
     resolve: {
         modules: [path.resolve(__dirname), path.resolve(__dirname, 'src'), 'node_modules'],

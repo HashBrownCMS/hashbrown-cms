@@ -11,6 +11,13 @@
         }
     }
 
+    // Spinner
+    &__spinner {
+        &__image {
+            left: calc(50% - 12rem) !important;
+        }
+    }
+
     // Demo reset button
     &__demo__reset {
         position: fixed !important;
@@ -52,7 +59,6 @@
 
             // Tablet mode
             @media($sm) {
-                top: 5.5rem;
                 padding: 0;
             }
 
@@ -106,9 +112,13 @@
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 position: relative;
 
+                h1 {
+                    margin-top: 0;
+                }
+
                 .widget--button {
-                    float: left;
-                    margin: 0 0.5rem 0.5rem 0;
+                    display: inline-block;
+                    margin: 0.5rem 0.5rem 0 0;
                 }
 
                 // Tablet mode

@@ -2,9 +2,9 @@
 
 const FileSystem = require('fs');
 const Path = require('path');
+const Util = require('util');
 
 // TODO: Make these GIT submodules
-const RimRaf = require('rimraf');
 const Glob = require('glob');
 
 /**
@@ -155,16 +155,26 @@ class FileHelper {
      *
      * @return {Promise} Result
      */
-    static remove(path) {
-        checkParam(path, 'path', String);
-        
-        return new Promise((resolve, reject) => {
-            RimRaf(path, (err) => {
-                if(err) { return reject(err); }
+    static async remove(path) {
+        checkParam(path, 'path', String, true);
+     
+        try {
+            if(FileSystem.lstatSync(path).isDirectory()) {
+                for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
+                    await this.remove(Path.join(path, filename));
+                }
+            
+                await Util.promisify(FileSystem.rmdir)(path);
 
-                resolve();
-            });
-        });
+            } else {
+                await Util.promisify(FileSystem.unlink)(path);
+
+            }
+        
+        } catch(e) {
+            // We don't really mind if a file we're trying to delete isn't there...
+
+        }
     }
 
     /**
@@ -172,19 +182,18 @@ class FileHelper {
      *
      * @param {String|Object} content
      * @param {String} path
-     *
-     * @return {Promise} Result
      */
     static write(content, path) {
         if(!content) { return Promise.resolve(); }
 
         checkParam(path, 'path', String);
 
-        return new Promise((resolve, reject) => {
-            if(typeof content === 'object') {
-                content = JSON.stringify(content);
-            }
+        // Automatically turn objects into string
+        if(content instanceof Buffer === false && content instanceof Object) {
+            content = JSON.stringify(content);
+        }
 
+        return new Promise((resolve, reject) => {
             FileSystem.writeFile(path, content, (err) => {
                 if(err) { return reject(err); }
 

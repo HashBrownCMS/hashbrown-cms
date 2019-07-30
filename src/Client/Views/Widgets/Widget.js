@@ -41,6 +41,15 @@ class Widget extends Crisp.View {
 
         notifier.innerHTML = message;
     }
+    
+    /**
+     * Post render
+     */
+    postrender() {
+        if(this.className) {
+            this.element.classList.toggle(this.className, true);
+        }
+    }
 }
 
 module.exports = Widget;

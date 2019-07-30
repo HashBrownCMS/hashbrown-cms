@@ -5,11 +5,22 @@
 node_modules/*
 package-lock.json
 .sass-cache/*
-/remote
+/docker/db/*
+/docker/remote
 
 # Storage directories
-storage/*
-db/*
+/storage/*
 
 # Config directories
-config/*
+/config/*
+
+# Plugin directories
+/plugins/*
+
+# Generated files
+/public/css/*
+/public/js/*
+!/public/js/login.js
+!/public/js/setup.js
+!/public/js/test.js
+!/public/js/browser-check.js

@@ -5,22 +5,17 @@
  *
  * @memberof HashBrown.Server.Controllers
  */
-class ConnectionController extends require('./ApiController') {
+class ConnectionController extends HashBrown.Controllers.ResourceController {
+    static get category() { return 'connections'; }
+    
     /**
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/:project/:environment/connections', this.middleware(), this.getConnections);
-        app.get('/api/:project/:environment/connections/deployers', this.middleware(), this.getDeployers);
-        app.get('/api/:project/:environment/connections/processors', this.middleware(), this.getProcessors);
-        app.get('/api/:project/:environment/connections/:id', this.middleware(), this.getConnection);
-        
-        app.post('/api/:project/:environment/connections/new', this.middleware({scope: 'connections'}), this.createConnection);
-        app.post('/api/:project/:environment/connections/pull/:id', this.middleware({scope: 'connections'}), this.pullConnection);
-        app.post('/api/:project/:environment/connections/push/:id', this.middleware({scope: 'connections'}), this.pushConnection);
-        app.post('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.postConnection);
-        
-        app.delete('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.deleteConnection);
+        app.get('/api/:project/:environment/connections/deployers', this.middleware(), this.getHandler('deployers'));
+        app.get('/api/:project/:environment/connections/processors', this.middleware(), this.getHandler('processors'));
+    
+        super.init(app);
     }        
     
     /**
@@ -29,19 +24,16 @@ class ConnectionController extends require('./ApiController') {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Array} Deployers
+     * @returns {Object} Deployers
      */
-    static getDeployers(req, res) {
-        let deployers = [];
+    static async deployers(req, res) {
+        let deployers = {};
 
         for(let deployer of HashBrown.Helpers.ConnectionHelper.deployers) {
-            deployers.push({
-                alias: deployer.alias,
-                name: deployer.name
-            });
+            deployers[deployer.alias] = deployer.title;
         }
 
-        res.send(deployers);
+        return deployers;
     }
     
     /**
@@ -50,19 +42,16 @@ class ConnectionController extends require('./ApiController') {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Array} Processors
+     * @returns {Object} Processors
      */
-    static getProcessors(req, res) {
-        let processors = [];
+    static processors(req, res) {
+        let processors = {};
 
         for(let processor of HashBrown.Helpers.ConnectionHelper.processors) {
-            processors.push({
-                alias: processor.alias,
-                name: processor.name
-            });
+            processors[processor.alias] = processor.title;
         }
 
-        res.send(processors);
+        return processors;
     }
     
     /**
@@ -73,14 +62,8 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {Array} Connections
      */
-    static getConnections(req, res) {
-        HashBrown.Helpers.ConnectionHelper.getAllConnections(req.project, req.environment)
-        .then((connections) => {
-            res.send(connections);
-        })
-        .catch((e) => {
-            res.status(502).send(ConnectionController.printError(e));
-        });
+    static async getAll(req, res) {
+        return await HashBrown.Helpers.ConnectionHelper.getAllConnections(req.project, req.environment);
     }
 
     /**
@@ -92,18 +75,12 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {Connection} Connection
      */
-    static postConnection(req, res) {
+    static async set(req, res) {
         let id = req.params.id;
         let connection = req.body;
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection), shouldCreate)
-        .then(() => {
-            res.status(200).send(connection);
-        })
-        .catch((e) => {
-            res.status(502).send(ConnectionController.printError(e));
-        });
+        return await HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(connection), shouldCreate);
     }
     
     /**
@@ -115,21 +92,14 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {String} Connection id
      */
-    static pullConnection(req, res) {
+    static async pull(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'connections', id)
-        .then((resourceItem) => {
-            if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Connection "' + id + '"')); }
+        let resourceItem = await HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'connections', id);
+
+        if(!resourceItem) { throw new Error('Couldn\'t find remote Connection "' + id + '"'); }
         
-            return HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(resourceItem), true)
-            .then((newConnection) => {
-                res.status(200).send(id);
-            });
-        })
-        .catch((e) => {
-            res.status(404).send(ConnectionController.printError(e));   
-        }); 
+        await HashBrown.Helpers.ConnectionHelper.setConnectionById(req.project, req.environment, id, new HashBrown.Models.Connection(resourceItem), true);
     }
     
     /**
@@ -141,19 +111,12 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {String} Connection id
      */
-    static pushConnection(req, res) {
+    static async push(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.ConnectionHelper.getConnectionById(req.project, req.environment, id)
-        .then((localConnection) => {
-            return HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'connections', id, localConnection);
-        })
-        .then(() => {
-            res.status(200).send(id);
-        })
-        .catch((e) => {
-            res.status(404).send(ConnectionController.printError(e));   
-        }); 
+        let localConnection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(req.project, req.environment, id);
+            
+        await HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'connections', id, localConnection);
     }
 
     /**
@@ -165,24 +128,10 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {Connection} Connection
      */
-    static getConnection(req, res) {
-        let id = req.params.id;
-   
-        if(id && id != 'undefined') {
-            HashBrown.Helpers.ConnectionHelper.getConnectionById(req.project, req.environment, id)
-            .then((connection) => {
-                res.send(connection);
-            })
-            .catch((e) => {
-                res.status(502).send(ConnectionController.printError(e));
-            });
-        
-        } else {
-            res.status(400).send('Connection id is not provided');
-        
-        }
+    static async get(req, res) {
+        return await HashBrown.Helpers.ConnectionHelper.getConnectionById(req.project, req.environment, req.params.id);
     }
-    
+
     /**
      * @example POST /api/:project/:environment/connections/new
      *
@@ -191,14 +140,8 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {Connection} Connection
      */
-    static createConnection(req, res) {
-        HashBrown.Helpers.ConnectionHelper.createConnection(req.project, req.environment)
-        .then((connection) => {
-            res.status(200).send(connection);
-        })
-        .catch((e) => {
-            res.status(502).send(ConnectionController.printError(e));
-        });
+    static async new(req, res) {
+        return await HashBrown.Helpers.ConnectionHelper.createConnection(req.project, req.environment);
     }
 
     /**
@@ -210,16 +153,12 @@ class ConnectionController extends require('./ApiController') {
      *
      * @returns {Connection} Connection
      */
-    static deleteConnection(req, res) {
+    static async remove(req, res) {
         let id = req.params.id;
         
-        HashBrown.Helpers.ConnectionHelper.removeConnectionById(req.project, req.environment, id)
-        .then(() => {
-            res.status(200).send(id);
-        })
-        .catch((e) => {
-            res.status(502).send(ConnectionController.printError(e));
-        });
+        await HashBrown.Helpers.ConnectionHelper.removeConnectionById(req.project, req.environment, id);
+
+        return 'Connection with id "' + id + '" deleted successfully';
     }
 }
 

@@ -151,7 +151,7 @@ class Connection extends ConnectionCommon {
         let languages = await HashBrown.Helpers.LanguageHelper.getLanguages(project);
         
         for(let language of languages) { 
-            await this.setContent(content.id, content, language);
+            await this.setContent(project, environment, content.id, content, language);
         }
 
         debug.log('Published all localisations successfully!', this);
@@ -160,11 +160,15 @@ class Connection extends ConnectionCommon {
     /**
      * Sets a Content node by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Content} content
      * @param {String} language
      */
-    async setContent(id, content, language) {
+    async setContent(project, environment, id, content, language) {
+        checkParam(project, 'project', String);
+        checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
         checkParam(content,  'content', HashBrown.Models.Content);
         checkParam(language, 'language', String);
@@ -177,7 +181,7 @@ class Connection extends ConnectionCommon {
             throw new Error('This Connection has no deployer defined');
         }
 
-        let result = await this.processor.process(content, language);
+        let result = await this.processor.process(project, environment, content, language);
 
         // Convert to string
         if(typeof result !== 'string') {

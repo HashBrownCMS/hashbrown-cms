@@ -14,7 +14,7 @@
         opacity: 0.75;
         user-select: none;
     }
-    
+
     // Header
     &__header {
         background-color: $secondary;
@@ -23,8 +23,6 @@
         height: 4rem;
         flex-shrink: 0;
         flex-basis: 4rem;
-
-        @include background('secondary');
 
         &__title {
             margin: 0px;
@@ -86,10 +84,17 @@
 
         // Tab
         &__tab {
+            margin-bottom: 8rem;
+            
             &:not(.active) { 
                 display: none;
             }
         }
+    }
+    
+    // Add margin in bottom
+    &__body > &__field:last-child {
+        margin-bottom: 8rem;
     }
 
     // Footer
@@ -163,70 +168,96 @@
         display: flex;
         padding: 1rem 0;
         position: relative;
-        transition: background-color 0.5s ease, transform 0.5s ease;
         border-bottom: 1px solid $standard-darker;
+        transition: background-color 0.3s ease, border-radius 0.3s ease, transform 0.3s ease, margin 0.3s ease, padding 0.3s ease;
 
         &:last-of-type {
             border-bottom: 0;
+            padding-bottom: 0;
         }
 
-        // Tablet mode
-        @media($sm) {
-            display: block;
-        }
+        // Loading
+        &.loading {
+            position: relative;
 
-        // Raised
-        &.raised {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-            background-color: $standard;
-
-            // Nested
-            & & {
-                box-shadow: none;
-                border: 1px dashed $standard-darker;
-            }
-
-            & & & {
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-                border: none;
-            }
-
-            & & & & {
-                box-shadow: none;
-                border: 1px dashed $standard-darker;
-            }
-
-            & & & & & {
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-                border: none;
-            }
-        }
-
-        // Collapsed & sorting mode
-        .editor__field__value.collapsed &,
-        .editor__field__value.sorting &,
-        &.collapsed {
-            height: 4rem;
-            border-radius: 0.2rem;
-
-            &:not(:first-of-type) {
-                margin-top: 1rem !important;
-            }
-
-            &:last-of-type {
-                margin-bottom: 0 !important;
-            }
-
-            .editor__field__sort-key {
-                display: block;
-            }
-
-            .editor__field__key,
-            .editor__field__value {
+            * {
                 display: none;
             }
+
+            &:after {
+                content: '\f110';
+                display: block;
+                margin: 0 auto;
+                text-align: center;
+                font-family: 'FontAwesome';
+                animation: widget--spinner 0.5s steps(8, end) infinite;
+            }
+        }
+
+        // Collapsible field
+        &.collapsible {
+            display: block;
+        }
+        
+        &.collapsible > & {
+            &__key {
+                display: flex;
+                line-height: 2rem;
+                padding: 0;
+            }
+            
+            &__value, &__toolbar {
+                margin-left: 2rem;
+            }
+        }
+        
+        &.collapsible > &__key &__key__label {
+            cursor: pointer;
+            display: flex;
+            
+            &::before {
+                font-family: 'FontAwesome';
+                content: '\f0d7';
+                display: block;
+                line-height: 2rem;
+                text-align: left;
+                width: 1rem;
+                color: $primary;
+            }
+        }
+
+        &.collapsible > &__key &__key__description {
+            margin: 0 0 0 1rem;
+        }
+        
+        &.collapsible > &__key &__key__actions {
+            left: auto;
+            right: 0;
+        }
+        
+        &.collapsible > &__key &__key__action {
+            margin-top: 0;
+        }
+
+        &.collapsible.collapsed > & {
+            &__value, &__toolbar {
+                display: none;
+            }
+        }
+
+        &.collapsible.collapsed > &__key > &__key__label {
+            &::before {
+                content: '\f0da';
+            }
+        }
+
+        &:not(.collapsible) > &__value:nth-child(2) > &:first-child {
+            padding-top: 0;
+        }
+
+        // Mobile mode
+        @media($xs) {
+            display: block;
         }
 
         // Vertical mode
@@ -242,6 +273,27 @@
             margin-left: 1rem;
         }
 
+        // Toolbar
+        &__toolbar {
+            display: flex;
+            margin: 0;
+            border-bottom: 1px solid $standard-darker;
+            padding: 1rem 0;
+
+            &__label {
+                line-height: 2rem;
+                flex-grow: 0;
+                flex-basis: 10rem;
+                margin-right: 1rem;
+                padding: 0;
+                background-color: transparent;
+            }
+
+            &__remove {
+                margin-left: auto;
+            }
+        }
+
         // Key
         &__key {
             flex-basis: 10rem;
@@ -249,6 +301,7 @@
             margin-right: 1rem;
             padding-top: 0.25rem;
             line-height: 1.5rem;
+            transition: color 0.3s ease;
 
             // Following state
             &.following &__actions {
@@ -284,9 +337,17 @@
             &__actions {
                 position: absolute;
                 line-height: 2rem;
+                z-index: 200;
 
                 &.hidden {
                     display: none;
+                }
+                
+                // Tablet mode
+                @media($sm) {
+                    top: 0.5rem;
+                    right: 0;
+                    display: flex;
                 }
             }
 
@@ -326,7 +387,7 @@
                 // Sort
                 &--sort {
                     &:after {
-                        content: 'Sort items'
+                        content: 'Sort';
                     }
 
                     &:before {
@@ -336,26 +397,43 @@
                     // Sorting state
                     &.sorting {
                         &:after {
-                            content: 'Done sorting'
+                            content: 'Done';
                         }
 
                         &:before {
                             content: '\f00c';
                         }
                     }
+                
                 }
 
                 // Expand
                 &--expand {
+                    &:after {
+                        content: 'Expand';
+                    }
+                    
                     &:before {
                         content: '\f065';
                     }
                 }
-                
+
                 // Collapse
                 &--collapse {
+                    &:after {
+                        content: 'Collapse';
+                    }
+                    
                     &:before {
                         content: '\f066';
+                    }
+                }
+
+                // Remove
+                &--remove {
+                    &:before {
+                        content: '\f00d';
+                        margin: 0;
                     }
                 }
             }
@@ -363,51 +441,76 @@
 
         // Value
         &__value {
+            transition: margin 0.3s ease, border 0.3s ease, padding 0.3s ease;
             flex-grow: 1;
             border: 0 dashed transparent;
             border-radius: 0.2rem;
-            transition: border 0.5s ease, padding 0.5s ease;
             position: relative;
-
+        
             // Sorting mode
             &.sorting {
                 padding: 1rem;
                 border: 0.15rem dashed $standard-darker;
-        
+                margin-top: 0;
+            }
+                
+            &.sorting > .editor__field__add {
+                display: none;
+            }
+
+            &.sorting > .editor__field {
+                background-color: $primary;
+                cursor: move;
+                padding: 1rem !important;
+                border-radius: 0.5rem;
+
+                &:not(:last-of-type) {
+                    margin-bottom: 1rem;
+                }
+                
+                // Dragging state
+                &.dragging {
+                    background-color: transparent;
+                    border: 2px dashed $primary;
+
+                    .editor__field__key {
+                        color: $primary;
+                    }
+                }
+                
                 // Hide the add button
                 .editor__field__add {
                     display: none;
                 }
 
                 // Style the sort key
-                .editor__field__sort-key {
+                .editor__field__key {
                     color: $primary-text;
-                }
-                
-                // Hide the action buttons
-                .editor__field__action {
-                    display: none;
-                }
 
-                // Style the items inside
-                .editor__field {
-                    background-color: $primary;
-                    cursor: move;
-
-                    // Dragging state
-                    &.dragging {
-                        background-color: transparent;
-                        border: 2px dashed $primary;
-
-                        .editor__field__sort-key {
-                            color: $primary;
-                        }
-                    }
-
-                    &__collapse,
-                    &__remove {
+                    .editor__field__key__label::before {
                         display: none;
                     }
+
+                    .editor__field__key__actions {
+                        display: none;
+                    }
+                }
+
+                // Hide the toolbar and value
+                .editor__field__toolbar,
+                .editor__field__value {
+                    display: none;
+                }
+            }
+
+            // Cluster mode
+            &.cluster {
+                display: flex;
+                flex-wrap: wrap;
+
+                & > * {
+                    display: block;
+                    margin: 0 0.5rem 0.5rem 0;
                 }
             }
 
@@ -464,75 +567,10 @@
             }
         }
 
-        // Actions
-        &__actions {
-            display: flex;
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-        &__action {
-            background-color: transparent;
-            line-height: 2rem;
-            height: 2rem;
-            width: 2rem;
-            border: 0;
-            display: block;
-            cursor: pointer;
-            z-index: 90;
-            color: $primary;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            border-radius: 0.2rem;
-
-            &:hover {
-                background-color: $primary;
-                color: $primary-text;
-            }
-
-            // Icon
-            &:after {
-                font-family: 'FontAwesome';
-            }
-
-            // Collapse button
-            &--collapse {
-                &:after {
-                    content: '\f2d1';
-                }
-            }
-
-            .editor__field.collapsed > .editor__field__actions > &--collapse {
-                &:after {
-                    content: '\f2d0';
-                }
-            }
-
-            // Remove button
-            &--remove {
-                &:after {
-                    content: '\f00d';
-                }
-            }
-        }
-
-        // Sort key
-        &__sort-key {
-            background-color: transparent;
-            font-weight: bold;
-            border: 0;
-            pointer-events: none;
-            line-height: 2rem;
-            height: 2rem;
-            display: none;
-            flex-grow: 1;
-        }
-            
         // Add button
         &__add {
             clear: both;
             margin-top: 1rem;
-            margin-left: auto;
         }
     }
 }

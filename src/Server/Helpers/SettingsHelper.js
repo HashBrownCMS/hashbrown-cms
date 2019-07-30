@@ -18,7 +18,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * @return {Promise} Settings
      */
     static async getSettings(project, environment = null, section = null) {
-        checkParam(project, 'project', String);
+        checkParam(project, 'project', String, true);
 
         // If the environment is a wildcard, just discard it
         if(environment === '*') {
@@ -29,9 +29,11 @@ class SettingsHelper extends SettingsHelperCommon {
 
         if(!settings) { settings = {}; }
 
-        if(section) { return settings[section]; }
+        delete settings['usedBy'];
+        
+        if(section) { return settings[section] || {}; }
 
-        return settings;
+        return settings || {};
     }
     
     /**

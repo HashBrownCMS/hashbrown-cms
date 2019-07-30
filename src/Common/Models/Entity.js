@@ -39,7 +39,7 @@ class Entity {
     }
 
     /**
-     * Checks the parameters berfore they're committed
+     * Checks the parameters before they're committed
      *
      * @params {Object} params
      *

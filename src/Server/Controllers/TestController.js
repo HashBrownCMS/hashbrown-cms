@@ -10,79 +10,77 @@ class TestController extends HashBrown.Controllers.ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.ws('/api/test', this.wsTest);
+        app.post('/api/test', this.postTest);
     }
 
     /**
      * Starts up the testing process
      */
-    static wsTest(ws, req) {
-        return TestController.authenticate(req.cookies.token, null, null, true)
-        .then((user) => {
-            if(!user.isAdmin) {
-                return Promise.reject(new Error('The testing tool requires admin privileges'));
+    static async postTest(req, res) {
+        let output = '';
+
+        let onMessage = (message, isSection) => {
+            if(isSection) {
+                output += '\n';
+                output += '--------------------\n';
             }
 
-            ws.on('message', (msg) => {
-                if(msg !== 'start') { return; }
+            output += message + '\n';
+            
+            if(isSection) {
+                output += '--------------------\n';
+            }
+        }
+        
+        try {
+            let user = await TestController.authenticate(req.cookies.token, null, null, true);
 
-                let onMessage = (msg, isSection) => {
-                    ws.send(JSON.stringify({message: msg, isSection: isSection}));
-                };
+            if(!user.isAdmin) {
+                throw new Error('The testing tool requires admin privileges');
+            }
+            
+            let environment = 'live';
+
+            onMessage('Creating test project...', true);
+            
+            let testProject = await HashBrown.Helpers.ProjectHelper.createProject('test ' + new Date().toString(), user.id);
+
+            onMessage('Testing BackupHelper...', true);
                 
-                let onError = (e) => {
-                    ws.send(JSON.stringify({error: e.message}));
+            await HashBrown.Helpers.TestHelper.testBackupHelper(testProject.id, onMessage);
 
-                    console.log(e.stack);
+            onMessage('Testing ConnectionHelper...', true);
 
-                    return Promise.resolve();
-                };
-                
-                let onDone = (msg) => {
-                    ws.send(JSON.stringify({isDone: true}));
-                };
+            await HashBrown.Helpers.TestHelper.testConnectionHelper(testProject.id, environment, onMessage);
 
-                let testProject;
-                let project = null;
-                let environment = 'live';
+            onMessage('Testing ContentHelper...', true);
+            
+            await HashBrown.Helpers.TestHelper.testContentHelper(testProject.id, environment, user, onMessage);
 
-                onMessage('Creating test project...', true);
-                return HashBrown.Helpers.ProjectHelper.createProject('test ' + new Date().toString(), user.id)
-                .then((newProject) => {
-                    testProject = newProject;
-                    project = newProject.id;
+            onMessage('Testing FormHelper...', true);
+            
+            await HashBrown.Helpers.TestHelper.testFormHelper(testProject.id, environment, onMessage);
 
-                    onMessage('Testing BackupHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testBackupHelper(project, onMessage)
-                }).catch(onError)
-                .then(() => {
-                    onMessage('Testing ConnectionHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testConnectionHelper(project, environment, onMessage);
-                }).catch(onError)
-                .then(() => {
-                    onMessage('Testing ContentHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testContentHelper(project, environment, user, onMessage);
-                }).catch(onError)
-                .then(() => {
-                    onMessage('Testing FormHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testFormHelper(project, environment, onMessage);
-                }).catch(onError)
-                .then(() => {
-                    onMessage('Testing SchemaHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testSchemaHelper(project, environment, onMessage);
-                }).catch(onError)
-                .then(() => {
-                    onMessage('Testing ProjectHelper...', true);
-                    return HashBrown.Helpers.TestHelper.testProjectHelper(testProject, onMessage);
-                }).catch(onError)
-                .then(() => {
-                    onDone();
-                }).catch(onError);
-            });
-        })
-        .catch((e) => {
-            ws.send(e.message);
-        });
+            onMessage('Testing SchemaHelper...', true);
+            
+            await HashBrown.Helpers.TestHelper.testSchemaHelper(testProject.id, environment, onMessage);
+
+            onMessage('Testing ProjectHelper...', true);
+            
+            await HashBrown.Helpers.TestHelper.testProjectHelper(testProject.id, onMessage);
+
+            onMessage('Done!', true);
+
+        } catch(e) {
+            if(e.stack) {
+                onMessage(e.stack);
+            } else {
+                onMessage('Error: ' + e.message);
+            }
+        
+        }
+            
+        res.status(200).send(output);
     }
 }
 

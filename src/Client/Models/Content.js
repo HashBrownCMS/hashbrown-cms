@@ -15,8 +15,8 @@ class Content extends ContentCommon {
      *
      * @returns {Object} Settings
      */
-    getSettings(key) {
-        let parentContent = this.getParent();
+    async getSettings(key) {
+        let parentContent = await this.getParent();
 
         // Loop through parents to find governing setting
         while(parentContent != null) {
@@ -33,7 +33,7 @@ class Content extends ContentCommon {
                 return settings[key];
             }
 
-            parentContent = parentContent.getParent();
+            parentContent = await parentContent.getParent();
         }
     
         this.settingsSanityCheck(key);
@@ -46,8 +46,10 @@ class Content extends ContentCommon {
      *
      * @returns {Content} Parent
      */
-    getParent() {
-        return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
+    async getParent() {
+        if(!this.parentId) { return null; }
+
+        return await HashBrown.Helpers.ContentHelper.getContentById(this.parentId);
     }
 }
 

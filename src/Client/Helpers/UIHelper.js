@@ -7,6 +7,72 @@
  */
 class UIHelper {
     /**
+     * Renders a spinner
+     *
+     * @param {HTMLElement} element
+     * @param {Boolean} noBackground
+     * @param {String} icon
+     *
+     * @return {HTMLElement} Spinner
+     */
+    static spinner(element = null, noBackground = false, icon = 'refresh') {
+        let iconIsImage = icon.indexOf('/') === 0;
+
+        let spinner = _.div({class: 'widget widget--spinner ' + (element ? 'embedded ' : '' ) + (noBackground ? 'no-background' : '')},
+            _.div({class: 'widget--spinner__inner'},
+                _.do(() => {
+                    if(iconIsImage) {
+                        return _.img({class: 'widget--spinner__image', src: icon});
+                    }
+                    
+                    return _.div({class: 'widget--spinner__image fa fa-' + icon});
+                }),
+                _.div({class: 'widget--spinner__messages'})
+            )
+        );
+
+        if(element) {
+            _.append(element, spinner);
+        } else {
+            _.append(document.body, spinner);
+        }
+
+        return spinner;
+    }
+   
+    /**
+     * Attaches a message to a spinner
+     *
+     * @param {HTMLElement} spinner
+     * @param {Number} index
+     * @param {String} message
+     * @param {Boolean} isLoaded
+     */
+    static setSpinnerMessage($spinner, index, message, isLoaded = false) {
+        let $messages = $spinner.find('.widget--spinner__messages');
+        let $message = $messages.children().eq(index);
+        
+        if(!$message || $message.length < 1) {
+            $message = _.div({class: 'widget--spinner__message'});
+            $messages.append($message);
+        }
+
+        $message.html(message);
+        $message.toggleClass('loaded', isLoaded);
+    }
+
+    /**
+     * Hides a spinner
+     *
+     * @param {HTMLElement} spinner
+     */
+    static hideSpinner($spinner) {
+        $spinner.toggleClass('hidden', true);
+
+        setTimeout(() => { $spinner.remove(); }, 1000);
+    }
+
+    /**
      * Highlights an element with an optional label
      *
      * @param {Boolean|HTMLElement} element
@@ -84,38 +150,31 @@ class UIHelper {
      * @param {Function} onChange
      */
     static fieldSortableArray(array, field, onChange) {
-        array = array || [];
+        let oldArray = JSON.parse(JSON.stringify(array || []));
 
-        // Set indices on all elements
-        let items = field.querySelector('.editor__field__value').children;
+        let itemParent = field.querySelector('.editor__field__value');
+        
+        // Map all elements
+        let mappings = [];
 
-        for(let i = 0; i < items.length; i++) {
-            if(items[i] instanceof HTMLElement === false || !items[i].classList.contains('editor__field')) { continue; }
-
-            items[i].dataset.index = i;
+        for(let element of Array.from(itemParent.children).filter((x) => { return x.classList.contains('editor__field'); })) {
+            mappings.push({element: element, value: oldArray.shift() });
         }
 
         // Init the sortable context
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let oldIndex = element.dataset.index;
-            let newIndex = 0;
+            // Rebuild array using mappings
+            let newArray = [];
 
-            // Discover new index
-            let items = field.querySelector('.editor__field__value').children;
+            for(let element of Array.from(itemParent.children).filter((x) => { return x.classList.contains('editor__field'); })) {
+                let mapping = mappings.filter((x) => { return x.element === element; })[0];
 
-            for(let i = 0; i < items.length; i++) {
-                if(items[i] === element) {
-                    newIndex = i;
-                    break;
-                }
+                newArray.push(mapping.value);
             }
 
-            // Swap indices
-            array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
-
-            onChange(array);
+            onChange(newArray);
         });
     }
 
@@ -127,48 +186,21 @@ class UIHelper {
      * @param {Function} onChange
      */
     static fieldSortableObject(object, field, onChange) {
-        object = object || {};
-
+        let oldObject = JSON.parse(JSON.stringify(object || {}));
+        
         this.fieldSortable(field, (element) => {
             if(!element) { return; }
 
-            let itemSortKeyElement = element.querySelector('.editor__field__sort-key');
-            let itemKey = itemSortKeyElement.value || itemSortKeyElement.innerHTML;
-            let itemValue = object[itemKey];
-
-            // Try to get the next key
-            let nextKey = '';
-            let nextSortKeyElement = element.nextElementSibling ? element.nextElementSibling.querySelector('.editor__field__sort-key') : null;
-
-            if(nextSortKeyElement) {
-                nextKey = nextSortKeyElement.value || nextSortKeyElement.innerHTML;
-            }
-
-            // Construct a new object based on the old one
+            // Rebuild object
             let newObject = {};
 
-            for(let fieldKey in object) {
-                // Omit existing key
-                if(fieldKey === itemKey) { continue; }
+            for(let element of Array.from(field.querySelectorAll('.editor__field__value > .editor__field'))) {
+                let itemSortKeyElement = element.querySelector('.editor__field__key__label');
+                let itemKey = itemSortKeyElement.dataset.sortKey || itemSortKeyElement.value || itemSortKeyElement.innerHTML;
+                let itemValue = object[itemKey];
 
-                let fieldValue = object[fieldKey];
-
-                // If there is a next key, and it's the same as this field key,
-                // the sorted item should be inserted just before it
-                if(nextKey === fieldKey) {
-                    newObject[itemKey] = itemValue;
-                }
-
-                newObject[fieldKey] = fieldValue;
-            }
-
-            // If the item wasn't reinserted, insert it now
-            if(!newObject[itemKey]) {
                 newObject[itemKey] = itemValue;
             }
-
-            // Assign the new object to the old one
-            object = newObject;
 
             // Fire the change event
             onChange(newObject);
@@ -254,8 +286,9 @@ class UIHelper {
                         sibling.style.transform = 'translateY(' + (siblingY - newSiblingY) + 'px)';
 
                         setTimeout(() => {
-                            currentDraggedChild.removeAttribute('style');
-                            sibling.removeAttribute('style');
+                            if(currentDraggedChild) { currentDraggedChild.removeAttribute('style'); }
+                            if(sibling) { sibling.removeAttribute('style'); }
+
                             canSort = true;
                         }, 100);
                     }
@@ -552,17 +585,22 @@ class UIHelper {
         if(error instanceof String) {
             error = new Error(error);
         
-        } else if(error instanceof Object) {
-            if(error.responseText) {
-                error = new Error(error.responseText);
-            }
+        } else if(error.responseText) {
+            error = new Error(error.responseText);
+        
+        } else if(error instanceof ErrorEvent) {
+            error = error.error;
+
+        } else if(error instanceof Event) {
+            error = error.target.error;
         
         } else if(error instanceof Error === false) {
             error = new Error(error.toString());
 
         }
        
-        debug.log(error.message, error.stack, 'HashBrown');
+        debug.log(error.message + ': ' + error.stack, 'HashBrown');
+        console.trace();
 
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
@@ -577,6 +615,22 @@ class UIHelper {
         if(!warning) { return; }
 
         return UIHelper.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
+    }
+
+    /**
+     * Brings up a notification
+     *
+     * @param {String} title
+     * @param {String} body
+     */
+    static notify(title, body) {
+        let modal = new HashBrown.Views.Modals.Modal({
+            title: title,
+            body: body,
+            group : 'notification'
+        });
+
+        return modal;
     }
 
     /**
@@ -650,17 +704,23 @@ class UIHelper {
 
     /**
      * Creates a context menu
+     *
+     * @param {HTMLElement} element
+     * @param {Object} items
+     * @param {HTMLElement} button
      */
-    static context(element, items) {
+    static context(element, items, button) {
+        if(!element) { return; }
+        
         let openContextMenu = (e) => {
             // Find any existing context menu targets and remove their classes
             let clearTargets = () => {
                 let targets = document.querySelectorAll('.context-menu-target');
             
-                if(targets) {
-                    for(let i = 0; i < targets.length; i++) {
-                        targets[i].classList.remove('context-menu-target');
-                    }
+                if(!targets) { return; }
+            
+                for(let i = 0; i < targets.length; i++) {
+                    targets[i].classList.remove('context-menu-target');
                 }
             };
 
@@ -684,9 +744,12 @@ class UIHelper {
                     pickedItem();
                 }
             });
+                
+            dropdown.toggle(false);
 
             // Prevent the toggle button from blocking new context menu events
             let toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
+            let options = dropdown.element.querySelector('.widget--dropdown__options');
 
             toggle.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
@@ -698,21 +761,24 @@ class UIHelper {
                 dropdown.remove();
 
                 // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
-                setTimeout(() => {
-                    clearTargets();
-                }, 100);
+                setTimeout(clearTargets, 100);
             });
-
-            // Set styles
-            dropdown.element.classList.toggle('context-menu', true);
-            dropdown.element.style.top = e.touches ? e.touches[0].pageY : e.pageY;
-            dropdown.element.style.left = e.touches ? e.touches[0].pageX : e.pageX;
-
-            // Open it
-            dropdown.toggle(true);
-
+            
             // Append to body
             document.body.appendChild(dropdown.element);
+
+            setTimeout(() => {
+                // Set styles
+                let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+                let pageX = e.touches ? e.touches[0].pageX : e.pageX;
+
+                dropdown.element.classList.toggle('context-menu', true);
+                dropdown.element.style.top = pageY + 'px';
+                dropdown.element.style.left = pageX + 'px';
+
+                // Open it
+                dropdown.toggle(true);
+            }, 1);
         };
         
         element.addEventListener('contextmenu', (e) => {
@@ -722,15 +788,6 @@ class UIHelper {
             openContextMenu(e);
         });
 
-        element.addEventListener('click', (e) => {
-            if(e.which === 3 || e.ctrlKey) {
-                e.preventDefault();
-                e.stopPropagation();
-            
-                openContextMenu(e);
-            }
-        });
-        
         element.addEventListener('touchstart', (e) => {
             if(e.touchTargets && e.touchTargets.length > 1) {
                 e.preventDefault();
@@ -739,6 +796,15 @@ class UIHelper {
                 openContextMenu(e);
             }
         });
+
+        if(button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            
+                openContextMenu(e);
+            });
+        }
     }
 }
 

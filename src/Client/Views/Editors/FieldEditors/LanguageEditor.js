@@ -22,19 +22,14 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     constructor(params) {
         super(params);
-
-        this.fetch();
-    }
-
-    /**
-     * Prerender
-     */
-    prerender() {
-        let options = HashBrown.Helpers.LanguageHelper.getLanguagesSync();
+       
+        let options = HashBrown.Context.projectSettings.languages;
 
         if(!this.value || options.indexOf(this.value) < 0) {
             this.value = options[0];
         }
+
+        this.fetch();
     }
 
     /**
@@ -44,8 +39,7 @@ class LanguageEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         return _.div({class: 'field-editor field-editor--language'},
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
-                options: HashBrown.Helpers.LanguageHelper.getLanguagesSync(),
-                tooltip: this.description || '',
+                options: HashBrown.Context.projectSettings.languages,
                 onChange: (newValue) => {
                     this.value = newValue;
 

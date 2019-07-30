@@ -1,13 +1,11 @@
 'use strict';
 
-const Resource = require('./Resource');
-
 /**
  * The base class for all Schema types
  *
  * @memberof HashBrown.Common.Models
  */
-class Schema extends Resource {
+class Schema extends HashBrown.Models.Resource {
     /**
      * Structure
      */

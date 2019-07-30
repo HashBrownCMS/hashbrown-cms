@@ -29,14 +29,18 @@ class LanguageEditor extends HashBrown.Views.Modals.Modal {
     /**
      * Event: Click save
      */
-    onClickSave() {
-        HashBrown.Helpers.LanguageHelper.setLanguages(this.model.id, this.model.settings.languages)
-        .then(() => {
+    async onClickSave() {
+        try {
+            await HashBrown.Helpers.LanguageHelper.setLanguages(this.model.id, this.model.settings.languages);
+
             this.close();
 
             this.trigger('change');
-        })
-        .catch(UI.errorModal);
+
+        } catch(e) {
+            UI.errorModal(e);
+                
+        }
     }
 
     /**

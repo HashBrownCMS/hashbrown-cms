@@ -1,26 +1,50 @@
 'use strict';
 
+const Url = require('url');
+
 /**
  * The Controller for Schemas
  *
  * @memberof HashBrown.Server.Controllers
  */
-class SchemaController extends require('./ApiController') {
+class SchemaController extends HashBrown.Controllers.ResourceController {
+    static get category() { return 'schemas'; }
+
     /**
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/:project/:environment/schemas', this.middleware(), this.getSchemas);
-        app.get('/api/:project/:environment/schemas/:id', this.middleware(), this.getSchema);
-        
-        app.post('/api/:project/:environment/schemas/pull/:id', this.middleware(), this.pullSchema);
-        app.post('/api/:project/:environment/schemas/push/:id', this.middleware(), this.pushSchema);
-        app.post('/api/:project/:environment/schemas/new', this.middleware({scope: 'schemas'}), this.createSchema);
-        app.post('/api/:project/:environment/schemas/:id', this.middleware({scope: 'schemas'}), this.setSchema);
-        
-        app.delete('/api/:project/:environment/schemas/:id', this.middleware({scope: 'schemas'}), this.deleteSchema);
-    }        
-    
+        app.post('/api/:project/:environment/schemas/import', this.middleware(), this.getHandler('import'));
+
+        super.init(app);
+    }
+
+    /**
+     * @example POST /api/:project/:environment/import
+     *
+     * @apiGroup Schema
+     *
+     * @param {String} project
+     * @param {String} environment
+     */
+    static async import(req, res) {
+        if(!req.query.url) { throw new Error('URL was not provided'); }
+
+        let url = req.query.url;
+
+        let response = await HashBrown.Helpers.RequestHelper.request('get', url);
+
+        if(Array.isArray(response)) {
+            for(let json of response) {
+                await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, json);
+            }
+        } else {
+            await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, response);
+        }
+
+        return response;
+    }
+
     /**
      * @example GET /api/:project/:environment/schemas
      *
@@ -31,22 +55,12 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Array} Schemas
      */
-    static getSchemas(req, res) {
-        let getter = function() {
-            if(req.query.customOnly) {
-                return HashBrown.Helpers.SchemaHelper.getCustomSchemas(req.project, req.environment);
-            } else {
-                return HashBrown.Helpers.SchemaHelper.getAllSchemas(req.project, req.environment);
-            }
-        };
+    static async getAll(req, res) {
+        if(req.query.customOnly) {
+            return await HashBrown.Helpers.SchemaHelper.getCustomSchemas(req.project, req.environment);
+        }
 
-        getter()
-        .then((schemas) => {
-            res.status(200).send(schemas);
-        })
-        .catch((e) => {
-            res.status(502).send(SchemaController.printError(e));
-        });
+        return await HashBrown.Helpers.SchemaHelper.getAllSchemas(req.project, req.environment);
     }
     
     /**
@@ -60,22 +74,8 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Schema} Schema
      */
-    static getSchema(req, res) {
-        let getter = () => {
-            if(req.query.withParentFields) {
-                return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(req.project, req.environment, req.params.id);
-            } else {
-                return HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, req.params.id);
-            }
-        }
-
-        getter()
-        .then((schema) => {
-            res.status(200).send(schema);
-        })
-        .catch((e) => {
-            res.status(502).send(SchemaController.printError(e));
-        });
+    static async get(req, res) {
+        return await HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, req.params.id)
     }
     
     /**
@@ -91,18 +91,14 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Schema} Schema
      */
-    static setSchema(req, res) {
+    static async set(req, res) {
         let id = req.params.id;
         let schema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, schema, shouldCreate)
-        .then(() => {
-            res.status(200).send(schema);
-        })
-        .catch((e) => {
-            res.status(502).send(SchemaController.printError(e));
-        });
+        await HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, schema, shouldCreate);
+
+        return schema;
     }
     
     /**
@@ -116,21 +112,15 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Schema} The pulled Schema
      */
-    static pullSchema(req, res) {
+    static async pull(req, res) {
         let id = req.params.id;
-
-        HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'schemas', id)
-        .then((resourceItem) => {
-            if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
+        let resourceItem = await HashBrown.Helpers.SyncHelper.getResourceItem(req.project, req.environment, 'schemas', id)
         
-            return HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, HashBrown.Helpers.SchemaHelper.getModel(resourceItem), true)
-            .then(() => {
-                res.status(200).send(resourceItem);
-            });
-        })
-        .catch((e) => {
-            res.status(404).send(SchemaController.printError(e));   
-        }); 
+        if(!resourceItem) { throw new Error('Couldn\'t find remote Schema "' + id + '"'); }
+    
+        await HashBrown.Helpers.SchemaHelper.setSchemaById(req.project, req.environment, id, HashBrown.Helpers.SchemaHelper.getModel(resourceItem), true);
+
+        return resourceItem;
     }
     
     /**
@@ -144,19 +134,14 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Schema} The pushed Schema
      */
-    static pushSchema(req, res) {
+    static async push(req, res) {
         let id = req.params.id;
 
-        HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, id)
-        .then((localSchema) => {
-            return HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
-        })
-        .then(() => {
-            res.status(200).send(id);
-        })
-        .catch((e) => {
-            res.status(404).send(SchemaController.printError(e));   
-        }); 
+        let localSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(req.project, req.environment, id);
+
+        await HashBrown.Helpers.SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
+       
+        return id;
     }
     
     /**
@@ -169,16 +154,8 @@ class SchemaController extends require('./ApiController') {
      *
      * @returns {Schema} The created Schema
      */
-    static createSchema(req, res) {
-        let parentSchema = HashBrown.Helpers.SchemaHelper.getModel(req.body);
-
-        HashBrown.Helpers.SchemaHelper.createSchema(req.project, req.environment, parentSchema)
-        .then((newSchema) => {
-            res.status(200).send(newSchema.getObject());
-        })
-        .catch((e) => {
-            res.status(502).send(SchemaController.printError(e));
-        });
+    static async new(req, res) {
+        return await HashBrown.Helpers.SchemaHelper.createSchema(req.project, req.environment, req.query.parentSchemaId);
     }
     
     /**
@@ -190,16 +167,12 @@ class SchemaController extends require('./ApiController') {
      * @param {String} environment
      * @param {String} id
      */
-    static deleteSchema(req, res) {
+    static async remove(req, res) {
         let id = req.params.id;
         
-        HashBrown.Helpers.SchemaHelper.removeSchemaById(req.project, req.environment, id)
-        .then(() => {
-            res.status(200).send('Schema with id "' + id + '" deleted successfully');
-        })
-        .catch((e) => {
-            res.status(502).send(SchemaController.printError(e));
-        });
+        await HashBrown.Helpers.SchemaHelper.removeSchemaById(req.project, req.environment, id);
+
+        return 'Schema with id "' + id + '" deleted successfully';
     }
 }
 

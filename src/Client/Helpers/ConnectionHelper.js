@@ -11,54 +11,21 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
-     * @return {Promise} Array of Connections
+     * @return {Array} Connections
      */
-    static getAllConnections() {
-        return Promise.resolve(resources.connections);
-    }
-    
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-    static getConnectionByIdSync(id) {
-        checkParam(id, 'id', String);
-
-        for(let i in resources.connections) {
-            let connection = resources.connections[i];
-
-            if(connection.id == id) {
-                return connection;
-            }
-        }
+    static async getAllConnections() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Connection, 'connections');
     }
     
     /**
      * Gets a Connection by id
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} id
      *
-     * @return {Promise} Connection
+     * @return {HashBrown.Models.Connection} Connection
      */
-    static getConnectionById(project, environment, id) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(id, 'id', String);
-
-        for(let i in resources.connections) {
-            let connection = resources.connections[i];
-
-            if(connection.id == id) {
-                return Promise.resolve(connection);
-            }
-        }
-
-        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    static async getConnectionById(id) {
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Connection, 'connections', id);
     }
 
     /**
@@ -68,29 +35,48 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @returns {Promise}
      */
-    static setMediaProvider(id) {
-        return super.setMediaProvider(
-            HashBrown.Helpers.ProjectHelper.currentProject,
-            HashBrown.Helpers.ProjectHelper.currentEnvironment,
-            id
-        ).then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('media');  
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();  
-        });
+    static async setMediaProvider(id) {
+        await super.setMediaProvider(HashBrown.Context.projectId, HashBrown.Context.environment, id);
+
+        HashBrown.Helpers.EventHelper.trigger('resource');  
     }
     
     /**
+     * Starts a tour of the Connection section
+     */
+    static async startTour() {
+        if(location.hash.indexOf('connections/') < 0) {
+            location.hash = '/connections/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/connections/"]', 'This the Connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+
+        await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--connection');
+
+        if(editor) {
+            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
+        }
+    }
+
+    /**
      * Gets the Media provider
      *
-     * @returns {Promise} Connection
+     * @return {HashBrown.Models.Connection} Connection object
      */
-    static getMediaProvider() {
-        return super.getMediaProvider(
-            HashBrown.Helpers.ProjectHelper.currentProject,
-            HashBrown.Helpers.ProjectHelper.currentEnvironment
-        );
+    static async getMediaProvider() {
+        let providers = await HashBrown.Helpers.SettingsHelper.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        
+        if(providers && providers.media) {
+            return await this.getConnectionById(providers.media);
+        } else {
+            return null;
+        }
     }
 }
 

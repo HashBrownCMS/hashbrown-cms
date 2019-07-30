@@ -1,26 +1,24 @@
+/**
+ * The array field editor
+ */
 .field-editor--array {
-    &__item {
+    min-height: 11rem;
+
+    // Array item
+    > .editor__field {
         flex-wrap: wrap;
-
-        &.collapsed &__toolbar { display: none; }
-
-        &__toolbar {
-            flex-basis: 100%;
-            display: flex;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
+    }
+            
+    // Add button
+    &__add {
+        clear: both;
+        margin-top: 1rem;
     }
 
     // Grid
-    &.grid &__item {
+    &.grid > .editor__field {
         float: left;
         margin: 0.5rem;
         width: calc(100% / 3 - 1rem);
-    }
-
-    // Sorting
-    &.sorting &__item__toolbar {
-        display: none;
     }
 }

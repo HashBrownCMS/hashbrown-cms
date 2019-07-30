@@ -40,11 +40,12 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
      *
      * @returns {Array} List of options
      */
-    getDropdownOptions() {
+    async getDropdownOptions() {
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
         let allowedContent = [];
         let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
 
-        for(let content of resources.content) {
+        for(let content of allContent) {
             if(areRulesDefined) {
                 let isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
                 
@@ -52,12 +53,25 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
             }
 
             allowedContent[allowedContent.length] = {
-                title: content.prop('title', window.language) || content.id,
+                title: content.prop('title', HashBrown.Context.language) || content.id,
                 id: content.id
             };
         }
 
         return allowedContent;
+    }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        if(this.model && this.model.prop('title', HashBrown.Context.language)) {
+            return this.model.prop('title', HashBrown.Context.language); 
+        }
+
+        return super.getFieldLabel();
     }
 
     /**
@@ -70,21 +84,19 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
     static renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
         
-        return _.div({class: 'editor__field'},
-            _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
-            _.div({class: 'editor__field__value'},
-                new HashBrown.Views.Widgets.Dropdown({
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
-                    useMultiple: true,
-                    value: config.allowedSchemas,
-                    useClearButton: true,
-                    valueKey: 'id',
-                    labelKey: 'name',
-                    onChange: (newValue) => {
-                        config.allowedSchemas = newValue;
-                    }
-                }).$element
-            )
+        return this.field(
+            'Allowed Schemas',
+            new HashBrown.Views.Widgets.Dropdown({
+                options: HashBrown.Helpers.SchemaHelper.getAllSchemas('content'),
+                useMultiple: true,
+                value: config.allowedSchemas,
+                useClearButton: true,
+                valueKey: 'id',
+                labelKey: 'name',
+                onChange: (newValue) => {
+                    config.allowedSchemas = newValue;
+                }
+            })
         );
     }
 
@@ -99,7 +111,6 @@ class ContentReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldE
                 useTypeAhead: true,
                 valueKey: 'id',
                 useClearButton: true,
-                tooltip: this.description || '',
                 labelKey: 'title',
                 onChange: (newValue) => {
                     this.value = newValue;

@@ -47,62 +47,54 @@ class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         config.step = config.step || 'any';
 
         return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Step'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'number',
-                        step: 'any',
-                        tooltip: 'The division by which the input number is allowed (0 is any division)',
-                        value: config.step === 'any' ? 0 : config.step,
-                        onChange: (newValue) => {
-                            if(newValue == 0) { newValue = 'any'; }
+            this.field(
+                'Step',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'number',
+                    step: 'any',
+                    tooltip: 'The division by which the input number is allowed (0 is any division)',
+                    value: config.step === 'any' ? 0 : config.step,
+                    onChange: (newValue) => {
+                        if(newValue == 0) { newValue = 'any'; }
 
-                            config.step = newValue;
-                        }
-                    }).$element
-                )
+                        config.step = newValue;
+                    }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Min value'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        tooltip: 'The minimum required value',
-                        type: 'number',
-                        step: 'any',
-                        value: config.min || 0,
-                        onChange: (newValue) => {
-                            config.min = newValue;
-                        }
-                    }).$element
-                )
+            this.field(
+                'Min value',
+                new HashBrown.Views.Widgets.Input({
+                    tooltip: 'The minimum required value',
+                    type: 'number',
+                    step: 'any',
+                    value: config.min || 0,
+                    onChange: (newValue) => {
+                        config.min = newValue;
+                    }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Max value'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        tooltip: 'The maximum allowed value (0 is infinite)',
-                        type: 'number',
-                        step: 'any',
-                        value: config.max || 0,
-                        onChange: (newValue) => {
-                            config.max = newValue;
-                        }
-                    }).$element
-                )
+            this.field(
+                'Max value',
+                new HashBrown.Views.Widgets.Input({
+                    tooltip: 'The maximum allowed value (0 is infinite)',
+                    type: 'number',
+                    step: 'any',
+                    value: config.max || 0,
+                    onChange: (newValue) => {
+                        config.max = newValue;
+                    }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Is slider'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        tooltip: 'Whether or not this number should be edited as a range slider',
-                        type: 'checkbox',
-                        value: config.isSlider || false,
-                        onChange: (newValue) => {
-                            config.isSlider = newValue;
-                        }
-                    }).$element
-                )
+            this.field(
+                'Is slider',
+                new HashBrown.Views.Widgets.Input({
+                    tooltip: 'Whether or not this number should be edited as a range slider',
+                    type: 'checkbox',
+                    value: config.isSlider || false,
+                    onChange: (newValue) => {
+                        config.isSlider = newValue;
+                    }
+                })
             )
         ];
     }
@@ -116,7 +108,6 @@ class NumberEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 value: this.value || '0',
                 type: this.config.isSlider ? 'range' : 'number',
                 step: this.config.step || 'any',
-                tooltip: this.description || '',
                 min: this.config.min || '0',
                 max: this.config.max || '0',
                 onChange: (newValue) => {

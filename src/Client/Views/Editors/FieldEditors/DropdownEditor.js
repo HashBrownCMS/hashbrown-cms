@@ -49,19 +49,17 @@ class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     static renderConfigEditor(config) {
         config.options = config.options || [];
 
-        return _.div({class: 'editor__field'},
-            _.div({class: 'editor__field__key'}, 'Options'),
-            _.div({class: 'editor__field__value'},
-                new HashBrown.Views.Widgets.Chips({
-                    value: config.options,
-                    valueKey: 'value',
-                    labelKey: 'label',
-                    placeholder: 'New option',
-                    onChange: (newValue) => {
-                        config.options = newValue;
-                    }
-                }).$element
-            )
+        return this.field(
+            'Options',
+            new HashBrown.Views.Widgets.Chips({
+                value: config.options,
+                valueKey: 'value',
+                labelKey: 'label',
+                placeholder: 'New option',
+                onChange: (newValue) => {
+                    config.options = newValue;
+                }
+            })
         );
     }
 
@@ -70,24 +68,24 @@ class DropdownEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--dropdown'},
-            _.if(this.config.options.length < 1,
-                _.span({class: 'editor__field__value__warning'}, 'No options configured')
-            ),
-            _.if(this.config.options.length > 0,
-                new HashBrown.Views.Widgets.Dropdown({
+            _.do(() => {
+                if(!this.config || !this.config.options || this.config.options.length < 1) {
+                    return _.span({class: 'editor__field__value__warning'}, 'No options configured');
+                }
+                
+                return new HashBrown.Views.Widgets.Dropdown({
                     value: this.value,
                     useClearButton: true,
                     options: this.config.options,
                     valueKey: 'value',
-                    tooltip: this.description || '',
                     labelKey: 'label',
                     onChange: (newValue) => {
                         this.value = newValue;
 
                         this.trigger('change', this.value);
                     }
-                }).$element
-            )
+                });
+            })
         );
     }
 }

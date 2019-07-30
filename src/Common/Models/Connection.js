@@ -2,16 +2,12 @@
 
 const Path = require('path');
 
-const Processor = require('./Processor');
-const Deployer = require('./Deployer');
-const Resource = require('./Resource');
-
 /**
  * The Connection class
  *
  * @memberof HashBrown.Common.Models
  */
-class Connection extends Resource {
+class Connection extends HashBrown.Models.Resource {
     /**
      * Structure
      */
@@ -23,6 +19,31 @@ class Connection extends Resource {
         
         // Sync
         this.def(Object, 'sync');
+    }
+
+    /**
+     * Constructs a URL from the member variable and an appendix
+     *
+     * @param {String} appendix
+     *
+     * @return {String} URL
+     */
+    getUrl(appendix = '') {
+        if(!appendix) { return this.url; }
+
+        if(typeof appendix === 'object') {
+            appendix = appendix[window.language];
+        }
+
+        if(this.url[this.url.length - 1] !== '/') {
+            this.url += '/';
+        }
+
+        if(appendix[0] === '/') {
+            appendix = appendix.substring(1);
+        }
+
+        return this.url + appendix;
     }
 
     /**

@@ -32,7 +32,6 @@ class TagsEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     template() {
         return _.div({class: 'field-editor field-editor--tags'},
             new HashBrown.Views.Widgets.Chips({
-                tooltip: this.description || '',
                 value: (this.value || '').split(','),
                 onChange: (newValue) => {
                     this.value = newValue.join(',');

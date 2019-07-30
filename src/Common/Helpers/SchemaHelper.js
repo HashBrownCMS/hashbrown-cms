@@ -7,19 +7,6 @@
  */
 class SchemaHelper {
     /**
-     * Gets all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Schema)} schema
-     */
-    static getSchemaWithParentFields(id) {
-        return new Promise((callback) => {
-            callback();
-        });
-    }
-
-    /**
      * Gets the appropriate model
      *
      * @param {Object} properties
@@ -78,7 +65,7 @@ class SchemaHelper {
             }
         }
 
-        // Overwrite native values 
+        // Overwrite common values 
         mergedSchema.id = childSchema.id;
         mergedSchema.name = childSchema.name;
         mergedSchema.parentSchemaId = childSchema.parentSchemaId;
@@ -87,7 +74,7 @@ class SchemaHelper {
         // Specific values for schema types
         switch(mergedSchema.type) {
             case 'field':
-                mergedSchema.editorId = mergedSchema.editorId || parentSchema.editorId;
+                mergedSchema.editorId = childSchema.editorId || mergedSchema.editorId;
                 
                 // Merge config
                 if(!mergedSchema.config) { mergedSchema.config = {}; }

@@ -100,7 +100,7 @@ class DateEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                     return this.formatDate(this.value);
                 }
                 
-                return _.div({class: 'widget widget-group', title: this.description || ''},
+                return _.div({class: 'widget widget-group'},
                     _.button({class: 'widget widget--button low'}, this.formatDate(this.value))
                         .click(() => { this.onClickOpen(); }),
                     _.div({class: 'widget widget--button small fa fa-remove'})

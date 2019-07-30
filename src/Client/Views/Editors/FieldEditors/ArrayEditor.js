@@ -23,48 +23,133 @@
  */
 class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
-     * Constructor
+     * Event: Click add item
      */
-    constructor(params) {
-        super(params);
+    onClickAddItem() {
+        let index = this.value.length;
 
-        this.fetch();
+        if(this.config.maxItems && index >= this.config.maxItems) {
+            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+            return;
+        }
+
+        this.value[index] = { value: null, schemaId: null };
+
+        this.trigger('change', this.value);
+
+        this.update();
     }
-   
+
+    /**
+     * Event: Change item schema
+     *
+     * @param {String} newSchemaId
+     * @param {Object} item
+     */
+    onChangeItemSchema(newSchemaId, item) {
+        if(newSchemaId === item.schemaId) { return; }
+
+        item.schemaId = newSchemaId;
+        item.value = null;
+
+        this.trigger('change', this.value);
+        
+        this.update();
+    }
+
+    /**
+     * Event: Click remove item
+     *
+     * @param {Number} index
+     */
+    onClickRemoveItem(index) {
+        this.value.splice(index, 1);
+
+        this.trigger('change', this.value);
+
+        this.element.removeChild(this.element.children[index]);
+    }
+
+    /**
+     * Gets all allowed schemas
+     *
+     * @return {Array} Schemas
+     */
+    async getAllowedSchemas() {
+        let allowedSchemas = [];
+
+        for(let schemaId of this.config.allowedSchemas) {
+            if(!schemaId) { continue; }
+
+            let schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(schemaId);
+
+            allowedSchemas.push(schema);
+        }
+
+        return allowedSchemas;
+    }
+
+    /**
+     * Updates this view
+     */
+    update() {
+        this._expandedItems = [];
+
+        for(let i = 0; i < this.element.children.length; i++) {
+            if(!this.element.children[i].classList.contains('collapsed')) {
+                this._expandedItems.push(i);
+            }
+        }
+        
+        super.update();
+    }
+
+    /**
+     * Gets whether an item is expandend (used when reloading the view)
+     *
+     * @param {Number} index
+     *
+     * @return {Boolean} Is expanded
+     */
+    isItemExpanded(index) {
+        checkParam(index, 'index', Number, true);
+
+        if(!this._expandedItems) { return false; }
+
+        return this._expandedItems.indexOf(index) > -1;
+    }
+    
     /**
      * Render key actions
      *
      * @returns {HTMLElement} Actions
      */
-    renderKeyActions() {
-        if(!this.value || this.value.length < 1 || this.config.useGrid) { return; }
+    getKeyActions() {
+        if(this.config.isGrid) { return; }
 
-        return [
-            _.button({class: 'editor__field__key__action editor__field__key__action--sort'})
-                .click((e) => {
-                    HashBrown.Helpers.UIHelper.fieldSortableArray(
-                        this.value,
-                        this.element.parentElement,
-                        (newArray) => {
-                            this.value = newArray;
-
-                            this.trigger('change', this.value);
-                        }
-                    );
-                }),
-            _.button({class: 'editor__field__key__action editor__field__key__action--collapse'}, 'Collapse all')
-                .click((e) => {
-                    Array.from(this.element.children).forEach((field) => {
-                        field.classList.toggle('collapsed', true);
-                    });
-                }),
-            _.button({class: 'editor__field__key__action editor__field__key__action--expand'}, 'Expand all')
-                .click((e) => {
-                    Array.from(this.element.children).forEach((field) => {
-                        field.classList.toggle('collapsed', false);
-                    });
-                })
-        ];
+        return {
+            sort: () => {
+                HashBrown.Helpers.UIHelper.fieldSortableArray(
+                    this.value,
+                    this.element.parentElement,
+                    (newArray) => {
+                        this.value = newArray;
+                
+                        this.trigger('change', this.value);
+                    }
+                );
+            },
+            collapse: () => {
+                Array.from(this.element.children).forEach((field) => {
+                    field.classList.toggle('collapsed', true);
+                });
+            },
+            expand: () => {
+                Array.from(this.element.children).forEach((field) => {
+                    field.classList.toggle('collapsed', false);
+                });
+            }
+        };
     }
 
     /**
@@ -76,46 +161,50 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     static renderConfigEditor(config) {
         return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Min items'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'number',
-                        min: 0,
-                        step: 1,
-                        tooltip: 'How many items are required in this array (0 is unlimited)',
-                        value: config.minItems || 0,
-                        onChange: (newValue) => { config.minItems = newValue; }
-                    }).$element
-                )
+            this.field(
+                'Min items',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'number',
+                    min: 0,
+                    step: 1,
+                    tooltip: 'How many items are required in this array (0 is unlimited)',
+                    value: config.minItems || 0,
+                    onChange: (newValue) => { config.minItems = newValue; }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Max items'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Input({
-                        type: 'number',
-                        min: 0,
-                        step: 1,
-                        tooltip: 'How many items are allowed in this array (0 is unlimited)',
-                        value: config.maxItems || 0,
-                        onChange: (newValue) => { config.maxItems = newValue; }
-                    }).$element
-                )
+            this.field(
+                'Max items',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'number',
+                    min: 0,
+                    step: 1,
+                    tooltip: 'How many items are allowed in this array (0 is unlimited)',
+                    value: config.maxItems || 0,
+                    onChange: (newValue) => { config.maxItems = newValue; }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Dropdown({
-                        useMultiple: true,
-                        useTypeAhead: true,
-                        labelKey: 'name',
-                        valueKey: 'id',
-                        value: config.allowedSchemas,
-                        useClearButton: true,
-                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-                        onChange: (newValue) => { config.allowedSchemas = newValue; }
-                    }).$element
-                )
+            this.field(
+                'Allowed Schemas',
+                new HashBrown.Views.Widgets.Dropdown({
+                    useMultiple: true,
+                    useTypeAhead: true,
+                    labelKey: 'name',
+                    tooltip: 'A list of schemas that can be part of this array',
+                    valueKey: 'id',
+                    value: config.allowedSchemas,
+                    useClearButton: true,
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemas('field'),
+                    onChange: (newValue) => { config.allowedSchemas = newValue; }
+                })
+            ),
+            this.field(
+                'Is grid',
+                new HashBrown.Views.Widgets.Input({
+                    type: 'checkbox',
+                    tooltip: 'When enabled, the array items will display as a grid',
+                    value: config.isGrid,
+                    onChange: (newValue) => { config.isGrid = newValue; }
+                })
             )
         ];
     }
@@ -198,159 +287,104 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
-     * Gets the label of an item
+     * Renders an array item
      *
+     * @param {HTMLElement} placeholder
      * @param {Object} item
-     * @param {Schema} schema
-     *
-     * @return {String} Label
+     * @param {Number} index
      */
-    getItemLabel(item, schema) {
-        if(schema.config) {
-            if(schema.config.label && item.value && item.value[schema.config.label]) {
-                return item.value[schema.config.label];
-            }
+    async renderItem($placeholder, item, index) {
+        let schema = null;
+
+        if(item.schemaId) {
+            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(item.schemaId, true);
         }
 
-        if(item.value !== null && item.value !== undefined && typeof item.value === 'string' || typeof item.value === 'number') {
-            return item.value;
+        // Schema could not be found, assign first allowed Schema
+        if(!schema) {
+            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.config.allowedSchemas[0]);
+            item.schemaId = schema.id;
         }
 
-        return schema.name;
+        if(!schema) { throw new Error('Item #' + i + ' has no available Schemas'); }
+
+        // Obtain the field editor
+        let fieldEditor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+        if(!fieldEditor) { throw new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'); }
+
+        // Perform sanity check on item value
+        item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema);
+
+        // Init the field editor
+        let editorInstance = new fieldEditor({
+            value: item.value,
+            config: schema.config,
+            schema: schema,
+            className: 'editor__field__value'
+        });
+
+        let $field = this.field(
+            {
+                isCollapsible: true,
+                isCollapsed: !this.isItemExpanded(index),
+                label: editorInstance.getFieldLabel(),
+                actions: {
+                    remove: () => { this.onClickRemoveItem(index); }
+                },
+                toolbar: {
+                    Schema: new HashBrown.Views.Widgets.Dropdown({
+                        className: 'editor__field__toolbar__widget',
+                        value: item.schemaId,
+                        placeholder: 'Schema',
+                        valueKey: 'id',
+                        labelKey: 'name',
+                        iconKey: 'icon',
+                        options: this.getAllowedSchemas(),
+                        onChange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
+                    })
+                }
+            },
+
+            // Render field editor instance
+            editorInstance
+        );
+
+        let $label = $field.children('.editor__field__key').children('.editor__field__key__label');
+
+        // Hook up the ready event
+        editorInstance.on('ready', () => {
+            $label.html(editorInstance.getFieldLabel());
+        });
+
+        // Hook up the change event
+        editorInstance.on('change', (newValue) => {
+            $label.html(editorInstance.getFieldLabel());
+        });
+
+        editorInstance.on('silentchange', (newValue) => {
+            $label.html(editorInstance.getFieldLabel());
+        });
+
+        $placeholder.replaceWith($field);
     }
 
     /**
      * Renders this editor
      */
     template() {
-        return _.div({class: 'field-editor field-editor--array ' + (this.config.useGrid ? 'grid' : '')},
+        return _.div({class: 'field-editor field-editor--array ' + (this.config.isGrid ? 'grid' : '')},
             _.each(this.value, (i, item) => {
-                // Render field
-                let $field = _.div({class: 'editor__field raised field-editor--array__item'});
+                if(!item) { return; }
 
-                let renderField = () => {
-                    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+                let $placeholder = _.div({class: 'editor__field loading'});
 
-                    // Schema could not be found, assign first allowed Schema
-                    if(!schema || this.config.allowedSchemas.indexOf(item.schemaId) < 0) {
-                        item.schemaId = this.config.allowedSchemas[0];
-                    
-                        schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
-                    }
+                this.renderItem($placeholder, item, parseInt(i));
 
-                    if(!schema) {
-                        UI.errorModal(new Error('Item #' + i + ' has no available Schemas'));
-                        $field = null;
-                        return;
-                    }
-
-                    // Obtain the field editor
-                    if(schema.editorId.indexOf('Editor') < 0) {
-                        schema.editorId = schema.editorId[0].toUpperCase() + schema.editorId.substring(1) + 'Editor';
-                    }
-                    
-                    let editorClass = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                    if(!editorClass) {
-                        UI.errorModal(new Error('The field editor "' + schema.editorId + '" for Schema "' + schema.name + '" was not found'));    
-                        $field = null;
-                        return;
-                    }
-                    
-                    // Perform sanity check on item value
-                    item.value = HashBrown.Helpers.ContentHelper.fieldSanityCheck(item.value, schema);
-
-                    // Init the field editor
-                    let editorInstance = new editorClass({
-                        value: item.value,
-                        config: schema.config,
-                        schema: schema,
-                        className: 'editor__field__value'
-                    });
-
-                    // Hook up the change event
-                    editorInstance.on('change', (newValue) => {
-                        item.value = newValue;
-                    });
-                    
-                    editorInstance.on('silentchange', (newValue) => {
-                        item.value = newValue;
-                    });
-
-                    _.append($field.empty(),
-                        // Render sort key
-                        _.div({class: 'editor__field__sort-key'}, this.getItemLabel(item, schema)),
-
-                        // Render Schema picker
-                        _.if(this.config.allowedSchemas.length > 1,
-                            _.div({class: 'field-editor--array__item__toolbar'},
-                                _.div({class: 'widget--label'}, 'Schema'),
-                                new HashBrown.Views.Widgets.Dropdown({
-                                    value: item.schemaId,
-                                    placeholder: 'Schema',
-                                    valueKey: 'id',
-                                    labelKey: 'name',
-                                    iconKey: 'icon',
-                                    options: resources.schemas.filter((schema) => {
-                                        return this.config.allowedSchemas.indexOf(schema.id) > -1;
-                                    }),
-                                    onChange: (newSchemaId) => {
-                                        item.schemaId = newSchemaId;
-                                        item.value = null;
-                                        
-                                        renderField();
-
-                                        this.trigger('change', this.value);
-                                    }
-                                }).$element
-                            )
-                        ),
-                
-                        // Render field editor instance
-                        editorInstance.$element,
-
-                        // Render field actions (collapse/expand, remove)
-                        _.div({class: 'editor__field__actions'},
-                            _.if(!this.config.useGrid,
-                                _.button({class: 'editor__field__action editor__field__action--collapse', title: 'Collapse/expand item'})
-                                    .click(() => {
-                                        $field.toggleClass('collapsed');
-                                    })
-                            ),
-                            _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove item'})
-                                .click(() => {
-                                    this.value.splice(i, 1);
-                            
-                                    this.trigger('change', this.value);
-
-                                    this.fetch();
-                                })
-                        )
-                    );
-                };
-
-                renderField();
-
-                return $field;
+                return $placeholder;
             }),
             _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
-                .click(() => {
-                    let index = this.value.length;
-
-                    if(this.config.maxItems && index >= this.config.maxItems) {
-                        UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
-                        return;
-                    }
-
-                    this.value[index] = { value: null, schemaId: null };
-
-                    this.trigger('change', this.value);
-
-                    // Restore the scroll position with 100ms delay
-                    HashBrown.Views.Editors.ContentEditor.restoreScrollPos(100);
-                    
-                    this.fetch();
-                })
+                .click(() => { this.onClickAddItem() })
         );
     }    
 }
