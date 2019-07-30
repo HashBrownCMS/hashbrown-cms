@@ -18,10 +18,12 @@
 // Editors
 @import 'Views/Editors/Editor';
 @import 'Views/Editors/JSONEditor';
+@import 'Views/Editors/WYSIWYGEditor';
 @import 'Views/Editors/SchemaEditor';
 @import 'Views/Editors/MediaViewer';
 
 // Field editors
+@import 'Views/Editors/FieldEditors/FieldEditor';
 @import 'Views/Editors/FieldEditors/ArrayEditor';
 @import 'Views/Editors/FieldEditors/MediaReferenceEditor';
 @import 'Views/Editors/FieldEditors/RichTextEditor';

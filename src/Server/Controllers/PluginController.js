@@ -1,7 +1,6 @@
 'use strict';
 
-const Glob = require('glob');
-const FileSystem = require('fs');
+const Path = require('path');
 
 /**
  * The controller for serving plugin content
@@ -14,39 +13,43 @@ class PluginController extends HashBrown.Controllers.Controller {
      */
     static init(app) {
         app.get('/js/plugins.js', this.getJs);
-        app.get('/css/plugins.cs', this.getCss);
+        app.get('/css/plugins.css', this.getCss);
     }
     
     /**
      * Serves JS files
      */
-    static getJs(req, res) {
-        Glob(APP_ROOT + '/plugins/*/client/**/*.js', (err, paths) => {
-            let compiledJs = '';
+    static async getJs(req, res) {
+        let paths = await HashBrown.Helpers.FileHelper.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.js'));
+    
+        let compiledJs = '';
 
-            for(let path of paths) {
-                compiledJs += FileSystem.readFileSync(path, 'utf8');
-            }
+        for(let path of paths) {
+            let file = await HashBrown.Helpers.FileHelper.read(path);
+            
+            compiledJs += file.toString('utf8');
+        }
 
-            res.set('Content-Type', 'text/javascript');
-            res.send(compiledJs);
-        });
+        res.set('Content-Type', 'text/javascript');
+        res.send(compiledJs);
     }
     
     /**
      * Serves CSS files
      */
-    static getCss(req, res) {
-        Glob(APP_ROOT + '/plugins/*/client/**/*.css', (err, paths) => {
-            let compiledCss = '';
+    static async getCss(req, res) {
+        let paths = await HashBrown.Helpers.FileHelper.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.css'));
+    
+        let compiledCss = '';
 
-            for(let path of paths) {
-                compiledCss += FileSystem.readFileSync(path, 'utf8');
-            }
+        for(let path of paths) {
+            let file = await HashBrown.Helpers.FileHelper.read(path);
+            
+            compiledCss += file.toString('utf8');
+        }
 
-            res.set('Content-Type', 'text/css');
-            res.send(compiledCss);
-        });
+        res.set('Content-Type', 'text/css');
+        res.send(compiledCss);
     }
 }
 

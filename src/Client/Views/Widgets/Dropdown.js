@@ -10,22 +10,52 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
      * Constructor
      */
     constructor(params) {
-        if(params.optionsUrl) {
-            params.isAsync = true;
-            
-            HashBrown.Helpers.RequestHelper.request('get', params.optionsUrl)
-            .then((options) => {
-                this.options = options;
-
-                this.fetch();
-            });
-        }
-                
         super(params);
-
-        this.optionIcons = {};
     }
-   
+  
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            if(this.options && typeof this.options.then === 'function') {
+                this.options = await this.options;
+            
+            } else if(this.optionsUrl) {
+                this.isAsync = true;
+                
+                this.options = await HashBrown.Helpers.RequestHelper.request('get', this.optionsUrl);
+            }
+                    
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+
+    /**
+     * Sets the value silently
+     *
+     * @param {String} value
+     */
+    setValueSilently(newValue) {
+        this.sanityCheck();
+
+        this.value = newValue;
+
+        // Update classes
+        this.updateSelectedClasses();
+       
+        // Update value label
+        let divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if(divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+    }
+
     /**
      * Gets option icon
      *
@@ -177,23 +207,52 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
     /**
      * Updates all position classes
      */
-    updatePositionClasses() {
-        setTimeout(() => {
-            let toggle = this.element.querySelector('.widget--dropdown__toggle');
-            let isChecked = toggle.checked;
+    updatePositionStyling() {
+        let toggle = this.element.querySelector('.widget--dropdown__toggle');
+        let options = this.element.querySelector('.widget--dropdown__options');
+        let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        let isChecked = toggle.checked;
+        let isContext = this.element.classList.contains('context-menu');
+
+        toggle.checked = true;
+
+        options.removeAttribute('style');
+    
+        let bounds = this.element.getBoundingClientRect();
+        let left = bounds.left;
+        let top = bounds.bottom;
+        let width = options.offsetWidth;
+        let height = options.offsetHeight;
+
+        toggle.checked = isChecked;
+
+        if(left < margin) {
+            left = margin;
+        }
+        
+        if(left + width > window.innerWidth - margin) {
+            left -= width;
+        }
+       
+        if(isContext) {
+            if(top + height > window.innerHeight - margin) {
+                top -= (top + height) - (window.innerHeight - margin);
+            }
             
-            toggle.checked = true;
-
-            let bounds = this.element.querySelector('.widget--dropdown__options').getBoundingClientRect();
-            
-            toggle.checked = isChecked;
-
-            let isAtRight = bounds.right >= window.innerWidth - 10;
-            let isAtBottom = bounds.bottom >= window.innerHeight - 10;
-
-            this.element.classList.toggle('right', isAtRight);
-            this.element.classList.toggle('bottom', isAtBottom);
-        }, 1);
+            if(top < margin) {
+                top = margin;
+            }
+        }
+      
+        if(top + height > window.innerHeight - margin) {
+            height = window.innerHeight - top - margin;
+        }
+     
+        options.style.position = 'fixed';
+        options.style.width = width + 'px';
+        options.style.left = left + 'px';
+        options.style.top = top + 'px';
+        options.style.height = height + 'px';
     }
 
     /**
@@ -288,8 +347,6 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             isOpen = !toggle.checked;
         }
 
-        toggle.checked = isOpen;
-
         if(!isOpen) {
             this.trigger('cancel');
         } else {
@@ -298,8 +355,12 @@ class Dropdown extends HashBrown.Views.Widgets.Widget {
             }
         }
         
-        this.updatePositionClasses();
+        this.updatePositionStyling();
         this.updateSelectedClasses();
+        
+        setTimeout(() => {
+            toggle.checked = isOpen;
+        }, 2);
     }
 
     /**

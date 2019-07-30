@@ -1,0 +1,31 @@
+version: "3.4"
+
+networks:
+    hashbrown-cms--network: ~
+    
+services:
+    node:
+        image: node
+        container_name: "hashbrown-cms--node"
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mongodb
+        networks:
+            - hashbrown-cms--network
+        restart: unless-stopped
+        command: "node /opt/hashbrown-cms/hashbrown.js"
+        environment:
+            - MONGODB_HOST=mongodb
+        volumes:
+            - "../:/opt/hashbrown-cms"
+            - "./remote:/remote"
+
+    mongodb:
+        image: mongo
+        container_name: "hashbrown-cms--mongodb"
+        networks:
+            - hashbrown-cms--network
+        restart: unless-stopped
+        volumes:
+            - "./db:/data/db"

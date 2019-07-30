@@ -33,19 +33,6 @@ class LanguageHelper extends LanguageHelperCommon {
             return Promise.resolve(selected);
         });
     }
-   
-    /**
-     * Gets all selected languages (sync)
-     *
-     * @param {String} project
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguagesSync(project) {
-        project = project || HashBrown.Helpers.ProjectHelper.currentProject;
-
-        return selectedLanguages[project] || ['en'];
-    }
 
     /**
      * Sets all languages

@@ -6,13 +6,27 @@
  * @memberof HashBrown.Client.Views.Navigation
  */
 class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
+    static get route() { return '/media/'; }
+    static get label() { return 'Media'; }
+    static get icon() { return 'file-image-o'; }
+    static get hasFolders() { return true; }
+
+    /**
+     * Gets all items
+     */
+    async fetch() {
+        this.items = await HashBrown.Helpers.MediaHelper.getAllMedia();
+
+        super.fetch();
+    }
+    
     /**
      * Event: On change folder path
      *
      * @param {String} newFolder
      */
-    static onChangeDirectory(id, newFolder) {
-        HashBrown.Helpers.RequestHelper.request(
+    async onChangeDirectory(id, newFolder) {
+        await HashBrown.Helpers.RequestHelper.request(
             'post',
             'media/tree/' + id,
             newFolder ? {
@@ -20,21 +34,16 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 folder: newFolder
             } : null
         )
-        .then(() => {
-            return HashBrown.Helpers.RequestHelper.reloadResource('media');
-        })
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
+        
+        HashBrown.Helpers.EventHelper.trigger('resource');  
 
-            location.hash = '/media/' + id;
-        })
-        .catch(UI.errorModal);
+        location.hash = '/media/' + id;
     }
 
     /**
      * Event: Click rename media
      */
-    static onClickRenameMedia() {
+    onClickRenameMedia() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -46,23 +55,18 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
                 value: name,
                 onChange: (newValue) => { name = newValue; }
             }),
-            () => {
-                HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name)
-                .then(() => {
-                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+            async () => {
+                await HashBrown.Helpers.RequestHelper.request('post', 'media/rename/' + id + '?name=' + name);
 
-                    let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
+                HashBrown.Helpers.EventHelper.trigger('resource');  
 
-                    if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
-                        mediaViewer.model = null;
+                let mediaViewer = Crisp.View.get(HashBrown.Views.Editors.MediaViewer);
 
-                        mediaViewer.fetch();
-                    }
-                })
-                .catch(UI.errorModal);
+                if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
+                    mediaViewer.model = null;
+
+                    mediaViewer.fetch();
+                }
             }
         );
 
@@ -72,7 +76,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click remove media
      */
-    static onClickRemoveMedia() {
+    onClickRemoveMedia() {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -81,22 +85,15 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             'delete',
             'Delete media',
             'Are you sure you want to delete the media object "' + name + '"?',
-            () => {
+            async () => {
                 $element.parent().toggleClass('loading', true);
 
-                HashBrown.Helpers.RequestHelper.request('delete', 'media/' + id)
-                .then(() => {
-                    return HashBrown.Helpers.RequestHelper.reloadResource('media');
-                })
-                .then(() => {
-                    HashBrown.Views.Navigation.NavbarMain.reload();
+                await HashBrown.Helpers.ResourceHelper.remove('media', id);
 
-                    // Cancel the MediaViever view if it was displaying the deleted object
-                    if(location.hash == '#/media/' + id) {
-                        location.hash = '/media/';
-                    }
-                })
-                .catch(UI.errorModal);
+                // Cancel the MediaViever view if it was displaying the deleted object
+                if(location.hash == '#/media/' + id) {
+                    location.hash = '/media/';
+                }
             }
         );
     }
@@ -104,7 +101,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click replace media
      */
-    static onClickReplaceMedia() {
+    onClickReplaceMedia() {
         let id = $('.context-menu-target').data('id');
 
         this.onClickUploadMedia(id);
@@ -113,7 +110,7 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
     /**
      * Event: Click upload media
      */
-    static onClickUploadMedia(replaceId) {
+    onClickUploadMedia(replaceId) {
         let folder = $('.context-menu-target').data('media-folder') || '/';
 
         new HashBrown.Views.Modals.MediaUploader({
@@ -143,61 +140,49 @@ class MediaPane extends HashBrown.Views.Navigation.NavbarPane {
             folder: folder
         });
     }
+
+    /**
+     * Hierarchy logic
+     */
+    hierarchy(item, queueItem) {
+        let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
+
+        queueItem.$element.attr('data-media-id', item.id);
+        queueItem.$element.attr('data-remote', true);
+       
+        if(item.folder) {
+            queueItem.createDir = true;
+            queueItem.parentDirAttr = { 'data-media-folder': item.folder };
+            queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
+        }
+    }
     
     /**
-     * Init
+     * Item context menu
      */
-    static init() {
-        HashBrown.Views.Navigation.NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
-            getItems: () => { return resources.media; },
+    getItemContextMenu() {
+        return {
+            'This media': '---',
+            'Open in new tab': () => { this.onClickOpenInNewTab(); },
+            'Move': () => { this.onClickMoveItem(); },
+            'Rename': () => { this.onClickRenameMedia(); },
+            'Remove': () => { this.onClickRemoveMedia(); },
+            'Replace': () => { this.onClickReplaceMedia(); },
+            'Copy id': () => { this.onClickCopyItemId(); },
+            'General': '---',
+            'Upload new media': () => { this.onClickUploadMedia(); }
+        };
+    }
 
-            // Hierarchy logic
-            hierarchy: (item, queueItem) => {
-                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(HashBrown.Helpers.ProjectHelper.currentProject, null, 'sync').enabled;
-
-                queueItem.$element.attr('data-media-id', item.id);
-                queueItem.$element.attr('data-remote', true);
-               
-                if(item.folder) {
-                    queueItem.createDir = true;
-                    queueItem.parentDirAttr = { 'data-media-folder': item.folder };
-                    queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
-                }
-            },
-            
-            // Item context menu
-            itemContextMenu: {
-                'This media': '---',
-                'Open in new tab': () => { this.onClickOpenInNewTab(); },
-                'Move': () => { this.onClickMoveItem(); },
-                'Rename': () => { this.onClickRenameMedia(); },
-                'Remove': () => { this.onClickRemoveMedia(); },
-                'Replace': () => { this.onClickReplaceMedia(); },
-                'Copy id': () => { this.onClickCopyItemId(); },
-                'General': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            },
-
-            // Dir context menu
-            dirContextMenu: {
-                'Directory': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'General': '---',
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            },
-
-            // General context menu
-            paneContextMenu: {
-                'Media': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Refresh': () => { this.onClickRefreshResource('media'); }
-            }
-        });
+    /**
+     * Pane context menu
+     */
+    getPaneContextMenu() {
+        return {
+            'Directory': '---',
+            'Upload new media': () => { this.onClickUploadMedia(); }
+        };
     }
 }
-
-// Settings
-MediaPane.canCreateDirectory = true;
 
 module.exports = MediaPane;

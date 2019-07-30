@@ -15,21 +15,12 @@ window.submoduleCheck = function submoduleCheck() {
 }
 
 /**
- * Converts a string from HTML to markdown
- *
- * @return {String} Markdown
- */
-window.toMarkdown = function toMarkdown(html) {
-    return HashBrown.Helpers.MarkdownHelper.fromHtml(html);
-}
-
-/**
  * Checks if the currently logged in user is admin
  *
  * @returns {Boolean} Is admin
  */
 window.currentUserIsAdmin = function isCurrentUserAdmin() {
-    return HashBrown.Models.User.current.isAdmin;
+    return HashBrown.Context.user.isAdmin;
 }
 
 /**
@@ -39,8 +30,8 @@ window.currentUserIsAdmin = function isCurrentUserAdmin() {
  *
  * @returns {Boolean} Has scope
  */
-window.currentUserHasScope = function currentUsr(scope) {
-    return HashBrown.Models.User.current.hasScope(HashBrown.Helpers.ProjectHelper.currentProject, scope);
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    return HashBrown.Context.user.hasScope(HashBrown.Context.projectId, scope);
 }
 
 /**
@@ -87,6 +78,20 @@ window.copyToClipboard = function copyToClipboard(string) {
 }
 
 /**
+ * Gets a URL query parameter
+ *
+ * @param {String} name
+ * @param {String} string
+ *
+ * @return {String} Value
+ */
+window.getQueryParam = function getQueryParam(name, string) {
+    if(!string) { string = location.search; }
+
+    return new URLSearchParams(string).get(name);
+};
+
+/**
  * Clears the workspace
  */
 window.clearWorkspace = function clearWorkspace() {
@@ -108,3 +113,14 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
         $workspace.addClass(classes);
     }
 };
+
+/**
+ * Checks for updates
+ */
+window.updateCheck = async function updateCheck() {
+    let update = await HashBrown.Helpers.RequestHelper.customRequest('get', '/api/server/update/check');
+    
+    if(update.isBehind) {
+        UI.notify('Update available', 'HashBrown can be updated to ' + update.remoteVersion + '. Please check the <a href="/readme">readme</a> for instructions.'); 
+    }
+}

@@ -40,26 +40,23 @@ base.namespace = function namespace(query) {
 }
 
 /**
- * Throws an error if parameter was null (used as a default param hack)
- *
- * @param {String} name
- */
-base.requiredParam = (name) => {
-    throw new Error('Parameter "' + name + '" is required');
-}
-
-/**
  * Checks a parameter for type
  *
  * @param {Anything} value
  * @param {String} name
  * @param {Type} type
  */
-base.checkParam = (value, name, type) => {
+base.checkParam = (value, name, type, notNull = false) => {
     if(value === undefined) {
+        console.trace();
         throw new Error('Parameter "' + name + '" is required');
     }
     
+    if(notNull && (value === null || value === '')) {
+        console.trace();
+        throw new Error('Parameter "' + name + '" cannot be null');
+    }
+
     if(value === null) { return; }
     if(value.constructor === type) { return; }
     if(value.prototype instanceof type) { return; }
@@ -75,6 +72,7 @@ base.checkParam = (value, name, type) => {
         valueTypename = value.prototype.name;
 
     }
-
+    
+    console.trace();
     throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
 }

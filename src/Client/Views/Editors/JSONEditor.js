@@ -16,40 +16,62 @@ class JSONEditor extends Crisp.View {
             _.div({class: 'editor__footer__error__body'})
         ).hide();
 
-        if(!this.model && !this.modelUrl) {
-            this.modelUrl = HashBrown.Helpers.RequestHelper.environmentUrl(this.apiPath);
+        this.fetch();
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            this.allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+            this.allConnections = await HashBrown.Helpers.ConnectionHelper.getAllConnections();
+            this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.resourceCategory, this.modelId);
+
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
+    }
+
+    /**
+     * Gets a schema synchronously
+     *
+     * @param {String} id
+     *
+     * @return {HashBrown.Models.Schema} Schema
+     */
+    getSchema(id) {
+        checkParam(id, 'id', String);
+
+        for(let schema of this.allSchemas) {
+            if(schema.id === id) { return schema; }
         }
 
-        this.fetch();
+        return null;
     }
 
     /**
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
-        let url = $('.navbar-main__pane__item.active > a').attr('href');
-    
-        if(url) {
-            location = url;
-        } else {
-            debug.log('Invalid url "' + url + '"', this);
-        }
+        location.hash = location.hash.replace('/json', '');
     }
 
     /**
      * Event: Click save. Posts the model to the apiPath
      */
-    onClickSave() {
-        let view = this;
-        
+    async onClickSave() {
+        this.model = JSON.parse(this.value); 
+
         this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
-            HashBrown.Helpers.RequestHelper.request('post', this.apiPath, this.model)
-            .then(() => {
-                this.$saveBtn.toggleClass('working', false);
-            })
-            .catch(UI.errorModal);
+            await HashBrown.Helpers.ResourceHelper.set(this.resourceCategory, this.modelId, this.model);
+
+            this.$saveBtn.toggleClass('working', false);
        
         } else {
             UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
@@ -87,20 +109,18 @@ class JSONEditor extends Crisp.View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
-                    if(HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(v)) {
-                        return;
-                    }
+                    if(this.getSchema(v)) { return; }
 
                     return 'Schema "' + v + '" not found';
                
                 case 'schemaBindings': case 'allowedSchemas': case 'allowedChildSchemas':
                     let invalidSchemas = v.slice(0);
                     
-                    for(let r in resources.schemas) {
-                        let schema = resources.schemas[r];
+                    for(let r in this.allSchemas) {
+                        let schema = this.allSchemas[r];
                         
                         for(let b = invalidSchemas.length - 1; b >= 0; b--) {
-                            if(schema.id == invalidSchemas[b]) {
+                            if(schema.id === invalidSchemas[b]) {
                                 invalidSchemas.splice(b, 1);
                             }
                         }   
@@ -119,8 +139,8 @@ class JSONEditor extends Crisp.View {
                 case 'connections':
                     let invalidConnections = v.slice(0);
                     
-                    for(let r in resources.connections) {
-                        let connection = resources.connections[r];
+                    for(let r in this.allConnections) {
+                        let connection = this.allConnections[r];
 
                         for(let c = invalidConnections.length - 1; c >= 0; c--) {
                             if(connection.id == invalidConnections[c]) {

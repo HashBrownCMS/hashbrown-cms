@@ -1,8 +1,5 @@
 'use strict';
 
-// Models
-const Media = require('../Models/Media');
-
 /**
  * A helper for Media objects
  *

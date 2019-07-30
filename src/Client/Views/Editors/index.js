@@ -4,6 +4,8 @@
  * @namespace HashBrown.Client.Views.Editors
  */
 namespace('Views.Editors')
+.add(require('./Editor'))
+.add(require('./ResourceEditor'))
 .add(require('./ConnectionEditor'))
 .add(require('./ContentEditor'))
 .add(require('./FormEditor'))
@@ -13,8 +15,8 @@ namespace('Views.Editors')
 .add(require('./SchemaEditor'))
 .add(require('./ContentSchemaEditor'))
 .add(require('./FieldSchemaEditor'))
+.add(require('./WYSIWYGEditor'))
 
-namespace('Views.Editors.DeployerEditors');
-namespace('Views.Editors.ProcessorEditors');
-
+require('./DeployerEditors')
 require('./FieldEditors')
+require('./ProcessorEditors')

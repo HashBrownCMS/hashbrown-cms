@@ -143,7 +143,7 @@ class ApiController extends HashBrown.Controllers.Controller {
         }
 
         if(printToLog) {
-            debug.log('ERROR: ' + fullErrorString, this);
+            debug.log(fullErrorString, this);
         }
 
         return shortErrorString;

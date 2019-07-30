@@ -9,7 +9,7 @@
     flex-grow: 1;
     background-color: $standard;
     border-radius: 0.2rem;
-    border: 2px solid $standard-dark;
+    border: 1px solid $standard-darker;
     height: 2rem;
     user-select: none;
     color: $standard-text;
@@ -28,25 +28,6 @@
     &.small {
         max-width: 2rem;
         width: 2rem;
-    }
-
-    // Right + bottom modes
-    &.right {
-        .widget--dropdown__options {
-            transform: translateX(calc(-100% + 3rem));
-        }
-    }
-
-    &.bottom {
-        .widget--dropdown__options {
-            transform: translateY(-100%);
-        }
-    }
-
-    &.bottom.right {
-        .widget--dropdown__options {
-            transform: translate(-100%, -100%);
-        }
     }
 
     // Icon mode
@@ -99,7 +80,7 @@
             top: 3.5rem;
             left: -0.5rem;
             max-height: none;
-            overflow: visible;
+            overflow-y: auto;
             width: 10rem;
             border-top-left-radius: 0.2rem;
             border-top-right-radius: 0.2rem;
@@ -123,19 +104,20 @@
     // Context menu mode
     &.context-menu {
         min-width: 0;
-        width: 16rem;
-        position: absolute;
-        z-index: 1200;
         border: 0;
         background-color: transparent;
+        position: absolute;
+        height: 0;
 
         .widget--dropdown__value {
             display: none;
         }
 
         .widget--dropdown__options {
-            top: 0;
+            z-index: 1200;
             max-height: none;
+            width: 16rem;
+            top: 0;
             padding: 1rem;
         }
     }
@@ -215,7 +197,7 @@
         position: absolute;
         line-height: 2rem;
         width: 100%;
-        border: 2px solid $standard;
+        border: 1px solid $standard;
         border-bottom: 0;
         border-top-right-radius: 0.2rem;
         border-top-left-radius: 0.2rem;
@@ -270,12 +252,12 @@
         position: absolute;
         top: 2rem;
         left: 0;
-        border: 2px solid $primary;
+        border: 1px solid $primary;
         background-color: $standard;
         width: 100%;
-        max-height: 10rem;
         overflow-y: auto;
         user-select: none;
+        max-height: 20rem;
     }
 
     // Option

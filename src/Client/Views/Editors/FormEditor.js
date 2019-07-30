@@ -5,11 +5,26 @@
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class FormEditor extends Crisp.View {
+class FormEditor extends HashBrown.Views.Editors.ResourceEditor {
     constructor(params) {
         super(params);
         
         this.fetch();
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            this.model = await HashBrown.Helpers.FormHelper.getFormById(this.modelId);
+
+            super.fetch();
+
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
     
     /**
@@ -20,24 +35,14 @@ class FormEditor extends Crisp.View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save
      */
-    onClickSave() {
+    async onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        HashBrown.Helpers.RequestHelper.request('post', 'forms/' + this.model.id, this.model)
-        .then(() => {
-            debug.log('Saved form "' + this.model.id + '"', this);
-            this.$saveBtn.toggleClass('working', false);
+        await HashBrown.Helpers.ResourceHelper.set('forms', this.model.id, this.model);
         
-            return HashBrown.Helpers.RequestHelper.reloadResource('forms');
-        })
-        .then(() => {
-            let navbar = Crisp.View.get('NavbarMain');
-            
-            navbar.reload();
-        })
-        .catch(UI.errorModal);
+        this.$saveBtn.toggleClass('working', false);
     }
 
     /**
@@ -48,7 +53,7 @@ class FormEditor extends Crisp.View {
             this.model.inputs['newinput'] = { type: 'text' };
         }
 
-        this.fetch();
+        this.update();
     }
 
     /**
@@ -59,7 +64,7 @@ class FormEditor extends Crisp.View {
     onClickRemoveInput(key) {
         delete this.model.inputs[key];
 
-        this.fetch();
+        this.update();
     }
     
     /**
@@ -68,15 +73,13 @@ class FormEditor extends Crisp.View {
      * @return {Object} element
      */
     renderAllowedOriginEditor() {
-        return _.div({class: 'editor__field__value'},
-            new HashBrown.Views.Widgets.Input({
-                value: this.model.allowedOrigin,
-                tooltip: 'The allowed origin from which entries to this form can be posted',
-                onChange: (newOrigin) => {
-                    this.model.allowedOrigin = newOrigin;
-                }
-            }).$element
-        );
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.allowedOrigin,
+            tooltip: 'The allowed origin from which entries to this form can be posted',
+            onChange: (newOrigin) => {
+                this.model.allowedOrigin = newOrigin;
+            }
+        });
     }
 
     /**
@@ -85,15 +88,13 @@ class FormEditor extends Crisp.View {
      * @return {Object} element
      */
     renderTitleEditor() {
-        return _.div({class: 'editor__field__value'},
-            new HashBrown.Views.Widgets.Input({
-                value: this.model.title,
-                tooltip: 'The title of the form',
-                onChange: (newTitle) => {
-                    this.model.title = newTitle;
-                }
-            }).$element
-        );
+        return new HashBrown.Views.Widgets.Input({
+            value: this.model.title,
+            tooltip: 'The title of the form',
+            onChange: (newTitle) => {
+                this.model.title = newTitle;
+            }
+        });
     }
     
     /**
@@ -102,156 +103,33 @@ class FormEditor extends Crisp.View {
      * @return {Object} element
      */
     renderRedirectEditor() {
-        return _.div({class: 'editor__field__value'},
-            _.div({class: 'widget-group'},
-                new HashBrown.Views.Widgets.Input({
-                    value: this.model.redirect,
-                    tooltip: 'The URL that the user will be redirected to after submitting the form entry',
-                    onChange: (newUrl) => {
-                        this.model.redirect = newUrl;
-                    }
-                }).$element,
-                new HashBrown.Views.Widgets.Input({
-                    value: this.model.appendRedirect,
-                    placeholder: 'Append',
-                    type: 'checkbox',
-                    tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
-                    onChange: (newValue) => {
-                        this.model.appendRedirect = newValue;
-                    }
-                }).$element
-            )
-        );
-    }
-
-    /**
-     * Renders the inputs editor
-     *
-     * @return {Object} element
-     */
-    renderInputsEditor() {
-        let types = [
-            'checkbox',
-            'hidden',
-            'number',
-            'select',
-            'text'
-        ];
-
-        return _.div({class: 'editor__field__value'},
-            _.each(this.model.inputs, (key, input) => {
-                return _.div({class: 'editor__field raised'},
-                    _.div({class: 'editor__field__actions'},
-                        _.button({class: 'editor__field__action editor__field__action--remove', title: 'Remove field'})
-                            .click(() => { view.onClickRemoveInput(key); })
-                    ),
-                    _.div({class: 'editor__field__value'},
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Name'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: key,
-                                    onChange: (newValue) => {
-                                        delete this.model.inputs[key];
-
-                                        key = newValue;
-
-                                        this.model.inputs[key] = input;
-                                    }
-                                }).$element
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Type'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Dropdown({
-                                    value: input.type,
-                                    options: types,
-                                    onChange: (newValue) => {
-                                        input.type = newValue;
-
-                                        this.fetch();
-                                    }
-                                }).$element
-                            )
-                        ),
-                        _.if(input.type == 'select',
-                            _.div({class: 'editor__field'},
-                                _.div({class: 'editor__field__key'}, 'Select options'),
-                                _.div({class: 'editor__field__value'},
-                                    new HashBrown.Views.Widgets.Chips({
-                                        value: input.options || [],
-                                        onChange: (newValue) => {
-                                            input.options = newValue;
-
-                                            this.renderPreview();
-                                        }
-                                    }).$element
-                                )
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Required'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    type: 'checkbox',
-                                    value: input.required === true,
-                                    onChange: (newValue) => {
-                                        input.required = newValue;
-                                    }
-                                }).$element
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Check duplicates'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    type: 'checkbox',
-                                    value: input.checkDuplicates === true,
-                                    onChange: (newValue) => {
-                                        input.checkDuplicates = newValue;
-                                    }
-                                }).$element
-                            )
-                        ),
-                        _.div({class: 'editor__field'},
-                            _.div({class: 'editor__field__key'}, 'Pattern'),
-                            _.div({class: 'editor__field__value'},
-                                new HashBrown.Views.Widgets.Input({
-                                    value: input.pattern,
-                                    onChange: (newValue) => {
-                                        input.pattern = newValue;
-                                    }
-                                }).$element
-                            )
-                        )
-                    )
-                );
+        return _.div({class: 'widget-group'},
+            new HashBrown.Views.Widgets.Input({
+                value: this.model.redirect,
+                tooltip: 'The URL that the user will be redirected to after submitting the form entry',
+                onChange: (newUrl) => {
+                    this.model.redirect = newUrl;
+                }
             }),
-            _.button({class: 'widget widget--button round editor__field__add fa fa-plus', title: 'Add an input'})
-                .on('click', () => { this.onClickAddInput(); })
-        );
-    }
-
-    /**
-     * Renders a preview
-     *
-     * @return {Object} element
-     */
-    renderPreview() {
-        let $preview = this.$element.find('.editor--form__preview');
-
-        _.append($preview.empty(),
-            _.each(this.model.inputs, (key, input) => {
-                if(input.type === 'select') {
-                    return new HashBrown.Views.Widgets.Dropdown({
-                        options: input.options || []
-                    }).$element
-                } else {
-                    return _.input({class: 'widget widget--input ' + (input.type || 'text'), placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required === true});
+            new HashBrown.Views.Widgets.Input({
+                value: this.model.appendRedirect,
+                placeholder: 'Append',
+                type: 'checkbox',
+                tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
+                onChange: (newValue) => {
+                    this.model.appendRedirect = newValue;
                 }
             })
         );
+    }
+
+    /**
+     * Gets all input types
+     *
+     * @return {Array} Types
+     */
+    getInputTypes() {
+        return [ 'checkbox', 'hidden', 'number', 'select', 'text' ];
     }
 
     /**
@@ -263,12 +141,16 @@ class FormEditor extends Crisp.View {
         return _.div({class: 'editor__field__value'},
             _.div({class: 'widget-group'},
                 _.button({class: 'widget widget--button low warning'}, 'Clear').click(() => {
-                    UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
-                        HashBrown.Helpers.RequestHelper.request('post', 'forms/clear/' + this.model.id)
-                        .then(() => {
+                    UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', async () => {
+                        try {
+                            await HashBrown.Helpers.RequestHelper.request('post', 'forms/clear/' + this.model.id);
+
                             this.model.entries = [];
-                        })
-                        .catch(UI.errorModal);
+                        
+                        } catch(e) {
+                            UI.errorModal(e);
+
+                        }
                     });
                 }),
                 _.button({class: 'widget widget--button low'}, 'Get .csv').click(() => {
@@ -279,85 +161,12 @@ class FormEditor extends Crisp.View {
     }
 
     /**
-     * Renders a single field
+     * Gets the POST URL
      *
-     * @return {HTMLElement} Element
+     * @return {String} URL
      */
-    renderField(label, $content, className) {
-        return _.div({class: 'editor__field'},
-            _.div({class: 'editor__field__key'},
-                label
-            ),
-            $content
-        );
-    }
-        
-    /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-    renderFields() {
-        let $element = _.div({class: 'editor__body'});
-        let postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
-        
-        return _.div({class: 'editor__body'},
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Entries (' + this.model.entries.length + ')'),
-                _.div({class: 'editor__field__value'},
-                    this.renderEntries()
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'POST URL'),
-                _.div({class: 'editor__field__value'},
-                    _.div({class: 'widget-group'},
-                        _.input({readonly: 'readonly', class: 'widget widget--input text', type: 'text', value: postUrl}),
-                        _.button({class: 'widget widget--button small fa fa-copy', title: 'Copy POST URL'})
-                            .click((e) => {
-                                copyToClipboard(e.currentTarget.previousElementSibling.value);
-                            })
-                    )
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Title'),
-                _.div({class: 'editor__field__value'},
-                    this.renderTitleEditor()
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Allowed origin'),
-                _.div({class: 'editor__field__value'},
-                    this.renderAllowedOriginEditor() 
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Redirect URL'),
-                _.div({class: 'editor__field__value'},
-                    this.renderRedirectEditor() 
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Inputs'),
-                _.div({class: 'editor__field__value'},
-                    this.renderInputsEditor()
-                )
-            ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Preview'),
-                _.div({class: 'editor__field__value'},
-                    _.div({class: 'editor--form__preview'})
-                )
-            )
-        );
-    }
-
-    /**
-     * Post render
-     */
-    postrender() {
-        this.renderPreview();
+    getPostUrl() {
+        return location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
     }
 
     /**
@@ -369,7 +178,134 @@ class FormEditor extends Crisp.View {
                 _.span({class: 'editor__header__icon fa fa-wpforms'}),
                 _.h4({class: 'editor__header__title'}, this.model.title)
             ),
-            this.renderFields(),
+            _.div({class: 'editor__body'},
+                this.field(
+                    'Entries (' + this.model.entries.length + ')',
+                    this.renderEntries()
+                ),
+                this.field(
+                    'POST URL',
+                    _.div({class: 'widget-group'},
+                        _.input({readonly: 'readonly', class: 'widget widget--input text', type: 'text', value: this.getPostUrl()}),
+                        _.button({class: 'widget widget--button small fa fa-copy', title: 'Copy POST URL'})
+                            .click((e) => { copyToClipboard(e.currentTarget.previousElementSibling.value); })
+                    )
+                ),
+                this.field(
+                    'Title',
+                    this.renderTitleEditor()
+                ),
+                this.field(
+                    'Allowed origin',
+                    this.renderAllowedOriginEditor() 
+                ),
+                this.field(
+                    'Redirect URL',
+                    this.renderRedirectEditor() 
+                ),
+                this.field(
+                    'Inputs',
+                    _.div({class: 'editor--form__inputs'},
+                        _.div({class: 'editor__field__value'},
+                            _.each(this.model.inputs, (key, input) => {
+                                return this.field(
+                                    {
+                                        isCollapsible: true,
+                                        isCollapsed: true,
+                                        label: key,
+                                        actions: {
+                                            remove: () => { this.onClickRemoveInput(key); }
+                                        }
+                                    },
+                                    this.field(
+                                        'Name',
+                                        new HashBrown.Views.Widgets.Input({
+                                            value: key,
+                                            onChange: (newValue) => {
+                                                delete this.model.inputs[key];
+
+                                                key = newValue;
+
+                                                this.model.inputs[key] = input;
+                                            }
+                                        })
+                                    ),
+                                    this.field(
+                                        'Type',
+                                        new HashBrown.Views.Widgets.Dropdown({
+                                            value: input.type,
+                                            options: this.getInputTypes(),
+                                            onChange: (newValue) => {
+                                                input.type = newValue;
+
+                                                this.update();
+                                            }
+                                        })
+                                    ),
+                                    _.if(input.type == 'select',
+                                        this.field(
+                                            'Select options',
+                                            new HashBrown.Views.Widgets.Chips({
+                                                value: input.options || [],
+                                                onChange: (newValue) => {
+                                                    input.options = newValue;
+
+                                                    this.update();
+                                                }
+                                            })
+                                        )
+                                    ),
+                                    this.field(
+                                        'Required',
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'checkbox',
+                                            value: input.required === true,
+                                            onChange: (newValue) => {
+                                                input.required = newValue;
+                                            }
+                                        })
+                                    ),
+                                    this.field(
+                                        'Check duplicates',
+                                        new HashBrown.Views.Widgets.Input({
+                                            type: 'checkbox',
+                                            value: input.checkDuplicates === true,
+                                            onChange: (newValue) => {
+                                                input.checkDuplicates = newValue;
+                                            }
+                                        })
+                                    ),
+                                    this.field(
+                                        'Pattern',
+                                        new HashBrown.Views.Widgets.Input({
+                                            value: input.pattern,
+                                            onChange: (newValue) => {
+                                                input.pattern = newValue;
+                                            }
+                                        })
+                                    )
+                                );
+                            }),
+                            _.button({class: 'widget widget--button round editor__field__add fa fa-plus', title: 'Add an input'})
+                                .on('click', () => { this.onClickAddInput(); })
+                        )
+                    )
+                ),
+                this.field(
+                    'Preview',
+                    _.div({class: 'editor--form__preview'},
+                        _.each(this.model.inputs, (key, input) => {
+                            if(input.type === 'select') {
+                                return new HashBrown.Views.Widgets.Dropdown({
+                                    options: input.options || []
+                                });
+                            } else {
+                                return _.input({class: 'widget widget--input ' + (input.type || 'text'), placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required === true});
+                            }
+                        })
+                    )
+                )
+            ),
             _.div({class: 'editor__footer'}, 
                 _.div({class: 'editor__footer__buttons'},
                     _.button({class: 'widget widget--button embedded'},

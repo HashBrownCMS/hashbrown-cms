@@ -9,20 +9,32 @@ const ContentHelperCommon = require('Common/Helpers/ContentHelper');
  */
 class ContentHelper extends ContentHelperCommon {
     /**
-     * Gets Content by id
+     * Gets all ancestors of a Content node by id
      *
      * @param {String} id
+     * @param {Boolean} includeSelf
      *
-     * @returns {Content} Content node
+     * @returns {Array} Content node
      */
-    static getContentByIdSync(id) {
-        if(!id) { return null; }
+    static async getContentAncestorsById(id, includeSelf = false) {
+        checkParam(id, 'id', String, true);
 
-        for(let content of resources.content) {
-            if(content.id === id) {
-                return content;
+        let ancestors = [];
+        let ancestorId = id;
+
+        while(ancestorId) {
+            let ancestor = await this.getContentById(ancestorId);
+
+            if(ancestorId !== id || includeSelf) {
+                ancestors.push(ancestor);
             }
+            
+            ancestorId = ancestor.parentId;
         }
+
+        ancestors.reverse();
+
+        return ancestors;
     }
     
     /**
@@ -30,33 +42,34 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise} Content node
+     * @returns {HashBrown.Models.Content} Content node
      */
-    static getContentById(id) {
-        if(!id) { return Promise.resolve(null); }
+    static async getContentById(id) {
+        checkParam(id, 'id', String, true);
 
-        return HashBrown.Helpers.RequestHelper.request('get', 'content/' + id)
-        .then((content) => {
-            return Promise.resolve(new HashBrown.Models.Content(content));
-        });
+        return await HashBrown.Helpers.ResourceHelper.get(HashBrown.Models.Content, 'content', id);
+    }
+    
+    /**
+     * Gets all Content
+     *
+     * @returns {Array} Content nodes
+     */
+    static async getAllContent() {
+        return await HashBrown.Helpers.ResourceHelper.getAll(HashBrown.Models.Content, 'content');
     }
     
     /**
      * Sets Content by id
      *
      * @param {String} id
-     * @param {Content} content
-     *
-     * @returns {Promise} Content node
+     * @param {HashBrown.Models.Content} content
      */
     static setContentById(id, content) {
         checkParam(id, 'id', String);
         checkParam(content, 'content', HashBrown.Models.Content);
 
-        return HashBrown.Helpers.RequestHelper.request('post', 'content/' + id, content.getObject())
-        .then((content) => {
-            return Promise.resolve(content);
-        });
+        return HashBrown.Helpers.ResourceHelper.set('content', id, content);
     }
 
     /**
@@ -71,10 +84,9 @@ class ContentHelper extends ContentHelperCommon {
 
         let isEmpty = true;
         let checkRecursive = (object) => {
-            if(!object) { return; }
+            if(object == undefined) { return; }
 
             // We consider a definition not empty, if it has a value that is not an object
-            // Remember, null is of type 'object' too
             if(typeof object !== 'object') { return isEmpty = false; }
 
             for(let k in object) {
@@ -92,6 +104,8 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {Object} value
      * @param {Object} definition
+     *
+     * @return {Object} Checked value
      */
     static fieldSanityCheck(value, definition) {
         // If the definition value is set to multilingual, but the value isn't an object, convert it
@@ -99,13 +113,13 @@ class ContentHelper extends ContentHelperCommon {
             let oldValue = value;
 
             value = {};
-            value[window.language] = oldValue;
+            value[HashBrown.Context.language] = oldValue;
         }
 
         // If the definition value is not set to multilingual, but the value is an object
         // containing the _multilingual flag, convert it
         if(!definition.multilingual && value && typeof value === 'object' && value._multilingual) {
-            value = value[window.language];
+            value = value[HashBrown.Context.language];
         }
 
         // Update the _multilingual flag
@@ -126,18 +140,26 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} parentId
      * @param {String} aboveId
      * @param {String} belowId
+     *
+     * @return {Number} New index
      */
-    static getNewSortIndex(parentId, aboveId, belowId) {
+    static async getNewSortIndex(parentId, aboveId, belowId) {
         if(aboveId) {
-            return this.getContentByIdSync(aboveId).sort + 1;
+            let aboveContent = await this.getContentById(aboveId);
+            
+            return aboveContent.sort + 1;
         }
 
         if(belowId) {
-            return this.getContentByIdSync(belowId).sort - 1;
+            let belowContent = await this.getContentById(belowId);
+            
+            return belowContent.sort + 1;
         }
 
         // Filter out content that doesn't have the same parent
-        let nodes = resources.content.filter((x) => {
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
+        
+        allContent.filter((x) => {
             return x.parentId == parentId || (!x.parentId && !parentId);
         });
 
@@ -145,7 +167,7 @@ class ContentHelper extends ContentHelperCommon {
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
         let newIndex = 10000;
 
-        for(let content of nodes) {
+        for(let content of allContent) {
             if(newIndex - 10000 <= content.sort) {
                 newIndex = content.sort + 10000;
             }
@@ -157,31 +179,24 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Starts a tour of the Content section
      */
-    static startTour() {
+    static async startTour() {
         if(location.hash.indexOf('content/') < 0) {
             location.hash = '/content/';
         }
        
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        })
-        .then(() => {
-            return UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next')
-        })
-        .then(() => {
-            return UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
-        })
-        .then(() => {
-            let editor = document.querySelector('.editor--content');
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
 
-            if(!editor) {
-                return UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
-            }
-                
-            return UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
-        });
+        await UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        
+        let editor = document.querySelector('.editor--content');
+
+        if(editor) {
+            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
+        } else {
+            await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
+        }
     }
 }
 

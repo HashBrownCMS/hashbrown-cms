@@ -9,9 +9,9 @@ class MainMenu extends Crisp.View {
     constructor(params) {
         super(params);
         
-        this.fetch();
-        
         $('.page--environment__space--menu').html(this.$element);
+        
+        this.fetch();
     }
     
     /**
@@ -19,24 +19,20 @@ class MainMenu extends Crisp.View {
      *
      * @param {String} newLanguage
      */
-    onChangeLanguage(newLanguage) {
+    async onChangeLanguage(newLanguage) {
         localStorage.setItem('language', newLanguage);
+        HashBrown.Context.language = newLanguage;
 
-        window.language = newLanguage;
+        HashBrown.Helpers.EventHelper.trigger('resource');  
 
-        HashBrown.Helpers.RequestHelper.reloadResource('content')
-        .then(() => {
-            HashBrown.Views.Navigation.NavbarMain.reload();
+        let contentEditor = Crisp.View.get('ContentEditor');
 
-            let contentEditor = Crisp.View.get('ContentEditor');
+        if(contentEditor) {
+            contentEditor.model = null;
+            await contentEditor.fetch();
+        }
 
-            if(contentEditor) {
-                contentEditor.model = null;
-                contentEditor.fetch();
-            }
-
-            this.fetch();
-        });
+        this.fetch();
     }
     
     /**
@@ -47,27 +43,22 @@ class MainMenu extends Crisp.View {
     onClickQuestion(topic) {
         switch(topic) {
             case 'content':
-                let modal = UI.messageModal('Content', [ 
-                    _.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')
-                ]);
+                HashBrown.Helpers.ContentHelper.startTour();
                 break;
 
             case 'media':
                 UI.messageModal('Media', [
                     _.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'),
-                    _.p('The contents of this gallery depends on which <a href="#/connections">Connection</a> has been set up as the Media provider')
+                    _.p('The contents of this gallery depends on which <a href="#/connections/">Connection</a> has been set up as the Media provider')
                 ]);
                 break;
 
-            case 'forms':
-                UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
+            case'forms':
+                HashBrown.Helpers.FormHelper.startTour();
                 break;
 
             case 'connections':
-                UI.messageModal('Connections', [
-                    _.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'),
-                    _.p('They can also be set up to provide statically hosted media.')
-                ]);
+                HashBrown.Helpers.ConnectionHelper.startTour();
                 break;
 
             case 'schemas':
@@ -77,17 +68,32 @@ class MainMenu extends Crisp.View {
     }
 
     /**
-     * Pre render
+     * Gets the help options
+     *
+     * @return {Object} Options
      */
-    prerender() {
-        this.languages = HashBrown.Helpers.LanguageHelper.getLanguagesSync() || [];
+    getHelpOptions() {
+        let helpOptions = {
+            'Connections': () => { this.onClickQuestion('connections'); },
+            'Content': () => { this.onClickQuestion('content'); },
+            'Forms': () => { this.onClickQuestion('forms'); },
+            'Media': () => { this.onClickQuestion('media'); },
+            'Schemas': () => { this.onClickQuestion('schemas'); }
+        };
+
+        if(!currentUserHasScope('connections')) { delete helpOptions['Connections']; }
+        if(!currentUserHasScope('schemas')) { delete helpOptions['Schemas']; }
+
+        return helpOptions;
     }
 
     /**
      * Post render
      */
     postrender() {
-        this.languageDropdown.notify(window.language);
+        if(this.languageDropdown) {
+            this.languageDropdown.notify(HashBrown.Context.language);
+        }
     }
 
     /**
@@ -95,13 +101,13 @@ class MainMenu extends Crisp.View {
      */
     template() {
         return _.div({class: 'main-menu widget-group'},
-            // Language picker
-            _.if(Array.isArray(this.languages) && this.languages.length > 1,
+            _.if(HashBrown.Context.projectSettings.languages.length > 1,
+                // Language picker
                 this.languageDropdown = new HashBrown.Views.Widgets.Dropdown({
                     tooltip: 'Language',
                     icon: 'flag',
-                    value: window.language,
-                    options: this.languages,
+                    value: HashBrown.Context.language,
+                    options: HashBrown.Context.projectSettings.languages,
                     onChange: (newValue) => {
                         this.onChangeLanguage(newValue);
                     }
@@ -110,11 +116,11 @@ class MainMenu extends Crisp.View {
 
             // User dropdown
             this.userDropdown = new HashBrown.Views.Widgets.Dropdown({
-                tooltip: 'Logged in as "' + (HashBrown.Models.User.current.fullName || HashBrown.Models.User.current.username) + '"',
+                tooltip: 'Logged in as "' + (HashBrown.Context.user.fullName || HashBrown.Context.user.username) + '"',
                 icon: 'user',
                 reverseKeys: true,
                 options: {
-                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Models.User.current }); },
+                    'User settings': () => { new HashBrown.Views.Editors.UserEditor({ hidePermissions: true, model: HashBrown.Context.user }); },
                     'Log out': () => {
                         HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/logout')
                         .then(() => {
@@ -129,13 +135,7 @@ class MainMenu extends Crisp.View {
                 tooltip: 'Get help',
                 icon: 'question-circle',
                 reverseKeys: true,
-                options: {
-                    'Connections': () => { this.onClickQuestion('connections'); },
-                    'Content': () => { this.onClickQuestion('content'); },
-                    'Forms': () => { this.onClickQuestion('forms'); },
-                    'Media': () => { this.onClickQuestion('media'); },
-                    'Schemas': () => { this.onClickQuestion('schemas'); }
-                }
+                options: this.getHelpOptions(),
             })
         );
     }

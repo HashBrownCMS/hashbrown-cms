@@ -14,30 +14,29 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testBackupHelper(project, onMessage) {
+    static async testBackupHelper(project, onMessage) {
         checkParam(project, 'project', String);
         checkParam(onMessage, 'onMessage', Function);
 
-        let timestamp;
-
         onMessage('Get backups for project "' + project + '"');
-        return HashBrown.Helpers.BackupHelper.getBackupsForProject(project)
-        .then((backups) => {
-            onMessage('Create backup'); 
-            return HashBrown.Helpers.BackupHelper.createBackup(project);
-        })
-        .then((newTimestamp) => {
-            timestamp = newTimestamp;
+        
+        let backups = await HashBrown.Helpers.BackupHelper.getBackupsForProject(project);
 
-            onMessage('Get path of backup "' + timestamp + '"');
-            return HashBrown.Helpers.BackupHelper.getBackupPath(project, timestamp);
-        }).then((path) => {
-            onMessage('Restore backup "' + timestamp + '"');
-            return HashBrown.Helpers.BackupHelper.restoreBackup(project, timestamp);
-        }).then((path) => {
-            onMessage('Delete backup "' + timestamp + '"');
-            return HashBrown.Helpers.BackupHelper.deleteBackup(project, timestamp);
-        });
+        onMessage('Create backup'); 
+        
+        let timestamp = await HashBrown.Helpers.BackupHelper.createBackup(project);
+
+        onMessage('Get path of backup "' + timestamp + '"');
+        
+        await HashBrown.Helpers.BackupHelper.getBackupPath(project, timestamp);
+        
+        onMessage('Restore backup "' + timestamp + '"');
+        
+        await HashBrown.Helpers.BackupHelper.restoreBackup(project, timestamp);
+        
+        onMessage('Delete backup "' + timestamp + '"');
+    
+        await HashBrown.Helpers.BackupHelper.deleteBackup(project, timestamp);
     }
 
     /**
@@ -49,29 +48,30 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testConnectionHelper(project, environment, onMessage) {
+    static async testConnectionHelper(project, environment, onMessage) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create connection')
-        return HashBrown.Helpers.ConnectionHelper.createConnection(project, environment)
-        .then((testConnection) => {
-            onMessage('Get connection by id "' + testConnection.id + '"');
-            return HashBrown.Helpers.ConnectionHelper.getConnectionById(project, environment, testConnection.id);
-        })
-        .then((testConnection) => {
-            onMessage('Update connection by id "' + testConnection.id + '"');
-            return HashBrown.Helpers.ConnectionHelper.setConnectionById(project, environment, testConnection.id, testConnection, false);
-        })
-        .then((testConnection) => {
-            onMessage('Remove connection by id "' + testConnection.id + '"');
-            return HashBrown.Helpers.ConnectionHelper.removeConnectionById(project, environment, testConnection.id);
-        })
-        .then(() => {   
-            onMessage('Get all connections');
-            return HashBrown.Helpers.ConnectionHelper.getAllConnections(project, environment)
-        });
+        
+        let testConnection = await HashBrown.Helpers.ConnectionHelper.createConnection(project, environment)
+
+        onMessage('Get connection by id "' + testConnection.id + '"');
+
+        testConnection = await HashBrown.Helpers.ConnectionHelper.getConnectionById(project, environment, testConnection.id);
+
+        onMessage('Update connection by id "' + testConnection.id + '"');
+
+        await HashBrown.Helpers.ConnectionHelper.setConnectionById(project, environment, testConnection.id, testConnection, false);
+
+        onMessage('Remove connection by id "' + testConnection.id + '"');
+
+        await HashBrown.Helpers.ConnectionHelper.removeConnectionById(project, environment, testConnection.id);
+
+        onMessage('Get all connections');
+
+        await HashBrown.Helpers.ConnectionHelper.getAllConnections(project, environment)
     }
 
     /**
@@ -83,33 +83,34 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testFormHelper(project, environment, onMessage) {
+    static async testFormHelper(project, environment, onMessage) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create form')
-        return HashBrown.Helpers.FormHelper.createForm(project, environment)
-        .then((testForm) => {
-            onMessage('Get form by id "' + testForm.id + '"');
-            return HashBrown.Helpers.FormHelper.getForm(project, environment, testForm.id);
-        })
-        .then((testForm) => {
-            onMessage('Update form by id "' + testForm.id + '"');
-            return HashBrown.Helpers.FormHelper.setForm(project, environment, testForm.id, testForm, false);
-        })
-        .then((testForm) => {
-            onMessage('Add entry to form "' + testForm.id + '"');
-            return HashBrown.Helpers.FormHelper.addEntry(project, environment, testForm.id, {});
-        })
-        .then((testForm) => {
-            onMessage('Remove form by id "' + testForm.id + '"');
-            return HashBrown.Helpers.FormHelper.deleteForm(project, environment, testForm.id);
-        })
-        .then(() => {   
-            onMessage('Get all forms');
-            return HashBrown.Helpers.FormHelper.getAllForms(project, environment)
-        });
+
+        let testForm = await HashBrown.Helpers.FormHelper.createForm(project, environment);
+
+        onMessage('Get form by id "' + testForm.id + '"');
+        
+        await HashBrown.Helpers.FormHelper.getForm(project, environment, testForm.id);
+            
+        onMessage('Update form by id "' + testForm.id + '"');
+        
+        await HashBrown.Helpers.FormHelper.setForm(project, environment, testForm.id, testForm, false);
+            
+        onMessage('Add entry to form "' + testForm.id + '"');
+    
+        await HashBrown.Helpers.FormHelper.addEntry(project, environment, testForm.id, {});
+            
+        onMessage('Remove form by id "' + testForm.id + '"');
+        
+        await HashBrown.Helpers.FormHelper.deleteForm(project, environment, testForm.id);
+            
+        onMessage('Get all forms');
+        
+        await HashBrown.Helpers.FormHelper.getAllForms(project, environment)
     }
 
     /**
@@ -122,35 +123,31 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testContentHelper(project, environment, user, onMessage) {
+    static async testContentHelper(project, environment, user, onMessage) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(user, 'user', HashBrown.Models.User);
         checkParam(onMessage, 'onMessage', Function);
 
         onMessage('Create content');
-        return HashBrown.Helpers.ContentHelper.createContent(
-            project,
-            environment,
-            'contentBase',
-            null,
-            user
-        ).then((testContent) => {
-            onMessage('Get content by id "' + testContent.id + '"');
-            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, testContent.id);
-        })
-        .then((testContent) => {
-            onMessage('Update content by id "' + testContent.id + '"');
-            return HashBrown.Helpers.ContentHelper.setContentById(project, environment, testContent.id, testContent, user);
-        })
-        .then((testContent) => {
-            onMessage('Remove content by id "' + testContent.id + '"');
-            return HashBrown.Helpers.ContentHelper.removeContentById(project, environment, testContent.id);
-        })
-        .then(() => {   
-            onMessage('Get all contents');
-            return HashBrown.Helpers.ContentHelper.getAllContents(project, environment)
-        });
+        
+        let testContent = await HashBrown.Helpers.ContentHelper.createContent(project, environment, 'contentBase', null, user)
+            
+        onMessage('Get content by id "' + testContent.id + '"');
+        
+        testContent = await HashBrown.Helpers.ContentHelper.getContentById(project, environment, testContent.id);
+            
+        onMessage('Update content by id "' + testContent.id + '"');
+       
+        await HashBrown.Helpers.ContentHelper.setContentById(project, environment, testContent.id, testContent, user);
+            
+        onMessage('Remove content by id "' + testContent.id + '"');
+        
+        await HashBrown.Helpers.ContentHelper.removeContentById(project, environment, testContent.id);
+            
+        onMessage('Get all content');
+        
+        await HashBrown.Helpers.ContentHelper.getAllContent(project, environment)
     }
     
     /**
@@ -161,28 +158,29 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testProjectHelper(testProject, onMessage) {
-        checkParam(testProject, 'testProject', HashBrown.Models.Project);
-        checkParam(onMessage, 'onMessage', Function);
+    static async testProjectHelper(project, onMessage) {
+        checkParam(project, 'project', String, true);
+        checkParam(onMessage, 'onMessage', Function, true);
 
-        onMessage('Get project by id "' + testProject.id + '"');
-        return HashBrown.Helpers.ProjectHelper.getProject(testProject.id)
-        .then(() => {
-            onMessage('Add environment to project "' + testProject.id + '"');
-            return HashBrown.Helpers.ProjectHelper.addEnvironment(testProject.id, 'testenvironment');
-        })
-        .then((testEnvironment) => {
-            onMessage('Remove environment from project "' + testProject.id  + '"');
-            return HashBrown.Helpers.ProjectHelper.deleteEnvironment(testProject.id, testEnvironment);
-        })
-        .then(() => {
-            onMessage('Get all environments from project "' + testProject.id  + '"');
-            return HashBrown.Helpers.ProjectHelper.getAllEnvironments(testProject.id);
-        })
-        .then(() => {
-            onMessage('Delete project "' + testProject.id  + '"');
-            return HashBrown.Helpers.ProjectHelper.deleteProject(testProject.id, false);
-        });
+        onMessage('Get project by id "' + project + '"');
+
+        await HashBrown.Helpers.ProjectHelper.getProject(project);
+        
+        onMessage('Add environment to project "' + project + '"');
+        
+        await HashBrown.Helpers.ProjectHelper.addEnvironment(project, 'testenvironment');
+        
+        onMessage('Remove environment from project "' + project  + '"');
+        
+        await HashBrown.Helpers.ProjectHelper.deleteEnvironment(project, 'testEnvironment');
+        
+        onMessage('Get all environments from project "' + project  + '"');
+        
+        await HashBrown.Helpers.ProjectHelper.getAllEnvironments(project);
+        
+        onMessage('Delete project "' + project  + '"');
+        
+        await HashBrown.Helpers.ProjectHelper.deleteProject(project, false);
     }
 
     /**
@@ -194,46 +192,34 @@ class TestHelper {
      *
      * @returns {Promise}
      */
-    static testSchemaHelper(project, environment, onMessage) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(onMessage, 'onMessage', Function);
+    static async testSchemaHelper(project, environment, onMessage) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(onMessage, 'onMessage', Function, true);
 
         onMessage('Get native schemas');
-        return HashBrown.Helpers.SchemaHelper.getNativeSchemas()
-        .then((nativeSchemas) => {
-            let contentBase;
 
-            for(let i in nativeSchemas) {
-                if(nativeSchemas[i].id === 'contentBase') {
-                    contentBase = nativeSchemas[i];
-                    break;
-                }
-            }
+        await HashBrown.Helpers.SchemaHelper.getNativeSchemas();
 
-            onMessage('Create schema')
-            return HashBrown.Helpers.SchemaHelper.createSchema(
-                project,
-                environment,
-                contentBase
-            );
-        })
-        .then((testSchema) => {
-            onMessage('Get schema by id "' + testSchema.id + '"');
-            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(project, environment, testSchema.id);
-        })
-        .then((testSchema) => {
-            onMessage('Update schema by id "' + testSchema.id + '"');
-            return HashBrown.Helpers.SchemaHelper.setSchemaById(project, environment, testSchema.id, testSchema, false);
-        })
-        .then((testSchema) => {
-            onMessage('Remove schema by id "' + testSchema.id + '"');
-            return HashBrown.Helpers.SchemaHelper.removeSchemaById(project, environment, testSchema.id);
-        })
-        .then(() => {   
-            onMessage('Get all schemas');
-            return HashBrown.Helpers.SchemaHelper.getAllSchemas(project, environment)
-        });
+        onMessage('Create schema')
+        
+        let testSchema = await HashBrown.Helpers.SchemaHelper.createSchema(project, environment, 'contentBase');
+        
+        onMessage('Get schema by id "' + testSchema.id + '"');
+        
+        testSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, testSchema.id, true);
+
+        onMessage('Update schema by id "' + testSchema.id + '"');
+        
+        testSchema = await HashBrown.Helpers.SchemaHelper.setSchemaById(project, environment, testSchema.id, testSchema, false);
+        
+        onMessage('Remove schema by id "' + testSchema.id + '"');
+        
+        await HashBrown.Helpers.SchemaHelper.removeSchemaById(project, environment, testSchema.id);
+        
+        onMessage('Get all schemas');
+        
+        await HashBrown.Helpers.SchemaHelper.getAllSchemas(project, environment)
     }
 }
 

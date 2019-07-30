@@ -1,9 +1,10 @@
+doctype html
 html
     head
         meta(charset='utf-8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge')
         meta(name='viewport', content='width=device-width initial-scale=1')
-        meta(name='description', content="The pluggable CMS")
+        meta(name='description', content="A free and open-source headless CMS")
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
 
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
@@ -47,6 +48,9 @@ html
                                 | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
 
                         .page--dashboard__projects__list
+                            .widget.widget--spinner.embedded.no-background
+                                .widget--spinner__inner
+                                    .widget--spinner__image.fa.fa-refresh
 
                         if(user.isAdmin)
                             button.page--dashboard__projects__add.widget.widget--button.round.right.fa.fa-plus(title='Create project')
@@ -90,20 +94,23 @@ html
                                 - var minutes = Math.floor(seconds % (60*60) / 60);
 
                                 .widget.widget--label #{days}d #{hours}h #{minutes}m
-                            
-                            .widget-group
-                                button.widget.widget--button.low.page--dashboard__restart(title='Restart this HashBrown instance') Restart
-                                button.widget.widget--button.low.working.page--dashboard__update
-                                    .widget--button__text-default Update
-                                    .widget--button__text-working Checking
 
+        script(src='/js/browser-check.js')
+        
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/crisp-ui/crisp-ui.min.js')
+
+        script.
+            window.HashBrown = {};
+            HashBrown.Context = {
+                user: !{JSON.stringify(user)},
+                view: 'dashboard'
+            };
 
         script(src='/js/common.js')
         script(src='/js/helpers.js')
         script(src='/js/models.js')
         script(src='/js/utilities.js')
         script(src='/js/views.js')
-        
+       
         script(src='/js/dashboard.js')

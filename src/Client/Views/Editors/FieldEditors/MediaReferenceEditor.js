@@ -7,7 +7,7 @@
  * <pre>
  * {
  *     "myMediaReference": {
- *         "label": "My medie reference",
+ *         "label": "My media reference",
  *         "tabId": "content",
  *         "schemaId": "mediaReference"
  *     }
@@ -24,42 +24,74 @@ class MediaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.FieldEdi
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.isBroken = false;
+
+        try {
+            if(this.value) {
+                this.model = await HashBrown.Helpers.MediaHelper.getMediaById(this.value);
+            }
+
+        } catch(e) {
+            this.isBroken = true;
+                
+        }
+            
+        super.fetch();
+    }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        if(this.model && this.model.name) { return this.model.name; }
+
+        return super.getFieldLabel();
+    }
+
+    /**
+     * Event: Click select
+     */
+    onClickSelect() {
+        new HashBrown.Views.Modals.MediaBrowser({
+            value: this.value
+        })
+        .on('select', (id) => {
+            this.value = id;
+
+            this.trigger('change', this.value);
+
+            this.fetch();
+        });
+    }
+
+    /**
      * Renders this editor
      */
     template() {
-        let media = HashBrown.Helpers.MediaHelper.getMediaByIdSync(this.value);
-
-        return _.div({class: 'field-editor field-editor--media-reference', title: this.description || ''},
-            _.button({class: 'field-editor--media-reference__pick'},
+        return _.div({class: 'field-editor field-editor--media-reference'},
+            _.button({class: 'field-editor--media-reference__pick', title: this.isBroken ? 'The selected media could not be found' : ''},
                 _.do(()=> {
-                    if(!media) { return _.div({class: 'field-editor--media-reference__empty'}); }
+                    if(this.isBroken) { return _.div({class: 'field-editor--media-reference__preview fa fa-exclamation-triangle'}); }
+                    if(!this.model) { return _.div({class: 'field-editor--media-reference__empty'}); }
             
-                    if(media.isAudio()) {
+                    if(this.model.isAudio()) {
                         return _.div({class: 'field-editor--media-reference__preview fa fa-file-audio-o'});
-                    }
 
-                    if(media.isVideo()) {
+                    } else if(this.model.isVideo()) {
                         return _.div({class: 'field-editor--media-reference__preview fa fa-file-video-o'});
-                    }
 
-                    if(media.isImage()) {
-                        return _.img({class: 'field-editor--media-reference__preview', src: '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + media.id + '?width=200'});
+                    } else if(this.model.isImage()) {
+                        return _.img({class: 'field-editor--media-reference__preview', src: '/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + this.model.id + '?width=200'});
                     }
                 })
-            ).click(() => {
-                new HashBrown.Views.Modals.MediaBrowser({
-                    value: this.value
-                })
-                .on('select', (id) => {
-                    this.value = id;
-
-                    this.trigger('change', this.value);
-
-                    this.fetch();
-                });
-            }),
+            ).click(() => { this.onClickSelect() }),
             _.div({class: 'field-editor--media-reference__footer'},
-                _.label({class: 'field-editor--media-reference__name'}, media ? media.name : ''),
+                _.label({class: 'field-editor--media-reference__name'}, this.getFieldLabel()),
                 _.button({class: 'field-editor--media-reference__remove', title: 'Clear the Media selection'})
                     .click(() => {
                         this.value = null;

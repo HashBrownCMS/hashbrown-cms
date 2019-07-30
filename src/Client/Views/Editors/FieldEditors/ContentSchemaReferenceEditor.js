@@ -23,14 +23,52 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
     constructor(params) {
         super(params);
        
-        // Adopt allowed Schemas from parent if applicable
-        let parentSchema = this.getParentSchema();
-
-        if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
-            this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-        }
-
         this.fetch();
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            // Get dropdown options 
+            this.contentSchemas = [];
+
+            let allSchemas = await HashBrown.Helpers.SchemaHelper.getAllSchemas();
+
+            for(let schema of allSchemas) {
+                let isNative = schema.id == 'page' || schema.id == 'contentBase';
+
+                if(
+                    schema.type == 'content' &&
+                    !isNative &&
+                    (
+                        !this.config ||
+                        !this.config.allowedSchemas ||
+                        !Array.isArray(this.config.allowedSchemas) ||
+                        this.config.allowedSchemas.indexOf(schema.id) > -1
+                    )
+                ) {
+                    this.contentSchemas.push({
+                        name: schema.name,
+                        id: schema.id
+                    });
+                }
+            }
+
+            // Adopt allowed Schemas from parent if applicable
+            let parentSchema = await this.getParentSchema();
+
+            if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
+                this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+            }
+
+            super.fetch();
+        
+        } catch(e) {
+            UI.errorModal(e);
+
+        }
     }
 
     /**
@@ -38,7 +76,7 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
      *
      * @returns {Schema} Parentn Schema
      */
-    getParentSchema() {
+    async getParentSchema() {
         // Return config parent Schema if available
         if(this.config.parentSchema) { return this.config.parentSchema; }
 
@@ -55,7 +93,7 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
         // Fetch parent Content
         if(!thisContent.parentId) { return null; }
         
-        let parentContent = HashBrown.Helpers.ContentHelper.getContentByIdSync(thisContent.parentId);
+        let parentContent = await HashBrown.Helpers.ContentHelper.getContentById(thisContent.parentId);
 
         if(!parentContent) {
             UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
@@ -63,7 +101,7 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
         }
 
         // Fetch parent Schema
-        let parentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
+        let parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(parentContent.schemaId);
             
         if(!parentSchema) {
             UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
@@ -72,38 +110,6 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
 
         // Return parent Schema
         return parentSchema;
-    }
-
-    /**
-     * Gets schema types
-     *
-     * @returns {Array} List of options
-     */
-    getDropdownOptions() {
-        let contentSchemas = [];
-
-        for(let i in window.resources.schemas) {
-            let schema = window.resources.schemas[i];
-            let isNative = schema.id == 'page' || schema.id == 'contentBase';
-
-            if(
-                schema.type == 'content' &&
-                !isNative &&
-                (
-                    !this.config ||
-                    !this.config.allowedSchemas ||
-                    !Array.isArray(this.config.allowedSchemas) ||
-                    this.config.allowedSchemas.indexOf(schema.id) > -1
-                )
-            ) {
-                contentSchemas[contentSchemas.length] = {
-                    name: schema.name,
-                    id: schema.id
-                };
-            }
-        }
-
-        return contentSchemas;
     }
     
     /**
@@ -116,22 +122,20 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
     static renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
         
-        return _.div({class: 'editor__field'},
-            _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
-            _.div({class: 'editor__field__value'},
-                new HashBrown.Views.Widgets.Dropdown({
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
-                    useMultiple: true,
-                    value: config.allowedSchemas,
-                    useClearButton: true,
-                    valueKey: 'id',
-                    labelKey: 'name',
-                    iconKey: 'icon',
-                    onChange: (newValue) => {
-                        config.allowedSchemas = newValue;
-                    }
-                }).$element
-            )
+        return this.field(
+            'Allowed Schemas',
+            new HashBrown.Views.Widgets.Dropdown({
+                options: HashBrown.Helpers.SchemaHelper.getAllSchemas('content'),
+                useMultiple: true,
+                value: config.allowedSchemas,
+                useClearButton: true,
+                valueKey: 'id',
+                labelKey: 'name',
+                iconKey: 'icon',
+                onChange: (newValue) => {
+                    config.allowedSchemas = newValue;
+                }
+            })
         );
     }
 
@@ -139,7 +143,7 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
      * Picks the first available Schema
      */
     pickFirstSchema() {
-        let options = this.getDropdownOptions();
+        let options = this.contentSchemas;
 
         if(options.length < 1) { return; }
 
@@ -157,9 +161,8 @@ class ContentSchemaReferenceEditor extends HashBrown.Views.Editors.FieldEditors.
         return _.div({class: 'field-editor field-editor--content-schema-reference'}, 
             new HashBrown.Views.Widgets.Dropdown({
                 value: this.value,
-                options: this.getDropdownOptions(),
+                options: this.contentSchemas,
                 valueKey: 'id',
-                tooltip: this.description || '',
                 labelKey: 'name',
                 iconKey: 'icon',
                 useClearButton: true,

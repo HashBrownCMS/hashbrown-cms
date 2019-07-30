@@ -51,7 +51,6 @@ class BooleanEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
             new HashBrown.Views.Widgets.Input({
                 type: 'checkbox',
                 value: this.value,
-                tooltip: this.description || '',
                 onChange: (newValue) => {
                     this.value = newValue;
                     

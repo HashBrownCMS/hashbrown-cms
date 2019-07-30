@@ -24,79 +24,43 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     }
 
     /**
-     * Get all parent content nodes
-     *
-     * @param {String} contentId
-     *
-     * @return {Array} nodes
-     */
-    static getAllParents(contentId) {
-        let nodes = [];    
-        let contentEditor = Crisp.View.get('ContentEditor');
-
-        function iterate(id) {
-            let node;
-        
-            node = window.resources.content.filter((node) => {
-                return node.id == id;
-            })[0];
-
-            if(node) {
-                nodes.push(node);
-
-                if(node.parentId) {
-                    iterate(node.parentId);
-                }
-
-            } else {
-                debug.log('Content not found: "' + id + '"', this);
-            }
-        }
-
-        iterate(contentId);
-
-        nodes.reverse();
-
-        return nodes;
-    }
-
-    /**
      * Generates a new url based on content id
      *
      * @param {String} contentId
      *
      * @return {String} url
      */
-    generateUrl(contentId) {
-        let nodes = UrlEditor.getAllParents(contentId);
+    async generateUrl(contentId) {
+        let ancestors = await HashBrown.Helpers.ContentHelper.getContentAncestorsById(contentId, true);
+        
         let url = '/';
       
         if(this.multilingual) {
-            url += window.language + '/';
+            url += HashBrown.Context.language + '/';
         }
 
-        for(let node of nodes) {
+        for(let ancestor of ancestors) {
             let title = '';
 
-            // If the node equals the currently edited node, take the value directly from the "title" field
-            if(node.id == Crisp.Router.params.id) {
+            // If the ancestor equals the currently edited ancestor, take the value directly from the "title" field
+            if(ancestor.id == Crisp.Router.params.id) {
                 title = $('.editor__field[data-key="title"] .editor__field__value input').val();
 
             // If it's not, try to get the title from the model
             } else {
                 // If title is set directly (unlikely), pass it
-                if(typeof node.title === 'string') {
-                    title = node.title;
+                if(typeof ancestor.title === 'string') {
+                    title = ancestor.title;
 
                 // If title is defined in properties (typical)
-                } else if(node.properties && node.properties.title) {
+                } else if(ancestor.properties && ancestor.properties.title) {
                     // If title is multilingual
-                    if(node.properties.title[window.language]) {
-                        title = node.properties.title[window.language];
+                    if(ancestor.properties.title[HashBrown.Context.language]) {
+                        title = ancestor.properties.title[HashBrown.Context.language];
                     
                     // If title is not multilingual
-                    } else if(typeof node.properties.title === 'string') {
-                        title = node.properties.title;
+                    } else if(typeof ancestor.properties.title === 'string') {
+                        title = ancestor.properties.title;
                     
                     }
                 }
@@ -107,10 +71,11 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         // Check for duplicate URLs
         let sameUrls = 0;
+        let allContent = await HashBrown.Helpers.ContentHelper.getAllContent();
 
-        for(let content of window.resources.content) {
+        for(let content of allContent) {
             if(content.id != contentId) {
-                let thatUrl = content.prop('url', window.language);
+                let thatUrl = content.prop('url', HashBrown.Context.language);
                 let isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
                 let isSameUrl = url == thatUrl || isMatchWithNumber;
 
@@ -131,8 +96,8 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Regenerates the URL
      */
-    regenerate() {
-        let newUrl = this.generateUrl(Crisp.Router.params.id);
+   async regenerate() {
+        let newUrl = await this.generateUrl(Crisp.Router.params.id);
 
         this.$input.val(newUrl);
 
@@ -142,16 +107,16 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
     /**
      * Fetch the URL from the Content title
      */
-    fetchFromTitle() {
+    async fetchFromTitle() {
         this.value = this.$titleInput.val();
 
-        this.regenerate();
+        await this.regenerate();
     }
 
     /**
      * Event: Change value
      */
-    onChange() {
+    async onChange() {
         this.value = this.$input.val();
 
         if(this.value.length > 0) {
@@ -165,7 +130,7 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                 this.$input.val(this.value);
             }
         } else {
-            this.fetchFromTitle();
+            await this.fetchFromTitle();
         }
 
         this.trigger('change', this.value);
@@ -176,7 +141,7 @@ class UrlEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--url'},
-            _.div({class: 'widget-group', title: this.description || ''},
+            _.div({class: 'widget-group'},
                 this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),
                 _.button({class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL'})

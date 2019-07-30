@@ -39,13 +39,73 @@ class AppHelper {
             });
 
             process.on('exit', (code) => {
-                if(code == 0 || code == '0') {
+                if(code === 0 || code === '0') {
                     resolve(result);
                 } else {
                     reject(new Error('Process "' + cmd + '" in "' + cwd + '" exited with code ' + code + ': ' + message));
                 }
             });
         });
+    }
+
+    /**
+     * Processes CLI input
+     */
+    static async processInput() {
+        let cmd = process.argv[2];
+        let args = {};
+
+        for(let k in process.argv) {
+            let v = process.argv[k];
+
+            let matches = v.match(/(\w+)=(.+)/);
+
+            if(matches) {
+                args[matches[1]] = matches[2];
+            }
+        }
+
+        // Create a new user
+        if(cmd === 'create-user') {
+            await HashBrown.Helpers.UserHelper.createUser(args.u, args.p, args.admin === 'true');
+
+        // Make a user an admin
+        } else if(cmd === 'make-user-admin') {
+            await HashBrown.Helpers.UserHelper.makeUserAdmin(args.u);
+
+        // Revoke tokens for a user
+        } else if(cmd === 'revoke-tokens') {
+            await HashBrown.Helpers.UserHelper.revokeTokens(args.u);
+
+        // Set scopes for a user
+        } else if(cmd === 'set-user-scopes') {
+            let user = await HashBrown.Helpers.UserHelper.findUser(args.u)
+            let obj = user.getObject();
+
+            if(!obj.scopes[args.p]) {
+                obj.scopes[args.p] = [];
+            }
+
+            obj.scopes[args.p] = args.s.split(',');
+
+            await HashBrown.Helpers.UserHelper.updateUser(args.u, obj);
+
+        // Change password for a user
+        } else if(cmd === 'set-user-password') {
+            let user = await HashBrown.Helpers.UserHelper.findUser(args.u);
+
+            user.setPassword(args.p);
+
+            await HashBrown.Helpers.UserHelper.updateUser(args.u, user.getObject());
+        
+        // No arguments were recognised, skip this entire check
+        } else { 
+            return;
+        
+        }
+
+        // If any arguments were recognised, exit the process after execution
+        process.exit();
     }
 }
 

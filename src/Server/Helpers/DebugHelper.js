@@ -1,8 +1,9 @@
 'use strict';
 
-let DebugHelperCommon = require('Common/Helpers/DebugHelper');
+const FileSystem = require('fs');
+const Path = require('path');
 
-let logHandlers = {};
+const DebugHelperCommon = require('Common/Helpers/DebugHelper');
 
 /**
  * The helper class for debugging
@@ -10,24 +11,6 @@ let logHandlers = {};
  * @memberof HashBrown.Server.Helpers
  */
 class DebugHelper extends DebugHelperCommon {
-    /**
-     * Event: Log
-     *
-     * @param {String} dateString
-     * @param {String} senderString
-     * @param {String} message
-     * @param {String} type
-     */
-    static onLog(dateString, senderString, message, type) {
-        // TODO (Issue #159): Write to log
-      
-        for(let name in logHandlers) {
-            logHandlers[name](dateString, senderString, message, type);
-        }
-
-        super.onLog(dateString, senderString, message, type);
-    }
-
     /**
      * Gets the debug verbosity
      *
@@ -38,13 +21,16 @@ class DebugHelper extends DebugHelperCommon {
     }
 
     /**
-     * Sets a handler to log output
-     *
-     * @param {String} name
-     * @param {Function} handler
+     * Watches the package.json file and exist the process on change
      */
-    static setLogHandler(name, handler) {
-        logHandlers[name] = handler;
+    static startWatching() {
+        debug.log('Watching package.json for changes', this);
+        
+        FileSystem.watchFile(Path.join(APP_ROOT, 'package.json'), () => {
+            debug.log('package.json changed, reloading...', this);
+
+            process.exit();
+        });
     }
 }
 

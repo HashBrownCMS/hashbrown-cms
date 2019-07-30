@@ -47,6 +47,12 @@ class DatabaseHelper {
 
         // No value found, return default ones
         switch(key) {
+<<<<<<< HEAD
+=======
+            case 'protocol':
+                return 'mongodb';
+            
+>>>>>>> v1.2
             case 'host':
                 return 'localhost';
 
@@ -72,7 +78,7 @@ class DatabaseHelper {
      * @returns {String} Connection string
      */
     static getConnectionString(databaseName) {
-        let connectionString = 'mongodb://';
+        let connectionString = this.getConfig('protocol') + '://';
       
         let username = this.getConfig('username');
         let password = this.getConfig('password');
@@ -229,8 +235,6 @@ class DatabaseHelper {
     static async listCollections(databaseName) {
         checkParam(databaseName, 'databaseName', String);
 
-        debug.log(databaseName + '::listCollections...', this, 4);
-
         let collections = [];
         let client = null;
 
@@ -252,8 +256,6 @@ class DatabaseHelper {
      * @returns {Promise} Array of databases
      */
     static async listDatabases() {
-        debug.log('Listing all databases...', this, 4);
-
         let result = null;
         let client = null;
 
@@ -333,8 +335,6 @@ class DatabaseHelper {
      * @return {Promise} Document
      */
     static async findOne(databaseName, collectionName, query, projection = {}) {
-        debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this, 4);
-
         projection._id = 0;
 
         let doc = null;
@@ -347,6 +347,10 @@ class DatabaseHelper {
             debug.error(e, this);
         } finally {
             client.close();
+        }
+
+        if(doc && doc['_id']) {
+            delete doc['_id'];
         }
 
         return doc;
@@ -364,8 +368,6 @@ class DatabaseHelper {
      * @return {Promise} Documents
      */
     static async find(databaseName, collectionName, query, projection = {}, sort = null) {
-        debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this, 4);
-
         projection._id = 0;
 
         let docs = [];
@@ -373,12 +375,16 @@ class DatabaseHelper {
 
         try {
             client = await this.connect(databaseName);
-            docs = await client.db().collection(collectionName).find(query, { sort: sort, projection: projection }).toArray();
+            docs = await client.db().collection(collectionName).find(query, { projection: projection })
+
+            if(sort) { docs = await docs.sort(sort); }
+
+            docs = docs.toArray();
 
         } catch(e) {
             debug.error(e, this);
         } finally {
-            client.close();
+            if(client) { client.close(); }
         }
 
         return docs;
@@ -394,8 +400,6 @@ class DatabaseHelper {
      * @return {Promise} Number of matching documents
      */
     static async count(databaseName, collectionName, query) {
-        debug.log(databaseName + '/' + collectionName + '::count ' + JSON.stringify(query) + '...', this, 4);
-        
         let client = null;
         let result = 0;
 
@@ -447,8 +451,6 @@ class DatabaseHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
-   
         let client = null;
 
         try {
@@ -476,8 +478,6 @@ class DatabaseHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
-        
         let client = null;
        
         try {
@@ -503,8 +503,6 @@ class DatabaseHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this, 4);
-        
         let client = null;
        
         try {
@@ -527,8 +525,6 @@ class DatabaseHelper {
      * @return {Promise} promise
      */
     static async remove(databaseName, collectionName, query) {
-        debug.log(databaseName + '/' + collectionName + '::remove ' + JSON.stringify(query) + '...', this, 4);
-        
         let client = null;
        
         try {
@@ -551,8 +547,6 @@ class DatabaseHelper {
      * @return {Promise} promise
      */
     static async removeOne(databaseName, collectionName, query) {
-        debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this, 4);
-       
         let client = null;
         
         try {
@@ -574,8 +568,6 @@ class DatabaseHelper {
      * @return {Promise} promise
      */
     static async dropCollection(databaseName, collectionName) {
-        debug.log(databaseName + '::dropCollection...', this, 4);
-
         let client = null;
         
         try {
@@ -596,8 +588,6 @@ class DatabaseHelper {
      * @returns {Promise}
      */
     static async dropDatabase(databaseName) {
-        debug.log(databaseName + '::dropDatabase...', this, 4);
-
         let client = null;
         
         try {

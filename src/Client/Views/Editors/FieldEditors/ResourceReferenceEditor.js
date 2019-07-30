@@ -13,6 +13,24 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        try {
+            if(this.config.resource && this.value) {
+                this.model = await HashBrown.Helpers.ResourceHelper.get(null, this.config.resource, this.value); 
+            }
+
+        } catch(e) {
+            debug.log(e.message, this);
+        
+        } finally {
+            super.fetch();
+
+        }
+    }
+
+    /**
      * Renders the config editor
      *
      * @param {Object} config
@@ -23,74 +41,63 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
         config.resourceKeys = config.resourceKeys || [];
 
         return [
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Resource'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Dropdown({
-                        value: config.resource,
-                        options: Object.keys(resources),
-                        onChange: (newValue) => {
-                            config.resource = newValue
-                        }
-                    }).$element
-                )
+            this.field(
+                'Resource',
+                new HashBrown.Views.Widgets.Dropdown({
+                    value: config.resource,
+                    options: HashBrown.Helpers.ResourceHelper.getResourceNames(),
+                    onChange: (newValue) => {
+                        config.resource = newValue
+                    }
+                })
             ),
-            _.div({class: 'editor__field'},
-                _.div({class: 'editor__field__key'}, 'Resource keys'),
-                _.div({class: 'editor__field__value'},
-                    new HashBrown.Views.Widgets.Chips({
-                        value: config.resourceKeys,
-                        placeholder: 'keyName',
-                        onChange: (newValue) => {
-                            config.resourceKeys = newValue;
-                        }
-                    }).$element
-                )
+            this.field(
+                'Resource keys',
+                new HashBrown.Views.Widgets.Chips({
+                    value: config.resourceKeys,
+                    placeholder: 'keyName',
+                    onChange: (newValue) => {
+                        config.resourceKeys = newValue;
+                    }
+                })
             )
         ];
+    }
+    
+    /**
+     * Gets the field label
+     *
+     * @return {String} Label
+     */
+    getFieldLabel() {
+        let label = '';
+
+        if(this.model) {
+            for(let key of (this.config.resourceKeys || [])) {
+                if(this.model[key]) {
+                    return this.model[key];
+                }
+            }
+
+        } else if(this.value) {
+            let singularResourceName = this.config.resource;
+
+            if(singularResourceName[singularResourceName.length - 1] == 's') {
+                singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
+            }
+
+            return '(' + singularResourceName + ' not found)';
+        }
+       
+        return super.getFieldLabel();
     }
 
     /**
      * Renders this editor
      */
-    template() {
-        let resource = resources[this.config.resource];
-        let value;
-
-        if(resource) {
-            value = resource[this.value];
-
-            if(!value) {
-                for(let i in resource) {
-                    if(resource[i].id == this.value) {
-                        value = resource[i];
-                        break;
-                    }
-                }
-            }
-
-            if(value) {
-                for(let key of (this.config.resourceKeys || [])) {
-                    if(value[key]) {
-                        value = value[key];
-                        break;    
-                    }
-                }
-
-            } else if(this.value) {
-                let singularResourceName = this.config.resource;
-
-                if(singularResourceName[singularResourceName.length - 1] == 's') {
-                    singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
-                }
-
-                value = '(' + singularResourceName + ' not found)';
-
-            }
-        }
-        
+    template() { 
         return _.div({class: 'field-editor field-editor--resource-reference'},
-            value || '(none)'
+            this.getFieldLabel()
         );
     }
 }

@@ -16,7 +16,7 @@ class UserHelper {
      *
      * @returns {Promise} Promise
      */
-    static invite(email, project) {
+    static async invite(email, project) {
         let token = Crypto.randomBytes(10).toString('hex');
         let user = HashBrown.Models.User.create();
 
@@ -28,15 +28,9 @@ class UserHelper {
             user.scopes[project] = [];
         }
         
-        return HashBrown.Helpers.DatabaseHelper.insertOne(
-            'users',
-            'users',
-            user.getObject()
-        ).then(() => {
-            debug.log('Created new user "' + email + '" successfully', this);
-             
-            return Promise.resolve(token);
-        });
+        await HashBrown.Helpers.DatabaseHelper.insertOne('users', 'users', user.getObject());
+
+        return token;
     }
 
     /**
@@ -44,36 +38,27 @@ class UserHelper {
      *  
      * @param {String} username
      *
-     * @returns {Promise(User)} user
+     * @returns {User} user
      */
-    static findUser(username) {
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                username: username
-            }
-        ).then((user) => {
-            if(!user || Object.keys(user).length < 1) {
-                return Promise.reject(new Error('No user "' + username + '" found'));
-            }
+    static async findUser(username) {
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { username: username });
+
+        if(!user || Object.keys(user).length < 1) {
+            throw new Error('No user "' + username + '" found');
+        }
             
-            return Promise.resolve(new HashBrown.Models.User(user));
-        });
+        return new HashBrown.Models.User(user);
     }
 
     /**
      * Revokes all User tokens
-     *
-     * @returns {Promise} promise
      */
-    static revokeTokens(username) {
-        return findUser(username)
-        .then((user) => {
-            user.tokens = [];
+    static async revokeTokens(username) {
+        let user = await findUser(username);
 
-            return this.updateUser(username, user.getObject());
-        });
+        user.tokens = [];
+
+        await this.updateUser(username, user.getObject());
     }
 
     /**
@@ -85,25 +70,22 @@ class UserHelper {
      *
      * @returns {Promise} Token
      */
-    static loginUser(username, password, persist) {
+    static async loginUser(username, password, persist) {
         debug.log('Attempting login for user "' + username + '"...', this);
 
-        return this.findUser(username)
-        .then((user) => {
-            if(user.validatePassword(password)) {
-                let token = user.generateToken(persist);
-               
-                user.cleanUpTokens();
+        let user = await this.findUser(username);
 
-                return this.updateUser(username, user.getObject())
-                .then(() => {
-                    debug.log('User "' + username + '" logged in with token "' + token + '"', this);
-                    return Promise.resolve(token);
-                });
-            } else {
-                return Promise.reject(new Error('Invalid password'));
-            }
-        });
+        if(!user.validatePassword(password)) {
+            throw new Error('Invalid password');
+        }
+        
+        let token = user.generateToken(persist);
+       
+        user.cleanUpTokens();
+
+        await this.updateUser(username, user.getObject());
+
+        return token;
     }
     
     /**
@@ -113,20 +95,14 @@ class UserHelper {
      *
      * @returns {Promise} Result
      */
-    static logoutUser(token) {
+    static async logoutUser(token) {
         debug.log('Logging out user with "' + token + '"...', this);
 
-        return this.findToken(token)
-        .then((user) => {
-            user.removeToken(token);
+        let user = await this.findToken(token);
+        
+        user.removeToken(token);
 
-            return this.updateUser(user.username, user.getObject())
-            .then(() => {
-                debug.log('User "' + user.username + '" logged out', this);
-
-                return Promise.resolve();
-            });
-        });
+        await this.updateUser(user.username, user.getObject());
     }
 
     /**
@@ -136,25 +112,20 @@ class UserHelper {
      *
      * @returns {Promise} User
      */
-    static findToken(token) {
-        return HashBrown.Helpers.DatabaseHelper.find(
-            'users',
-            'users',
-            {}
-        )
-        .then((users) => {
-            for(let u of users) {
-                let user = new HashBrown.Models.User(u);
-                
-                let isValid = user.validateToken(token);
+    static async findToken(token) {
+        let users = await HashBrown.Helpers.DatabaseHelper.find('users', 'users', {});
 
-                if(isValid) {
-                    return Promise.resolve(user);
-                }
+        for(let u of users) {
+            let user = new HashBrown.Models.User(u);
+            
+            let isValid = user.validateToken(token);
+
+            if(isValid) {
+                return user;
             }
+        }
 
-            return Promise.resolve(null);
-        });
+        return null;
     }
     
     /**
@@ -164,24 +135,14 @@ class UserHelper {
      *
      * @returns {Promise} User
      */
-    static findInviteToken(inviteToken) {
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                inviteToken: inviteToken
-            }
-        ).then((user) => {
-            return new Promise((resolve, reject) => {
-                if(user && Object.keys(user).length > 0) {
-                    resolve(new HashBrown.Models.User(user));
-                
-                } else {
-                    reject(new Error('Invite token "' + inviteToken + '" could not be found'));
+    static async findInviteToken(inviteToken) {
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { inviteToken: inviteToken });
 
-                }
-            });  
-        });
+        if(!user || Object.keys(user).length < 1) {
+            throw new Error('Invite token "' + inviteToken + '" could not be found');
+        }
+        
+        return new HashBrown.Models.User(user);
     }
     
     /**
@@ -191,18 +152,8 @@ class UserHelper {
      *
      * @returns {Promise} Promise
      */
-    static removeUser(id) {
-        return HashBrown.Helpers.DatabaseHelper.removeOne(
-            'users',
-            'users',
-            {
-                id: id
-            }
-        ).then(() => {
-            debug.log('Deleted user "' + id + '" successfully', this);
-           
-            return Promise.resolve();
-        });
+    static async removeUser(id) {
+        await HashBrown.Helpers.DatabaseHelper.removeOne('users', 'users', { id: id });
     }
 
     /**
@@ -210,35 +161,21 @@ class UserHelper {
      *
      * @param {String} id
      * @param {String} scope
-     *
-     * @returns {Promise} Promise
      */
-    static removeUserProjectScope(id, scope) {
-        let user;
-        let project;
+    static async removeUserProjectScope(id, scope) {
+        let project = await HashBrown.Helpers.ProjectHelper.getProject(scope);
+
+        if(project.users.length < 2) {
+            throw new Error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly');
+        }
         
-        return HashBrown.Helpers.ProjectHelper.getProject(scope) 
-        .then((result) => {
-            project = result;
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id });
 
-            if(project.users.length < 2) {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly'));
-                });
-            
-            } else {
-                return HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id });
-            }
-        })
-        .then((result) => {
-            user = result;
+        debug.log('Removing user "' + user.username + '" from project "' + project.name + '"', this);
 
-            debug.log('Removing user "' + user.username + '" from project "' + project.name + '"', this);
-
-            delete user.scopes[scope];
-            
-            return HashBrown.Helpers.DatabaseHelper.updateOne('users', 'users', { id: id }, user);
-        });
+        delete user.scopes[scope];
+        
+        await HashBrown.Helpers.DatabaseHelper.updateOne('users', 'users', { id: id }, user);
     }
     
     /**
@@ -250,15 +187,13 @@ class UserHelper {
      *
      * @returns {Promise} Promise
      */
-    static addUserProjectScope(id, project, scopes) {
-        return HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id })
-        .then((user) => {
-            user.scopes  = user.scopes || {};
+    static async addUserProjectScope(id, project, scopes) {
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id });
 
-            user.scopes[project] = scopes || [];
+        user.scopes  = user.scopes || {};
+        user.scopes[project] = scopes || [];
 
-            return this.updateUserById(id, user);
-        });
+        await this.updateUserById(id, user);
     }
 
     /**
@@ -271,51 +206,33 @@ class UserHelper {
      *
      * @returns {Promise} Login token
      */
-    static activateUser(username, password, fullName, inviteToken) {
-        let newUser;
-
+    static async activateUser(username, password, fullName, inviteToken) {
         // Username check
         if(!username || username.length < 4) {
-            return Promise.reject(new Error('Usernames must be at least 4 characters'));
+            throw new Error('Usernames must be at least 4 characters');
         }
         
         // Password check
         if(!password || password.length < 4) {
-            return Promise.reject(new Error('Passwords must be at least 4 characters'));
+            throw new Error('Passwords must be at least 4 characters');
         }
         
-        return this.findInviteToken(inviteToken)
-        .then((user) => {
-            user.fullName = user.fullName || fullName;
-            user.username = username;
-            user.setPassword(password);
-            user.inviteToken = '';
+        let user = await this.findInviteToken(inviteToken)
+        
+        user.fullName = user.fullName || fullName;
+        user.username = username;
+        user.setPassword(password);
+        user.inviteToken = '';
 
-            newUser = user;
-
-            return HashBrown.Helpers.DatabaseHelper.findOne(
-                'users',
-                'users',
-                {
-                    username: username
-                }
-            );
-        }).then((existingUser) => {
-            if(!existingUser) {
-                console.log(newUser.getObject());
-
-                return this.updateUserById(newUser.id, newUser.getObject());
-            
-            } else {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('Username "' + username + '" is taken'));
-                });
-
-            }
-        })
-        .then(() => {
-            return this.loginUser(username, password);
-        });
+        let existingUser = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { username: username });
+        
+        if(existingUser) {
+            throw new Error('Username "' + username + '" is taken');
+        }
+        
+        await this.updateUserById(user.id, user.getObject());
+        
+        return await this.loginUser(username, password);
     }
 
     /**
@@ -328,72 +245,37 @@ class UserHelper {
      *
      * @returns {Promise} promise
      */
-    static createUser(username, password, admin, scopes) {
-        if(!username) {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Username was not provided'));
-            });
-        }
-        
-        if(!password) {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Password was not provided'));
-            });
-        }
-        
+    static async createUser(username, password, admin, scopes) {
+        checkParam(username, 'username', String, true);
+        checkParam(username, 'password', String, true);
+
         let user = HashBrown.Models.User.create(username, password);
 
         user.isAdmin = admin || false;
         user.scopes = scopes || {};
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                username: username
-            }
-        ).then((found) => {
-            let foundUser = new HashBrown.Models.User(found);
+        let foundUser = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { username: username })
 
-            // User wasn't found, create
-            if(!found) {
-                debug.log('Creating user "' + username + '"...', this);
-                
-                return HashBrown.Helpers.DatabaseHelper.insertOne(
-                    'users',
-                    'users',
-                    user.getObject()
-                ).then(() => {
-                    debug.log('Created user "' + username + '" successfully', this);
-                   
-                    return new Promise((resolve) => {
-                        resolve(user);
-                    }); 
-                });
+        if(foundUser) {
+            throw new Error('Username "' + username + '" is taken');
+        }
+            
+        await HashBrown.Helpers.DatabaseHelper.insertOne('users', 'users', user.getObject());
 
-            // Username matches an existing user
-            } else {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('Username "' + username + '" is taken'));
-                });
-            }
-        });
+        return user;
     }
 
     /**
      * Makes a User an admin
      *
      * @param {String} username
-     *
-     * @returns {Promise} Promise
      */
-    static makeUserAdmin(username) {
-        return this.getUser(username)
-        .then((user) => {
-            user.isAdmin = true;
+    static async makeUserAdmin(username) {
+        let user = await this.getUser(username);
 
-            return this.updateUser(username, user);
-        });
+        user.isAdmin = true;
+
+        await this.updateUser(username, user);
     }
 
     /**
@@ -403,7 +285,7 @@ class UserHelper {
      *
      * @returns {Promise} Array of User objects
      */
-    static getAllUsers(project) {
+    static async getAllUsers(project) {
         let query = {};
 
         // Build query for project scope
@@ -424,33 +306,27 @@ class UserHelper {
             debug.log('Getting all users...', this, 3);
         }
 
-        return HashBrown.Helpers.DatabaseHelper.find(
-            'users',
-            'users',
-            query,
-            {
-                tokens: 0,
-                password: 0
-            }
-        )
-        .then((users) => {
-            let userModels = [];
-            
-            users = users.sort((a, b) => {
-                a = a.fullName || a.username || a.email;
-                b = b.fullName || b.username || b.email;
+        let users = await HashBrown.Helpers.DatabaseHelper.find('users', 'users', query, { tokens: 0, password: 0 });
 
-                if(a < b) { return -1; }
-                if(a > b) { return 1; }
-                return 0;
-            });
+        let userModels = [];
+        
+        users = users.sort((a, b) => {
+            a = a.fullName || a.username || a.email || '';
+            b = b.fullName || b.username || b.email || '';
 
-            for(let user of users) {
-                userModels.push(new HashBrown.Models.User(user));
-            }  
+            a = a.toLowerCase();
+            b = b.toLowerCase();
 
-            return Promise.resolve(userModels);
+            if(a < b) { return -1; }
+            if(a > b) { return 1; }
+            return 0;
         });
+
+        for(let user of users) {
+            userModels.push(new HashBrown.Models.User(user));
+        }  
+
+        return userModels;
     }
     
     /**
@@ -460,22 +336,16 @@ class UserHelper {
      *
      * @returns {Promise} User object
      */
-    static getUserById(id) {
+    static async getUserById(id) {
+        checkParam(id, 'id', String);
+        
         let query = {};
 
-        debug.log('Getting user "' + id + '"...', this, 3);
+        let user = await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { id: id }, { tokens: 0, password: 0 });
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                id: id
-            },
-            {
-                tokens: 0,
-                password: 0
-            }
-        );
+        if(!user) { throw new Error('User "' + id + '" could not be found'); }
+
+        return user;
     }
     
     /**
@@ -485,44 +355,27 @@ class UserHelper {
      *
      * @returns {Promise} User object
      */
-    static getUser(username) {
+    static async getUser(username) {
         let query = {};
 
         debug.log('Getting user "' + username + '"...', this, 3);
 
-        return HashBrown.Helpers.DatabaseHelper.findOne(
-            'users',
-            'users',
-            {
-                username: username
-            },
-            {
-                tokens: 0,
-                password: 0
-            }
-        );
+        return await HashBrown.Helpers.DatabaseHelper.findOne('users', 'users', { username: username }, { tokens: 0, password: 0 });
     }
 
     /**
      * Cleans up expired tokens
-     *
-     * @returns {Promise} promise
      */
-    static cleanUpTokens(username) {
-        return this.findUser(username)
-        .then((user) => {
-            if(user) {
-                user.cleanUpTokens();
+    static async cleanUpTokens(username) {
+        let user = await this.findUser(username);
+        
+        if(!user) {
+            throw new Error('No user by username "' + username + '"');
+        }
 
-                return this.updateUser(username, user.getObject());
+        user.cleanUpTokens();
 
-            } else {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('No user by username "' + username + '"'));
-                });
-            
-            }
-        });
+        await this.updateUser(username, user.getObject());
     }
     
     /**
@@ -533,23 +386,14 @@ class UserHelper {
      *
      * @returns {Promise} Promise
      */
-    static updateUserById(id, properties) {
+    static async updateUserById(id, properties) {
         if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
             properties.password = HashBrown.Models.User.createPasswordHashSalt(properties.password);
         }
         
-        return HashBrown.Helpers.DatabaseHelper.mergeOne(
-            'users',
-            'users',
-            {
-                id: id
-            },
-            properties
-        ).then(() => {
-            debug.log('Updated user "' + id + '" successfully', this);
-            
-            return Promise.resolve(new HashBrown.Models.User(properties));
-        });
+        await HashBrown.Helpers.DatabaseHelper.mergeOne('users', 'users', { id: id }, properties);
+
+        return new HashBrown.Models.User(properties);
     }
 
     /**
@@ -560,21 +404,12 @@ class UserHelper {
      *
      * @returns {Promise} promise
      */
-    static updateUser(username, properties) {
+    static async updateUser(username, properties) {
         if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
             properties.password = HashBrown.Models.User.createPasswordHashSalt(properties.password);
         }
 
-        return HashBrown.Helpers.DatabaseHelper.mergeOne(
-            'users',
-            'users',
-            {
-                username: username
-            },
-            properties
-        ).then(() => {
-            debug.log('Updated "' + username + '" successfully', this);
-        });
+        await HashBrown.Helpers.DatabaseHelper.mergeOne('users', 'users', { username: username }, properties);
     }
 }
 

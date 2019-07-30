@@ -1,44 +1,60 @@
+doctype html
 html
     head
         meta(charset='utf-8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge')
         meta(name='viewport', content='width=device-width initial-scale=1')
-        meta(name='description', content="The pluggable CMS")
+        meta(name='description', content="A free and open-source headless CMS")
         meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
         
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
-        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
+        link(href='/lib/normalize/normalize.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
         link(href='/css/plugins.css', rel='stylesheet')
         link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
 
-        title demo - HashBrown
-    
+        title Demo - HashBrown
+
     body.page.page--environment
         .page--environment__spaces
             .page--environment__space.page--environment__space--menu
             .page--environment__space.page--environment__space--nav
             .page--environment__space.page--environment__space--editor
         
-        .widget.widget--spinner.page--environment__spinner
+        .widget.widget--spinner.page--environment__spinner.hidden
             .widget--spinner__inner
                 img.widget--spinner__image.page--environment__spinner__image(src='/svg/logo_pink.svg')
                 .widget--spinner__messages.page--environment__spinner__messages
 
+        script(src='/js/browser-check.js')
+
         script(src='/lib/jquery/jquery.min.js')
-        script(src='/lib/ckeditor/ckeditor.js')
+        script(src='/lib/crisp-ui/crisp-ui.js')
+            
         script(src='/lib/codemirror/lib/codemirror.js')
         script(src='/lib/codemirror/mode/javascript/javascript.js')
         script(src='/lib/codemirror/mode/markdown/markdown.js')
-        script(src='/lib/codemirror/mode/xml/xml.js')
-        script(src='/lib/crisp-ui/crisp-ui.js')
-        script(src='/js/client.js')
-        script(src='/js/plugins.js')
-        script(src='/js/demo.js')
 
         script.
-            HashBrown.Helpers.ProjectHelper.currentProject = 'demo';
-            HashBrown.Helpers.ProjectHelper.currentProjectName = 'Demo';
-            HashBrown.Helpers.ProjectHelper.currentEnvironment = 'live';
+            window.HashBrown = {};
+            HashBrown.Context = {
+                projectName: 'Demo',
+                projectId: 'demo',
+                projectSettings: {info:{name:'Demo'},languages:['en'],sync:{}},
+                environment: 'live',
+                user: {id:'demouser',isAdmin:true,isCurrent:true,username:'demouser',fullName:'Demo user',scopes:{}},
+                isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1,
+                isDemo: true
+            };
+
+        script(src='/js/common.js')
+        script(src='/js/helpers.js')
+        script(src='/js/models.js')
+        script(src='/js/routes.js')
+        script(src='/js/utilities.js')
+        script(src='/js/views.js')
         
+        script(src='/js/environment.js')
+        script(src='/js/plugins.js')
+        script(src='/js/demo.js')
