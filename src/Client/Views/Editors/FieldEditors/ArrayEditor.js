@@ -360,10 +360,18 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         // Hook up the change event
         editorInstance.on('change', (newValue) => {
             $label.html(editorInstance.getFieldLabel());
+            
+            item.value = newValue;
+
+            this.trigger('change', this.value);
         });
 
         editorInstance.on('silentchange', (newValue) => {
             $label.html(editorInstance.getFieldLabel());
+            
+            item.value = newValue;
+            
+            this.trigger('silentchange', this.value);
         });
 
         $placeholder.replaceWith($field);

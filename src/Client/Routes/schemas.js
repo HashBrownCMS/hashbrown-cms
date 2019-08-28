@@ -13,7 +13,7 @@ Crisp.Router.route('/schemas/', function() {
             _.p('Click on a Schema to edit it.'),
             _.button({class: 'widget widget--button'}, 'Import schemas')
                 .click(() => {
-                    let url = 'https://uischema.org/all.json';
+                    let url = 'https://uischema.org/schemas.json';
 
                     let modal = UI.messageModal(
                         'Import schemas',
@@ -23,7 +23,7 @@ Crisp.Router.route('/schemas/', function() {
                                 type: 'text',
                                 value: url,
                                 isRequired: true,
-                                placeholder: 'E.g. https://uischema.org/all.json',
+                                placeholder: 'E.g. https://uischema.org/schemas.json',
                                 onChange: (newValue) => {
                                     url = newValue;
                                 }

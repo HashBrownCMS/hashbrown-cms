@@ -35,6 +35,14 @@ class SchemaController extends HashBrown.Controllers.ResourceController {
         let response = await HashBrown.Helpers.RequestHelper.request('get', url);
 
         if(Array.isArray(response)) {
+            // Sort schemas without parents first, to avoid dependency exceptions
+            response.sort((a, b) => {
+                if(!a['@parent']) { return -1; }     
+                if(!b['@parent']) { return 1; }
+
+                return 0;
+            });
+
             for(let json of response) {
                 await HashBrown.Helpers.SchemaHelper.importSchema(req.project, req.environment, json);
             }

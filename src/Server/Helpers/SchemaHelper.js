@@ -258,6 +258,10 @@ class SchemaHelper extends SchemaHelperCommon {
                 let info = i18n[key] || {};
                 let type = json[key];
 
+                if(type && type['@type']) {
+                    type = type['@type'];
+                }
+
                 if(!type) { throw new Error('Type for key "' + key + '" was null'); }
 
                 let def = {
@@ -296,6 +300,15 @@ class SchemaHelper extends SchemaHelperCommon {
                     } else if(type === 'bool') {
                         def.schemaId = 'boolean';
                     
+                    } else if(type === 'text') {
+                        def.schemaId = 'string';
+                        def.config = {
+                            isMultiLine: true
+                        };
+                    
+                    } else if(type === 'html') {
+                        def.schemaId = 'richText';
+
                     } else {
                         def.schemaId = getId(type);
 
