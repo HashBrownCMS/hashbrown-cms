@@ -302,7 +302,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
         // Schema could not be found, assign first allowed Schema
         if(!schema) {
-            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.config.allowedSchemas[0]);
+            schema = await HashBrown.Helpers.SchemaHelper.getSchemaById(this.config.allowedSchemas[0], true);
             item.schemaId = schema.id;
         }
 
@@ -337,6 +337,7 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         className: 'editor__field__toolbar__widget',
                         value: item.schemaId,
                         placeholder: 'Schema',
+                        useTypeAhead: true,
                         valueKey: 'id',
                         labelKey: 'name',
                         iconKey: 'icon',

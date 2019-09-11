@@ -343,6 +343,11 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
         } else {
             config = {};
         }
+        
+        // Structs are always collapsed by default
+        if(config.isCollapsed === undefined) {
+            config.isCollapsed = !!config.struct;
+        }
        
         // Init the field editor
         let fieldEditorInstance = new fieldEditor({
