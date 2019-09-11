@@ -7,6 +7,27 @@
  */
 class Media extends HashBrown.Models.Resource {
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(String, 'icon', 'file-image-o');
+        this.def(String, 'name');
+        this.def(String, 'url');
+        this.def(String, 'path');
+        this.def(String, 'folder', '/');
+        this.def(Date, 'updateDate');
+    }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'media'; }
+
+    /**
      * Checks the format of the params
      *
      * @params {Object} params
@@ -27,19 +48,6 @@ class Media extends HashBrown.Models.Resource {
         return params;
     }
     
-    /**
-     * Structure
-     */
-    structure() {
-        this.def(String, 'id');
-        this.def(String, 'icon', 'file-image-o');
-        this.def(String, 'name');
-        this.def(String, 'url');
-        this.def(String, 'path');
-        this.def(String, 'folder', '/');
-        this.def(Date, 'updateDate');
-    }
-
     /**
      * Gets the content type header
      *

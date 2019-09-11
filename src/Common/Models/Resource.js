@@ -7,6 +7,22 @@
  */
 class Resource extends HashBrown.Models.Entity {
     /**
+     * Structure
+     */
+    structure() {
+        this.def(String, 'id');
+        this.def(String, 'viewedBy');
+        this.def(Date, 'viewedOn');
+    }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return ''; }
+
+    /**
      * Checks the format of the params
      *
      * @params {Object} params

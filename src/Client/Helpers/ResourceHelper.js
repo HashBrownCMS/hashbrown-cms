@@ -7,14 +7,48 @@
  */
 class ResourceHelper {
     /**
-     * Gets a list of all resource names
+     * Gets a list of all resource category names
      *
      * @return {Array} Names
      */
-    static getResourceNames() {
-        return ['content', 'connections', 'forms', 'media', 'schemas', 'users'];
+    static getResourceCategoryNames() {
+        let names = {};
+
+        for(let modelName in HashBrown.Models) {
+            let model = HashBrown.Models[modelName];
+
+            if(!model || model.prototype instanceof HashBrown.Models.Resource === false) { continue; }
+
+            let name = model.category;
+
+            if(!name) { continue; }
+
+            names[name] = true;
+        }
+
+        names = Object.keys(names);
+        names.sort();
+
+        return names;
     }
-   
+
+    /**
+     * Lets the server know a resource is being worked on
+     *
+     * @param {HashBrown.Models.Resource} resource
+     */
+    static async heartbeat(resource = null) {
+        checkParam(resource, 'resource', HashBrown.Models.Resource);
+
+        if(!resource) { return; }
+
+        let category = resource.constructor.category;
+
+        if(!category) { return; }
+
+        await HashBrown.Helpers.RequestHelper.request('post', category + '/heartbeat/' + resource.id);      
+    }
+    
     /**
      * Removes a resource
      *

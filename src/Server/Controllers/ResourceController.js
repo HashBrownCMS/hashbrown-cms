@@ -17,6 +17,7 @@ class ResourceController extends HashBrown.Controllers.ApiController {
         app.post('/api/:project/:environment/' + this.category + '/pull/:id', this.middleware(), this.getHandler('pull'));
         app.post('/api/:project/:environment/' + this.category + '/push/:id', this.middleware(), this.getHandler('push'));
         app.post('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('set'));
+        app.post('/api/:project/:environment/' + this.category + '/heartbeat/:id', this.middleware(), this.getHandler('heartbeat'));
 
         app.delete('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('remove'));
     }
@@ -55,6 +56,13 @@ class ResourceController extends HashBrown.Controllers.ApiController {
 
             }
         };
+    }
+
+    /**
+     * Updates the edited time of a resource
+     */
+    static async heartbeat(req, res) {
+        await HashBrown.Helpers.DatabaseHelper.mergeOne(req.project, req.environment + '.' + this.category, { id: req.params.id }, { viewedBy: req.user.id, viewedOn: new Date() });
     }
 
     /**

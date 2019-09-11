@@ -45,7 +45,7 @@ class ResourceReferenceEditor extends HashBrown.Views.Editors.FieldEditors.Field
                 'Resource',
                 new HashBrown.Views.Widgets.Dropdown({
                     value: config.resource,
-                    options: HashBrown.Helpers.ResourceHelper.getResourceNames(),
+                    options: HashBrown.Helpers.ResourceHelper.getResourceCategoryNames(),
                     onChange: (newValue) => {
                         config.resource = newValue
                     }

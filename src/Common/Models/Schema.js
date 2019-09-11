@@ -10,7 +10,8 @@ class Schema extends HashBrown.Models.Resource {
      * Structure
      */
     structure() {
-        this.def(String, 'id');
+        super.structure();
+
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'type');
@@ -22,6 +23,13 @@ class Schema extends HashBrown.Models.Resource {
 
         this.def(Array, 'hiddenProperties', []);
     }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'schemas'; }
 
     /**
      * Gets a URL safe name for this schema

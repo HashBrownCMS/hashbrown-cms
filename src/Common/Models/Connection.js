@@ -12,7 +12,8 @@ class Connection extends HashBrown.Models.Resource {
      * Structure
      */
     structure() {
-        this.def(String, 'id');
+        super.structure();
+
         this.def(String, 'title');
         this.def(String, 'url');
         this.def(Boolean, 'isLocked');
@@ -20,6 +21,13 @@ class Connection extends HashBrown.Models.Resource {
         // Sync
         this.def(Object, 'sync');
     }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'connections'; }
 
     /**
      * Constructs a URL from the member variable and an appendix

@@ -11,7 +11,8 @@ class User extends HashBrown.Models.Resource {
     }
 
     structure() {
-        this.def(String, 'id');
+        super.structure();
+
         this.def(Boolean, 'isAdmin', false);
         this.def(Boolean, 'isCurrent', false);
         this.def(String, 'username');
@@ -19,6 +20,13 @@ class User extends HashBrown.Models.Resource {
         this.def(String, 'email');
         this.def(Object, 'scopes', {});
     }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'users'; }
 
     /**
      * Checks the parameters before they're committed

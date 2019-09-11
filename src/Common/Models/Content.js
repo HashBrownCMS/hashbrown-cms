@@ -6,9 +6,13 @@
  * @memberof HashBrown.Common.Models
  */
 class Content extends HashBrown.Models.Resource {
+    /**
+     * Structure
+     */
     structure() {
+        super.structure();
+
         // Fundamental fields
-        this.def(String, 'id');
         this.def(String, 'parentId');
         this.def(String, 'createdBy');
         this.def(String, 'updatedBy');
@@ -37,6 +41,13 @@ class Content extends HashBrown.Models.Resource {
             }
         }); 
     }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'content'; }
 
     /**
      * Checks the format of the params

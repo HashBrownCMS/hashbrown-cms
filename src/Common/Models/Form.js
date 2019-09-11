@@ -10,8 +10,9 @@ class Form extends HashBrown.Models.Resource {
      * Structure
      */
     structure() {
+        super.structure();
+        
         // Fundamental fields
-        this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
@@ -25,6 +26,13 @@ class Form extends HashBrown.Models.Resource {
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
     }
+
+    /**
+     * Gets the resource category name
+     *
+     * @returns {String} Name
+     */
+    static get category() { return 'forms'; }
 
     /**
      * Creates a new Form object

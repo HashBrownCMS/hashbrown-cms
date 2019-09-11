@@ -343,8 +343,8 @@
                     display: none;
                 }
                 
-                // Tablet mode
-                @media($sm) {
+                // Mobile mode
+                @media($xs) {
                     top: 0.5rem;
                     right: 0;
                     display: flex;
