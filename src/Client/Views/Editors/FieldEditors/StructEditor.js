@@ -183,7 +183,7 @@ class StructEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
                         sort: () => { 
                             HashBrown.Helpers.UIHelper.fieldSortableObject(
                                 config.struct,
-                                this.getField('Struct'),
+                                this.getField('Fields'),
                                 (newStruct) => {
                                     config.struct = newStruct;
                                 }
