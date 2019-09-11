@@ -392,8 +392,10 @@ class ArrayEditor extends HashBrown.Views.Editors.FieldEditors.FieldEditor {
 
                 return $placeholder;
             }),
-            _.button({title: 'Add an item', class: 'editor__field__add widget widget--button round fa fa-plus'})
-                .click(() => { this.onClickAddItem() })
+            _.button({title: 'Add an item', class: 'editor__field__add widget widget--button dashed embedded expanded'},
+                _.span({class: 'fa fa-plus'}), 
+                'Add item'
+            ).click(() => { this.onClickAddItem() })
         );
     }    
 }
