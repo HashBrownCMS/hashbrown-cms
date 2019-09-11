@@ -5,7 +5,7 @@ A free and open-source headless CMS built with Node.js and MongoDB
 - The `/db` folder for the `mongodb` docker volume has been moved, along with all other docker related files, to the `/docker` folder. After you pull the latest changes, make sure to manually move your `/db` folder to `/docker/db` before you restart the container.
 - The `/plugins` folder has been unversioned, so please remove all content in this directory (except for custom plugins you want to keep, of course)
 
-## Installing and running HashBrown
+## Installing HashBrown
 First make sure you have these dependencies met:  
 - node.js
 - mongodb
@@ -21,6 +21,7 @@ cd ./hashbrown-cms
 npm install
 ```
 
+## Running HashBrown
 Building and starting the server for production:
 ```
 npm start
@@ -58,6 +59,8 @@ git submodule update --recursive --init
 npm install
 webpack 
 ```
+
+Remember to restart the server after updating (see "Running HashBrown" above)
 
 ## Configuring MongoDB  
 Using environment variables:
