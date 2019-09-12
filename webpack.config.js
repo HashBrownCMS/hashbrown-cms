@@ -11,17 +11,17 @@ let isWatching = false;
 
 // Observe changes for specific files
 let entry = {
-    dashboard: './src/Client/dashboard.js',
-    demo: './src/Client/demo.js',
-    environment: './src/Client/environment.js',
+    dashboard: './lib/Client/dashboard.js',
+    demo: './lib/Client/demo.js',
+    environment: './lib/Client/environment.js',
     
-    routes: './src/Client/Routes',
+    route: './lib/Client/Route',
     
-    common: './src/Common',
-    helpers: './src/Client/Helpers',
-    models: './src/Client/Models',
-    utilities: './src/Client/utilities',
-    views: './src/Client/Views'
+    common: './lib/Common',
+    service: './lib/Client/Service',
+    entity: './lib/Client/Entity',
+    utilities: './lib/Client/utilities',
+    view: './lib/Client/View'
 }
 
 // Process input arguments
@@ -66,7 +66,7 @@ module.exports = {
 
     // Automatically accept these extensions
     resolve: {
-        modules: [path.resolve(__dirname), path.resolve(__dirname, 'src'), 'node_modules'],
+        modules: [path.resolve(__dirname), path.resolve(__dirname, 'lib'), 'node_modules'],
         extensions: ['.js', '.json', '.schema']
     }
 };
@@ -81,6 +81,6 @@ if(isWatching) {
 
 sassArgs.push('--source-map');
 sassArgs.push('--embed-sources'),
-sassArgs.push('./src/Client/Style/client.scss:./public/css/client.css');
+sassArgs.push('./lib/Client/Style/client.scss:./public/css/client.css');
 
 sass.run_(sassArgs);

@@ -6,4 +6,4 @@ const Path = require('path');
 global.APP_ROOT = Path.resolve(__dirname);
 
 // Include main server module
-require(Path.join(APP_ROOT, 'src', 'Server'));
+require(Path.join(APP_ROOT, 'lib', 'Server'));
