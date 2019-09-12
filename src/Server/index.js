@@ -18,23 +18,24 @@ const AppModulePath = require('app-module-path');
 AppModulePath.addPath(APP_ROOT);
 AppModulePath.addPath(Path.join(APP_ROOT, 'src'));
 
-// Express app
-const app = Express();
-
-app.set('view engine', 'pug');
-app.set('views', Path.join(APP_ROOT, 'src', 'Server', 'View'));
-
-// App middlewares
-app.use(CookieParser());
-app.use(BodyParser.json({limit: '50mb'}));
-app.use(Express.static(Path.join(APP_ROOT, 'public')));
-app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'storage', 'plugins')));
-
 // Dependencies
 require('Common');
 require('Server/Service');
 require('Server/Entity');
 require('Server/Controller');
+require('Server/View');
+
+// Express app
+const app = Express();
+
+app.engine('js', HashBrown.View.ViewBase.render);
+app.set('view engine', 'js');
+app.set('views', Path.join(APP_ROOT, 'src', 'Server', 'View'));
+
+app.use(CookieParser());
+app.use(BodyParser.json({limit: '50mb'}));
+app.use(Express.static(Path.join(APP_ROOT, 'public')));
+app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'storage', 'plugins')));
 
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;

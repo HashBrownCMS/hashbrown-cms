@@ -55,7 +55,7 @@ class ViewController extends HashBrown.Controller.Controller {
                 let users = await HashBrown.Service.UserService.getAllUsers();
                 
                 if(users && users.length > 0) { 
-                    return res.status(400).render('error', { message: 'Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.' });
+                    return res.status(400).render('error', { message: 'Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.' });
                 }
 
                 res.render('setup', { step: req.params.step });
@@ -99,11 +99,18 @@ class ViewController extends HashBrown.Controller.Controller {
                 
                 user.clearSensitiveData();
                 
+                let uptime = {};
+                uptime['seconds'] = OS.uptime();
+                uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
+                uptime['hours'] = Math.floor(uptime['seconds'] / (60*60)) - uptime['days'] * 24;
+                uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
+
                 res.render('dashboard', {
                     tab: req.params.tab,
                     os: OS,
                     user: user,
-                    app: require(APP_ROOT + '/package.json')
+                    app: require(APP_ROOT + '/package.json'),
+                    uptime: uptime
                 });
             } catch(e) {
                 res.status(403).redirect('/login');  

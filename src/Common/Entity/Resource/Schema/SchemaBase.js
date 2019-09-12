@@ -57,7 +57,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.Schema.SchemaBase);
 
         return HashBrown.Service.SchemaService.getEntity({
-            id: Schema.createId(),
+            id: HashBrown.Entity.Resource.Schema.SchemaBase.createId(),
             icon: parentSchema.icon || 'file',
             type: parentSchema.type,
             editorId: parentSchema.editorId,

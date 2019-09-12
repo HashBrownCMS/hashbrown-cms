@@ -199,7 +199,7 @@ class TestService {
 
         onMessage('Get native schemas');
 
-        await HashBrown.Service.SchemaService.getNativeSchema();
+        await HashBrown.Service.SchemaService.getNativeSchemas();
 
         onMessage('Create schema')
         

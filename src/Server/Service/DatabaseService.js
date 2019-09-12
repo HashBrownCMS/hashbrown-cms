@@ -196,7 +196,7 @@ class DatabaseService {
         let timestamp = Date.now();
         let archivePath = Path.join(dumpPath, timestamp + '.hba'); 
 
-        debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '.hba...', this);
+        debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '...', this);
     
         let collectionNames = await this.listCollections(databaseName);
     

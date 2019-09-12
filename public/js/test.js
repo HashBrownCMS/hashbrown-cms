@@ -13,7 +13,7 @@ function initServiceTest() {
         messages.innerHTML = '';
         
         try {
-            result = await HashBrown.Helpers.RequestHelper.customRequest('post', url);
+            result = await HashBrown.Service.RequestService.customRequest('post', url);
         
         } catch(e) {
             result = e.message;    

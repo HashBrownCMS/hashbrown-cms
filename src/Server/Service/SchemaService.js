@@ -186,11 +186,11 @@ class SchemaService extends require('Common/Service/SchemaService') {
         // First get the Schema object
         let thisSchema = await this.getSchemaById(project, environment, id)
 
-        // Then get all custom Schema
-        let customSchema = await this.getCustomSchema(project, environment);
+        // Then get all custom Schemas
+        let customSchemas = await this.getCustomSchemas(project, environment);
         
         // Then check if any custom Schema use this one as a parent
-        for(let customSchema of customSchema) {
+        for(let customSchema of customSchemas) {
             if(customSchema.parentSchemaId != thisSchema.id) { continue; }
 
             // If it does use this schema as a parent, make it use its grandparent instead
