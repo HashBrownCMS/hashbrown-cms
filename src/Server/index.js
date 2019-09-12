@@ -16,13 +16,13 @@ const AppModulePath = require('app-module-path');
 
 // Make sure we can require our source files conveniently
 AppModulePath.addPath(APP_ROOT);
-AppModulePath.addPath(Path.join(APP_ROOT, 'lib'));
+AppModulePath.addPath(Path.join(APP_ROOT, 'src'));
 
 // Express app
 const app = Express();
 
 app.set('view engine', 'pug');
-app.set('views', Path.join(APP_ROOT, 'lib', 'Server', 'View'));
+app.set('views', Path.join(APP_ROOT, 'src', 'Server', 'View'));
 
 // App middlewares
 app.use(CookieParser());

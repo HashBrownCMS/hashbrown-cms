@@ -15,7 +15,7 @@ class SchemaService extends require('Common/Service/SchemaService') {
      * @returns {Promise} Array of Schema
      */
     static async getNativeSchemas() {
-        let path = Path.join(APP_ROOT, 'lib', 'Common', 'Schema', '*', '*.json');
+        let path = Path.join(APP_ROOT, 'src', 'Common', 'Schema', '*', '*.json');
         let paths = await HashBrown.Service.FileService.list(path);
         
         // Native Schema output
@@ -102,7 +102,7 @@ class SchemaService extends require('Common/Service/SchemaService') {
     static async getNativeSchema(id) {
         checkParam(id, 'id', String, true);
         
-        let path = Path.join(APP_ROOT, 'lib', 'Common', 'Schema', '*', id + '.json');
+        let path = Path.join(APP_ROOT, 'src', 'Common', 'Schema', '*', id + '.json');
         let paths = await HashBrown.Service.FileService.list(path);
 
         if(paths.length < 1) { throw new Error('Native schema "' + id + '" could not be found'); }
