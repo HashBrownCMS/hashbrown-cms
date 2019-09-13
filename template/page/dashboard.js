@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <!DOCTYPE html>
 <html>
     <head>
-        ${require('./inc/head')(_, view)}
+        ${_.include(require('./inc/head'))}
     </head>
 
     <body class="page page--dashboard">
@@ -14,10 +14,10 @@ module.exports = (_, view) => `
                 <img class="page--dashboard__header__logo__image" src="/svg/logo_pink.svg">
             </a>
 
-            ${_.if(view.user.isAdmin, `
-                <a class="page--dashboard__header__tab ${view.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Projects</a>
-                <a class="page--dashboard__header__tab ${view.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
-                <a class="page--dashboard__header__tab ${view.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
+            ${_.if(model.user.isAdmin, `
+                <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Projects</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
             `)}
 
             <div class="page--dashboard__header__actions">
@@ -29,34 +29,28 @@ module.exports = (_, view) => `
 
         <main class="page--dashboard__body">
             <div class="page--dashboard__body__container">
-                ${_.if(view.tab === 'projects', `
+                ${_.if(model.tab === 'projects', `
                     <div class="page--dashboard__projects">
                         <div class="page--dashboard__projects__welcome">
-                            <p>Welcome to the HashBrown dashboard.<br>Below you will find a list of active projects on this server.</p>
+                            <p>Welcome to the HashBrown dashboard.<br>Below you will find a list of active projects on model server.</p>
                             <p>To author content, you can click the environment buttons to get started.</p>
 
-                            ${_.if(view.user.isAdmin, `
+                            ${_.if(model.user.isAdmin, `
                                 <p>You're an admin, so you can use the various project menus ( <span class="fa fa-ellipsis-v"></span> and <span class="fa fa-plus"></span> ) to manage backups and create/delete environments and projects.</p>
                             `)}
 
                             <p>If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a></p>
                         </div>
 
-                        <div class="page--dashboard__projects__list">
-                            <div class="widget widget--spinner embedded no-background">
-                                <div class="widget--spinner__inner">
-                                    <div class="widget--spinner__image fa fa-refresh"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="page--dashboard__projects__list"></div>
 
-                        ${_.if(view.user.isAdmin, `
+                        ${_.if(model.user.isAdmin, `
                             <button class="page--dashboard__projects__add widget widget--button round right fa fa-plus" title="Create project"></button>
                         `)}
                     </div>
                 `)}
                 
-                ${_.if(view.user.isAdmin && view.tab === 'users', `
+                ${_.if(model.user.isAdmin && model.tab === 'users', `
                     <div class="page--dashboard__users">
                         <div class="page--dashboard__users__list"></div>
 
@@ -64,20 +58,20 @@ module.exports = (_, view) => `
                     </div>
                 `)}
                 
-                ${_.if(view.user.isAdmin && view.tab === 'server', `
+                ${_.if(model.user.isAdmin && model.tab === 'server', `
                     <div class="page--dashboard__server">
                         <div class="page--dashboard__server__info">
                             <div class="widget-group">
                                 <div class="widget widget--label small secondary">Software</div>
-                                <div class="widget widget--label">HashBrown v${view.app.version}</div>
+                                <div class="widget widget--label">HashBrown v${model.app.version}</div>
                             </div>
 
                             <div class="widget-group">
                                 <div class="widget widget--label small secondary">Platform</div>
-                                <div class="widget widget--label">${view.os.type()}</div> 
+                                <div class="widget widget--label">${model.os.type()}</div> 
                             </div>
 
-                            ${_.each(view.os.cpus(), (i, cpu) => `
+                            ${_.each(model.os.cpus(), (i, cpu) => `
                                 <div class="widget-group">
                                     <div class="widget widget--label small secondary">CPU ${i + 1}</div>
                                     <div class="widget widget--label">${cpu.model}</div>
@@ -86,17 +80,17 @@ module.exports = (_, view) => `
 
                             <div class="widget-group">
                                 <div class="widget widget--label small secondary">Memory</div>
-                                <div class="widget widget--label">${Math.round(view.os.freemem() / 1000000)}mb / ${Math.round(view.os.totalmem() / 1000000)}mb</div>
+                                <div class="widget widget--label">${Math.round(model.os.freemem() / 1000000)}mb / ${Math.round(model.os.totalmem() / 1000000)}mb</div>
                             </div>
 
                             <div class="widget-group">
                                 <div class="widget widget--label small secondary">Load average</div>
-                                <div class="widget widget--label">${Math.round(view.os.loadavg()[0] * 10000) / 10000}</div>
+                                <div class="widget widget--label">${Math.round(model.os.loadavg()[0] * 10000) / 10000}</div>
                             </div>
 
                             <div class="widget-group">
                                 <div class="widget widget--label small secondary">Uptime</div>
-                                <div class="widget widget--label">${view.uptime.days}d ${view.uptime.hours}h ${view.uptime.minutes}m</div>
+                                <div class="widget widget--label">${model.uptime.days}d ${model.uptime.hours}h ${model.uptime.minutes}m</div>
                             </div>
                         </div>
                     </div>
@@ -104,12 +98,12 @@ module.exports = (_, view) => `
             </div>
         </main>
 
-        ${require('./inc/scripts')(_, view)}
+        ${_.include(require('./inc/scripts'))}
 
         <script>
             window.HashBrown = {};
             HashBrown.Context = {
-                user: ${JSON.stringify(view.user)},
+                user: ${JSON.stringify(model.user)},
                 view: "dashboard"
             };
         </script>
@@ -121,8 +115,7 @@ module.exports = (_, view) => `
         <script src="/js/view.js"></script>
        
         <script src="/js/dashboard.js"></script>
-
     </body>
-</html> 
+</html>
 
 `

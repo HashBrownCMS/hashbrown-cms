@@ -23,12 +23,11 @@ require('Common');
 require('Server/Service');
 require('Server/Entity');
 require('Server/Controller');
-require('Server/View');
 
 // Express app
 const app = Express();
 
-app.engine('js', HashBrown.View.ViewBase.render);
+app.engine('js', HashBrown.Entity.View.ViewBase.engine);
 app.set('view engine', 'js');
 app.set('views', Path.join(APP_ROOT, 'template', 'page'));
 

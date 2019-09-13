@@ -1,8 +1,8 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
-<title>${ view.title || 'HashBrown CMS' }</title>
+<title>${ model.title || 'HashBrown CMS' }</title>
 
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">

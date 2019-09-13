@@ -92,29 +92,25 @@ class ViewController extends HashBrown.Controller.Controller {
 
         // Dashboard
         app.get('/dashboard/:tab', async (req, res) => {
-            try {
-                let user = await this.authenticate(req.cookies.token);
+            let user = await this.authenticate(req.cookies.token);
 
-                if(!user) { return res.redirect('/login?path=/dashboard/' + req.params.tab); }
-                
-                user.clearSensitiveData();
-                
-                let uptime = {};
-                uptime['seconds'] = OS.uptime();
-                uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
-                uptime['hours'] = Math.floor(uptime['seconds'] / (60*60)) - uptime['days'] * 24;
-                uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
+            if(!user) { return res.redirect('/login?path=/dashboard/' + req.params.tab); }
+            
+            user.clearSensitiveData();
+            
+            let uptime = {};
+            uptime['seconds'] = OS.uptime();
+            uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
+            uptime['hours'] = Math.floor(uptime['seconds'] / (60*60)) - uptime['days'] * 24;
+            uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
 
-                res.render('dashboard', {
-                    tab: req.params.tab,
-                    os: OS,
-                    user: user,
-                    app: require(APP_ROOT + '/package.json'),
-                    uptime: uptime
-                });
-            } catch(e) {
-                res.status(403).redirect('/login');  
-            }
+            res.render('dashboard', {
+                tab: req.params.tab,
+                os: OS,
+                user: user,
+                app: require(APP_ROOT + '/package.json'),
+                uptime: uptime
+            });
         });
 
         // Test

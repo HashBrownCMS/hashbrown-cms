@@ -18,6 +18,7 @@
   "author": "Putaitu",
   "license": "MIT",
   "dependencies": {
+    "acorn": "^7.0.0",
     "app-module-path": "^2.2.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",

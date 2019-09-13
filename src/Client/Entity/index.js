@@ -10,3 +10,4 @@ namespace('Entity')
 require('Common/Entity/Deployer');
 require('Common/Entity/Processor');
 require('./Resource');
+require('./View');
