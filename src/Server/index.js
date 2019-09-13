@@ -30,7 +30,7 @@ const app = Express();
 
 app.engine('js', HashBrown.View.ViewBase.render);
 app.set('view engine', 'js');
-app.set('views', Path.join(APP_ROOT, 'src', 'Server', 'View'));
+app.set('views', Path.join(APP_ROOT, 'template', 'page'));
 
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(_, view) { return `
+module.exports = (_, view) => `
 
 <h1>Login</h1>
 <ul>
@@ -372,4 +372,4 @@ module.exports = function(_, view) { return `
     <li>Can save changes</li>
 </ul>
 
-`}
+`

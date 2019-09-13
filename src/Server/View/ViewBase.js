@@ -34,8 +34,6 @@ class ViewBase {
             let template = require(filePath);
             let html = template(helpers, options);
 
-            html = '<!DOCTYPE html>\n<html>' + html + '</html>'; 
-
             callback(null, html);
 
         } catch(e) {

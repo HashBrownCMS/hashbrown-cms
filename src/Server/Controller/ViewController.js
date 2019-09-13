@@ -139,7 +139,7 @@ class ViewController extends HashBrown.Controller.Controller {
 
         // Demo
         app.get('/demo/', (req, res) => {
-            res.render('demo');
+            res.render('demo', { title: 'Demo | HashBrown CMS' });
         });
 
         // Environment
@@ -158,6 +158,7 @@ class ViewController extends HashBrown.Controller.Controller {
                 user.clearSensitiveData();
 
                 res.render('environment', {
+                    title: project.settings.info.name,
                     currentProject: project.id,
                     currentProjectName: project.settings.info.name,
                     currentProjectSettings: project.settings,
