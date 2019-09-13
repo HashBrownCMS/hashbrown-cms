@@ -45,7 +45,7 @@ class ResourceEditor extends HashBrown.View.Editor.Editor {
      * Event: Heartbeat
      */
     async onHeartbeat() {
-        if(typeof this === 'undefined' || !this) { return; }
+        if(typeof this === 'undefined' || !this || !this.element || !this.element.parentElement) { return; }
 
         try {
             await HashBrown.Service.ResourceService.heartbeat(this.model);
