@@ -155,12 +155,16 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             
             } else if(content && content[0] && content[0] instanceof Node) {
                 content = content[0];
-
-            } else if(content instanceof Node === false) {
-                content = document.createTextNode(content.toString());
+            
             }
 
-            element.appendChild(content);
+            if(content instanceof Node) {
+                element.appendChild(content);
+            
+            } else {
+                element.innerHTML += content.toString();
+            
+            }
         }
     }
 
