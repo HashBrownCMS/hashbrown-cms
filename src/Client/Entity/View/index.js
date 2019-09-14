@@ -5,3 +5,6 @@
  */
 namespace('Entity.View')
 .add(require('./ViewBase'));
+
+require('./ListItem');
+require('./Modal');

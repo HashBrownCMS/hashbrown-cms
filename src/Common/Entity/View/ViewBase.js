@@ -9,41 +9,15 @@ class ViewBase extends HashBrown.Entity.EntityBase {
      */
     structure() {
         this.def(Object, 'model', {});
-        this.def(Function, 'template' , null);
+        this.def(Function, 'template', () => { return ''; });
     }
 
     /**
-     * Returns a colleciton of helper functions
+     * Scope
      *
-     * @return {Object} Helpers
+     * @return {Object} Scope
      */
-    scope() {
-        return {
-            if: (statement, content)  => {
-                if(!statement) { return ''; }
-
-                return content;
-            },
-            each: (items, callback) => {
-                let content = '';
-
-                for(let key in items) {
-                    if(!isNaN(key)) {
-                        key = parseFloat(key);
-                    }
-
-                    content += callback(key, items[key]);
-                }
-
-                return content;
-            },
-            include: (template, model) => {
-                if(typeof template !== 'function') { return ''; }
-
-                return template(this.scope(), model || this.model);
-            }
-        }
-    }
+    scope() { return {} }
 
     /**
      * Renders the template

@@ -1,31 +1,17 @@
 'use strict';
 
 /**
- * The base view for server side pages
+ * The base view class
  */
-class ViewBase extends require('Common/Entity/View/ViewBase') {
+class ViewBase extends HashBrown.Entity.EntityBase {
     /**
-     * Acts as a view engine handler
-     *
-     * @param {String} filePath
-     * @param {Object} options
-     * @param {Function} callback
+     * Structure
      */
-    static engine(filePath, options, callback) {
-        try {
-            let view = new ViewBase({
-                template: require(filePath),
-                model: options
-            });
-        
-            callback(null, view.render());
-
-        } catch(e) {
-            callback(null, e.stack || e.message);
-
-        }
+    structure() {
+        this.def(Object, 'model', {});
+        this.def(Function, 'template', () => { return ''; });
     }
-    
+
     /**
      * Scope
      *
@@ -56,7 +42,18 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                 return template(this.scope(), model || this.model);
             }
-        };
+        }
+    }
+
+    /**
+     * Renders the template
+     *
+     * @return {String} HTML
+     */
+    render() {
+        if(typeof this.template !== 'function') { return ''; }
+
+        return this.template(this.scope(), this.model);
     }
 }
 

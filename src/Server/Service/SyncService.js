@@ -29,15 +29,19 @@ class SyncService {
      * @param {String} project
      * @param {String} username
      * @param {String} password
+     * @param {String} overrideUrl
      *
      * @returns {String} New token
      */
-    static async renewToken(project, username, password) {
+    static async renewToken(project, username, password, overrideUrl = '') {
         checkParam(project, 'project', String);
         checkParam(username, 'username', String);
         checkParam(password, 'password', String);
+        checkParam(overrideUrl, 'overrideUrl', String);
 
         let settings = await HashBrown.Service.SettingsService.getSettings(project, '', 'sync') || {};
+
+        if(overrideUrl) { settings.url = overrideUrl; }
 
         this.validateSettings(settings, project, true);
 

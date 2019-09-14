@@ -13,7 +13,7 @@
 
     // Group
     &-group {
-        display: flex !important;
+        display: flex;
 
         &.vertical {
             flex-direction: column;
@@ -25,8 +25,21 @@
 
         > .widget {
             border-radius: 0 !important;
-            flex-grow: 1;
-            flex-basis: 0;
+
+            &--input,
+            &--dropdown {
+                flex-grow: 1;
+                flex-basis: 100%;
+                max-width: 100% !important;
+            }
+
+            &--label {
+                flex-grow: 0;
+                flex-shrink: 1;
+                flex-basis: 10rem;
+                width: 10rem;
+                min-width: 10rem;
+            }
         }
 
         &:not(.vertical) > .widget {

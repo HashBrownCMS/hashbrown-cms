@@ -16,14 +16,16 @@ class SyncController extends HashBrown.Controller.ApiController {
     /**
      * Logs in a user remotely
      */
-    static postLogin(req, res) {
-        HashBrown.Service.SyncService.renewToken(req.params.project, req.body.username, req.body.password)
-        .then((token) => {
+    static async postLogin(req, res) {
+        try {
+            let token = await HashBrown.Service.SyncService.renewToken(req.params.project, req.body.username, req.body.password, req.body.url);
+            
             res.status(200).send(token);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(401).send(SyncController.printError(e));
-        });
+        
+        }
     }
 }
 

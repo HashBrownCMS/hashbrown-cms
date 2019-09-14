@@ -8,13 +8,13 @@ async function initProjects() {
     $('.page--dashboard__projects__add').click(onClickAddProject);
 
     // Fetch projects
-    let projects = await HashBrown.Service.RequestService.request('get', 'server/projects?ids=true');
-   
     $('.page--dashboard__projects__list').empty();
 
-    for(let project of projects || []) {
-        let projectEditor = new HashBrown.View.Dashboard.ProjectEditor({
-            modelId: project
+    let projectIds = await HashBrown.Service.RequestService.request('get', 'server/projects?ids=true');
+   
+    for(let projectId of projectIds || []) {
+        let projectEditor = new HashBrown.Entity.View.ListItem.Project({
+            modelId: projectId
         });
 
         $('.page--dashboard__projects__list').prepend(projectEditor.element);
@@ -236,41 +236,6 @@ async function onClickAddProject() {
 }
 
 /**
- * Init routes
- */
-function initRoutes() {
-    Crisp.Router.route('/:project/info', () => {
-        console.log('info');
-    });
-    
-    Crisp.Router.route('/:project/languages', () => {
-        console.log('languages');
-    });
-    
-    Crisp.Router.route('/:project/backups', () => {
-        console.log('backups');
-    });
-    
-    Crisp.Router.route('/:project/sync', () => {
-        console.log('sync');
-    });
-    
-    Crisp.Router.route('/:project/delete', () => {
-        console.log('delete');
-    });
-    
-    Crisp.Router.route('/:project/migrate', () => {
-        console.log('migrate');
-    });
-    
-    Crisp.Router.route('/:project/:environment/delete', () => {
-        console.log('delete');
-    });
-
-    Crisp.Router.init();
-}
-
-/**
  * Event: Document ready
  */
 document.addEventListener('DOMContentLoaded', () => {
@@ -291,9 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);
 
     // Run init functions
-//    initRoutes();
     initProjects();
-    //initUsers();
+    initUsers();
 
     // Check for updates
     updateCheck();
