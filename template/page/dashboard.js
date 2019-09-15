@@ -20,10 +20,8 @@ module.exports = (_, model) => `
                 <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
             `)}
 
-            <div class="page--dashboard__header__actions">
-                <form action="/api/user/logout" method="POST">
-                    <button class="widget widget--button condensed low fa fa-sign-out" type="submit" title="Log out"></button>
-                </form>
+            <div class="page--environment__space page--environment__space--menu">
+                <div class="main-menu widget-group"></div>
             </div>
         </header>
 
@@ -31,17 +29,6 @@ module.exports = (_, model) => `
             <div class="page--dashboard__body__container">
                 ${_.if(model.tab === 'projects', `
                     <div class="page--dashboard__projects">
-                        <div class="page--dashboard__projects__welcome">
-                            <p>Welcome to the HashBrown dashboard.<br>Below you will find a list of active projects on model server.</p>
-                            <p>To author content, you can click the environment buttons to get started.</p>
-
-                            ${_.if(model.user.isAdmin, `
-                                <p>You're an admin, so you can use the various project menus ( <span class="fa fa-ellipsis-v"></span> and <span class="fa fa-plus"></span> ) to manage backups and create/delete environments and projects.</p>
-                            `)}
-
-                            <p>If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a></p>
-                        </div>
-
                         <div class="page--dashboard__projects__list"></div>
 
                         ${_.if(model.user.isAdmin, `

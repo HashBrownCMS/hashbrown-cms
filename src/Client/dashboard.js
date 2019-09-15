@@ -61,6 +61,36 @@ async function initUsers() {
 }
 
 /**
+ * Initialises the current user menu
+ */
+function initUser() {
+    let userDropdown = new HashBrown.View.Widget.Dropdown({
+        tooltip: 'Logged in as "' + (HashBrown.Context.user.fullName || HashBrown.Context.user.username) + '"',
+        icon: 'user',
+        reverseKeys: true,
+        options: {
+            'User settings': () => {
+                new HashBrown.Entity.View.Modal.UserEditor({ model: HashBrown.Context.user })
+                .on('change', initUsers);
+            },
+            'Log out': async () => {
+                try {
+                    await HashBrown.Service.RequestService.customRequest('post', '/api/user/logout')
+
+                    location = '/login';
+
+                } catch(e) {
+                    UI.errorModal(e);
+
+                }
+            }
+        }
+    });
+
+    document.querySelector('.main-menu').appendChild(userDropdown.element);
+}
+
+/**
  * Event: Click invite user
  */
 async function onClickInviteUser() {
@@ -99,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run init functions
     initProjects();
     initUsers();
+    initUser();
 
     // Check for updates
     updateCheck();
