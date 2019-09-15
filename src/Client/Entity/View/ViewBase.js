@@ -58,6 +58,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         if(!this.events[type]) { this.events[type] = []; }
 
         this.events[type].push(handler);
+
+        return this;
     }
 
     /**
@@ -70,9 +72,15 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         checkParam(type, 'type', String, true);
 
         if(!this.events || !this.events[type]) { return; }
-    
-        for(let handler of this.events[type]) {
-            handler.call(this, ...params);
+
+        try {
+            for(let handler of this.events[type]) {
+                handler.call(this, ...params);
+            }
+
+        } catch(e) {
+            this.setErrorState(e);
+
         }
     }
 
@@ -82,8 +90,11 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * @param {String} name
      * @param {Object} properties
      */
-    setState(name, properties = {}) {
-        this.state = properties;
+    setState(name, properties = null) {
+        if(properties) {
+            this.state = properties;
+        }
+
         this.state.name = name;
 
         this.render();

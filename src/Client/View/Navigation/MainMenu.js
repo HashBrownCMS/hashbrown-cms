@@ -120,7 +120,7 @@ class MainMenu extends Crisp.View {
                 icon: 'user',
                 reverseKeys: true,
                 options: {
-                    'User settings': () => { new HashBrown.View.Editor.UserEditor({ hidePermissions: true, model: HashBrown.Context.user }); },
+                    'User settings': () => { new HashBrown.Entity.View.Modal.UserEditor({ model: HashBrown.Context.user }); },
                     'Log out': () => {
                         HashBrown.Service.RequestService.customRequest('post', '/api/user/logout')
                         .then(() => {

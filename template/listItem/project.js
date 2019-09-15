@@ -32,7 +32,7 @@ _.div({class: 'page--dashboard__project in'},
                             icon: 'ellipsis-v',
                             reverseKeys: true,
                             options: {
-                                'Delete': () => { _.onClickRemoveEnvironment(environment); }
+                                'Delete': () => _.onClickRemoveEnvironment(environment)
                             }
                         }).$element.addClass('page--dashboard__project__environment__menu')
                     )

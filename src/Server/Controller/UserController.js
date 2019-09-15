@@ -257,14 +257,13 @@ class UserController extends HashBrown.Controller.ApiController {
     static createUser(req, res) {
         let username = req.body.username;
         let password = req.body.password;
-        let scopes = req.body.scopes;
 
-        HashBrown.Service.UserService.createUser(username, password, false, scopes)
+        HashBrown.Service.UserService.createUser(username, password, false, req.body)
         .then((user) => {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(403).send(UserController.printError(e));   
+            res.status(400).send(UserController.printError(e));   
         });
     }
 }

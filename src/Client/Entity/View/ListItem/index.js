@@ -5,4 +5,5 @@
  */
 namespace('Entity.View.ListItem')
 .add(require('./ListItemBase'))
-.add(require('./Project'));
+.add(require('./Project'))
+.add(require('./User'));

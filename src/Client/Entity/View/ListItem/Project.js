@@ -50,14 +50,20 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
-        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.settings.info.name || this.model.id) + '"?', async () => {
+        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+            state: {
+                heading: `Remove environment "${environmentName}"`,
+                message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.settings.info.name || this.model.id}"?`
+            }
+        })
+        .on('ok', async () => {
             try {
                 await HashBrown.Service.RequestService.request('delete', 'server/projects/' + this.model.id + '/' + environmentName);
 
                 this.update();
-            
+
             } catch(e) {
-                UI.errorModal(e);
+                modal.setErrorState(e);
 
             }
         });
@@ -108,35 +114,10 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click add environment button
      */
     onClickAddEnvironment() {
-        let modal = new HashBrown.View.Modal.Modal({
-            title: 'New environment for "' + this.model.settings.info.name + '"',
-            body: _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label'}, 'Environment name'),
-                new HashBrown.View.Widget.Input({
-                    placeholder: 'i.e. "testing" or "staging"'
-                })
-            ),
-            actions: [
-                {
-                    label: 'Create',
-                    onClick: () => {
-                        let environmentName = modal.$element.find('input').val();
-
-                        if(!environmentName) { return false; }
-
-                        HashBrown.Service.RequestService.request('put', 'server/projects/' + this.model.id + '/' + environmentName)
-                        .then(() => {
-                            modal.close();
-
-                            this.update();
-                        })
-                        .catch(UI.errorModal);
-
-                        return false;
-                    }
-                }
-            ]
-        });
+        new HashBrown.Entity.View.Modal.AddEnvironment({
+            model: this.model
+        })
+        .on('change', () => { this.update(); });
     }
 }
 

@@ -3,6 +3,9 @@
 /**
  * A generic modal
  *
+ * TODO: Enable ESC to cancel
+ * TODO: Enable grouping
+ *
  * @memberof HashBrown.Client.View.Modal
  */
 class ModalBase extends HashBrown.Entity.View.ViewBase {
@@ -12,19 +15,8 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
     constructor(params) {
         super(params);
 
-        // If this belongs to a group, find existing modals and append instead
-        /* TODO
-        if(this.group) {
-            for(let modal of Crisp.View.getAll('Modal')) {
-                if(modal.group !== this.group || modal === this) { continue; }
+        this.template = require('template/modal/modalBase'); 
 
-                modal.append(this);
-
-                this.remove();
-                break;
-            }
-        }*/
-        
         document.body.appendChild(this.element);
     }
   
@@ -53,9 +45,20 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Event: Clicked OK
+     */
+    onClickOK() {
+        this.trigger('ok');
+
+        this.close();
+    }
+
+    /**
      * Event: Clicked close
      */
     onClickClose() {
+        this.trigger('cancel');
+
         this.close();
     }
     
@@ -91,31 +94,5 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
         thisBody.innerHTML += thatBody.innerHTML;
     }
 }
-
-/* TODO:
-// Modal key events
-document.addEventListener('keyup', (e) => {
-    let modal = Crisp.View.getAll(Modal).pop();
-    
-    if(!modal) { return; }
-
-    switch(e.which) {
-        case 27: // Escape
-            if(modal.element.querySelector('.modal__close')) {
-                modal.close();
-            }
-            break;
-
-        case 13: // Enter
-            if((!modal.actions || modal.actions.length === 0) && modal.renderFooter === Modal.renderFooter) {
-                modal.close();
-                modal.trigger('ok');
-            } else if(modal.actions.length === 1) {
-                modal.close();
-                modal.actions[0].onClick();
-            }
-            break;
-    }
-});*/
 
 module.exports = ModalBase;

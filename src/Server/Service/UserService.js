@@ -240,19 +240,25 @@ class UserService {
      *
      * @param {String} username
      * @param {String} password
-     * @param {Boolean} admin
-     * @param {Object} scopes
+     * @param {Boolean} isAdmin
+     * @param {Object} params
      *
      * @returns {Promise} promise
      */
-    static async createUser(username, password, admin, scopes) {
+    static async createUser(username, password, isAdmin = false, params = {}) {
         checkParam(username, 'username', String, true);
-        checkParam(username, 'password', String, true);
+        checkParam(password, 'password', String, true);
+
+        delete params['username'];
+        delete params['password'];
 
         let user = HashBrown.Entity.Resource.User.create(username, password);
 
-        user.isAdmin = admin || false;
-        user.scopes = scopes || {};
+        for(let key in params) {
+            user[key] = params[key];
+        }
+
+        user.isAdmin = isAdmin;
 
         let foundUser = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username })
 

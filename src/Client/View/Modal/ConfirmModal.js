@@ -17,7 +17,7 @@ class ConfirmModal extends HashBrown.View.Modal.Modal {
      * Render header
      */
     renderHeader() {
-        return _.h4({class: 'modal--date__header__title'}, this.title);
+        return _.h4({class: 'modal--confirm__header__title'}, this.title);
     }
     
     /**
