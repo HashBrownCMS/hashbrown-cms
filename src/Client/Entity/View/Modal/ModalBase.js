@@ -58,6 +58,13 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
     onClickClose() {
         this.close();
     }
+    
+    /**
+     * Event: Click reset
+     */
+    onClickReset() {
+        this.reset();
+    }
 
     /**
      * Closes this modal

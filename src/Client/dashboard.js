@@ -5,10 +5,10 @@
  */
 async function initProjects() {
     // Add project
-    $('.page--dashboard__projects__add').click(onClickAddProject);
+    document.querySelector('.page--dashboard__projects__add').onclick = onClickAddProject;
 
     // Fetch projects
-    $('.page--dashboard__projects__list').empty();
+    document.querySelector('.page--dashboard__projects__list').innerHTML = '';
 
     let projectIds = await HashBrown.Service.RequestService.request('get', 'server/projects?ids=true');
    
@@ -17,7 +17,7 @@ async function initProjects() {
             modelId: projectId
         });
 
-        $('.page--dashboard__projects__list').prepend(projectEditor.element);
+        document.querySelector('.page--dashboard__projects__list').appendChild(projectEditor.element);
     }
 }
 
@@ -25,7 +25,7 @@ async function initProjects() {
  * Initialises the user views
  */
 async function initUsers() {
-    if(!currentUserIsAdmin()) { return; }
+    if(!HashBrown.Context.user.isAdmin) { return; }
 
     // Invite user
     $('.page--dashboard__users__add').click(onClickInviteUser);
@@ -208,31 +208,8 @@ async function onClickInviteUser() {
  * Event: Click create project
  */
 async function onClickAddProject() {
-    let modal = new HashBrown.View.Modal.Modal({
-        title: 'Create new project',
-        body: _.div({class: 'widget-group'},
-            _.label({class: 'widget widget--label'}, 'Project name'),
-            new HashBrown.View.Widget.Input({
-                placeholder: 'example.com'
-            }).$element
-        ),
-        actions: [
-            {
-                label: 'Create',
-                onClick: async (e) => {
-                    let name = modal.$element.find('input').val();
-
-                    if(name) {
-                        await HashBrown.Service.RequestService.request('post', 'server/projects/new', { name: name });
-                            
-                        location.reload();
-                    }
-
-                    return false;
-                }
-            }
-        ]
-    });
+    new HashBrown.Entity.View.Modal.CreateProject()
+    .on('change', initProjects);
 }
 
 /**

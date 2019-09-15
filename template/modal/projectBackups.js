@@ -10,7 +10,7 @@ _.div({class: 'modal in'},
         ),
         _.div({class: 'modal__body'},
             _.if(state.name === 'error', 
-                state.error ? state.error.stack || state.error.message : 'An unknown error occurred'
+                state.message
             ),
 
             _.if(state.name === 'uploading',

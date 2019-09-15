@@ -37,41 +37,11 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      */ 
     onClickRemove() {
         if(!HashBrown.Context.user.isAdmin) { return; }
-
-        let modal = new HashBrown.View.Modal.Modal({
-            title: 'Delete ' + this.model.settings.info.name,
-            body: _.div({class: 'widget-group'},
-                _.p({class: 'widget widget--label'}, 'Type the project name to confirm'),
-                _.input({class: 'widget widget--input text', type: 'text', placeholder: this.model.settings.info.name})
-                    .on('input', (e) => {
-                        let $btn = modal.$element.find('.widget.warning');
-                        let isMatch = $(e.target).val() == this.model.settings.info.name;
-                        
-                        $btn.toggleClass('disabled', !isMatch);
-                    })
-            ),
-            actions: [
-                {
-                    label: 'Cancel',
-                    class: 'default'
-                },
-                {
-                    label: 'Delete',
-                    class: 'warning disabled',
-                    onClick: async () => {
-                        try {
-                            await HashBrown.Service.RequestService.request('delete', 'server/projects/' + this.model.id);
-
-                            this.remove();
-
-                        } catch(e) {
-                            UI.errorModal(e); 
-                        
-                        }
-                    }
-                }
-            ]
-        });
+        
+        new HashBrown.Entity.View.Modal.DeleteProject({
+            model: this.model
+        })
+        .on('change', () => { this.remove(); });
     }
 
     /**
@@ -124,11 +94,11 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(!HashBrown.Context.user.isAdmin) { return; }
 
         if(this.model.environments.length < 2) {
-            UI.errorModal(new Error('You need at least 2 environments to migrate content'));
+            UI.errorModal(new Error('You need at least 2 environments to migrate resources'));
             return;
         }
     
-        new HashBrown.View.Dashboard.MigrationEditor({
+        new HashBrown.Entity.View.Modal.MigrateResources({
             model: this.model
         })
         .on('change', () => { this.update(); });

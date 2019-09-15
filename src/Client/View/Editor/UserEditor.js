@@ -120,6 +120,7 @@ class UserEditor extends HashBrown.View.Modal.Modal {
         return new HashBrown.View.Widget.Dropdown({
             value: this.model.getScopes(project),
             useMultiple: true,
+
             placeholder: '(no scopes)',
             options: [
                 'connections',
@@ -195,7 +196,7 @@ class UserEditor extends HashBrown.View.Modal.Modal {
             }
         }
 
-        return _.div({class: 'widget-group'},
+        return [
             new HashBrown.View.Widget.Input({
                 placeholder: 'Type new password',
                 type: 'password',
@@ -214,7 +215,7 @@ class UserEditor extends HashBrown.View.Modal.Modal {
                     onChange();
                 }
             }).$element
-        );
+        ];
     }
     
     /**
@@ -243,7 +244,7 @@ class UserEditor extends HashBrown.View.Modal.Modal {
      */
     renderField(label, $content) {
         return _.div({class: 'widget-group'},
-            _.div({class: 'widget widget--label'},
+            _.div({class: 'widget widget--label small'},
                 label
             ),
             $content

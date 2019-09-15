@@ -11,8 +11,8 @@ _.div({class: 'page--dashboard__project in'},
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
-                    'Delete': _.onClickRemove,
-                    'Migrate content': _.onClickMigrate
+                    'Migrate resources': _.onClickMigrate,
+                    'Delete': _.onClickRemove
                 }
             }).$element.addClass('page--dashboard__project__menu')
         ),

@@ -167,7 +167,9 @@ class Dropdown extends HashBrown.View.Widget.Widget {
                 }
             }
 
-            label = labels.join(', ');
+            if(labels.length > 0) {
+                label = labels.join(', ');
+            }
 
         } else {
             label = options[this.value] === 0 ? '0' : options[this.value] || label;

@@ -77,6 +77,19 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     }
 
     /**
+     * Sets the view state
+     *
+     * @param {String} name
+     * @param {Object} properties
+     */
+    setState(name, properties = {}) {
+        this.state = properties;
+        this.state.name = name;
+
+        this.render();
+    }
+
+    /**
      * Sets the view state as an error
      *
      * @param {Error} error
@@ -84,7 +97,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     setErrorState(error) {
         this.state = {
             name: 'error',
-            error: error
+            error: error,
+            message: error.message
         };
 
         this.render();

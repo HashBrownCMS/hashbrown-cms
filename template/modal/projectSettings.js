@@ -9,7 +9,6 @@ _.div({class: 'modal'},
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
-            _.h4('General'),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Name'),
                 _.input({class: 'widget widget--input text', type: 'text', value: model.settings.info.name, oninput: _.onChangeName})
@@ -24,7 +23,7 @@ _.div({class: 'modal'},
                     onChange: _.onChangeLanguages
                 })
             ),
-            _.h4('Sync'),
+            _.div({class: 'widget widget--separator'}, 'Sync'),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Enabled'),
                 new HashBrown.View.Widget.Input({

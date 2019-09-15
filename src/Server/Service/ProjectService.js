@@ -40,8 +40,8 @@ class ProjectService {
 
         // Sort by name
         allProjects.sort((a, b) => {
-            if(a.settings.info.name < b.settings.info.name) { return 1; }
-            if(a.settings.info.name > b.settings.info.name) { return -1; }
+            if(a.settings.info.name < b.settings.info.name) { return -1; }
+            if(a.settings.info.name > b.settings.info.name) { return 1; }
             return 0;
         });
 

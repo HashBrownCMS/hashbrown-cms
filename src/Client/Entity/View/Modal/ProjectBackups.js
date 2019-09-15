@@ -64,13 +64,6 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
 
         this.render();
     }
-    
-    /**
-     * Event: Click reset
-     */
-    onClickReset() {
-        this.reset();
-    }
 
     /**
      * Event: Submitted backup
