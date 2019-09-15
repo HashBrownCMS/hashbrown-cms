@@ -10,12 +10,19 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     constructor(params) {
         super(params);
 
+        this.init();
+    }
+
+    /**
+     * Initialise
+     */
+    async init() {
         this.element = document.createElement('div');
         this.element.className = 'placeholder';
 
-        this.update();
+        await this.update();
 
-        this.constructor.instance = this;
+        this.trigger('init');
     }
 
     /**
@@ -26,16 +33,6 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         this.def(HTMLElement, 'element', null);
         this.def(Object, 'events', {});
-    }
-    
-    /**
-     * Gets a valid instance of this view
-     * This should only be used with solo views like the navbar, as keeping arrays creates a potential for memory leaks
-     */
-    static getInstance() {
-        if(!this.instance || !this.instance.isValid()) { return null; }
-
-        return this.instance;
     }
 
     /**
@@ -75,8 +72,22 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         if(!this.events || !this.events[type]) { return; }
     
         for(let handler of this.events[type]) {
-            handler(...params);
+            handler.call(this, ...params);
         }
+    }
+
+    /**
+     * Sets the view state as an error
+     *
+     * @param {Error} error
+     */
+    setErrorState(error) {
+        this.state = {
+            name: 'error',
+            error: error
+        };
+
+        this.render();
     }
 
     /**
@@ -87,7 +98,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     scope() {
         // Create a default scope with basic templating functionaly
         let scope = {
-            if: (statement, content)  => {
+            if: (statement, ...content)  => {
                 if(!statement) { return ''; }
 
                 return content;
@@ -96,11 +107,13 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                 let content = [];
 
                 for(let key in items) {
+                    let value = items[key];
+
                     if(!isNaN(key)) {
                         key = parseFloat(key);
                     }
-
-                    content.push(callback(key, items[key]));
+                    
+                    content.push(callback(key, value));
                 }
 
                 return content;
@@ -117,7 +130,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             get: (target, name, receiver) => {
                 // Any key starting with "on" that corresponds with a function name will be passed to the scope
                 if(name.substring(0, 2) === 'on' && typeof this[name] === 'function') {
-                    return (e) => { this[name](e); };
+                    return (...args) => { this[name].call(this, ...args); };
                 }
 
                 // Any other undefined key in the scope will be interpreted as an element constructor
@@ -150,18 +163,21 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             }
 
         } else {
-            if(content instanceof Crisp.View) {
+            if(content && content.element instanceof Node) {
                 content = content.element;
             
             } else if(content && content[0] && content[0] instanceof Node) {
                 content = content[0];
             
+            } else if(typeof content === 'function') {
+                content = content();
+
             }
 
             if(content instanceof Node) {
                 element.appendChild(content);
             
-            } else {
+            } else if(content) {
                 element.innerHTML += content.toString();
             
             }
@@ -213,6 +229,15 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * Fetches the model
      */
     async fetch() {}
+    
+    /**
+     * Resets the view
+     */
+    async reset() {
+        this.state = {};
+
+        await this.update();
+    }
 
     /**
      * Updates the view
@@ -227,6 +252,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         }
 
         this.render();
+
+        this.trigger('update');
     }
 
     /**

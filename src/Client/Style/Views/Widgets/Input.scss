@@ -5,6 +5,10 @@
     display: block;
     line-height: 2rem;
 
+    &.widget-group {
+        display: flex;
+    }
+
     // Tall mode
     &.tall {
         line-height: 3rem;

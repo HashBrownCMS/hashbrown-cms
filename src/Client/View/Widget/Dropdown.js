@@ -367,7 +367,7 @@ class Dropdown extends HashBrown.View.Widget.Widget {
      * Template
      */
     template() {
-        return _.div({title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' has-icon' : '')},
+        return _.div({title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.icon ? ' small has-icon' : '')},
             // Value
             _.div({class: 'widget--dropdown__value'}, this.getValueLabel()),
             

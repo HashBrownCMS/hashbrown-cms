@@ -66,7 +66,7 @@ class Input extends HashBrown.View.Widget.Widget {
       
             case 'file':
                 return _.form({class: config.class + (typeof this.onSubmit === 'function' ? ' widget-group' : ''), title: config.title},
-                    _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button expanded'}, this.placeholder || 'Browse...'), 
+                    _.label({for: 'file-' + this.guid, class: 'widget--input__file-browse widget widget--button low'}, this.placeholder || 'Browse...'), 
                     _.input({id: 'file-' + this.guid, class: 'widget--input__file-input', type: 'file', required: this.isRequired, name: this.name || 'file', multiple: this.useMultiple, directory: this.useDirectory})
                         .on('change', (e) => {
                             let names = [];
@@ -95,10 +95,7 @@ class Input extends HashBrown.View.Widget.Widget {
                             }
                         }),
                     _.if(typeof this.onSubmit === 'function',
-                        _.button({class: 'widget widget--button widget--input__file-submit disabled', type: 'submit', title: 'Upload file'},
-                            _.span({class: 'fa fa-upload'}),
-                            'Upload'
-                        )
+                        _.button({class: 'widget widget--button widget--input__file-submit small disabled fa fa-upload', type: 'submit', title: 'Upload file'})
                     )
                 ).on('submit', (e) => {
                     e.preventDefault();

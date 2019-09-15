@@ -1,5 +1,7 @@
 'use strict';
 
+const Path = require('path');
+
 /**
  * The controller for dashboard related operations
  *
@@ -274,7 +276,7 @@ class ServerController extends HashBrown.Controller.ApiController {
         let file = req.file;
 
         if(file) {
-            res.status(200).send('OK');
+            res.status(200).send(Path.basename(file.filename, Path.extname(file.filename)));
 
         } else {
             res.status(400).send('File was not provided');    

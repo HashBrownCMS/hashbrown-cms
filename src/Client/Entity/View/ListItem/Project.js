@@ -102,24 +102,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         new HashBrown.Entity.View.Modal.ProjectSettings({
             model: this.model
         })
-        .on('change', () => {
-            this.update();
-        });
-    }
-    
-    /**
-     * Event: Click sync button
-     */
-    onClickSync() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
-
-        new HashBrown.View.Dashboard.SyncEditor({
-            projectId: this.model.id,
-            modelUrl: '/api/' + this.model.id + '/settings/sync'
-        })
-        .on('change', (newSettings) => {
-            this.update();
-        });
+        .on('change', () => { this.update(); });
     }
     
     /**
@@ -128,12 +111,10 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickBackups() {
         if(!HashBrown.Context.user.isAdmin) { return; }
         
-        new HashBrown.View.Dashboard.BackupEditor({
-            modelUrl: '/api/server/projects/' + this.model.id
+        new HashBrown.Entity.View.Modal.ProjectBackups({
+            model: this.model
         })
-        .on('change', () => {
-            this.update();
-        });
+        .on('change', () => { this.update(); });
     }
 
     /**
@@ -150,9 +131,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         new HashBrown.View.Dashboard.MigrationEditor({
             model: this.model
         })
-        .on('change', () => {
-            this.update();
-        });
+        .on('change', () => { this.update(); });
     }
 
     /**

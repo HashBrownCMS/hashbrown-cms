@@ -5,4 +5,5 @@
  */
 namespace('Entity.View.Modal')
 .add(require('./ModalBase'))
-.add(require('./ProjectSettings'));
+.add(require('./ProjectSettings'))
+.add(require('./ProjectBackups'));

@@ -24,14 +24,23 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
                 break;
             }
         }*/
-
+        
         document.body.appendChild(this.element);
+    }
+  
+    /**
+     * Init
+     */
+    async init() {
+        await super.init();
+            
+        this.element.classList.toggle('in', false);
 
         setTimeout(() => {
             this.element.classList.toggle('in', true);
         }, 100);
     }
-   
+
     /**
      * Toggles the loading state
      *
