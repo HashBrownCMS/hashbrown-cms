@@ -121,56 +121,67 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * @return {Object} Scope
      */
     scope() {
-        // Create a default scope with basic templating functionaly
-        let scope = {
-            if: (statement, ...content)  => {
-                if(!statement) { return ''; }
-
-                return content;
-            },
-            each: (items, callback) => {
-                let content = [];
-
-                for(let key in items) {
-                    let value = items[key];
-
-                    if(!isNaN(key)) {
-                        key = parseFloat(key);
-                    }
-                    
-                    content.push(callback(key, value));
-                }
-
-                return content;
-            },
-            include: (template, model) => {
-                if(typeof template !== 'function') { return ''; }
-
-                return template(this.scope(), model || this.model);
-            }
-        };
-
-        // Let the template call the scope dynamically
-        let proxy = new Proxy(scope, {
+        return new Proxy({}, {
             get: (target, name, receiver) => {
-                // Any key starting with "on" that corresponds with a function name will be passed to the scope
+                // Return any valid function starting with "on", like "onClick", "onChange", etc.
+                // We are only including event handlers in the scope, because we want to minimise the use of logic in templates
                 if(name.substring(0, 2) === 'on' && typeof this[name] === 'function') {
                     return (...args) => { this[name].call(this, ...args); };
                 }
 
-                // Any other undefined key in the scope will be interpreted as an element constructor
-                if(target[name] === undefined) {
-                    return (attributes = {}, ...content) => {
-                        return this.createElement(name, attributes, content);
-                    }
+                // Look up recognised field names                
+                switch(name) {
+                    // A simple conditional
+                    case 'if':
+                        return(statement, ...content)  => {
+                            if(!statement) { return ''; }
+
+                            return content;
+                        };
+
+                    // Loop an array or object
+                    case 'each':
+                        return (items, callback) => {
+                            let content = [];
+
+                            for(let key in items) {
+                                let value = items[key];
+
+                                if(!isNaN(key)) {
+                                    key = parseFloat(key);
+                                }
+
+                                content.push(callback(key, value));
+                            }
+
+                            return content;
+                        };
+
+                    // Render an included template
+                    case 'include':
+                        return (template, model) => {
+                            if(typeof template !== 'function') { return ''; }
+
+                            return template(this.scope(), model || this.model);
+                        };
+
+                    // Render a dropdown
+                    case 'dropdown':
+                        return (params) => { return new HashBrown.View.Widget.Dropdown(params); };
+                    
+                    // Render an enhanced input element
+                    case 'input':
+                        return (params) => { return new HashBrown.View.Widget.Input(params); };
+
+                    // Any unrecognised key will be interpreted as an element constructor
+                    // This means that, for instance, calling "_.div" will return a <div> HTMLElement 
+                    default:
+                        return (attributes = {}, ...content) => {
+                            return this.createElement(name, attributes, content);
+                        }
                 }
-                   
-                // Defined keys will be passed directly
-                return target[name];
             }
         });
-
-        return proxy;
     }
  
     /**

@@ -78,29 +78,29 @@ class CreateUser extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Input password
      */
-    onInputPassword(e) {
-        this.model.password = e.currentTarget.value;
+    onInputPassword(password) {
+        this.model.password = password;
     }
     
     /**
      * Event: Input email
      */
-    onInputEmail(e) {
-        this.model.email = e.currentTarget.value;
+    onInputEmail(email) {
+        this.model.email = email;
     }
         
     /**
      * Event: Input name
      */
-    onInputUsername(e) {
-        this.model.username = e.currentTarget.value;
+    onInputUsername(username) {
+        this.model.username = username;
     }
     
     /**
      * Event: Input full name
      */
-    onInputFullName(e) {
-        this.model.fullName = e.currentTarget.value;
+    onInputFullName(fullName) {
+        this.model.fullName = fullName;
     }
 }
 

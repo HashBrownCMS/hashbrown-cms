@@ -41,8 +41,8 @@
         color: material-color('red', '500');
     }
 
-    &__menu {
-        position: absolute !important;
+    .widget--dropdown {
+        position: absolute;
         right: 0.5rem;
         top: 0.5rem;
     }

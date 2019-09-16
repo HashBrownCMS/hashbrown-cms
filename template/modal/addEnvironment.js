@@ -16,10 +16,7 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label'}, 'Environment name'),
-                    new HashBrown.View.Widget.Input({
-                        placeholder: 'staging',
-                        onChange: _.onInputName
-                    })
+                    _.input({type: 'text', value: state.environmentName, onChange: _.onInputName})
                 )
             )
         ),

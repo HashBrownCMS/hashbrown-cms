@@ -5,7 +5,7 @@ module.exports = (_, model) =>
 _.div({class: 'page--dashboard__project in'},
     _.div({class: 'page--dashboard__project__body'},
         _.if(HashBrown.Context.user.isAdmin,
-            new HashBrown.View.Widget.Dropdown({
+            _.dropdown({
                 icon: 'ellipsis-v',
                 reverseKeys: true,
                 options: {
@@ -14,7 +14,7 @@ _.div({class: 'page--dashboard__project in'},
                     'Migrate resources': _.onClickMigrate,
                     'Delete': _.onClickRemove
                 }
-            }).$element.addClass('page--dashboard__project__menu')
+            })
         ),
         _.div({class: 'page--dashboard__project__info'},
             _.h3({class: 'page--dashboard__project__info__name'}, model.settings.info.name || model.id),
@@ -27,14 +27,14 @@ _.div({class: 'page--dashboard__project in'},
                     _.a({title: 'Go to "' + environment + '" CMS', href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                         environment
                     ),
-                    _.if(HashBrown.Context.user.isAdmin,
-                        new HashBrown.View.Widget.Dropdown({
+                    _.if(HashBrown.Context.user.isAdmin && model.environments.length > 1,
+                        _.dropdown({
                             icon: 'ellipsis-v',
                             reverseKeys: true,
                             options: {
                                 'Delete': () => _.onClickRemoveEnvironment(environment)
                             }
-                        }).$element.addClass('page--dashboard__project__environment__menu')
+                        })
                     )
                 )
             ),

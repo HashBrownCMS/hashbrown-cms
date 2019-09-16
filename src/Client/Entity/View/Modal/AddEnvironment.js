@@ -12,6 +12,8 @@ class AddEnvironment extends HashBrown.Entity.View.Modal.ModalBase {
     constructor(params) {
         super(params);
 
+        this.state.environmentName = 'staging';
+
         this.template = require('template/modal/addEnvironment');
     }
 

@@ -14,11 +14,7 @@ _.div({class: 'modal in'},
             ),
 
             _.if(state.name === 'uploading',
-                new HashBrown.View.Widget.Input({
-                    type: 'file',
-                    name: 'backup',
-                    onSubmit: _.onSubmitBackup
-                })
+                _.input({type: 'file', name: 'backup', onSubmit: _.onSubmitBackup})
             ),
             
             _.if(state.name === 'restoring',
@@ -38,9 +34,8 @@ _.div({class: 'modal in'},
                         _.label({class: 'widget widget--label'},
                             isNaN(new Date(parseInt(timestamp))) ? timestamp : new Date(parseInt(timestamp)).toString()
                         ),
-                        new HashBrown.View.Widget.Dropdown({
+                        _.dropdown({
                             icon: 'ellipsis-v',
-                            class: 'small',
                             reverseKeys: true,
                             options: {
                                 'Restore': () => { _.onClickRestoreBackup(timestamp); },

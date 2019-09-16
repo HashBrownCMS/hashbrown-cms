@@ -16,24 +16,24 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined, 
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Username'),
-                    _.input({class: 'widget widget--input text', type: 'text', value: model.username, onchange: _.onChangeUsername})
+                    _.input({class: 'widget widget--input text', type: 'text', value: model.username, onChange: _.onChangeUsername})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Full name'),
-                    _.input({class: 'widget widget--input text', type: 'text', value: model.fullName, onchange: _.onChangeFullName})
+                    _.input({class: 'widget widget--input text', type: 'text', value: model.fullName, onChange: _.onChangeFullName})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Email'),
-                    _.input({class: 'widget widget--input text', type: 'email', value: model.email, onchange: _.onChangeEmail})
+                    _.input({class: 'widget widget--input text', type: 'email', value: model.email, onChange: _.onChangeEmail})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
-                    _.input({class: 'widget widget--input text', type: 'password', min: 3, onchange: _.onChangePassword})
+                    _.input({class: 'widget widget--input text', type: 'password', min: 3, onChange: _.onChangePassword})
                 ),
                 _.if(HashBrown.Context.user.id !== model.id,
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
-                        new HashBrown.View.Widget.Input({
+                        _.input({
                             type: 'checkbox',
                             value: model.isAdmin,
                             onChange: _.onChangeAdmin
@@ -44,13 +44,13 @@ _.div({class: 'modal in'},
                     _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},
-                            new HashBrown.View.Widget.Input({
+                            _.input({
                                 type: 'checkbox',
                                 value: model.hasScope(project.id),
                                 onChange: (isEnabled) => _.onChangeProjectScope(project.id, isEnabled)
                             }),
                             _.div({class: 'widget widget--label'}, project.settings.info.name),
-                            new HashBrown.View.Widget.Dropdown({
+                            _.dropdown({
                                 value: model.getScopes(project.id),
                                 useMultiple: true,
                                 placeholder: '(no scopes)',

@@ -43,29 +43,29 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Change username
      */
-    onChangeUsername(e) {
-        this.model.username = e.currentTarget.value;
+    onChangeUsername(username) {
+        this.model.username = username;
     }
     
     /**
      * Event: Change full name
      */
-    onChangeFullName(e) {
-        this.model.fullName = e.currentTarget.value;
+    onChangeFullName(fullName) {
+        this.model.fullName = fullName;
     }
     
     /**
      * Event: Change email
      */
-    onChangeEmail(e) {
-        this.model.email = e.currentTarget.value;
+    onChangeEmail(email) {
+        this.model.email = email;
     }
     
     /**
      * Event: Change password
      */
-    onChangePassword(e) {
-        this.state.newPassword = e.currentTarget.value;
+    onChangePassword(newPassword) {
+        this.state.newPassword = newPassword;
     }
 
     /**

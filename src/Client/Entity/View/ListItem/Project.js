@@ -50,6 +50,8 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
+        if(this.model.environments.length < 1) { return; }
+
         let modal = new HashBrown.Entity.View.Modal.ModalBase({
             state: {
                 heading: `Remove environment "${environmentName}"`,

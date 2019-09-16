@@ -13,7 +13,9 @@
     transform-origin: center;
     transition: transform 0.25s ease;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-   
+    display: flex;
+    flex-direction: column;
+    
     @media($sm) {
         flex-basis: calc(50% - 1rem);
         width: calc(50% - 1rem);
@@ -24,7 +26,15 @@
         width: auto;
     }
 
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+        
     &__info {
+        flex-grow: 1;
+
         &__name {
             margin: 0;
         }
@@ -43,17 +53,18 @@
         position: relative;
         margin-bottom: 1rem;
 
-        &__menu {
-            position: absolute !important;
-            top: 0.5rem;
-            right: 0;
+        .widget--dropdown {
             background-color: transparent;
-            color: $primary-light;
+            color: $standard;
+
+            &:hover .widget--dropdown__value {
+                background-color: $primary-dark;
+            }
         }
     }
 
-    &__menu {
-        position: absolute !important;
+    .widget--dropdown {
+        position: absolute;
         right: 0.5rem;
         top: 0.5rem;
     }

@@ -19,27 +19,14 @@ _.div({class: 'modal in'},
 
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
-                    new HashBrown.View.Widget.Dropdown({
-                        value: state.from,
-                        options: model.environments,
-                        onChange: _.onChangeFromOption,
-                    }),
+                    _.dropdown({ value: state.from, options: model.environments, onChange: _.onChangeFromOption}),
                     _.div({class: 'widget-group__separator fa fa-arrow-right'}),
-                    new HashBrown.View.Widget.Dropdown({
-                        value: state.to,
-                        options: model.environments.filter((environment) => environment !== state.from), 
-                        onChange: _.onChangeToOption,
-                    })
+                    _.dropdown({ value: state.to, options: model.environments.filter((environment) => environment !== state.from), onChange: _.onChangeToOption})
                 ),
                 _.each(state.resourceOptions, (key, label) =>
                     _.div({class: 'widget-group'},      
                         _.label({class: 'widget widget--label'}, label),
-                        new HashBrown.View.Widget.Input({
-                            type: 'checkbox',
-                            name: key,
-                            value: state.settings[key] === true,
-                            onChange: (value) => _.onChangeResourceOption(key, value)
-                        })
+                        _.input({type: 'checkbox', name: key, value: state.settings[key] === true, onChange: (value) => _.onChangeResourceOption(key, value)})
                     )
                 )
             )

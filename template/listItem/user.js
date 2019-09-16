@@ -4,7 +4,7 @@ module.exports = (_, model, state) =>
 
 _.div({class: 'page--dashboard__user'},
     _.div({class: 'page--dashboard__user__body'},
-        new HashBrown.View.Widget.Dropdown({
+        _.dropdown({
             icon: 'ellipsis-v',
             reverseKeys: true,
             options: HashBrown.Context.user.id === model.id ? {
@@ -13,7 +13,7 @@ _.div({class: 'page--dashboard__user'},
                 'Edit': _.onClickEdit,
                 'Delete': _.onClickDelete,
             }
-        }).$element.addClass('page--dashboard__user__menu'),
+        }),
         _.h3({class: 'page--dashboard__user__name'},
             (model.fullName || model.username || model.email || model.id) + (model.id == HashBrown.Context.user.id ? ' (you)' : '')
         ),

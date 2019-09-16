@@ -18,8 +18,8 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Change name
      */
-    onChangeName(e) {
-        this.model.settings.info.name = e.currentTarget.value;
+    onChangeName(projectName) {
+        this.model.settings.info.name = projectName;
     }
 
     /**
@@ -60,10 +60,10 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Click remote login
      */
-    async onClickRemoteLogin(e) {
+    async onClickRemoteLogin() {
         try {
-            let username = e.currentTarget.parentElement.querySelector('input[type="text"]').value;
-            let password = e.currentTarget.parentElement.querySelector('input[type="password"]').value;
+            let username = this.element.querySelector('input[name="username"]').value;
+            let password = this.element.querySelector('input[name="password"]').value;
             let url = this.model.settings.sync.url;
    
             if(username && password && url) {
