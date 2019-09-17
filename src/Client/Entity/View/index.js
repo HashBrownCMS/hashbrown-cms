@@ -8,3 +8,4 @@ namespace('Entity.View')
 
 require('./ListItem');
 require('./Modal');
+require('./Widget');

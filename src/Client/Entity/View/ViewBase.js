@@ -116,6 +116,21 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     }
 
     /**
+     * Gets a widget constructor by an alias
+     *
+     * @param {String} alias
+     *
+     * @return {HashBrown.Entity.View.Widget.WidgetBase} Widget
+     */
+    getWidget(alias) {
+        for(let name in HashBrown.Entity.View.Widget) {
+            if(name.toLowerCase() === alias) { return HashBrown.Entity.View.Widget[name]; }
+        }
+
+        return null;
+    }
+
+    /**
      * Scope
      *
      * @return {Object} Scope
@@ -133,8 +148,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                 switch(name) {
                     // A simple conditional
                     case 'if':
-                        return(statement, ...content)  => {
-                            if(!statement) { return ''; }
+                        return(statement, ...content) => {
+                            if(!statement) { return null; }
 
                             return content;
                         };
@@ -164,18 +179,23 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             return template(this.scope(), model || this.model);
                         };
-
-                    // Render a dropdown
-                    case 'dropdown':
-                        return (params) => { return new HashBrown.View.Widget.Dropdown(params); };
-                    
-                    // Render an enhanced input element
-                    case 'input':
-                        return (params) => { return new HashBrown.View.Widget.Input(params); };
-
+ 
                     // Any unrecognised key will be interpreted as an element constructor
                     // This means that, for instance, calling "_.div" will return a <div> HTMLElement 
                     default:
+                        // First check if we have a custom widget matching the key
+                        let widget = this.getWidget(name);
+
+                        if(widget) {
+                            return (attributes) => {
+                                let value = attributes.value;
+                                delete attributes.value;
+
+                                return new widget({model: value, state: attributes});
+                            };
+                        }
+
+                        // If not, render a native element
                         return (attributes = {}, ...content) => {
                             return this.createElement(name, attributes, content);
                         }

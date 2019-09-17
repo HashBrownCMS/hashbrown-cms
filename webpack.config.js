@@ -82,5 +82,6 @@ if(isWatching) {
 sassArgs.push('--source-map');
 sassArgs.push('--embed-sources'),
 sassArgs.push('./src/Client/Style/client.scss:./public/css/client.css');
+sassArgs.push('./style/index.scss:./public/css/style.css');
 
 sass.run_(sassArgs);

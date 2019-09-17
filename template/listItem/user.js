@@ -2,11 +2,11 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: 'page--dashboard__user'},
-    _.div({class: 'page--dashboard__user__body'},
-        _.dropdown({
+_.div({class: 'list-item--user'},
+    _.div({class: 'list-item--user__body'},
+        _.popup({
             icon: 'ellipsis-v',
-            reverseKeys: true,
+            role: 'item-menu',
             options: HashBrown.Context.user.id === model.id ? {
                 'Edit': _.onClickEdit
             } : {
@@ -14,16 +14,16 @@ _.div({class: 'page--dashboard__user'},
                 'Delete': _.onClickDelete,
             }
         }),
-        _.h3({class: 'page--dashboard__user__name'},
+        _.h3({class: 'list-item--user__name'},
             (model.fullName || model.username || model.email || model.id) + (model.id == HashBrown.Context.user.id ? ' (you)' : '')
         ),
-        _.div({class: 'page--dashboard__user__type'},
+        _.div({class: 'list-item--user__type'},
             _.if(model.isAdmin,
-                _.span({class: 'page--dashboard__user__type__icon fa fa-black-tie'}),
+                _.span({class: 'list-item--user__type__icon fa fa-black-tie'}),
                 'Admin'
             ),
             _.if(!model.isAdmin,
-                _.span({class: 'page--dashboard__user__type__icon fa fa-user'}),
+                _.span({class: 'list-item--user__type__icon fa fa-user'}),
                 'Editor'
             )
         )

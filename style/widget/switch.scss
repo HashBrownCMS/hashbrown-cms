@@ -1,0 +1,40 @@
+.widget--switch {
+    display: block;
+    cursor: pointer;
+    border-radius: 0.2rem;
+    overflow: hidden;
+    height: 2rem;
+    width: 2rem;
+    max-width: 2rem;
+    min-width: 2rem;
+    border: 1px solid var(--standard-darker);
+
+    &:hover {
+        border-color: var(--primary);
+    }
+
+    &__input {
+        display: none;
+    }
+
+    &__indicator {
+        display: block;
+        line-height: 2rem;
+        width: 2rem;
+        text-align: center;
+
+        &::after {
+            position: relative;
+            top: -1px;
+            left: -1px;
+            font-family: 'FontAwesome';
+            content: '\f00d';    
+            color: var(--standard-darker);
+        }
+    }
+
+    &__input:checked + &__indicator::after {
+        content: '\f00c';
+        color: var(--standard-text);
+    }
+}

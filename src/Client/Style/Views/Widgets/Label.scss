@@ -7,7 +7,6 @@
     display: block;
     flex-grow: 1;
     margin: 0;
-    padding: 0;
     background-color: $standard-dark;
     padding: 0 0.5rem;
     border-radius: 0.2rem;
@@ -15,7 +14,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    .fa {
+    > .fa {
         margin-right: 0.5rem;
     }
 

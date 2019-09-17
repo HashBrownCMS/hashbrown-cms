@@ -19,14 +19,14 @@ _.div({class: 'modal in'},
 
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
-                    _.dropdown({ value: state.from, options: model.environments, onChange: _.onChangeFromOption}),
+                    _.popup({value: state.from, options: model.environments, onchange: _.onChangeFromOption}),
                     _.div({class: 'widget-group__separator fa fa-arrow-right'}),
-                    _.dropdown({ value: state.to, options: model.environments.filter((environment) => environment !== state.from), onChange: _.onChangeToOption})
+                    _.popup({value: state.to, options: model.environments.filter((environment) => environment !== state.from), onchange: _.onChangeToOption})
                 ),
                 _.each(state.resourceOptions, (key, label) =>
                     _.div({class: 'widget-group'},      
                         _.label({class: 'widget widget--label'}, label),
-                        _.input({type: 'checkbox', name: key, value: state.settings[key] === true, onChange: (value) => _.onChangeResourceOption(key, value)})
+                        _.switch({name: key, value: state.settings[key] === true, onchange: (value) => _.onChangeResourceOption(key, value)})
                     )
                 )
             )

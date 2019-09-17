@@ -1,27 +1,25 @@
-/**
- * Project editor
- */
-.page--dashboard__project {
+.list-item--project {
     padding: 1rem;
     margin: 0.5rem;
     position: relative;
     flex-grow: 0;
     flex-basis: calc(33.33% - 1rem);
     width: calc(33.33% - 1rem);
-    color: $standard-text;
-    background-color: $standard;
+    color: var(--standard-text);
+    background-color: var(--standard);
     transform-origin: center;
     transition: transform 0.25s ease;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     
-    @media($sm) {
+    @include tablet {
         flex-basis: calc(50% - 1rem);
         width: calc(50% - 1rem);
     }
 
-    @media($xs) {
+
+    @include phone {
         flex-basis: 0;
         width: auto;
     }
@@ -52,20 +50,10 @@
     &__environment {
         position: relative;
         margin-bottom: 1rem;
-
-        .widget--dropdown {
-            background-color: transparent;
-            color: $standard;
-
-            &:hover .widget--dropdown__value {
-                background-color: $primary-dark;
-            }
-        }
     }
 
-    .widget--dropdown {
-        position: absolute;
-        right: 0.5rem;
+    .widget--popup {
         top: 0.5rem;
+        right: 0.5rem;
     }
 }

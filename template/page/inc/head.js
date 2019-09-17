@@ -14,5 +14,6 @@ module.exports = (_, model) => `
 <link href="/lib/normalize/normalize.css" rel="stylesheet">
 <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/css/client.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet">
 
 `

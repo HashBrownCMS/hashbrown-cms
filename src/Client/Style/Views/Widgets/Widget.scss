@@ -14,34 +14,37 @@
     // Group
     &-group {
         display: flex;
+        position: relative;
 
         &.vertical {
             flex-direction: column;
         }
 
-        &:not(:last-child) {
-            margin-bottom: 0.5rem;
+        + .widget-group {
+            margin-top: 0.5rem;
         }
 
         > .widget {
-            border-radius: 0 !important;
-            
-            &:not(.small):not(.checkbox) {
+            &:not(.small):not(.checkbox):not(.widget--switch) {
                 flex-grow: 1;
                 flex-basis: 100%;
-                max-width: 100% !important;
+                max-width: 100%;
             }
         }
 
         &:not(.vertical) > .widget {
             &:first-child {
-                border-top-left-radius: 0.2rem !important;
-                border-bottom-left-radius: 0.2rem !important;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            
+            &:not(:first-child):not(:last-child) {
+                border-radius: 0;
             }
             
             &:last-child {
-                border-top-right-radius: 0.2rem !important;
-                border-bottom-right-radius: 0.2rem !important;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
             }
         }
         

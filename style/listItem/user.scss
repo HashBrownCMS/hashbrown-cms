@@ -1,27 +1,29 @@
-/**
- * User editor
- */
-.page--dashboard__user {
+.list-item--user {
+    color: var(--standard-text);
+    background-color: var(--standard);
+    
     padding: 1rem;
     margin: 0.5rem;
     position: relative;
     flex-grow: 0;
     flex-basis: calc(33.33% - 1rem);
     width: calc(33.33% - 1rem);
-    color: $standard-text;
-    background-color: $standard;
     transform-origin: center;
     transition: transform 0.25s ease;
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
     
-    @media($sm) {
+    @include tablet {
         flex-basis: calc(50% - 1rem);
         width: calc(50% - 1rem);
     }
 
-    @media($xs) {
+    @include phone {
         flex-basis: 0;
         width: auto;
+    }
+
+    &__name {
+        margin: 0;
     }
 
     &__type {
@@ -32,17 +34,7 @@
         }   
     }
 
-    &__remove {
-        padding: 0rem;
-        position: absolute;
-        right: 1rem;
-        top: 1rem;
-        display: block;
-        color: material-color('red', '500');
-    }
-
-    .widget--dropdown {
-        position: absolute;
+    .widget--popup {
         right: 0.5rem;
         top: 0.5rem;
     }

@@ -8,9 +8,10 @@ class ViewBase extends HashBrown.Entity.EntityBase {
      * Structure
      */
     structure() {
-        this.def(Object, 'model', {});
         this.def(Function, 'template', () => { return ''; });
         this.def(Object, 'state', {});
+    
+        this.model = null;
     }
 
     /**

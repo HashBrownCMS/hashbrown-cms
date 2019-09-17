@@ -16,13 +16,29 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
     }
 
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+        
+        this.def(String, 'modelId');
+    }
+    
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        this.model = await HashBrown.Service.ResourceService.get(HashBrown.Entity.Resource.User, 'users', this.modelId);
+    }
+
+    /**
      * Event: Click edit button
      */
     onClickEdit() {
         if(!HashBrown.Context.user.isAdmin && this.model.id !== HashBrown.Context.user.id) { return }
         
         new HashBrown.Entity.View.Modal.UserEditor({
-            model: this.model
+            model: this.model.clone()
         })
         .on('change', () => { this.update(); });
     }

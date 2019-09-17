@@ -14,7 +14,7 @@ _.div({class: 'modal in'},
             ),
 
             _.if(state.name === 'uploading',
-                _.input({type: 'file', name: 'backup', onSubmit: _.onSubmitBackup})
+                _.input({type: 'file', name: 'backup', onsubmit: _.onSubmitBackup})
             ),
             
             _.if(state.name === 'restoring',
@@ -32,11 +32,14 @@ _.div({class: 'modal in'},
                 _.each(model.backups, (i, timestamp) =>
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label'},
-                            isNaN(new Date(parseInt(timestamp))) ? timestamp : new Date(parseInt(timestamp)).toString()
+                            isNaN(new Date(parseInt(timestamp))) ?
+                                timestamp
+                            :
+                                new Date(parseInt(timestamp)).toString()
                         ),
-                        _.dropdown({
+                        _.popup({
                             icon: 'ellipsis-v',
-                            reverseKeys: true,
+                            role: 'item-menu',
                             options: {
                                 'Restore': () => { _.onClickRestoreBackup(timestamp); },
                                 'Download': () => { _.onClickDownloadBackup(timestamp); },

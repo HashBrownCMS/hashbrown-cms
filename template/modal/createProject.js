@@ -20,7 +20,7 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label'}, 'Project name'),
-                    _.input({ placeholder: 'example.com', onChange: _.onInputName})
+                    _.input({placeholder: 'example.com', onchange: _.onInputName})
                 )
             )
         ),

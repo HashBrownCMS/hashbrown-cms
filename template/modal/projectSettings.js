@@ -11,60 +11,65 @@ _.div({class: 'modal'},
         _.div({class: 'modal__body'},
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Name'),
-                _.input({class: 'widget widget--input text', type: 'text', value: model.settings.info.name, onChange: _.onChangeName})
+                _.input({class: 'widget widget--input text', type: 'text', value: model.settings.info.name, onchange: (e) => _.onChangeName(e.target.value)})
             ),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Languages'),
-                _.dropdown({
+                _.popup({
                     value: model.settings.languages,
-                    useTypeAhead: true,
-                    useMultiple: true,
+                    autocomplete: true,
+                    clearable: true,
+                    multiple: true,
+                    min: 1,
                     options: HashBrown.Service.LanguageService.getLanguageOptions(model.id),
-                    onChange: _.onChangeLanguages
+                    onchange: _.onChangeLanguages
                 })
             ),
             _.div({class: 'widget widget--separator'}, 'Sync'),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Enabled'),
-                _.input({
-                    type: 'checkbox',
-                    name: 'enabled',
+                _.switch({
                     value: model.settings.sync.enabled === true,
-                    onChange: _.onToggleSync
+                    onchange: _.onToggleSync
                 })
             ),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'API URL'),
                 _.input({
                     name: 'url',
+                    class: 'widget widget--input text',
                     type: 'text',
                     value: model.settings.sync.url || '',
                     placeholder: 'e.g. "https://myserver.com/api/"',
-                    onChange: _.onChangeSyncUrl
+                    onchange: (e) => _.onChangeSyncUrl(e.target.value)
                 })
             ),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Project id'),
                 _.input({
+                    class: 'widget widget--input text',
                     name: 'name',
+                    type: 'text',
                     value: model.settings.sync.project || '',
-                    onChange: _.onChangeSyncProject
+                    onchange: (e) => _.onChangeSyncProject(e.target.value)
                 })
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__input'},
                 _.label({class: 'widget widget--label small'}, 'Token'),
                 _.input({
                     value: model.settings.sync.token,
+                    type: 'text',
+                    class: 'widget widget--input text',
                     name: 'token',
                     placeholder: 'API token',
-                    onChange: _.onChangeSyncToken
+                    onchange: (e) => _.onChangeSyncToken(e.target.value)
                 }),
                 _.button({class: 'widget widget--button small fa fa-refresh', onclick: _.onClickGetSyncToken})
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__login', style: 'display: none'},
                 _.input({class: 'widget widget--input text', name: 'username', type: 'text', placeholder: 'Username'}),
                 _.input({class: 'widget widget--input text', name: 'password', type: 'password', placeholder: 'Password'}),
-                _.button({class: 'widget widget--button small fa fa-check', onclick: _.onClickRemoteLogin}), 
+                _.button({class: 'widget widget--button small fa fa-check', onclick: _.onClickRemoteLogin}) 
             )
         ),
         _.div({class: 'modal__footer'},

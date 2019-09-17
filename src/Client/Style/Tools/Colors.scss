@@ -39,6 +39,38 @@ $standard-darkest: #666666;
 
 $standard-text: #333333;
 
+// Public variables
+:root {
+    --primary: #{$primary};
+    --primary-light: #{$primary-light};
+    --primary-dark: #{$primary-dark};
+
+    --primary-text: #{$primary-text};
+
+    // Secondary
+    --secondary: #{$secondary}; 
+    --secondary-light: #{$secondary-light};
+    --secondary-lighter: #{$secondary-lighter};
+    --secondary-lightest: #{$secondary-lightest};
+    --secondary-dark: #{$secondary-dark};
+    --secondary-darker: #{$secondary-darker};
+
+    --secondary-text: #{$secondary-text};
+
+    // Warning
+    --warning: #{$warning};
+
+    --warning-text: #{$warning-text};
+
+    // Standard
+    --standard: #{$standard};
+    --standard-dark: #{$standard-dark};
+    --standard-darker: #{$standard-darker};
+    --standard-darkest: #{$standard-darkest};
+
+    --standard-text: #{$standard-text};
+}
+
 // Fancy backgrounds
 @mixin background($variant, $top: 0px) {
     background-image: url('/img/bg-#{$variant}.jpg');

@@ -73,6 +73,15 @@ class EntityBase {
     }
 
     /**
+     * Clones this entity
+     *
+     * @returns {HashBrown.Entity.EntityBase} Clone
+     */
+    clone() {
+        return new this.constructor(this.getObject());
+    }
+
+    /**
      * Defines a type safe member variable
      *
      * @param {String} type

@@ -2,12 +2,12 @@
 
 module.exports = (_, model) =>
 
-_.div({class: 'page--dashboard__project in'},
-    _.div({class: 'page--dashboard__project__body'},
+_.div({class: 'list-item--project'},
+    _.div({class: 'list-item--project__body'},
         _.if(HashBrown.Context.user.isAdmin,
-            _.dropdown({
+            _.popup({
                 icon: 'ellipsis-v',
-                reverseKeys: true,
+                role: 'item-menu',
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
@@ -16,21 +16,22 @@ _.div({class: 'page--dashboard__project in'},
                 }
             })
         ),
-        _.div({class: 'page--dashboard__project__info'},
-            _.h3({class: 'page--dashboard__project__info__name'}, model.settings.info.name || model.id),
+        _.div({class: 'list-item--project__info'},
+            _.h3({class: 'list-item--project__info__name'}, model.settings.info.name || model.id),
             _.p(model.users.length + ' user' + (model.users.length != 1 ? 's' : '')),
             _.p(model.settings.languages.length + ' language' + (model.settings.languages.length != 1 ? 's' : '') + ' (' + model.settings.languages.join(', ') + ')')
         ),
-        _.div({class: 'page--dashboard__project__environments'},
+        _.div({class: 'list-item--project__environments'},
             _.each(model.environments, (i, environment) =>
-                _.div({class: 'page--dashboard__project__environment'},
+                _.div({class: 'list-item--project__environment'},
                     _.a({title: 'Go to "' + environment + '" CMS', href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                         environment
                     ),
                     _.if(HashBrown.Context.user.isAdmin && model.environments.length > 1,
-                        _.dropdown({
+                        _.popup({
                             icon: 'ellipsis-v',
-                            reverseKeys: true,
+                            role: 'item-menu',
+                            color: 'primary',
                             options: {
                                 'Delete': () => _.onClickRemoveEnvironment(environment)
                             }
