@@ -17,7 +17,7 @@ _.div({class: 'modal modal--pick-icon large in'},
                 _.input({type: 'text', class: 'widget widget--input text modal--pick-icon__search', placeholder: 'Search for icons', oninput: (e) => _.onSearch(e.target.value)}),
                 _.div({class: 'modal--pick-icon__icons'},
                     _.each(state.icons, (i, icon) => 
-                        _.button({class: 'modal--pick-icon__icon widget widget--button fa fa-' + icon, title: icon, onclick: () => _.onClickIcon(icon)})
+                        _.button({class: 'modal--pick-icon__icon fa fa-' + icon, title: icon, onclick: () => _.onClickIcon(icon)})
                     )
                 )
             )

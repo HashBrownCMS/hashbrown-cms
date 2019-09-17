@@ -4,22 +4,25 @@
     }
 
     &__search {
-        margin-bottom: 1rem !important;
-        max-width: 100% !important; 
-    }
-
-    &__icons {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -0.5rem;
+        margin-bottom: 1rem;
+        max-width: 100%; 
     }
 
     &__icon {
-        flex-basis: 3rem;
-        flex-grow: 1;
-        min-width: 0 !important;
-        width: 3rem;
+        border: 0;
+        background-color: transparent;
+        padding: 0;
         margin: 0.5rem;
-        max-width: 3.06rem !important;
+        text-align: center;
+        line-height: 3rem;
+        float: left;
+        width: 3rem;
+        height: 3rem;
+        cursor: pointer;
+        border-radius: 0.2rem;
+            
+        &:hover {
+            background-color: var(--standard-dark);
+        }
     }
 }
