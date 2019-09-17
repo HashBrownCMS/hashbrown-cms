@@ -30,6 +30,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
     onClickOption(value) {
         if(typeof value === 'function') {
             value();
+            this.toggle(false);
         
         } else {
             if(this.state.multiple) {
@@ -47,14 +48,21 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
 
                 this.model = this.model.filter((x) => !!x);
                 this.model.sort();
+                
+                let scrollTop = this.element.querySelector('.widget--popup__options').scrollTop;
+
+                this.state.value = this.getValueLabel();
+                this.render();
+                
+                this.element.querySelector('.widget--popup__options').scrollTop = scrollTop;
+                this.onSearch(this.state.searchQuery);
 
             } else {
                 this.model = value;
+                this.toggle(false);
 
             }
         }
-
-        this.toggle(false);
 
         this.onChange();
     }

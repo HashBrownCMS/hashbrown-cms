@@ -26,7 +26,7 @@ _.div({class: 'modal in'},
                 _.each(state.resourceOptions, (key, label) =>
                     _.div({class: 'widget-group'},      
                         _.label({class: 'widget widget--label'}, label),
-                        _.switch({name: key, value: state.settings[key] === true, onchange: (value) => _.onChangeResourceOption(key, value)})
+                        _.checkbox({name: key, value: state.settings[key] === true, onchange: (value) => _.onChangeResourceOption(key, value)})
                     )
                 )
             )

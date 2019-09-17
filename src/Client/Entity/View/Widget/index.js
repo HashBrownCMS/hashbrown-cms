@@ -5,5 +5,5 @@
  */
 namespace('Entity.View.Widget')
 .add(require('./WidgetBase'))
-.add(require('./Popup'))
-.add(require('./Switch'));
+.add(require('./Checkbox'))
+.add(require('./Popup'));

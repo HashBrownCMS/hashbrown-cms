@@ -28,7 +28,7 @@ _.div({class: 'modal'},
             _.div({class: 'widget widget--separator'}, 'Sync'),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Enabled'),
-                _.switch({
+                _.checkbox({
                     value: model.settings.sync.enabled === true,
                     onchange: _.onToggleSync
                 })

@@ -33,18 +33,19 @@ _.div({class: 'modal in'},
                 _.if(HashBrown.Context.user.id !== model.id,
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
-                        _.switch({value: model.isAdmin, onchange: _.onChangeAdmin})
+                        _.checkbox({value: model.isAdmin, onchange: _.onChangeAdmin})
                     )
                 ),
                 _.if(HashBrown.Context.user.id !== model.id && !model.isAdmin,
                     _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},
-                            _.switch({value: model.hasScope(project.id), onchange: (isEnabled) => _.onChangeProjectScope(project.id, isEnabled)}),
+                            _.checkbox({value: model.hasScope(project.id), onchange: (isEnabled) => _.onChangeProjectScope(project.id, isEnabled)}),
                             _.div({class: 'widget widget--label'}, project.settings.info.name),
                             _.popup({
                                 value: model.getScopes(project.id),
                                 multiple: true,
+                                clearable: true,
                                 placeholder: '(no scopes)',
                                 options: [
                                     'connections',
