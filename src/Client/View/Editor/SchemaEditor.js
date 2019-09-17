@@ -75,7 +75,7 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
      * Event: Change icon
      */
     onClickChangeIcon() {
-        let modal = new HashBrown.View.Modal.IconModal();
+        let modal = new HashBrown.Entity.View.Modal.PickIcon();
 
         modal.on('change', (newIcon) => {
             this.model.icon = newIcon;
