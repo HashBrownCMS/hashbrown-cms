@@ -28,7 +28,7 @@ _.div({class: 'modal in'},
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
-                    _.input({class: 'widget widget--input text', type: 'password', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
+                    _.input({class: 'widget widget--input text', type: 'password', placeholder: '●●●●●●●●', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
                 ),
                 _.if(HashBrown.Context.user.id !== model.id,
                     _.div({class: 'widget-group'},

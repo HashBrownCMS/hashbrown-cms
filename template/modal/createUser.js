@@ -19,20 +19,20 @@ _.div({class: 'modal in'},
             
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, 'Username'),
-                    _.input({min: 2, type: 'text', onchange: _.onInputUsername, value: model.username})
+                    _.label({class: 'widget widget--label small'}, 'Username'),
+                    _.input({class: 'widget widget--input text', min: 2, type: 'text', onchange: (e) => _.onInputUsername(e.target.value), value: model.username})
                 ),
                 _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, 'Full name'),
-                    _.input({type: 'text', onchange: _.onInputFullName, value: model.fullName})
+                    _.label({class: 'widget widget--label small'}, 'Full name'),
+                    _.input({class: 'widget widget--input text', type: 'text', onchange: (e) => _.onInputFullName(e.target.value), value: model.fullName})
                 ),
                 _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, 'Email'),
-                    _.input({type: 'email', onchange: _.onInputEmail, value: model.email})
+                    _.label({class: 'widget widget--label small'}, 'Email'),
+                    _.input({class: 'widget widget--input text', type: 'email', onchange: (e) => _.onInputEmail(e.target.value), value: model.email})
                 ),
                 _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, 'Password'),
-                    _.input({min: 6, type: 'text', onchange: _.onInputPassword, value: model.password})
+                    _.label({class: 'widget widget--label small'}, 'Password'),
+                    _.input({class: 'widget widget--input text', min: 6, type: 'text', onchange: (e) => _.onInputPassword(e.target.value), value: model.password})
                 )
             )
         ),

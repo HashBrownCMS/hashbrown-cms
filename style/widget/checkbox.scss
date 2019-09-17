@@ -1,14 +1,22 @@
 .widget--checkbox {
-    display: block;
+    display: flex;
     cursor: pointer;
     border-radius: 0.2rem;
-    overflow: hidden;
-    height: 2rem;
-    width: 2rem;
-    max-width: 2rem;
-    min-width: 2rem;
     border: 1px solid var(--standard-darker);
+    height: 2rem;
 
+    &.large {
+        height: 3rem;
+    }
+    
+    &.large &__label {
+        padding-left: 1rem;
+    }
+
+    &.large &__indicator {
+        width: 3rem;
+    }
+    
     &:hover {
         border-color: var(--primary);
     }
@@ -18,9 +26,11 @@
     }
 
     &__indicator {
-        display: block;
-        line-height: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         width: 2rem;
+        line-height: 2rem;
         text-align: center;
 
         &::after {
@@ -31,6 +41,16 @@
             content: '\f00d';    
             color: var(--standard-darker);
         }
+    }
+
+    &__label {
+        padding-left: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: var(--standard-darkest);
     }
 
     &__input:checked + &__indicator::after {

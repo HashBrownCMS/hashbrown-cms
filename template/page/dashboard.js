@@ -19,10 +19,6 @@ module.exports = (_, model) => `
                 <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
                 <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
             `)}
-
-            <div class="page--environment__space page--environment__space--menu">
-                <div class="main-menu widget-group"></div>
-            </div>
         </header>
 
         <main class="page--dashboard__body">
@@ -32,7 +28,7 @@ module.exports = (_, model) => `
                         <div class="page--dashboard__projects__list"></div>
 
                         ${_.if(model.user.isAdmin, `
-                            <button class="page--dashboard__projects__add widget widget--button round right fa fa-plus" title="Create project"></button>
+                            <button class="page--dashboard__projects__add widget widget--button round fa fa-plus" title="Create project"></button>
                         `)}
                     </div>
                 `)}
@@ -41,7 +37,7 @@ module.exports = (_, model) => `
                     <div class="page--dashboard__users">
                         <div class="page--dashboard__users__list"></div>
 
-                        <button class="page--dashboard__users__add widget widget--button round fa fa-plus right" title="Add user"></button>
+                        <button class="page--dashboard__users__add widget widget--button round fa fa-plus" title="Add user"></button>
                     </div>
                 `)}
                 

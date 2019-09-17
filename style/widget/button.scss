@@ -1,11 +1,8 @@
-/**
- * A versatile button
- */
 .widget--button {
     border: 0;
     border-radius: 0.2rem;
-    background-color: $primary;
-    color: $primary-text;
+    background-color: var(--primary);
+    color: var(--primary-text);
     height: 3rem;
     line-height: 3rem;
     padding: 0 1rem;
@@ -19,15 +16,20 @@
     position: relative;
 
     &:hover {
-        background-color: $primary-dark;
+        background-color: var(--primary-dark);
         text-decoration: none;
     }
 
     &.round {
-        width: 3rem;
+        font-size: 1.5rem;
+        font-weight: normal;
+        height: 4rem;
+        line-height: 4rem;
+        width: 4rem;
         min-width: 0;
         border-radius: 50%;
         padding: 0;
+        box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
     }
 
     &.right {
@@ -67,17 +69,17 @@
     }
 
     &.warning {
-        background-color: $warning;
-        color: $warning-text;
+        background-color: var(--warning);
+        color: var(--warning-text);
     }
     
     &.standard {
-        background-color: $standard;
-        color: $standard-text;
-        border-color: $standard-text;
+        background-color: var(--standard);
+        color: var(--standard-text);
+        border-color: var(--standard-text);
         
         &:hover {
-            background-color: $standard-dark;
+            background-color: var(--standard-dark);
         }
     }
 
@@ -92,12 +94,12 @@
     }
     
     &.embedded {
-        color: $primary;
+        color: var(--primary);
         background-color: transparent;
         box-shadow: none;
 
         &:hover {
-            color: $primary-dark;
+            color: var(--primary-dark);
         }
     }
 

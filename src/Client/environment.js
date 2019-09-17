@@ -59,7 +59,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Init navigation UI
     new HashBrown.View.Navigation.NavbarMain();
-    new HashBrown.View.Navigation.MainMenu();
+
+    document.querySelector('.page--environment__space--menu').appendChild(
+        new HashBrown.Entity.View.Navigation.Session().element
+    );
 
     // Init router
     Crisp.Router.init();

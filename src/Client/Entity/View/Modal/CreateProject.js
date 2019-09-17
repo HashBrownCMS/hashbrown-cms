@@ -16,6 +16,15 @@ class CreateProject extends HashBrown.Entity.View.Modal.ModalBase {
     }
 
     /**
+     * Init
+     */
+    async init() {
+        await super.init();
+
+        this.element.querySelector('input').focus();
+    }
+
+    /**
      * Event: Clicked create
      */
     async onClickCreate() {

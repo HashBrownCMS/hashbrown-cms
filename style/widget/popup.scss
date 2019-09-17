@@ -17,6 +17,7 @@
 
     &.primary &__icon {
         color: var(--primary-text);
+        background-color: var(--primary);
 
         &:hover {
             background-color: var(--primary-light);
@@ -25,6 +26,7 @@
     
     &.secondary &__icon {
         color: var(--secondary-text);
+        background-color: var(--secondary);
 
         &:hover {
             background-color: var(--secondary-light);
@@ -181,10 +183,10 @@
         background-color: inherit;
         background-color: var(--standard);
         overflow: auto;
-        max-height: 10rem;
+        max-height: 20rem;
         border-radius: 0.2rem;
         border: 1px solid var(--standard-darker);
-        box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
     }
 
     &__option {

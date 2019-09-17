@@ -1,16 +1,11 @@
-/**
- * The dashboard page
- */
 .page--dashboard {
     // Header
     &__header {
-        background-color: $secondary;
+        background-color: var(--secondary);
+        color: var(--secondary-text);
         padding: 1rem 0 0 5rem;
-        color: $secondary-text;
         height: 4rem;
         display: flex;
-
-        @include background('secondary');
 
         // Logo
         &__logo {
@@ -48,20 +43,20 @@
             font-weight: bold;
             border: 0;
             background-color: transparent;
-            color: $secondary-text;
-            background-color: $secondary-light;
+            color: var(--secondary-text);
+            background-color: var(--secondary-light);
             margin-right: 0.5rem;
 
             &:hover {
-                color: $primary-text;
-                background-color: $primary;
+                color: var(--primary-text);
+                background-color: var(--primary);
                 text-decoration: none;
             }
 
             &.active {
                 pointer-events: none;
-                color: $standard-text;
-                background-color: $standard-dark;
+                color: var(--standard-text);
+                background-color: var(--standard-dark);
             }
         }
     }
@@ -88,7 +83,7 @@
             flex-wrap: wrap;
             margin: 0 -0.5rem;
 
-            @media($xs) {
+            @include phone {
                 flex-direction: column;
             }
         }
@@ -115,7 +110,7 @@
             position: relative;
             min-height: 10rem;
 
-            @media($xs) {
+            @include phone {
                 flex-direction: column;
             }
 
@@ -127,8 +122,8 @@
                 flex-grow: 0;
                 flex-basis: calc(33.33% - 1rem);
                 width: calc(33.33% - 1rem);
-                color: $standard-text;
-                background-color: $standard;
+                color: var(--standard-text);
+                background-color: var(--standard);
                 transform-origin: center;
                 transition: transform 0.25s ease;
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
@@ -147,7 +142,7 @@
             max-width: 40rem;
             margin: 0 auto;
             padding: 1rem;
-            background-color: $standard;
+            background-color: var(--standard);
             box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
         }
     }
@@ -161,12 +156,12 @@
 
             &:not(:last-child) {
                 margin-bottom: 0.5rem;
-                border-bottom: 1px solid $standard-darker;
+                border-bottom: 1px solid var(--standard-darker);
 
             }
 
             ul {
-                border-top: 1px solid $standard-darker;
+                border-top: 1px solid var(--standard-darker);
                 padding-top: 0.5rem;
                 margin-top: 0.5rem;
             }
@@ -176,6 +171,16 @@
                 top: 0;
                 right: 0;
             }
+        }
+    }
+
+    // "Add" button
+    &__projects,
+    &__users {
+        &__add {
+            position: fixed !important;
+            bottom: 2rem;
+            right: 3rem;
         }
     }
 }

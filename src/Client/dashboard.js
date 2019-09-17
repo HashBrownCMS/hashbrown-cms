@@ -64,32 +64,9 @@ async function initUsers() {
  * Initialises the current user menu
  */
 function initUser() {
-    let userDropdown = new HashBrown.Entity.View.Widget.Popup({
-        state: {
-            tooltip: 'Logged in as "' + (HashBrown.Context.user.fullName || HashBrown.Context.user.username) + '"',
-            color: 'secondary',
-            icon: 'user',
-            options: {
-                'User settings': () => {
-                    new HashBrown.Entity.View.Modal.UserEditor({ model: HashBrown.Context.user })
-                    .on('change', initUsers);
-                },
-                'Log out': async () => {
-                    try {
-                        await HashBrown.Service.RequestService.customRequest('post', '/api/user/logout')
-
-                        location = '/login';
-
-                    } catch(e) {
-                        UI.errorModal(e);
-
-                    }
-                }
-            }
-        }
-    });
-
-    document.querySelector('.main-menu').appendChild(userDropdown.element);
+    document.querySelector('header').appendChild(
+        new HashBrown.Entity.View.Navigation.Session().element
+    );
 }
 
 /**

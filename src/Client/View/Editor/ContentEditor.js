@@ -103,14 +103,14 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
             
             await HashBrown.Service.ContentService.setContentById(this.model.id, this.model);
 
-            let saveAction = this.$element.find('.editor__footer__buttons select').val();
+            let isPublished = this.element.querySelector('.editor__footer__buttons input[name="published"]').checked;
 
             // Unpublish
-            if(this.connection && saveAction === 'unpublish') {
+            if(this.connection && !isPublished) {
                 await HashBrown.Service.RequestService.request('post', 'content/unpublish', this.model);
 
             // Publish
-            } else if(this.connection && saveAction === 'publish') {
+            } else if(this.connection && isPublished) {
                 await HashBrown.Service.RequestService.request('post', 'content/publish', this.model);
 
             }
@@ -369,15 +369,11 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
                                 _.span({class: 'widget--button__text-working'}, 'Saving')
                             ).click(() => { this.onClickSave(); }),
                             _.if(this.connection,
-                                _.span({class: 'widget widget--button widget-group__separator'}, '&'),
-                                _.select({class: 'widget widget--select'},
-                                    _.option({value: 'publish'}, 'Publish'),
-                                    _.option({value: 'preview'}, 'Preview'),
-                                    _.if(this.model.isPublished, 
-                                        _.option({value: 'unpublish'}, 'Unpublish')
-                                    ),
-                                    _.option({value: ''}, '(No action)')
-                                ).val('publish')
+                                _.label({class: 'widget widget--checkbox large label'},
+                                    _.span({class: 'widget--checkbox__label'}, 'Published'),
+                                    _.input({class: 'widget--checkbox__input', name: 'published', type: 'checkbox', checked: this.model.isPublished}),
+                                    _.div({class: 'widget--checkbox__indicator'})
+                                )
                             )
                         )
                     )

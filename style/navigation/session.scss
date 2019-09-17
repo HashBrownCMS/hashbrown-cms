@@ -1,0 +1,10 @@
+.navigation--session {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+
+    .widget {
+        margin-left: 0.5rem;
+    }
+}

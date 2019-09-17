@@ -64,6 +64,7 @@
             user-select: none;
             pointer-events: none;
             position: relative;
+            line-height: 2rem;
 
             &:not(.line) {
                 min-width: 2rem !important;

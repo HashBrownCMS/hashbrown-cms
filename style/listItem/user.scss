@@ -34,7 +34,7 @@
         }   
     }
 
-    .widget--popup {
+    .widget--popup[role="item-menu"] {
         right: 0.5rem;
         top: 0.5rem;
     }
