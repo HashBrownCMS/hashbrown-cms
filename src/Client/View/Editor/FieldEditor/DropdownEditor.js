@@ -51,15 +51,16 @@ class DropdownEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
 
         return this.field(
             'Options',
-            new HashBrown.View.Widget.Chips({
-                value: config.options,
-                valueKey: 'value',
-                labelKey: 'label',
-                placeholder: 'New option',
-                onChange: (newValue) => {
-                    config.options = newValue;
+            new HashBrown.Entity.View.Widget.List({
+                model: {
+                    keys: true,
+                    value: config.options,
+                    placeholder: 'option',
+                    onchange: (newValue) => {
+                        config.options = newValue;
+                    }
                 }
-            })
+            }).element
         );
     }
 
@@ -73,18 +74,18 @@ class DropdownEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                     return _.span({class: 'editor__field__value__warning'}, 'No options configured');
                 }
                 
-                return new HashBrown.View.Widget.Dropdown({
-                    value: this.value,
-                    useClearButton: true,
-                    options: this.config.options,
-                    valueKey: 'value',
-                    labelKey: 'label',
-                    onChange: (newValue) => {
-                        this.value = newValue;
+                return new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        value: this.value,
+                        clearable: true,
+                        options: this.config.options,
+                        onchange: (newValue) => {
+                            this.value = newValue;
 
-                        this.trigger('change', this.value);
+                            this.trigger('change', this.value);
+                        }
                     }
-                });
+                }).element;
             })
         );
     }

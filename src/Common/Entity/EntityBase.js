@@ -21,7 +21,10 @@ class EntityBase {
 
         for(let k in params) {
             try {
-                if(typeof params[k] !== 'undefined') {
+                if(
+                    typeof this[k] !== 'undefined' &&
+                    typeof params[k] !== 'undefined'
+                ) {
                     this[k] = params[k]
                 }
             

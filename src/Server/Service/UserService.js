@@ -259,7 +259,7 @@ class UserService {
      *
      * @param {String} id
      *
-     * @returns {Promise} User object
+     * @returns {HashBrown.Entity.Resource.User} User object
      */
     static async getUserById(id) {
         checkParam(id, 'id', String);
@@ -270,7 +270,7 @@ class UserService {
 
         if(!user) { throw new Error('User "' + id + '" could not be found'); }
 
-        return user;
+        return new HashBrown.Entity.Resource.User(user);
     }
     
     /**

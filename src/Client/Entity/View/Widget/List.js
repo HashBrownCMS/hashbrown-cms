@@ -36,7 +36,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onChangeItemKey(oldKey, newKey) {
         this.sanityCheck();
 
-        let newValue = this.model.keys ? [] : {};
+        let newValue = this.model.keys ? {} : [];
 
         for(let key in this.model.value) {
             let value = this.model.value[key];
@@ -48,6 +48,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
 
         this.model.value = newValue;
 
+        this.render();
         this.onChange();
     }
 

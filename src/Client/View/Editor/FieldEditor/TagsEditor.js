@@ -34,7 +34,7 @@ class TagsEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
             new HashBrown.Entity.View.Widget.List({
                 model: {
                     value: this.value ? this.value.split(',') : [],
-                    label: 'tag',
+                    placeholder: 'tag',
                     onchange: (newValue) => {
                         this.value = newValue.join(',');
 

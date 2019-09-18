@@ -245,14 +245,16 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                                     _.if(input.type == 'select',
                                         this.field(
                                             'Select options',
-                                            new HashBrown.View.Widget.Chips({
-                                                value: input.options || [],
-                                                onChange: (newValue) => {
-                                                    input.options = newValue;
+                                            new HashBrown.Entity.View.Widget.List({
+                                                model: {
+                                                    value: input.options || [],
+                                                    onchange: (newValue) => {
+                                                        input.options = newValue;
 
-                                                    this.update();
+                                                        this.update();
+                                                    }
                                                 }
-                                            })
+                                            }).element
                                         )
                                     ),
                                     this.field(
@@ -286,8 +288,10 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                                     )
                                 );
                             }),
-                            _.button({class: 'widget widget--button round editor__field__add fa fa-plus', title: 'Add an input'})
-                                .on('click', () => { this.onClickAddInput(); })
+                            _.button({class: 'widget widget--button dashed expanded embedded editor__field__add'},
+                                _.span({class: 'fa fa-plus'}),
+                                'Add input'
+                            ).on('click', () => { this.onClickAddInput(); })
                         )
                     )
                 ),

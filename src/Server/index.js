@@ -39,6 +39,15 @@ app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'sto
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;
 
+// HTTP error type
+global.HttpError = class HttpError extends Error {
+    constructor(code, message) {
+        super(message);
+
+        this.code = code;
+    }
+}
+
 async function main() {
     // Check CLI input
     await HashBrown.Service.AppService.processInput();

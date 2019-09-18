@@ -4,7 +4,10 @@
     max-width: 20rem;
 
     &__add {
-        margin-top: 0.5rem;
         margin-left: auto;
+    }
+
+    &__item {
+        margin-bottom: 0.5rem;
     }
 }

@@ -88,12 +88,7 @@ class RequestService {
                 const UNAUTHORIZED = 403;
 
                 if(xhr.readyState === DONE) {
-                    if(xhr.status === UNAUTHORIZED) {
-                        location = '/login/?path=' + location.pathname + location.hash;
-
-                        reject(new Error('User is not logged in'));
-
-                    } else if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                    if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
                         let response = xhr.responseText;
 
                         if(response && response != 'OK') {
@@ -113,7 +108,7 @@ class RequestService {
                     } else {
                         let error = new Error(xhr.responseText);
 
-                        error.statusCode = xhr.status;
+                        error.code = xhr.status;
 
                         reject(error);
                     

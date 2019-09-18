@@ -27,42 +27,23 @@ class ScheduleService {
      *
      * @returns {Promise} Promise
      */
-    static checkTasks() {
+    static async checkTasks() {
         debug.log('Checking scheduled tasks...', this, 4);
 
-        return this.getTasks()
-        .then((tasks) => {
-            let nextTask = (i) => {
-                let task = tasks[i];
+        let tasks = await this.getTasks();
 
-                if(task && task.isOverdue()) {
-                    return this.runTask(task)
-                    .then(() => {
-                        return nextTask(i + 1);
-                    })
-                    .catch((e) => {
-                        // If tasks will infinitely fail, they should be removed
-                        // It will take up the entire log, if these errors occur every minute
-                        if(e.message.indexOf('No connections defined') > -1) {
-                            debug.log(e.message + ', removing task...', this, 2);
+        for(let task of tasks) {
+            if(!task || !task.isOverdue()) { continue; }
 
-                            this.removeTask(task.project, task.environment, task.type, task.content);
-
-                        } else {
-                            debug.log(e.message, this);
-                        }
-                    });
-                
-                } else {
-                    return new Promise((resolve) => {
-                        resolve();
-                    });
-
-                }
-            };
-
-            return nextTask(0);
-        });
+            try {
+                await this.runTask(task);
+            
+            } catch(e) {
+                debug.log(e.message + ', removing task...', this, 2);
+                await this.removeTask(task.project, task.environment, task.type, task.content);
+            
+            }
+        }
     }
 
     /**
@@ -72,38 +53,25 @@ class ScheduleService {
      *
      * @return {Promise} Promise
      */
-    static runTask(task) {
+    static async runTask(task) {
         checkParam(task, 'task', HashBrown.Entity.Task);
 
         debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);
 
-        let user;
+        let user = await HashBrown.Service.UserService.getUserById(task.user);
+        let content = await HashBrown.Service.ContentService.getContentById(task.project, task.environment, task.content);
+        
+        switch(task.type) {
+            case 'publish':
+                await HashBrown.Service.ConnectionService.publishContent(task.project, task.environment, content, user);
+                break;
 
-        return HashBrown.Service.UserService.getUserById(task.user)
-        .then((taskUser) => {
-            user = taskUser;
-
-            return HashBrown.Service.ContentService.getContentById(task.project, task.environment, task.content);
-        })
-        .then((content) => {
-            switch(task.type) {
-                case 'publish':
-                    return HashBrown.Service.ConnectionService.publishContent(task.project, task.environment, content, user)
-                    .then(() => {
-                        return this.removeTask(task.project, task.environment, task.type, task.content);
-                    });
-                    break;
-
-                case 'unpublish':
-                    return HashBrown.Service.ConnectionService.unpublishContent(task.project, task.environment, content, user)
-                    .then(() => {
-                        return this.removeTask(task.project, task.environment, task.type, task.content);
-                    });
-                    break;
-            }
-
-            return Promise.resolve();
-        });
+            case 'unpublish':
+                await HashBrown.Service.ConnectionService.unpublishContent(task.project, task.environment, content, user);
+                break;
+        }
+                
+        await this.removeTask(task.project, task.environment, task.type, task.content);
     }
 
     /**

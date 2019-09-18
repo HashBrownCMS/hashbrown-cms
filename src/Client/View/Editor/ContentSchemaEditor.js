@@ -111,25 +111,34 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
             ),
             this.field(
                 'Tabs',
-                new HashBrown.View.Widget.Chips({
-                    disabledValue: Object.values(this.getParentTabs()),
-                    value: Object.values(this.model.tabs),
-                    placeholder: 'New tab',
-                    onChange: (newValue) => {
-                        let newTabs = {};
-
-                        for(let tab of newValue) {
-                            newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
-                        }
-                        
-                        this.model.tabs = newTabs;
-
-                        defaultTabEditor.options = this.getAllTabs();
-                        defaultTabEditor.fetch();
-
-                        this.update();
+                new HashBrown.Entity.View.Widget.List({
+                    model: {
+                        disabled: true,
+                        value: Object.values(this.getParentTabs()) 
                     }
-                })
+                }).element,
+                new HashBrown.Entity.View.Widget.List({
+                    model: {
+                        value: Object.values(this.model.tabs),
+                        placeholder: 'tab',
+                        onchange: (newValue) => {
+                            let newTabs = {};
+
+                            for(let tab of newValue) {
+                                if(!tab) { tab = 'New tab'; }
+
+                                newTabs[tab.toLowerCase().replace(/[^a-zA-Z]/g, '')] = tab;
+                            }
+                            
+                            this.model.tabs = newTabs;
+
+                            defaultTabEditor.options = this.getAllTabs();
+                            defaultTabEditor.fetch();
+
+                            this.update();
+                        }
+                    }
+                }).element
             ),
 
             // Tabs

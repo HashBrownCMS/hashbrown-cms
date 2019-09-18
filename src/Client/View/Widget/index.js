@@ -6,5 +6,4 @@
 namespace('View.Widget')
 .add(require('./Widget'))
 .add(require('./Dropdown'))
-.add(require('./Chips'))
 .add(require('./Input'));

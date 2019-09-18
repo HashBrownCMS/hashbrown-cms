@@ -43,23 +43,27 @@ class ResourceReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdi
         return [
             this.field(
                 'Resource',
-                new HashBrown.View.Widget.Dropdown({
-                    value: config.resource,
-                    options: HashBrown.Service.ResourceService.getResourceCategoryNames(),
-                    onChange: (newValue) => {
-                        config.resource = newValue
+                new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        value: config.resource,
+                        options: HashBrown.Service.ResourceService.getResourceCategoryNames(),
+                        onchange: (newValue) => {
+                            config.resource = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Resource keys',
-                new HashBrown.View.Widget.Chips({
-                    value: config.resourceKeys,
-                    placeholder: 'keyName',
-                    onChange: (newValue) => {
-                        config.resourceKeys = newValue;
+                new HashBrown.Entity.View.Widget.List({
+                    model: {
+                        value: config.resourceKeys,
+                        placeholder: 'key',
+                        onchange: (newValue) => {
+                            config.resourceKeys = newValue;
+                        }
                     }
-                })
+                }).element
             )
         ];
     }
