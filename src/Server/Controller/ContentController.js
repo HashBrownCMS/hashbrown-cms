@@ -14,7 +14,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
     static init(app) {
         app.post('/api/:project/:environment/content/publish', this.middleware(), this.getHandler('publish'));
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.getHandler('unpublish'));
-        app.post('/api/:project/:environment/content/preview', this.middleware(), this.getHandler('preview'));
         app.post('/api/:project/:environment/content/example', this.middleware(), this.getHandler('example'));
         app.post('/api/:project/:environment/content/insert', this.middleware(), this.getHandler('insert'));
         
@@ -66,24 +65,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
         return await HashBrown.Service.ContentService.getContentById(req.project, req.environment, req.params.id);
     }
     
-    /**
-     * @example POST /api/:project/:environment/content/preview
-     *
-     * @apiGroup Content
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @param {Content} content The Content model to preview
-     *
-     * @returns {String} Preview URL
-     */
-    static async preview(req, res) {
-        let content = new HashBrown.Entity.Resource.Content(req.body);
-
-        return await HashBrown.Service.ConnectionService.previewContent(req.project, req.environment, content, req.user, req.query.language || 'en');
-    }
-
     /**
      * @example POST /api/:project/:environment/content/new
      *

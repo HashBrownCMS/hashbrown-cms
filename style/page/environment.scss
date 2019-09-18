@@ -18,14 +18,6 @@
         }
     }
 
-    // Demo reset button
-    &__demo__reset {
-        position: fixed !important;
-        z-index: 9999;
-        bottom: 1rem;
-        left: 1rem;
-    }
-
     // Spaces
     &__spaces {
         display: flex;
@@ -35,8 +27,7 @@
         position: relative;
         z-index: 2;
 
-        // Tablet mode
-        @media($sm) {
+        @include tablet {
             flex-direction: column;
         }
     }
@@ -57,14 +48,13 @@
             flex-grow: 1;
             z-index: 500;
 
-            // Tablet mode
-            @media($sm) {
+            @include tablet {
                 padding: 0;
             }
 
             // overwriting default dropdown-background
             .widget--dropdown.has-icon {
-                background-color: $standard;
+                background-color: var(--standard);
             }
         }
 
@@ -76,8 +66,7 @@
             height: 100%;
             transition: width 0.5s, flex-basis 0.5s;
 
-            // Mobile mode
-            @media($sm) {
+            @include tablet {
                 overflow: hidden;
                 width: 100%;
                 height: 80vh;
@@ -94,8 +83,7 @@
             flex-grow: 1;
             height: 100%;
 
-            // Tablet mode
-            @media($sm) {
+            @include tablet {
                 height: calc(100% - 8rem);
             }
 
@@ -107,8 +95,8 @@
                 max-height: calc(100% - 4rem);
                 margin: 10vh 2rem 2rem 4rem;
                 padding: 2rem;
-                background-color: $standard;
-                color: $standard-text;
+                background-color: var(--standard);
+                color: var(--standard-text);
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 position: relative;
 
@@ -121,8 +109,7 @@
                     margin: 0.5rem 0.5rem 0 0;
                 }
 
-                // Tablet mode
-                @media($sm) {
+                @include tablet {
                     display: block;
                     margin: 4rem auto;
                 }
@@ -139,17 +126,16 @@
                     transform: translateY(-50%);
                     border-top: 2rem solid transparent;
                     border-bottom: 2rem solid transparent;
-                    border-right: 2rem solid $standard;
+                    border-right: 2rem solid var(--standard);
 
-                    // Tablet mode
-                    @media($sm) {
+                    @include tablet {
                         right: 50%;
                         bottom: 100%;
                         top: auto;
                         transform: translateX(50%);
                         border-left: 2rem solid transparent;
                         border-right: 2rem solid transparent;
-                        border-bottom: 2rem solid $standard;
+                        border-bottom: 2rem solid var(--standard);
                     }
                 }
             }

@@ -9,5 +9,4 @@ namespace('View.Modal')
 .add(require('./DateModal'))
 .add(require('./IframeModal'))
 .add(require('./MediaBrowser'))
-.add(require('./MediaUploader'))
-.add(require('./PublishingSettingsModal'));
+.add(require('./MediaUploader'));

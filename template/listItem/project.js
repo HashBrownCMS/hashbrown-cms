@@ -8,6 +8,7 @@ _.div({class: 'list-item--project'},
             _.popup({
                 icon: 'ellipsis-v',
                 role: 'item-menu',
+                tooltip: `Options for ${model.settings.info.name || model.id}`,
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
@@ -24,13 +25,14 @@ _.div({class: 'list-item--project'},
         _.div({class: 'list-item--project__environments'},
             _.each(model.environments, (i, environment) =>
                 _.div({class: 'list-item--project__environment'},
-                    _.a({title: 'Go to "' + environment + '" CMS', href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
+                    _.a({title: `Enter "${environment}" environment`, href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                         environment
                     ),
                     _.if(HashBrown.Context.user.isAdmin && model.environments.length > 1,
                         _.popup({
                             icon: 'ellipsis-v',
                             role: 'item-menu',
+                            tooltip: `Options for "${environment}" environment`,
                             color: 'primary',
                             options: {
                                 'Delete': () => _.onClickRemoveEnvironment(environment)

@@ -35,11 +35,11 @@ async function initProjects() {
 async function initUsers() {
     if(!HashBrown.Context.user.isAdmin) { return; }
 
-    // Invite user
+    // Add user
     let userAddButton = document.querySelector('.page--dashboard__users__add');
 
     if(userAddButton) {
-        userAddButton.onclick = onClickInviteUser;
+        userAddButton.onclick = onClickAddUser;
     }
 
     // Get users
@@ -70,9 +70,9 @@ function initUser() {
 }
 
 /**
- * Event: Click invite user
+ * Event: Click add user
  */
-async function onClickInviteUser() {
+async function onClickAddUser() {
     new HashBrown.Entity.View.Modal.CreateUser()
     .on('change', initUsers);
 }

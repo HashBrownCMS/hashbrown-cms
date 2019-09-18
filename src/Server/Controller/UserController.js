@@ -21,8 +21,6 @@ class UserController extends HashBrown.Controller.ApiController {
         app.get('/api/users/:id', this.middleware({needsAdmin: true, setProject: false}), this.getUser);
         app.get('/api/users', this.middleware({needsAdmin: true, setProject: false}), this.getUsers);
 
-        app.post('/api/users/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
-        app.post('/api/users/activate', this.postActivate);
         app.post('/api/users/first', this.createFirstAdmin);
         app.post('/api/users/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
         app.post('/api/users/:id', this.middleware({setProject: false}), this.postUser);
@@ -36,37 +34,6 @@ class UserController extends HashBrown.Controller.ApiController {
         app.post('/api/:project/:environment/users/:id', this.middleware(), this.postUser);
     }    
     
-    /**
-     * Activates an invited user
-     */
-    static postActivate(req, res) {
-        let username = req.body.username;
-        let fullName = req.body.fullName;
-        let password = req.body.password;
-        let inviteToken = req.body.inviteToken;
-
-        HashBrown.Service.UserService.activateUser(username, password, fullName, inviteToken)
-        .then((token) => {
-            res.status(200).cookie('token', token).send(token);
-        })
-        .catch((e) => {
-            res.status(403).send(UserController.printError(e));
-        });
-    }
-
-    /**
-     * Invites a user
-     */
-    static postInvite(req, res) {
-        HashBrown.Service.UserService.invite(req.body.email, req.body.project)
-        .then((msg) => {
-            res.status(200).send(msg);
-        })
-        .catch((e) => {
-            res.status(502).send(UserController.printError(e));
-        });
-    } 
-
     /**
      * @example POST /api/user/login
      *
@@ -114,7 +81,6 @@ class UserController extends HashBrown.Controller.ApiController {
             user = user.getObject();
 
             delete user.tokens;
-            delete user.inviteToken;
             delete user.password;
 
             res.status(200).send(user);
@@ -150,7 +116,6 @@ class UserController extends HashBrown.Controller.ApiController {
                 users[i].isCurrent = users[i].id == req.user.id;
 
                 delete users[i].tokens;
-                delete users[i].inviteToken;
                 delete users[i].password;
             }
 

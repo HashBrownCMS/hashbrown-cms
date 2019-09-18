@@ -65,8 +65,6 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         
         debug.log('Unpublishing all localised property sets...', this);
         
-        await this.removePreview(project, environment, content)
-        
         let languages = await HashBrown.Service.LanguageService.getLanguages(project);
 
         for(let language of languages) {
@@ -76,60 +74,6 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         debug.log('Unpublished all localised property sets successfully!', this);
     }
     
-    /**
-     * Removes a Content preview
-     *
-     * @params {Content} content
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     */
-    async removePreview(project, environment, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
-        
-        if(!content.hasPreview) { return; }
-
-        content.hasPreview = false;
-        
-        await HashBrown.Service.ContentService.updateContent(project, environment, content);
-
-        let languages = await HashBrown.Service.LanguageService.getLanguages(project);
-
-        for(let language of languages) {
-            await this.removeContent(content.id + '_preview', language);
-        }
-    }
-
-    /**
-     * Generates a Content preview
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     * @param {String} language
-     *
-     * @returns {String} Preview URL
-     */
-    async generatePreview(project, environment, content, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
-        checkParam(language, 'language', String);
-        
-        content.hasPreview = true;
-       
-        await HashBrown.Service.ContentService.updateContent(project, environment, content);
-
-        content.setPropertyValue('url', '/preview' + content.getPropertyValue('url', language), language);
-
-        await this.setContent(content.id + '_preview', content, language);
-
-        return this.url + content.getPropertyValue('url', language);
-    }
-
     /**
      * Publishes content
      *
@@ -143,8 +87,6 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
 
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
-
-        await this.removePreview(project, environment, content);
 
         let languages = await HashBrown.Service.LanguageService.getLanguages(project);
         

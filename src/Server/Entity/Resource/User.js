@@ -37,7 +37,6 @@ class User extends require('Common/Entity/Resource/User') {
 
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
-        this.def(String, 'inviteToken');
     }
 
     /**
@@ -60,7 +59,6 @@ class User extends require('Common/Entity/Resource/User') {
     clearSensitiveData() {
         this.password = null;
         this.tokens = null;
-        this.inviteToken = null;
     }
 
     /**

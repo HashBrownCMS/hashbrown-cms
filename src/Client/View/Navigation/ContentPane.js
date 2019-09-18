@@ -182,7 +182,7 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
 
         let content = await HashBrown.Service.ContentService.getContentById(id);
 
-        let modal = new HashBrown.View.Modal.PublishingSettingsModal({
+        let modal = new HashBrown.Entity.View.Modal.ContentPublishingSettings({
             model: content
         });
 

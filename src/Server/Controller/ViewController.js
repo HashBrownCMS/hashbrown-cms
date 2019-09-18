@@ -66,27 +66,16 @@ class ViewController extends HashBrown.Controller.Controller {
 
         // Login
         app.get('/login/', async (req, res) => {
-            if(req.query.inviteToken) {
-                try {
-                    let user = await HashBrown.Service.UserService.findInviteToken(req.query.inviteToken);
+            try {
+                let users = await HashBrown.Service.UserService.getAllUsers();
 
-                    res.render('login', { invitedUser: user });
-                } catch(e) {
-                    res.status(400).render('error', { message: e.message });
+                if(!users || users.length < 1) { 
+                    res.redirect('/setup/1');
+                } else {
+                    res.render('login');
                 }
-
-            } else {
-                try {
-                    let users = await HashBrown.Service.UserService.getAllUsers();
-
-                    if(!users || users.length < 1) { 
-                        res.redirect('/setup/1');
-                    } else {
-                        res.render('login');
-                    }
-                } catch(e) {
-                    res.status(400).render('error', { message: e.message });
-                }
+            } catch(e) {
+                res.status(400).render('error', { message: e.message });
             }
         });
 

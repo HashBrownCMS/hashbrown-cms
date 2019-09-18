@@ -31,7 +31,8 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         if(typeof value === 'function') {
             value();
             this.toggle(false);
-        
+            this.render();
+
         } else {
             if(this.state.multiple) {
                 if(!Array.isArray(this.model)) {

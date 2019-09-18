@@ -1,0 +1,32 @@
+.page {
+    margin: 0;
+    padding: 0;
+    
+    &.logo {
+        background-color: var(--secondary);
+        color: var(--secondary-text);
+        
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/svg/logo_white.svg');
+            opacity: 0.04;
+            background-size: cover;
+            background-position: center;
+            pointer-events: none;
+        }
+    }
+
+    &.centered {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}

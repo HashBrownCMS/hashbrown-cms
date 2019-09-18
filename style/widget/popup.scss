@@ -15,7 +15,8 @@
         right: 0;
     }
 
-    &.primary &__icon {
+    &.primary &__icon,
+    &.primary &__label {
         color: var(--primary-text);
         background-color: var(--primary);
 
@@ -24,7 +25,8 @@
         }
     }
     
-    &.secondary &__icon {
+    &.secondary &__icon,
+    &.secondary &__label {
         color: var(--secondary-text);
         background-color: var(--secondary);
 
@@ -52,6 +54,25 @@
             right: 0;
             top: -2px;
             color: var(--standard-darker);
+        }
+    }
+
+    &__label {
+        border: 0;
+        padding: 0 0.6rem;
+        margin: 0;
+        background-color: transparent;
+        cursor: pointer;
+        color: inherit;
+        line-height: 2rem;
+        border-radius: 1rem;
+       
+        .fa {
+            margin-right: 0.5rem;
+        }
+
+        &:hover {
+            background-color: var(--standard-dark);
         }
     }
 
@@ -165,7 +186,8 @@
         }
     }
     
-    &__icon ~ &__menu::before {
+    &__icon ~ &__menu::before,
+    &__label ~ &__menu::before {
         content: '';
         display: block;
         width: 1rem;

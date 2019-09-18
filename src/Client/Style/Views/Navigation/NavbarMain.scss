@@ -31,8 +31,6 @@
         flex-shrink: 0;
         position: relative;
         
-        @include background('secondary');
-
         &:after {
             font-family: 'FontAwesome';
             content: '\f107';
@@ -61,8 +59,6 @@
         position: relative;
         z-index: 10;
         background-color: $secondary;
-
-        @include background('secondary');
 
         // Tablet mode
         @media($sm) {

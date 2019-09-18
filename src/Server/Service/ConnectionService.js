@@ -45,40 +45,6 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
     }
 
     /**
-     * Previews content
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     * @param {User} user
-     * @param {String} language
-     *
-     * @returns {Promise} Promise
-     */
-    static previewContent(project, environment, content, user, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
-        checkParam(user, 'user', HashBrown.Entity.Resource.User);
-        checkParam(language, 'language', String);
-
-        return content.getSettings(project, environment, 'publishing')
-        .then((settings) => {
-            if(!settings.connectionId) {
-                return Promise.reject(new Error('Content by id "' + content.id + '" has no connection configured'));
-            }
-
-            return this.getConnectionById(project, environment, settings.connectionId);
-        })
-        .then((connection) => {
-            return connection.generatePreview(project, environment, content, language);
-        })
-        .then((previewUrl) => {
-            return Promise.resolve(previewUrl);  
-        });
-    }
-
-    /**
      * Publishes content
      *
      * @param {String} project

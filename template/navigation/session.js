@@ -8,6 +8,7 @@ _.div({class: 'navigaton navigation--session'},
             tooltip: 'Language',
             color: 'secondary',
             icon: 'flag',
+            label: (value) => value ? value.toUpperCase() : '',
             value: HashBrown.Context.language,
             options: state.languageOptions,
             onchange: _.onChangeLanguage

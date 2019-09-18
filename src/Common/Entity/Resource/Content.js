@@ -28,7 +28,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         this.def(Date, 'publishOn');
         this.def(Date, 'unpublishOn');
         this.def(Boolean, 'isPublished');
-        this.def(Boolean, 'hasPreview');
 
         // Sync
         this.def(Object, 'sync');

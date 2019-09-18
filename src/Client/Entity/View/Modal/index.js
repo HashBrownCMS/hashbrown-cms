@@ -6,6 +6,7 @@
 namespace('Entity.View.Modal')
 .add(require('./ModalBase'))
 .add(require('./AddEnvironment'))
+.add(require('./ContentPublishingSettings'))
 .add(require('./CreateProject'))
 .add(require('./CreateUser'))
 .add(require('./DeleteProject'))

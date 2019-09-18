@@ -8,14 +8,14 @@ module.exports = (_, view) => `
         ${require('./inc/head')(_, view)}
     </head>
 
-    <body class="page page--error">
+    <body class="page page--error logo centered">
         <h2 class="page--error__title">Error</h2>
         
         <div class="widget widget--message warning large">
             ${view.message || 'An unspecified error occurred'}
         </div>
 
-        <a class="widget widget--button tall" href="/">Go to dashboard</a>
+        <a class="widget widget--button" href="/">Go to dashboard</a>
     </body>
 </html> 
 

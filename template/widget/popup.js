@@ -3,10 +3,18 @@
 module.exports = (_, model, state) =>
 
 _.div({title: state.tooltip, class: `widget widget--popup ${state.color || ''}`, role: state.role},
-    _.if(state.icon,
+    _.if(state.icon && !state.label,
         _.button({class: `widget--popup__icon fa fa-${state.icon}`, onclick: _.onClickToggle})
     ),
-    _.if(!state.icon,
+    _.if(state.label,
+        _.button({class: 'widget--popup__label', onclick: _.onClickToggle},
+            _.if(state.icon,
+                _.span({class: `fa fa-${state.icon}`})
+            ),
+            typeof state.label === 'function' ? state.label(model) : state.label
+        )
+    ),
+    _.if(!state.icon && !state.label,
         _.div({class: 'widget-group'},
             _.button({class: 'widget--popup__value widget widget--input text', onclick: _.onClickToggle}, state.value),
             _.if(state.clearable,

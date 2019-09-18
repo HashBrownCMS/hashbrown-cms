@@ -9,31 +9,6 @@ const Crypto = require('crypto');
  */
 class UserService {
     /**
-     * Sends a welcome message
-     *
-     * @param {String} email
-     * @param {String} project
-     *
-     * @returns {Promise} Promise
-     */
-    static async invite(email, project) {
-        let token = Crypto.randomBytes(10).toString('hex');
-        let user = HashBrown.Entity.Resource.User.create();
-
-        user.inviteToken = token;
-        user.email = email;
-        user.scopes = {};
-
-        if(project) {
-            user.scopes[project] = [];
-        }
-        
-        await HashBrown.Service.DatabaseService.insertOne('users', 'users', user.getObject());
-
-        return token;
-    }
-
-    /**
      * Finds a User by username
      *  
      * @param {String} username
@@ -129,23 +104,6 @@ class UserService {
     }
     
     /**
-     * Finds an invite token
-     *  
-     * @param {String} inviteToken
-     *
-     * @returns {Promise} User
-     */
-    static async findInviteToken(inviteToken) {
-        let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { inviteToken: inviteToken });
-
-        if(!user || Object.keys(user).length < 1) {
-            throw new Error('Invite token "' + inviteToken + '" could not be found');
-        }
-        
-        return new HashBrown.Entity.Resource.User(user);
-    }
-    
-    /**
      * Removes a User
      *
      * @param {String} id
@@ -194,45 +152,6 @@ class UserService {
         user.scopes[project] = scopes || [];
 
         await this.updateUserById(id, user);
-    }
-
-    /**
-     * Activates an invited User
-     *
-     * @param {String} username
-     * @param {String} password
-     * @param {String} fullName
-     * @param {String} inviteToken
-     *
-     * @returns {Promise} Login token
-     */
-    static async activateUser(username, password, fullName, inviteToken) {
-        // Username check
-        if(!username || username.length < 4) {
-            throw new Error('Usernames must be at least 4 characters');
-        }
-        
-        // Password check
-        if(!password || password.length < 4) {
-            throw new Error('Passwords must be at least 4 characters');
-        }
-        
-        let user = await this.findInviteToken(inviteToken)
-        
-        user.fullName = user.fullName || fullName;
-        user.username = username;
-        user.setPassword(password);
-        user.inviteToken = '';
-
-        let existingUser = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username });
-        
-        if(existingUser) {
-            throw new Error('Username "' + username + '" is taken');
-        }
-        
-        await this.updateUserById(user.id, user.getObject());
-        
-        return await this.loginUser(username, password);
     }
 
     /**

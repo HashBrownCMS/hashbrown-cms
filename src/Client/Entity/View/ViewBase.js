@@ -106,11 +106,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * @param {Error} error
      */
     setErrorState(error) {
-        this.state = {
-            name: 'error',
-            error: error,
-            message: error.message
-        };
+        this.state.name = 'error';
+        this.state.message = error.message;
 
         this.render();
     }
