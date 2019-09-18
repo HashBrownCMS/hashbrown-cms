@@ -13,11 +13,11 @@ class WidgetBase extends HashBrown.Entity.View.ViewBase {
      */
     onChange(newValue) {
         if(newValue !== undefined) {
-            this.model = newValue;
+            this.model.value = newValue;
         }
 
-        if(typeof this.state.onchange === 'function') {
-            this.state.onchange(this.model);
+        if(typeof this.model.onchange === 'function') {
+            this.model.onchange(this.model.value);
         }
     }
 }

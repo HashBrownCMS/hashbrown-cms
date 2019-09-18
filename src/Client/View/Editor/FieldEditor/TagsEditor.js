@@ -31,14 +31,17 @@ class TagsEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--tags'},
-            new HashBrown.View.Widget.Chips({
-                value: (this.value || '').split(','),
-                onChange: (newValue) => {
-                    this.value = newValue.join(',');
+            new HashBrown.Entity.View.Widget.List({
+                model: {
+                    value: this.value ? this.value.split(',') : [],
+                    label: 'tag',
+                    onchange: (newValue) => {
+                        this.value = newValue.join(',');
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
+            }).element
         );
     }
 }

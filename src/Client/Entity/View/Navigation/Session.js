@@ -77,7 +77,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      */
     onClickMediaHelp() {
         new HashBrown.Entity.View.Modal.ModalBase({
-            state: {
+            model: {
                 heading: 'Media',
                 message: 'This is a gallery of your statically hosted files, such as images, videos and PDFs. The contents of this gallery depends on which <a href="#/connections/">Connection</a> has been set up as the Media provider'
             }
@@ -103,7 +103,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      */
     onClickSchemasHelp() {
         new HashBrown.Entity.View.Modal.ModalBase({
-            state: {
+            model: {
                 heading: 'Schemas',
                 message: 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'
             }

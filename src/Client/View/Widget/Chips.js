@@ -119,7 +119,7 @@ class Chips extends HashBrown.View.Widget.Widget {
                         })
                 );
             }),
-            _.button({class: 'widget widget--button round widget--chips__add fa fa-plus', title: 'Add item'})
+            _.button({class: 'widget widget--button small condensed widget--chips__add fa fa-plus', title: 'Add item'})
                 .click(() => {
                     let newValue = this.placeholder || 'New item';
                     let newKey = newValue.toLowerCase().replace(/[^a-zA-Z]/g, '');

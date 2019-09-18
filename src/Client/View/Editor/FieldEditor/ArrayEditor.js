@@ -71,22 +71,20 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
     }
 
     /**
-     * Gets all allowed schemas
-     *
-     * @return {Array} Schema
+     * Fetches the model
      */
-    async getAllowedSchemas() {
-        let allowedSchemas = [];
+    async fetch() {
+        this.schemaOptions = {};
 
         for(let schemaId of this.config.allowedSchemas) {
             if(!schemaId) { continue; }
 
             let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
 
-            allowedSchemas.push(schema);
+            this.schemaOptions[schema.title] = schema.id;
         }
 
-        return allowedSchemas;
+        super.fetch(); 
     }
 
     /**
@@ -333,17 +331,15 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                     remove: () => { this.onClickRemoveItem(index); }
                 },
                 toolbar: {
-                    Schema: new HashBrown.View.Widget.Dropdown({
-                        className: 'editor__field__toolbar__widget',
-                        value: item.schemaId,
-                        placeholder: 'Schema',
-                        useTypeAhead: true,
-                        valueKey: 'id',
-                        labelKey: 'name',
-                        iconKey: 'icon',
-                        options: this.getAllowedSchemas(),
-                        onChange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
-                    })
+                    Schema: new HashBrown.Entity.View.Widget.Popup({
+                        model: {
+                            value: item.schemaId,
+                            placeholder: 'Schema',
+                            autocomplete: true,
+                            options: this.schemaOptions,
+                            onchange: (newSchemaId) => { this.onChangeItemSchema(newSchemaId, item); }
+                        }
+                    }).element
                 }
             },
 

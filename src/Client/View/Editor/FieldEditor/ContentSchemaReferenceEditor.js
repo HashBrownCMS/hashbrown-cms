@@ -32,11 +32,11 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
     async fetch() {
         try {
             // Get dropdown options 
-            this.contentSchema = [];
+            this.options = {};
 
-            let allSchema = await HashBrown.Service.SchemaService.getAllSchemas();
+            let allSchemas = await HashBrown.Service.SchemaService.getAllSchemas();
 
-            for(let schema of allSchema) {
+            for(let schema of allSchemas) {
                 let isNative = schema.id == 'page' || schema.id == 'contentBase';
 
                 if(
@@ -49,10 +49,7 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
                         this.config.allowedSchemas.indexOf(schema.id) > -1
                     )
                 ) {
-                    this.contentSchema.push({
-                        name: schema.name,
-                        id: schema.id
-                    });
+                    this.options[schema.name] = schema.id;
                 }
             }
 
@@ -159,19 +156,17 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
      */
     template() {
         return _.div({class: 'field-editor field-editor--content-schema-reference'}, 
-            new HashBrown.View.Widget.Dropdown({
-                value: this.value,
-                options: this.contentSchema,
-                valueKey: 'id',
-                labelKey: 'name',
-                iconKey: 'icon',
-                useClearButton: true,
-                onChange: (newValue) => {
-                    this.value = newValue;
+            new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    value: this.value,
+                    options: this.options,
+                    onchange: (newValue) => {
+                        this.value = newValue;
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
+            }).element
         );
     }
 }

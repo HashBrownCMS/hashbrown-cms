@@ -52,7 +52,7 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = location.hash.replace('/schemas/', '/schema/json/');
+        location.hash = '/schemas/json/' + this.model.id;
     }
     
     /**

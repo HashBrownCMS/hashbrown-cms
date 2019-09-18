@@ -31,7 +31,7 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = location.hash.replace('/forms/', '/forms/json/');
+        location.hash = '/forms/json/' + this.model.id;
     }
 
     /**

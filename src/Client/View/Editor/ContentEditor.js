@@ -103,7 +103,8 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
             
             await HashBrown.Service.ContentService.setContentById(this.model.id, this.model);
 
-            let isPublished = this.element.querySelector('.editor__footer__buttons input[name="published"]').checked;
+            let publishedCheckbox = this.element.querySelector('.editor__footer__buttons input[name="published"]');
+            let isPublished = publishedCheckbox ? publishedCheckbox.checked : false;
 
             // Unpublish
             if(this.connection && !isPublished) {
@@ -146,8 +147,9 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
      * @param {Object} value
      * @param {Object} definition
      * @param {HTMLElement} placeholder
+     * @param {Boolean} isMetaValue
      */
-    async renderField(key, value, definition, $placeholder) {
+    async renderField(key, value, definition, $placeholder, isMetaValue) {
         checkParam(key, 'key', String, true);
 
         // On change function
@@ -164,7 +166,11 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
                 value = newValue;
             }
 
-            this.model.properties[key] = value;
+            if(isMetaValue) {
+                this.model[key] = value;
+            } else {
+                this.model.properties[key] = value;
+            }
         };
         
         // Get schema
@@ -238,10 +244,11 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
      * @param {String} tabId The tab for which to render the fields
      * @param {Object} values The set of field values to inject into the field editor
      * @param {Object} definitions The set of field definitions to render
+     * @param {Boolean} areMetaValues Determines whether values should be set directly on the content or on the "properties" field
      *
      * @returns {Array} A list of HTMLElements to render
      */
-    renderTabContent(tabId, values, definitions) {
+    renderTabContent(tabId, values, definitions, areMetaValues) {
         let tabDefinitions = {};
 
         // Map out field definitions to render
@@ -270,7 +277,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
             // Field value sanity check
             values[key] = HashBrown.Service.ContentService.fieldSanityCheck(values[key], definition);
             
-            this.renderField(key, values[key], definition, $placeholder);
+            this.renderField(key, values[key], definition, $placeholder, areMetaValues);
 
             return $placeholder;
         });
@@ -322,7 +329,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
                 // Render meta properties
                 _.if(this.getActiveTab() === 'meta',
                     _.div({class: 'editor__body__tab ' + ('meta' === this.getActiveTab() ? 'active' : ''), 'data-id': 'meta'},
-                        this.renderTabContent('meta', this.model, this.schema.fields),
+                        this.renderTabContent('meta', this.model, this.schema.fields, true),
                         this.renderTabContent('meta', this.model.properties, this.schema.fields.properties)
                     )
                 )

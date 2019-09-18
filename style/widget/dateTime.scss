@@ -1,0 +1,67 @@
+.widget--date-time {
+    display: flex;
+    width: 30rem;
+    white-space: nowrap;
+
+    &.disabled {
+        line-height: 2rem;
+    }
+
+    &:not(.disabled) {
+        background-color: var(--standard);
+        color: var(--standard-text);
+        border: 1px solid var(--standard-darker);
+        border-radius: 0.2rem;
+    }
+
+    &__field {
+        width: 0;
+        flex-grow: 1;
+        border: 0;
+        background-color: transparent;
+        display: block;
+        line-height: 2rem;
+        padding: 0 0.5rem;
+        appearance: textfield; 
+        -o-appearance: textfield; 
+        -ms-appearance: textfield; 
+        -moz-appearance: textfield; 
+        -webkit-appearance: textfield;
+        text-align: center; 
+
+        &::-webkit-outer-spin-button { -webkit-appearance: none; }
+        &::-webkit-inner-spin-button { -webkit-appearance: none;  }
+    }
+
+    &__clear {
+        cursor: pointer;
+        background-color: transparent;
+        color: var(--standard-text);
+        display: block;
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+        padding: 0;
+        border: 0;
+        margin: 0;
+        border-left: 1px solid var(--standard-darker);
+
+        &:hover {
+            background-color: var(--primary);
+            color: var(--primary-text);
+        }
+    }
+
+    &__separator {
+        color: var(--standard-darkest);
+        line-height: 2rem;
+
+        &.hard {
+            width: 1px;
+            display: block;
+            flex-shrink: 0;
+            background-color: var(--standard-darker);
+        }
+    }
+}

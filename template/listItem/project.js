@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (_, model) =>
+module.exports = (_, model, state) =>
 
 _.div({class: 'list-item--project'},
     _.div({class: 'list-item--project__body'},

@@ -185,10 +185,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                         if(widget) {
                             return (attributes) => {
-                                let value = attributes.value;
-                                delete attributes.value;
-
-                                return new widget({model: value, state: attributes});
+                                return new widget({model: attributes}).element;
                             };
                         }
 

@@ -24,7 +24,7 @@ class JSONEditor extends Crisp.View {
      */
     async fetch() {
         try {
-            this.allSchema = await HashBrown.Service.SchemaService.getAllSchemas();
+            this.allSchemas = await HashBrown.Service.SchemaService.getAllSchemas();
             this.allConnections = await HashBrown.Service.ConnectionService.getAllConnections();
             this.model = await HashBrown.Service.ResourceService.get(null, this.resourceCategory, this.modelId);
 
@@ -46,7 +46,7 @@ class JSONEditor extends Crisp.View {
     getSchema(id) {
         checkParam(id, 'id', String);
 
-        for(let schema of this.allSchema) {
+        for(let schema of this.allSchemas) {
             if(schema.id === id) { return schema; }
         }
 
@@ -109,28 +109,32 @@ class JSONEditor extends Crisp.View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
+                    if(typeof v !== 'string') { return; }
+
                     if(this.getSchema(v)) { return; }
 
                     return 'Schema "' + v + '" not found';
                
                 case 'schemaBindings': case 'allowedSchemas': case 'allowedChildSchemas':
-                    let invalidSchema = v.slice(0);
+                    if(!Array.isArray(v)) { return; }
+
+                    let invalidSchemas = v.slice(0);
                     
-                    for(let r in this.allSchema) {
-                        let schema = this.allSchema[r];
+                    for(let r in this.allSchemas) {
+                        let schema = this.allSchemas[r];
                         
-                        for(let b = invalidSchema.length - 1; b >= 0; b--) {
-                            if(schema.id === invalidSchema[b]) {
-                                invalidSchema.splice(b, 1);
+                        for(let b = invalidSchemas.length - 1; b >= 0; b--) {
+                            if(schema.id === invalidSchemas[b]) {
+                                invalidSchemas.splice(b, 1);
                             }
                         }   
                     }
 
-                    if(invalidSchema.length > 0) {
-                        if(invalidSchema.length == 1) {
-                            return 'Schema "' + invalidSchema[0] + '" not found';
+                    if(invalidSchemas.length > 0) {
+                        if(invalidSchemas.length === 1) {
+                            return 'Schema ' + invalidSchemas[0] + ' not found';
                         } else {
-                            return 'Schema "' + invalidSchema.join(', ') + '" not found';
+                            return 'Schemas ' + invalidSchemas.join(', ') + ' not found';
                         }
                     }
 

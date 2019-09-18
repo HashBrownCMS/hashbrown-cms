@@ -34,21 +34,21 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
             this.render();
 
         } else {
-            if(this.state.multiple) {
-                if(!Array.isArray(this.model)) {
-                    this.model = [];
+            if(this.model.multiple) {
+                if(!Array.isArray(this.model.value)) {
+                    this.model.value = [];
                 }
 
-                let existingIndex = this.model.indexOf(value);
+                let existingIndex = this.model.value.indexOf(value);
 
                 if(existingIndex > -1) {
-                    this.model.splice(existingIndex, 1);
+                    this.model.value.splice(existingIndex, 1);
                 } else {
-                    this.model.push(value);
+                    this.model.value.push(value);
                 }
 
-                this.model = this.model.filter((x) => !!x);
-                this.model.sort();
+                this.model.value = this.model.value.filter((x) => !!x);
+                this.model.value.sort();
                 
                 let scrollTop = this.element.querySelector('.widget--popup__options').scrollTop;
 
@@ -59,7 +59,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.onSearch(this.state.searchQuery);
 
             } else {
-                this.model = value;
+                this.model.value = value;
                 this.toggle(false);
 
             }
@@ -93,11 +93,11 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
      * Event: Click clear value
      */
     onClickClearValue() {
-        if(this.state.multiple) {
-            this.model = [];
+        if(this.model.multiple) {
+            this.model.value = [];
             
         } else {
-            this.model = null;
+            this.model.value = null;
         
         }
 
@@ -155,16 +155,16 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
      * @returns {String} Value label
      */
     getValueLabel() {
-        let label = this.state.placeholder || '(none)';
+        let label = this.model.placeholder || '(none)';
 
         let labels = [];
 
-        for(let key in this.state.options) {
-            let value = this.state.options[key];
-            let hasValue = (Array.isArray(this.model) && this.model.indexOf(value) > -1) || this.model === value;
+        for(let key in this.model.options) {
+            let value = this.model.options[key];
+            let hasValue = (Array.isArray(this.model.value) && this.model.value.indexOf(value) > -1) || this.model.value === value;
 
             if(hasValue) {
-                if(Array.isArray(this.state.options)) {
+                if(Array.isArray(this.model.options)) {
                     labels.push(value);
                 } else {
                     labels.push(key);
