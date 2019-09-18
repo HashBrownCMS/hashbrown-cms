@@ -657,31 +657,6 @@ class UIService {
     }
 
     /**
-     * Brings up an iframe modal
-     *
-     * @param {String} title
-     * @param {String} url
-     * @param {Function} onSubmit
-     * @param {Function} onCancel
-     */
-    static iframeModal(title, url, onSubmit, onCancel) {
-        let modal = new HashBrown.View.Modal.IframeModal({
-            title: title,
-            url: url
-        });
-
-        if(typeof onSubmit === 'function') {
-            modal.on('ok', onSubmit);
-        }
-
-        if(typeof onCancel === 'function') {
-            modal.on('cancel', onCancel);
-        }
-       
-        return modal;
-    }
-
-    /**
      * Brings up a confirm modal
      *
      * @param {String} type
