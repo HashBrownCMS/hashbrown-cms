@@ -16,25 +16,27 @@ class ApiDeployerEditor extends HashBrown.View.Editor.Editor {
         return _.div({class: 'editor__field-group'},
             this.field(
                 { label: 'URL', description: 'The base URL of the API' },
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.url,
-                    placeholder: 'Input URL',
-                    onChange: (newValue) => {
-                        this.model.url = newValue;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.url,
+                        placeholder: 'Input URL',
+                        onchange: (newValue) => {
+                            this.model.url = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 { label: 'Token', description: 'An authenticated API token' },
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.token,
-                    placeholder: 'Input token',
-                    onChange: (newValue) => {
-                        this.model.token = newValue;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.token,
+                        placeholder: 'Input token',
+                        onchange: (newValue) => {
+                            this.model.token = newValue;
+                        }
                     }
-                })
+                }).element
             )
         );
     }

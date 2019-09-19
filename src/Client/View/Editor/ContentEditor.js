@@ -376,8 +376,8 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
                                 _.span({class: 'widget--button__text-working'}, 'Saving')
                             ).click(() => { this.onClickSave(); }),
                             _.if(this.connection,
-                                _.label({class: 'widget widget--checkbox large label'},
-                                    _.span({class: 'widget--checkbox__label'}, 'Published'),
+                                _.label({class: 'widget widget--checkbox large placeholder'},
+                                    _.span({class: 'widget--checkbox__placeholder'}, 'Published'),
                                     _.input({class: 'widget--checkbox__input', name: 'published', type: 'checkbox', checked: this.model.isPublished}),
                                     _.div({class: 'widget--checkbox__indicator'})
                                 )

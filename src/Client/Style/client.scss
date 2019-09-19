@@ -9,7 +9,6 @@
 // Editors
 @import 'Views/Editors/Editor';
 @import 'Views/Editors/JSONEditor';
-@import 'Views/Editors/WYSIWYGEditor';
 @import 'Views/Editors/SchemaEditor';
 @import 'Views/Editors/MediaViewer';
 
@@ -23,16 +22,3 @@
 @import 'Views/Modals/Modal';
 @import 'Views/Modals/MediaBrowser';
 @import 'Views/Modals/MediaUploader';
-
-// Widgets
-@import 'Views/Widgets/Widget';
-@import 'Views/Widgets/Message';
-@import 'Views/Widgets/Separator';
-@import 'Views/Widgets/Label';
-@import 'Views/Widgets/Tabs';
-@import 'Views/Widgets/Select';
-@import 'Views/Widgets/Chips';
-@import 'Views/Widgets/Input';
-@import 'Views/Widgets/Highlight';
-@import 'Views/Widgets/Dropdown';
-@import 'Views/Widgets/Spinner';

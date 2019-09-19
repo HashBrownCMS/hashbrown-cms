@@ -1,24 +1,40 @@
+'use strict';
+
+// Parser cache
+let cache = {};
+
 /**
- * A standalone WYSIWYG editor
+ * A rich text widget
  *
- * @memberof HashBrown.Client.View.Editor
+ * @memberof HashBrown.Client.Entity.View.Widget
  */
-class WYSIWYGEditor extends Crisp.View {
+class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(params);
 
-        if(!this.toolbar) { this.toolbar = {}; }
-
-        this.fetch();
+        this.template = require('template/widget/richText'); 
+    
+        this.state.paragraphOptions = this.getParagraphOptions();
+        this.state.viewHtml = this.toView(this.model.value);
     }
 
     /**
      * Event: Value changed
      */
     onChange() {
-        this.value = this.toValue(this.$editor.html());
+        let newValue = this.toValue(this.namedChildren.editor.innerHTML);
 
-        this.trigger('change', this.value);
+        super.onChange(newValue);
+    }
+
+    /**
+     * Event: Silent change
+     */
+    onSilentChange() {
+        this.updateElementTag();
     }
 
     /**
@@ -29,7 +45,7 @@ class WYSIWYGEditor extends Crisp.View {
     insertHtml(html) {
         if(!html) { return; }
 
-        this.$editor[0].innerHTML += this.toView(html);
+        this.namedChildren.editor.innerHTML += this.toView(html);
 
         this.onChange();
     };
@@ -38,6 +54,10 @@ class WYSIWYGEditor extends Crisp.View {
      * Updates the paragraph picker and selection tag
      */
     updateElementTag () {
+        let paragraphPicker = this.namedChildren.paragraph;
+        
+        if(!paragraphPicker) { return; }
+
         let selection = window.getSelection();
 
         if(!selection) { return; }
@@ -62,12 +82,13 @@ class WYSIWYGEditor extends Crisp.View {
             }
         }
 
+
         // If the parent tag is not a heading or a paragraph, default to paragraph
-        if(!this.paragraphPicker.options[parentElementTagName]) {
+        if(!paragraphPicker.hasOption(parentElementTagName)) {
             parentElementTagName = 'p';
         }
 
-        this.paragraphPicker.setValueSilently(parentElementTagName);
+        paragraphPicker.setValue(parentElementTagName);
     }
 
     /**
@@ -78,12 +99,12 @@ class WYSIWYGEditor extends Crisp.View {
      * @return {String} HTML
      */
     toView(html) {
-        this._parserCache = {};
+        cache = {};
         
         if(!html) { return ''; }
 
         return html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
-            this._parserCache[id] = filename;
+            cache[id] = filename;
         
             return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
         });
@@ -101,7 +122,7 @@ class WYSIWYGEditor extends Crisp.View {
         
         // Replace media references
         html = html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
-            let filename = this._parserCache ? this._parserCache[id] : null;
+            let filename = cache ? cache[id] : null;
 
             if(!filename) { return original; }
         
@@ -126,7 +147,7 @@ class WYSIWYGEditor extends Crisp.View {
      */
     onChangeHeading(newValue) {
         document.execCommand('heading', false, newValue);
-        this.$editor.focus();
+        this.namedChildren.editor.focus();
         this.onChange();
     }
 
@@ -168,16 +189,18 @@ class WYSIWYGEditor extends Crisp.View {
             'Create link for selection "' + text + '"',
             _.div({class: 'widget-group'},
                 _.div({class: 'widget widget--label'}, 'URL'),
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: url,
-                    onChange: (newValue) => { url = newValue; }
-                }),
-                new HashBrown.View.Widget.Input({
-                    type: 'checkbox',
-                    placeholder: 'New tab',
-                    onChange: (newValue) => { newTab = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: url,
+                        onchange: (newValue) => { url = newValue; }
+                    }
+                }).element,
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        placeholder: 'New tab',
+                        onchange: (newValue) => { newTab = newValue; }
+                    }
+                }).element
             ),
             () => {
                 if(!url) { return; }
@@ -262,7 +285,7 @@ class WYSIWYGEditor extends Crisp.View {
                 throw new Error('WYSIWYG toolbar element category "' + category + '" not recognised');
         }
 
-        return JSON.parse(JSON.stringify(elements));
+        return elements;
     }
 
 
@@ -272,102 +295,25 @@ class WYSIWYGEditor extends Crisp.View {
      * @returns {Object} Options
      */
     getParagraphOptions() {
-        let options = HashBrown.View.Editor.WYSIWYGEditor.getToolbarElements('paragraphs');
+        let options = this.constructor.getToolbarElements('paragraphs');
 
         for(let key in options) {
-            if(this.toolbar[key] === false) { delete options[key]; }
+            if(this.model.toolbar[key] === false) { delete options[key]; }
         }
        
         options.p = 'Paragraph';
 
+        // Reverse keys and values for the popup widget
+        for(let key in options) {
+            let value = options[key];
+
+            delete options[key];
+
+            options[value] = key;
+        }
+
         return options;
-    }
-
-    /**
-     * Renders this view
-     */
-    template() {
-        return _.div({class: 'editor editor--wysiwyg'},
-            this.$toolbar = _.div({class: 'editor--wysiwyg__toolbar widget-group'},
-                this.paragraphPicker = new HashBrown.View.Widget.Dropdown({
-                    value: 'p',
-                    options: this.getParagraphOptions(),
-                    onChange: (newValue) => { this.onChangeHeading(newValue); }
-                }),
-                _.div({class: 'widget-group__separator line'}),
-                _.if(this.toolbar.bold !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-bold', title: 'Bold'})
-                        .click(() => { this.onChangeStyle('bold'); })
-                ),
-                _.if(this.toolbar.italic !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-italic', title: 'Italic'})
-                        .click(() => { this.onChangeStyle('italic'); })
-                ),
-                _.if(this.toolbar.underline !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-underline', title: 'Underline'})
-                        .click(() => { this.onChangeStyle('underline'); })
-                ),
-                _.if(this.toolbar.color !== false,
-                    _.div({class: 'widget widget--button standard small fa fa-paint-brush', title: 'Font color'},
-                        _.input({class: 'widget--button__input', type: 'color'})
-                            .change((e) => { this.onChangeFontColor(e.currentTarget.value); })
-                    )
-                ),
-                
-                _.div({class: 'widget-group__separator line'}),
-                
-                _.if(this.toolbar.orderedList !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-list-ol', title: 'Ordered list'})
-                        .click(() => { this.onChangeStyle('insertOrderedList'); })
-                ),
-                _.if(this.toolbar.unorderedList !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-list-ul', title: 'Unordered list'})
-                        .click(() => { this.onChangeStyle('insertUnorderedList'); })
-                ),
-
-                _.div({class: 'widget-group__separator line'}),
-                
-                _.if(this.toolbar.indent !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-indent', title: 'Indent'})
-                        .click(() => { this.onChangeStyle('indent'); })
-                ),
-                _.if(this.toolbar.outdent !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-outdent', title: 'Outdent'})
-                        .click(() => { this.onChangeStyle('outdent'); })
-                ),
-                _.if(this.toolbar.alignLeft !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-align-left', title: 'Left'})
-                        .click(() => { this.onChangeStyle('justifyLeft'); })
-                ),
-                _.if(this.toolbar.center !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-align-center', title: 'Center'})
-                        .click(() => { this.onChangeStyle('justifyCenter'); })
-                ),
-                _.if(this.toolbar.justify !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-align-justify', title: 'Justify'})
-                        .click(() => { this.onChangeStyle('justifyFull'); })
-                ),
-                _.if(this.toolbar.alignRight !== false,
-                    _.button({class: 'widget widget--button standard small fa fa-align-right', title: 'Right'})
-                        .click(() => { this.onChangeStyle('justifyRight'); })
-                ),
-
-                _.div({class: 'widget-group__separator line'}),
-                
-                _.button({class: 'widget widget--button standard small fa fa-link', title: 'Create link'})
-                    .click(() => { this.onCreateLink(); }),
-                
-                _.div({class: 'widget-group__separator line'}),
-                
-                _.button({class: 'widget widget--button standard small fa fa-remove', title: 'Remove formatting'})
-                    .click(() => { this.onRemoveFormat(); })
-            ),
-            this.$editor = _.div({class: 'editor--wysiwyg__editor', contenteditable: true}, this.toView(this.value))
-                .on('input', (e) => { this.onChange(); })
-                .on('click', (e) => { this.updateElementTag(); })
-                .on('keyup', (e) => { this.updateElementTag(); })
-        )
     }
 }
 
-module.exports = WYSIWYGEditor;
+module.exports = RichText;

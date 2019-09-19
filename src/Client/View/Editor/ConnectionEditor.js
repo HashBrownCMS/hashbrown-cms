@@ -57,29 +57,29 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
      * Renders the Media provider editor
      */
     renderMediaProviderEditor() {
-        let input = new HashBrown.View.Widget.Input({
-            value: false,
-            type: 'checkbox',
-            onChange: (isProvider) => {
-                HashBrown.Service.ConnectionService.setMediaProvider(isProvider ? this.model.id : null)
-                .catch(UI.errorModal);
+        let input = new HashBrown.Entity.View.Widget.Checkbox({
+            model: {
+                value: false,
+                onchange: (isProvider) => {
+                    HashBrown.Service.ConnectionService.setMediaProvider(isProvider ? this.model.id : null)
+                    .catch(UI.errorModal);
+                }
             }
         });
 
         // Set the value
-        input.$element.toggleClass('working', true);
+        input.element.classList.toggle('working', true);
 
         HashBrown.Service.ConnectionService.getMediaProvider()
         .then((connection) => {
             if(connection && connection.id === this.model.id) {
-                input.value = true;
-                input.fetch();
+                input.setValue(true);
             }
         
-            input.$element.toggleClass('working', false);
+            input.element.classList.toggle('working', false);
         });
 
-        return input.$element;
+        return input.element;
     }
 
     /**
@@ -101,23 +101,27 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
                 // Title
                 this.field(
                     'Title',
-                    new HashBrown.View.Widget.Input({
-                        value: this.model.title,
-                        onChange: (newValue) => {
-                            this.model.title = newValue;
+                    new HashBrown.Entity.View.Widget.Text({
+                        model: {
+                            value: this.model.title,
+                            onchange: (newValue) => {
+                                this.model.title = newValue;
+                            }
                         }
-                    })
+                    }).element
                 ),
 
                 // URL
                 this.field(
                     'URL',
-                    new HashBrown.View.Widget.Input({
-                        value: this.model.url,
-                        onChange: (newValue) => {
-                            this.model.url = newValue;
+                    new HashBrown.Entity.View.Widget.Text({
+                        model: {
+                            value: this.model.url,
+                            onchange: (newValue) => {
+                                this.model.url = newValue;
+                            }
                         }
-                    })
+                    }).element
                 ),
 
                 // Processor settings
@@ -125,16 +129,26 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
                     { label: 'Processor', description: 'Which format to deploy Content in' },
                     this.field(
                         'Type',
-                        new HashBrown.View.Widget.Dropdown({
-                            value: this.model.processor.alias,
-                            optionsUrl: 'connections/processors', 
-                            placeholder: 'Type',
-                            onChange: (newValue) => {
-                                this.model.processor.alias = newValue;
+                        new HashBrown.Entity.View.Widget.Popup({
+                            model: {
+                                value: this.model.processor.alias,
+                                options: (async () => {
+                                    let options = {};
+                                    let processors = await HashBrown.Service.RequestService.request('get', 'connections/processors');
 
-                                this.fetch(true);
+                                    for(let id in processors) {
+                                        options[processors[id]] = id;
+                                    }
+
+                                    return options;
+                                })(),
+                                onchange: (newValue) => {
+                                    this.model.processor.alias = newValue;
+
+                                    this.fetch(true);
+                                }
                             }
-                        })
+                        }).element
                     ),
                     this.field(
                         { label: 'File extension', description: 'A file extension such as .json or .xml'},
@@ -145,12 +159,14 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
                                 model: this.model.processor
                             });
                         }),
-                        new HashBrown.View.Widget.Input({
-                            value: this.model.processor.fileExtension,
-                            onChange: (newValue) => {
-                                this.model.processor.fileExtension = newValue;
+                        new HashBrown.Entity.View.Widget.Text({
+                            model: {
+                                value: this.model.processor.fileExtension,
+                                onchange: (newValue) => {
+                                    this.model.processor.fileExtension = newValue;
+                                }
                             }
-                        })
+                        }).element
                     )
                 ),
                 
@@ -159,16 +175,27 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
                     { label: 'Deployer', description: 'How to transfer data to and from the website\'s server' },
                     this.field(
                         'Type',
-                        new HashBrown.View.Widget.Dropdown({
-                            value: this.model.deployer.alias,
-                            optionsUrl: 'connections/deployers', 
-                            placeholder: 'Type',
-                            onChange: (newValue) => {
-                                this.model.deployer.alias = newValue;
+                        new HashBrown.Entity.View.Widget.Popup({
+                            model: {
+                                value: this.model.deployer.alias,
+                                options: (async () => {
+                                    let options = {};
+                                    let processors = await HashBrown.Service.RequestService.request('get', 'connections/deployers');
 
-                                this.fetch(true);
+                                    for(let id in processors) {
+                                        options[processors[id]] = id;
+                                    }
+
+                                    return options;
+                                })(),
+                                placeholder: 'Type',
+                                onchange: (newValue) => {
+                                    this.model.deployer.alias = newValue;
+
+                                    this.fetch(true);
+                                }
                             }
-                        })
+                        }).element
                     ),
                     _.each(HashBrown.View.Editor.DeployerEditor, (name, editor) => {
                         if(editor.alias !== this.model.deployer.alias) { return; }
@@ -184,21 +211,25 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
                             { label: 'Paths', description: 'Where to send the individual resources' },
                             this.field(
                                 'Content',
-                                new HashBrown.View.Widget.Input({
-                                    value: this.model.deployer.paths.content,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.content = newValue;
+                                new HashBrown.Entity.View.Widget.Text({
+                                    model: {
+                                        value: this.model.deployer.paths.content,
+                                        onchange: (newValue) => {
+                                            this.model.deployer.paths.content = newValue;
+                                        }
                                     }
-                                })
+                                }).element
                             ),
                             this.field(
                                 'Media',
-                                new HashBrown.View.Widget.Input({
-                                    value: this.model.deployer.paths.media,
-                                    onChange: (newValue) => {
-                                        this.model.deployer.paths.media = newValue;
+                                new HashBrown.Entity.View.Widget.Text({
+                                    model: {
+                                        value: this.model.deployer.paths.media,
+                                        onchange: (newValue) => {
+                                            this.model.deployer.paths.media = newValue;
+                                        }
                                     }
-                                })
+                                }).element
                             )
                         );
                     })

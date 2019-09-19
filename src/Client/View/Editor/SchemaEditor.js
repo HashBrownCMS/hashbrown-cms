@@ -136,17 +136,21 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
         return _.div({class: 'editor__body'},
             this.field(
                 { isLocked: true, label: 'Id' },
-                new HashBrown.View.Widget.Input({
-                    value: this.model.id,
-                    onChange: (newValue) => { this.model.id = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.id,
+                        onchange: (newValue) => { this.model.id = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Name',
-                new HashBrown.View.Widget.Input({
-                    value: this.model.name,
-                    onChange: (newValue) => { this.model.name = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.name,
+                        onchange: (newValue) => { this.model.name = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Icon',

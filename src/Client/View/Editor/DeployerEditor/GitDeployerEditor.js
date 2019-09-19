@@ -15,48 +15,52 @@ class GitDeployerEditor extends HashBrown.View.Editor.Editor {
         return _.div({class: 'editor__field-group'},
             this.field(
                 'Repository (https://)',
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.repo,
-                    placeholder: 'example.com/user/repo.git',
-                    onChange: (newRepo) => {
-                        this.model.repo = newRepo;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.repo,
+                        placeholder: 'example.com/user/repo.git',
+                        onchange: (newRepo) => {
+                            this.model.repo = newRepo;
+                        }
                     }
-                })
+                }).element
             ),
             
             this.field(
                 'Branch',
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.branch,
-                    placeholder: 'master',
-                    onChange: (newBranch) => {
-                        this.model.branch = newBranch;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.branch,
+                        placeholder: 'master',
+                        onchange: (newBranch) => {
+                            this.model.branch = newBranch;
+                        }
                     }
-                })
+                }).element
             ),
             
             this.field(
                 'Username',
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.username,
-                    onChange: (newUsername) => {
-                        this.model.username = newUsername;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.username,
+                        onchange: (newUsername) => {
+                            this.model.username = newUsername;
+                        }
                     }
-                })
+                }).element
             ),
             
             this.field(
                 'Password',
-                new HashBrown.View.Widget.Input({
-                    type: 'password',
-                    value: this.model.password,
-                    onChange: (newPassword) => {
-                        this.model.password = newPassword;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.password,
+                        onchange: (newPassword) => {
+                            this.model.password = newPassword;
+                        }
                     }
-                })
+                }).element
             )
         );
     }

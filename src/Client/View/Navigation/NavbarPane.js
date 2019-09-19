@@ -477,14 +477,14 @@ class NavbarPane extends Crisp.View {
      */
     getSortingOptions() {
         let sortingOptions = {
-            default: 'Default',
-            alphaAsc: 'A → Z',
-            alphaDesc: 'Z → A'
+            'Default': 'default',
+            'A → Z': 'alphaAsc',
+            'Z → A': 'alphaDesc'
         };
 
         if(this.constructor.route === '/content/') {
-            sortingOptions.dateAsc = 'Old → new';
-            sortingOptions.dateDesc = 'New → old';
+            sortingOptions['Old → new'] = 'dateAsc';
+            sortingOptions['New → old'] = 'dateDesc';
         }
 
         return sortingOptions;
@@ -604,16 +604,19 @@ class NavbarPane extends Crisp.View {
             // Filter/sort bar
             _.div({class: 'navbar-main__pane__filter-sort-bar'},
                 _.div({class: 'widget-group'},
-                    new HashBrown.View.Widget.Input({
-                        placeholder: 'Filter',
-                        onChange: (newValue) => { this.onChangeFilter(newValue); },
-                        type: 'text'
-                    }),
-                    new HashBrown.View.Widget.Dropdown({
-                        placeholder: 'Sort',
-                        options: this.getSortingOptions(),
-                        onChange: (newValue) => { this.onChangeSorting(newValue); }
-                    })
+                    new HashBrown.Entity.View.Widget.Text({
+                        model: {
+                            placeholder: 'Filter',
+                            onchange: (newValue) => { this.onChangeFilter(newValue); },
+                        }
+                    }).element,
+                    new HashBrown.Entity.View.Widget.Popup({
+                        model: {
+                            placeholder: 'Sort',
+                            options: this.getSortingOptions(),
+                            onchange: (newValue) => { this.onChangeSorting(newValue); }
+                        }
+                    }).element
                 )
             ),
 

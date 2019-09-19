@@ -19,15 +19,16 @@ Crisp.Router.route('/schemas/', function() {
                         'Import schemas',
                         _.div({class: 'widget-group'},
                             _.div({class: 'widget widget--label'}, 'URL to uischema.org definitions'),
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                value: url,
-                                isRequired: true,
-                                placeholder: 'E.g. https://uischema.org/schemas.json',
-                                onChange: (newValue) => {
-                                    url = newValue;
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    value: url,
+                                    required: true,
+                                    placeholder: 'E.g. https://uischema.org/schemas.json',
+                                    onchange: (newValue) => {
+                                        url = newValue;
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         async () => {
                             try {

@@ -29,11 +29,11 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
         let parentTabs = this.getParentTabs();
 
         for(let tabId in parentTabs) {
-            allTabs[tabId] = parentTabs[tabId];
+            allTabs[parentTabs[tabId]] = tabId;
         }
         
         for(let tabId in this.model.tabs) {
-            allTabs[tabId] = this.model.tabs[tabId];
+            allTabs[this.model.tabs[tabId]] = tabId;
         }
 
         return allTabs;
@@ -70,7 +70,7 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
         }
         
         if(!this.currentTab) {
-            this.currentTab = Object.keys(this.getAllTabs())[0] || 'meta';
+            this.currentTab = Object.values(this.getAllTabs())[0] || 'meta';
         }
         
     }
@@ -80,34 +80,44 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
      */
     renderBody() {
         let $element = super.renderBody();
-        let defaultTabEditor;
 
         _.append($element,
             this.field(
                 'Allowed child Schemas',
-                new HashBrown.View.Widget.Dropdown({
-                    options: HashBrown.Service.SchemaService.getAllSchemas('content'),
-                    value: this.model.allowedChildSchemas,
-                    labelKey: 'name',
-                    valueKey: 'id',
-                    useMultiple: true,
-                    useClearButton: true,
-                    useTypeAhead: true,
-                    onChange: (newValue) => {
-                        this.model.allowedChildSchemas = newValue;
+                new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        options: (async () => {
+                            let options = {};
+                            let schemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
+
+                            for(let schema of schemas) {
+                                options[schema.name] = schema.id;
+                            }
+
+                            return options;
+                        })(),
+                        value: this.model.allowedChildSchemas,
+                        multiple: true,
+                        clearable: true,
+                        autocomplete: true,
+                        onchange: (newValue) => {
+                            this.model.allowedChildSchemas = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Default tab',
-                defaultTabEditor = new HashBrown.View.Widget.Dropdown({
-                    options: this.getAllTabs(),
-                    useClearButton: true,
-                    value: this.model.defaultTabId,
-                    onChange: (newValue) => {
-                        this.model.defaultTabId = newValue;
+                new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        options: this.getAllTabs(),
+                        clearable: true,
+                        value: this.model.defaultTabId,
+                        onchange: (newValue) => {
+                            this.model.defaultTabId = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Tabs',
@@ -132,9 +142,6 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
                             
                             this.model.tabs = newTabs;
 
-                            defaultTabEditor.options = this.getAllTabs();
-                            defaultTabEditor.fetch();
-
                             this.update();
                         }
                     }
@@ -143,7 +150,7 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
 
             // Tabs
             _.div({class: 'editor--schema__tabs'},
-                _.each(this.getAllTabs(), (id, name) => {
+                _.each(this.getAllTabs(), (name, id) => {
                     return _.button({class: 'editor--schema__tab' + (this.currentTab === id ? ' active' : '')}, name)
                         .click(() => {
                             this.currentTab = id;
@@ -210,7 +217,7 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
                 _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
                     if(!fieldValue) { return; }
 
-                    let isValidTab = !!this.getAllTabs()[fieldValue.tabId];
+                    let isValidTab = Object.values(this.getAllTabs()).indexOf(fieldValue.tabId) > -1;
 
                     if(isValidTab && fieldValue.tabId !== this.currentTab) { return; }
                     if(!isValidTab && this.currentTab !== 'meta') { return; }
@@ -235,104 +242,120 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
                         },
                         this.field(
                             'Tab',
-                            new HashBrown.View.Widget.Dropdown({
-                                useClearButton: true,
-                                options: this.getAllTabs(),
-                                value: fieldValue.tabId,
-                                onChange: (newValue) => {
-                                    fieldValue.tabId = newValue;
+                            new HashBrown.Entity.View.Widget.Popup({
+                                model: {
+                                    clearable: true,
+                                    options: this.getAllTabs(),
+                                    value: fieldValue.tabId,
+                                    onchange: (newValue) => {
+                                        fieldValue.tabId = newValue;
 
-                                    this.update();
+                                        this.update();
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.field(
                             'Key',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A variable name, e.g. "myField"',
-                                tooltip: 'The field variable name',
-                                value: fieldKey,
-                                onChange: (newKey) => {
-                                    if(!newKey) { return; }
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    placeholder: 'A variable name, e.g. "myField"',
+                                    tooltip: 'The field variable name',
+                                    value: fieldKey,
+                                    onchange: (newKey) => {
+                                        if(!newKey) { return; }
 
-                                    let newProperties = {};
+                                        let newProperties = {};
 
-                                    // Insert the changed key into the correct place in the object
-                                    for(let key in this.model.fields.properties) {
-                                        if(key === fieldKey) {
-                                            newProperties[newKey] = this.model.fields.properties[fieldKey];
-                                        
-                                        } else {
-                                            newProperties[key] = this.model.fields.properties[key];
+                                        // Insert the changed key into the correct place in the object
+                                        for(let key in this.model.fields.properties) {
+                                            if(key === fieldKey) {
+                                                newProperties[newKey] = this.model.fields.properties[fieldKey];
+                                            
+                                            } else {
+                                                newProperties[key] = this.model.fields.properties[key];
 
+                                            }
                                         }
+
+                                        // Change internal reference to new key
+                                        fieldKey = newKey;
+
+                                        // Reassign the properties object
+                                        this.model.fields.properties = newProperties;
                                     }
-
-                                    // Change internal reference to new key
-                                    fieldKey = newKey;
-
-                                    // Reassign the properties object
-                                    this.model.fields.properties = newProperties;
                                 }
-                            })
+                            }).element
                         ),
                         this.field(
                             'Label',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A label, e.g. "My field"',
-                                tooltip: 'The field label',
-                                value: fieldValue.label,
-                                onChange: (newValue) => { 
-                                    this.changeFieldLabel(fieldValue.label, newValue);
-                                    
-                                    fieldValue.label = newValue;
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    placeholder: 'A label, e.g. "My field"',
+                                    tooltip: 'The field label',
+                                    value: fieldValue.label,
+                                    onchange: (newValue) => { 
+                                        this.changeFieldLabel(fieldValue.label, newValue);
+                                        
+                                        fieldValue.label = newValue;
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.field(
                             'Description',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A description',
-                                tooltip: 'The field description',
-                                value: fieldValue.description,
-                                onChange: (newValue) => { fieldValue.description = newValue; }
-                            })
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    placeholder: 'A description',
+                                    tooltip: 'The field description',
+                                    value: fieldValue.description,
+                                    onchange: (newValue) => { fieldValue.description = newValue; }
+                                }
+                            }).element
                         ),
                         this.field(
                             'Multilingual',
-                            new HashBrown.View.Widget.Input({
-                                type: 'checkbox',
-                                tooltip: 'Whether or not this field should support multiple languages',
-                                value: fieldValue.multilingual || false,
-                                onChange: (newValue) => { fieldValue.multilingual = newValue; }
-                            })
+                            new HashBrown.Entity.View.Widget.Checkbox({
+                                model: {
+                                    tooltip: 'Whether or not this field should support multiple languages',
+                                    value: fieldValue.multilingual || false,
+                                    onchange: (newValue) => { fieldValue.multilingual = newValue; }
+                                }
+                            }).element
                         ),
                         this.field(
                             'Collapsed',
-                            new HashBrown.View.Widget.Input({
-                                type: 'checkbox',
-                                tooltip: 'Whether or not this field should be collapsed by default',
-                                value: fieldValue.config.isCollapsed,
-                                onChange: (newValue) => { fieldValue.config.isCollapsed = newValue; }
-                            })
+                            new HashBrown.Entity.View.Widget.Checkbox({
+                                model: {
+                                    tooltip: 'Whether or not this field should be collapsed by default',
+                                    value: fieldValue.config.isCollapsed,
+                                    onchange: (newValue) => { fieldValue.config.isCollapsed = newValue; }
+                                }
+                            }).element
                         ),
                         this.field(
                             'Schema',
-                            new HashBrown.View.Widget.Dropdown({
-                                useTypeAhead: true,
-                                options: HashBrown.Service.SchemaService.getAllSchemas('field'),
-                                value: fieldValue.schemaId,
-                                labelKey: 'name',
-                                valueKey: 'id',
-                                onChange: (newValue) => {
-                                    fieldValue.schemaId = newValue;
+                            new HashBrown.Entity.View.Widget.Popup({
+                                model: {
+                                    autocomplete: true,
+                                    options: (async () => {
+                                        let options = {};
+                                        let schemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
 
-                                    this.update();
+                                        for(let schema of schemas) {
+                                            options[schema.name] = schema.id;
+                                        }
+
+                                        return options;
+                                    })(),
+                                    value: fieldValue.schemaId,
+                                    onchange: (newValue) => {
+                                        fieldValue.schemaId = newValue;
+
+                                        this.update();
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.renderConfigEditor(fieldValue.schemaId, fieldValue.config)
                     );

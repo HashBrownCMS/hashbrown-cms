@@ -50,11 +50,12 @@ class MediaPane extends HashBrown.View.Navigation.NavbarPane {
 
         let modal = UI.messageModal(
             'Rename ' + name,
-            new HashBrown.View.Widget.Input({
-                type: 'text',
-                value: name,
-                onChange: (newValue) => { name = newValue; }
-            }),
+            new HashBrown.Entity.View.Widget.Text({
+                model: {
+                    value: name,
+                    onchange: (newValue) => { name = newValue; }
+                }
+            }).element,
             async () => {
                 await HashBrown.Service.RequestService.request('post', 'media/rename/' + id + '?name=' + name);
 

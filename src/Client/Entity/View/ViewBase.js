@@ -33,6 +33,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         this.def(HTMLElement, 'element', null);
         this.def(Object, 'events', {});
+        this.def(Object, 'namedChildren', {});
     }
 
     /**
@@ -185,13 +186,25 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                         if(widget) {
                             return (attributes) => {
-                                return new widget({model: attributes}).element;
+                                let child = new widget({model: attributes});
+
+                                if(attributes && attributes.name) {
+                                    this.namedChildren[attributes.name] = child;
+                                }
+
+                                return child.element;
                             };
                         }
 
                         // If not, render a native element
                         return (attributes = {}, ...content) => {
-                            return this.createElement(name, attributes, content);
+                            let element = this.createElement(name, attributes, content);
+
+                            if(attributes && attributes.name) {
+                                this.namedChildren[attributes.name] = element;
+                            }
+
+                            return element;
                         }
                 }
             }
@@ -262,7 +275,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
             if(value === null || value === undefined || value === false) { continue; }
 
-            if(typeof value === 'number' || typeof value === 'string') {
+            if(typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
                 element.setAttribute(key, value);
             } else {
                 element[key] = value;

@@ -31,18 +31,28 @@ class FieldSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
             _.if(this.model.parentSchemaId === 'fieldBase',
                 this.field(
                     'Field editor',
-                    new HashBrown.View.Widget.Dropdown({
-                        useTypeahead: true,
-                        value: this.model.editorId,
-                        options: HashBrown.View.Editor.FieldEditor,
-                        valueKey: 'name',
-                        labelKey: 'name',
-                        onChange: (newEditor) => {
-                            this.model.editorId = newEditor;
+                    new HashBrown.Entity.View.Widget.Popup({
+                        model: {
+                            autocomplete: true,
+                            value: this.model.editorId,
+                            options: () => {
+                                let options = {};
+                                
+                                for(let name in HashBrown.View.Editor.FieldEditor) {
+                                    let editor = HashBrown.View.Editor.FieldEditor[name];
 
-                            this.update();
+                                    options[editor.name] = editor.name;
+                                }
+
+                                return options;
+                            },
+                            onchange: (newEditor) => {
+                                this.model.editorId = newEditor;
+
+                                this.update();
+                            }
                         }
-                    })
+                    }).element
                 )
             ),
             _.if($configEditor,

@@ -75,7 +75,7 @@ class MediaBrowser extends HashBrown.View.Modal.Modal {
      * @returns {HTMLElement} Body
      */
     renderBody() {
-        return _.iframe({src: location.href.replace(location.hash, '') + '/?isMediaPicker=true#/media/' + (this.value || '')});
+        return _.iframe({src: location.href.replace(location.hash, '') + '?isMediaPicker=true#/media/' + (this.value || '')});
     }
 }
 

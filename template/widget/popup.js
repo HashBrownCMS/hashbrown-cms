@@ -34,7 +34,7 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''}`,
             ),
             _.div({class: 'widget--popup__options'},
                 _.each(model.options, (label, value) =>
-                    value === null || value === undefined ? 
+                    value === null || value === undefined || value === '---' ? 
                         _.div({class: 'widget--popup__separator'}, label)
                     :
                         _.button({class: `widget--popup__option ${model.value === value || (Array.isArray(model.value) && model.value.indexOf(value) > -1) ? 'selected' : ''}`, onclick: (e) => _.onClickOption(value)}, Array.isArray(model.options) ? value : label)

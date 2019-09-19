@@ -120,17 +120,18 @@ class MediaUploader extends HashBrown.View.Modal.Modal {
     renderBody() {
         return [
             _.div({class: 'modal--media-uploader__preview'}),
-            new HashBrown.View.Widget.Input({
-                type: 'file',
-                name: 'media',
-                useMultiple: !this.replaceId,
-                onChange: (newValue) => {
-                    this.onChangeFile(newValue);
-                },
-                onSubmit: (newValue, newFiles) => {
-                    this.onSubmit(newFiles);
+            new HashBrown.Entity.View.Widget.File({
+                model: {
+                    name: 'media',
+                    multiple: !this.replaceId,
+                    onchange: (newValue) => {
+                        this.onChangeFile(newValue);
+                    },
+                    onsubmit: (newFiles) => {
+                        this.onSubmit(newFiles);
+                    }
                 }
-            }).$element
+            }).element
         ];
     }
 }

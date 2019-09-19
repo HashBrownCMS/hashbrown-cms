@@ -221,6 +221,19 @@
         background-color: transparent;
         overflow: auto;
         max-height: 20rem;
+        padding: 0.25rem 0;
+    }
+    
+    &[role="context-menu"] &__options {
+        max-height: none;
+    }
+
+    &__separator {
+        position: relative;
+        line-height: var(--size-widget-small);
+        padding: 0 1rem;
+        color: var(--color-default-300);
+        border-bottom: 1px solid var(--color-default-200);
     }
 
     &__option {
@@ -231,7 +244,7 @@
         white-space: nowrap;
         text-align: left;
         line-height: var(--size-widget-small);
-        padding: 0 0.5rem;
+        padding: 0 1rem;
         border: 0;
         cursor: pointer;
         position: relative;
@@ -256,4 +269,9 @@
             color: var(--color-action-text);
         }
     }
+    
+    &__option + &__separator {
+        margin-top: 0.5rem;
+    }
+
 }

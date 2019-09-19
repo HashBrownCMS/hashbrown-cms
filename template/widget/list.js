@@ -15,7 +15,7 @@ _.ul({class: 'widget widget--list'},
         )
     ),
     _.if(!model.disabled,
-        _.button({class: 'widget--list__add widget widget--button dashed embedded expanded low', title: `Add ${model.label || 'item'}`, onclick: _.onClickAddItem},
+        _.button({class: 'widget--list__add widget widget--button dashed embedded expanded low', title: `Add ${model.placeholder || 'item'}`, onclick: _.onClickAddItem},
             _.span({class: 'fa fa-plus'}),
             `Add ${model.placeholder || 'item'}`
         )

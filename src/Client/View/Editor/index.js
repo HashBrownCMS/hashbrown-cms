@@ -13,8 +13,7 @@ namespace('View.Editor')
 .add(require('./MediaViewer'))
 .add(require('./SchemaEditor'))
 .add(require('./ContentSchemaEditor'))
-.add(require('./FieldSchemaEditor'))
-.add(require('./WYSIWYGEditor'))
+.add(require('./FieldSchemaEditor'));
 
 require('./DeployerEditor')
 require('./FieldEditor')

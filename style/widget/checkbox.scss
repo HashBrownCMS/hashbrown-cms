@@ -6,7 +6,7 @@
     height: var(--size-widget-small);
     background-color: var(--color-default); 
 
-    &:not(.label) {
+    &:not(.placeholder) {
         width: var(--size-widget-small);
         max-width: var(--size-widget-small);
         min-width: var(--size-widget-small);
@@ -16,7 +16,7 @@
         height: var(--size-widget-medium);
     }
     
-    &.large &__label {
+    &.large &__placeholder {
         padding-left: 1rem;
     }
 
@@ -47,7 +47,7 @@
         }
     }
 
-    &__label {
+    &__placeholder {
         padding-left: 0.5rem;
         display: flex;
         flex-direction: column;
@@ -55,6 +55,7 @@
         text-transform: uppercase;
         font-weight: bold;
         color: var(--color-default-300);
+        white-space: nowrap;
     }
 
     &__input:checked + &__indicator::after {

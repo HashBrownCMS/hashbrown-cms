@@ -68,15 +68,10 @@
         width: 100%;
     }
 
-    &.warning {
-        background-color: var(--color-warn);
-        color: var(--color-warn-text);
-    }
-    
-    &.standard {
+    &.default {
         background-color: var(--color-default);
         color: var(--color-default-text);
-        border-color: var(--color-default-text);
+        border-color: var(--color-default-200);
         
         &:hover {
             background-color: var(--color-default-100);

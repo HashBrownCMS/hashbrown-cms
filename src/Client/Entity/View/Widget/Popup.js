@@ -257,7 +257,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
             }
         }
        
-        if(bounds.bottom > window.innerHeight - margin) {
+        if(bounds.bottom > window.innerHeight - margin && bounds.top - bounds.height > margin) {
             menu.classList.add('bottom');
         } else {
             menu.classList.add('top');
@@ -268,6 +268,17 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         if(bounds.bottom > window.innerHeight - margin) {
             menu.style.height = (window.innerHeight - bounds.top - margin) + 'px';
         }
+    }
+
+    /**
+     * Gets whether this popup has an option
+     *
+     * @param {String} value
+     *
+     * @return {Boolean} has option
+     */
+    hasOption(value) {
+        return Object.values(this.model.options || {}).indexOf(value) > -1;
     }
 }
 

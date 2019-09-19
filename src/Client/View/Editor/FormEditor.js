@@ -73,13 +73,15 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
      * @return {Object} element
      */
     renderAllowedOriginEditor() {
-        return new HashBrown.View.Widget.Input({
-            value: this.model.allowedOrigin,
-            tooltip: 'The allowed origin from which entries to this form can be posted',
-            onChange: (newOrigin) => {
-                this.model.allowedOrigin = newOrigin;
+        return new HashBrown.Entity.View.Widget.Text({
+            model: {
+                value: this.model.allowedOrigin,
+                tooltip: 'The allowed origin from which entries to this form can be posted',
+                onchange: (newOrigin) => {
+                    this.model.allowedOrigin = newOrigin;
+                }
             }
-        });
+        }).element;
     }
 
     /**
@@ -88,13 +90,15 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
      * @return {Object} element
      */
     renderTitleEditor() {
-        return new HashBrown.View.Widget.Input({
-            value: this.model.title,
-            tooltip: 'The title of the form',
-            onChange: (newTitle) => {
-                this.model.title = newTitle;
+        return new HashBrown.Entity.View.Widget.Text({
+            model: {
+                value: this.model.title,
+                tooltip: 'The title of the form',
+                onchange: (newTitle) => {
+                    this.model.title = newTitle;
+                }
             }
-        });
+        }).element;
     }
     
     /**
@@ -104,22 +108,26 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
      */
     renderRedirectEditor() {
         return _.div({class: 'widget-group'},
-            new HashBrown.View.Widget.Input({
-                value: this.model.redirect,
-                tooltip: 'The URL that the user will be redirected to after submitting the form entry',
-                onChange: (newUrl) => {
-                    this.model.redirect = newUrl;
+            new HashBrown.Entity.View.Widget.Text({
+                model: {
+                    value: this.model.redirect,
+                    tooltip: 'The URL that the user will be redirected to after submitting the form entry',
+                    onchange: (newUrl) => {
+                        this.model.redirect = newUrl;
+                    }
                 }
-            }),
-            new HashBrown.View.Widget.Input({
-                value: this.model.appendRedirect,
-                placeholder: 'Append',
-                type: 'checkbox',
-                tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
-                onChange: (newValue) => {
-                    this.model.appendRedirect = newValue;
+            }).element,
+            new HashBrown.Entity.View.Widget.Checkbox({
+                model: {
+                    value: this.model.appendRedirect,
+                    placeholder: 'Append',
+                    type: 'checkbox',
+                    tooltip: 'If ticked, the redirect URL will be appended to that of the origin',
+                    onchange: (newValue) => {
+                        this.model.appendRedirect = newValue;
+                    }
                 }
-            })
+            }).element
         );
     }
 
@@ -219,28 +227,32 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                                     },
                                     this.field(
                                         'Name',
-                                        new HashBrown.View.Widget.Input({
-                                            value: key,
-                                            onChange: (newValue) => {
-                                                delete this.model.inputs[key];
+                                        new HashBrown.Entity.View.Widget.Text({
+                                            model: {
+                                                value: key,
+                                                onchange: (newValue) => {
+                                                    delete this.model.inputs[key];
 
-                                                key = newValue;
+                                                    key = newValue;
 
-                                                this.model.inputs[key] = input;
+                                                    this.model.inputs[key] = input;
+                                                }
                                             }
-                                        })
+                                        }).element
                                     ),
                                     this.field(
                                         'Type',
-                                        new HashBrown.View.Widget.Dropdown({
-                                            value: input.type,
-                                            options: this.getInputTypes(),
-                                            onChange: (newValue) => {
-                                                input.type = newValue;
+                                        new HashBrown.Entity.View.Widget.Popup({
+                                            model: {
+                                                value: input.type,
+                                                options: this.getInputTypes(),
+                                                onchange: (newValue) => {
+                                                    input.type = newValue;
 
-                                                this.update();
+                                                    this.update();
+                                                }
                                             }
-                                        })
+                                        }).element
                                     ),
                                     _.if(input.type == 'select',
                                         this.field(
@@ -259,32 +271,36 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                                     ),
                                     this.field(
                                         'Required',
-                                        new HashBrown.View.Widget.Input({
-                                            type: 'checkbox',
-                                            value: input.required === true,
-                                            onChange: (newValue) => {
-                                                input.required = newValue;
+                                        new HashBrown.Entity.View.Widget.Checkbox({
+                                            model: {
+                                                value: input.required === true,
+                                                onchange: (newValue) => {
+                                                    input.required = newValue;
+                                                }
                                             }
-                                        })
+                                        }).element
                                     ),
                                     this.field(
                                         'Check duplicates',
-                                        new HashBrown.View.Widget.Input({
-                                            type: 'checkbox',
-                                            value: input.checkDuplicates === true,
-                                            onChange: (newValue) => {
-                                                input.checkDuplicates = newValue;
+                                        new HashBrown.Entity.View.Widget.Checkbox({
+                                            model: {
+                                                value: input.checkDuplicates === true,
+                                                onchange: (newValue) => {
+                                                    input.checkDuplicates = newValue;
+                                                }
                                             }
-                                        })
+                                        }).element
                                     ),
                                     this.field(
                                         'Pattern',
-                                        new HashBrown.View.Widget.Input({
-                                            value: input.pattern,
-                                            onChange: (newValue) => {
-                                                input.pattern = newValue;
+                                        new HashBrown.Entity.View.Widget.Text({
+                                            model: {
+                                                value: input.pattern,
+                                                onchange: (newValue) => {
+                                                    input.pattern = newValue;
+                                                }
                                             }
-                                        })
+                                        }).element
                                     )
                                 );
                             }),
@@ -293,20 +309,6 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                                 'Add input'
                             ).on('click', () => { this.onClickAddInput(); })
                         )
-                    )
-                ),
-                this.field(
-                    'Preview',
-                    _.div({class: 'editor--form__preview'},
-                        _.each(this.model.inputs, (key, input) => {
-                            if(input.type === 'select') {
-                                return new HashBrown.View.Widget.Dropdown({
-                                    options: input.options || []
-                                });
-                            } else {
-                                return _.input({class: 'widget widget--input ' + (input.type || 'text'), placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required === true});
-                            }
-                        })
                     )
                 )
             ),

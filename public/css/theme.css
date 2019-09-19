@@ -25,7 +25,8 @@
     --color-default: #ffffff;
     --color-default-100: #eeeeee;
     --color-default-200: #dddddd;
-    --color-default-300: #666666;
+    --color-default-300: #888888;
+    --color-default-400: #666666;
     --color-default-text: #333333;
 
     /* Border radius */

@@ -67,7 +67,7 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                 new HashBrown.Entity.View.Widget.Checkbox({
                     model: {
                         tooltip: 'Hides the HTML tab if enabled',
-                        value: config.isMarkdownDisabled || false,
+                        value: config.isHtmlDisabled || false,
                         onchange: (newValue) => { config.isHtmlDisabled = newValue; }
                     }
                 }).element
@@ -85,7 +85,7 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                             isCollapsible: true,
                             isCollapsed: true
                         },
-                        _.each(HashBrown.View.Editor.WYSIWYGEditor.getToolbarElements(categoryKey), (key, label) => {
+                        _.each(HashBrown.Entity.View.Widget.RichText.getToolbarElements(categoryKey), (key, label) => {
                             return this.field(
                                 label,
                                 new HashBrown.Entity.View.Widget.Checkbox({
@@ -246,15 +246,14 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      * Initialises the WYSIWYG editor
      */
     initWYSIWYGEditor() {
-        this.wysiwyg = new HashBrown.View.Editor.WYSIWYGEditor({
-            value: this.value,
-            toolbar: this.config.wysiwygToolbar || {}
+        this.wysiwyg = new HashBrown.Entity.View.Widget.RichText({
+            model: {
+                value: this.value,
+                toolbar: this.config.wysiwygToolbar || {},
+                onchange: (newValue) => { this.onChange(newValue); }
+            }
         });
 
-        this.wysiwyg.on('change', (newValue) => {
-            this.onChange(newValue);
-        });
-        
         _.replace(this.getTabContent().parentElement, this.wysiwyg.element);
     }
 

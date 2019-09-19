@@ -233,13 +233,14 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
             'Remove the content "' + name + '"?',
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label'}, 'Remove child Content too'),
-                new HashBrown.View.Widget.Input({
-                    value: shouldDeleteChildren,
-                    type: 'checkbox',
-                    onChange: (newValue) => {
-                        shouldDeleteChildren = newValue;
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        value: shouldDeleteChildren,
+                        onchange: (newValue) => {
+                            shouldDeleteChildren = newValue;
+                        }
                     }
-                }).$element
+                }).element
             ),
             async () => {
                 $element.parent().toggleClass('loading', true);
@@ -284,12 +285,14 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
             'Rename "' + content.getPropertyValue('title', HashBrown.Context.language) + '"', 
             _.div({class: 'widget-group'}, 
                 _.label({class: 'widget widget--label'}, 'New name'),
-                new HashBrown.View.Widget.Input({
-                    value: content.getPropertyValue('title', HashBrown.Context.language), 
-                    onChange: (newValue) => {
-                        content.setPropertyValue('title', newValue, HashBrown.Context.language);
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: content.getPropertyValue('title', HashBrown.Context.language), 
+                        onchange: (newValue) => {
+                            content.setPropertyValue('title', newValue, HashBrown.Context.language);
+                        }
                     }
-                })
+                }).element
             ),
             async () => {
                 await HashBrown.Service.ContentService.setContentById(id, content);

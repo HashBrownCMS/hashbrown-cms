@@ -7,6 +7,17 @@
  */
 class WidgetBase extends HashBrown.Entity.View.ViewBase {
     /**
+     * Sets the value without triggering change events
+     *
+     * @param {*} newValue
+     */
+    setValue(newValue) {
+        this.model.value = newValue;
+
+        this.render();
+    }
+
+    /**
      * Event: Value changed
      *
      * @param {*} newValue
@@ -20,7 +31,7 @@ class WidgetBase extends HashBrown.Entity.View.ViewBase {
             this.model.onchange(this.model.value);
         }
     }
-    
+
     /**
      * Event: Value input
      *

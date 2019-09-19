@@ -15,14 +15,15 @@ class FileSystemDeployerEditor extends HashBrown.View.Editor.Editor {
         return _.div({class: 'editor__field-group'},
             this.field(
                 { label: 'Root path', description: 'A path to a folder on this machine' },
-                new HashBrown.View.Widget.Input({
-                    type: 'text',
-                    value: this.model.rootPath,
-                    placeholder: 'Input path',
-                    onChange: (newValue) => {
-                        this.model.rootPath = newValue;
+                new HashBrown.Entity.View.Widget.Text({
+                    model: {
+                        value: this.model.rootPath,
+                        placeholder: 'Input path',
+                        onchange: (newValue) => {
+                            this.model.rootPath = newValue;
+                        }
                     }
-                })
+                }).element
             )
         );
     }

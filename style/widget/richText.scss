@@ -1,16 +1,13 @@
-/**
- * A standalone WYSIWYG editor
- */
-.editor--wysiwyg {
-    background-color: $standard;
+.widget--rich-text {
+    background-color: var(--default);
     height: 100%;
 
     &__toolbar {
         margin: 0 !important;
-        background-color: $standard-darkest;
+        background-color: var(--default-300);
         padding: 0.5rem;
 
-        .widget--dropdown {
+        .widget--popup {
             max-width: 14rem;
             
             &__option {
@@ -34,7 +31,7 @@
     }
 
     &__editor {
-        height: calc(100% - 2rem);
+        height: calc(100% - var(--size-widget-small));
         overflow: auto;
         padding: 0 1rem;
 
