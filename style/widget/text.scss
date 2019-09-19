@@ -5,10 +5,15 @@
     padding: 0 0.5rem;
     border-radius: var(--border-radius-small);
     display: block;
-    height: var(--size-widget-small);
-    line-height: var(--size-widget-small);
     background-color: var(--color-default);
     color: var(--color-default-text);
+    height: var(--size-widget-small);
+    line-height: var(--size-widget-small);
+
+    &.large {
+        height: var(--size-widget-medium);
+        line-height: var(--size-widget-medium);
+    }
 
     &:focus {
         border-color: var(--color-action);

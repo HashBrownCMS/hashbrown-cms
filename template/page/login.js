@@ -10,8 +10,8 @@ module.exports = (_, view) => `
 
     <body class="page page--login logo centered">
         <form class="page--login__login">
-            <input class="widget widget--input tall expanded text" name="username" type="text" placeholder="Username">
-            <input class="widget widget--input tall expanded text" name="password" type="password" placeholder="Password">
+            <input class="widget widget--text large" name="username" type="text" placeholder="Username">
+            <input class="widget widget--text large" name="password" type="password" placeholder="Password">
             <input class="widget widget--button expanded" type="submit" value="Login">
         </form>
         

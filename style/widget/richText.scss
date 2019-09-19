@@ -11,17 +11,6 @@
             max-width: 14rem;
             
             &__option {
-                &:not([data-value="p"]) {
-                    font-weight: bold;
-                }
-                
-                &[data-value="h1"] { font-size: 2rem; line-height: 3rem; }
-                &[data-value="h2"] { font-size: 1.5rem; line-height: 2.5rem; }
-                &[data-value="h3"] { font-size: 1.17rem; line-height: 2.17rem; }
-                &[data-value="h4"] { font-size: 1rem; }
-                &[data-value="h5"] { font-size: 0.83rem; }
-                &[data-value="h6"] { font-size: 0.67rem; }
-
                 &::after {
                     font-size: 1rem;
                     line-height: inherit !important;
@@ -32,6 +21,8 @@
 
     &__editor {
         height: calc(100% - var(--size-widget-small));
+        background-color: var(--color-default);
+        color: var(--color-default-text);
         overflow: auto;
         padding: 0 1rem;
 

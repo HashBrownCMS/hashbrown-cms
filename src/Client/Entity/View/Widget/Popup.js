@@ -26,8 +26,34 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.model.options = await this.model.options;
             }
         }
+    }
 
-        this.state.value = this.getValueLabel();
+    /**
+     * Set the label before rendering
+     */
+    prerender() {
+        let label = this.model.placeholder || '(none)';
+
+        let labels = [];
+
+        for(let key in this.model.options) {
+            let value = this.model.options[key];
+            let hasValue = (Array.isArray(this.model.value) && this.model.value.indexOf(value) > -1) || this.model.value === value;
+
+            if(hasValue) {
+                if(Array.isArray(this.model.options)) {
+                    labels.push(value);
+                } else {
+                    labels.push(key);
+                }
+            }
+        }
+
+        if(labels.length > 0) {
+            label = labels.join(', ');
+        }
+
+        this.state.value = label;
     }
 
     /**
@@ -85,7 +111,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
                 
                 let scrollTop = this.element.querySelector('.widget--popup__options').scrollTop;
 
-                this.state.value = this.getValueLabel();
                 this.render();
                 
                 this.element.querySelector('.widget--popup__options').scrollTop = scrollTop;
@@ -134,7 +159,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         
         }
 
-        this.state.value = this.getValueLabel();
         this.render();
 
         this.onChange();
@@ -171,7 +195,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
             
         this.state.isOpen = isOpen;
         this.state.searchQuery = '';
-        this.state.value = this.getValueLabel();
         
         this.render();
        
@@ -193,37 +216,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
             }
         }
     }
-
-    /**
-     * Gets the current value label
-     *
-     * @returns {String} Value label
-     */
-    getValueLabel() {
-        let label = this.model.placeholder || '(none)';
-
-        let labels = [];
-
-        for(let key in this.model.options) {
-            let value = this.model.options[key];
-            let hasValue = (Array.isArray(this.model.value) && this.model.value.indexOf(value) > -1) || this.model.value === value;
-
-            if(hasValue) {
-                if(Array.isArray(this.model.options)) {
-                    labels.push(value);
-                } else {
-                    labels.push(key);
-                }
-            }
-        }
-
-        if(labels.length > 0) {
-            label = labels.join(', ');
-        }
-
-        return label;
-    }
-    
 
     /**
      * Updates position style

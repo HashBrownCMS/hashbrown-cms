@@ -327,11 +327,18 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     }
 
     /**
+     * Runs before rendering
+     */
+    prerender() {}
+
+    /**
      * Renders the template
      *
      * @return {HTMLElement} Element
      */
     render() {
+        this.prerender();
+
         let output = super.render();
         let element = null;
 
