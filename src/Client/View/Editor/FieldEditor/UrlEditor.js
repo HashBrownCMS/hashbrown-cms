@@ -142,7 +142,7 @@ class UrlEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
     template() {
         return _.div({class: 'field-editor field-editor--url'},
             _.div({class: 'widget-group'},
-                this.$input = _.input({class: 'widget widget--input text', type: 'text', value: this.value})
+                this.$input = _.input({class: 'widget widget--text', type: 'text', value: this.value})
                     .on('change', () => { this.onChange(); }),
                 _.button({class: 'widget widget--button small fa fa-refresh', title: 'Regenerate URL'})
                     .click(() => { this.regenerate(); })

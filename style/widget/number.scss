@@ -1,0 +1,37 @@
+.widget--number {
+    width: 100%;
+    display: flex;  
+
+    &__input {
+        display: block;
+        cursor: pointer;
+        width: 100%;
+        resize: none;
+        border: 1px solid var(--color-default-200);
+        padding: 0 0.5rem;
+        border-radius: var(--border-radius-small);
+        height: var(--size-widget-small);
+        line-height: var(--size-widget-small);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        
+        &:focus {
+            border-color: var(--color-action);
+        }
+    }
+
+    &__indicator {
+        height: var(--size-widget-small);
+        flex-basis: 4rem;
+        width: 4rem;
+        min-width: 4rem;
+        line-height: var(--size-widget-small);
+        padding: 0 0.5rem;
+        text-align: center;
+        background-color: var(--color-default-200);
+        color: var(--color-default-text);
+        margin-left: 0.5rem;
+        border-radius: var(--border-radius-small);
+        white-space: nowrap;
+    }
+}

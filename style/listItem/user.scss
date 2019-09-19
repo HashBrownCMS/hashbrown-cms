@@ -1,7 +1,6 @@
 .list-item--user {
-    color: var(--standard-text);
-    background-color: var(--standard);
-    
+    color: var(--color-default-text);
+    background-color: var(--color-default);
     padding: 1rem;
     margin: 0.5rem;
     position: relative;
@@ -10,7 +9,7 @@
     width: calc(33.33% - 1rem);
     transform-origin: center;
     transition: transform 0.25s ease;
-    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
     
     @include tablet {
         flex-basis: calc(50% - 1rem);

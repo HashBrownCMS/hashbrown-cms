@@ -81,7 +81,7 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
 
             let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
 
-            this.schemaOptions[schema.title] = schema.id;
+            this.schemaOptions[schema.name] = schema.id;
         }
 
         super.fetch(); 
@@ -161,48 +161,57 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
         return [
             this.field(
                 'Min items',
-                new HashBrown.View.Widget.Input({
-                    type: 'number',
-                    min: 0,
-                    step: 1,
-                    tooltip: 'How many items are required in this array (0 is unlimited)',
-                    value: config.minItems || 0,
-                    onChange: (newValue) => { config.minItems = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Number({
+                    model: {
+                        min: 0,
+                        step: 1,
+                        value: config.minItems || 0,
+                        onchange: (newValue) => { config.minItems = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Max items',
-                new HashBrown.View.Widget.Input({
-                    type: 'number',
-                    min: 0,
-                    step: 1,
-                    tooltip: 'How many items are allowed in this array (0 is unlimited)',
-                    value: config.maxItems || 0,
-                    onChange: (newValue) => { config.maxItems = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Number({
+                    model: {
+                        min: 0,
+                        step: 1,
+                        value: config.maxItems || 0,
+                        onchange: (newValue) => { config.maxItems = newValue; }
+                    }
+                }).element
             ),
             this.field(
-                'Allowed Schema',
-                new HashBrown.View.Widget.Dropdown({
-                    useMultiple: true,
-                    useTypeAhead: true,
-                    labelKey: 'name',
-                    tooltip: 'A list of schemas that can be part of this array',
-                    valueKey: 'id',
-                    value: config.allowedSchemas,
-                    useClearButton: true,
-                    options: HashBrown.Service.SchemaService.getAllSchemas('field'),
-                    onChange: (newValue) => { config.allowedSchemas = newValue; }
-                })
+                'Allowed schemas',
+                new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        multiple: true,
+                        autocomplete: true,
+                        tooltip: 'A list of schemas that can be part of this array',
+                        value: config.allowedSchemas,
+                        clearable: true,
+                        options: (async () => { 
+                            let schemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
+                            let options = {};
+
+                            for(let schema of schemas) {
+                                options[schema.name] = schema.id;
+                            }
+
+                            return options;
+                        })(),
+                        onchange: (newValue) => { config.allowedSchemas = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Is grid',
-                new HashBrown.View.Widget.Input({
-                    type: 'checkbox',
-                    tooltip: 'When enabled, the array items will display as a grid',
-                    value: config.isGrid,
-                    onChange: (newValue) => { config.isGrid = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        value: config.isGrid,
+                        onchange: (newValue) => { config.isGrid = newValue; }
+                    }
+                }).element
             )
         ];
     }

@@ -42,8 +42,8 @@ class ContentReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdit
      */
     async getDropdownOptions() {
         let allContent = await HashBrown.Service.ContentService.getAllContent();
-        let allowedContent = [];
-        let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchema.length > 0;
+        let allowedContent = {};
+        let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
 
         for(let content of allContent) {
             if(areRulesDefined) {
@@ -52,10 +52,9 @@ class ContentReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdit
                 if(!isContentAllowed) { continue; }
             }
 
-            allowedContent[allowedContent.length] = {
-                title: content.prop('title', HashBrown.Context.language) || content.id,
-                id: content.id
-            };
+            let title = content.prop('title', HashBrown.Context.language) || content.id;
+
+            allowedContent[title] = content.id;
         }
 
         return allowedContent;
@@ -86,17 +85,26 @@ class ContentReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdit
         
         return this.field(
             'Allowed Schema',
-            new HashBrown.View.Widget.Dropdown({
-                options: HashBrown.Service.SchemaService.getAllSchemas('content'),
-                useMultiple: true,
-                value: config.allowedSchemas,
-                useClearButton: true,
-                valueKey: 'id',
-                labelKey: 'name',
-                onChange: (newValue) => {
-                    config.allowedSchemas = newValue;
+            new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    options: (async () => {
+                        let options = {};
+                        let schemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
+
+                        for(let schema of schemas) {
+                            options[schema.name] = schema.id;
+                        }
+
+                        return options;
+                    })(),
+                    multiple: true,
+                    value: config.allowedSchemas,
+                    clearable: true,
+                    onchange: (newValue) => {
+                        config.allowedSchemas = newValue;
+                    }
                 }
-            })
+            }).element
         );
     }
 
@@ -104,21 +112,21 @@ class ContentReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdit
      * Render this editor
      */
     template() {
-        return _.div({class: 'field-editor field-editor--content-reference'}, [
-            new HashBrown.View.Widget.Dropdown({
-                value: this.value,
-                options: this.getDropdownOptions(),
-                useTypeAhead: true,
-                valueKey: 'id',
-                useClearButton: true,
-                labelKey: 'title',
-                onChange: (newValue) => {
-                    this.value = newValue;
+        return _.div({class: 'field-editor field-editor--content-reference'},
+            new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    value: this.value,
+                    options: this.getDropdownOptions(),
+                    autocomplete: true,
+                    clearable: true,
+                    onchange: (newValue) => {
+                        this.value = newValue;
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
-        ]);
+            }).element
+        );
     }
 }
 

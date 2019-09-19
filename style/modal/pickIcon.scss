@@ -14,15 +14,15 @@
         padding: 0;
         margin: 0.5rem;
         text-align: center;
-        line-height: 3rem;
+        line-height: var(--size-widget-medium);
         float: left;
-        width: 3rem;
-        height: 3rem;
+        width: var(--size-widget-medium);
+        height: var(--size-widget-medium);
         cursor: pointer;
-        border-radius: 0.2rem;
+        border-radius: var(--border-radius-small);
             
         &:hover {
-            background-color: var(--standard-dark);
+            background-color: var(--color-default-100);
         }
     }
 }

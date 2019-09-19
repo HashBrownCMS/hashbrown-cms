@@ -377,203 +377,6 @@ class UIService {
     }
 
     /**
-     * Creates a group of chips
-     *
-     * @param {Array} items
-     * @param {Array} dropdownItems
-     * @param {Function} onChange
-     * @param {Boolean} isDropdownUnique
-     *
-     * @returns {HtmlElement} Chip group element
-     */
-    static inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
-        let $element = _.div({class: 'chip-group'});
-
-        if(!items) { items = []; }
-
-        function render() {
-            _.append($element.empty(),
-
-                // Render individual chips
-                _.each(items, (itemIndex, item) => {
-                    let label = item.label || item.name || item.title;
-                    
-                    if(!label) {
-                        for(let dropdownItem of dropdownItems) {
-                            let value = dropdownItem.id || dropdownItem.value || dropdownItem;
-
-                            if(value === item) {
-                                label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
-                            }
-                        }
-                    }
-
-                    if(!label) { 
-                        label = item;
-                    }
-
-                    let $chip = _.div({class: 'chip'},
-
-                        // Dropdown
-                        _.if(Array.isArray(dropdownItems),
-                            _.div({class: 'chip-label dropdown'},
-                                _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                    label
-                                ),
-                                _.if(onChange,
-                                    _.ul({class: 'dropdown-menu'},
-                                        _.each(dropdownItems, (dropdownItemIndex, dropdownItem) => {
-                                            // Look for unique dropdown items
-                                            if(isDropdownUnique) {
-                                                for(let item of items) {
-                                                    if(item == dropdownItem) {
-                                                        return;
-                                                    }
-                                                }
-                                            }
-
-                                            return _.li(
-                                                _.a({href: '#'},
-                                                    dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem
-                                                ).click(function(e) {
-                                                    e.preventDefault();
-                                                        
-                                                    items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
-
-                                                    render();
-                                
-                                                    if(typeof onChange === 'function') {
-                                                        onChange(items);
-                                                    }
-                                                })
-                                            );
-                                        })
-                                    )
-                                )
-                            )
-                        ),
-
-                        // Regular string
-                        _.if(!Array.isArray(dropdownItems),
-                            _.if(!onChange,
-                                _.p({class: 'chip-label'}, item)
-                            ),
-                            _.if(onChange,
-                                _.input({type: 'text', class: 'chip-label', value: item})
-                                    .change((e) => {
-                                        items[itemIndex] = e.target.value;
-                                    })
-                            )
-                        ),
-
-                        // Remove button
-                        _.if(onChange,
-                            _.button({class: 'btn chip-remove'},
-                                _.span({class: 'fa fa-remove'})
-                            ).click(() => {
-                                items.splice(itemIndex, 1);
-
-                                render();
-
-                                if(typeof onChange === 'function') {
-                                    onChange(items);
-                                }
-                            })
-                        )
-                    );
-                    
-                    return $chip;
-                }),
-
-                // Add button
-                _.if(onChange,
-                    _.button({class: 'btn chip-add'},
-                        _.span({class: 'fa fa-plus'})
-                    ).click(() => {
-                        if(Array.isArray(dropdownItems)) {
-                            if(isDropdownUnique) {
-                                for(let dropdownItem of dropdownItems) {
-                                    let isSelected = false;
-
-                                    for(let item of items) {
-                                        if(item == dropdownItem) {
-                                            isSelected = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if(!isSelected) {
-                                        items.push(dropdownItem.value || dropdownItem);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                items.push(dropdownItems[0].value || dropdownItems[0]);
-                            }
-                        
-                        } else if(typeof dropdownItems === 'string') {
-                            items.push(dropdownItems);
-
-                        } else {
-                            items.push('New item');
-
-                        }
-
-                        render(); 
-
-                        if(typeof onChange === 'function') {
-                            onChange(items);
-                        }
-                    })
-                )
-            );
-        };
-
-        render();
-
-        return $element;
-    }
-    
-    /**
-     * Renders a carousel
-     *
-     * @param {Array} items
-     * @param {Boolean} useIndicators
-     * @param {Boolean} useControls
-     * @param {String} height
-     *
-     * @returns {HtmlElement} Carousel element
-     */
-    static carousel(items, useIndicators, useControls, height) {
-        let id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
-        
-        return _.div({class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0},
-            _.if(useIndicators,
-                _.ol({class: 'carousel-indicators'},
-                    _.each(items, (i, item) => {
-                        return _.li({'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : ''});
-                    })
-                )
-            ),
-            _.div({class: 'carousel-inner', role: 'listbox'},
-                _.each(items, (i, item) => {
-                    return _.div({class: 'item' + (i == 0? ' active': ''), style: 'height:' + (height || '500px')},
-                        item
-                    );
-                })
-            ),
-            _.if(useControls,
-                _.a({href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev'},
-                    _.span({class: 'fa fa-arrow-left'})
-                ),
-                _.a({href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next'},
-                    _.span({class: 'fa fa-arrow-right'})
-                )
-            )
-        );
-    }
-
-    /**
      * Brings up an error modal
      *
      * @param {String|Error} error
@@ -704,55 +507,33 @@ class UIService {
             // Set new target
             element.classList.toggle('context-menu-target', true);
             
-            // Remove existing dropdowns
-            let existingMenu = _.find('.widget--dropdown.context-menu');
+            // Remove existing menus
+            let existingMenu = _.find('.widget--popup.context');
 
             if(existingMenu) { existingMenu.remove(); }
 
-            // Init new dropdown
-            let dropdown = new HashBrown.View.Widget.Dropdown({
-                options: items,
-                reverseKeys: true,
-                onChange: (pickedItem) => {
-                    if(typeof pickedItem !== 'function') { return; }
+            // Init new menu
+            let contextMenu = new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    options: items,
+                    onchange: (pickedItem) => {
+                        if(typeof pickedItem !== 'function') { return; }
 
-                    pickedItem();
+                        pickedItem();
+                    }
                 }
             });
                 
-            dropdown.toggle(false);
-
-            // Prevent the toggle button from blocking new context menu events
-            let toggle = dropdown.element.querySelector('.widget--dropdown__toggle');
-            let options = dropdown.element.querySelector('.widget--dropdown__options');
-
-            toggle.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                dropdown.toggle(false);
-            });
-
-            // Set cancel event
-            dropdown.on('cancel', () => {
-                dropdown.remove();
-
-                // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+            // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
+            contextMenu.on('closed', () => {
                 setTimeout(clearTargets, 100);
             });
             
             // Append to body
-            document.body.appendChild(dropdown.element);
+            document.body.appendChild(contextMenu.element);
 
             setTimeout(() => {
-                // Set styles
-                let pageY = e.touches ? e.touches[0].pageY : e.pageY;
-                let pageX = e.touches ? e.touches[0].pageX : e.pageX;
-
-                dropdown.element.classList.toggle('context-menu', true);
-                dropdown.element.style.top = pageY + 'px';
-                dropdown.element.style.left = pageX + 'px';
-
-                // Open it
-                dropdown.toggle(true);
+                contextMenu.onContext(e);
             }, 1);
         };
         

@@ -121,16 +121,24 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
         
         return this.field(
             'Allowed Schema',
-            new HashBrown.View.Widget.Dropdown({
-                options: HashBrown.Service.SchemaService.getAllSchemas('content'),
-                useMultiple: true,
-                value: config.allowedSchemas,
-                useClearButton: true,
-                valueKey: 'id',
-                labelKey: 'name',
-                iconKey: 'icon',
-                onChange: (newValue) => {
-                    config.allowedSchemas = newValue;
+            new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    options: (async () => {
+                        let options = {};
+                        let schemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
+
+                        for(let schema of schemas) {
+                            options[schema.name] = schema.id;
+                        }
+
+                        return schemas;
+                    })(),
+                    multiple: true,
+                    value: config.allowedSchemas,
+                    clearable: true,
+                    onchange: (newValue) => {
+                        config.allowedSchemas = newValue;
+                    }
                 }
             })
         );

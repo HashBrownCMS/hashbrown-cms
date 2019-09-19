@@ -5,11 +5,11 @@
     flex-grow: 0;
     flex-basis: calc(33.33% - 1rem);
     width: calc(33.33% - 1rem);
-    color: var(--standard-text);
-    background-color: var(--standard);
+    color: var(--color-default-text);
+    background-color: var(--color-default);
     transform-origin: center;
     transition: transform 0.25s ease;
-    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
     
@@ -37,15 +37,6 @@
             margin: 0;
         }
     }   
-
-    &__remove {
-        padding: 0rem;
-        position: absolute;
-        right: 1rem;
-        top: 1rem;
-        display: block;
-        color: material-color('red', '500');
-    }
 
     &__environment {
         position: relative;

@@ -8,4 +8,6 @@ namespace('Entity.View.Widget')
 .add(require('./Checkbox'))
 .add(require('./DateTime'))
 .add(require('./List'))
-.add(require('./Popup'));
+.add(require('./Number'))
+.add(require('./Popup'))
+.add(require('./Text'));

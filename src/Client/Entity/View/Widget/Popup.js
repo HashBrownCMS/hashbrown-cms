@@ -13,15 +13,48 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         super(params);
 
         this.template = require('template/widget/popup');
+    }
+
+    /**
+     * Fetches the model data
+     */
+    async fetch() {
+        if(this.model.options) {
+            if(typeof this.model.options === 'function') {
+                this.model.options = await this.model.options();
+            } else if(typeof this.model.options.then === 'function') {
+                this.model.options = await this.model.options;
+            }
+        }
 
         this.state.value = this.getValueLabel();
     }
 
     /**
+     * Event: open as context menu
+     */
+    onContext(e) {
+        this.model.role = 'context-menu';
+        this.toggle(true);
+
+        let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+        let pageX = e.touches ? e.touches[0].pageX : e.pageX;
+
+        this.element.style.top = pageY + 'px';
+        this.element.style.left = pageX + 'px';
+
+        this.updatePositionStyle();
+    }
+
+    /**
      * Event: Click toggle
      */
-    onClickToggle() {
+    onClickToggle(e) {
+        e.preventDefault();
+
         this.toggle();
+
+        return false;
     }
 
     /**
@@ -122,6 +155,8 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         if(input) {
             input.value = '';
         }
+        
+        this.updatePositionStyle();
     }
 
     /**
@@ -146,6 +181,16 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
 
         if(input && isOpen) {
             input.focus();
+        }
+
+        if(isOpen) {
+            this.trigger('opened');
+        } else {
+            this.trigger('closed');
+
+            if(this.model.role === 'context-menu') {
+                this.remove();
+            }
         }
     }
 
@@ -190,6 +235,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
 
         let margin = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
+        menu.removeAttribute('style');
         menu.classList.remove('top');
         menu.classList.remove('bottom');
         menu.classList.remove('left');
@@ -197,10 +243,18 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
     
         let bounds = menu.getBoundingClientRect();
 
-        if(bounds.left < margin) {
-            menu.classList.add('left');
+        if(this.model.role === 'context-menu') {
+            if(bounds.right > window.innerWidth - margin) {
+                menu.classList.add('right');
+            } else {
+                menu.classList.add('left');
+            }
         } else {
-            menu.classList.add('right');
+            if(bounds.left < margin) {
+                menu.classList.add('left');
+            } else {
+                menu.classList.add('right');
+            }
         }
        
         if(bounds.bottom > window.innerHeight - margin) {

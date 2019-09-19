@@ -39,12 +39,13 @@ class StringEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
     static renderConfigEditor(config) {
         return this.field(
             'Is multi-line',
-            new HashBrown.View.Widget.Input({
-                type: 'checkbox',
-                tooltip: 'Whether or not this string uses line breaks',
-                value: config.isMultiLine || false,
-                onChange: (newValue) => { config.isMultiLine = newValue; }
-            })
+            new HashBrown.Entity.View.Widget.Checkbox({
+                model: {
+                    tooltip: 'Whether or not this string uses line breaks',
+                    value: config.isMultiLine || false,
+                    onchange: (newValue) => { config.isMultiLine = newValue; }
+                }
+            }).element
         );
     }
     
@@ -53,15 +54,17 @@ class StringEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--string'},
-            new HashBrown.View.Widget.Input({
-                type: this.config.isMultiLine ? 'textarea' : 'text',
-                value: this.value,
-                onChange: (newValue) => {
-                    this.value = newValue;
+            new HashBrown.Entity.View.Widget.Text({
+                model: {
+                    multiline: this.config.isMultiLine,
+                    value: this.value,
+                    onchange: (newValue) => {
+                        this.value = newValue;
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            })
+            }).element
         );
     }
 }

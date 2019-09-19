@@ -1,0 +1,43 @@
+/**
+ * @id default
+ * @name Default
+ * @description The default theme for HashBrown CMS
+ * @author Jeppe Zapp
+ */
+:root {
+    /* Colour */
+    --color-action: #e70d3b;
+    --color-action-light: #f66483;
+    --color-action-dark: #b70a2f;
+    --color-action-text: #ffffff;
+
+    --color-decor: #21303b;
+    --color-decor-light: #283b48;
+    --color-decor-lighter: #2c404f;
+    --color-decor-lightest: #375062;
+    --color-decor-dark: #0f151a;
+    --color-decor-darker: black;
+    --color-decor-text: #ffffff;
+
+    --color-warn: #FFB300;
+    --color-warn-text: #664800;
+
+    --color-default: #ffffff;
+    --color-default-100: #eeeeee;
+    --color-default-200: #dddddd;
+    --color-default-300: #666666;
+    --color-default-text: #333333;
+
+    /* Border radius */
+    --border-radius-small: 0.4rem;
+    --border-radius-medium: 1rem;
+    --border-radius-large: 2rem;
+
+    /* Widget size */
+    --size-widget-small: 2rem;
+    --size-widget-medium: 3rem;
+    --size-widget-large: 4rem;
+    
+    /* Box shadow */
+    --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+}

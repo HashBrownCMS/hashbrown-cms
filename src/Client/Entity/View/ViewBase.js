@@ -297,13 +297,11 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             await this.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            this.setErrorState(e);
 
         }
 
         this.render();
-
-        this.trigger('update');
     }
 
     /**

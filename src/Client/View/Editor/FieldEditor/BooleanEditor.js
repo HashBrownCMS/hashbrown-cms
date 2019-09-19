@@ -48,15 +48,16 @@ class BooleanEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--boolean'},
-            new HashBrown.View.Widget.Input({
-                type: 'checkbox',
-                value: this.value,
-                onChange: (newValue) => {
-                    this.value = newValue;
-                    
-                    this.trigger('change', this.value);
+            new HashBrown.Entity.View.Widget.Checkbox({
+                model: {
+                    value: this.value,
+                    onchange: (newValue) => {
+                        this.value = newValue;
+                        
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
+            }).element
         );
     }
 }

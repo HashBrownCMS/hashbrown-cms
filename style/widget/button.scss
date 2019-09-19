@@ -1,10 +1,10 @@
 .widget--button {
     border: 0;
-    border-radius: 0.2rem;
-    background-color: var(--primary);
-    color: var(--primary-text);
-    height: 3rem;
-    line-height: 3rem;
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-action);
+    color: var(--color-action-text);
+    height: var(--size-widget-medium);
+    line-height: var(--size-widget-medium);
     padding: 0 1rem;
     text-transform: uppercase;
     display: block;
@@ -16,20 +16,20 @@
     position: relative;
 
     &:hover {
-        background-color: var(--primary-dark);
+        background-color: var(--color-action-dark);
         text-decoration: none;
     }
 
     &.round {
         font-size: 1.5rem;
         font-weight: normal;
-        height: 4rem;
-        line-height: 4rem;
-        width: 4rem;
+        height: var(--size-widget-large);
+        line-height: var(--size-widget-large);
+        width: var(--size-widget-large);
         min-width: 0;
         border-radius: 50%;
         padding: 0;
-        box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+        box-shadow: var(--box-shadow);
     }
 
     &.right {
@@ -37,17 +37,17 @@
     }
 
     &.low {
-        height: 2rem;
-        line-height: 2rem;
+        height: var(--size-widget-small);
+        line-height: var(--size-widget-small);
     }
 
     &.small {
-        width: 2rem;
-        line-height: 2rem;
+        width: var(--size-widget-small);
+        flex-basis: var(--size-widget-small);
+        line-height: var(--size-widget-small);
+        height: var(--size-widget-small);
         padding: 0;
-        height: 2rem;
         min-width: 0;
-        flex-basis: 2rem;
         flex-grow: 0;
         flex-shrink: 0;
     }
@@ -69,17 +69,17 @@
     }
 
     &.warning {
-        background-color: var(--warning);
-        color: var(--warning-text);
+        background-color: var(--color-warn);
+        color: var(--color-warn-text);
     }
     
     &.standard {
-        background-color: var(--standard);
-        color: var(--standard-text);
-        border-color: var(--standard-text);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        border-color: var(--color-default-text);
         
         &:hover {
-            background-color: var(--standard-dark);
+            background-color: var(--color-default-100);
         }
     }
 
@@ -94,12 +94,12 @@
     }
     
     &.embedded {
-        color: var(--primary);
+        color: var(--color-action);
         background-color: transparent;
         box-shadow: none;
 
         &:hover {
-            color: var(--primary-dark);
+            color: var(--color-action-dark);
         }
     }
 

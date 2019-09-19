@@ -3,8 +3,8 @@
     padding: 0;
     
     &.logo {
-        background-color: var(--secondary);
-        color: var(--secondary-text);
+        background-color: var(--color-decor);
+        color: var(--color-decor-text);
         
         &::after {
             content: '';

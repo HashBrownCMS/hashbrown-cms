@@ -1,8 +1,8 @@
 .page--dashboard {
     // Header
     &__header {
-        background-color: var(--secondary);
-        color: var(--secondary-text);
+        background-color: var(--color-decor);
+        color: var(--color-decor-text);
         padding: 1rem 0 0 5rem;
         height: 4rem;
         display: flex;
@@ -43,20 +43,20 @@
             font-weight: bold;
             border: 0;
             background-color: transparent;
-            color: var(--secondary-text);
-            background-color: var(--secondary-light);
+            color: var(--color-decor-text);
+            background-color: var(--color-decor-light);
             margin-right: 0.5rem;
 
             &:hover {
-                color: var(--primary-text);
-                background-color: var(--primary);
+                color: var(--color-action-text);
+                background-color: var(--color-action);
                 text-decoration: none;
             }
 
             &.active {
                 pointer-events: none;
-                color: var(--standard-text);
-                background-color: var(--standard-dark);
+                color: var(--color-default-text);
+                background-color: var(--color-default-100);
             }
         }
     }
@@ -122,8 +122,8 @@
                 flex-grow: 0;
                 flex-basis: calc(33.33% - 1rem);
                 width: calc(33.33% - 1rem);
-                color: var(--standard-text);
-                background-color: var(--standard);
+                color: var(--color-default-text);
+                background-color: var(--color-default);
                 transform-origin: center;
                 transition: transform 0.25s ease;
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
@@ -142,7 +142,7 @@
             max-width: 40rem;
             margin: 0 auto;
             padding: 1rem;
-            background-color: var(--standard);
+            background-color: var(--color-default);
             box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
         }
     }
@@ -156,12 +156,12 @@
 
             &:not(:last-child) {
                 margin-bottom: 0.5rem;
-                border-bottom: 1px solid var(--standard-darker);
+                border-bottom: 1px solid var(--color-default-200);
 
             }
 
             ul {
-                border-top: 1px solid var(--standard-darker);
+                border-top: 1px solid var(--color-default-200);
                 padding-top: 0.5rem;
                 margin-top: 0.5rem;
             }

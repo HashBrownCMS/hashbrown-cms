@@ -37,15 +37,17 @@ class LanguageEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--language'},
-            new HashBrown.View.Widget.Dropdown({
-                value: this.value,
-                options: HashBrown.Context.projectSettings.languages,
-                onChange: (newValue) => {
-                    this.value = newValue;
+            new HashBrown.Entity.View.Widget.Popup({
+                model: {
+                    value: this.value,
+                    options: HashBrown.Context.projectSettings.languages,
+                    onchange: (newValue) => {
+                        this.value = newValue;
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
+            }).element
         );
     }
 }

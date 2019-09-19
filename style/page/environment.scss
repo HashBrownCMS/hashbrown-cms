@@ -54,7 +54,7 @@
 
             // overwriting default dropdown-background
             .widget--dropdown.has-icon {
-                background-color: var(--standard);
+                background-color: var(--color-default);
             }
         }
 
@@ -95,8 +95,8 @@
                 max-height: calc(100% - 4rem);
                 margin: 10vh 2rem 2rem 4rem;
                 padding: 2rem;
-                background-color: var(--standard);
-                color: var(--standard-text);
+                background-color: var(--color-default);
+                color: var(--color-default-text);
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 position: relative;
 
@@ -126,7 +126,7 @@
                     transform: translateY(-50%);
                     border-top: 2rem solid transparent;
                     border-bottom: 2rem solid transparent;
-                    border-right: 2rem solid var(--standard);
+                    border-right: 2rem solid var(--color-default);
 
                     @include tablet {
                         right: 50%;
@@ -135,7 +135,7 @@
                         transform: translateX(50%);
                         border-left: 2rem solid transparent;
                         border-right: 2rem solid transparent;
-                        border-bottom: 2rem solid var(--standard);
+                        border-bottom: 2rem solid var(--color-default);
                     }
                 }
             }

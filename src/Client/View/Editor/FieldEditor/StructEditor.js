@@ -129,13 +129,13 @@ class StructEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
         for(let key in parentStruct) {
             if(!parentStruct[key]) { continue; }
 
-            labelOptions[key] = parentStruct[key].label;
+            labelOptions[parentStruct[key].label] = key;
         }
 
         for(let key in config.struct) {
             if(!config.struct[key]) { continue; }
 
-            labelOptions[key] = config.struct[key].label;
+            labelOptions[config.struct[key].label] = key;
         }
 
         // Render everything
@@ -143,13 +143,15 @@ class StructEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
             // Render the label picker
             this.field(
                 { label: 'Label', description: 'The value of the field picked here will represent this struct when collapsed' },
-                new HashBrown.View.Widget.Dropdown({
-                    options: labelOptions,
-                    value: config.label,
-                    onChange: (newLabel) => {
-                        config.label = newLabel;
+                new HashBrown.Entity.View.Widget.Popup({
+                    model: {
+                        options: labelOptions,
+                        value: config.label,
+                        onchange: (newLabel) => {
+                            config.label = newLabel;
+                        }
                     }
-                })
+                }).element
             ),
 
             // Render the parent struct
@@ -212,82 +214,98 @@ class StructEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                         },
                         this.field(
                             'Key',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A variable name, e.g. "myField"',
-                                tooltip: 'The field variable name',
-                                value: fieldKey,
-                                onChange: (newKey) => {
-                                    if(!newKey) { return; }
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    placeholder: 'A variable name, e.g. "myField"',
+                                    tooltip: 'The field variable name',
+                                    value: fieldKey,
+                                    onchange: (newKey) => {
+                                        if(!newKey) { return; }
 
-                                    let newStruct = {};
+                                        let newStruct = {};
 
-                                    // Insert the changed key into the correct place in the struct
-                                    for(let key in config.struct) {
-                                        if(key === fieldKey) {
-                                            newStruct[newKey] = config.struct[fieldKey];
-                                        
-                                        } else {
-                                            newStruct[key] = config.struct[key];
+                                        // Insert the changed key into the correct place in the struct
+                                        for(let key in config.struct) {
+                                            if(key === fieldKey) {
+                                                newStruct[newKey] = config.struct[fieldKey];
+                                            
+                                            } else {
+                                                newStruct[key] = config.struct[key];
 
+                                            }
                                         }
-                                    }
-                                
-                                    // Change internal reference to new key
-                                    fieldKey = newKey;
+                                    
+                                        // Change internal reference to new key
+                                        fieldKey = newKey;
 
-                                    // Reassign the struct object
-                                    config.struct = newStruct;
+                                        // Reassign the struct object
+                                        config.struct = newStruct;
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.field(
                             'Label',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A label, e.g. "My field"',
-                                tooltip: 'The field label',
-                                value: fieldValue.label,
-                                onChange: (newValue) => {
-                                    this.changeFieldLabel(fieldValue.label, newValue);
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    type: 'text',
+                                    placeholder: 'A label, e.g. "My field"',
+                                    tooltip: 'The field label',
+                                    value: fieldValue.label,
+                                    onchange: (newValue) => {
+                                        this.changeFieldLabel(fieldValue.label, newValue);
 
-                                    fieldValue.label = newValue;
+                                        fieldValue.label = newValue;
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.field(
                             'Description',
-                            new HashBrown.View.Widget.Input({
-                                type: 'text',
-                                placeholder: 'A description',
-                                tooltip: 'The field description',
-                                value: fieldValue.description,
-                                onChange: (newValue) => { fieldValue.description = newValue; }
-                            })
+                            new HashBrown.Entity.View.Widget.Text({
+                                model: {
+                                    placeholder: 'A description',
+                                    tooltip: 'The field description',
+                                    value: fieldValue.description,
+                                    onchange: (newValue) => { fieldValue.description = newValue; }
+                                }
+                            }).element
                         ),
                         this.field(
                             'Multilingual',
-                            new HashBrown.View.Widget.Input({
-                                type: 'checkbox',
-                                tooltip: 'Whether or not this field should support multiple languages',
-                                value: fieldValue.multilingual || false,
-                                onChange: (newValue) => { fieldValue.multilingual = newValue; }
-                            })
+                            new HashBrown.Entity.View.Widget.Checkbox({
+                                model: {
+                                    tooltip: 'Whether or not this field should support multiple languages',
+                                    value: fieldValue.multilingual || false,
+                                    onchange: (newValue) => { fieldValue.multilingual = newValue; }
+                                }
+                            }).element
                         ),
                         this.field(
                             'Schema',
-                            new HashBrown.View.Widget.Dropdown({
-                                useTypeAhead: true,
-                                options: HashBrown.Service.SchemaService.getAllSchemas('field'),
-                                value: fieldValue.schemaId,
-                                labelKey: 'name',
-                                valueKey: 'id',
-                                onChange: (newValue) => {
-                                    fieldValue.schemaId = newValue;
+                            new HashBrown.Entity.View.Widget.Popup({
+                                model: {
+                                    useTypeAhead: true,
+                                    options: (async () => {
+                                        let options = {};
+                                        let schemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
 
-                                    this.update();
+                                        for(let schema of schemas) {
+                                            options[schema.name] = schema.id;
+                                        }
+
+                                        return options;
+                                    })(),
+                                    value: fieldValue.schemaId,
+                                    labelKey: 'name',
+                                    valueKey: 'id',
+                                    onchange: (newValue) => {
+                                        fieldValue.schemaId = newValue;
+
+                                        this.update();
+                                    }
                                 }
-                            })
+                            }).element
                         ),
                         this.renderConfigEditor(fieldValue.schemaId, fieldValue.config, true)
                     );

@@ -1,17 +1,18 @@
 .widget--date-time {
     display: flex;
-    width: 30rem;
+    width: 100%;
     white-space: nowrap;
 
     &.disabled {
-        line-height: 2rem;
+        line-height: var(--size-widget-small);
     }
 
     &:not(.disabled) {
-        background-color: var(--standard);
-        color: var(--standard-text);
-        border: 1px solid var(--standard-darker);
-        border-radius: 0.2rem;
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        border: 1px solid var(--color-default-200);
+        border-radius: var(--border-radius-small);
+        overflow: hidden;
     }
 
     &__field {
@@ -20,7 +21,7 @@
         border: 0;
         background-color: transparent;
         display: block;
-        line-height: 2rem;
+        line-height: var(--size-widget-small);
         padding: 0 0.5rem;
         appearance: textfield; 
         -o-appearance: textfield; 
@@ -36,32 +37,32 @@
     &__clear {
         cursor: pointer;
         background-color: transparent;
-        color: var(--standard-text);
+        color: var(--color-default-text);
         display: block;
-        width: 2rem;
-        height: 2rem;
-        line-height: 2rem;
+        width: var(--size-widget-small);
+        height: var(--size-widget-small);
+        line-height: var(--size-widget-small);
         text-align: center;
         padding: 0;
         border: 0;
         margin: 0;
-        border-left: 1px solid var(--standard-darker);
+        border-left: 1px solid var(--color-default-200);
 
         &:hover {
-            background-color: var(--primary);
-            color: var(--primary-text);
+            background-color: var(--color-action);
+            color: var(--color-action-text);
         }
     }
 
     &__separator {
-        color: var(--standard-darkest);
-        line-height: 2rem;
+        color: var(--color-default-300);
+        line-height: var(--size-widget-small);
 
         &.hard {
             width: 1px;
             display: block;
             flex-shrink: 0;
-            background-color: var(--standard-darker);
+            background-color: var(--color-default-200);
         }
     }
 }

@@ -44,30 +44,33 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
         return [
             this.field(
                 'Disable media',
-                new HashBrown.View.Widget.Input({
-                    type: 'checkbox',
-                    tooltip: 'Hides the media picker if enabled',
-                    value: config.isMediaDisabled || false,
-                    onChange: (newValue) => { config.isMediaDisabled = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        tooltip: 'Hides the media picker if enabled',
+                        value: config.isMediaDisabled || false,
+                        onchange: (newValue) => { config.isMediaDisabled = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Disable markdown',
-                new HashBrown.View.Widget.Input({
-                    type: 'checkbox',
-                    tooltip: 'Hides the markdown tab if enabled',
-                    value: config.isMarkdownDisabled || false,
-                    onChange: (newValue) => { config.isMarkdownDisabled = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        tooltip: 'Hides the markdown tab if enabled',
+                        value: config.isMarkdownDisabled || false,
+                        onchange: (newValue) => { config.isMarkdownDisabled = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 'Disable HTML',
-                new HashBrown.View.Widget.Input({
-                    type: 'checkbox',
-                    tooltip: 'Hides the HTML tab if enabled',
-                    value: config.isMarkdownDisabled || false,
-                    onChange: (newValue) => { config.isHtmlDisabled = newValue; }
-                })
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        tooltip: 'Hides the HTML tab if enabled',
+                        value: config.isMarkdownDisabled || false,
+                        onchange: (newValue) => { config.isHtmlDisabled = newValue; }
+                    }
+                }).element
             ),
             this.field(
                 {
@@ -85,11 +88,12 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
                         _.each(HashBrown.View.Editor.WYSIWYGEditor.getToolbarElements(categoryKey), (key, label) => {
                             return this.field(
                                 label,
-                                new HashBrown.View.Widget.Input({
-                                    type: 'checkbox',
-                                    value: config.wysiwygToolbar[key] !== false,
-                                    onChange: (newValue) => { config.wysiwygToolbar[key] = newValue; }
-                                })
+                                new HashBrown.Entity.View.Widget.Checkbox({
+                                    model: {
+                                        value: config.wysiwygToolbar[key] !== false,
+                                        onchange: (newValue) => { config.wysiwygToolbar[key] = newValue; }
+                                    }
+                                }).element
                             );
                         })
                     );

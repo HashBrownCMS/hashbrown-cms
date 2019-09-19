@@ -1,12 +1,19 @@
 .widget--checkbox {
     display: flex;
     cursor: pointer;
-    border-radius: 0.2rem;
-    border: 1px solid var(--standard-darker);
-    height: 2rem;
+    border-radius: var(--border-radius-small);
+    border: 1px solid var(--color-default-200);
+    height: var(--size-widget-small);
+    background-color: var(--color-default); 
+
+    &:not(.label) {
+        width: var(--size-widget-small);
+        max-width: var(--size-widget-small);
+        min-width: var(--size-widget-small);
+    }
 
     &.large {
-        height: 3rem;
+        height: var(--size-widget-medium);
     }
     
     &.large &__label {
@@ -14,11 +21,11 @@
     }
 
     &.large &__indicator {
-        width: 3rem;
+        width: var(--size-widget-medium);
     }
     
     &:hover {
-        border-color: var(--primary);
+        border-color: var(--color-action);
     }
 
     &__input {
@@ -29,14 +36,14 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        width: 2rem;
+        width: var(--size-widget-small);
         text-align: center;
 
         &::after {
             position: relative;
             font-family: 'FontAwesome';
             content: '\f00d';    
-            color: var(--standard-darker);
+            color: var(--color-default-200);
         }
     }
 
@@ -47,11 +54,11 @@
         justify-content: center;
         text-transform: uppercase;
         font-weight: bold;
-        color: var(--standard-darkest);
+        color: var(--color-default-300);
     }
 
     &__input:checked + &__indicator::after {
         content: '\f00c';
-        color: var(--standard-text);
+        color: var(--color-default-text);
     }
 }

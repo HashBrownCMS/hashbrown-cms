@@ -49,52 +49,56 @@ class NumberEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
         return [
             this.field(
                 'Step',
-                new HashBrown.View.Widget.Input({
-                    type: 'number',
-                    step: 'any',
-                    tooltip: 'The division by which the input number is allowed (0 is any division)',
-                    value: config.step === 'any' ? 0 : config.step,
-                    onChange: (newValue) => {
-                        if(newValue == 0) { newValue = 'any'; }
+                new HashBrown.Entity.View.Widget.Number({
+                    model: {
+                        step: 'any',
+                        tooltip: 'The division by which the input number is allowed (0 is any division)',
+                        value: config.step === 'any' ? 0 : config.step,
+                        onchange: (newValue) => {
+                            if(newValue == 0) { newValue = 'any'; }
 
-                        config.step = newValue;
+                            config.step = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Min value',
-                new HashBrown.View.Widget.Input({
-                    tooltip: 'The minimum required value',
-                    type: 'number',
-                    step: 'any',
-                    value: config.min || 0,
-                    onChange: (newValue) => {
-                        config.min = newValue;
+                new HashBrown.Entity.View.Widget.Number({
+                    model: {
+                        tooltip: 'The minimum required value',
+                        step: 'any',
+                        value: config.min || 0,
+                        onchange: (newValue) => {
+                            config.min = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Max value',
-                new HashBrown.View.Widget.Input({
-                    tooltip: 'The maximum allowed value (0 is infinite)',
-                    type: 'number',
-                    step: 'any',
-                    value: config.max || 0,
-                    onChange: (newValue) => {
-                        config.max = newValue;
+                new HashBrown.Entity.View.Widget.Number({
+                    model: {
+                        tooltip: 'The maximum allowed value (0 is infinite)',
+                        step: 'any',
+                        value: config.max || 0,
+                        onchange: (newValue) => {
+                            config.max = newValue;
+                        }
                     }
-                })
+                }).element
             ),
             this.field(
                 'Is slider',
-                new HashBrown.View.Widget.Input({
-                    tooltip: 'Whether or not this number should be edited as a range slider',
-                    type: 'checkbox',
-                    value: config.isSlider || false,
-                    onChange: (newValue) => {
-                        config.isSlider = newValue;
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        tooltip: 'Whether or not this number should be edited as a range slider',
+                        value: config.isSlider || false,
+                        onchange: (newValue) => {
+                            config.isSlider = newValue;
+                        }
                     }
-                })
+                }).element
             )
         ];
     }
@@ -104,18 +108,20 @@ class NumberEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      */
     template() {
         return _.div({class: 'field-editor field-editor--number'},
-            new HashBrown.View.Widget.Input({
-                value: this.value || '0',
-                type: this.config.isSlider ? 'range' : 'number',
-                step: this.config.step || 'any',
-                min: this.config.min || '0',
-                max: this.config.max || '0',
-                onChange: (newValue) => {
-                    this.value = parseFloat(newValue);
+            new HashBrown.Entity.View.Widget.Number({
+                model: {
+                    value: this.value,
+                    range: this.config.isSlider,
+                    step: this.config.step || 'any',
+                    min: this.config.min,
+                    max: this.config.max,
+                    onchange: (newValue) => {
+                        this.value = parseFloat(newValue);
 
-                    this.trigger('change', this.value);
+                        this.trigger('change', this.value);
+                    }
                 }
-            }).$element
+            }).element
         );
     }
 }
