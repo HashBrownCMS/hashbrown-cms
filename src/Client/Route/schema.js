@@ -13,39 +13,19 @@ Crisp.Router.route('/schemas/', function() {
             _.p('Click on a Schema to edit it.'),
             _.button({class: 'widget widget--button'}, 'Import schemas')
                 .click(() => {
-                    let url = 'https://uischema.org/schemas.json';
-
-                    let modal = UI.notify(
+                    let modal = UI.prompt(
                         'Import schemas',
-                        _.div({class: 'widget-group'},
-                            _.div({class: 'widget widget--label'}, 'URL to uischema.org definitions'),
-                            new HashBrown.Entity.View.Widget.Text({
-                                model: {
-                                    value: url,
-                                    required: true,
-                                    placeholder: 'E.g. https://uischema.org/schemas.json',
-                                    onchange: (newValue) => {
-                                        url = newValue;
-                                    }
-                                }
-                            }).element
-                        ),
-                        async () => {
-                            try {
-                                if(!url) { throw new Error('Please specify a URL'); }
+                        'URL to uischema.org definitions',
+                        'text',
+                        'https://uischema.org/schemas.json',
+                        async (url) => {
+                            if(!url) { throw new Error('Please specify a URL'); }
 
-                                await HashBrown.Service.RequestService.request('post', 'schema/import?url=' + url);
-                                
-                                HashBrown.Service.EventService.trigger('resource');  
-
-                            } catch(e) {
-                                UI.error(e);
-    
-                            }
+                            await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
+                            
+                            HashBrown.Service.EventService.trigger('resource');  
                         }
                     );
-
-                    modal.$element.find('input').focus();
                 })
         ],
         'text'

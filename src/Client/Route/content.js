@@ -22,7 +22,7 @@ Crisp.Router.route('/content/', () => {
                 .click(async () => {
                     await HashBrown.Service.RequestService.request('post', 'content/example');
 
-                    await HashBrown.Service.ResourceService.preloadAllResources();
+                    HashBrown.Service.EventService.trigger('resource');
                 })
         ],
         'text'

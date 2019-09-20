@@ -31,8 +31,8 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: On click remove
      */
-    async onClickRemoveForm() {
-        let id = $('.context-menu-target').data('id');
+    async onClickRemoveForm(target) {
+        let id = target.dataset.id;
         let form = await HashBrown.Service.FormService.getFormById(id);
 
         UI.confirm(
@@ -47,8 +47,8 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click pull Form
      */
-    async onClickPullForm() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPullForm(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.pull('forms', id);
     }
@@ -56,8 +56,8 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click push Form
      */
-    async onClickPushForm() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPushForm(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.push('forms', id);
     }
@@ -71,13 +71,11 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
         
         menu['This form'] = '---';
 
-        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-
         if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = () => { this.onClickRemoveForm(); };
+            menu['Remove'] = (target) => { this.onClickRemoveForm(target); };
         }
         
-        menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        menu['Copy id'] = (target) => { this.onClickCopyItemId(target); };
 
         if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
@@ -85,15 +83,15 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
             menu['Sync'] = '---';
 
             if(!item.sync.isRemote) {
-                menu['Push to remote'] = () => { this.onClickPushForm(); };
+                menu['Push to remote'] = (target) => { this.onClickPushForm(target); };
             }
 
             if(item.sync.hasRemote) {
-                menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
+                menu['Remove local copy'] = (target) => { this.onClickRemoveForm(target); };
             }
             
             if(item.sync.isRemote) {
-                menu['Pull from remote'] = () => { this.onClickPullForm(); };
+                menu['Pull from remote'] = (target) => { this.onClickPullForm(target); };
             }
         }
         

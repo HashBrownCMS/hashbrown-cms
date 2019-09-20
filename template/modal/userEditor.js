@@ -16,19 +16,19 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined, 
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Username'),
-                    _.input({class: 'widget widget--input text', type: 'text', value: model.username, onchange: (e) => _.onChangeUsername(e.target.value)})
+                    _.input({class: 'widget widget--text', type: 'text', value: model.username, onchange: (e) => _.onChangeUsername(e.target.value)})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Full name'),
-                    _.input({class: 'widget widget--input text', type: 'text', value: model.fullName, onchange: (e) => _.onChangeFullName(e.target.value)})
+                    _.input({class: 'widget widget--text', type: 'text', value: model.fullName, onchange: (e) => _.onChangeFullName(e.target.value)})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Email'),
-                    _.input({class: 'widget widget--input text', type: 'email', value: model.email, onchange: (e) =>  _.onChangeEmail(e.target.value)})
+                    _.input({class: 'widget widget--text', type: 'email', value: model.email, onchange: (e) =>  _.onChangeEmail(e.target.value)})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
-                    _.input({class: 'widget widget--input text', type: 'password', placeholder: '●●●●●●●●', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
+                    _.input({class: 'widget widget--text', type: 'password', placeholder: '●●●●●●●●', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
                 ),
                 _.if(HashBrown.Context.user.id !== model.id,
                     _.div({class: 'widget-group'},

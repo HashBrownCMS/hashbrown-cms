@@ -20,19 +20,19 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Username'),
-                    _.input({class: 'widget widget--input text', min: 2, type: 'text', onchange: (e) => _.onInputUsername(e.target.value), value: model.username})
+                    _.input({class: 'widget widget--text', min: 2, type: 'text', onchange: (e) => _.onInputUsername(e.target.value), value: model.username})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Full name'),
-                    _.input({class: 'widget widget--input text', type: 'text', onchange: (e) => _.onInputFullName(e.target.value), value: model.fullName})
+                    _.input({class: 'widget widget--text', type: 'text', onchange: (e) => _.onInputFullName(e.target.value), value: model.fullName})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Email'),
-                    _.input({class: 'widget widget--input text', type: 'email', onchange: (e) => _.onInputEmail(e.target.value), value: model.email})
+                    _.input({class: 'widget widget--text', type: 'email', onchange: (e) => _.onInputEmail(e.target.value), value: model.email})
                 ),
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
-                    _.input({class: 'widget widget--input text', min: 6, type: 'text', onchange: (e) => _.onInputPassword(e.target.value), value: model.password})
+                    _.input({class: 'widget widget--text', min: 6, type: 'text', onchange: (e) => _.onInputPassword(e.target.value), value: model.password})
                 )
             )
         ),

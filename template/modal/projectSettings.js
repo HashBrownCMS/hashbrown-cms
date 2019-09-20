@@ -11,7 +11,7 @@ _.div({class: 'modal'},
         _.div({class: 'modal__body'},
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Name'),
-                _.input({class: 'widget widget--input text', type: 'text', value: model.settings.info.name, onchange: (e) => _.onChangeName(e.target.value)})
+                _.input({class: 'widget widget--text', type: 'text', value: model.settings.info.name, onchange: (e) => _.onChangeName(e.target.value)})
             ),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Languages'),
@@ -37,7 +37,7 @@ _.div({class: 'modal'},
                 _.label({class: 'widget widget--label small'}, 'API URL'),
                 _.input({
                     name: 'url',
-                    class: 'widget widget--input text',
+                    class: 'widget widget--text',
                     type: 'text',
                     value: model.settings.sync.url || '',
                     placeholder: 'e.g. "https://myserver.com/api/"',
@@ -47,7 +47,7 @@ _.div({class: 'modal'},
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Project id'),
                 _.input({
-                    class: 'widget widget--input text',
+                    class: 'widget widget--text',
                     name: 'name',
                     type: 'text',
                     value: model.settings.sync.project || '',
@@ -59,7 +59,7 @@ _.div({class: 'modal'},
                 _.input({
                     value: model.settings.sync.token,
                     type: 'text',
-                    class: 'widget widget--input text',
+                    class: 'widget widget--text',
                     name: 'token',
                     placeholder: 'API token',
                     onchange: (e) => _.onChangeSyncToken(e.target.value)
@@ -67,8 +67,8 @@ _.div({class: 'modal'},
                 _.button({class: 'widget widget--button small fa fa-refresh', onclick: _.onClickGetSyncToken})
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__login', style: 'display: none'},
-                _.input({class: 'widget widget--input text', name: 'username', type: 'text', placeholder: 'Username'}),
-                _.input({class: 'widget widget--input text', name: 'password', type: 'password', placeholder: 'Password'}),
+                _.input({class: 'widget widget--text', name: 'username', type: 'text', placeholder: 'Username'}),
+                _.input({class: 'widget widget--text', name: 'password', type: 'password', placeholder: 'Password'}),
                 _.button({class: 'widget widget--button small fa fa-check', onclick: _.onClickRemoteLogin}) 
             )
         ),

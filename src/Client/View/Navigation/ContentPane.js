@@ -75,8 +75,8 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click pull content
      */
-    async onClickPullContent() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPullContent(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.pull('content', id);
     }
@@ -84,21 +84,19 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click push content
      */
-    async onClickPushContent() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPushContent(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.push('content', id);
     }
 
     /**
      * Event: Click new content
-     *
-     * @param {String} parentId
      */
-    async onClickNewContent(parentId) {
+    async onClickNewContent(target) {
         new HashBrown.Entity.View.Modal.CreateContent({
             model: {
-                parentId: parentId
+                parentId: target ? target.dataset.id : null
             }
         });
     }
@@ -106,8 +104,8 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click Content settings
      */
-    async onClickContentPublishing() {
-        let id = $('.context-menu-target').data('id');
+    async onClickContentPublishing(target) {
+        let id = target.dataset.id;
 
         let content = await HashBrown.Service.ContentService.getContentById(id);
 
@@ -146,9 +144,8 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
      *
      * @param {Boolean} shouldUnpublish
      */
-    async onClickRemoveContent(shouldUnpublish) {
-        let $element = $('.context-menu-target'); 
-        let id = $element.data('id');
+    async onClickRemoveContent(target, shouldUnpublish) {
+        let id = target.dataset.id;
   
         new HashBrown.Entity.View.Modal.RemoveContent({
             model: {
@@ -161,8 +158,8 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click rename
      */
-    async onClickRename() {
-        let id = $('.context-menu-target').data('id');
+    async onClickRename(target) {
+        let id = target.dataset.id;
         let content = await HashBrown.Service.ContentService.getContentById(id);
 
         UI.notify(
@@ -201,46 +198,41 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+        
         menu['This content'] = '---';
         
-        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-        
-        menu['Rename'] = () => { this.onClickRename(); };
-
-        menu['New child content'] = () => {
-            this.onClickNewContent($('.context-menu-target').data('id'));
-        };
+        menu['Rename'] = (target) => { this.onClickRename(target); };
+        menu['New child content'] = (target) => { this.onClickNewContent(target); };
                         
         if(!item.sync.isRemote && !item.isLocked) {
-            menu['Move'] = () => { this.onClickMoveItem(); };
+            menu['Move'] = (target) => { this.onClickMoveItem(target); };
         }
 
         if(!item.sync.hasRemote && !item.isLocked) {
-            menu['Remove'] = () => { this.onClickRemoveContent(true); };
+            menu['Remove'] = (target) => { this.onClickRemoveContent(target, true); };
         }
         
-        menu['Copy id'] = () => { this.onClickCopyItemId(); };
+        menu['Copy id'] = (target) => { this.onClickCopyItemId(target); };
         
         if(!item.sync.isRemote && !item.isLocked) {
             menu['Settings'] = '---';
-            menu['Publishing'] = () => { this.onClickContentPublishing(); };
+            menu['Publishing'] = (target) => { this.onClickContentPublishing(target); };
         }
         
-        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
-       
         if(isSyncEnabled) {
             menu['Sync'] = '---';
             
             if(!item.sync.isRemote) {
-                menu['Push to remote'] = () => { this.onClickPushContent(); };
+                menu['Push to remote'] = (target) => { this.onClickPushContent(target); };
             }
 
             if(item.sync.hasRemote) {
-                menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
+                menu['Remove local copy'] = (target) => { this.onClickRemoveContent(target); };
             }
             
             if(item.sync.isRemote) {
-                menu['Pull from remote'] = () => { this.onClickPullContent(); };
+                menu['Pull from remote'] = (target) => { this.onClickPullContent(target); };
             }
         }
 
@@ -258,15 +250,6 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
             'Content': '---',
             'New content': () => { this.onClickNewContent(); }
         };
-    }
-
-    /**
-     * Hierarchy logic
-     */
-    hierarchy(item, queueItem) {
-        // Set id data attributes
-        queueItem.$element.attr('data-content-id', item.id);
-        queueItem.parentDirAttr = {'data-content-id': item.parentId };
     }
 }
 

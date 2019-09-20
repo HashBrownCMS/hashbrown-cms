@@ -16,7 +16,7 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label'}, 'Environment name'),
-                    _.input({class: 'widget widget--input text', type: 'text', value: state.environmentName, onchange: (e) => _.onInputName(e.target.value)})
+                    _.input({class: 'widget widget--text', type: 'text', value: state.environmentName, onchange: (e) => _.onInputName(e.target.value)})
                 )
             )
         ),

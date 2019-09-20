@@ -366,6 +366,11 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * Runs before rendering
      */
     prerender() {}
+    
+    /**
+     * Runs after rendering
+     */
+    postrender() {}
 
     /**
      * Renders the template
@@ -394,6 +399,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         this.element = element;
 
+        this.postrender();
+        
         return this.element;
     }
 }

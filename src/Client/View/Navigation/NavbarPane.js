@@ -31,21 +31,12 @@ class NavbarPane extends Crisp.View {
     /**
      * Event: Click copy item id
      */
-    onClickCopyItemId() {
-        let id = $('.context-menu-target').data('id');
+    onClickCopyItemId(target) {
+        let id = target.dataset.id;
 
         copyToClipboard(id);
     }
     
-    /**
-     * Event: Click open in new tab
-     */
-    onClickOpenInNewTab() {
-        let href = $('.context-menu-target').attr('href');
-
-        window.open(location.protocol + '//' + location.host + '/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + href);
-    }
-
     /**
      * Event: Change directory
      *
@@ -66,8 +57,8 @@ class NavbarPane extends Crisp.View {
     /**
      * Event: Click move item
      */
-    onClickMoveItem() {
-        let id = $('.context-menu-target').data('id');
+    onClickMoveItem(target) {
+        let id = target.dataset.id;
         let navbar = Crisp.View.get('NavbarMain');
 
         this.$element.find('.navbar-main__pane__item a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
@@ -143,18 +134,17 @@ class NavbarPane extends Crisp.View {
                     let modal = UI.notify(
                         'Move item',
                         _.div({class: 'widget-group'},
-                            _.input({class: 'widget widget--input text', value: (item.folder || item.parentId || ''), placeholder: '/path/to/media/'}),
+                            _.input({class: 'widget widget--text', value: (item.folder || item.parentId || ''), placeholder: '/path/to/media/'}),
                             _.div({class: 'widget widget--label'}, (item.name || item.title || item.id))
                         ),
+                        () => {
+                            let newPath = modal.element.querySelector('.widget--text').value;
+
+                            reset(newPath);
+
+                            this.onChangeDirectory(item.id, newPath);
+                        }
                     );
-
-                    modal.on('ok', () => {
-                        let newPath = modal.$element.find('.widget--input').val();
-
-                        reset(newPath);
-
-                        this.onChangeDirectory(item.id, newPath);
-                    });
 
                 } catch(e) {
                     UI.error(e);
@@ -379,15 +369,6 @@ class NavbarPane extends Crisp.View {
         });
     }
     
-    /**
-     * Event: Click copy item id
-     */
-    onClickCopyItemId() {
-        let id = $('.context-menu-target').data('id');
-
-        copyToClipboard(id);
-    }
-
     /**
      * Event: Toggle children
      */

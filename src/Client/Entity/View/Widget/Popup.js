@@ -29,6 +29,22 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
     }
 
     /**
+     * Initialises this view
+     */
+    init() {
+        // If this popup is a context menu, remove all other instances
+        if(this.model.role === 'context-menu') {
+            for(let menu of Array.from(document.querySelectorAll('.widget--popup[role="context-menu"]'))) {
+                menu.parentElement.removeChild(menu);
+            }
+
+            this.state.isOpen = true;
+        }
+
+        super.init();
+    }
+
+    /**
      * Set the label before rendering
      */
     prerender() {
@@ -57,18 +73,9 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
     }
 
     /**
-     * Event: open as context menu
+     * Update position style post render
      */
-    onContext(e) {
-        this.model.role = 'context-menu';
-        this.toggle(true);
-
-        let pageY = e.touches ? e.touches[0].pageY : e.pageY;
-        let pageX = e.touches ? e.touches[0].pageX : e.pageX;
-
-        this.element.style.top = pageY + 'px';
-        this.element.style.left = pageX + 'px';
-
+    postrender() {
         this.updatePositionStyle();
     }
 
@@ -88,7 +95,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
      */
     onClickOption(value) {
         if(typeof value === 'function') {
-            value();
+            value(this.model.target);
             this.toggle(false);
             this.render();
 
@@ -197,8 +204,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         this.state.searchQuery = '';
         
         this.render();
-       
-        this.updatePositionStyle();
 
         let input = this.element.querySelector('input');
 

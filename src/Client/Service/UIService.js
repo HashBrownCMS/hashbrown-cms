@@ -371,18 +371,6 @@ class UIService {
     }
     
     /**
-     * Brings up a warning modal
-     *
-     * @param {String} warning
-     * @param {Function} onClickOK
-     */
-    static warningModal(warning, onClickOK) {
-        if(!warning) { return; }
-
-        return this.notify('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
-    }
-
-    /**
      * Brings up a notification
      *
      * @param {String} heading
@@ -410,6 +398,7 @@ class UIService {
      * @param {String} heading
      * @param {String} message
      * @param {String} widget
+     * @param {*} value
      * @param {Function} onClickOK
      */
     static prompt(heading, message, widget, value, onClickOK) {
@@ -467,50 +456,22 @@ class UIService {
         if(!element) { return; }
         
         let openContextMenu = (e) => {
-            // Find any existing context menu targets and remove their classes
-            let clearTargets = () => {
-                let targets = document.querySelectorAll('.context-menu-target');
-            
-                if(!targets) { return; }
-            
-                for(let i = 0; i < targets.length; i++) {
-                    targets[i].classList.remove('context-menu-target');
-                }
-            };
+            let pageY = e.touches ? e.touches[0].pageY : e.pageY;
+            let pageX = e.touches ? e.touches[0].pageX : e.pageX;
 
-            clearTargets();
-
-            // Set new target
-            element.classList.toggle('context-menu-target', true);
-            
-            // Remove existing menus
-            let existingMenu = _.find('.widget--popup.context');
-
-            if(existingMenu) { existingMenu.remove(); }
-
-            // Init new menu
             let contextMenu = new HashBrown.Entity.View.Widget.Popup({
                 model: {
+                    target: element,
                     options: items,
-                    onchange: (pickedItem) => {
-                        if(typeof pickedItem !== 'function') { return; }
-
-                        pickedItem();
+                    role: 'context-menu',
+                    offset: {
+                        x: pageX,
+                        y: pageY
                     }
                 }
             });
-                
-            // Wait a bit before removing the classes, as they are often used as references in the functions executed by the context menu
-            contextMenu.on('closed', () => {
-                setTimeout(clearTargets, 100);
-            });
-            
-            // Append to body
-            document.body.appendChild(contextMenu.element);
 
-            setTimeout(() => {
-                contextMenu.onContext(e);
-            }, 1);
+            document.body.appendChild(contextMenu.element);
         };
         
         element.addEventListener('contextmenu', (e) => {

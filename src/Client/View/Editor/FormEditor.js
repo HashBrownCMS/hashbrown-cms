@@ -194,7 +194,7 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
                 this.field(
                     'POST URL',
                     _.div({class: 'widget-group'},
-                        _.input({readonly: 'readonly', class: 'widget widget--input text', type: 'text', value: this.getPostUrl()}),
+                        _.input({readonly: 'readonly', class: 'widget widget--text', type: 'text', value: this.getPostUrl()}),
                         _.button({class: 'widget widget--button small fa fa-copy', title: 'Copy POST URL'})
                             .click((e) => { copyToClipboard(e.currentTarget.previousElementSibling.value); })
                     )

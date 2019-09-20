@@ -29,13 +29,13 @@ class ResourceEditor extends HashBrown.View.Editor.Editor {
         
         // The check failed, ask the user if they want to proceed
         } else {
-            let modal = UI.warningModal('This resource is currently being edited by someone else. Do you still want to proceed?');
+            let modal = UI.confirm('This resource is currently being edited by someone else. Do you still want to proceed?');
 
-            modal.on('ok', () => {
+            modal.on('yes', () => {
                 this.onHeartbeat();
             });
 
-            modal.on('cancel', () => {
+            modal.on('no', () => {
                 location.hash = this.model.constructor.category;
             });
         }

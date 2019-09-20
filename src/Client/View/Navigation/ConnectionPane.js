@@ -32,8 +32,8 @@ class ConnectionPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: On click remove connection
      */
-    async onClickRemoveConnection() {
-        let id = $('.context-menu-target').data('id');
+    async onClickRemoveConnection(target) {
+        let id = target.dataset.id;
         let connection = await HashBrown.Service.ConnectionService.getConnectionById(id);
 
         UI.confirm('Delete connection', 'Are you sure you want to remove this connection "' + connection.title + '"?', async () => {
@@ -44,8 +44,8 @@ class ConnectionPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click pull connection
      */
-    async onClickPullConnection() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPullConnection(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.pull('connections', id);    
     }
@@ -53,8 +53,8 @@ class ConnectionPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click push connection
      */
-    async onClickPushConnection() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPushConnection(target) {
+        let id = target.dataset.id;
 
         await HashBrown.Service.ResourceService.push('connections', id);
     }
@@ -66,31 +66,29 @@ class ConnectionPane extends HashBrown.View.Navigation.NavbarPane {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
         
+        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+        
         menu['This connection'] = '---';
 
-        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-
         if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = () => { this.onClickRemoveConnection(); };
+            menu['Remove'] = (target) => { this.onClickRemoveConnection(target); };
         }
         
-        menu['Copy id'] = () => { this.onClickCopyItemId(); };
-
-        if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
+        menu['Copy id'] = (target) => { this.onClickCopyItemId(target); };
 
         if(isSyncEnabled) {
             menu['Sync'] = '---';
 
             if(!item.sync.isRemote) {
-                menu['Push to remote'] = () => { this.onClickPushConnection(); };
+                menu['Push to remote'] = (target) => { this.onClickPushConnection(target); };
             }
 
             if(item.sync.hasRemote) {
-                menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
+                menu['Remove local copy'] = (target) => { this.onClickRemoveConnection(target); };
             }
             
             if(item.sync.isRemote) {
-                menu['Pull from remote'] = () => { this.onClickPullConnection(); };
+                menu['Pull from remote'] = (target) => { this.onClickPullConnection(target); };
             }
         }
         

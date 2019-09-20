@@ -32,8 +32,8 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click new Schema
      */
-    async onClickNewSchema() {
-        let parentId = $('.context-menu-target').data('id');
+    async onClickNewSchema(target) {
+        let parentId = target ? target.dataset.id : '';
         let newSchema = await HashBrown.Service.ResourceService.new(null, 'schemas', '?parentSchemaId=' + parentId);
 
         location.hash = '/schemas/' + newSchema.id;
@@ -42,8 +42,8 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click remove schema
      */
-    async onClickRemoveSchema() {
-        let id = $('.context-menu-target').data('id');
+    async onClickRemoveSchema(target) {
+        let id = target.dataset.id;
         let schema = await HashBrown.Service.SchemaService.getSchemaById(id);
 		
         if(!schema.isLocked) {
@@ -61,8 +61,8 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click pull Schema
      */
-    async onClickPullSchema() {
-        let id = $('.context-menu-target').data('id');
+    async onClickPullSchema(target) {
+        let id = target.dataset.id;
 		
         await HashBrown.Service.SchemaService.pullSchemaById(id);
     }
@@ -70,8 +70,8 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
     /**
      * Event: Click push Schema
      */
-    async onClickPushSchema() {
-		let id = $('.context-menu-target').data('id');
+    async onClickPushSchema(target) {
+		let id = target.dataset.id;
 
         await HashBrown.Service.SchemaService.pushSchemaById(id);
     }
@@ -83,33 +83,31 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
         let menu = {};
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled;
 
-        menu['This schema'] = '---';
-        
-        menu['Open in new tab'] = () => { this.onClickOpenInNewTab(); };
-       
-        menu['New child schema'] = () => { this.onClickNewSchema(); };
-        
-        if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
-            menu['Remove'] = () => { this.onClickRemoveSchema(); };
-        }
-        
-        menu['Copy id'] = () => { this.onClickCopyItemId(); };
-        
         if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
+        menu['This schema'] = '---';
+        
+        menu['New child schema'] = (target) => { this.onClickNewSchema(target); };
+        
+        if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
+            menu['Remove'] = (target) => { this.onClickRemoveSchema(target); };
+        }
+        
+        menu['Copy id'] = (target) => { this.onClickCopyItemId(target); };
+        
         if(isSyncEnabled) {
             menu['Sync'] = '---';
             
             if(!item.sync.isRemote) {
-                menu['Push to remote'] = () => { this.onClickPushSchema(); };
+                menu['Push to remote'] = (target) => { this.onClickPushSchema(target); };
             }
 
             if(item.sync.hasRemote) {
-                menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
+                menu['Remove local copy'] = (target) => { this.onClickRemoveSchema(target); };
             }
 
             if(item.sync.isRemote) {
-                menu['Pull from remote'] = () => { this.onClickPullSchema(); };
+                menu['Pull from remote'] = (target) => { this.onClickPullSchema(target); };
             }
         }
 
