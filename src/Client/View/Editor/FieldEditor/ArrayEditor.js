@@ -76,7 +76,7 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
     async fetch() {
         this.schemaOptions = {};
 
-        for(let schemaId of this.config.allowedSchemas) {
+        for(let schemaId of this.config.allowedSchemas || []) {
             if(!schemaId) { continue; }
 
             let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
