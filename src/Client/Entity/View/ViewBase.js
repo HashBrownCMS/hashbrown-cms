@@ -33,6 +33,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         this.def(HTMLElement, 'element', null);
         this.def(Object, 'events', {});
+        this.def(Object, 'partials', {});
         this.def(Object, 'namedChildren', {});
     }
 
@@ -129,6 +130,25 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     }
 
     /**
+     * Renders a partial
+     *
+     * @param {String} name
+     *
+     * @return {HTMLElement} Render result
+     */
+    renderPartial(name) {
+        checkParam(name, 'name', String);
+
+        if(!this.partials[name]) { return null; }
+
+        let result = this.partials[name].render(this.scope(), this.model, this.state);
+
+        this.partials[name].element.parentElement.replaceChild(result, this.partials[name].element);
+
+        return result;
+    }
+
+    /**
      * Scope
      *
      * @return {Object} Scope
@@ -177,7 +197,23 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             return template(this.scope(), model || this.model);
                         };
- 
+
+                    // Register a partial
+                    case 'partial':
+                        return(partialName, renderFunction) => {
+                            if(typeof renderFunction !== 'function') { return null; }
+
+                            let content = renderFunction(this.scope(), this.model, this.state);
+                                
+                            this.partials[partialName] = {
+                                render: renderFunction,
+                                element: content
+                            }
+
+                            return content;
+                        };
+                        
+
                     // Any unrecognised key will be interpreted as an element constructor
                     // This means that, for instance, calling "_.div" will return a <div> HTMLElement 
                     default:

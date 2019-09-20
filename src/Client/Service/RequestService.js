@@ -23,12 +23,11 @@ class RequestService {
      * Uploads a file
      *
      * @param {String} url
-     * @param {String} type
      * @param {FormData} data
      *
      * @returns {Promise} Response
      */
-    static uploadFile(url, type, data) {
+    static upload(url, data) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: this.environmentUrl(url),

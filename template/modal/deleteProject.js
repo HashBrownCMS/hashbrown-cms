@@ -20,7 +20,7 @@ _.div({class: 'modal in'},
             _.if(state.name === undefined,
                 _.div({class: 'widget-group'},
                     _.p({class: 'widget widget--label'}, 'Type the project name to confirm'),
-                    _.input({class: 'widget widget--input text', type: 'text', placeholder: model.settings.info.name, oninput: (e) => _.onInputName(e.target.value)})
+                    _.text({placeholder: model.settings.info.name, oninput: _.onInputName})
                 )
             )
         ),
@@ -34,7 +34,7 @@ _.div({class: 'modal in'},
             ),
             
             _.if(state.name === undefined, 
-                _.button({class: 'widget widget--button warning disabled', onclick: _.onClickDelete}, 'Delete')
+                _.button({class: 'widget widget--button warn disabled', onclick: _.onClickDelete}, 'Delete')
             )
         )
     )

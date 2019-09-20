@@ -2,6 +2,7 @@
 
 const Path = require('path');
 const FileSystem = require('fs');
+const Multer = require('multer');
 
 const WATCH_CACHE_INTERVAL = 1000 * 60; // One minute
 const MAX_CACHE_TIME = 1000 * 60 * 60 * 24 * 10 // 10 days
@@ -23,6 +24,40 @@ class MediaService extends require('Common/Service/MediaService') {
         this.cleanCache();
     }
     
+    /**
+     * Gets the upload handler
+     *
+     * @return {Function} Handler
+     */
+    static getUploadHandler() {
+        let handler = Multer({
+            storage: Multer.diskStorage({
+                destination: async (req, file, resolve) => {
+                    let path = Path.join(APP_ROOT, 'storage', req.project, 'temp');
+                  
+                    await HashBrown.Service.FileService.makeDirectory(path);
+                    
+                    resolve(null, path);
+                },
+                filename: (req, file, resolve) => {
+                    let split = file.originalname.split('.');
+                    let name = split[0];
+                    let extension = split[1];
+                    
+                    name = name.replace(/\W+/g, '-').toLowerCase();
+                   
+                    if(extension) {
+                        name += '.' + extension;
+                    }
+
+                    resolve(null, name);
+                }
+            })
+        })
+       
+        return handler.array('media', 100);
+    }
+
     /**
      * Renames a Media object
      *
@@ -190,9 +225,14 @@ class MediaService extends require('Common/Service/MediaService') {
         checkParam(id, 'id', String);
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, 'cache');
-        let cachedPath = Path.join(cacheFolder, id);
-     
-        HashBrown.Service.FileService.remove(cachedPath + '*');
+
+        let files = await HashBrown.Service.FileService.list(cacheFolder);
+
+        for(let file of files) {
+            if(file.indexOf(id) < 0) { continue; }
+
+            await HashBrown.Service.FileService.remove(Path.join(cacheFolder, file));
+        }
     }
 
 

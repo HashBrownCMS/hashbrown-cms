@@ -10,17 +10,17 @@ Crisp.Router.route('/media/', function() {
             _.p('Right click in the Media pane to upload, edit and sort Media items.'),
             _.button({class: 'widget widget--button'}, 'Upload media')
                 .click(() => {
-                    new HashBrown.View.Modal.MediaUploader({
-                        onSuccess: (ids) => {
-                            // We got one id back
-                            if(typeof ids === 'string') {
-                                location.hash = '/media/' + ids;
+                    let modal = new HashBrown.Entity.View.Modal.UploadMedia();
 
-                            // We got several ids back
-                            } else {
-                                location.hash = '/media/' + ids[0];
-                            
-                            }
+                    modal.on('success', (ids) => {
+                        // We got one id back
+                        if(typeof ids === 'string') {
+                            location.hash = '/media/' + ids;
+
+                        // We got several ids back
+                        } else {
+                            location.hash = '/media/' + ids[0];
+                        
                         }
                     });
                 })

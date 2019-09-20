@@ -39,9 +39,7 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
      * @param {Boolean} isActive
      */
     setLoading(isActive) {
-        let spinner = this.element.querySelector('.widget--spinner');
-
-        spinner.classList.toggle('hidden', !isActive);
+        this.element.classList.toggle('loading', !isActive);
     }
 
     /**

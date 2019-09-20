@@ -14,7 +14,7 @@ _.div({class: 'modal in'},
             ),
 
             _.if(state.name === 'uploading',
-                _.input({type: 'file', name: 'backup', onsubmit: _.onSubmitBackup})
+                _.file({name: 'backup', onsubmit: _.onSubmitBackup})
             ),
             
             _.if(state.name === 'restoring',

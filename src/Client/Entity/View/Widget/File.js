@@ -60,7 +60,7 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
 
         if(typeof this.model.onsubmit !== 'function') { return; }
 
-        this.model.onsubmit(input.files);
+        this.model.onsubmit(new FormData(e.target), input.files);
 
         return false;
     }

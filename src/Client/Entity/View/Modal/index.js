@@ -14,4 +14,5 @@ namespace('Entity.View.Modal')
 .add(require('./PickIcon'))
 .add(require('./ProjectSettings'))
 .add(require('./ProjectBackups'))
+.add(require('./UploadMedia'))
 .add(require('./UserEditor'));

@@ -19,9 +19,9 @@ class MediaController extends HashBrown.Controller.ApiController {
         app.get('/api/:project/:environment/media', this.middleware(), this.getAll);
         app.get('/api/:project/:environment/media/:id', this.middleware(), this.get);
         
-        app.post('/api/:project/:environment/media/new', this.middleware(), this.new);
+        app.post('/api/:project/:environment/media/new', this.middleware(), HashBrown.Service.MediaService.getUploadHandler(), this.new);
         app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setTree);
-        app.post('/api/:project/:environment/media/:id', this.middleware(), this.set);
+        app.post('/api/:project/:environment/media/:id', this.middleware(), HashBrown.Service.MediaService.getUploadHandler(), this.set);
         app.post('/api/:project/:environment/media/rename/:id', this.middleware(), this.rename);
         
         app.delete('/api/:project/:environment/media/:id', this.middleware(), this.remove);
@@ -224,17 +224,19 @@ class MediaController extends HashBrown.Controller.ApiController {
      */
     static async set(req, res) {
         try {
-            let file = req.body.files[0];
+            let file = req.files ? req.files[0] : null;
             
             if(!file) {
                 throw new Error('No files provided');
             }
 
+            let base64 = await HashBrown.Service.FileService.read(file.path, 'base64'); 
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
 
-            await HashBrown.Service.MediaService.removeCachedMedia(req.project, req.params.id);
+            await connection.setMedia(req.params.id, file.filename, base64);
 
-            await connection.setMedia(req.params.id, file.filename, file.base64);
+            await HashBrown.Service.FileService.remove(file.path);
+            await HashBrown.Service.MediaService.removeCachedMedia(req.project, req.params.id);
 
             res.status(200).send(req.params.id);
 
@@ -260,10 +262,14 @@ class MediaController extends HashBrown.Controller.ApiController {
             
             let ids = [];
 
-            for(let file of req.body.files) {
+            for(let file of req.files) {
                 let media = HashBrown.Entity.Resource.Media.create();
 
-                await connection.setMedia(media.id, file.filename, file.base64);
+                let base64 = await HashBrown.Service.FileService.read(file.path, 'base64'); 
+
+                await connection.setMedia(media.id, file.filename, base64);
+            
+                await HashBrown.Service.FileService.remove(file.path);
                 
                 ids.push(media.id);
             }

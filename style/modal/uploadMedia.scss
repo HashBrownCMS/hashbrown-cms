@@ -1,0 +1,30 @@
+.modal--upload-media {
+    &__previews {
+        margin: 0 auto 1rem auto;
+        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+
+        &:empty {
+            display: none;
+        }
+
+        &::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+    }
+
+    &__preview {
+        flex-grow: 1;
+        flex-basis: 0;
+
+        img, video {
+            max-width: 100%;
+            display: block;
+            max-height: 20vh;
+            margin: 0 auto;
+        }
+    }
+}

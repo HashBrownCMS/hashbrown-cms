@@ -113,32 +113,26 @@ class MediaPane extends HashBrown.View.Navigation.NavbarPane {
      */
     onClickUploadMedia(replaceId) {
         let folder = $('.context-menu-target').data('media-folder') || '/';
+        let modal = new HashBrown.Entity.View.Modal.UploadMedia({
+            model: {
+                replaceId: replaceId,
+                folder: folder
+            }
+        });
+            
+        modal.on('success', (ids) => {
+            if(replaceId) {
+                let mediaViewer = Crisp.View.get(HashBrown.View.Editor.MediaViewer);
 
-        new HashBrown.View.Modal.MediaUploader({
-            onSuccess: (ids) => {
-                // We got one id back
-                if(typeof ids === 'string') {
-                    location.hash = '/media/' + ids;
+                if(mediaViewer) {
+                    mediaViewer.model = null;
 
-                // We got several ids back
-                } else if(Array.isArray(ids)) {
-                    location.hash = '/media/' + ids[0];
-                
+                    mediaViewer.fetch();
                 }
+            } else if(ids) {
+                location.hash = '/media/' + ids[0];
 
-                // Refresh on replace
-                if(replaceId) {
-                    let mediaViewer = Crisp.View.get(HashBrown.View.Editor.MediaViewer);
-
-                    if(mediaViewer) {
-                        mediaViewer.model = null;
-
-                        mediaViewer.fetch();
-                    }
-                }
-            },
-            replaceId: replaceId,
-            folder: folder
+            }
         });
     }
 
