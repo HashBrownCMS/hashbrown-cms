@@ -22,7 +22,7 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
             super.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -46,7 +46,7 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
             HashBrown.Service.EventService.trigger('resource');  
         
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
 
@@ -60,9 +60,12 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
         let input = new HashBrown.Entity.View.Widget.Checkbox({
             model: {
                 value: false,
-                onchange: (isProvider) => {
-                    HashBrown.Service.ConnectionService.setMediaProvider(isProvider ? this.model.id : null)
-                    .catch(UI.errorModal);
+                onchange: async (isProvider) => {
+                    try {
+                        await HashBrown.Service.ConnectionService.setMediaProvider(isProvider ? this.model.id : null);
+                    } catch(e) {
+                        UI.error(e);
+                    }
                 }
             }
         });

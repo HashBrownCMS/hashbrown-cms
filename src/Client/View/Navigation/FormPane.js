@@ -35,8 +35,7 @@ class FormPane extends HashBrown.View.Navigation.NavbarPane {
         let id = $('.context-menu-target').data('id');
         let form = await HashBrown.Service.FormService.getFormById(id);
 
-        UI.confirmModal(
-            'delete',
+        UI.confirm(
             'Delete form',
             'Are you sure you want to delete the form "' + form.title + '"?',
             async () => {

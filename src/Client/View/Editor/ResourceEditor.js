@@ -51,7 +51,7 @@ class ResourceEditor extends HashBrown.View.Editor.Editor {
             await HashBrown.Service.ResourceService.heartbeat(this.model);
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
 

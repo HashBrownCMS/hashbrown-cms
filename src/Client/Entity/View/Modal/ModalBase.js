@@ -6,7 +6,7 @@
  * TODO: Enable ESC to cancel
  * TODO: Enable grouping
  *
- * @memberof HashBrown.Client.View.Modal
+ * @memberof HashBrown.Client.Entity.View.Modal
  */
 class ModalBase extends HashBrown.Entity.View.ViewBase {
     /**
@@ -17,15 +17,36 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
 
         this.template = require('template/modal/modalBase'); 
 
-        document.body.appendChild(this.element);
+        let similarModals = this.getSimilarModals();
+
+        if(similarModals.length > 0) {
+            this.state.prependedHtml = similarModals[0].querySelector('.modal__body').innerHTML;
+            this.element = similarModals[0];
+            this.state.skipTransitionIn = true;
+        } else {
+            document.body.appendChild(this.element);
+        }
     }
   
+    /**
+     * Gets existing modals with the same role as this one
+     *
+     * @return {Array} Modal elements
+     */
+    getSimilarModals() {
+        if(!this.model.role) { return []; }
+
+        return Array.from(document.querySelectorAll('.modal[role="' + this.model.role + '"]'));
+    }
+
     /**
      * Init
      */
     async init() {
         await super.init();
             
+        if(this.state.skipTransitionIn) { return; }
+
         this.element.classList.toggle('in', false);
 
         setTimeout(() => {
@@ -76,20 +97,6 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
         setTimeout(() => {
             this.remove();
         }, 500);
-    }
-
-    /**
-     * Appends another modal to this modal
-     *
-     * @param {HashBrown.Entity.View.Modal.ModalBase} modal
-     */
-    append(modal) {
-        checkParam(modal, 'modal', HashBrown.Entity.View.Modal.ModalBase, true);
-
-        let thisBody = this.element.querySelector('modal__body');
-        let thatBody = modal.element.querySelector('modal__body');
-
-        thisBody.innerHTML += thatBody.innerHTML;
     }
 }
 

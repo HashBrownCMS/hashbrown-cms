@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.UI = HashBrown.Service.UIService;
 
     // Error handling
-    window.onerror = UI.errorModal;
+    window.onerror = (e) => { UI.error(e) };
 
     // Init current user
     HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);

@@ -88,7 +88,7 @@ class MediaService extends require('Common/Service/MediaService') {
         HashBrown.Context.isMediaPicker = true;
         
         // Claim debug messages
-        UI.errorModal = onError;
+        UI.error = onError;
         
         // Listen for picked Media
         window.addEventListener('hashchange', () => {

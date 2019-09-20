@@ -25,7 +25,7 @@ class MediaViewer extends HashBrown.View.Editor.ResourceEditor {
             super.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }

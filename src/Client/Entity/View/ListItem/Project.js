@@ -53,7 +53,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(this.model.environments.length < 1) { return; }
 
         let modal = new HashBrown.Entity.View.Modal.ModalBase({
-            state: {
+            model: {
                 heading: `Remove environment "${environmentName}"`,
                 message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.settings.info.name || this.model.id}"?`
             }
@@ -102,7 +102,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(!HashBrown.Context.user.isAdmin) { return; }
 
         if(this.model.environments.length < 2) {
-            UI.errorModal(new Error('You need at least 2 environments to migrate resources'));
+            UI.error(new Error('You need at least 2 environments to migrate resources'));
             return;
         }
     

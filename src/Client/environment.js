@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.UI = HashBrown.Service.UIService;
 
     // Error handling
-    window.addEventListener('error', UI.errorModal);
+    window.addEventListener('error', (e) => { UI.error(e); });
    
     // Set context variables
     HashBrown.Context.language = localStorage.getItem('language') || 'en';
@@ -45,8 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        UI.confirmModal(
-            'Discard',
+        UI.confirm(
             'Discard unsaved changes?',
             'You have made changes to "' + (contentEditor.model.prop('title', HashBrown.Context.language) || contentEditor.model.id) + '"',
             () => {

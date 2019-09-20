@@ -47,11 +47,11 @@ class SchemaPane extends HashBrown.View.Navigation.NavbarPane {
         let schema = await HashBrown.Service.SchemaService.getSchemaById(id);
 		
         if(!schema.isLocked) {
-            UI.confirmModal('delete', 'Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', async () => {
+            UI.confirm('Delete schema', 'Are you sure you want to delete the schema "' + schema.name + '"?', async () => {
                 await HashBrown.Service.SchemaService.removeSchemaById(id);
             });
         } else {
-            UI.messageModal(
+            UI.notify(
                 'Delete schema',
                 'The schema "' + schema.name + '" is locked and cannot be removed'
             );

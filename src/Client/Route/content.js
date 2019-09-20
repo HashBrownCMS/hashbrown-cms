@@ -54,12 +54,12 @@ Crisp.Router.route('/content/:id', async () => {
             location.hash = '/content/' + Crisp.Router.params.id + '/' + (contentSchema.defaultTabId || 'meta');
         
         } else {
-            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'), () => { location.hash = '/content/json/' + Crisp.Router.params.id; });
+            UI.error(new Error('Schema by id "' + content.schemaId + '" not found'), () => { location.hash = '/content/json/' + Crisp.Router.params.id; });
 
         }
     
     } else {
-        UI.errorModal(new Error('Content by id "' + Crisp.Router.params.id + '" not found'));
+        UI.error(new Error('Content by id "' + Crisp.Router.params.id + '" not found'));
 
     }
 });

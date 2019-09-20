@@ -47,7 +47,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
             await super.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -119,7 +119,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
             this.isDirty = false;
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         } finally {
             this.$saveBtn.toggleClass('working', false);

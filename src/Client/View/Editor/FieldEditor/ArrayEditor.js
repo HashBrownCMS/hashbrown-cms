@@ -29,7 +29,7 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
         let index = this.value.length;
 
         if(this.config.maxItems && index >= this.config.maxItems) {
-            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+            UI.notify('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
             return;
         }
 
@@ -240,7 +240,7 @@ class ArrayEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
 
             // If this value isn't using the old system, we can't recover it
             if(!Array.isArray(this.value.items) || !Array.isArray(this.value.schemaBindings)) {
-                return UI.errorModal(new Error('The type "' + typeof this.value + '" of the value is incorrect or corrupted'));
+                return UI.error(new Error('The type "' + typeof this.value + '" of the value is incorrect or corrupted'));
             }
 
             let newItems = [];

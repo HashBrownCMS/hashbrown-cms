@@ -31,7 +31,7 @@ class JSONEditor extends Crisp.View {
             super.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -74,7 +74,7 @@ class JSONEditor extends Crisp.View {
             this.$saveBtn.toggleClass('working', false);
        
         } else {
-            UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
+            UI.error('Unable to save', 'Please refer to the error prompt for details');
 
         }
     }

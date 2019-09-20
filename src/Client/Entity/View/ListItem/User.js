@@ -50,7 +50,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(this.model.id === HashBrown.Context.user.id) { return; }
 
         new HashBrown.Entity.View.Modal.ModalBase({
-            state: {
+            model: {
                 heading: `Delete user ${this.model.fullName || this.model.username || this.model.id}`,
                 message: 'Are you sure want to delete this user?'
             }

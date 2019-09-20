@@ -16,6 +16,7 @@ class ContentSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
         this.def(String, 'defaultTabId');
         this.def(Object, 'tabs', {});
         this.def(Object, 'fields', { properties: {} });
+        this.def(Boolean, 'allowedAtRoot', true);
         this.def(Array, 'allowedChildSchemas', []);
 
         this.name = 'New content schema';

@@ -57,7 +57,7 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
             await HashBrown.Service.ResourceService.set('content', id, content);
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -95,83 +95,12 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
      *
      * @param {String} parentId
      */
-    async onClickNewContent(parentId, asSibling) {
-        try {
-            let parentContent = null;
-            let parentSchema = null;
-            let allowedSchemas = null;
-
-            // Try to get a parent schema if it exists to determine allowed child schemas
-            if(parentId) {
-                parentContent = await HashBrown.Service.ContentService.getContentById(parentId);
-                parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentContent.schemaId);
-            
-                allowedSchemas = parentSchema.allowedChildSchemas;
-
-                // If allowed child Schema were found, but none were provided, don't create the Content node
-                if(allowedSchemas && allowedSchemas.length < 1) {
-                    throw new Error('No child content schemas are allowed under this parent');
-                }
+    async onClickNewContent(parentId) {
+        new HashBrown.Entity.View.Modal.CreateContent({
+            model: {
+                parentId: parentId
             }
-            
-            let schemaId;
-          
-            // Instatiate a new Content Schema reference editor
-            let schemaReference = new HashBrown.View.Editor.FieldEditor.ContentSchemaReferenceEditor({
-                config: {
-                    allowedSchemas: allowedSchemas,
-                    parentSchema: parentSchema
-                }
-            });
-
-            schemaReference.on('change', (newValue) => {
-                schemaId = newValue;
-            });
-
-            schemaReference.pickFirstSchema();
-
-            // Make the editor behave like a widget, since it's inside a widget group
-            schemaReference.ready(() => {
-                schemaReference.$element.addClass('widget');
-            });
-
-            // Render the confirmation modal
-            UI.confirmModal(
-                'OK',
-                'Create new content',
-                _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'},'Schema'),
-                    schemaReference.$element
-                ),
-
-                // Event fired when clicking "OK"
-                async () => {
-                    try {
-                        if(!schemaId) { return false; }
-                       
-                        let query = '?schemaId=' + schemaId;
-
-                        // Append parent Content id to request URL
-                        if(parentId) {
-                            query += '&parentId=' + parentId;
-                        }
-
-                        // API call to create new Content node
-                        let newContent = await HashBrown.Service.ResourceService.new(HashBrown.Entity.Resource.Content, 'content', query)
-                        
-                        location.hash = '/content/' + newContent.id;
-
-                    } catch(e) {
-                        UI.errorModal(e);
-
-                    }
-                }
-            );
-        
-        } catch(e) {
-            UI.errorModal(e);
-        
-        }
+        });
     }
 
     /**
@@ -206,7 +135,7 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
                 }
 
             } catch(e) {
-                UI.errorModal(e);
+                UI.error(e);
             
             }
         });
@@ -220,58 +149,13 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
     async onClickRemoveContent(shouldUnpublish) {
         let $element = $('.context-menu-target'); 
         let id = $element.data('id');
-        let name = $element.data('name');
-    
-        let content = await HashBrown.Service.ContentService.getContentById(id);
-
-        content.settingsSanityCheck('publishing');
-
-        let shouldDeleteChildren = false;
-        
-        UI.confirmModal(
-            'Remove',
-            'Remove the content "' + name + '"?',
-            _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label'}, 'Remove child Content too'),
-                new HashBrown.Entity.View.Widget.Checkbox({
-                    model: {
-                        value: shouldDeleteChildren,
-                        onchange: (newValue) => {
-                            shouldDeleteChildren = newValue;
-                        }
-                    }
-                }).element
-            ),
-            async () => {
-                $element.parent().toggleClass('loading', true);
-
-                await HashBrown.Service.RequestService.request('delete', 'content/' + id + '?removeChildren=' + shouldDeleteChildren)
-                
-                if(shouldUnpublish && content.getSettings('publishing').connectionId) {
-                    await HashBrown.Service.RequestService.request('post', 'content/unpublish', content);
-                }
-
-                HashBrown.Service.EventService.trigger('resource');  
-                            
-                let contentEditor = Crisp.View.get('ContentEditor');
-                   
-                // Change the ContentEditor view if it was displaying the deleted content
-                if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
-                    // The Content was actually deleted
-                    if(shouldUnpublish) {
-                        location.hash = '/content/';
-                    
-                    // The Content still has a synced remote
-                    } else {
-                        contentEditor.model = null;
-                        contentEditor.fetch();
-
-                    }
-                }
-                
-                $element.parent().toggleClass('loading', false);
+  
+        new HashBrown.Entity.View.Modal.RemoveContent({
+            model: {
+                contentId: id,
+                unpublish: shouldUnpublish
             }
-        );
+        });
     }
 
     /**
@@ -281,7 +165,7 @@ class ContentPane extends HashBrown.View.Navigation.NavbarPane {
         let id = $('.context-menu-target').data('id');
         let content = await HashBrown.Service.ContentService.getContentById(id);
 
-        UI.messageModal(
+        UI.notify(
             'Rename "' + content.getPropertyValue('title', HashBrown.Context.language) + '"', 
             _.div({class: 'widget-group'}, 
                 _.label({class: 'widget widget--label'}, 'New name'),

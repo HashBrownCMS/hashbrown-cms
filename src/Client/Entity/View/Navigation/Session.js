@@ -60,7 +60,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
             location = '/login';
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }

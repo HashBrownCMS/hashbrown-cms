@@ -1,6 +1,7 @@
 {
     "defaultTabId": "meta",
     "icon": "cogs",
+    "allowedAtRoot": false,
     "name": "Content Base",
     "fields": {
         "createDate": {

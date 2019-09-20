@@ -63,7 +63,7 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
             super.fetch();
         
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -93,7 +93,7 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
         let parentContent = await HashBrown.Service.ContentService.getContentById(thisContent.parentId);
 
         if(!parentContent) {
-            UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+            UI.error(new Error('Content by id "' + thisContent.parentId + '" not found'));
             return null;
         }
 
@@ -101,7 +101,7 @@ class ContentSchemaReferenceEditor extends HashBrown.View.Editor.FieldEditor.Fie
         let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentContent.schemaId);
             
         if(!parentSchema) {
-            UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
+            UI.error(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
             return null;
         }
 

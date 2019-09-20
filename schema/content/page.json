@@ -2,6 +2,7 @@
     "icon": "file",
     "name": "Page",
     "parentSchemaId": "contentBase",
+    "allowedAtRoot": false,
     "tabs": {
         "content": "Content"
     },

@@ -15,7 +15,7 @@ Crisp.Router.route('/schemas/', function() {
                 .click(() => {
                     let url = 'https://uischema.org/schemas.json';
 
-                    let modal = UI.messageModal(
+                    let modal = UI.notify(
                         'Import schemas',
                         _.div({class: 'widget-group'},
                             _.div({class: 'widget widget--label'}, 'URL to uischema.org definitions'),
@@ -39,7 +39,7 @@ Crisp.Router.route('/schemas/', function() {
                                 HashBrown.Service.EventService.trigger('resource');  
 
                             } catch(e) {
-                                UI.errorModal(e);
+                                UI.error(e);
     
                             }
                         }

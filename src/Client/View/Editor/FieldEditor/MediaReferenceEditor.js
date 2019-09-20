@@ -57,8 +57,10 @@ class MediaReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor
      * Event: Click select
      */
     onClickSelect() {
-        new HashBrown.View.Modal.MediaBrowser({
-            value: this.value
+        new HashBrown.Entity.View.Modal.MediaBrowser({
+            model: {
+                value: this.value
+            }
         })
         .on('select', (id) => {
             this.value = id;

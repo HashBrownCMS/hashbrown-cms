@@ -22,7 +22,7 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
             super.fetch();
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
     }
@@ -149,14 +149,14 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
         return _.div({class: 'editor__field__value'},
             _.div({class: 'widget-group'},
                 _.button({class: 'widget widget--button low warning'}, 'Clear').click(() => {
-                    UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', async () => {
+                    UI.confirm('Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', async () => {
                         try {
                             await HashBrown.Service.RequestService.request('post', 'forms/clear/' + this.model.id);
 
                             this.model.entries = [];
                         
                         } catch(e) {
-                            UI.errorModal(e);
+                            UI.error(e);
 
                         }
                     });

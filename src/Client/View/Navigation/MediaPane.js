@@ -48,30 +48,17 @@ class MediaPane extends HashBrown.View.Navigation.NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
 
-        let modal = UI.messageModal(
+        UI.prompt(
             'Rename ' + name,
-            new HashBrown.Entity.View.Widget.Text({
-                model: {
-                    value: name,
-                    onchange: (newValue) => { name = newValue; }
-                }
-            }).element,
-            async () => {
-                await HashBrown.Service.RequestService.request('post', 'media/rename/' + id + '?name=' + name);
+            'New name',
+            'text',
+            name,
+            async (newName) => {
+                await HashBrown.Service.RequestService.request('post', 'media/rename/' + id + '?name=' + newName);
 
-                HashBrown.Service.EventService.trigger('resource');  
-
-                let mediaViewer = Crisp.View.get(HashBrown.View.Editor.MediaViewer);
-
-                if(mediaViewer && mediaViewer.model && mediaViewer.model.id === id) {
-                    mediaViewer.model = null;
-
-                    mediaViewer.fetch();
-                }
+                HashBrown.Service.EventService.trigger('resource', id);  
             }
         );
-
-        modal.$element.find('input').focus();
     }
 
     /**
@@ -82,8 +69,7 @@ class MediaPane extends HashBrown.View.Navigation.NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        UI.confirmModal(
-            'delete',
+        UI.confirm(
             'Delete media',
             'Are you sure you want to delete the media object "' + name + '"?',
             async () => {

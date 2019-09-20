@@ -339,50 +339,12 @@ class UIService {
 
 
     /**
-     * Creates a switch
-     *
-     * @param {Boolean} initialValue
-     * @param {Function} onChange
-     *
-     * @returns {HTMLElement} Switch element
-     */
-    static inputSwitch(initialValue, onChange) {
-        let id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
-        let $input;
-
-        let $element = _.div({class: 'switch', 'data-checked': initialValue},
-            $input = _.input({
-                id: id,
-                class: 'form-control switch',
-                type: 'checkbox'
-            }).change(function() {
-                this.parentElement.dataset.checked = this.checked;
-
-                if(onChange) {
-                    onChange(this.checked);
-                }
-            }),
-            _.label({for: id})
-        );
-
-        $element.on('set', (e, newValue) => {
-            $input[0].checked = newValue;
-        });
-
-        if(initialValue) {
-            $input.attr('checked', true);
-        }
-
-        return $element;
-    }
-
-    /**
      * Brings up an error modal
      *
      * @param {String|Error} error
      * @param {Function} onClickOK
      */
-    static errorModal(error, onClickOK) {
+    static error(error, onClickOK) {
         if(!error) { return; }
 
         if(error instanceof String) {
@@ -405,7 +367,7 @@ class UIService {
         debug.log(error.message + ': ' + error.stack, 'HashBrown');
         console.trace();
 
-        return UIService.messageModal('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
+        return this.notify('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
     }
     
     /**
@@ -417,39 +379,47 @@ class UIService {
     static warningModal(warning, onClickOK) {
         if(!warning) { return; }
 
-        return UIService.messageModal('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
+        return this.notify('<span class="fa fa-warning"></span> Warning', warning, onClickOK, 'warning');
     }
 
     /**
      * Brings up a notification
      *
-     * @param {String} title
-     * @param {String} body
+     * @param {String} heading
+     * @param {String} message
      */
-    static notify(title, body) {
-        let modal = new HashBrown.View.Modal.Modal({
-            title: title,
-            body: body,
-            group : 'notification'
+    static notify(heading, message, onClickOK) {
+        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+            model: {
+                heading: heading,
+                message: message,
+                role: 'notification'
+            }
         });
+
+        if(typeof onClickOK === 'function') {
+            modal.on('ok', onClickOK);
+        }
 
         return modal;
     }
 
     /**
-     * Brings up a message modal
+     * Brings up a prompt modal
      *
-     * @param {String} title
-     * @param {String} body
+     * @param {String} heading
+     * @param {String} message
+     * @param {String} widget
      * @param {Function} onClickOK
-     * @param {String} group
      */
-    static messageModal(title, body, onClickOK, group) {
-        let modal = new HashBrown.View.Modal.Modal({
-            isBlocking: onClickOK === false,
-            title: title,
-            group: group,
-            body: body
+    static prompt(heading, message, widget, value, onClickOK) {
+        let modal = new HashBrown.Entity.View.Modal.Prompt({
+            model: {
+                heading: heading,
+                message: message,
+                widget: widget,
+                value: value
+            }
         });
 
         if(onClickOK) {
@@ -458,24 +428,30 @@ class UIService {
 
         return modal;
     }
-
+        
     /**
      * Brings up a confirm modal
      *
-     * @param {String} type
-     * @param {String} title
-     * @param {String} body
-     * @param {Function} onSubmit
+     * @param {String} heading
+     * @param {String} message
+     * @param {Function} onClickYes
+     * @param {Function} onClickNo
      */
-    static confirmModal(type, title, body, onSubmit, onCancel) {
-        let modal = new HashBrown.View.Modal.ConfirmModal({
-            type: type ? type.toLowerCase() : null,
-            title: title,
-            body: body
+    static confirm(heading, message, onClickYes, onClickNo) {
+        let modal = new HashBrown.Entity.View.Modal.Confirm({
+            model: {
+                heading: heading,
+                message: message
+            }
         });
 
-        modal.on('cancel', onCancel);
-        modal.on('ok', onSubmit);
+        if(onClickYes) {
+            modal.on('yes', onClickYes);
+        }
+
+        if(onClickNo) {
+            modal.on('no', onClickNo);
+        }
 
         return modal;
     }

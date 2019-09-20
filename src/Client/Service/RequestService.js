@@ -142,7 +142,7 @@ class RequestService {
      * Listens for server restart
      */
     static listenForRestart() {
-        UI.messageModal('Restart', 'HashBrown is restarting...', false);
+        UI.notify('Restart', 'HashBrown is restarting...', false);
 
         function poke() {
             $.ajax({

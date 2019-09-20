@@ -75,7 +75,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
             }
 
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
 
         }
         
@@ -111,7 +111,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
             this.trigger('change');
        
         } catch(e) {
-            UI.errorModal(e);
+            UI.error(e);
         
         }
     }    

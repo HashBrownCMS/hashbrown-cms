@@ -119,7 +119,7 @@ class NavbarPane extends Crisp.View {
                 await this.onChangeSortIndex(id, otherId, parentId);
 
             } catch(e) {
-                UI.errorModal(e);
+                UI.error(e);
 
             }
         });
@@ -140,28 +140,24 @@ class NavbarPane extends Crisp.View {
                 try {
                     let item = await HashBrown.Service.MediaService.getMediaById(id);
 
-                    let messageModal = new HashBrown.View.Modal.Modal({
-                        title: 'Move item',
-                        body: _.div({class: 'widget-group'},
+                    let modal = UI.notify(
+                        'Move item',
+                        _.div({class: 'widget-group'},
                             _.input({class: 'widget widget--input text', value: (item.folder || item.parentId || ''), placeholder: '/path/to/media/'}),
                             _.div({class: 'widget widget--label'}, (item.name || item.title || item.id))
                         ),
-                        actions: [
-                            {
-                                label: 'OK',
-                                onClick: () => {
-                                    let newPath = messageModal.$element.find('.widget--input').val();
-                                    
-                                    reset(newPath);
+                    );
 
-                                    this.onChangeDirectory(item.id, newPath);
-                                }
-                            }
-                        ]
+                    modal.on('ok', () => {
+                        let newPath = modal.$element.find('.widget--input').val();
+
+                        reset(newPath);
+
+                        this.onChangeDirectory(item.id, newPath);
                     });
 
                 } catch(e) {
-                    UI.errorModal(e);
+                    UI.error(e);
 
                 }
             });

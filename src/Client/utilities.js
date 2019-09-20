@@ -68,10 +68,10 @@ window.copyToClipboard = function copyToClipboard(string) {
         let success = document.execCommand('copy');
 
         if(!success) {
-            UI.errorModal('Your browser does not yet support copying to clipboard');
+            UI.error('Your browser does not yet support copying to clipboard');
         }
     } catch(e) {
-            UI.errorModal(e.toString());
+        UI.error(e.toString());
     }
 
     document.body.removeChild(text);

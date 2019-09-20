@@ -182,10 +182,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         let newTab = false;
 
         if(Math.abs(anchorOffset - focusOffset) < 1) {
-            return UI.messageModal('Create link', 'Please select some text first');
+            return UI.notify('Create link', 'Please select some text first');
         }
 
-        let modal = UI.messageModal(
+        let modal = UI.notify(
             'Create link for selection "' + text + '"',
             _.div({class: 'widget-group'},
                 _.div({class: 'widget widget--label'}, 'URL'),

@@ -36,7 +36,7 @@ class ConnectionPane extends HashBrown.View.Navigation.NavbarPane {
         let id = $('.context-menu-target').data('id');
         let connection = await HashBrown.Service.ConnectionService.getConnectionById(id);
 
-        UI.confirmModal('delete', 'Delete connection', 'Are you sure you want to remove this connection "' + connection.title + '"?', async () => {
+        UI.confirm('Delete connection', 'Are you sure you want to remove this connection "' + connection.title + '"?', async () => {
             await HashBrown.Service.ResourceService.remove('connections', id);
         });
     }

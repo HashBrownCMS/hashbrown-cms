@@ -28,8 +28,8 @@
         transform: translateY(-2rem);
         margin: 10rem auto 2rem auto;
         transition: transform 0.5s ease;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
-        border-radius: 0.2rem;
+        box-shadow: var(--box-shadow);
+        border-radius: var(--border-radius-small);
         width: calc(100% - 2rem);
         max-width: 40rem;
         position: relative;
@@ -42,49 +42,59 @@
         border: 0;
         position: absolute;
         line-height: 2rem;
-        height: 2rem;
+        height: var(--size-widget-small);
         display: block;
-        width: 2rem;
-        color: $secondary-text;
-        background-color: $secondary;
-        border-radius: 0.2rem;
+        width: var(--size-widget-small);
+        color: var(--color-decor-text);
+        background-color: var(--color-decor);
+        border-radius: var(--border-radius-small);
         cursor: pointer;
         top: 1rem;
         right: 1rem;
 
         &:hover {
-            background-color: $secondary-darker;
+            background-color: var(--color-decor-darker);
         }
     }
 
     // Header
     &__header {
-        background-color: $secondary;
-        color: $secondary-text;
+        background-color: var(--color-decor);
+        color: var(--color-decor-text);
         padding: 1rem;
         position: relative;
     }
     
     // Title
     &__title {
-        line-height: 2rem;
-        height: 2rem;
+        line-height: var(--size-widget-small);
+        height: var(--size-widget-small);
         margin: 0;
     }
 
     // Body
     &__body {
         padding: 1rem;
-        background-color: $standard;
+        background-color: var(--color-default);
+        color: var(--color-default-text);
         position: relative;
         flex-grow: 1;
+        margin: 0;
+        
+        &__message {
+            list-style-type: none;
+        }
+        
+        &__message + &__message {
+            margin-top: 1rem;
+        }
     }
 
     // Footer
     &__footer {
-        background-color: $secondary;
+        background-color: var(--color-decor);
         padding: 1rem;
-        color: $secondary-text;
+        color: var(--color-decor-text);
         display: flex;
         justify-content: flex-end;
 
@@ -107,8 +117,8 @@
             transform: translateY(2rem);
             width: auto;
             margin: 1rem;
-            background-color: $primary;
-            color: $primary-text;
+            background-color: var(--color-action);
+            color: var(--color-action-text);
             padding: 1rem;
         }
 
@@ -124,7 +134,7 @@
         }
 
         &__close {
-            background-color: $primary-dark;
+            background-color: var(--color-action-dark);
             top: 0;
             right: 0;
         }
