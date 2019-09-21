@@ -1,4 +1,21 @@
 /**
+ * Gets part of the hash route
+ *
+ * @param {Number} index 
+ *
+ * @return {String} Path
+ */
+window.getRoute = function getRoute(index) {
+    checkParam(index, 'index', Number);
+
+    let route = location.hash
+        .split('/')
+        .filter((x) => x && x !== '#');
+
+    return route[index];
+}
+
+/**
  * Performs a submodule check
  */
 window.submoduleCheck = function submoduleCheck() {

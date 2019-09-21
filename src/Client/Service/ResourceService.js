@@ -68,7 +68,7 @@ class ResourceService {
             location.hash = '/' + category + '/';
         } 
 
-        HashBrown.Service.EventService.trigger('resource');  
+        HashBrown.Service.EventService.trigger('resource', id);  
     }
     
     /**
@@ -111,8 +111,6 @@ class ResourceService {
         await HashBrown.Service.RequestService.request('post', category + '/pull/' + id);
     
         HashBrown.Service.EventService.trigger('resource', id);  
-
-        location.hash = '/' + category + '/' + id;
     }
     
     /**
@@ -179,7 +177,7 @@ class ResourceService {
 
         await HashBrown.Service.RequestService.request('post', category + '/' + id, data);
     
-        HashBrown.Service.EventService.triggerById('resource', 'navbar', id);  
+        HashBrown.Service.EventService.trigger('resource', id);  
     }
     
     /**
@@ -200,11 +198,11 @@ class ResourceService {
 
         let resource = await HashBrown.Service.RequestService.request('post', category + '/new' + query, data);
     
-        HashBrown.Service.EventService.triggerById('resource', 'navbar');  
-
         if(model) {
             resource = new model(resource);
         }
+
+        HashBrown.Service.EventService.trigger('resource', resource.id);  
 
         return resource;
     }
@@ -227,8 +225,6 @@ class ResourceService {
         checkParam(query, 'query', String, true);
 
         let result = await HashBrown.Service.RequestService.request(method, category + '/' + action + query, data);
-
-        HashBrown.Service.EventService.trigger('resource', 'navbar');  
 
         return result;
     }

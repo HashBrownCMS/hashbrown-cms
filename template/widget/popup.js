@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''}`, role: model.role, style: model.offset ? `left: ${model.offset.x}px; top: ${model.offset.y}px;` : null},
+_.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} ${model.class || ''}`, role: model.role, style: model.offset ? `left: ${model.offset.x}px; top: ${model.offset.y}px;` : null},
     _.if(model.role !== 'context-menu',
         _.if(model.icon && !model.label,
             _.button({class: `widget--popup__icon fa fa-${model.icon}`, onclick: _.onClickToggle})

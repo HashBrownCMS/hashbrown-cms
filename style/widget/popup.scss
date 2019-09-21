@@ -15,12 +15,6 @@
         min-height: 0;
     }
 
-    &[role="item-menu"] {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
-
     &.primary &__icon,
     &.primary &__label {
         color: var(--color-action-text);
@@ -37,7 +31,7 @@
         background-color: var(--color-decor);
 
         &:hover {
-            background-color: var(--color-decor-light);
+            background-color: var(--color-decor-lightest);
         }
     }
 

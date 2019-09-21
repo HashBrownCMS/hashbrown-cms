@@ -22,7 +22,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         await this.update();
 
-        this.trigger('init');
+        this.trigger('ready');
     }
 
     /**
@@ -110,6 +110,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     setErrorState(error) {
         this.state.name = 'error';
         this.state.message = error.message;
+
+        debug.error(error, this);
 
         this.render();
     }
@@ -348,9 +350,10 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         } catch(e) {
             this.setErrorState(e);
 
-        }
+        } finally {
+            this.render();
 
-        this.render();
+        }
     }
 
     /**

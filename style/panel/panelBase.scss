@@ -1,0 +1,17 @@
+.panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &__items {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    &__context {
+        flex-grow: 1;
+        width: 100%;
+    }
+}
