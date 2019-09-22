@@ -12,8 +12,8 @@ _.div({class: 'panel'},
                 _.popup({options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
             )
         ),
-        _.div({class: 'panel__items'},
+        _.div({class: 'panel__items', name: 'items'},
             state.rootItems,
-            _.div({class: 'panel__context', oncontextmenu: _.onClickContext})
+            _.div({class: 'panel__context', oncontextmenu: _.onClickContext, ondrop: _.onDropItemOntoPanel, ondragover: _.onDragOverPanel})
         )
 )

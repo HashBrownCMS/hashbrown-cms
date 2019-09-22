@@ -14,4 +14,8 @@
         flex-grow: 1;
         width: 100%;
     }
+
+    &[data-drag-over] &__context {
+        box-shadow: inset 0 0 0 2px var(--color-decor-text);
+    }
 }

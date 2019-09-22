@@ -18,7 +18,26 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
             }
         });
     }
+    
+    /**
+     * Event: Drop item
+     *
+     * @param {String} itemId
+     * @param {String} parentId
+     * @param {Number} position
+     */
+    async onDropItem(itemId, parentId, position) {
+        try {
+            await HashBrown.Service.RequestService.request('post', `content/insert?contentId=${itemId}&parentId=${parentId || ''}&position=${position}`);
 
+            this.update();
+
+        } catch(e) {
+            UI.error(e);
+
+        }
+    }
+    
     /**
      * Gets available sorting options
      *
@@ -49,19 +68,6 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     }
     
     /**
-     * Gets the context menu options for this panel
-     *
-     * @return {Object} Options
-     */
-    getPanelOptions() {
-        let options = super.getPanelOptions();
-        
-        options['Sort'] = () => this.onClickSort();
-
-        return options;
-    }
-
-    /**
      * Gets a panel item from a resource
      *
      * @param {HashBrown.Entity.Resource.Content} content
@@ -73,7 +79,10 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
 
         item.name = content.prop('title', HashBrown.Context.language) || content.id;
         item.parentId = content.parentId;
-        item.sort = content.sort; 
+        item.sort = content.sort;
+        item.isDraggable = true;
+        item.isSortable = true;
+        item.isDropContainer = true;
         item.changed = content.updateDate;
         item.created = content.createDate;
 

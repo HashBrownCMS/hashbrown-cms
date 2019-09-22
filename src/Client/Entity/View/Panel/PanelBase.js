@@ -96,12 +96,42 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
         this.state.rootItems.sort((a, b) => this.sortItems(a, b));
     }
-   
+
     /**
-     * Event: Click sort
+     * Event: Drop item
+     *
+     * @param {String} itemId
+     * @param {String} parentId
+     * @param {Number} position
      */
-    onClickSort() {
+    async onDropItem(itemId, parentId, position) {}
+    
+    /**
+     * Event: Drop item onto the panel area
+     *
+     * @param {InputEvent} e
+     */
+    async onDropItemOntoPanel(e) {
+        e.preventDefault();
+
+        let itemId = e.dataTransfer.getData('source');
+
+        await this.onDropItem(itemId, null, this.state.rootItems.length);
+    }
+
+    /**
+     * Event: Drag item over the panel area
+     *
+     * @param {InputEvent} e
+     */
+    onDragOverPanel(e) {
+        e.preventDefault();
         
+        for(let item of Array.from(document.querySelectorAll('*[data-drag-over]'))) {
+            delete item.dataset.dragOver;
+        }
+       
+        this.element.dataset.dragOver = 'self';
     }
 
     /**
@@ -342,7 +372,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             category: this.category,
             options: this.getItemOptions(resource),
             name: resource.id,
-            children: []
+            children: [],
+            onDrop: (contentId, parentId, position) => { this.onDropItem(contentId, parentId, position); },
         };
     }
 }

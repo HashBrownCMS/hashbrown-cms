@@ -300,7 +300,7 @@ class UIService {
 
         }
 
-        _.each(children, (i, child) => {
+        for(let child of children) {
             child.draggable = isActive;
 
             if(isActive) {
@@ -330,7 +330,7 @@ class UIService {
                 child.ondragcancel = null;
                 currentDraggedChild = null;
             }
-        });
+        }
         
         parentElement.classList.toggle('sorting', isActive);
 

@@ -166,67 +166,97 @@ class ContentService extends require('Common/Service/ContentService') {
     }
 
     /**
+     * Checks whether a content node is a descendant of another one
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} contentId
+     * @param {String} ancestorId
+     *
+     * @return {Boolean} Is descendant
+     */
+    static async isDescendant(project, environment, contentId, ancestorId) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(contentId, 'contentId', String, true);
+        checkParam(ancestorId, 'ancestorId', String, true);
+        
+        let allContent = await this.getAllContent(project, environment) || [];
+        
+        let map = {};
+
+        for(let content of allContent) {
+            map[content.id] = content;
+        }
+
+        if(!map[contentId]) { return false; }
+
+        let parentId = map[contentId].parentId;
+
+        while(parentId && map[parentId]) {
+            if(parentId === ancestorId) { return true; }
+
+            parentId = map[parentId].parentId;
+        }
+
+        return false;
+    }
+
+    /**
      * Inserts content before/after another node
      *
      * @param {String} project
      * @param {String} environment
      * @param {String} contentId
-     * @param {String} otherId
+     * @param {String} parentId
+     * @param {Number} position
      */
-    static async insertContent(project, environment, user, contentId, otherId, parentId = '') {
+    static async insertContent(project, environment, user, contentId, parentId, position) {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(user, 'user', HashBrown.Entity.Resource.User, true);
         checkParam(contentId, 'contentId', String, true);
-        checkParam(otherId, 'otherId', String, true);
         checkParam(parentId, 'parentId', String);
+        checkParam(position, 'position', Number, true);
         
-        let nodes = await this.getAllContent(project, environment);
+        let allContent = await this.getAllContent(project, environment) || [];
 
-        if(!nodes || nodes.length < 1) { throw new Error('Could not find sibling content'); }
-        
-        // Remove irrelevant nodes
-        nodes = nodes.filter((x) => { return x.id !== contentId && (x.parentId === parentId || !x.parentId === !parentId); });
+        // Filter nodes
+        let siblings = allContent.filter((x) => { return x.id !== contentId && (x.parentId === parentId || !x.parentId === !parentId); });
       
-        // Find the index of the other node
-        let otherNode = nodes.filter((x) => { return x.id === otherId; }).pop();
-        
-        if(!otherNode) {
-            throw new Error('Content "' + otherId + '" was not found under the parent "' + parentId + '"');
-        }
+        // Get the content model
+        let content = await this.getContentById(project, environment, contentId);
 
-        let otherIndex = nodes.indexOf(otherNode);
-
-        if(otherIndex < 0) {
-            throw new Error('Content "' + otherId + '" returned invalid index "' + otherIndex + '"');
-        }
-
-        // Get the node model
-        let node = await this.getContentById(project, environment, contentId);
-
-        // Assign new parent
+        // Check parent id for errors
         if(parentId) {
-            let isAllowed = await this.isSchemaAllowedAsChild(project, environment, parentId, node.schemaId);
+            if(parentId === contentId) { throw new Error('Content cannot be a parent of itself'); }
+
+            let isAllowed = await this.isSchemaAllowedAsChild(project, environment, parentId, content.schemaId);
 
             if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
+
+            let isDescendant = await this.isDescendant(project, environment, parentId, content.id); 
+            
+            if(isDescendant) { throw new Error('Content cannot be a child of its own descendants'); }
         }
 
-        node.parentId = parentId;
+        // Assign new parent
+        content.parentId = parentId;
 
         // Assign the new position
-        if(otherIndex < nodes.length - 1) {
-            nodes.splice(otherIndex + 1, 0, node);
-        
+        if(position < 0) { position = 0; }
+       
+        if(position >= siblings.length) {
+            siblings.push(content);
         } else {
-            nodes.push(node);
-        
+            siblings.splice(position, 0, content);
         }
 
         // Update all nodes with their new sort index
-        for(let i = 0; i < nodes.length; i++) {
-            nodes[i].sort = i + 1;
+        for(let i = 0; i < siblings.length; i++) {
+            siblings[i].sort = i + 1;
 
-            await this.setContentById(project, environment, nodes[i].id, nodes[i], user);
+            await this.setContentById(project, environment, siblings[i].id, siblings[i], user);
         }
     }
     

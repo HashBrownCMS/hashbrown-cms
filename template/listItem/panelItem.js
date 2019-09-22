@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
         
 _.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'active' : ''}`, id: model.id},
-    _.div({class: 'list-item--panel-item__inner'},
+    _.div({class: 'list-item--panel-item__inner', name:'inner', draggable: model.isDraggable, ondragstart: _.onDragStart, ondragend: _.onDragEnd,  ondragover: _.onDragOver, ondragleave: _.onDragLeave, ondrop: _.onDrop},
         _.a({href: `#/${model.category}/${model.id}`, class: 'list-item--panel-item__name', oncontextmenu: _.onClickContext},
             model.name       
         ), 

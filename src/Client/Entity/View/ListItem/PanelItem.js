@@ -16,6 +16,101 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
     }
 
     /**
+     * Event: Drag start
+     */
+    onDragStart(e) {
+        e.dataTransfer.setData('source', this.model.id);
+    
+        this.element.classList.toggle('dragging', true);
+        
+        this.clearDragOverDatasets();
+    }
+    
+    /**
+     * Event: Drag end
+     */
+    onDragEnd(e) {
+        this.element.classList.toggle('dragging', false);
+        
+        this.clearDragOverDatasets();
+    }
+
+    /**
+     * Event: Drag over
+     */
+    onDragOver(e) {
+        e.preventDefault();     
+    
+        this.clearDragOverDatasets();
+
+        if(!this.model.isDropContainer && !this.model.isSortable) { return; }
+        if(e.dataTransfer.getData('source') === this.model.id) { return; }
+
+        let bounds = this.namedChildren.inner.getBoundingClientRect();
+        let margin = bounds.height / 4;
+        let delta = e.pageY - bounds.top;
+
+        if(delta < 0 || delta > bounds.height) {
+            delete this.element.dataset.dragOver;
+            return;
+        }
+
+        if(this.model.isDropContainer) {
+            this.element.dataset.dragOver = 'self';
+        }
+
+        if(this.model.isSortable) {
+            if(delta < margin) {
+                this.element.dataset.dragOver = 'above';
+            } else if(delta > bounds.height - margin) {
+                this.element.dataset.dragOver = 'below';
+            }
+        }
+    }
+    
+    /**
+     * Event: Drag leave
+     */
+    onDragLeave(e) {
+        e.preventDefault();     
+       
+        this.clearDragOverDatasets();
+    }
+    
+    /**
+     * Event: Drop
+     */
+    onDrop(e) {
+        e.preventDefault();     
+        
+        if(!this.model.isDropContainer) { return; }
+
+        let position = this.element.dataset.dragOver;
+        let itemId = e.dataTransfer.getData('source');
+
+        if(!itemId || itemId === this.model.id) { return; }
+
+        if(typeof this.model.onDrop === 'function') {
+            // Drop onto item
+            if(position === 'self') {
+                this.model.onDrop(itemId, this.model.id, 0);
+            
+            // Sort above/below item
+            } else {
+                let index = Array.from(this.element.parentElement.children).indexOf(this.element);
+
+                if(position === 'below') {
+                    index++;
+                }
+
+                this.model.onDrop(itemId, this.model.parentId, index);
+            }
+        }
+        
+        this.clearDragOverDatasets();
+    }
+
+    /**
      * Event: Click expand
      */
     onClickExpand() {
@@ -80,6 +175,15 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
 
         this.model.parent.setExpanded(true);
         this.model.parent.expandAncestors();
+    }
+
+    /**
+     * Clears all "dragOver" datasets
+     */
+    clearDragOverDatasets() {
+        for(let item of Array.from(document.querySelectorAll('*[data-drag-over]'))) {
+            delete item.dataset.dragOver;
+        }
     }
 }
 

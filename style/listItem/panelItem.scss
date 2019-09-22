@@ -3,8 +3,46 @@
         border-bottom: 1px solid var(--color-decor-lightest);
     }
 
+    &.dragging {
+        pointer-events: none;
+    }
+
     &__inner {
         display: flex;
+    }
+    
+    &[data-drag-over] > &__inner {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            display: block;
+            z-index: 20;
+            pointer-events: none;
+        }
+    }
+
+    &[data-drag-over="self"] > &__inner::after {
+        top: 0;
+        height: calc(100% - 2px);
+        width: calc(100% - 4px);
+        border: 2px solid var(--color-decor-text);
+    }
+    
+    &[data-drag-over="above"] > &__inner::after {
+        top: -1px;
+        height: 2px;
+        width: 100%;
+        background-color: var(--color-decor-text);
+    }
+    
+    &[data-drag-over="below"] &__inner::after {
+        bottom: -2px;
+        height: 2px;
+        width: 100%;
+        background-color: var(--color-decor-text);
     }
 
     &__name {
