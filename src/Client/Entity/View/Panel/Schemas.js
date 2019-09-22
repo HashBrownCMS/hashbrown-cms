@@ -1,12 +1,12 @@
 'use strict';
 
 /**
- * A panel for connection resources
+ * A panel for schema resources
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Connections extends HashBrown.Entity.View.Panel.PanelBase {
-    static get icon() { return 'exchange'; }
+class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
+    static get icon() { return 'cogs'; }
     
     /**
      * Gets a panel item from a resource
@@ -18,10 +18,11 @@ class Connections extends HashBrown.Entity.View.Panel.PanelBase {
     getItem(resource) {
         let item = super.getItem(resource);
 
-        item.name = resource.title;
+        item.name = resource.name;
+        item.parentId = resource.parentSchemaId;
 
         return item;
     }
 }
 
-module.exports = Connections;
+module.exports = Schemas;

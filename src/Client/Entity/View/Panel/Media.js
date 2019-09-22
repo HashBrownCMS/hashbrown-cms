@@ -1,12 +1,12 @@
 'use strict';
 
 /**
- * A panel for connection resources
+ * A panel for media resources
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Connections extends HashBrown.Entity.View.Panel.PanelBase {
-    static get icon() { return 'exchange'; }
+class Media extends HashBrown.Entity.View.Panel.PanelBase {
+    static get icon() { return 'file-image-o'; }
     
     /**
      * Gets a panel item from a resource
@@ -18,10 +18,10 @@ class Connections extends HashBrown.Entity.View.Panel.PanelBase {
     getItem(resource) {
         let item = super.getItem(resource);
 
-        item.name = resource.title;
+        item.name = resource.name;
 
         return item;
     }
 }
 
-module.exports = Connections;
+module.exports = Media;

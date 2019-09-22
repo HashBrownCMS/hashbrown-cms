@@ -1,8 +1,9 @@
 @import 'breakpoints';
+@import 'utilities';
 
+@import 'widget';
 @import 'listItem';
 @import 'modal';
 @import 'navigation';
-@import 'page';
 @import 'panel';
-@import 'widget';
+@import 'page';

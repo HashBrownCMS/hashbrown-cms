@@ -1,12 +1,12 @@
 'use strict';
 
 /**
- * A panel for connection resources
+ * A panel for form resources
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Connections extends HashBrown.Entity.View.Panel.PanelBase {
-    static get icon() { return 'exchange'; }
+class Forms extends HashBrown.Entity.View.Panel.PanelBase {
+    static get icon() { return 'wpforms'; }
     
     /**
      * Gets a panel item from a resource
@@ -24,4 +24,4 @@ class Connections extends HashBrown.Entity.View.Panel.PanelBase {
     }
 }
 
-module.exports = Connections;
+module.exports = Forms;

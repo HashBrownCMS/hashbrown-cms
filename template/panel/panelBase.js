@@ -6,11 +6,9 @@ _.div({class: 'panel'},
     state.name === 'error' ?
         state.message
     :
-        _.div({class: 'panel__filter'},
-            _.div({class: 'widget-group'},
-                _.text({oninput: (e) => _.onSearch(e.target.value)}),
-                _.popup({options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
-            )
+        _.div({class: 'panel__tools'},
+            _.text({class: 'panel__tools__search', oninput: _.onSearch}),
+            _.popup({class: 'panel__tools__sort', options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
         ),
         _.div({class: 'panel__items', name: 'items'},
             state.rootItems,

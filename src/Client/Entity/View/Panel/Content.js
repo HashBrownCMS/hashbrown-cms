@@ -20,6 +20,20 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     }
     
     /**
+     * Event: Click remove
+     */
+    async onClickRemove(id) {
+        let content = await HashBrown.Service.ContentService.getContentById(id);
+
+        new HashBrown.Entity.View.Modal.RemoveContent({
+            model: {
+                contentId: content.id,
+                unpublish: !content.sync.hasRemote && !content.isLocked
+            }
+        });
+    }
+    
+    /**
      * Event: Drop item
      *
      * @param {String} itemId
@@ -77,7 +91,21 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     getItem(content) {
         let item = super.getItem(content);
 
-        item.name = content.prop('title', HashBrown.Context.language) || content.id;
+        item.name = content.prop('title', HashBrown.Context.language);
+
+        if(!item.name) {
+            item.name = 'Untitled';
+
+            for(let language in content.properties.title) {
+                let languageTitle = content.properties.title[language];
+
+                if(languageTitle) {
+                    item.name += ' - (' + language + ': ' + languageTitle + ')';
+                    break;
+                }
+            }
+        }
+
         item.parentId = content.parentId;
         item.sort = content.sort;
         item.isDraggable = true;

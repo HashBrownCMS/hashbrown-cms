@@ -1,0 +1,34 @@
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(359deg); }
+}
+
+@mixin spinner {
+    position: relative;
+    pointer-events: none;
+
+    &::before, &::after {
+        position: absolute;
+        content: '';
+        display: block;
+    }
+
+    &::before {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.2);
+        z-index: 20;
+    }
+
+    &::after {
+        font-family: 'FontAwesome';
+        content: '\f110';
+        z-index: 21;
+        font-size: 1rem;
+        top: calc(50% - 0.5em);
+        left: calc(50% - 0.5em);
+        animation: spinner 0.5s steps(8) infinite;
+    }
+}

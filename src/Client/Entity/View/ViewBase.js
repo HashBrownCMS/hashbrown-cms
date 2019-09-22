@@ -34,7 +34,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         this.def(HTMLElement, 'element', null);
         this.def(Object, 'events', {});
         this.def(Object, 'partials', {});
-        this.def(Object, 'namedChildren', {});
+        this.def(Object, 'namedElements', {});
     }
 
     /**
@@ -227,7 +227,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                                 let child = new widget({model: attributes});
 
                                 if(attributes && attributes.name) {
-                                    this.namedChildren[attributes.name] = child;
+                                    this.namedElements[attributes.name] = child;
                                 }
 
                                 return child.element;
@@ -239,7 +239,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             let element = this.createElement(name, attributes, content);
 
                             if(attributes && attributes.name) {
-                                this.namedChildren[attributes.name] = element;
+                                this.namedElements[attributes.name] = element;
                             }
 
                             return element;

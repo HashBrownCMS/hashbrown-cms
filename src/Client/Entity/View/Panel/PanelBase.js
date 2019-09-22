@@ -32,6 +32,13 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Update
      */
     async update() {
+        // Cache scroll position
+        let scrollTop = 0;
+
+        if(this.namedElements.items) {
+            scrollTop = this.namedElements.items.scrollTop;
+        }
+
         // Cache item states
         let itemStates = {};
 
@@ -48,10 +55,13 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             this.state.itemMap[id].render();
         }
 
-        // Highlight selected item if needed
-        if(getRoute(1)) {
-            this.highlightItem(getRoute(1));
+        // Restore scroll position
+        if(this.namedElements.items) {
+            this.namedElements.items.scrollTop = scrollTop;
         }
+
+        // Highlight selected item
+        this.highlightItem(getRoute(1));
     }
 
     /**
@@ -191,8 +201,16 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             'Remove item',
             'Are you sure you want to remove this item?',
             async () => {
+                if(this.state.itemMap[id]) {
+                    this.state.itemMap[id].element.classList.toggle('loading', true);
+                }
+
                 await HashBrown.Service.ResourceService.remove(this.category, id);
-       
+                
+                if(this.state.itemMap[id]) {
+                    this.state.itemMap[id].element.classList.toggle('loading', false);
+                }
+      
                 if(location.hash.indexOf(id) > -1) {
                     location.hash = `/${this.category}/`;
                 }
@@ -212,6 +230,20 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     async onClickPush(id) {
         await HashBrown.Service.ResourceService.push(this.category, id);
+    }
+
+    /**
+     * Event: Search
+     */
+    onSearch(query = '') {
+        query = (query || '').toLowerCase();
+
+        for(let id in this.state.itemMap) {
+            let item = this.state.itemMap[id];
+            let isMatch = !query || item.model.name.toLowerCase().indexOf(query) > -1;
+
+            item.element.classList.toggle('defocused', !isMatch);
+        }
     }
 
     /**
@@ -255,6 +287,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        if(!resource.sync) { resource.sync = {}; }
+       
         let options = {};
 
         options['Copy id'] = () => this.onClickCopyId(resource.id);
@@ -274,6 +308,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemSyncOptions(resource) {
+        if(!resource.sync) { resource.sync = {}; }
+
         let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
 
         if(!isSyncEnabled) { return {}; }
@@ -370,6 +406,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         return {
             id: resource.id,
             category: this.category,
+            isLocked: resource.isLocked,
             options: this.getItemOptions(resource),
             name: resource.id,
             children: [],

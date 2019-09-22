@@ -46,8 +46,8 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(!this.model.isDropContainer && !this.model.isSortable) { return; }
         if(e.dataTransfer.getData('source') === this.model.id) { return; }
 
-        let bounds = this.namedChildren.inner.getBoundingClientRect();
-        let margin = bounds.height / 4;
+        let bounds = this.namedElements.inner.getBoundingClientRect();
+        let margin = bounds.height / 3;
         let delta = e.pageY - bounds.top;
 
         if(delta < 0 || delta > bounds.height) {

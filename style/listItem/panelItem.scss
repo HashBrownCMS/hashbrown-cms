@@ -1,14 +1,20 @@
 .list-item--panel-item {
-    &:not(:last-child) {
-        border-bottom: 1px solid var(--color-decor-lightest);
-    }
-
     &.dragging {
         pointer-events: none;
     }
 
+    &.defocused > &__inner {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    &.loading > &__inner {
+        @include spinner; 
+    }
+
     &__inner {
         display: flex;
+        border-bottom: 1px solid var(--color-decor-lightest);
     }
     
     &[data-drag-over] > &__inner {
@@ -57,22 +63,27 @@
     }
 
     &__name:hover ~ &__actions,
-    &__name:hover ~ &__icons {
+    &__name:hover ~ &__properties {
         background-color: var(--color-decor-lightest);
     }
 
     &.active > &__inner > &__name,
     &.active > &__inner > &__actions,
-    &.active > &__inner > &__icons {
+    &.active > &__inner > &__properties {
         background-color: var(--color-action);
     }
 
-    &__actions {
+    &__actions,
+    &__properties {
         display: flex;
         align-items: center;
     }
+    
+    &__property {
+        opacity: 0.5;
+    } 
 
-    &__icon,
+    &__property,
     &__action {
         padding: 0;
         margin: 0;

@@ -25,7 +25,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Event: Value changed
      */
     onChange() {
-        let newValue = this.toValue(this.namedChildren.editor.innerHTML);
+        let newValue = this.toValue(this.namedElements.editor.innerHTML);
 
         super.onChange(newValue);
     }
@@ -45,7 +45,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     insertHtml(html) {
         if(!html) { return; }
 
-        this.namedChildren.editor.innerHTML += this.toView(html);
+        this.namedElements.editor.innerHTML += this.toView(html);
 
         this.onChange();
     };
@@ -54,7 +54,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Updates the paragraph picker and selection tag
      */
     updateElementTag () {
-        let paragraphPicker = this.namedChildren.paragraph;
+        let paragraphPicker = this.namedElements.paragraph;
         
         if(!paragraphPicker) { return; }
 
@@ -147,7 +147,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      */
     onChangeHeading(newValue) {
         document.execCommand('heading', false, newValue);
-        this.namedChildren.editor.focus();
+        this.namedElements.editor.focus();
         this.onChange();
     }
 

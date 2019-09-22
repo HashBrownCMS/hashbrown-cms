@@ -203,6 +203,36 @@ class ContentService extends require('Common/Service/ContentService') {
     }
 
     /**
+     * Gets children of a content id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {Array} excludeIds
+     *
+     * @return {Array} Children
+     */
+    static async getChildren(project, environment, parentId, excludeIds = []) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(parentId, 'parentId', String);
+        checkParam(excludeIds, 'excludeIds', Array);
+        
+        let result = await HashBrown.Service.DatabaseService.find(project, environment + '.content', { parentId: parentId }, {}, { sort: 1 });
+        let children = [];
+
+        for(let child of result) {
+            if(excludeIds && excludeIds.indexOf(child.id) > -1) { continue; }
+
+            child = new HashBrown.Entity.Resource.Content(child);
+
+            children.push(child);
+        }
+
+        return children;
+    }
+
+    /**
      * Inserts content before/after another node
      *
      * @param {String} project
@@ -219,11 +249,9 @@ class ContentService extends require('Common/Service/ContentService') {
         checkParam(parentId, 'parentId', String);
         checkParam(position, 'position', Number, true);
         
-        let allContent = await this.getAllContent(project, environment) || [];
+        // Get siblings
+        let siblings = await this.getChildren(project, environment, parentId);
 
-        // Filter nodes
-        let siblings = allContent.filter((x) => { return x.id !== contentId && (x.parentId === parentId || !x.parentId === !parentId); });
-      
         // Get the content model
         let content = await this.getContentById(project, environment, contentId);
 
@@ -240,23 +268,28 @@ class ContentService extends require('Common/Service/ContentService') {
             if(isDescendant) { throw new Error('Content cannot be a child of its own descendants'); }
         }
 
-        // Assign new parent
-        content.parentId = parentId;
-
         // Assign the new position
+        let result = [];
+        
         if(position < 0) { position = 0; }
-       
-        if(position >= siblings.length) {
-            siblings.push(content);
-        } else {
-            siblings.splice(position, 0, content);
+      
+        for(let i = 0; i < siblings.length; i++) {
+            if(siblings[i].id === contentId) { continue; }
+
+            if(i === position) {
+                result.push(content);
+            }
+
+            result.push(siblings[i]);
+        }
+
+        if(result.indexOf(content) < 0) {
+            result.push(content);
         }
 
         // Update all nodes with their new sort index
-        for(let i = 0; i < siblings.length; i++) {
-            siblings[i].sort = i + 1;
-
-            await this.setContentById(project, environment, siblings[i].id, siblings[i], user);
+        for(let i = 0; i < result.length; i++) {
+            await HashBrown.Service.DatabaseService.updateOne(project, environment + '.content', { id: result[i].id }, { sort: i, parentId: parentId });
         }
     }
     

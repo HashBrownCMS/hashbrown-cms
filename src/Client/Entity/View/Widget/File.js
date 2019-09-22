@@ -23,8 +23,8 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
     onChange(files) {
         let names = [];
 
-        let submit = this.namedChildren.submit;
-        let placeholder = this.namedChildren.placeholder;
+        let submit = this.namedElements.submit;
+        let placeholder = this.namedElements.placeholder;
 
         if(submit) {
             submit.classList.toggle('disabled', !files || files.length < 1);
@@ -54,7 +54,7 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
     onSubmit(e) {
         e.preventDefault();
 
-        let input = this.namedChildren[this.model.name];
+        let input = this.namedElements[this.model.name];
 
         if(!input || !input.files || input.files.length < 1) { return; }
 

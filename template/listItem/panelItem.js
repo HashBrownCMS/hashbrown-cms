@@ -2,14 +2,17 @@
 
 module.exports = (_, model, state) =>
         
-_.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'active' : ''}`, id: model.id},
+_.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'active' : ''}`, 'data-sort': model.sort, id: model.id},
     _.div({class: 'list-item--panel-item__inner', name:'inner', draggable: model.isDraggable, ondragstart: _.onDragStart, ondragend: _.onDragEnd,  ondragover: _.onDragOver, ondragleave: _.onDragLeave, ondrop: _.onDrop},
         _.a({href: `#/${model.category}/${model.id}`, class: 'list-item--panel-item__name', oncontextmenu: _.onClickContext},
             model.name       
         ), 
-        _.div({class: 'list-item--panel-item__icons'},
+        _.div({class: 'list-item--panel-item__properties'},
             _.if(model.isRemote,
-                _.div({class: 'list-item--panel-item__icon fa fa-external-link'})
+                _.div({class: 'list-item--panel-item__property fa fa-external-link'})
+            ),
+            _.if(model.isLocked,
+                _.div({class: 'list-item--panel-item__property fa fa-lock'})
             )
         ),
         _.div({class: 'list-item--panel-item__actions'},

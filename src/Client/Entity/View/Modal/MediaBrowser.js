@@ -21,7 +21,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Iframe loaded
      */
     onLoadIframe() {
-        let iframe = this.namedChildren.iframe;
+        let iframe = this.namedElements.iframe;
 
         if(!iframe) { return; }
 
