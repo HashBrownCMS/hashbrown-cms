@@ -34,6 +34,15 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
     }
     
     /**
+     * Gets the context menu options for this panel
+     *
+     * @return {Object} Options
+     */
+    getPanelOptions() {
+        return {};
+    }
+    
+    /**
      * Gets a panel item from a resource
      *
      * @param {HashBrown.Entity.Resource.Content} content

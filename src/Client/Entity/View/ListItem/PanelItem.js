@@ -82,29 +82,27 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
      */
     onDrop(e) {
         e.preventDefault();     
-        
+    
         if(!this.model.isDropContainer) { return; }
 
         let position = this.element.dataset.dragOver;
         let itemId = e.dataTransfer.getData('source');
 
         if(!itemId || itemId === this.model.id) { return; }
+        
+        // Drop onto item
+        if(position === 'self') {
+            this.trigger('drop', itemId, this.model.id, 0);
+        
+        // Sort above/below item
+        } else {
+            let index = Array.from(this.element.parentElement.children).indexOf(this.element);
 
-        if(typeof this.model.onDrop === 'function') {
-            // Drop onto item
-            if(position === 'self') {
-                this.model.onDrop(itemId, this.model.id, 0);
-            
-            // Sort above/below item
-            } else {
-                let index = Array.from(this.element.parentElement.children).indexOf(this.element);
-
-                if(position === 'below') {
-                    index++;
-                }
-
-                this.model.onDrop(itemId, this.model.parentId, index);
+            if(position === 'below') {
+                index++;
             }
+
+            this.trigger('drop', itemId, this.model.parentId, index);
         }
         
         this.clearDragOverDatasets();
@@ -186,6 +184,22 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
         for(let item of Array.from(document.querySelectorAll('*[data-drag-over]'))) {
             delete item.dataset.dragOver;
         }
+    }
+    
+    /**
+     * Gets the placeholder element
+     *
+     * @return {HTMLElement} Placeholder
+     */
+    getPlaceholder() {
+        let element = document.createElement('div');
+        element.className = 'list-item--panel-item loading';
+        
+        let inner = document.createElement('div');
+        inner.className = 'list-item--panel-item__inner';
+        
+
+        return element;
     }
 }
 

@@ -27,20 +27,29 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
     }
     
     /**
+     * Event: Click rename
+     */
+    onClickRename(media) {
+        let modal = new HashBrown.Entity.View.Modal.Rename({
+            model: {
+                value: media.name
+            }
+        });
+            
+        modal.on('submit', async (newName) => {
+            await HashBrown.Service.RequestService.request('post', 'media/rename/' + media.id + '?name=' + newName);
+
+            HashBrown.Service.EventService.trigger('resource', media.id); 
+        });
+    }
+    
+    /**
      * Event: Click replace
      */
     onClickReplace(replaceId) {
         let modal = new HashBrown.Entity.View.Modal.UploadMedia({
             model: {
                 replaceId: replaceId
-            }
-        });
-            
-        modal.on('success', (ids) => {
-            if(location.hash.indexOf(replaceId) > -1) {
-                window.dispatchEvent(new HashChangeEvent("hashchange"));
-
-                location.hash = '/media/' + replaceId;
             }
         });
     }
@@ -73,6 +82,25 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
             HashBrown.Service.EventService.trigger('resource');  
         });
     }
+    
+    /**
+     * Event: Drop media into folder
+     *
+     * @param {String} itemId
+     * @param {String} parentId
+     * @param {Number} position
+     */
+    async onDropItem(itemId, parentId, position) {
+        try {
+            await HashBrown.Service.RequestService.request('post', 'media/tree/' + itemId, { id: itemId, folder: parentId });
+
+            this.update();
+
+        } catch(e) {
+            UI.error(e);
+
+        }
+    }
 
     /**
      * Gets a panel item from a resource
@@ -88,6 +116,7 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
         item.parentId = resource.folder;   
         item.icon = 'file-o';
         item.isRemote = true;
+        item.isDraggable = true;
 
         if(resource.isVideo()) {
             item.icon = 'file-video-o';
@@ -111,6 +140,7 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
     getItemBaseOptions(resource) {
         let options = super.getItemBaseOptions(resource);
 
+        options['Rename'] = () => this.onClickRename(resource);
         options['Move'] = () => this.onClickMove(resource);
         options['Replace'] = () => this.onClickReplace(resource.id);
 
@@ -134,19 +164,30 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
 
         if(!folderName) { return null; }
         
-        let parentFolderPath = '/' + parts.join('/') + '/';
+        let parentFolderPath = '/';
 
-        return new HashBrown.Entity.View.ListItem.PanelItem({
+        if(parts.length > 0) {
+            parentFolderPath += parts.join('/') + '/';
+        }
+
+        let item = new HashBrown.Entity.View.ListItem.PanelItem({
             model: {
                 name: folderName,
                 id: path,
                 isDisabled: true,
+                isDropContainer: true,
                 icon: 'folder',
                 hasSortingPriority: true,
                 parentId: parentFolderPath,
                 children: []
             }
         });
+        
+        item.on('drop', (itemId, parentId, position) => {
+            this.onDropItem(itemId, parentId, position);
+        });
+
+        return item;
     }
 }
 

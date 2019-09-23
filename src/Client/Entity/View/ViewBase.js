@@ -17,8 +17,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * Initialise
      */
     async init() {
-        this.element = document.createElement('div');
-        this.element.className = 'placeholder';
+        this.element = this.getPlaceholder();
 
         await this.update();
 
@@ -35,6 +34,18 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         this.def(Object, 'events', {});
         this.def(Object, 'partials', {});
         this.def(Object, 'namedElements', {});
+    }
+
+    /**
+     * Gets the placeholder element
+     *
+     * @return {HTMLElement} Placeholder
+     */
+    getPlaceholder() {
+        let element = document.createElement('div');
+        element.className = 'placeholder';
+
+        return element;
     }
 
     /**

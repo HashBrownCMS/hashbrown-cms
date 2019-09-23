@@ -75,8 +75,11 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         // Generate items and place them in the queue and map cache
         for(let resource of resources) {
             let model = await this.getItem(resource);
-
             let item = new HashBrown.Entity.View.ListItem.PanelItem({model: model});
+
+            item.on('drop', (itemId, parentId, position) => {
+                this.onDropItem(itemId, parentId, position);
+            });
 
             this.state.itemMap[item.model.id] = item;
             
@@ -156,13 +159,17 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     onClickContext(e) {
         e.preventDefault();
 
+        let options = this.getPanelOptions();
+
+        if(!options || Object.keys(options).length < 1) { return; }
+
         let pageY = e.touches ? e.touches[0].pageY : e.pageY;
         let pageX = e.touches ? e.touches[0].pageX : e.pageX;
         
         let contextMenu = new HashBrown.Entity.View.Widget.Popup({
             model: {
                 target: this.element,
-                options: this.getPanelOptions(),
+                options: options,
                 role: 'context-menu',
                 offset: {
                     x: pageX,
@@ -262,8 +269,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         if(!a || !a.model) { return -1; }
         if(!b || !b.model) { return 1; }
 
-        if(a.model.hasSortingPriority) { return -1; }
-        if(b.model.hasSortingPriority) { return 1; }
+        if(a.model.hasSortingPriority && !b.model.hasSortingPriority) { return -1; }
+        if(b.model.hasSortingPriority && !a.model.hasSortingPriority) { return 1; }
 
         let method = this.state.sortingMethod.split(':');
 
@@ -419,11 +426,10 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         return {
             id: resource.id,
             category: this.category,
-            isLocked: resource.isLocked,
+            isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
             name: resource.id,
-            children: [],
-            onDrop: (contentId, parentId, position) => { this.onDropItem(contentId, parentId, position); },
+            children: []
         };
     }
 
@@ -436,6 +442,18 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     getParentItem(parentId) {
         return this.state.itemMap[parentId];
+    }
+    
+    /**
+     * Gets the placeholder element
+     *
+     * @return {HTMLElement} Placeholder
+     */
+    getPlaceholder() {
+        let element = document.createElement('div');
+        element.className = 'panel loading';
+
+        return element;
     }
 }
 

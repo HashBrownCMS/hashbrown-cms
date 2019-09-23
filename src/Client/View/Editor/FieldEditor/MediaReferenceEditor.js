@@ -62,7 +62,7 @@ class MediaReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor
                 value: this.value
             }
         })
-        .on('select', (id) => {
+        .on('pick', (id) => {
             this.value = id;
 
             this.trigger('change', this.value);

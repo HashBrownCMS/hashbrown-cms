@@ -3,6 +3,10 @@
     display: flex;
     flex-direction: column;
 
+    &.loading {
+        @include spinner; 
+    }
+    
     &__tools {
         display: flex;
         padding: 0.5rem;

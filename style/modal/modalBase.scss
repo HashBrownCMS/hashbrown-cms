@@ -40,7 +40,6 @@
     // Close button
     &__close {
         border: 0;
-        position: absolute;
         line-height: 2rem;
         height: var(--size-widget-small);
         display: block;
@@ -49,8 +48,7 @@
         background-color: var(--color-decor-500);
         border-radius: var(--border-radius-small);
         cursor: pointer;
-        top: 1rem;
-        right: 1rem;
+        margin-left: 1rem;
 
         &:hover {
             background-color: var(--color-decor-200);
@@ -63,13 +61,18 @@
         color: var(--color-decor-text);
         padding: 1rem;
         position: relative;
+        display: flex;
     }
     
     // Title
     &__title {
+        white-space: nowrap;
         line-height: var(--size-widget-small);
         height: var(--size-widget-small);
         margin: 0;
+        padding-right: 1rem;
+        flex-shrink: 0;
+        flex-grow: 1;
     }
 
     // Body
@@ -135,8 +138,6 @@
 
         &__close {
             background-color: var(--color-action-300);
-            top: 0;
-            right: 0;
         }
 
         &__body {

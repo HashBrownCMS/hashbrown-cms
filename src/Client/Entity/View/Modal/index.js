@@ -20,5 +20,6 @@ namespace('Entity.View.Modal')
 .add(require('./ProjectBackups'))
 .add(require('./Prompt'))
 .add(require('./RemoveContent'))
+.add(require('./Rename'))
 .add(require('./UploadMedia'))
 .add(require('./UserEditor'));

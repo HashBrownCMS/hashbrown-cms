@@ -15,6 +15,7 @@
     &__inner {
         display: flex;
         border-bottom: 1px solid var(--color-decor-800);
+        min-height: var(--size-widget-large);
     }
     
     &[data-drag-over] > &__inner {

@@ -7,9 +7,10 @@
     display: block;
     flex-grow: 1;
     margin: 0;
+    background-color: var(--color-default-100);
     color: var(--color-default-text);
     padding: 0 0.5rem;
-    border-radius: 0.2rem;
+    border-radius: var(--border-radius-small);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

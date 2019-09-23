@@ -36,13 +36,9 @@ _.div({class: 'modal modal--upload-media in'},
                 })
             )
         ),
-        _.div({class: 'modal__footer'},
-            _.if(state.name === 'error', 
+        _.if(state.name === 'error', 
+            _.div({class: 'modal__footer'},
                 _.button({class: 'widget widget--button', onclick: _.onClickReset}, 'OK')
-            ),
-            
-            _.if(state.name === undefined, 
-                _.button({class: 'widget widget--button', onclick: _.onClickClose}, 'Cancel')
             )
         )
     )

@@ -142,7 +142,7 @@ class RichTextEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
     onClickInsertMedia() {
         let mediaBrowser = new HashBrown.Entity.View.Modal.MediaBrowser();
 
-        mediaBrowser.on('select', async (id) => {
+        mediaBrowser.on('pick', async (id) => {
             let media = await HashBrown.Service.MediaService.getMediaById(id);
             
             if(!media) { return; }

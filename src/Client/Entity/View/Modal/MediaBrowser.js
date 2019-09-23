@@ -13,50 +13,102 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
         super(params);
     
         this.template = require('template/modal/mediaBrowser');
-
-        this.state.iframeUrl = location.href.replace(location.hash, '') + '?isMediaPicker=true#/media/' + (this.model.value || '');
     }
 
     /**
-     * Event: Iframe loaded
+     * Fetches all media
      */
-    onLoadIframe() {
-        let iframe = this.namedElements.iframe;
-
-        if(!iframe) { return; }
-
-        iframe.contentWindow.HashBrown.Service.MediaService.initMediaPickerMode(
-            (id) => { this.onPickMedia(id); },
-            () => { this.onChangeResource(); },
-            (e) => { this.setErrorState(e); }
-        );
-    }
-
-    /**
-     * Event: Pick Media
-     *
-     * @param {string} id
-     */
-    onPickMedia(id) {
-        this.model.value = id;
-    }
-
-    /** 
-     * Event: Click select
-     */
-    onClickSelect() {
-        if(!this.model.value) { return; }
+    async fetch() {
+        this.state.items = await HashBrown.Service.MediaService.getAllMedia();
         
-        this.trigger('select', this.model.value);
+        // Establish abstract root folder
+        this.state.rootFolder = {
+            name: '/',
+            path: '/',
+            children: []
+        };
+
+        // Map folders, including generated ones
+        let map = {};
+
+        map['/'] = this.state.rootFolder;
+
+        for(let item of this.state.items || []) {
+            let parts = item.folder.split('/').filter((x) => !!x) || [];
+            
+            while(parts.length > 0) {
+                let thisPath = '/' + parts.join('/') + '/';
+            
+                let name = parts.pop();
+
+                let parentPath = '/';
+
+                if(parts.length > 0) {
+                    parentPath += parts.join('/') + '/';
+                }
+
+                if(!map[thisPath]) {
+                    map[thisPath] =  {
+                        name: name, 
+                        path: thisPath,
+                        parentPath: parentPath,
+                        children: []
+                    };
+                }
+            }
+        }
+
+        // Place folders into hierarchy
+        for(let path in map) {
+            let folder = map[path];
+
+            if(map[folder.parentPath]) {
+                map[folder.parentPath].children.push(folder);
+            }
+        }
+    }
+
+    /**
+     * Event: Search
+     */
+    onSearch(query) {
+        query = (query || '').toLowerCase();
+
+        for(let item of Array.from(this.namedElements.items.children)) {
+            let name = (item.title || '').toLowerCase();
+
+            if(name.indexOf(query) > -1) {
+                item.removeAttribute('style');
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * Event: Click item
+     *
+     * @param {String} itemId
+     */
+    onClickItem(itemId) {
+        this.trigger('pick', itemId);
 
         this.close();
     }
-    
+
     /**
-     * Event: Change resource
+     * Event: Click folder
+     *
+     * @param {String} path
      */
-    onChangeResource() {
-        HashBrown.Service.EventService.trigger('resource');
+    onClickFolder(path) {
+        for(let item of Array.from(this.namedElements.items.children)) {
+            if(!path || item.dataset.folder === path) {
+                item.removeAttribute('style');
+            } else {
+                item.style.display = 'none';
+            }
+        }
     }
 }
 
