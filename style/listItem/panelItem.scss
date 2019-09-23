@@ -14,7 +14,7 @@
 
     &__inner {
         display: flex;
-        border-bottom: 1px solid var(--color-decor-lightest);
+        border-bottom: 1px solid var(--color-decor-800);
     }
     
     &[data-drag-over] > &__inner {
@@ -51,26 +51,36 @@
         background-color: var(--color-decor-text);
     }
 
+    &__icon {
+        display: inline-block;
+        margin-right: 0.75rem;
+        width: 1rem;
+        text-align: center;
+    }
+
     &__name {
         padding: 0 1rem 0 1rem;
         line-height: var(--size-widget-large); 
         flex-grow: 1;
         color: inherit;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:hover {
-            background-color: var(--color-decor-lightest);
+            background-color: var(--color-decor-700);
         }
     }
 
     &__name:hover ~ &__actions,
     &__name:hover ~ &__properties {
-        background-color: var(--color-decor-lightest);
+        background-color: var(--color-decor-700);
     }
 
     &.active > &__inner > &__name,
     &.active > &__inner > &__actions,
     &.active > &__inner > &__properties {
-        background-color: var(--color-action);
+        background-color: var(--color-decor-800);
     }
 
     &__actions,
@@ -102,6 +112,6 @@
 
     &__children {
         margin-left: 1rem;
-        border-left: 1px solid var(--color-decor-lightest);
+        border-left: 1px solid var(--color-decor-800);
     }
 }

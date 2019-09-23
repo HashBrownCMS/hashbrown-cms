@@ -7,6 +7,7 @@
  */
 class Forms extends HashBrown.Entity.View.Panel.PanelBase {
     static get icon() { return 'wpforms'; }
+    static get itemType() { return HashBrown.Entity.Resource.Form; }
     
     /**
      * Gets a panel item from a resource
@@ -15,10 +16,11 @@ class Forms extends HashBrown.Entity.View.Panel.PanelBase {
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
-    getItem(resource) {
-        let item = super.getItem(resource);
+    async getItem(resource) {
+        let item = await super.getItem(resource);
 
         item.name = resource.title;
+        item.icon = 'wpforms';
 
         return item;
     }

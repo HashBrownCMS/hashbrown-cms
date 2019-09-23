@@ -88,7 +88,7 @@
         display: block;
         top: -0.75rem;
         right: calc(100% - 0.75rem);
-        background-color: var(--color-action);
+        background-color: var(--color-action-500);
         color: var(--color--action-text);
         border-radius: 1rem;
         text-align: center;
@@ -133,12 +133,12 @@
     }
     
     &.action {
-        background-color: var(--color-action);
+        background-color: var(--color-action-500);
         color: var(--color-action-text);
     }
     
     &.decor {
-        background-color: var(--color-decor);
+        background-color: var(--color-decor-500);
         color: var(--color-decor-text);
     }
 }

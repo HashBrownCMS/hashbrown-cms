@@ -192,6 +192,25 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             return content;
                         };
 
+                    // Recurse through an array
+                    case 'recurse':
+                        return (items, key, callback) => {
+                            if(!items || !Array.isArray(items)) { return []; }
+
+                            let content = [];
+
+                            for(let i in items) {
+                                let item = items[i];
+
+                                let children = this.scope().recurse(item[key], key, callback);
+                                let element = callback(i, item, children);
+
+                                content.push(element);
+                            }
+
+                            return content;
+                        };
+
                     // Render an included template
                     case 'include':
                         return (template, model) => {

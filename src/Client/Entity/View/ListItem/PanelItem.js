@@ -125,6 +125,8 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickContext(e) {
         e.preventDefault();
 
+        if(!this.model.options || this.model.options.length < 1) { return; }
+
         let pageY = e.touches ? e.touches[0].pageY : e.pageY;
         let pageX = e.touches ? e.touches[0].pageX : e.pageX;
         

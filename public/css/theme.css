@@ -6,17 +6,18 @@
  */
 :root {
     /* Colour */
-    --color-action: #e70d3b;
-    --color-action-light: #f66483;
-    --color-action-dark: #b70a2f;
+    --color-action-300: #b70a2f;
+    --color-action-500: #e70d3b;
+    --color-action-600: #f66483;
     --color-action-text: #ffffff;
 
-    --color-decor: #21303b;
-    --color-decor-light: #283b48;
-    --color-decor-lighter: #2c404f;
-    --color-decor-lightest: #375062;
-    --color-decor-dark: #0f151a;
-    --color-decor-darker: black;
+    --color-decor-200: black; 
+    --color-decor-300: #0f151a;
+    --color-decor-400: #131d23;
+    --color-decor-500: #21303b;
+    --color-decor-600: #283b48;
+    --color-decor-700: #2c404f;
+    --color-decor-800: #375062;
     --color-decor-text: #ffffff;
 
     --color-warn: #FFB300;
@@ -41,4 +42,7 @@
     
     /* Box shadow */
     --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+
+    /* Panels */
+    --width-panels: 30rem;
 }

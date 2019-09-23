@@ -5,7 +5,7 @@
 
     &__tabs {
         padding: 0.5rem 0 0 0;
-        background-color: var(--color-decor);
+        background-color: var(--color-decor-500);
     }
     
     &__tab {
@@ -16,21 +16,29 @@
         height: var(--size-widget-large);
         border-top-left-radius: var(--border-radius-small);
         border-bottom-left-radius: var(--border-radius-small);
-        background-color: var(--color-decor-light);
-        color: var(--color-decor-lightest);
         line-height: var(--size-widget-large);
         text-align: center;
         font-size: 2rem;
 
         &.active {
             color: var(--color-decor-text);
-            background-color: var(--color-decor-lighter);
+            background-color: var(--color-decor-600);
+        }
+
+        &:not(.active) {
+            background-color: var(--color-decor-600);
+            color: var(--color-decor-800);
+
+            &:hover {
+                background-color: var(--color-decor-700);
+            }
         }
     }
 
     &__panels {
         flex-grow: 1;
-        background-color: var(--color-decor-lighter);
+        background-color: var(--color-decor-600);
         color: var(--color-decor-text);
+        width: calc(var(--width-panels) - var(--size-widget-large));
     }
 }

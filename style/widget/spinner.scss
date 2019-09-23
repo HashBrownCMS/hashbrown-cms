@@ -50,7 +50,7 @@
         height: 8rem;
         text-align: center;
         line-height: 8rem;
-        color: var(--color-decor);
+        color: var(--color-decor-500);
         font-size: 2rem;
         top: calc(50% - 4rem);
         left: calc(50% - 4rem);
@@ -65,7 +65,7 @@
         top: 50%;
         position: absolute;
         transform: translate(0%, -50%);
-        border-left: 1px solid var(--color-action);
+        border-left: 1px solid var(--color-action-500);
     }
     
     &__message {
@@ -75,12 +75,12 @@
         padding: 10px;
         font-weight: 700;
         text-transform: uppercase;
-        color: var(--color-action);
+        color: var(--color-action-500);
 
         &:before {
             content: '';
             display: block;
-            background-color: var(--color-action);
+            background-color: var(--color-action-500);
             width: 0%;
             height: 100%;
             transition: width 0.25s ease;

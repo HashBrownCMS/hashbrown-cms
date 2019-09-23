@@ -1,0 +1,45 @@
+.modal--folders {
+    &__folder {
+        &__inner {
+            display: flex;
+        }
+
+        &__add {
+            display: block;
+            line-height: var(--size-widget-small);
+            width: var(--size-widget-small);
+            flex-shrink: 0;
+            border: 0;
+            background-color: transparent;
+            cursor: pointer;
+            
+            &:hover {
+                background-color: var(--color-default-100);
+            }
+        }
+
+        &__name {
+            background-color: var(--color-default);
+            color: var(--color-default-text);
+            padding: 0 0.5rem;
+            margin: 0;
+            line-height: var(--size-widget-small);
+            border: 0;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            
+            &:hover {
+                background-color: var(--color-default-100);
+            }
+        }
+
+        &__children {
+            margin-left: 1rem;
+        }
+
+        &__icon {
+            margin-right: 0.75rem;
+        }
+    }
+}

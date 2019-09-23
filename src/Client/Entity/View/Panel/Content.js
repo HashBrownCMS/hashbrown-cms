@@ -59,10 +59,10 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
      */
     getSortingOptions() {
         return {
-            'Default': 'sort',
-            'A-Z': 'name',
-            'Changed': 'changed',
-            'Created': 'created'
+            'Manual': 'sort:asc',
+            'Name': 'name:asc',
+            'Changed': 'changed:desc',
+            'Created': 'created:desc'
         }
     }
     
@@ -88,8 +88,8 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
-    getItem(content) {
-        let item = super.getItem(content);
+    async getItem(content) {
+        let item = await super.getItem(content);
 
         item.name = content.prop('title', HashBrown.Context.language);
 
@@ -106,9 +106,12 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
             }
         }
 
+        let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
+
         item.parentId = content.parentId;
         item.sort = content.sort;
         item.isDraggable = true;
+        item.icon = schema.icon;
         item.isSortable = true;
         item.isDropContainer = true;
         item.changed = content.updateDate;

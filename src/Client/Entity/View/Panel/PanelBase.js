@@ -7,7 +7,7 @@
  */
 class PanelBase extends HashBrown.Entity.View.ViewBase {
     static get icon() { return 'file'; }
-    static get category() { return this.name.toLowerCase(); }
+    static get category() { return this.name.replace('Panel', '').toLowerCase(); }
     static get itemType() { return null; }
 
     get icon() { return this.constructor.icon; }
@@ -22,8 +22,6 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
         this.template = require('template/panel/panelBase');
     
-        HashBrown.Service.EventService.on('resource', 'panel', () => { this.update(); });
-
         this.state.sortingOptions = this.getSortingOptions();
         this.state.sortingMethod = Object.values(this.state.sortingOptions || {})[0];
     }
@@ -72,31 +70,39 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
         this.state.itemMap = {};
 
-        let queue = {};
+        let queue = [];
 
         // Generate items and place them in the queue and map cache
         for(let resource of resources) {
-            queue[resource.id] = new HashBrown.Entity.View.ListItem.PanelItem({model: this.getItem(resource)});
-            this.state.itemMap[resource.id] = queue[resource.id];
+            let model = await this.getItem(resource);
+
+            let item = new HashBrown.Entity.View.ListItem.PanelItem({model: model});
+
+            this.state.itemMap[item.model.id] = item;
+            
+            queue.push(item);
         }
 
         // Apply the item hierarchy
-        for(let id in queue) {
-            let item = queue[id];
-            let parent = queue[item.model.parentId];
+        for(let item of queue) {
+            let parent = this.getParentItem(item.model.parentId);
             
             if(parent) {
                 item.model.parent = parent;
                 parent.model.children.push(item);
+
+                if(queue.indexOf(parent) < 0) {
+                    queue.push(parent);
+                }
+
+                this.state.itemMap[parent.model.id] = parent;
             }
         }
   
         // Add items to the root view and sort them
         this.state.rootItems = [];
         
-        for(let id in queue) {
-            let item = queue[id];
-
+        for(let item of queue) {
             if(!item.model.parent) {
                 this.state.rootItems.push(item);
             }
@@ -256,12 +262,24 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         if(!a || !a.model) { return -1; }
         if(!b || !b.model) { return 1; }
 
-        let method = this.state.sortingMethod;
+        if(a.model.hasSortingPriority) { return -1; }
+        if(b.model.hasSortingPriority) { return 1; }
 
-        if(!method) { return 0; }
+        let method = this.state.sortingMethod.split(':');
 
-        if(a.model[method] < b.model[method]) { return -1; }
-        if(a.model[method] > b.model[method]) { return 1; }
+        if(!method[0]) { return 0; }
+
+        let key = method[0];
+        let delta = method[1] === 'asc' ? -1 : 1;
+
+        let aValue = a.model[key];
+        let bValue = b.model[key];
+
+        if(typeof aValue === 'string') { aValue = aValue.toLowerCase(); }
+        if(typeof bValue === 'string') { bValue = bValue.toLowerCase(); }
+
+        if(aValue < bValue) { return delta; }
+        if(aValue > bValue) { return -delta; }
             
         return 0;
     }
@@ -287,13 +305,11 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
-        if(!resource.sync) { resource.sync = {}; }
-       
         let options = {};
 
         options['Copy id'] = () => this.onClickCopyId(resource.id);
     
-        if(!resource.sync.hasRemote && !resource.isLocked) {
+        if(!resource.sync || (!resource.sync.hasRemote && !resource.isLocked)) {
             options['Remove'] = () => this.onClickRemove(resource.id);
         }
 
@@ -308,9 +324,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemSyncOptions(resource) {
-        if(!resource.sync) { resource.sync = {}; }
-
-        let isSyncEnabled = HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
+        let isSyncEnabled = resource.sync && HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
 
         if(!isSyncEnabled) { return {}; }
 
@@ -379,8 +393,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     getSortingOptions() {
         return {
-            'Default': 'id',
-            'A-Z': 'name'
+            'Name': 'name:asc'
         }
     }
 
@@ -402,7 +415,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
-    getItem(resource) {
+    async getItem(resource) {
         return {
             id: resource.id,
             category: this.category,
@@ -412,6 +425,17 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             children: [],
             onDrop: (contentId, parentId, position) => { this.onDropItem(contentId, parentId, position); },
         };
+    }
+
+    /**
+     * Creates an abstract parent item, such as a folder
+     *
+     * @param {String} parentId
+     *
+     * @return {HashBrown.Entity.View.ListItem.PanelItem} Parent
+     */
+    getParentItem(parentId) {
+        return this.state.itemMap[parentId];
     }
 }
 

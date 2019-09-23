@@ -57,10 +57,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     
     // Init navigation UI
-    new HashBrown.View.Navigation.NavbarMain();
-    //document.querySelector('.page--environment__space--nav').appendChild(
-    //    new HashBrown.Entity.View.Navigation.ResourceBrowser().element
-    //);
+    //new HashBrown.View.Navigation.NavbarMain();
+    document.querySelector('.page--environment__space--nav').appendChild(
+        new HashBrown.Entity.View.Navigation.ResourceBrowser().element
+    );
 
     document.querySelector('.page--environment__space--menu').appendChild(
         new HashBrown.Entity.View.Navigation.Session().element

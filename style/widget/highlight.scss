@@ -47,7 +47,7 @@
         &:after {
             border-top: 1rem solid transparent;
             border-bottom: 1rem solid transparent;
-            border-right: 1rem solid var(--color-action);
+            border-right: 1rem solid var(--color-action-500);
             top: 0%;
             right: 100%;
         }
@@ -60,7 +60,7 @@
         &:after {
             border-top: 1rem solid transparent;
             border-bottom: 1rem solid transparent;
-            border-left: 1rem solid var(--color-action);
+            border-left: 1rem solid var(--color-action-500);
             top: 0%;
             left: 100%;
         }
@@ -72,7 +72,7 @@
         &:after {
             border-left: 1rem solid transparent;
             border-right: 1rem solid transparent;
-            border-top: 1rem solid var(--color-action);
+            border-top: 1rem solid var(--color-action-500);
             top: 100%;
             left: 0%;
         }
@@ -84,7 +84,7 @@
         &:after {
             border-left: 1rem solid transparent;
             border-right: 1rem solid transparent;
-            border-bottom: 1rem solid var(--color-action);
+            border-bottom: 1rem solid var(--color-action-500);
             bottom: 100%;
             left: 0%;
         }
@@ -100,9 +100,9 @@
     }
 
     &__frame {
-        border: 1px solid var(--color-action);   
+        border: 1px solid var(--color-action-500);   
         border-radius: 0.2rem;
-        box-shadow: 0 0 0 0 var(--color-action);
+        box-shadow: 0 0 0 0 var(--color-action-500);
         animation: highlight-pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
     }
 
@@ -110,7 +110,7 @@
         transform-origin: 0% 0%;
         animation: highlight-popup 0.5s once cubic-bezier(.75, -0.5, 0, 1.75);
         border-radius: 0.2rem;
-        border: 1px solid var(--color-action);
+        border: 1px solid var(--color-action-500);
         background-color: var(--color-default);
         color: var(--color-default-text);
         font-weight: bold;

@@ -1,7 +1,7 @@
 .page--dashboard {
     // Header
     &__header {
-        background-color: var(--color-decor);
+        background-color: var(--color-decor-500);
         color: var(--color-decor-text);
         padding: 1rem 0 0 5rem;
         height: 4rem;
@@ -44,12 +44,12 @@
             border: 0;
             background-color: transparent;
             color: var(--color-decor-text);
-            background-color: var(--color-decor-light);
+            background-color: var(--color-decor-600);
             margin-right: 0.5rem;
 
             &:hover {
                 color: var(--color-action-text);
-                background-color: var(--color-action);
+                background-color: var(--color-action-500);
                 text-decoration: none;
             }
 

@@ -7,6 +7,7 @@
  */
 class Connections extends HashBrown.Entity.View.Panel.PanelBase {
     static get icon() { return 'exchange'; }
+    static get itemType() { return HashBrown.Entity.Resource.Connection; }
     
     /**
      * Gets a panel item from a resource
@@ -15,8 +16,8 @@ class Connections extends HashBrown.Entity.View.Panel.PanelBase {
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
-    getItem(resource) {
-        let item = super.getItem(resource);
+    async getItem(resource) {
+        let item = await super.getItem(resource);
 
         item.name = resource.title;
 

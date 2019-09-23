@@ -18,20 +18,20 @@
     &.primary &__icon,
     &.primary &__label {
         color: var(--color-action-text);
-        background-color: var(--color-action);
+        background-color: var(--color-action-500);
 
         &:hover {
-            background-color: var(--color-action-light);
+            background-color: var(--color-action-600);
         }
     }
     
     &.secondary &__icon,
     &.secondary &__label {
         color: var(--color-decor-text);
-        background-color: var(--color-decor);
+        background-color: var(--color-decor-500);
 
         &:hover {
-            background-color: var(--color-decor-lightest);
+            background-color: var(--color-decor-800);
         }
     }
 
@@ -41,7 +41,7 @@
         text-overflow: ellipsis;
 
         &:hover {
-            border-color: var(--color-action);
+            border-color: var(--color-action-500);
         }
 
         &::after {
@@ -135,7 +135,7 @@
             padding: 0 var(--size-widget-small);
 
             &:focus {
-                border-color: var(--color-action);
+                border-color: var(--color-action-500);
             }
         }
 
@@ -259,7 +259,7 @@
         }
 
         &:hover {
-            background-color: var(--color-action);
+            background-color: var(--color-action-500);
             color: var(--color-action-text);
         }
     }

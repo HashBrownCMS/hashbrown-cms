@@ -1,7 +1,7 @@
 .widget--button {
     border: 0;
     border-radius: var(--border-radius-small);
-    background-color: var(--color-action);
+    background-color: var(--color-action-500);
     color: var(--color-action-text);
     height: var(--size-widget-medium);
     line-height: var(--size-widget-medium);
@@ -16,7 +16,7 @@
     position: relative;
 
     &:hover {
-        background-color: var(--color-action-dark);
+        background-color: var(--color-action-300);
         text-decoration: none;
     }
 
@@ -89,12 +89,12 @@
     }
     
     &.embedded {
-        color: var(--color-action);
+        color: var(--color-action-500);
         background-color: transparent;
         box-shadow: none;
 
         &:hover {
-            color: var(--color-action-dark);
+            color: var(--color-action-300);
         }
     }
 
