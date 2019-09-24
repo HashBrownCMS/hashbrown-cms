@@ -13,25 +13,6 @@
         border-bottom: 1px solid var(--color-decor-800);
         position: relative;
 
-        &::before {
-            content: '\f002';
-            font-family: 'FontAwesome';
-            display: block;
-            line-height: var(--size-widget-small);
-            width: var(--size-widget-small);
-            text-align: center;
-            position: absolute;
-            color: var(--color-default-300);
-            z-index: 20;
-            left: 0.5rem;
-            top: 0.5rem;
-            pointer-events: none;
-        }
-
-        &__search {
-            padding-left: var(--size-widget-small);
-        }
-
         &__sort {
             margin-left: 0.5rem;
         }

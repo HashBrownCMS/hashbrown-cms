@@ -7,7 +7,7 @@ _.div({class: 'panel'},
         state.message
     :
         _.div({class: 'panel__tools'},
-            _.text({class: 'panel__tools__search', oninput: _.onSearch}),
+            _.search({class: 'widget-group panel__tools__search', value: state.searchQuery, onclear: _.onClickClearSearch, onsearch: _.onClickSearch}),
             _.if(state.sortingOptions && Object.values(state.sortingOptions).length > 1,
                 _.popup({class: 'panel__tools__sort', options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
             )

@@ -28,8 +28,15 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
     /**
      * Update
+     *
+     * @param {Boolean} useCache
      */
-    async update() {
+    async update(useCache = true) {
+        if(!useCache) { 
+            await super.update();
+            return;
+        }
+        
         // Cache scroll position
         let scrollTop = 0;
 
@@ -45,7 +52,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         await super.update();        
-       
+      
         // Restore item states
         for(let id in this.state.itemMap || {}) {
             this.state.itemMap[id].state = itemStates[id] || {};
@@ -77,6 +84,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             let model = await this.getItem(resource);
             let item = new HashBrown.Entity.View.ListItem.PanelItem({model: model});
 
+            if(this.state.searchQuery && item.model.name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) < 0) { continue; }
+
             item.on('drop', (itemId, parentId, position) => {
                 this.onDropItem(itemId, parentId, position);
             });
@@ -106,6 +115,10 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         this.state.rootItems = [];
         
         for(let item of queue) {
+            if(this.state.searchQuery) {
+                item.state.isExpanded = true;
+            }
+
             if(!item.model.parent) {
                 this.state.rootItems.push(item);
             }
@@ -246,17 +259,21 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
-     * Event: Search
+     * Event: Click search
      */
-    onSearch(query = '') {
-        query = (query || '').toLowerCase();
-
-        for(let id in this.state.itemMap) {
-            let item = this.state.itemMap[id];
-            let isMatch = !query || item.model.name.toLowerCase().indexOf(query) > -1;
-
-            item.element.classList.toggle('defocused', !isMatch);
-        }
+    onClickSearch(query) {
+        this.state.searchQuery = query;
+    
+        this.update(false);
+    }
+    
+    /**
+     * Event: Click clear search
+     */
+    onClickClearSearch() {
+        this.state.searchQuery = '';
+    
+        this.update(false);
     }
 
     /**

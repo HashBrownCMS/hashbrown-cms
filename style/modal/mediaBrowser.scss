@@ -29,6 +29,8 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: center;
+        min-height: 20rem;
 
         &::after {
             content: '';
@@ -38,7 +40,24 @@
     }
 
     &__search {
-        flex-grow: 1;
+        &::before {
+            pointer-events: none;
+            z-index: 20;
+            content: '\f002';
+            font-family: 'FontAwesome';
+            color: var(--color-default-300);
+            display: block;
+            width: var(--size-widget-small);
+            line-height: var(--size-widget-small);
+            text-align: center;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        &__input {
+            padding-left: var(--size-widget-small);
+        }
     }
 
     &__item {

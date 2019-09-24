@@ -7,7 +7,26 @@
         padding: 0.5rem 0 0 0;
         background-color: var(--color-decor-500);
     }
-    
+
+    &__logo {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0 1rem 0;
+        text-align: center;
+
+        svg {
+            fill: var(--color-action-500);
+            width: var(--size-widget-medium);
+            height: var(--size-widget-medium);
+        }
+
+        &:hover {
+            svg {
+                fill: var(--color-action-300);
+            }
+        }
+    }
+
     &__tab {
         display: block;
         margin-top: 0.5rem;

@@ -32,30 +32,44 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
 
         this.state.items = [];
 
-        for(let item of items) {
-            if(!item.folder) { item.folder = '/'; }
+        if(this.state.name === 'searching') {
+            let query = (this.state.searchQuery || '').toLowerCase();
 
-            if(this.state.folder !== item.folder) { continue; }
+            for(let item of items) {
+                if(query && (item.name || '').toLowerCase().indexOf(query) < 0) { continue; }
 
-            this.state.items.push(item);
+                this.state.items.push(item);
+            }
+
+        } else if(this.state.name === undefined) {
+            for(let item of items) {
+                if(!item.folder) { item.folder = '/'; }
+
+                if(this.state.folder !== item.folder) { continue; }
+
+                this.state.items.push(item);
+            }
         }
     }
 
     /**
-     * Event: Search
+     * Event: Click search
      */
-    onSearch(query) {
-        query = (query || '').toLowerCase();
+    onClickSearch() {
+        this.state.name = 'searching';
+        this.state.searchQuery = (this.namedElements.search.model.value || '').toLowerCase();
+    
+        this.update();
+    }
 
-        for(let item of Array.from(this.namedElements.items.children)) {
-            let name = (item.title || '').toLowerCase();
-
-            if(name.indexOf(query) > -1) {
-                item.removeAttribute('style');
-            } else {
-                item.style.display = 'none';
-            }
-        }
+    /**
+     * Event: Click clear search
+     */
+    onClickClearSearch() {
+        this.state.name = undefined;
+        this.state.searchQuery = '';
+    
+        this.update();
     }
 
     /**

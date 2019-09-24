@@ -32,6 +32,8 @@ class MediaReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor
         try {
             if(this.value) {
                 this.model = await HashBrown.Service.MediaService.getMediaById(this.value);
+            } else {
+                this.model = null;
             }
 
         } catch(e) {
