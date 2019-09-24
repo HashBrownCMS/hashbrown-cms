@@ -53,6 +53,21 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
     }
 
     /**
+     * Event: Click upload
+     */
+    onClickUpload() {
+        let modal = new HashBrown.Entity.View.Modal.UploadMedia({
+            model: {
+                folder: this.state.folder 
+            }
+        });
+            
+        modal.on('success', (ids) => {
+            this.update();
+        });
+    }
+
+    /**
      * Event: Click search
      */
     onClickSearch(query) {
