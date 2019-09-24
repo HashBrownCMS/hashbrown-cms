@@ -12,19 +12,21 @@ class PluginController extends HashBrown.Controller.Controller {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/js/plugins.js', this.getJs);
-        app.get('/css/plugins.css', this.getCss);
+        app.get('/js/plugins.js', this.js);
+        app.get('/css/plugins.css', this.css);
     }
     
     /**
      * Serves JS files
      */
-    static async getJs(req, res) {
-        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.js'));
+    static async js(req, res) {
+        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*', 'script.js'));
     
-        let compiledJs = '';
+        let compiledJs = '/* HashBrown plugins */';
 
         for(let path of paths) {
+            compiledJs += '\n\n/* [' + Path.basename(Path.dirname(path)) + '] */\n\n';
+
             let file = await HashBrown.Service.FileService.read(path);
             
             compiledJs += file.toString('utf8');
@@ -37,12 +39,14 @@ class PluginController extends HashBrown.Controller.Controller {
     /**
      * Serves CSS files
      */
-    static async getCss(req, res) {
-        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*' , 'client', '**', '*.css'));
+    static async css(req, res) {
+        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*', 'style.css'));
     
-        let compiledCss = '';
+        let compiledCss = '/* HashBrown plugins */';
 
         for(let path of paths) {
+            compiledCss += '\n\n/* [' + Path.basename(Path.dirname(path)) + '] */\n\n';
+            
             let file = await HashBrown.Service.FileService.read(path);
             
             compiledCss += file.toString('utf8');

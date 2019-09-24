@@ -5,7 +5,7 @@ module.exports = (_, model) =>
 _.div({class: 'modal'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Info for ${model.settings.info.name}`),
+            _.h4({class: 'modal__title'}, `Settings for ${model.settings.info.name}`),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
@@ -64,12 +64,12 @@ _.div({class: 'modal'},
                     placeholder: 'API token',
                     onchange: (e) => _.onChangeSyncToken(e.target.value)
                 }),
-                _.button({class: 'widget widget--button small fa fa-refresh', onclick: _.onClickGetSyncToken})
+                _.button({title: 'Get new token', class: 'widget widget--button default small fa fa-refresh', onclick: _.onClickGetSyncToken})
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__login', style: 'display: none'},
                 _.input({class: 'widget widget--text', name: 'username', type: 'text', placeholder: 'Username'}),
                 _.input({class: 'widget widget--text', name: 'password', type: 'password', placeholder: 'Password'}),
-                _.button({class: 'widget widget--button small fa fa-check', onclick: _.onClickRemoteLogin}) 
+                _.button({class: 'widget widget--button default small fa fa-check', onclick: _.onClickRemoteLogin}) 
             )
         ),
         _.div({class: 'modal__footer'},

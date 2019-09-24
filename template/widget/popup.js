@@ -16,10 +16,13 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} $
             )
         ),
         _.if(!model.icon && !model.label,
-            _.div({class: 'widget-group'},
-                _.button({class: 'widget--popup__value widget widget--text', onclick: _.onClickToggle}, state.value),
+            _.div({class: 'widget--popup__inner'},
+                _.button({class: 'widget--popup__value', onclick: _.onClickToggle},
+                    state.value,
+                    _.span({class: 'widget--popup__value__icon fa fa-chevron-down'})
+                ),
                 _.if(model.clearable,
-                    _.button({class: 'widget widget--button small fa fa-remove', title: 'Clear selection', onclick: _.onClickClearValue})
+                    _.button({class: 'widget--popup__clear fa fa-remove', title: 'Clear selection', onclick: _.onClickClearValue})
                 )
             )
         )

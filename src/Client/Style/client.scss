@@ -1,7 +1,56 @@
-// Tools
-@import 'Tools/Colors';
-@import 'Tools/Base';
-@import 'Tools/Typography';
+// Breakpoints
+$lg: 'min-width: 1400px';
+$md: 'max-width: 1399px';
+$sm: 'max-width: 991px';
+$xs: 'max-width: 767px';
+
+// Greys
+$lightest-grey: #f1f1f1;
+$lighter-grey: #dddddd;
+$light-grey: #cccccc;
+$grey: #999999;
+$dark-grey: #444444;
+$darker-grey: #333333;
+$darkest-grey: #222222;
+
+$white: #ffffff;
+
+// Primary
+$primary: #e70d3b;
+$primary-light: lighten($primary, 20);
+$primary-dark: darken($primary, 10);
+
+$primary-text: #ffffff;
+
+// Secondary
+$secondary: #21303b; 
+$secondary-light: lighten($secondary, 4);
+$secondary-lighter: lighten($secondary, 6);
+$secondary-lightest: lighten($secondary, 12);
+$secondary-dark: darken($secondary, 10);
+$secondary-darker: darken($secondary, 20);
+
+$secondary-text: #ffffff;
+
+// Warning
+$warning: #FFB300;
+
+$warning-text: darken($warning, 30);
+
+// Standard
+$standard: #ffffff;
+$standard-dark: #eeeeee;
+$standard-darker: #dddddd;
+$standard-darkest: #666666;
+
+$standard-text: #333333;
+
+// Fancy backgrounds
+@mixin background($variant, $top: 0px) {
+    background-image: url('/img/bg-#{$variant}.jpg');
+    background-attachment: fixed;
+    background-position: 0px $top;
+}
 
 // Editors
 @import 'Views/Editors/Editor';

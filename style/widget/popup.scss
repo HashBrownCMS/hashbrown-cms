@@ -35,28 +35,61 @@
         }
     }
 
+    &__inner {
+        display: flex;
+        border-top-right-radius: var(--border-radius-small);
+        border-bottom-right-radius: var(--border-radius-small);
+    }
+
     &__value {
         background-color: var(--color-default);
+        color: var(--color-default-text);
+        border-radius: var(--border-radius-small);
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        padding: 0 0 0 0.5rem;
+        border: 1px solid var(--color-default-200);
+        width: 100%;
+        flex-grow: 1;
+        line-height: var(--size-widget-small);
+        text-align: left;
+        
+        &:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
 
         &:hover {
             border-color: var(--color-action-500);
         }
 
-        &::after {
-            background-color: var(--color-default);
-            font-family: 'FontAwesome';
-            content: '\f078';
-            display: block;
-            position: absolute; 
-            pointer-events: none;
-            line-height: var(--size-widget-small);
+        &__icon {
+            float: right;
+            display: inline-block;
             width: var(--size-widget-small);
+            line-height: var(--size-widget-small);
             text-align: center;
-            right: 0;
-            top: -2px;
-            color: var(--color-default-200);
+        }
+    }
+
+    &__clear {
+        width: var(--size-widget-small);
+        cursor: pointer;
+        border: 0;
+        padding: 0;
+        line-height: var(--size-widget-small);
+        display: block;
+        text-align: center;
+        border-top-right-radius: var(--border-radius-small);
+        border-bottom-right-radius: var(--border-radius-small);
+        color: var(--color-default-text);
+        background-color: var(--color-default-200);
+
+        &:hover {
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
         }
     }
 

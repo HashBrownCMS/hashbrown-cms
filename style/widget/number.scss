@@ -4,7 +4,7 @@
 
     &__input {
         display: block;
-        cursor: pointer;
+        cursor: auto;
         width: 100%;
         resize: none;
         border: 1px solid var(--color-default-200);
@@ -14,8 +14,8 @@
         line-height: var(--size-widget-small);
         background-color: var(--color-default);
         color: var(--color-default-text);
-        
-        &:focus {
+
+        &:focus, &:hover {
             border-color: var(--color-action-500);
         }
     }

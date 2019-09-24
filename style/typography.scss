@@ -1,0 +1,54 @@
+@font-face {
+    font-family: 'NunitoSans';
+    font-weight: 400;
+    src: url('/fonts/NunitoSans/NunitoSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'NunitoSans';
+    font-weight: 700;
+    src: url('/fonts/NunitoSans/NunitoSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'NunitoSans';
+    font-weight: 100;
+    src: url('/fonts/NunitoSans/NunitoSans-ExtraLight.ttf');
+}
+
+html {
+    font-size: 14px;
+    font-family: 'NunitoSans', sans-serif;
+    
+    @include laptop {
+        font-size: 13px;
+    }
+
+    @include tablet {
+        font-size: 12px;
+    }
+    
+    @include phone {
+        font-size: 11px;
+    }
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-action-500);
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.17rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: 0.83rem; }
+h6 { font-size: 0.67rem; }

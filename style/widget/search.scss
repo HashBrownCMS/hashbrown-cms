@@ -1,8 +1,5 @@
 .widget--search {
     position: relative;
-    border-radius: var(--border-radius-small);
-    background-color: var(--color-default);
-    color: var(--color-default-text);
     width: 100%;
 
     &__clear, &__icon, &__submit {
@@ -23,25 +20,46 @@
     }
 
     &__input {
+        width: 10rem;
         flex-grow: 1;
         padding-left: var(--size-widget-small);
-        border: 0;
         background-color: transparent;
         display: block;
+        border-top-left-radius: var(--border-radius-small);
+        border-bottom-left-radius: var(--border-radius-small);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        border: 1px solid var(--color-default-200);
+        border-right: 0;
+
+        &:focus, &:hover,
+        &:focus + button, &:hover + button {
+            border-color: var(--color-action-500);
+        }
     }
 
     &__clear {
+        border: 1px solid var(--color-default-200);
+        border-left: 0;
         width: var(--size-widget-small);
+        color: var(--color-default-text);
+        cursor: pointer;
+        display: block;
+        background-color: var(--color-default);
+        color: var(--color-default-text);
     }
 
     &__submit {
+        cursor: pointer;
         width: var(--size-widget-small);
         border-top-right-radius: var(--border-radius-small);
         border-bottom-right-radius: var(--border-radius-small);
-        border-left: 1px solid var(--color-default-200);
+        color: var(--color-default-text);
+        background-color: var(--color-default-200);
 
         &:hover {
-            background-color: var(--color-default-200);
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
         }
     }
 }

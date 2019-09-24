@@ -2,9 +2,14 @@
     display: flex;
     cursor: pointer;
     border-radius: var(--border-radius-small);
-    border: 1px solid var(--color-default-200);
     height: var(--size-widget-small);
-    background-color: var(--color-default); 
+    color: var(--color-default-400);
+    background-color: var(--color-default-200);
+    
+    &:hover {
+        background-color: var(--color-action-500);
+        color: var(--color-action-text);
+    }
 
     &:not(.placeholder) {
         width: var(--size-widget-small);
@@ -24,10 +29,6 @@
         width: var(--size-widget-medium);
     }
     
-    &:hover {
-        border-color: var(--color-action-500);
-    }
-
     &__input {
         display: none;
     }
@@ -42,8 +43,7 @@
         &::after {
             position: relative;
             font-family: 'FontAwesome';
-            content: '\f00d';    
-            color: var(--color-default-200);
+            content: '\f10c';    
         }
     }
 
@@ -61,5 +61,9 @@
     &__input:checked + &__indicator::after {
         content: '\f00c';
         color: var(--color-default-text);
+    }
+
+    &:hover  &__input:checked + &__indicator::after {
+        color: var(--color-action-text);
     }
 }

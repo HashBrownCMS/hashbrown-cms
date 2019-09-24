@@ -69,12 +69,12 @@
     }
 
     &.default {
-        background-color: var(--color-default);
         color: var(--color-default-text);
-        border-color: var(--color-default-200);
+        background-color: var(--color-default-200);
         
         &:hover {
-            background-color: var(--color-default-100);
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
         }
     }
 

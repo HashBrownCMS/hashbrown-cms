@@ -17,7 +17,13 @@ class PluginService {
         let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*'));
         
         for(let path of paths) {
-            let plugin = require(Path.join(path, 'index.js'));
+            path = Path.join(path, 'index.js');
+
+            let indexExists = await HashBrown.Service.FileService.exists(path);
+
+            if(!indexExists) { continue; }
+
+            let plugin = require(path);
             
             plugin.init(app);
         }

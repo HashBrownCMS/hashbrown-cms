@@ -24,11 +24,12 @@ class ViewController extends HashBrown.Controller.Controller {
                 theme = user.theme || 'default';
 
             } catch(e) {
-                res.status(500).send(e.message);
+                // Ignore any errors, since we need a theme file no matter what
+
+            } finally {
+                res.sendFile(Path.join(APP_ROOT, 'theme', theme + '.css'));            
 
             }
-
-            res.sendFile(Path.join(APP_ROOT, 'theme', theme + '.css'));            
         });
 
         // Catch evildoers

@@ -15,7 +15,7 @@
         line-height: var(--size-widget-medium);
     }
 
-    &:focus {
+    &:focus, &:hover {
         border-color: var(--color-action-500);
     }
 
