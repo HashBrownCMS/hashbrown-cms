@@ -6,6 +6,10 @@
     &__body {
         display: flex;
         padding: 0;
+        
+        @include tablet {
+            display: block;
+        }
     }
 
     &__folders {
@@ -13,34 +17,9 @@
         border-right: 1px solid var(--color-default-300);
         flex-basis: 20rem;
         flex-shrink: 0;
-    }
 
-    &__folder {
-        &__icon {
-            margin-right: 0.75rem;
-        }
-
-        &__name {
-            text-align: left;
-            border: 0;
-            background-color: transparent;
-            padding: 0 0.5rem;
-            line-height: var(--size-widget-small);
-            border-radius: var(--border-radius-small);
-            margin: 0;
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 100%;
-            text-overflow: ellipsis;
-
-            &:hover {
-                background-color: var(--color-default-100);
-            }
-        }
-
-        &__children {
-            margin-left: 1rem;
+        @include tablet {
+            flex-basis: 0;
         }
     }
 
@@ -49,7 +28,8 @@
         padding: 0.5rem;
         display: flex;
         flex-wrap: wrap;
-        
+        justify-content: center;
+
         &::after {
             content: '';
             display: block;
@@ -69,12 +49,21 @@
         background-color: transparent;
         margin: 0;
         min-width: 20rem;
+        max-width: calc(100% / 3);
         height: 20rem;
         position: relative;
         border: 1px solid transparent;
 
         &:hover {
             border-color: var(--color-action-500);
+        }
+        
+        @include tablet {
+            max-width: calc(100% / 2);
+        }
+        
+        @include phone {
+            max-width: 100%;
         }
 
         &__image,

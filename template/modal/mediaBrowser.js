@@ -14,19 +14,7 @@ _.div({class: 'modal modal--media-browser in'},
             ),
    
             _.if(state.name === undefined,
-                _.div({class: 'modal--media-browser__folders'},
-                    _.recurse([ state.rootFolder ], 'children', (i, folder, children) =>
-                        _.div({class: 'modal--media-browser__folder'},
-                            _.button({class: 'modal--media-browser__folder__name', onclick: (e) => _.onClickFolder(folder.path)},
-                                _.span({class: 'modal--media-browser__folder__icon fa fa-folder'}),
-                                folder.name
-                            ),
-                            _.div({class: 'modal--media-browser__folder__children'},
-                                children
-                            )
-                        )
-                    )
-                ),
+                _.folders({class: 'modal--media-browser__folders', options: state.folders, value: state.folder, onclick: _.onClickFolder}),
                 _.div({class: 'modal--media-browser__items', name: 'items'},
                     _.each(state.items, (i, item) =>
                         _.button({class: 'modal--media-browser__item', 'data-folder': item.folder, title: item.name, onclick: (e) => _.onClickItem(item.id)},

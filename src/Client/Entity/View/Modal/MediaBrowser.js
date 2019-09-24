@@ -13,58 +13,31 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
         super(params);
     
         this.template = require('template/modal/mediaBrowser');
+        this.state.folder = '/';
     }
 
     /**
-     * Fetches all media
+     * Fetches all media and caches folder paths
      */
     async fetch() {
-        this.state.items = await HashBrown.Service.MediaService.getAllMedia();
+        let items = await HashBrown.Service.MediaService.getAllMedia() || [];
         
-        // Establish abstract root folder
-        this.state.rootFolder = {
-            name: '/',
-            path: '/',
-            children: []
-        };
+        this.state.folders = [];
 
-        // Map folders, including generated ones
-        let map = {};
+        for(let item of items) {
+            if(!item.folder || item.folder === '/' || this.state.folders.indexOf(item.folder) > -1) { continue; }
 
-        map['/'] = this.state.rootFolder;
-
-        for(let item of this.state.items || []) {
-            let parts = item.folder.split('/').filter((x) => !!x) || [];
-            
-            while(parts.length > 0) {
-                let thisPath = '/' + parts.join('/') + '/';
-            
-                let name = parts.pop();
-
-                let parentPath = '/';
-
-                if(parts.length > 0) {
-                    parentPath += parts.join('/') + '/';
-                }
-
-                if(!map[thisPath]) {
-                    map[thisPath] =  {
-                        name: name, 
-                        path: thisPath,
-                        parentPath: parentPath,
-                        children: []
-                    };
-                }
-            }
+            this.state.folders.push(item.folder);
         }
 
-        // Place folders into hierarchy
-        for(let path in map) {
-            let folder = map[path];
+        this.state.items = [];
 
-            if(map[folder.parentPath]) {
-                map[folder.parentPath].children.push(folder);
-            }
+        for(let item of items) {
+            if(!item.folder) { item.folder = '/'; }
+
+            if(this.state.folder !== item.folder) { continue; }
+
+            this.state.items.push(item);
         }
     }
 
@@ -102,13 +75,9 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
      * @param {String} path
      */
     onClickFolder(path) {
-        for(let item of Array.from(this.namedElements.items.children)) {
-            if(!path || item.dataset.folder === path) {
-                item.removeAttribute('style');
-            } else {
-                item.style.display = 'none';
-            }
-        }
+        this.state.folder = path;
+
+        this.update();
     }
 }
 

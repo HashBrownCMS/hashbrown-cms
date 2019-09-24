@@ -1,4 +1,4 @@
-.modal--folders {
+.widget--folders {
     &__folder {
         &__inner {
             display: flex;
@@ -12,6 +12,7 @@
             border: 0;
             background-color: transparent;
             cursor: pointer;
+            border-radius: var(--border-radius-small);
             
             &:hover {
                 background-color: var(--color-default-100);
@@ -28,10 +29,15 @@
             cursor: pointer;
             width: 100%;
             text-align: left;
+            border-radius: var(--border-radius-small);
             
             &:hover {
                 background-color: var(--color-default-100);
             }
+        }
+        
+        &.active > &__inner > &__name {
+            background-color: var(--color-default-200);
         }
 
         &__children {

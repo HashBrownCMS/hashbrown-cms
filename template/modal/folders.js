@@ -13,31 +13,8 @@ _.div({class: 'modal model--folders in'},
                 state.message,
             ),
 
-            _.if(state.name === 'adding',
-                _.div({class: 'widget-group'},
-                    _.label({class: 'widget widget--label'}, state.addToPath),
-                    _.text({name: 'adding', value: 'New folder'}),
-                    _.button({class: 'widget widget--button small fa fa-check', onclick: _.onClickConfirmAdd})
-                )
-            ),
-
             _.if(state.name === undefined,
-                _.recurse([ state.root ], 'children', (i, folder, children) =>
-                    _.div({class: 'modal--folders__folder'},
-                        _.div({class: 'modal--folders__folder__inner'},
-                            _.button({class: 'modal--folders__folder__name', onclick: (e) => _.onPick(folder.path)},
-                                _.span({class: 'modal--folders__folder__icon fa fa-folder'}),
-                                folder.name
-                            ),
-                            _.if(model.canAdd,
-                                _.button({class: 'modal--folders__folder__add fa fa-plus', title: `Add folder inside "${folder.name}"`, onclick: () => _.onClickAdd(folder.path)})
-                            )
-                        ),
-                        _.div({class: 'modal--folders__folder__children'},
-                            children
-                        )
-                    )
-                )
+                _.folders({options: model.folders, onadd: _.onPick, onclick: _.onPick, add: true})
             )
         ),
         _.if(state.name === 'error', 

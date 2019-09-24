@@ -213,6 +213,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             for(let i in items) {
                                 let item = items[i];
 
+                                if(!item) { continue; }
+
                                 let children = this.scope().recurse(item[key], key, callback);
                                 let element = callback(i, item, children);
 
