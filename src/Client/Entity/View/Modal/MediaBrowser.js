@@ -55,9 +55,9 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Click search
      */
-    onClickSearch() {
+    onClickSearch(query) {
         this.state.name = 'searching';
-        this.state.searchQuery = (this.namedElements.search.model.value || '').toLowerCase();
+        this.state.searchQuery = query;
     
         this.update();
     }

@@ -6,11 +6,7 @@ _.div({class: 'modal modal--media-browser in'},
     _.div({class: 'modal__dialog modal--media-browser__dialog'},
         _.div({class: 'modal__header'},
             _.h4({class: 'modal__title'}, 'Pick media'),
-            _.div({class: 'widget-group modal--media-browser__search'},
-                _.text({class: 'widget-group modal--media-browser__search__input', name: 'search', value: state.searchQuery}),
-                _.button({class: 'widget widget--button default small fa fa-remove', title: 'Clear search', onclick: _.onClickClearSearch}),
-                _.button({class: 'widget widget--button small fa fa-search', title: 'Search', onclick: _.onClickSearch})
-            ),
+            _.search({class: 'widget-group modal--media-browser__search', value: state.searchQuery, onsearch: _.onClickSearch, onclear: _.onClickClearSearch}),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body modal--media-browser__body'},

@@ -40,24 +40,8 @@
     }
 
     &__search {
-        &::before {
-            pointer-events: none;
-            z-index: 20;
-            content: '\f002';
-            font-family: 'FontAwesome';
-            color: var(--color-default-300);
-            display: block;
-            width: var(--size-widget-small);
-            line-height: var(--size-widget-small);
-            text-align: center;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        &__input {
-            padding-left: var(--size-widget-small);
-        }
+        flex-grow: 0;
+        width: auto;
     }
 
     &__item {
