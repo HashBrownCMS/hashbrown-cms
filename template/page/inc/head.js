@@ -17,6 +17,6 @@ module.exports = (_, model) => `
 <!-- TODO: Deprecate this file -->
 <link href="/css/client.css" rel="stylesheet">
 
-<link href="/css/theme.css" rel="stylesheet">
+<link href="/css/theme.css" rel="stylesheet" id="theme">
 <link href="/css/style.css" rel="stylesheet">
 `

@@ -14,6 +14,23 @@ class ViewController extends HashBrown.Controller.Controller {
      * Initialises this controller
      */
     static init(app) {
+        // Serve theme
+        app.get('/css/theme.css', async (req, res) => {
+            let theme = 'default';
+
+            try {
+                let user = await this.authenticate(req.cookies.token);
+            
+                theme = user.theme || 'default';
+
+            } catch(e) {
+                res.status(500).send(e.message);
+
+            }
+
+            res.sendFile(Path.join(APP_ROOT, 'theme', theme + '.css'));            
+        });
+
         // Catch evildoers
         app.get(['/admin', '/user', '/wp-admin', '/umbraco' ], (req, res) => {
             res.sendStatus(404);
@@ -87,6 +104,8 @@ class ViewController extends HashBrown.Controller.Controller {
             
             user.clearSensitiveData();
             
+            let themes = await HashBrown.Service.AppService.getThemes();
+
             let uptime = {};
             uptime['seconds'] = OS.uptime();
             uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
@@ -98,7 +117,8 @@ class ViewController extends HashBrown.Controller.Controller {
                 os: OS,
                 user: user,
                 app: require(APP_ROOT + '/package.json'),
-                uptime: uptime
+                uptime: uptime,
+                themes: themes
             });
         });
 
@@ -142,6 +162,8 @@ class ViewController extends HashBrown.Controller.Controller {
 
                 user.clearSensitiveData();
 
+                let themes = await HashBrown.Service.AppService.getThemes();
+                
                 res.render('environment', {
                     title: project.settings.info.name,
                     currentProject: project.id,
@@ -149,7 +171,8 @@ class ViewController extends HashBrown.Controller.Controller {
                     currentProjectSettings: project.settings,
                     currentEnvironment: req.params.environment,
                     isMediaPicker: !!req.query.isMediaPicker,
-                    user: user
+                    user: user,
+                    themes: themes
                 });
             } catch(e) {
                 res.status(400).render('error', { message: e.message });

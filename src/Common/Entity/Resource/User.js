@@ -20,6 +20,7 @@ class User extends HashBrown.Entity.Resource.ResourceBase {
         this.def(String, 'username');
         this.def(String, 'fullName');
         this.def(String, 'email');
+        this.def(String, 'theme');
         this.def(Object, 'scopes', {});
     }
 

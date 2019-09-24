@@ -55,6 +55,13 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
     }
     
     /**
+     * Event: Change theme
+     */
+    onChangeTheme(theme) {
+        this.model.theme = theme;
+    }
+    
+    /**
      * Event: Change email
      */
     onChangeEmail(email) {
@@ -91,6 +98,12 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
             await HashBrown.Service.ResourceService.set('users', this.model.id, newUserObject);
             
             this.close();
+
+            let link = document.getElementById('theme');
+
+            if(link) {
+                link.setAttribute('href', '/css/theme.css?t=' + Date.now());
+            }
 
             this.trigger('change', this.model);
         

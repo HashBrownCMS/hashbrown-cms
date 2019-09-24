@@ -87,7 +87,8 @@ module.exports = (_, model) => `
             window.HashBrown = {};
             HashBrown.Context = {
                 user: ${JSON.stringify(model.user)},
-                view: "dashboard"
+                view: "dashboard",
+                themes: ${JSON.stringify(view.themes)}
             };
         </script>
 

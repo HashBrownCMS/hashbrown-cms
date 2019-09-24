@@ -32,7 +32,8 @@ module.exports = (_, view) => `
                 projectSettings: ${JSON.stringify(view.currentProjectSettings)},
                 environment: '${view.currentEnvironment}',
                 user: ${JSON.stringify(view.user)},
-                isMediaPicker: ${view.isMediaPicker}
+                isMediaPicker: ${view.isMediaPicker},
+                themes: ${JSON.stringify(view.themes)}
             };
         </script>
 

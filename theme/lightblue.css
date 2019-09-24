@@ -1,0 +1,42 @@
+:root {
+    /* Colour */
+    --color-action-300: #4fc3f7;
+    --color-action-500: #03a9f4;
+    --color-action-600: #039be5;
+    --color-action-text: #ffffff;
+
+    --color-decor-200: #b0bec5; 
+    --color-decor-300: #90a4ae;
+    --color-decor-400: #78909c;
+    --color-decor-500: #607d8b;
+    --color-decor-600: #546e7a;
+    --color-decor-700: #455a64;
+    --color-decor-800: #37474f;
+    --color-decor-text: #ffffff;
+
+    --color-warn: red;
+    --color-warn-text: white;
+
+    --color-default: #ffffff;
+    --color-default-100: #f5f5f5;
+    --color-default-200: #eeeeee;
+    --color-default-300: #e0e0e0;
+    --color-default-400: #bdbdbd;
+    --color-default-text: #424242;
+
+    /* Border radius */
+    --border-radius-small: 0.4rem;
+    --border-radius-medium: 1rem;
+    --border-radius-large: 2rem;
+
+    /* Widget size */
+    --size-widget-small: 2rem;
+    --size-widget-medium: 3rem;
+    --size-widget-large: 4rem;
+    
+    /* Box shadow */
+    --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+
+    /* Panels */
+    --width-panels: 30rem;
+}

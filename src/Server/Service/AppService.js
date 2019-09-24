@@ -2,6 +2,7 @@
 
 const ChildProcess = require('child_process');
 const FileSystem = require('fs');
+const Path = require('path');
 
 /**
  * The main class for basic app operations
@@ -106,6 +107,24 @@ class AppService {
 
         // If any arguments were recognised, exit the process after execution
         process.exit();
+    }
+
+    /**
+     * Gets a list of available themes
+     *
+     * @return {Array} Themes
+     */
+    static async getThemes() {
+        let files = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'theme'));
+        let themes = [];
+
+        for(let file of files) {
+            if(Path.extname(file) !== '.css') { continue; }
+
+            themes.push(Path.basename(file, '.css'));
+        }
+
+        return themes;
     }
 }
 

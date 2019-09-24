@@ -76,41 +76,6 @@ class MediaService extends require('Common/Service/MediaService') {
     static getAllMedia(id) {
         return HashBrown.Service.ResourceService.getAll(HashBrown.Entity.Resource.Media, 'media');
     }
-
-    /**
-     * Initialises the media picker mode
-     *
-     * @param {Function} onPickMedia
-     * @param {Function} onChangeResource
-     */
-    static initMediaPickerMode(onPickMedia, onChangeResource, onError) {
-        // Set the context
-        HashBrown.Context.isMediaPicker = true;
-        
-        // Claim debug messages
-        UI.error = onError;
-        
-        // Listen for picked Media
-        window.addEventListener('hashchange', () => {
-            let isMediaView = location.hash.indexOf('#/media/') === 0;
-
-            if(isMediaView) {
-                let id = location.hash.replace('#/media/', '');
-
-                onPickMedia(id);
-            }
-        }); 
-       
-        // Listen for resource change
-        HashBrown.View.Navigation.NavbarMain.reload = () => {
-            Crisp.View.get('NavbarMain').reload();
-
-            onChangeResource();
-        };
-
-        // Set visual fixes for media picker mode
-        $('.page--environment').addClass('media-picker');
-    }
 }
 
 module.exports = MediaService;

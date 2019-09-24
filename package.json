@@ -12,7 +12,7 @@
     "start:docker": "npm run build:frontend && cd ./docker && docker-compose up --build -d",
     "stop:docker": "cd ./docker && docker-compose down",
     "restart:docker": "cd ./docker && docker-compose restart",
-    "watch:docker": "cd ./docker && docker-compose logs -f node",
+    "watch:docker": "cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && docker-compose logs -f node",
     "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend"
   },
   "author": "Putaitu",

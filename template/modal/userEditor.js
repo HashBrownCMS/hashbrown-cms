@@ -30,6 +30,12 @@ _.div({class: 'modal in'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
                     _.input({class: 'widget widget--text', type: 'password', placeholder: '●●●●●●●●', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
                 ),
+                _.if(HashBrown.Context.user.id === model.id,
+                    _.div({class: 'widget-group'},
+                        _.label({class: 'widget widget--label small'}, 'Theme'),
+                        _.popup({options: HashBrown.Context.themes, value: model.theme || 'default', onchange: _.onChangeTheme})
+                    )
+                ),
                 _.if(HashBrown.Context.user.id !== model.id,
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),

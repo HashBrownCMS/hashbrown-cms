@@ -59,8 +59,6 @@ class ResourceService {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
         
-        HashBrown.View.Navigation.NavbarMain.setItemLoading(category, id);
-
         await HashBrown.Service.RequestService.request('delete', category + '/' + id);
        
         // Cancel any editor instances displaying the deleted content
@@ -106,8 +104,6 @@ class ResourceService {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
         
-        HashBrown.View.Navigation.NavbarMain.setItemLoading(category, id);
-
         await HashBrown.Service.RequestService.request('post', category + '/pull/' + id);
     
         HashBrown.Service.EventService.trigger('resource', id);  
@@ -122,8 +118,6 @@ class ResourceService {
     static async push(category, id) {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
-
-        HashBrown.View.Navigation.NavbarMain.setItemLoading(category, id);
 
         await HashBrown.Service.RequestService.request('post', category + '/push/' + id);
     
@@ -173,8 +167,6 @@ class ResourceService {
             data = data.getObject();
         }
         
-        HashBrown.View.Navigation.NavbarMain.setItemLoading(category, id);
-
         await HashBrown.Service.RequestService.request('post', category + '/' + id, data);
     
         HashBrown.Service.EventService.trigger('resource', id);  
