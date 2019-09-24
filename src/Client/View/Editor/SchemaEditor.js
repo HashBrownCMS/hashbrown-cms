@@ -6,12 +6,31 @@
  * @memberof HashBrown.Client.View.Editor
  */
 class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
+    static get category() { return 'schemas'; }
+  
     /**
      * Fetches the model
      */
     async fetch() {
         try {
             this.model = await HashBrown.Service.SchemaService.getSchemaById(this.modelId);
+
+            // NOTE: Temporary hack for guiding to the right editor
+            if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema && this instanceof HashBrown.View.Editor.ContentSchemaEditor == false) {
+                let editor = new HashBrown.View.Editor.ContentSchemaEditor();
+
+                this.element.parentElement.replaceChild(editor.element, this.element);
+                this.remove();
+                return;
+            }
+            
+            if(this.model instanceof HashBrown.Entity.Resource.Schema.FieldSchema && this instanceof HashBrown.View.Editor.FieldSchemaEditor == false) {
+                let editor = new HashBrown.View.Editor.FieldSchemaEditor();
+                
+                this.element.parentElement.replaceChild(editor.element, this.element);
+                this.remove();
+                return;
+            }
 
             this.allSchemas = await HashBrown.Service.SchemaService.getAllSchemas();
             this.parentSchemaOptions = {};
@@ -39,6 +58,33 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
     }
 
     /**
+     * Welcome template
+     */
+    welcomeTemplate() {
+        return [
+            _.h1('Schemas'),
+            _.p('Right click in the Schema pane to create a new Schema.'),
+            _.p('Click on a Schema to edit it.'),
+            _.button({class: 'widget widget--button'}, 'Import schemas')
+                .click(() => {
+                    let modal = UI.prompt(
+                        'Import schemas',
+                        'URL to uischema.org definitions',
+                        'text',
+                        'https://uischema.org/schemas.json',
+                        async (url) => {
+                            if(!url) { throw new Error('Please specify a URL'); }
+
+                            await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
+                            
+                            HashBrown.Service.EventService.trigger('resource');  
+                        }
+                    );
+                })
+        ];
+    }
+
+    /**
      * Gets a schema synchronously
      *
      * @param {String} id
@@ -57,7 +103,7 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/schemas/json/' + this.model.id;
+        location.hash = '/schemas/' + this.model.id + '/json';
     }
     
     /**
@@ -71,7 +117,7 @@ class SchemaEditor extends HashBrown.View.Editor.ResourceEditor {
         this.$saveBtn.toggleClass('working', false);
         
         // If id changed, change the hash
-        if(Crisp.Router.params.id != this.model.id) {
+        if(HashBrown.Service.NavigationService.getRoute(1) != this.model.id) {
             location.hash = '/schemas/' + this.model.id;
         }
     }

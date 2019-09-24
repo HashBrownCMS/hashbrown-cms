@@ -40,13 +40,11 @@ module.exports = (_, view) => `
         <script src="/js/common.js"></script>
         <script src="/js/service.js"></script>
         <script src="/js/entity.js"></script>
-        <script src="/js/route.js"></script>
         <script src="/js/utilities.js"></script>
         <script src="/js/view.js"></script>
         
         <script src="/js/environment.js"></script>
         <script src="/js/plugins.js"></script>
-
     </body>
 </html>
 

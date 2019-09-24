@@ -6,8 +6,8 @@
  * @memberof HashBrown.Client.View.Editor
  */
 class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
-    constructor(id) {
-        super({ modelId: id });
+    constructor(params = {}) {
+        super(params);
 
         this.isDirty = false;
     }
@@ -51,6 +51,27 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
 
         }
     }
+    
+    /**
+     * Welcome template
+     */
+    welcomeTemplate() {
+        return [
+            _.h1('Content'),
+            _.p('Right click in the Content pane to create new Content.'),
+            _.p('Click on a Content node to edit it.'),
+            _.button({class: 'widget widget--button'}, 'New Content')
+                .click(() => { Crisp.View.get('ContentPane').onClickNewContent(); }),
+            _.button({class: 'widget widget--button'}, 'Quick tour')
+                .click(HashBrown.Service.ContentService.startTour),
+            _.button({class: 'widget widget--button condensed', title: 'Click here to get some example content'}, 'Get example content')
+                .click(async () => {
+                    await HashBrown.Service.RequestService.request('post', 'content/example');
+
+                    HashBrown.Service.EventService.trigger('resource');
+                })
+        ];
+    }
 
     /**
      * Event: Scroll
@@ -91,7 +112,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/content/json/' + this.model.id;
+        location.hash = '/content/' + this.model.id + '/json';
     }
 
     /**
@@ -289,7 +310,7 @@ class ContentEditor extends HashBrown.View.Editor.ResourceEditor {
      * @return {String} Tab
      */
     getActiveTab() {
-        return Crisp.Router.params.tab || this.schema.defaultTabId || 'meta';
+        return HashBrown.Service.NavigationService.getRoute(2) || this.schema.defaultTabId || 'meta';
     }
 
     /**

@@ -49,7 +49,7 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Event: Route changed
      */
     onChangeRoute() {
-        if(!this.state.panel || this.state.panel.category !== getRoute(0)) {
+        if(!this.state.panel || this.state.panel.category !== HashBrown.Service.NavigationService.getRoute(0)) {
             this.update();
 
         } else {
@@ -62,9 +62,11 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Fetches the view data
      */
     async fetch() {
-        let category = getRoute(0);
+        let category = HashBrown.Service.NavigationService.getRoute(0);
 
         this.state.panels = [];
+
+        if(!category) { return; }
 
         for(let panel of Object.values(HashBrown.Entity.View.Panel)) {
             if(panel === HashBrown.Entity.View.Panel.PanelBase) { continue; }

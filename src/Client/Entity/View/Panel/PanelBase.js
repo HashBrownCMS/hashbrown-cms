@@ -66,7 +66,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         // Highlight selected item
-        this.highlightItem(getRoute(1));
+        this.highlightItem(HashBrown.Service.NavigationService.getRoute(1));
     }
 
     /**

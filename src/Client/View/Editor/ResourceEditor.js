@@ -7,16 +7,37 @@ const HEARTBEAT_TIMEOUT  = 1000 * 5; // An extra 5 seconds waiting time when che
  * The base for all resource editors
  */
 class ResourceEditor extends HashBrown.View.Editor.Editor {
-    constructor(params) {
-        super(params);
+    static get category() { return this.name.replace('Editor', '').toLowerCase(); }
+    static get itemType() { return null; }
 
-        UI.spinner(this.element, true);
+    get category() { return this.constructor.category; }
+    get itemType() { return this.constructor.itemType; }
 
-        HashBrown.Service.EventService.on('resource', 'editor', (id) => { this.onResourceChanged(id); });
+    constructor(params = {}) {
+        params.modelId = HashBrown.Service.NavigationService.getRoute(1);
 
-        this.on('ready', () => {
-            this.editedCheck();
-        });
+        if(!params.modelId) {
+            super(params, true);
+            this.element = _.div({class: 'page--environment__space--editor__text'}, this.welcomeTemplate())[0];
+
+        } else {
+            super(params);
+
+            UI.spinner(this.element, true);
+
+            HashBrown.Service.EventService.on('resource', 'editor', (id) => { this.onResourceChanged(id); });
+
+            this.on('ready', () => {
+                this.editedCheck();
+            });
+        }
+    }
+
+    /**
+     * Welcome template
+     */
+    welcomeTemplate() {
+        return _.p('Welcome to ' + this.category);
     }
 
     /**

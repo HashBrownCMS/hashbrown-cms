@@ -6,10 +6,12 @@
  * @memberof HashBrown.Client.View.Editor
  */
 class Editor extends Crisp.View {
-    constructor(params) {
+    constructor(params, skipFetch = false) {
         super(params);
 
-        this.fetch();
+        if(!skipFetch) {
+            this.fetch();
+        }
     }
 
     /**

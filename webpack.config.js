@@ -15,8 +15,6 @@ let entry = {
     demo: './src/Client/demo.js',
     environment: './src/Client/environment.js',
     
-    route: './src/Client/Route',
-    
     common: './src/Common',
     service: './src/Client/Service',
     entity: './src/Client/Entity',

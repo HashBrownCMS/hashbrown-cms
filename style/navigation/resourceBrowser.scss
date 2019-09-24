@@ -15,14 +15,14 @@
         text-align: center;
 
         svg {
-            fill: var(--color-action-500);
+            fill: var(--color-decor-700);
             width: var(--size-widget-medium);
             height: var(--size-widget-medium);
         }
 
         &:hover {
             svg {
-                fill: var(--color-action-300);
+                fill: var(--color-action-500);
             }
         }
     }

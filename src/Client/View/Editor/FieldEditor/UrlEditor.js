@@ -43,7 +43,7 @@ class UrlEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
             let title = '';
 
             // If the ancestor equals the currently edited ancestor, take the value directly from the "title" field
-            if(ancestor.id == Crisp.Router.params.id) {
+            if(ancestor.id == HashBrown.Service.NavigationService.getRoute(1)) {
                 title = $('.editor__field[data-key="title"] .editor__field__value input').val();
 
             // If it's not, try to get the title from the model
@@ -97,7 +97,7 @@ class UrlEditor extends HashBrown.View.Editor.FieldEditor.FieldEditor {
      * Regenerates the URL
      */
    async regenerate() {
-        let newUrl = await this.generateUrl(Crisp.Router.params.id);
+        let newUrl = await this.generateUrl(HashBrown.Service.NavigationService.getRoute(1));
 
         this.$input.val(newUrl);
 

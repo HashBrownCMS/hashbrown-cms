@@ -1,21 +1,4 @@
 /**
- * Gets part of the hash route
- *
- * @param {Number} index 
- *
- * @return {String} Path
- */
-window.getRoute = function getRoute(index) {
-    checkParam(index, 'index', Number);
-
-    let route = location.hash
-        .split('/')
-        .filter((x) => x && x !== '#');
-
-    return route[index];
-}
-
-/**
  * Performs a submodule check
  */
 window.submoduleCheck = function submoduleCheck() {
@@ -29,26 +12,6 @@ window.submoduleCheck = function submoduleCheck() {
         alert(message);
         throw new Error(message);
     }
-}
-
-/**
- * Checks if the currently logged in user is admin
- *
- * @returns {Boolean} Is admin
- */
-window.currentUserIsAdmin = function isCurrentUserAdmin() {
-    return HashBrown.Context.user.isAdmin;
-}
-
-/**
- * Checks if the currently logged in user has a certain scope
- *
- * @param {String} scope
- *
- * @returns {Boolean} Has scope
- */
-window.currentUserHasScope = function currentUserHasScope(scope) {
-    return HashBrown.Context.user.hasScope(HashBrown.Context.projectId, scope);
 }
 
 /**
@@ -93,20 +56,6 @@ window.copyToClipboard = function copyToClipboard(string) {
 
     document.body.removeChild(text);
 }
-
-/**
- * Gets a URL query parameter
- *
- * @param {String} name
- * @param {String} string
- *
- * @return {String} Value
- */
-window.getQueryParam = function getQueryParam(name, string) {
-    if(!string) { string = location.search; }
-
-    return new URLSearchParams(string).get(name);
-};
 
 /**
  * Clears the workspace

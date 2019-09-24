@@ -6,11 +6,7 @@
  * @memberof HashBrown.Client.View.Editor
  */
 class FormEditor extends HashBrown.View.Editor.ResourceEditor {
-    constructor(params) {
-        super(params);
-        
-        this.fetch();
-    }
+    static get category() { return 'forms'; }
 
     /**
      * Fetches the model
@@ -28,10 +24,25 @@ class FormEditor extends HashBrown.View.Editor.ResourceEditor {
     }
     
     /**
+     * Welcome template
+     */
+    welcomeTemplate() {
+        return [
+            _.h1('Forms'),
+            _.p('Right click in the Forms pane to create a new Form.'),
+            _.p('Click on a Form to edit it.'),
+            _.button({class: 'widget widget--button'}, 'New Form')
+                .click(() => { Crisp.View.get('FormPane').onClickNewForm(); }),
+            _.button({class: 'widget widget--button'}, 'Quick tour')
+                .click(HashBrown.Service.FormService.startTour),
+        ];
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/forms/json/' + this.model.id;
+        location.hash = '/forms/' + this.model.id + '/json';
     }
 
     /**

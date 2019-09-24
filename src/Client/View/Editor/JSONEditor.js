@@ -8,7 +8,10 @@ const beautify = require('js-beautify').js_beautify;
  * @memberof HashBrown.Client.View.Editor
  */
 class JSONEditor extends Crisp.View {
-    constructor(params) {
+    constructor(params = {}) {
+        params.modelId = HashBrown.Service.NavigationService.getRoute(1);
+        params.resourceCategory = HashBrown.Service.NavigationService.getRoute(0);
+
         super(params);
 
         this.$error = _.div({class: 'editor__footer__error'},
@@ -243,7 +246,7 @@ class JSONEditor extends Crisp.View {
         return _.div({class: 'editor editor--json'},
             _.div({class: 'editor__header'}, 
                 _.span({class: 'editor__header__icon fa fa-code'}),
-                _.h4({class: 'editor__header__title'}, Crisp.Router.params.id)
+                _.h4({class: 'editor__header__title'}, HashBrown.Service.NavigationService.getRoute(1))
             ),
             _.div({class: 'editor__body'},
                 _.textarea(),

@@ -12,10 +12,18 @@
             position: absolute;
             left: 1rem;
             top: 0.5rem;
+            text-align: center;
 
-            &__image {
-                height: 3rem;
-                width: 3rem;
+            svg {
+                fill: var(--color-decor-700);
+                width: var(--size-widget-medium);
+                height: var(--size-widget-medium);
+            }
+
+            &:hover {
+                svg {
+                    fill: var(--color-action-500);
+                }
             }
         }
 

@@ -1,17 +1,17 @@
 :root {
     /* Colour */
-    --color-action-300: #4fc3f7;
-    --color-action-500: #03a9f4;
-    --color-action-600: #039be5;
+    --color-action-300: #64b5f6;
+    --color-action-500: #2196f3;
+    --color-action-600: #1e88e5;
     --color-action-text: #ffffff;
 
-    --color-decor-200: #b0bec5; 
-    --color-decor-300: #90a4ae;
-    --color-decor-400: #78909c;
-    --color-decor-500: #607d8b;
-    --color-decor-600: #546e7a;
-    --color-decor-700: #455a64;
-    --color-decor-800: #37474f;
+    --color-decor-200: #eceff1; 
+    --color-decor-300: #cfd8dc;
+    --color-decor-400: #b0bec5;
+    --color-decor-500: #90a4ae;
+    --color-decor-600: #78909c;
+    --color-decor-700: #607d8b;
+    --color-decor-800: #546e7a;
     --color-decor-text: #ffffff;
 
     --color-warn: red;

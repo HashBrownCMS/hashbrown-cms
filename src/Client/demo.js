@@ -231,10 +231,10 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
 
             } else {
                 if(id === 'new') {
-                    let schemaId = getQueryParam('schemaId', query);
+                    let schemaId = HashBrown.Service.NavigationService.getQuery('schemaId', query);
                     let content = HashBrown.Entity.Resource.Content.create(schemaId);
 
-                    content.parentId = getQueryParam('parentId', query);
+                    content.parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
 
                     CONTENT[content.id] = content.getObject();
 
@@ -329,7 +329,7 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
     
             } else {
                 if(id === 'new') {
-                    let parentSchemaId = getQueryParam('parentSchemaId', query);
+                    let parentSchemaId = HashBrown.Service.NavigationService.getQuery('parentSchemaId', query);
                     let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentSchemaId);
                     let schema = HashBrown.Entity.Resource.Schema.SchemaBase.create(parentSchema);
 

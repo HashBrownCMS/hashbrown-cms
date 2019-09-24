@@ -6,6 +6,8 @@
  * @memberof HashBrown.Client.View.Editor
  */
 class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
+    static get category() { return 'connections'; }
+
     /**
      * Fetches the model
      *
@@ -28,10 +30,23 @@ class ConnectionEditor extends HashBrown.View.Editor.ResourceEditor {
     }
 
     /**
+     * Welcome template
+     */
+    welcomeTemplate() {
+        return [
+            _.h1('Connections'),
+            _.button({class: 'widget widget--button'}, 'New connection')
+                .click(() => { Crisp.View.get('ConnectionPane').onClickNewConnection(); }),
+            _.button({class: 'widget widget--button'}, 'Quick tour')
+                .click(HashBrown.Service.ConnectionService.startTour),
+        ];
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/connections/json/' + this.model.id;
+        location.hash = '/connections/' + this.model.id + '/json';
     }
 
     /**
