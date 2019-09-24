@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     
     // Init navigation UI
-    //new HashBrown.View.Navigation.NavbarMain();
     document.querySelector('.page--environment__space--nav').appendChild(
         new HashBrown.Entity.View.Navigation.ResourceBrowser().element
     );

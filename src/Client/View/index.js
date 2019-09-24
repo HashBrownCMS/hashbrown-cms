@@ -4,4 +4,3 @@
  * @namespace HashBrown.Client.View
  */
 require('./Editor');
-require('./Navigation');
