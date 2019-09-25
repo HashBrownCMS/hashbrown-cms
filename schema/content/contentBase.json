@@ -3,6 +3,10 @@
     "icon": "cogs",
     "allowedAtRoot": false,
     "name": "Content Base",
+    "tabs": {
+        "content": "Content"
+    },
+    "defaultTabId": "content",
     "fields": {
         "createDate": {
             "disabled": "true",
@@ -50,7 +54,8 @@
         "properties": {
             "title": {
                 "label": "Title",
-                "schemaId": "string"
+                "schemaId": "string",
+                "tabId": "content"
             }
         }
     }

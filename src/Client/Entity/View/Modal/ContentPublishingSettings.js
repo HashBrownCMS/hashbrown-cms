@@ -19,31 +19,24 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches the model
      */
     async fetch() {
-        try {
-            this.state.value = await this.model.getSettings('publishing') || {};
-            this.state.modelTitle = this.model.prop('title', HashBrown.Context.language);
+        if(!this.model.settings) { this.model.settings = {}; }
+        if(!this.model.settings.publishing) { this.model.settings.publishing = {}; }
 
-            if(!this.state.value) {
-                throw new Error('Failed to retrieve publishing settings');
-            }
+        this.state.value = await this.model.getSettings('publishing') || {};
+        this.state.title = this.model.prop('title', HashBrown.Context.language) || this.model.id;
 
-            if(this.state.value.governedBy) {
-                let content = await HashBrown.Service.ContentService.getContentById(this.state.value.governedBy);
-            
-                throw new Error(`(Settings inherited from <a href="#/content/${content.id}">${content.prop('title', HashBrown.Context.language)}</a>)`);
-            }
+        if(this.state.value.governedBy) {
+            let content = await HashBrown.Service.ContentService.getContentById(this.state.value.governedBy);
+        
+            throw new Error(`(Settings inherited from <a href="#/content/${content.id}">${content.prop('title', HashBrown.Context.language) || content.id}</a>)`);
+        }
 
-            let connections = await HashBrown.Service.ConnectionService.getAllConnections();
+        let connections = await HashBrown.Service.ConnectionService.getAllConnections();
 
-            this.state.connections = {};
+        this.state.connections = {};
 
-            for(let connection of connections) {
-                this.state.connections[connection.title] = connection.id;
-            }
-
-        } catch(e) {
-            this.setErrorState(e);
-
+        for(let connection of connections) {
+            this.state.connections[connection.title] = connection.id;
         }
     }
 
@@ -51,21 +44,23 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Change apply to children checkbox
      */
     onToggleApplyToChildren(apply) {
-        this.state.value.applyToChildren = apply;
+        this.model.settings.publishing.applyToChildren = apply;
     }
 
     /**
      * Event: Change connection
      */
     onChangeConnection(connectionId) {
-        this.state.value.connectionId = connectionId;
+        this.model.settings.publishing.connectionId = connectionId;
     }
 
     /**
      * Event: Click OK
      */
-    onClickOK() {
-        this.trigger('change', this.state.value);
+    async onClickOK() {
+        await HashBrown.Service.ResourceService.set('content', this.model.id, this.model);
+    
+        HashBrown.Service.EventService.trigger('settings', this.model.id); 
 
         this.close();
     }

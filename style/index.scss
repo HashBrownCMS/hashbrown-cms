@@ -2,9 +2,11 @@
 @import 'utilities';
 @import 'typography';
 
+@import 'page';
 @import 'widget';
 @import 'listItem';
-@import 'modal';
 @import 'navigation';
 @import 'panel';
-@import 'page';
+@import 'modal';
+@import 'field';
+@import 'resourceEditor';

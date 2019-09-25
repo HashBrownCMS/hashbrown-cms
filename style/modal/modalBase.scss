@@ -106,16 +106,17 @@
         }
     }
 
-    // Notification type
-    &.notification {
+    // Small notification type
+    &[role="notification-small"] {
         background-color: transparent;
         height: auto;
+        width: auto;
         overflow-y: visible;
         top: auto;
         bottom: 0;
     }
 
-    &.notification & {
+    &[role="notification-small"] & {
         &__dialog {
             transform: translateY(2rem);
             width: auto;
@@ -131,9 +132,7 @@
         }
 
         &__title {
-            line-height: 1;
             height: auto;
-            margin-bottom: 0.5rem;
         }
 
         &__close {
@@ -143,7 +142,8 @@
         &__body {
             padding: 0;
             background-color: transparent;
-       
+            color: inherit;
+
             a {
                 color: inherit;
                 text-decoration: underline;

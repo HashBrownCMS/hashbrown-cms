@@ -371,10 +371,34 @@ class UIService {
     }
     
     /**
+     * Brings up a small notification
+     *
+     * @param {String} heading
+     * @param {String} message
+     * @param {Number} timeout
+     */
+    static notifySmall(heading, message, timeout) {
+        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+            model: {
+                heading: heading,
+                message: message,
+                role: 'notification-small'
+            }
+        });
+
+        if(!isNaN(timeout)) {
+            setTimeout(() => { modal.close(); }, timeout * 1000);
+        }
+
+        return modal;
+    }
+    
+    /**
      * Brings up a notification
      *
      * @param {String} heading
      * @param {String} message
+     * @param {Function} onClickOK
      */
     static notify(heading, message, onClickOK) {
         let modal = new HashBrown.Entity.View.Modal.ModalBase({

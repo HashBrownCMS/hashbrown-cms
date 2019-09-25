@@ -33,7 +33,12 @@
     --size-widget-small: 2rem;
     --size-widget-medium: 3rem;
     --size-widget-large: 4rem;
-    
+
+    /* Padding */
+    --padding-small: 0.5rem;
+    --padding-medium: 1rem;
+    --padding-large: 2rem;
+
     /* Box shadow */
     --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
 

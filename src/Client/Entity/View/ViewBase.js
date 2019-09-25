@@ -172,7 +172,15 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                 // Return any valid function starting with "on", like "onClick", "onChange", etc.
                 // We are only including event handlers in the scope, because we want to minimise the use of logic in templates
                 if(name.substring(0, 2) === 'on' && typeof this[name] === 'function') {
-                    return (...args) => { this[name].call(this, ...args); };
+                    return (...args) => {
+                        try {
+                            this[name].call(this, ...args);
+
+                        } catch(e) {
+                            this.setErrorState(e);
+
+                        }
+                    };
                 }
 
                 // Look up recognised field names                
@@ -229,7 +237,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                         return (template, model) => {
                             if(typeof template !== 'function') { return ''; }
 
-                            return template(this.scope(), model || this.model);
+                            return template(this.scope(), model || this.model, this.state);
                         };
 
                     // Register a partial

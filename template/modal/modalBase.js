@@ -10,9 +10,11 @@ _.div({class: 'modal in', role: model.role},
                 _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
             )
         ),
-        _.ul({class: 'modal__body'},
-            state.prependedHtml,
-            _.li({class: 'modal__body__message'}, model.message)
+        _.if(state.prependedHtml || model.message,
+            _.ul({class: 'modal__body'},
+                state.prependedHtml,
+                _.li({class: 'modal__body__message'}, model.message)
+            )
         ),
         _.if(!model.isBlocking,
             _.div({class: 'modal__footer'},

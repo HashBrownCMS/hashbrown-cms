@@ -4,6 +4,7 @@
     background-color: transparent;
     min-height: var(--size-widget-small);
     min-width: var(--size-widget-small);
+    border-radius: var(--border-radius-small);
 
     &:not([role]) {
         width: 100%;
@@ -37,14 +38,14 @@
 
     &__inner {
         display: flex;
-        border-top-right-radius: var(--border-radius-small);
-        border-bottom-right-radius: var(--border-radius-small);
+        border-radius: inherit;
+        height: var(--size-widget-small);
     }
 
     &__value {
         background-color: var(--color-default);
         color: var(--color-default-text);
-        border-radius: var(--border-radius-small);
+        border-radius: inherit;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -71,6 +72,10 @@
             width: var(--size-widget-small);
             line-height: var(--size-widget-small);
             text-align: center;
+
+            &::before {
+                margin-top: -2px;
+            }
         }
     }
 
@@ -82,8 +87,8 @@
         line-height: var(--size-widget-small);
         display: block;
         text-align: center;
-        border-top-right-radius: var(--border-radius-small);
-        border-bottom-right-radius: var(--border-radius-small);
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
         color: var(--color-default-text);
         background-color: var(--color-default-200);
 
@@ -101,7 +106,7 @@
         cursor: pointer;
         color: inherit;
         line-height: var(--size-widget-small);
-        border-radius: var(--border-radius-medium);
+        border-radius: inherit;
        
         .fa {
             margin-right: 0.5rem;
@@ -124,7 +129,7 @@
         min-width: var(--size-widget-small);
         text-align: center;
         display: block;
-        border-radius: 50rem;
+        border-radius: 50%;
 
         &:hover {
             background-color: var(--color-default-100);

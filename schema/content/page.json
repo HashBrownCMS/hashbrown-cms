@@ -3,17 +3,8 @@
     "name": "Page",
     "parentSchemaId": "contentBase",
     "allowedAtRoot": false,
-    "tabs": {
-        "content": "Content"
-    },
-    "defaultTabId": "content",
     "fields": {
         "properties": {
-            "title": {
-                "label": "Title",
-                "schemaId": "string",
-                "tabId": "content"
-            },
             "description": {
                 "label": "Description",
                 "schemaId": "string",

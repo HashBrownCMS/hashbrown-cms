@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     HashBrown.Context.language = localStorage.getItem('language') || 'en';
     HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);
 
+    // Preload schemas
+    await HashBrown.Service.SchemaService.getAllSchemas();
+
     // Init router
     HashBrown.Service.NavigationService.startListening();
     

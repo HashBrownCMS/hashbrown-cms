@@ -1,0 +1,25 @@
+.field {
+    position: relative;
+    display: flex;
+    margin-bottom: 1rem;
+
+    &.loading {
+        height: var(--size-widget-small);
+
+        @include spinner;
+    }
+
+    @include tablet {
+        display: block;
+    }
+
+    &__key {
+        flex-basis: 14rem;
+        flex-shrink: 0;
+        line-height: var(--size-widget-small);
+    }
+
+    &__value {
+        flex-grow: 1;
+    }
+}

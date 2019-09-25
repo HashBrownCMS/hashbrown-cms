@@ -92,14 +92,25 @@ class NavigationService {
             editor = new HashBrown.View.Editor.JSONEditor();
 
         } else {
-            for(let name in HashBrown.View.Editor) {
-                let type = HashBrown.View.Editor[name];
+            for(let name in HashBrown.Entity.View.ResourceEditor) {
+                let type = HashBrown.Entity.View.ResourceEditor[name];
 
-                if(type.prototype instanceof HashBrown.View.Editor.ResourceEditor === false) { continue; }
                 if(type.category !== category) { continue; }
 
                 editor = new type();
                 break;
+            }
+            
+            if(!editor) {
+                for(let name in HashBrown.View.Editor) {
+                    let type = HashBrown.View.Editor[name];
+
+                    if(type.prototype instanceof HashBrown.View.Editor.ResourceEditor === false) { continue; }
+                    if(type.category !== category) { continue; }
+
+                    editor = new type();
+                    break;
+                }
             }
         }
 

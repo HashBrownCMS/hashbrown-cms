@@ -3,7 +3,7 @@
     cursor: pointer;
     border-radius: var(--border-radius-small);
     height: var(--size-widget-small);
-    color: var(--color-default-400);
+    color: var(--color-default-text);
     background-color: var(--color-default-200);
     
     &:hover {
@@ -54,16 +54,14 @@
         justify-content: center;
         text-transform: uppercase;
         font-weight: bold;
-        color: var(--color-default-300);
         white-space: nowrap;
     }
 
     &__input:checked + &__indicator::after {
         content: '\f00c';
-        color: var(--color-default-text);
     }
 
-    &:hover  &__input:checked + &__indicator::after {
-        color: var(--color-action-text);
+    &:not(:hover) &__input:not(:checked) + &__indicator::after {
+        color: var(--color-default-300);
     }
 }

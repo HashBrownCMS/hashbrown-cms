@@ -87,6 +87,6 @@ window.updateCheck = async function updateCheck() {
     let update = await HashBrown.Service.RequestService.customRequest('get', '/api/server/update/check');
     
     if(update.isBehind) {
-        UI.notify('Update available', 'HashBrown can be updated to ' + update.remoteVersion + '. Please check the <a href="/readme">readme</a> for instructions.'); 
+        UI.notifySmall('Update available', 'HashBrown can be updated to ' + update.remoteVersion + '. Please check the <a href="/readme">readme</a> for instructions.'); 
     }
 }

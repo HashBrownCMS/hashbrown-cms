@@ -31,7 +31,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
         localStorage.setItem('language', newLanguage);
         HashBrown.Context.language = newLanguage;
 
-        HashBrown.Service.EventService.trigger('resource');  
+        HashBrown.Service.EventService.trigger('language');  
 
         let contentEditor = Crisp.View.get('ContentEditor');
 

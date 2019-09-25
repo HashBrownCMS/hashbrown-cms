@@ -32,7 +32,18 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
             }
         });
     }
-    
+   
+    /**
+     * Event: Click settings
+     */
+    async onClickPublishingSettings(id) {
+        let content = await HashBrown.Service.ContentService.getContentById(id);
+
+        new HashBrown.Entity.View.Modal.ContentPublishingSettings({
+            model: content
+        });
+    }
+
     /**
      * Event: Drop item
      *
@@ -77,6 +88,8 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
         let options = super.getItemBaseOptions(resource);
 
         options['New child'] = () => this.onClickNew(resource.id);
+        options['Settings'] = '---';
+        options['Publishing'] = () => this.onClickPublishingSettings(resource.id);
 
         return options;
     }

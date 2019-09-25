@@ -7,22 +7,10 @@
     position: relative;
     pointer-events: none;
 
-    &::before, &::after {
+    &::after {
         position: absolute;
         content: '';
         display: block;
-    }
-
-    &::before {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.2);
-        z-index: 20;
-    }
-
-    &::after {
         font-family: 'FontAwesome';
         content: '\f110';
         z-index: 21;

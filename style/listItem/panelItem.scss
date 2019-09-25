@@ -75,7 +75,9 @@
     }
 
     &__name:hover ~ &__actions,
-    &__name:hover ~ &__properties {
+    &__name:hover ~ &__properties,
+    &__name:focus ~ &__actions,
+    &__name:focus ~ &__properties {
         background-color: var(--color-decor-700);
     }
 
