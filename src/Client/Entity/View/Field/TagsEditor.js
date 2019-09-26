@@ -22,7 +22,7 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
         await super.fetch();
 
         this.state.value = (this.state.value || '').split(',')
-        this.state.value.filter((x) => !!x);
+        this.state.value = this.state.value.filter((x) => !!x);
     }
 
     /**

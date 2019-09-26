@@ -17,9 +17,11 @@
         flex-basis: 14rem;
         flex-shrink: 0;
         line-height: var(--size-widget-small);
-    }
+        margin-right: var(--padding-medium);
 
-    &__value {
-        flex-grow: 1;
+        &__description {
+            color: var(--color-default-400);
+            line-height: 1.5;
+        }
     }
 }

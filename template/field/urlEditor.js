@@ -13,8 +13,8 @@ _.div({class: 'field field--url-editor'},
             _.div({class: 'field__key__description'}, model.description)
         ),
         _.div({class: 'field__value widget-group'},
-            _.input({class: 'widget widget--text', name: 'input', value: state.value, onchange: (e) => _.onChange(e.target.value)}),
-            _.button({class: 'widget widget--button small default fa fa-refresh', title: 'Regenerate URL', onclick: _.onClickRegenerate}) 
+            _.input({disabled: model.isDisabled, class: 'widget widget--text', name: 'input', value: state.value, onchange: (e) => _.onChange(e.target.value)}),
+            _.button({disabled: model.isDisabled, class: 'widget widget--button small default fa fa-refresh', title: 'Regenerate URL', onclick: _.onClickRegenerate}) 
         )
     )
 )

@@ -24,7 +24,7 @@ _.div({class: 'modal modal--media-browser in'},
                         state.name === 'searching' ?
                             `No results matching "${state.searchQuery}"`
                         :
-                            'No media items yet. Did you set up a <a href="#/connections">connection</a> as media provider?'
+                            'No media items yet. Did you set up a connection as media provider?'
                     ),
 
                     _.each(state.items, (i, item) =>

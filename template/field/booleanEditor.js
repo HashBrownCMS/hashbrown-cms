@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: 'field field--tags-editor'},
+_.div({class: 'field field--boolean-editor'},
     _.if(state.name === 'error',
         state.message
     ),
@@ -13,7 +13,7 @@ _.div({class: 'field field--tags-editor'},
             _.div({class: 'field__key__description'}, model.description)
         ),
         _.div({class: 'field__value'},
-            _.list({disabled: model.isDisabled, value: state.value, sortable: true, placeholder: 'tag', onchange: _.onChange})
+            _.checkbox({disabled: model.isDisabled, value: state.value, onchange: _.onChange})
         )
     )
 )

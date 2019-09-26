@@ -14,8 +14,9 @@
     --color-decor-800: #546e7a;
     --color-decor-text: #ffffff;
 
-    --color-warn: red;
-    --color-warn-text: white;
+    --color-warn-500: #f44336;
+    --color-warn-300: #e57373;
+    --color-warn-text: #ffffff;
 
     --color-default: #ffffff;
     --color-default-100: #f5f5f5;

@@ -84,7 +84,7 @@ class ContentReferenceEditor extends HashBrown.View.Editor.FieldEditor.FieldEdit
         config.allowedSchemas = config.allowedSchemas || [];
         
         return this.field(
-            'Allowed Schema',
+            'Allowed schemas',
             new HashBrown.Entity.View.Widget.Popup({
                 model: {
                     options: (async () => {

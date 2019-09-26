@@ -16,7 +16,7 @@
     }
 
     &__field {
-        width: 0;
+        width: 3rem;
         flex-grow: 1;
         border: 0;
         background-color: transparent;
@@ -29,6 +29,10 @@
         -moz-appearance: textfield; 
         -webkit-appearance: textfield;
         text-align: center; 
+
+        &.year {
+            width: 5rem;
+        }
 
         &::-webkit-outer-spin-button { -webkit-appearance: none; }
         &::-webkit-inner-spin-button { -webkit-appearance: none;  }

@@ -13,7 +13,7 @@ _.div({class: 'field field--language-editor'},
             _.div({class: 'field__key__description'}, model.description)
         ),
         _.div({class: 'field__value'},
-            _.popup({options: state.languageOptions, value: state.value, onchange: _.onChange})
+            _.popup({disabled: model.isDisabled, options: state.languageOptions, value: state.value, onchange: _.onChange})
         )
     )
 )

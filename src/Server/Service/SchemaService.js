@@ -268,15 +268,15 @@ class SchemaService extends require('Common/Service/SchemaService') {
                 };
 
                 if(Array.isArray(type)) {
-                    let allowedSchema = [];
+                    let allowedSchemas = [];
 
                     for(let t of type) {
-                        allowedSchema.push(getId(t));
+                        allowedSchemas.push(getId(t));
                     }
 
                     def.schemaId = 'array';
                     def.config = {
-                        allowedSchema: allowedSchema 
+                        allowedSchemas: allowedSchemas 
                     };
 
                 } else if(typeof type === 'string') {

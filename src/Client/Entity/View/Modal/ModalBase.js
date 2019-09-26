@@ -20,11 +20,22 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
         let similarModals = this.getSimilarModals();
 
         if(similarModals.length > 0) {
-            this.state.prependedHtml = similarModals[0].querySelector('.modal__body').innerHTML;
-            this.element = similarModals[0];
-            this.state.skipTransitionIn = true;
+            let body = similarModals[0].querySelector('.modal__body');
+           
+            if(!body) {
+                similarModals[0].parentElement.removeChild(similarModals[0]);
+
+                document.body.appendChild(this.element);
+
+            } else {
+                this.state.prependedHtml = body.innerHTML;
+                this.element = similarModals[0];
+                this.state.skipTransitionIn = true;
+            }
+
         } else {
             document.body.appendChild(this.element);
+        
         }
     }
   

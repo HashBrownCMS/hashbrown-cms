@@ -10,12 +10,12 @@
     "fields": {
         "createDate": {
             "disabled": "true",
-            "label": "Created at",
+            "label": "Created on",
             "schemaId": "date"
         },
         "updateDate": {
             "disabled": "true",
-            "label": "Updated at",
+            "label": "Updated on",
             "schemaId": "date"
         },
         "createdBy": {

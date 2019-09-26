@@ -13,7 +13,7 @@ _.div({class: 'field field--number-editor'},
             _.div({class: 'field__key__description'}, model.description)
         ),
         _.div({class: 'field__value'},
-            _.number({min: model.config.min, max: model.config.max, step: model.config.step, range: model.config.isSlider, value: state.value, onchange: _.onChange})
+            _.number({disabled: model.isDisabled, min: model.config.min, max: model.config.max, step: model.config.step, range: model.config.isSlider, value: state.value, onchange: _.onChange})
         )
     )
 )

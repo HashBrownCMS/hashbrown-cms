@@ -13,7 +13,7 @@ _.div({class: 'field field--string-editor'},
             _.div({class: 'field__key__description'}, model.description)
         ),
         _.div({class: 'field__value'},
-            _.text({value: state.value, onchange: _.onChange})
+            _.text({disabled: model.isDisabled, value: state.value, onchange: _.onChange})
         )
     )
 )

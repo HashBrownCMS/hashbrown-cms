@@ -73,6 +73,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                     config: schemaField.config || {},
                     key: key, 
                     label: schemaField.label,
+                    description: schemaField.description,
                     schema: fieldSchema,
                     value: contentFields[key]
                 }
@@ -91,7 +92,29 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             this.state.fields.push(field); 
         }
     }
-    
+
+    /**
+     * Event: Clicked start tour
+     */
+    onClickStartTour() {
+        HashBrown.Service.ContentService.startTour();
+    }
+
+    /**
+     * Event: Click example content
+     */
+    onClickExampleContent() {
+        UI.confirm(
+            'Example content',
+            'Do you want to load some example content? This could overwrite existing schemas',
+            async () => {
+                await HashBrown.Service.RequestService.request('post', 'content/example');
+            
+                HashBrown.Service.EventService.trigger('resource');
+            }
+        );
+    }
+
     /**
      * Event: Content settings changed
      *
