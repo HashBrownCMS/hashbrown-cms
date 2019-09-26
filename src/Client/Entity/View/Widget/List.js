@@ -31,6 +31,80 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     }
 
     /**
+     * Event: Drag start
+     */
+    onDragStart(e) {
+        let index = Array.from(this.element.children).indexOf(e.currentTarget);
+
+        e.currentTarget.classList.toggle('dragging', true);
+
+        e.dataTransfer.setData('index', index);
+    }
+
+    /**
+     * Event: Drag over
+     */
+    onDragOver(e) {
+        e.preventDefault();
+
+        for(let item of Array.from(this.element.children)) {
+            delete item.dataset.dragOver;
+        }
+
+        let item = e.currentTarget;
+        let bounds = item.getBoundingClientRect();
+        let margin = bounds.height / 2;
+        let delta = e.pageY - bounds.top;
+
+        if(delta < margin) {
+            item.dataset.dragOver = 'above';
+        } else if(delta > bounds.height - margin) {
+            item.dataset.dragOver = 'below';
+        }
+    }
+
+    /**
+     * Event: Drag end
+     */
+    onDragEnd(e) {
+        this.sanityCheck();
+        
+        let oldIndex = parseInt(e.dataTransfer.getData('index'));
+        let newIndex = 0;
+
+        let items = Array.from(this.element.children);
+
+        for(let i = 0; i < items.length; i++) {
+            let item = items[i];
+
+            if(item.dataset.dragOver === 'above') {
+                newIndex = i;
+                break;
+            }
+            
+            if(item.dataset.dragOver === 'below') {
+                newIndex = i + 1;
+                break;
+            }
+        }
+            
+        let item = this.model.value.splice(oldIndex, 1)[0]
+
+        if(newIndex > oldIndex) { newIndex--; }
+
+        if(newIndex < 0) {
+            this.model.value.splice(0, 0, item);
+        } else if(newIndex >= this.model.value.length) {
+            this.model.value.push(item);
+        } else {
+            this.model.value.splice(newIndex, 0, item)
+        }
+
+        this.render();
+        this.onChange(); 
+    }
+
+    /**
      * Event: Change item key
      */
     onChangeItemKey(oldKey, newKey) {

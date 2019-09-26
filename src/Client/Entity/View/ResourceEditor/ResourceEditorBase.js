@@ -1,5 +1,8 @@
 'use strict';
 
+const HEARTBEAT_INTERVAL  = 1000 * 60; // 1 minute between each heartbeat
+const HEARTBEAT_TIMEOUT  = 1000 * 5; // An extra 5 seconds waiting time when checking for last heartbeat
+
 /**
  * The base class for resource editors
  *
@@ -44,6 +47,48 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         return element;
     }
+    
+    /**
+     * Checks whether this resource is currently being edited by someone else, and displays a warning if it is
+     */
+    editedCheck() {
+        // The check succeeded, just start the heartbeat
+        if(!this.model || !this.model.viewedBy || !this.model.viewedOn || this.model.viewedBy === HashBrown.Context.user.id || new Date() - this.model.viewedOn > HEARTBEAT_INTERVAL + HEARTBEAT_TIMEOUT) {
+            this.onHeartbeat();
+        
+        // The check failed, ask the user if they want to proceed
+        } else {
+            let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
+
+            modal.on('yes', () => {
+                this.onHeartbeat();
+            });
+
+            modal.on('no', () => {
+                location.hash = '/' + this.category + '/';
+            });
+        }
+    }
+    
+    /**
+     * Event: Heartbeat
+     */
+    async onHeartbeat() {
+        if(typeof this === 'undefined' || !this || !this.model || Object.keys(this.model).length < 1 || !this.element || !this.element.parentElement) { return; }
+
+        try {
+            await HashBrown.Service.ResourceService.heartbeat(this.model);
+
+        } catch(e) {
+            UI.error(e);
+
+        } finally {
+            setTimeout(() => {
+                this.onHeartbeat();
+            }, HEARTBEAT_INTERVAL);
+
+        }
+    }
 
     /**
      * Event: Click save
@@ -54,6 +99,15 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
         await this.update();
+    }
+
+    /**
+     * Init
+     */
+    async init() {
+        await super.init();
+
+        this.editedCheck();
     }
 
     /**

@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);
 
     // Preload schemas
+    document.body.classList.toggle('loading', true);
     await HashBrown.Service.SchemaService.getAllSchemas();
+    document.body.classList.toggle('loading', false);
 
     // Init router
     HashBrown.Service.NavigationService.startListening();

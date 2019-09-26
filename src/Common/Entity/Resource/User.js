@@ -68,7 +68,7 @@ class User extends HashBrown.Entity.Resource.ResourceBase {
      * @returns {Boolean} hasScope
      */
     hasScope(project, scope) {
-        if(this.isAdmin) { return true; }
+        if(this.isAdmin || scope === 'content' || scope === 'media') { return true; }
 
         if(!project) { return false; }
         if(!scope && !this.scopes[project]) { return false; }

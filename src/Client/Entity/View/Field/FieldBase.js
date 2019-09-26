@@ -16,10 +16,9 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
-     * Pre render
+     * Fetches view data
      */
-    prerender() {
-        // Multilingual sanity check
+    async fetch() {
         if(this.model.isMultilingual) {
             if(!this.model.value || this.model.value.constructor !== Object) {
                 this.model.value = {};

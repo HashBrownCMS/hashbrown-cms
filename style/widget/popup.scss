@@ -74,7 +74,8 @@
             text-align: center;
 
             &::before {
-                margin-top: -2px;
+                position: relative;
+                top: -2px;
             }
         }
     }
@@ -106,7 +107,7 @@
         cursor: pointer;
         color: inherit;
         line-height: var(--size-widget-small);
-        border-radius: inherit;
+        border-radius: var(--border-radius-medium);
        
         .fa {
             margin-right: 0.5rem;
@@ -129,7 +130,7 @@
         min-width: var(--size-widget-small);
         text-align: center;
         display: block;
-        border-radius: 50%;
+        border-radius: var(--border-radius-medium);
 
         &:hover {
             background-color: var(--color-default-100);

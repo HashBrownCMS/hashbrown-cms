@@ -12,6 +12,8 @@ module.exports = (_, view) => `
     </head>
 
     <body class="page page--environment">
+        ${require('./inc/spinner')(_, view)}
+        
         <main class="page--environment__spaces">
             <div class="page--environment__space page--environment__space--menu"></div>
             <div class="page--environment__space page--environment__space--nav"></div>
