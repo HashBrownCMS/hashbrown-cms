@@ -1,0 +1,38 @@
+.field--array-editor {
+    &__items {
+        width: 100%;
+    }
+
+    &__item {
+        position: relative;
+        
+        &.extra-padding {
+            padding-right: calc(var(--size-widget-small) + var(--padding-medium));
+        }
+
+        & + & {
+            margin-top: var(--padding-medium);
+            border-top: 1px solid var(--color-default-200);
+            padding-top: var(--padding-medium);
+        }
+
+        &__schema {
+            margin-bottom: var(--padding-small);
+        }
+
+        &__remove {
+            position: absolute;
+            margin-top: inherit;
+            top: 0;
+            right: 0;
+        }
+    }
+
+    &__add {
+        margin-top: var(--padding-medium);
+
+        > .widget--popup__label {
+            @extend .widget--button, .default, .expanded;
+        }
+    }
+}

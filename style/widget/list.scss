@@ -16,6 +16,7 @@
         display: block;
         text-align: center;
         cursor: grab;
+        flex-shrink: 0;
     }
 
     &__item {

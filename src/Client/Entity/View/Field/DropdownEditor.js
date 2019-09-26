@@ -12,7 +12,7 @@ class DropdownEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/dropdownEditor');
+        this.model.innerTemplate = require('template/field/inc/dropdownEditor');
     }
 
     /**
@@ -38,6 +38,15 @@ class DropdownEditor extends HashBrown.Entity.View.Field.FieldBase {
 
             this.model.config.options = options;
         }
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

@@ -1,7 +1,12 @@
 .field {
     position: relative;
     display: flex;
-    margin-bottom: 1rem;
+
+    & + & {
+        margin-top: var(--padding-medium);
+        border-top: 1px solid var(--color-default-200);
+        padding-top: var(--padding-medium);
+    }
 
     &.loading {
         height: var(--size-widget-small);
@@ -13,6 +18,18 @@
         display: block;
     }
 
+    &__tools {
+        margin-right: var(--padding-medium);
+    
+        &:empty {
+            display: none;
+        }
+    }
+
+    &__tool {
+        margin-bottom: var(--padding-small);
+    }
+
     &__key {
         flex-basis: 14rem;
         flex-shrink: 0;
@@ -22,6 +39,32 @@
         &__description {
             color: var(--color-default-400);
             line-height: 1.5;
+        }
+        
+        &__tools {
+            margin-top: var(--padding-medium);
+
+            &::after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+
+            &:empty {
+                display: none;
+            }
+        }
+
+        &__tool {
+            margin-right: var(--padding-small);
+            margin-bottom: var(--padding-small);
+            float: left;
+        }
+    }
+
+    &__value {
+        &__label {
+            line-height: var(--size-widget-small);
         }
     }
 }

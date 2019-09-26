@@ -69,6 +69,10 @@
         padding: 1rem;
         flex-grow: 1;
         overflow: auto;
+
+        > *:last-child {
+           margin-bottom: var(--padding-medium); 
+        }
     }
 
     &__footer {

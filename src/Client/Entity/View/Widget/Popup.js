@@ -239,31 +239,55 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         menu.classList.remove('right');
     
         let bounds = menu.getBoundingClientRect();
+       
+        // Establish scrolling bounds
+        let yMin = 0;
+        let yMax = window.innerHeight;
+        let xMin = 0;
+        let xMax = window.innerWidth;
 
+        let parentElement = this.element.parentElement;
+
+        while(parentElement) {
+            if(window.getComputedStyle(parentElement).overflow === 'auto') {
+                let parentBounds = parentElement.getBoundingClientRect();
+
+                yMin = parentBounds.top;
+                yMax = parentBounds.bottom;
+                xMin = parentBounds.left;
+                xMax = parentBounds.right;
+                break;
+            }
+
+            parentElement = parentElement.parentElement;
+        }
+
+        // Apply appropriate classes
         if(this.model.role === 'context-menu') {
-            if(bounds.right > window.innerWidth - margin) {
+            if(bounds.right > xMax - margin) {
                 menu.classList.add('right');
             } else {
                 menu.classList.add('left');
             }
         } else {
-            if(bounds.left < margin) {
+            if(bounds.left < xMin + margin) {
                 menu.classList.add('left');
             } else {
                 menu.classList.add('right');
             }
         }
-       
-        if(bounds.bottom > window.innerHeight - margin && bounds.top - bounds.height > margin) {
+      
+        if(bounds.bottom > yMax - margin && bounds.top - bounds.height > yMin + margin) {
             menu.classList.add('bottom');
         } else {
             menu.classList.add('top');
         }
       
+        // Make final adjustment in case the menu is too tall for the screen
         bounds = menu.getBoundingClientRect();
         
-        if(bounds.bottom > window.innerHeight - margin) {
-            menu.style.height = (window.innerHeight - bounds.top - margin) + 'px';
+        if(bounds.bottom > yMax - margin) {
+            menu.style.height = (yMax - bounds.top - margin) + 'px';
         }
     }
 

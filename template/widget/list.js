@@ -12,7 +12,7 @@ _.ul({class: 'widget widget--list'},
                 _.text({disabled: model.disabled, value: key, onchange: (newKey) => _.onChangeItemKey(key, newKey)}),
             ),
             _.if(model.readonly,
-                _.label({class: 'widget widget--label'}, value)
+                _.label({class: 'widget widget--label'}, value.label || value)
             ),
             _.if(!model.readonly,
                 _.text({disabled: model.disabled, value: value, onchange: (newValue) => _.onChangeItemValue(key, newValue)})
@@ -23,7 +23,7 @@ _.ul({class: 'widget widget--list'},
         )
     ),
     _.if(!model.disabled && !model.readonly,
-        _.button({class: 'widget--list__add widget widget--button dashed embedded expanded low', title: `Add ${model.placeholder || 'item'}`, onclick: _.onClickAddItem},
+        _.button({class: 'widget--list__add widget widget--button default expanded low', title: `Add ${model.placeholder || 'item'}`, onclick: _.onClickAddItem},
             _.span({class: 'fa fa-plus'}),
             `Add ${model.placeholder || 'item'}`
         )

@@ -12,7 +12,7 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/tagsEditor');
+        this.model.innerTemplate = require('template/field/inc/tagsEditor');
     }
 
     /**
@@ -32,6 +32,15 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
         newValue = newValue.join(',');
 
         super.onChange(newValue);
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

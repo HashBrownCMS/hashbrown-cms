@@ -61,23 +61,10 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         }
 
         for(let key in schemaFields) {
-            let schemaField = schemaFields[key];
-            let fieldSchema = await HashBrown.Service.SchemaService.getSchemaById(schemaField.schemaId, true);
-            let fieldType = HashBrown.Entity.View.Field[fieldSchema.editorId] || HashBrown.Entity.View.Field.FieldBase;
-            let fieldValue = contentFields[key];
-
-            let field = new fieldType({
-                model: {
-                    isMultilingual: schemaField.multilingual,
-                    isDisabled: schemaField.disabled,
-                    config: schemaField.config || {},
-                    key: key, 
-                    label: schemaField.label,
-                    description: schemaField.description,
-                    schema: fieldSchema,
-                    value: contentFields[key]
-                }
-            });
+            let field = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
+                schemaFields[key],
+                contentFields[key]
+            );
 
             field.on('change', (newValue) => {  
                 if(this.state.tab === 'meta') {

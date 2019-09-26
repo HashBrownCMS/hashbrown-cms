@@ -12,7 +12,16 @@ class MediaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/mediaReferenceEditor');
+        this.model.innerTemplate = require('template/field/inc/mediaReferenceEditor');
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

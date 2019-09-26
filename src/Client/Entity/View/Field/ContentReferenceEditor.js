@@ -12,7 +12,7 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/contentReferenceEditor');
+        this.model.innerTemplate = require('template/field/inc/contentReferenceEditor');
     }
 
     /**
@@ -31,6 +31,15 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.contentOptions[content.prop('title', HashBrown.Context.language) || content.id] = content.id;
         }
     }   
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
+    }
 }
 
 module.exports = ContentReferenceEditor;

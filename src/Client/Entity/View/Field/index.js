@@ -5,6 +5,7 @@
  */
 namespace('Entity.View.Field')
 .add(require('./FieldBase'))
+.add(require('./ArrayEditor'))
 .add(require('./BooleanEditor'))
 .add(require('./ContentReferenceEditor'))
 .add(require('./ContentSchemaReferenceEditor'))
@@ -14,5 +15,6 @@ namespace('Entity.View.Field')
 .add(require('./MediaReferenceEditor'))
 .add(require('./NumberEditor'))
 .add(require('./StringEditor'))
+.add(require('./StructEditor'))
 .add(require('./TagsEditor'))
 .add(require('./UrlEditor'));

@@ -12,7 +12,16 @@ class DateEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/dateEditor');
+        this.model.innerTemplate = require('template/field/inc/dateEditor');
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

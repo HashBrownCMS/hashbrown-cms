@@ -12,7 +12,7 @@ class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/languageEditor');
+        this.model.innerTemplate = require('template/field/inc/languageEditor');
     }
 
     /**
@@ -26,6 +26,15 @@ class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
         if(HashBrown.Context.projectSettings) {
             this.state.languageOptions = HashBrown.Context.projectSettings.languages || [ 'en' ];
         }
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

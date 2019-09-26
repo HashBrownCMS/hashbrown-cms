@@ -12,7 +12,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.template = require('template/field/urlEditor');
+        this.model.innerTemplate = require('template/field/inc/urlEditor');
     }
 
     /**
@@ -50,10 +50,19 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         url = url.replace(/\/\//g, '/');
 
-        this.model.value = url;
-        this.namedElements.input.value = this.model.value;
+        this.state.value = url;
+        this.namedElements.input.value = this.state.value;
 
-        this.onChange(this.model.value);
+        this.onChange(this.state.value);
+    }
+    
+    /**
+     * Gets tools for this field
+     *
+     * @return {Array} Tools
+     */
+    getTools() {
+        return [];
     }
 }
 

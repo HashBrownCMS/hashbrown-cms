@@ -153,9 +153,9 @@
 
         &::before {
             position: absolute;
+            content: '\f002';
             display: block;
             font-family: 'FontAwesome';
-            content: '\f002';
             color: var(--color-default-200);
             line-height: var(--size-widget-small);
             width: var(--size-widget-small);
@@ -204,17 +204,29 @@
         border-radius: var(--border-radius-small);
         border: 1px solid var(--color-default-200);
 
+        &::before {
+            font-family: 'FontAwesome';
+            display: block;
+            width: 1rem;
+            height: 1rem;
+            line-height: 1rem;
+            font-size: 2rem;
+            position: absolute;
+            z-index: 10;
+            color: var(--color-default);
+        }
+
         &.top {
             top: var(--size-widget-small);
 
-            &::before { top: -0.5rem; }
+            &::before { content: '\f0d8'; top: -0.9rem; }
         }
 
         &.bottom {
             bottom: var(--size-widget-small);
             flex-direction: column-reverse;
     
-            &::before { bottom: -0.5rem; }
+            &::before { content: '\f0d7'; bottom: -0.7rem; }
         }
 
         &.left {
@@ -234,21 +246,6 @@
         &.top { top: 0; }
         &.bottom { bottom: 0; }
     }
-
-    &__icon ~ &__menu::before,
-    &__label ~ &__menu::before {
-        content: '';
-        display: block;
-        width: 1rem;
-        height: 1rem;
-        position: absolute;
-        transform: rotate(45deg);
-        z-index: 10;
-        background-color: var(--color-default);
-        border-left: 1px solid var(--color-default-200);
-        border-top: 1px solid var(--color-default-200);
-    }
-
 
     &__options {
         background-color: transparent;
