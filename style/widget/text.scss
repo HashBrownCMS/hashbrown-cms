@@ -10,6 +10,10 @@
     height: var(--size-widget-small);
     line-height: var(--size-widget-small);
 
+    &.code {
+        font-family: monospace;
+    }
+
     &.large {
         height: var(--size-widget-medium);
         line-height: var(--size-widget-medium);

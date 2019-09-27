@@ -48,7 +48,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         this.namedElements.editor.innerHTML += this.toView(html);
 
         this.onChange();
-    };
+    }
 
     /**
      * Updates the paragraph picker and selection tag
@@ -81,7 +81,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 }
             }
         }
-
 
         // If the parent tag is not a heading or a paragraph, default to paragraph
         if(!paragraphPicker.hasOption(parentElementTagName)) {

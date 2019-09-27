@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'editor widget--rich-text'},
-    _.div({class: 'widget--rich-text__toolbar widget-group'},
+    _.div({class: 'widget--rich-text__toolbar'},
         _.popup({name: 'paragraph', value: 'p', options: state.paragraphOptions, onchange: _.onChangeHeading}),
 
         _.div({class: 'widget-group__separator line'}),

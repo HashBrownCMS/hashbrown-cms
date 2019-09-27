@@ -3,9 +3,8 @@
     height: 100%;
 
     &__toolbar {
-        margin: 0 !important;
-        background-color: var(--default-300);
-        padding: 0.5rem;
+        margin-bottom: var(--padding-small);
+        display: flex;
 
         .widget--popup {
             max-width: 14rem;
@@ -24,7 +23,8 @@
         background-color: var(--color-default);
         color: var(--color-default-text);
         overflow: auto;
-        padding: 0 1rem;
+        padding: var(--padding-medium);
+        border-radius: var(--border-radius-small);
 
         &:focus {
             outline: none;

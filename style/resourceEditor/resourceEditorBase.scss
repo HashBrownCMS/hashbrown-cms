@@ -51,6 +51,7 @@
             &.active {
                 background-color: var(--color-default-100);
                 color: var(--color-default-text);
+                pointer-events: none;
             }
 
             &:not(.active) {
@@ -59,7 +60,8 @@
                 border-color: var(--color-decor-500);
 
                 &:hover {
-                    background-color: var(--color-decor-700);
+                    background-color: var(--color-action-500);
+                    color: var(--color-action-text);
                 }
             }
         }

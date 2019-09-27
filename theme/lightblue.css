@@ -49,4 +49,7 @@
     /* Fields */
     --width-field-key: 14rem;
     --max-width-field-value: 30rem;
+
+    /* Rich text editor */
+    --height-rich-text-editor: 30rem;
 }
