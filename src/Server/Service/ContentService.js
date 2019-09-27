@@ -526,6 +526,7 @@ class ContentService extends require('Common/Service/ContentService') {
                         label: 'Struct',
                         description: 'A combination of fields',
                         config: {
+                            label: 'string',
                             struct: {
                                 string: {
                                     schemaId: 'string',

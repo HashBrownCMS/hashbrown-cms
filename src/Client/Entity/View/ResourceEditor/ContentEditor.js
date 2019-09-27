@@ -147,8 +147,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
         }
-
-        await this.update();
     }
 
     /**

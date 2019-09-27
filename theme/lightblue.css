@@ -45,4 +45,8 @@
 
     /* Panels */
     --width-panels: 30rem;
+    
+    /* Fields */
+    --width-field-key: 14rem;
+    --max-width-field-value: 30rem;
 }

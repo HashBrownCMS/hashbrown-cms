@@ -8,12 +8,15 @@
     padding: 0 1rem;
     text-transform: uppercase;
     display: block;
-    font-weight: bold;
     min-width: 10rem;
     text-align: center;
     cursor: pointer;
     max-width: 20rem;
     position: relative;
+
+    &:not(.fa) {
+        font-weight: bold;
+    }
 
     &:hover {
         background-color: var(--color-action-300);
@@ -115,7 +118,10 @@
         -webkit-appearance: none;
     }
 
-    .fa:first-child {
-        margin-right: 0.5rem;
+    .fa {
+        font-weight: normal;
+
+        &:first-child { margin-right: var(--padding-small); }
+        &:last-child { margin-left: var(--padding-small); }
     }
 }

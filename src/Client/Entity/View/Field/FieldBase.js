@@ -17,10 +17,14 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     static async createFromFieldDefinition(definition, value) {
         checkParam(definition, 'definition', Object, true);
 
-        let model = definition;
-        
-        model.value = value;
-        model.schema = await HashBrown.Service.SchemaService.getSchemaById(model.schemaId, true);
+        let model = {
+            config: definition.config || {},
+            description: definition.description,
+            isMultilingual: definition.multilingual,
+            label: definition.label,
+            schema: await HashBrown.Service.SchemaService.getSchemaById(definition.schemaId, true),
+            value: value
+        };
         
         let type = HashBrown.Entity.View.Field[model.schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
 
@@ -39,9 +43,12 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      */
     static async createFromSchemaId(schemaId, value) {
         checkParam(schemaId, 'schemaId', String, true);
+        
+        let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId, true);
 
         let model = {
-            schema: await HashBrown.Service.SchemaService.getSchemaById(schemaId, true),
+            schema: schema,
+            config: schema.config,
             value: value
         };
         

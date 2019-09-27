@@ -69,9 +69,7 @@
             max-width: 100%;
         }
 
-        &__image,
-        &__video,
-        &__file {
+        &__media {
             position: absolute;
             max-height: calc(100% - 1rem);
             max-width: calc(100% - 1rem);

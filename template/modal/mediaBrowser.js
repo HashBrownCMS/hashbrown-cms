@@ -29,17 +29,7 @@ _.div({class: 'modal modal--media-browser in'},
 
                     _.each(state.items, (i, item) =>
                         _.button({class: 'modal--media-browser__item', 'data-folder': item.folder, title: item.name, onclick: (e) => _.onClickItem(item.id)},
-                            item.isImage() ?
-                                _.img({class: 'modal--media-browser__item__image', alt: item.name, src: `/media/${HashBrown.Context.projectId}/${HashBrown.Context.environment}/${item.id}?width=800&t=${Date.now()}`})
-                            : null,
-                            item.isVideo() ?
-                                _.video({class: 'modal--media-browser__item__video'},
-                                    _.source({src: `/media/${HashBrown.Context.projectId}/${HashBrown.Context.environment}/${item.id}`})
-                                )
-                            : null,
-                            !item.isImage() && !item.isVideo() ?
-                                _.span({class: 'fa fa-file modal--media-browser__item__file'})
-                            : null,
+                            _.media({class: 'modal--media-browser__item__media', disabled: true, value: item}),
                             _.label({class: 'modal--media-browser__item__name'}, item.name)
                         )
                     )

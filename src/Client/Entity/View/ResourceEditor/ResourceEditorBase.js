@@ -154,7 +154,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
             if(!state) { continue; }
 
-            field.state.isExpanded = state.isExpanded;
+            field.state.isCollapsed = state.isCollapsed;
             field.render();
         }
 

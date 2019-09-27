@@ -27,11 +27,13 @@
     }
 
     &__tool {
-        margin-bottom: var(--padding-small);
+        &:not(:last-child) {
+            margin-bottom: var(--padding-small);
+        }
     }
 
     &__key {
-        flex-basis: 14rem;
+        flex-basis: var(--width-field-key);
         flex-shrink: 0;
         line-height: var(--size-widget-small);
         margin-right: var(--padding-medium);
@@ -63,6 +65,12 @@
     }
 
     &__value {
+        flex-grow: 1;
+
+        > .widget, >.widget-group {
+            max-width: var(--max-width-field-value);
+        }
+
         &__label {
             line-height: var(--size-widget-small);
         }

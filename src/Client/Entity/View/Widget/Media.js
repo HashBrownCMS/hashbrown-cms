@@ -22,8 +22,12 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
         this.state = {};
 
         if(this.model.value) {
-            let media = await HashBrown.Service.MediaService.getMediaById(this.model.value);
-            
+            let media = this.model.value;
+
+            if(typeof media === 'string') {
+                media = await HashBrown.Service.MediaService.getMediaById(media);
+            }
+
             this.state.source = `/media/${HashBrown.Context.projectId}/${HashBrown.Context.environment}/${media.id}?width=300`;
             
             if(media.isImage()) {

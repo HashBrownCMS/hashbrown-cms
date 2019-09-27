@@ -76,21 +76,12 @@ class MediaViewer extends HashBrown.View.Editor.ResourceEditor {
                 )
             ),
             _.div({class: 'editor__body'},
-                _.do(() => {
-                    if(this.model.isImage()) {
-                        return _.img({class: 'editor--media__preview', src: mediaSrc});
-                    
-                    } else if(this.model.isVideo()) {
-                        return _.video({class: 'editor--media__preview', controls: true},
-                            _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
-                        );
-                    
-                    } else if(this.model.isAudio()) {
-                        return _.audio({class: 'editor--media__preview', controls: true},
-                            _.source({src: mediaSrc, type: this.model.getContentTypeHeader()})
-                        );
+                new HashBrown.Entity.View.Widget.Media({
+                    model: {
+                        readonly: true,
+                        value: this.model.id
                     }
-                })
+                }).element
             )
         );
     }

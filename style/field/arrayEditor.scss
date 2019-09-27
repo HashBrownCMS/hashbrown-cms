@@ -10,21 +10,30 @@
             padding-right: calc(var(--size-widget-small) + var(--padding-medium));
         }
 
+        > .widget, >.widget-group {
+            max-width: var(--max-width-field-value);
+        }
+        
         & + & {
             margin-top: var(--padding-medium);
             border-top: 1px solid var(--color-default-200);
             padding-top: var(--padding-medium);
         }
 
-        &__schema {
-            margin-bottom: var(--padding-small);
-        }
-
-        &__remove {
+        &__tools {
             position: absolute;
             margin-top: inherit;
             top: 0;
             right: 0;
+            display: flex;
+        }
+        
+        &__tool {
+            margin-left: var(--padding-small);
+
+            > .widget--popup__icon {
+                @extend .widget--button, .small, .default;
+            }
         }
     }
 

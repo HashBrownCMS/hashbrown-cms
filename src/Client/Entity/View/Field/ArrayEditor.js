@@ -166,6 +166,23 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.update();
     }
+    
+    /**
+     * Event: Change schema
+     */
+    onChangeItemSchema(index, schemaId) {
+        if(!this.state.value || index >= this.state.value.length) { return; }
+
+        if(!this.state.value[index]) {
+            this.state.value[index] = {};
+        }
+            
+        this.state.value[index].schemaId = schemaId;
+
+        this.onChange(this.state.value);
+
+        this.update();
+    }
 
     /**
      * Event: Change sorting

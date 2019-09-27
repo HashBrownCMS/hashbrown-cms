@@ -2,4 +2,4 @@
 
 module.exports = (_, model, state) =>
 
-_.media({disabled: model.isDisabled, value: state.value, onchange: _.onChange})
+_.media({class: 'small', disabled: model.isDisabled, value: state.value, onchange: _.onChange})
