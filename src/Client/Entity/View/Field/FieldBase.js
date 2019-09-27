@@ -20,6 +20,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         let model = {
             config: definition.config || {},
             description: definition.description,
+            isDisabled: definition.disabled,
             isMultilingual: definition.multilingual,
             label: definition.label,
             schema: await HashBrown.Service.SchemaService.getSchemaById(definition.schemaId, true),

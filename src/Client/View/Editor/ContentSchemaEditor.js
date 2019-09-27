@@ -83,6 +83,17 @@ class ContentSchemaEditor extends HashBrown.View.Editor.SchemaEditor {
 
         _.append($element,
             this.field(
+                'Allowed at root',
+                new HashBrown.Entity.View.Widget.Checkbox({
+                    model: {
+                        value: this.model.allowedAtRoot,
+                        onchange: (newValue) => {
+                            this.model.allowedAtRoot = newValue;
+                        }
+                    }
+                }).element
+            ),
+            this.field(
                 'Allowed child Schemas',
                 new HashBrown.Entity.View.Widget.Popup({
                     model: {

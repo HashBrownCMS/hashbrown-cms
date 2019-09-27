@@ -25,10 +25,23 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
 
         this.state.schemaOptions = {};
 
-        for(let schema of allSchemas) {
-            if(this.model.config.allowedSchemas && this.model.config.allowedSchemas.indexOf(schema.id) < 0) { continue; }
+        let allowedSchemas = this.model.config.allowedSchemas || [];
 
-            this.state.schemaOptions[schema.name] = schema.id;
+        let thisContentId = HashBrown.Service.NavigationService.getRoute(1);
+        let thisContent = await HashBrown.Service.ContentService.getContentById(thisContentId);
+        
+        if(allowedSchemas === 'fromParent' && thisContent.parentId) {
+            let parentContent = await HashBrown.Service.ContentService.getContentById(thisContent.parentId);
+        
+            allowedSchemas = parentContent.allowedChildSchemas || [];
+        }
+
+        if(!Array.isArray(allowedSchemas)) { allowedSchemas = []; }
+
+        for(let schema of allSchemas) {
+            if((!thisContent.parentId && schema.allowedAtRoot) || allowedSchemas.indexOf(schema.id) >= 0) {
+                this.state.schemaOptions[schema.name] = schema.id;
+            }
         }
     }   
     

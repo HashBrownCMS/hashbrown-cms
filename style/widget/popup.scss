@@ -243,6 +243,7 @@
     }
 
     &[role="context-menu"] &__menu {
+        &::before { display: none; }
         &.top { top: 0; }
         &.bottom { bottom: 0; }
     }
