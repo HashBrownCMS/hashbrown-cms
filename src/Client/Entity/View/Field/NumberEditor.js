@@ -12,16 +12,8 @@ class NumberEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/numberEditor');
-    }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
+        this.editorTemplate = require('template/field/editor/numberEditor');
+        this.configTemplate = require('template/field/config/numberEditor');
     }
 }
 

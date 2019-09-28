@@ -12,20 +12,36 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/resourceReferenceEditor');
+        this.editorTemplate = require('template/field/editor/resourceReferenceEditor');
+        this.configTemplate = require('template/field/config/resourceReferenceEditor');
     }
 
     /**
      * Fetches the model
      */
     async fetch() {
-        await super.fetch();
-        
-        if(this.model.config.resource && this.state.value) {
-            this.state.resource = await HashBrown.Service.ResourceService.get(null, this.model.config.resource, this.state.value); 
-        }
+        if(this.state.name === 'config') {
+            this.state.categoryOptions = HashBrown.Service.ResourceService.getResourceCategoryNames();
+            this.state.keyOptions = [];
 
-        this.state.label = this.getValueLabel();
+            if(this.model.config.resource) {
+                for(let type of Object.values(HashBrown.Entity.Resource)) {
+                    if(type.category === this.model.config.resource) {
+                        for(let key of Object.keys(new type())) {
+                            this.state.keyOptions.push(key);
+                        }
+                        break;
+                    }
+                }
+            }
+
+        } else {
+            if(this.model.config.resource && this.state.value) {
+                this.state.resource = await HashBrown.Service.ResourceService.get(null, this.model.config.resource, this.state.value); 
+            }
+
+            this.state.label = this.getValueLabel();
+        }
     }
 
     /**
@@ -54,6 +70,26 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
         }
        
         return super.getValueLabel();
+    }
+
+    /**
+     * Event: Change resource category
+     */
+    onChangeResourceCategory(newValue) {
+        this.model.config.resource = newValue;
+        this.model.config.resourceKeys = [];
+
+        this.onChange();
+        this.update();
+    }
+
+    /**
+     * Event: Change resource keys
+     */
+    onChangeResourceKeys(newValue) {
+        this.model.config.resourceKeys = newValue;
+    
+        this.onChange();
     }
 }
 

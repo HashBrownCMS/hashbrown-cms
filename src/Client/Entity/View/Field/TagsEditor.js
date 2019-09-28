@@ -12,7 +12,7 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/tagsEditor');
+        this.editorTemplate = require('template/field/editor/tagsEditor');
     }
 
     /**

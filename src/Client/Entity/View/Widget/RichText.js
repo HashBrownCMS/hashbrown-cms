@@ -297,7 +297,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         let options = this.constructor.getToolbarElements('paragraphs');
 
         for(let key in options) {
-            if(this.model.toolbar[key] === false) { delete options[key]; }
+            if(!this.model.toolbar || this.model.toolbar[key] === false) { delete options[key]; }
         }
        
         options.p = 'Paragraph';

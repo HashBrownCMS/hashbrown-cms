@@ -66,6 +66,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                 contentFields[key]
             );
 
+            field.model.isDisabled = this.model.isLocked;
+
             field.on('change', (newValue) => {  
                 if(this.state.tab === 'meta') {
                     this.model[key] = newValue;

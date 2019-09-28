@@ -12,25 +12,75 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/richTextEditor');
-        
-        // Sanity check of value
-        if(typeof this.state.value !== 'string') {
-            this.state.value = this.state.value || '';
-        }
+        this.editorTemplate = require('template/field/editor/richTextEditor');
+        this.configTemplate = require('template/field/config/richTextEditor');
+    }
 
-        // Make sure the string is HTML
-        this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
+    /**
+     * Fetches view data
+     */
+    async fetch() {
+        if(this.state.name === 'config') {
+            if(!this.model.config.wysiwygToolbar) {
+                this.model.config.wysiwygToolbar = {};
+            }
+            
+            let toolbarOptions = {};
 
-        let lastTab = localStorage.getItem('rich-text-editor--tab');
+            let categories = {
+                paragraphs: 'Paragraphs',
+                style: 'Style',
+                lists: 'Lists',
+                positioning: 'Positioning'
+            };
 
-        if(lastTab === 'markdown' && !this.model.config.isMarkdownDisabled) {
-            this.state.name = 'markdown';
-            this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
-        
-        } else if(lastTab === 'html' && !this.model.config.isHtmlDisabled) {
-            this.state.name = 'html';
+            for(let key in categories) {
+                let label = categories[key];
+                let options = HashBrown.Entity.View.Widget.RichText.getToolbarElements(key);
 
+                toolbarOptions[label] = '---';
+
+                for(let key in options) {
+                    let label = options[key];
+                    
+                    toolbarOptions[label] = key;
+                }
+            }
+                
+            this.state.wysiwygToolbarOptions = toolbarOptions;
+           
+            let toolbarValue = [];
+
+            for(let label in toolbarOptions) {
+                let key = toolbarOptions[label];
+
+                if(this.model.config.wysiwygToolbar && this.model.config.wysiwygToolbar[key] === false) { continue; }
+
+                toolbarValue.push(key);
+            }
+            
+            this.state.wysiwygToolbarValue = toolbarValue;
+           
+
+        } else {
+            // Sanity check of value
+            if(typeof this.state.value !== 'string') {
+                this.state.value = this.state.value || '';
+            }
+
+            // Make sure the string is HTML
+            this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
+
+            let lastTab = localStorage.getItem('rich-text-editor--tab');
+
+            if(lastTab === 'markdown' && !this.model.config.isMarkdownDisabled) {
+                this.state.name = 'markdown';
+                this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
+            
+            } else if(lastTab === 'html' && !this.model.config.isHtmlDisabled) {
+                this.state.name = 'html';
+
+            }
         }
     }
     
@@ -119,9 +169,48 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      * @param {String} newValue
      */
     onChange(newValue) {
-        newValue = HashBrown.Service.MarkdownService.toHtml(newValue);
+        if(this.state.name !== 'config') {
+            newValue = HashBrown.Service.MarkdownService.toHtml(newValue);
+        }
         
         super.onChange(newValue);
+    }
+
+    /**
+     * Event: Change config WYSIWYG
+     *
+     * @param {Array} enabled
+     */
+    onChangeConfigWysiwyg(enabled) {
+        if(!this.model.config.wysiwygToolbar) {
+            this.model.config.wysiwygToolbar = {};
+        }
+
+        let keys = [];
+
+        let categories = {
+            paragraphs: 'Paragraphs',
+            style: 'Style',
+            lists: 'Lists',
+            positioning: 'Positioning'
+        };
+
+        for(let key in categories) {
+            let label = categories[key];
+            let options = HashBrown.Entity.View.Widget.RichText.getToolbarElements(key);
+
+            keys = keys.concat(Object.keys(options));
+        }
+
+        for(let key of keys) {
+            if(enabled.indexOf(key) > -1) {
+                delete this.model.config.wysiwygToolbar[key];
+            } else {
+                this.model.config.wysiwygToolbar[key] = false;
+            }
+        }
+
+        this.onChange();
     }
 }
 

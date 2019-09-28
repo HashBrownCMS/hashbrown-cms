@@ -12,16 +12,8 @@ class StringEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/stringEditor');
-    }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
+        this.editorTemplate = require('template/field/editor/stringEditor');
+        this.configTemplate = require('template/field/config/stringEditor');
     }
     
     /**

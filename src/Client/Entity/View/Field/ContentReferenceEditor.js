@@ -12,34 +12,34 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/contentReferenceEditor');
+        this.editorTemplate = require('template/field/editor/contentReferenceEditor');
+        this.configTemplate = require('template/field/config/contentReferenceEditor');
     }
 
     /**
      * Fetches view data
      */
     async fetch() {
-        await super.fetch();
+        if(this.state.name === 'config') {
+            // Build schema options
+            this.state.schemaOptions = {};
 
-        let allContent = await HashBrown.Service.ContentService.getAllContent();
+            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('content') || []) {
+                this.state.schemaOptions[schema.name] = schema.id;
+            }
 
-        this.state.contentOptions = {};
+        } else {
+            let allContent = await HashBrown.Service.ContentService.getAllContent();
 
-        for(let content of allContent) {
-            if(this.model.config.allowedSchemas && this.model.config.allowedSchemas.indexOf(content.schemaId) < 0) { continue; }
+            this.state.contentOptions = {};
 
-            this.state.contentOptions[content.prop('title', HashBrown.Context.language) || content.id] = content.id;
+            for(let content of allContent) {
+                if(this.model.config.allowedSchemas && this.model.config.allowedSchemas.indexOf(content.schemaId) < 0) { continue; }
+
+                this.state.contentOptions[content.prop('title', HashBrown.Context.language) || content.id] = content.id;
+            }
         }
     }   
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = ContentReferenceEditor;

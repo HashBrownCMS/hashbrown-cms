@@ -12,15 +12,18 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
     constructor(params) {
         super(params);
 
-        this.model.innerTemplate = require('template/field/inc/arrayEditor');
+        this.editorTemplate = require('template/field/editor/arrayEditor');
+        this.configTemplate = require('template/field/config/arrayEditor');
     }
-    
+
     /**
      * Gets tools for this field
      *
      * @return {Array} Tools
      */
     getTools() {
+        if(this.state.name === 'config') { return []; }
+
         if(this.state.name === 'sorting') {
             return [
                 {
@@ -54,44 +57,54 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Fetches view data
      */
     async fetch() {
-        // Build schema options
-        this.state.schemaOptions = {};
+        if(this.state.name === 'config') {
+            // Build schema options
+            this.state.schemaOptions = {};
 
-        for(let schemaId of this.model.config.allowedSchemas || []) {
-            let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
+            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('field') || []) {
+                this.state.schemaOptions[schema.name] = schema.id;
+            }
 
-            this.state.schemaOptions[schema.name] = schema.id;
-        }
+        } else {
+            // Build schema options
+            this.state.schemaOptions = {};
 
-        // Build fields
-        this.state.fields = [];
+            for(let schemaId of this.model.config.allowedSchemas || []) {
+                let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
 
-        if(!Array.isArray(this.state.value)) { this.state.value = []; }
+                this.state.schemaOptions[schema.name] = schema.id;
+            }
 
-        for(let i = 0; i < this.state.value.length; i++) {
-            let item = this.state.value[i];
+            // Build fields
+            this.state.fields = [];
 
-            let view = await HashBrown.Entity.View.Field.FieldBase.createFromSchemaId(
-                item.schemaId,
-                item.value
-            );
+            if(!Array.isArray(this.state.value)) { this.state.value = []; }
+
+            for(let i = 0; i < this.state.value.length; i++) {
+                let item = this.state.value[i];
+
+                let view = await HashBrown.Entity.View.Field.FieldBase.createFromSchemaId(
+                    item.schemaId,
+                    item.value
+                );
+                
+                view.on('change', (newValue) => {
+                    item.value = newValue;
+                    this.state.value[i] = item;
+
+                    this.trigger('change', this.state.value);
+                });
+
+                this.state.fields.push({
+                    view: view,
+                    label: view.state.label
+                }); 
+            }
             
-            view.on('change', (newValue) => {
-                item.value = newValue;
-                this.state.value[i] = item;
-
-                this.trigger('change', this.state.value);
-            });
-
-            this.state.fields.push({
-                view: view,
-                label: view.state.label
-            }); 
+            // Set state limitations
+            this.state.canRemoveItems = !this.model.config.minItems || this.state.value.length > this.model.config.minItems;
+            this.state.canAddItems = !this.model.config.maxItems || this.state.value.length < this.model.config.maxItems;
         }
-        
-        // Set state limitations
-        this.state.canRemoveItems = !this.model.config.minItems || this.state.value.length > this.model.config.minItems;
-        this.state.canAddItems = !this.model.config.maxItems || this.state.value.length < this.model.config.maxItems;
     }
 
     /**

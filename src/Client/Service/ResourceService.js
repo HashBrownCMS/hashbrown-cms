@@ -14,16 +14,12 @@ class ResourceService {
     static getResourceCategoryNames() {
         let names = {};
 
-        for(let modelName in HashBrown.Entity.Resource) {
-            let model = HashBrown.Entity.Resource[modelName];
+        for(let type of Object.values(HashBrown.Entity.Resource)) {
+            if(!type || type === HashBrown.Entity.Resource.ResourceBase) { continue; }
 
-            if(!model || model.prototype === HashBrown.Entity.Resource.ResourceBase) { continue; }
+            if(!type.category) { continue; }
 
-            let name = model.category;
-
-            if(!name) { continue; }
-
-            names[name] = true;
+            names[type.category] = true;
         }
 
         names = Object.keys(names);

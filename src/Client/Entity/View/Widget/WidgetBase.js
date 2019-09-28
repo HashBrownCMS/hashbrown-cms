@@ -28,7 +28,7 @@ class WidgetBase extends HashBrown.Entity.View.ViewBase {
         }
 
         if(typeof this.model.onchange === 'function') {
-            this.model.onchange(this.model.value);
+            this.model.onchange(this.model.value, this.model.name);
         }
     }
 

@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `field ${model.class || ''}`},
+_.div({class: `field ${state.className || ''}`},
     _.if(state.name === 'error',
         state.message
     ),
@@ -33,7 +33,10 @@ _.div({class: `field ${model.class || ''}`},
                 )
             ),
             _.if(!state.isCollapsed,
-                _.include(model.innerTemplate)
+                state.name === 'config' ?
+                    _.include(state.configTemplate)
+                :
+                    _.include(state.editorTemplate)
             )
         )
     )

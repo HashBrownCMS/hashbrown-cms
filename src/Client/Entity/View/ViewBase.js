@@ -34,6 +34,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         this.def(Object, 'events', {});
         this.def(Object, 'partials', {});
         this.def(Object, 'namedElements', {});
+        this.def(Boolean, 'isUpdating', false);
     }
 
     /**
@@ -183,7 +184,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                     };
                 }
 
-                // Look up recognised field names                
+                // Look up recognised names                
                 switch(name) {
                     // A simple conditional
                     case 'if':
@@ -232,17 +233,27 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             return content;
                         };
 
+                    // Render SVG
+                    case 'svg':
+                        return (svg) => {
+                            let element = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+                            element.innerHTML = svg;
+
+                            return element;
+                        };
+
                     // Render an included template
                     case 'include':
                         return (template, model) => {
                             if(typeof template !== 'function') { return ''; }
-
+                            
                             return template(this.scope(), model || this.model, this.state);
                         };
 
                     // Register a partial
                     case 'partial':
-                        return(partialName, renderFunction) => {
+                        return (partialName, renderFunction) => {
                             if(typeof renderFunction !== 'function') { return null; }
 
                             let content = renderFunction(this.scope(), this.model, this.state);
@@ -254,7 +265,18 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             return content;
                         };
-                        
+                   
+                    // Render a field
+                    case 'field':
+                        return (model, ...content) => {
+                            return require('template/field/fieldBase')(
+                                this.scope(),
+                                model,
+                                {
+                                    editorTemplate: (_, model, state) => { return content; },
+                                }
+                            );
+                        };
 
                     // Any unrecognised key will be interpreted as an element constructor
                     // This means that, for instance, calling "_.div" will return a <div> HTMLElement 
@@ -263,7 +285,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                         let widget = this.getWidget(name);
 
                         if(widget) {
-                            return (attributes) => {
+                            return (attributes = {}) => {
                                 let child = new widget({model: attributes});
 
                                 if(attributes && attributes.name) {
@@ -281,7 +303,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             if(attributes && attributes.name) {
                                 this.namedElements[attributes.name] = element;
                             }
-
+                            
                             return element;
                         }
                 }
@@ -315,13 +337,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
             }
 
-            if(content instanceof Node) {
-                element.appendChild(content);
-            
-            } else if(content) {
-                element.innerHTML += content.toString();
-            
-            }
+            element.append(content);
         }
     }
 
@@ -384,6 +400,10 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * Updates the view
      */
     async update() {
+        if(this.isUpdating) { return; }
+
+        this.isUpdating = true;
+
         try {
             await this.fetch();
 
@@ -392,6 +412,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         } finally {
             this.render();
+            this.isUpdating = false;
 
         }
     }

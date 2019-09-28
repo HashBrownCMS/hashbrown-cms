@@ -23,10 +23,10 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     sanityCheck() {
         if(this.model.keys && (!this.model.value || this.model.value.constructor !== Object)) {
             this.model.value = {};
-        }
-
-        if(!this.model.keys && (!this.model.value || this.model.value.constructor !== Array)) {
+        
+        } else if(!this.model.value || this.model.value.constructor !== Array) {
             this.model.value = [];
+        
         }
     }
 
@@ -88,16 +88,38 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
             }
         }
             
-        let item = this.model.value.splice(oldIndex, 1)[0]
-
         if(newIndex > oldIndex) { newIndex--; }
+           
+        if(this.model.value.constructor === Object) {
+            let keys = Object.keys(this.model.value);
+            let key = keys.splice(oldIndex, 1)[0];
 
-        if(newIndex < 0) {
-            this.model.value.splice(0, 0, item);
-        } else if(newIndex >= this.model.value.length) {
-            this.model.value.push(item);
-        } else {
-            this.model.value.splice(newIndex, 0, item)
+            if(newIndex < 0) {
+                keys.splice(0, 0, key);
+            } else if(newIndex >= keys.length) {
+                keys.push(key);
+            } else {
+                keys.splice(newIndex, 0, key)
+            }
+
+            let newValue = {};
+
+            for(let key of keys) {
+                newValue[key] = this.model.value[key];
+            }
+
+            this.model.value = newValue;
+
+        } else if(this.model.value.constructor === Array) {
+            let item = this.model.value.splice(oldIndex, 1)[0];
+
+            if(newIndex < 0) {
+                this.model.value.splice(0, 0, item);
+            } else if(newIndex >= this.model.value.length) {
+                this.model.value.push(item);
+            } else {
+                this.model.value.splice(newIndex, 0, item)
+            }
         }
 
         this.render();
@@ -110,7 +132,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onChangeItemKey(oldKey, newKey) {
         this.sanityCheck();
 
-        let newValue = this.model.keys ? {} : [];
+        let newValue = this.model.value.constructor === Object ? {} : [];
 
         for(let key in this.model.value) {
             let value = this.model.value[key];
@@ -143,10 +165,12 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onClickRemoveItem(key) {
         this.sanityCheck();
 
-        if(this.model.keys) {
+        if(this.model.value.constructor === Object) {
             delete this.model.value[key];
-        } else {
+        
+        } else if(this.model.value.constructor === Array) {
             this.model.value.splice(key, 1);
+        
         }
 
         this.render();
@@ -159,10 +183,12 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onClickAddItem() {
         this.sanityCheck();
 
-        if(this.model.keys) {
+        if(this.model.value.constructor === Object) {
             this.model.value['newField'] = 'New field';
-        } else {
+
+        } else if(this.model.value.constructor === Array) {
             this.model.value.push(null);
+       
         }
 
         this.render();

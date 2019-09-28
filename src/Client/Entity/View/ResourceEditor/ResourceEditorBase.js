@@ -97,8 +97,6 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         await HashBrown.Service.ResourceService.set(this.category, this.state.id, this.model);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-
-        await this.update();
     }
 
     /**
