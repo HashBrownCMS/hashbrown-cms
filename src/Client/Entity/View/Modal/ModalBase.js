@@ -3,9 +3,6 @@
 /**
  * A generic modal
  *
- * TODO: Enable ESC to cancel
- * TODO: Enable grouping
- *
  * @memberof HashBrown.Client.Entity.View.Modal
  */
 class ModalBase extends HashBrown.Entity.View.ViewBase {

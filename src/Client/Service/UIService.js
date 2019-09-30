@@ -367,7 +367,7 @@ class UIService {
         debug.log(error.message + ': ' + error.stack, 'HashBrown');
         console.trace();
 
-        return this.notify('<span class="fa fa-warning"></span> Error', error.message, onClickOK, 'error');
+        return this.notify([ _.span({class: 'fa fa-warning'}), ' Error' ], error.message, onClickOK, 'error');
     }
     
     /**

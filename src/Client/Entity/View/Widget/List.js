@@ -21,12 +21,12 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
      * Performs a sanity check on the value
      */
     sanityCheck() {
-        if(this.model.keys && (!this.model.value || this.model.value.constructor !== Object)) {
-            this.model.value = {};
-        
-        } else if(!this.model.value || this.model.value.constructor !== Array) {
-            this.model.value = [];
-        
+        if(!this.model.value) {
+            if(this.model.keys) {
+                this.model.value = {};
+            } else {
+                this.model.value = [];
+            }
         }
     }
 
@@ -184,12 +184,14 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
         this.sanityCheck();
 
         if(this.model.value.constructor === Object) {
-            this.model.value['newField'] = 'New field';
+            this.model.value[`new${this.model.placeholder || 'item'}`] = `New ${this.model.placeholder || 'item'}`;
 
         } else if(this.model.value.constructor === Array) {
             this.model.value.push(null);
        
         }
+
+        
 
         this.render();
         this.onChange();

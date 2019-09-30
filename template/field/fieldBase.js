@@ -13,7 +13,7 @@ _.div({class: `field ${state.className || ''}`},
                 _.div({class: 'field__key__label'}, model.label),
                 _.div({class: 'field__key__description'}, model.description),
                 _.div({class: 'field__key__tools'},
-                    _.each(state.tools, (i, tool) =>
+                    _.each(model.tools || state.tools, (i, tool) =>
                         _.button({class: `widget widget--button default small field__key__tool fa fa-${tool.icon || ''}`, title: tool.tooltip, onclick: tool.handler})
                     )
                 )

@@ -23,13 +23,8 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     async fetch() {
         if(this.state.name === 'config') {
-            // Build schema options
-            this.state.schemaOptions = {};
-
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('field') || []) {
-                this.state.schemaOptions[schema.name] = schema.id;
-            }
-
+            this.state.fields = {};
+            
             // Build label options
             this.state.labelOptions = {};
 
@@ -38,9 +33,10 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 this.state.labelOptions[label] = key;
             }
+        } else {
+            this.state.fields = [];
+
         }
-        
-        this.state.fields = [];
 
         if(!this.state.value || typeof this.state.value !== 'object' || Array.isArray(this.state.value)) {
             this.state.value = {};
@@ -52,26 +48,11 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         for(let key in this.model.config.struct) {
             let definition = this.model.config.struct[key];
 
+            // When in the config state, only the label and key is needed
             if(this.state.name === 'config') {
-                let view = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
-                    definition,
-                    null,
-                    {
-                        name: 'config'
-                    }
-                );
-
-                view.on('change', (newValue) => {
-                    this.onChangeConfigStructValue(key, 'config', newValue);
-                });
-
-                this.state.fields.push({
-                    label: definition.label,
-                    key: key,
-                    definition: definition,
-                    config: view.configTemplate(view.scope(), view.model, view.state)
-                });
+                this.state.fields[key] = definition.label;
             
+            // When in the editor state, show all fields as normal
             } else {
                 let view = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
                     definition,
@@ -88,7 +69,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             }
         }
     }
-    
+   
     /**
      * Gets the value label
      *
@@ -106,28 +87,8 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
      * @return {Array} Tools
      */
     getTools() {
-        if(this.state.name === 'config') {
-            if(!this.state.isEditing) {
-                return [
-                    {
-                        icon: 'pencil',
-                        tooltip: 'Edit fields',
-                        handler: () => this.onClickEditFields()
-                    }
-                ];
-            
-            } else {
-                return [
-                    {
-                        icon: 'check',
-                        tooltip: 'Done editing fields',
-                        handler: () => this.onClickDoneEditingFields()
-                    }
-                ];
-            
-            }
-        }
-
+        if(this.state.name === 'config') { return []; }
+        
         return [
             {
                 icon: this.state.isCollapsed ? 'caret-right' : 'caret-down',
@@ -136,7 +97,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             }
         ];
     }
-    
+   
     /**
      * Event: Toggle collapsed/expanded
      */
@@ -144,6 +105,33 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.state.isCollapsed = !this.state.isCollapsed;
 
         this.render();
+    }
+
+    /**
+     * Event: Click edit field
+     *
+     * @param {String} key
+     */
+    onClickEditField(key) {
+        if(!this.model.config.struct) { this.model.config.struct = {}; }
+        if(!this.model.config.struct[key]) { this.model.config.struct[key] = { schemaId: 'string' }; }
+
+        let modal = new HashBrown.Entity.View.Modal.EditField({
+            model: {
+                key: key,
+                definition: this.model.config.struct[key]
+            }
+        });
+        
+        modal.on('changekey', (newKey) => {
+            this.onChangeConfigStructKey(key, newKey);
+
+            key = newKey;
+        });
+
+        modal.on('change', (newValue) => {
+            this.onChangeConfigStructValue(key, newValue);
+        });
     }
 
     /**
@@ -169,36 +157,15 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
-     * Event: Change config value
+     * Event: Change config struct
      */
-    onChangeConfigStructValue(key, subKey, newValue) {
+    onChangeConfigStructValue(key, newValue) {
         if(!this.model.config.struct) { this.model.config.struct = {}; }
         if(!this.model.config.struct[key]) { this.model.config.struct[key] = {}; }
-       
-        this.model.config.struct[key][subKey] = newValue;
+        
+        this.model.config.struct[key] = newValue;
 
         this.onChange();
-        
-        if(subKey === 'schemaId' || subKey === 'label') {
-            this.update();
-        }
-    }
-
-    /**
-     * Event: Click sort fields
-     */
-    onClickDoneEditingFields() {
-        this.state.isEditing = false;
-
-        this.update();
-    }
-    
-    /**
-     * Event: Click edit fields
-     */
-    onClickEditFields() {
-        this.state.isEditing = true;
-
         this.update();
     }
 
@@ -208,16 +175,20 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
     onChangeFieldSorting(fields) {
         let newFields = {};
 
-        for(let field of fields) {
-            let key = field.key;
+        for(let key in fields) {
             let value = this.model.config.struct[key];
 
-            newFields[key] = value;
+            newFields[key] = value || { label: fields[key] };
         }
 
-        this.model.config.struct = newFields;
+        let isNewField = Object.keys(fields).length > Object.keys(this.model.config.struct).length;
 
+        this.model.config.struct = newFields;
         this.onChange();
+        
+        if(isNewField) {
+            this.onClickEditField(Object.keys(fields).pop());
+        }
     }
 }
 

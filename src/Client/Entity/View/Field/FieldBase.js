@@ -121,7 +121,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * @return {Array} Tools
      */
     getTools() {
-        return [];
+        return this.model.tools || [];
     }
 
     /**
