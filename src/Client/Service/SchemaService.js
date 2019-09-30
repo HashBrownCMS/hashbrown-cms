@@ -86,7 +86,7 @@ class SchemaService extends require('Common/Service/SchemaService') {
      */
     static async setSchemaById(id, schema) {
         checkParam(id, 'id', String, true);
-        checkParam(schema, 'schemas', HashBrown.Entity.Resource.Schema.SchemaBase);
+        checkParam(schema, 'schema', HashBrown.Entity.Resource.Schema.SchemaBase);
         
         this.setCached(id, schema);
         

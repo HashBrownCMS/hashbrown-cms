@@ -60,6 +60,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
                 );
                 
                 view.on('change', (newValue) => {
+                    if(!this.state.value) { this.state.value = {}; }
                     this.state.value[key] = newValue;
 
                     this.trigger('change', this.state.value);

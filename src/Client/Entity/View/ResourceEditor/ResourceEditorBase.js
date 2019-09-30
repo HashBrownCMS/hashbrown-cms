@@ -71,6 +71,71 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
     
     /**
+     * Init
+     */
+    async init() {
+        this.state.category = HashBrown.Service.NavigationService.getRoute(0);
+        this.state.id = HashBrown.Service.NavigationService.getRoute(1);
+        
+        if(!this.state.id) {
+            this.state.name = 'welcome';
+                    
+        } else {
+            this.state.name = undefined;
+       
+        }
+
+        await super.init();
+
+        this.editedCheck();
+    }
+
+    /**
+     * Fetches the model
+     */
+    async fetch() {
+        if(this.state.id) {
+            this.model = await HashBrown.Service.ResourceService.get(this.itemType, this.category, this.state.id);
+        }
+    }
+ 
+    /**
+     * Override render to maintain field states and scroll position
+     */
+    render() {
+        // Cache scroll position
+        let scrollTop = 0;
+
+        if(this.namedElements.body) {
+            scrollTop = this.namedElements.body.scrollTop;
+        }
+
+        // Cache field states
+        let fieldStates = {};
+
+        for(let field of this.state.fields || []) {
+            fieldStates[field.model.key] = field.state;
+        }
+
+        super.render();
+        
+        // Restore field states
+        for(let field of this.state.fields || []) {
+            let state = fieldStates[field.model.key];
+
+            if(!state) { continue; }
+
+            field.state.isCollapsed = state.isCollapsed;
+            field.render();
+        }
+
+        // Restore scroll position
+        if(this.namedElements.body) {
+            this.namedElements.body.scrollTop = scrollTop;
+        }
+    }
+
+    /**
      * Event: Heartbeat
      */
     async onHeartbeat() {
@@ -97,69 +162,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         await HashBrown.Service.ResourceService.set(this.category, this.state.id, this.model);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-    }
 
-    /**
-     * Init
-     */
-    async init() {
-        await super.init();
-
-        this.editedCheck();
-    }
-
-    /**
-     * Fetches the model
-     */
-    async fetch() {
-        this.state.category = HashBrown.Service.NavigationService.getRoute(0);
-        this.state.id = HashBrown.Service.NavigationService.getRoute(1);
-
-        if(!this.state.id) {
-            this.state.name = 'welcome';
-                    
-        } else {
-            this.state.name = undefined;
-            
-            this.model = await HashBrown.Service.ResourceService.get(this.itemType, this.category, this.state.id);
-        
-        }
-    }
-    
-    /**
-     * Update
-     */
-    async update() {
-        // Cache scroll position
-        let scrollTop = 0;
-
-        if(this.namedElements.body) {
-            scrollTop = this.namedElements.body.scrollTop;
-        }
-
-        // Cache field states
-        let fieldStates = {};
-
-        for(let field of this.state.fields || []) {
-            fieldStates[field.model.key] = field.state;
-        }
-
-        await super.update();        
-      
-        // Restore field states
-        for(let field of this.state.fields || []) {
-            let state = fieldStates[field.model.key];
-
-            if(!state) { continue; }
-
-            field.state.isCollapsed = state.isCollapsed;
-            field.render();
-        }
-
-        // Restore scroll position
-        if(this.namedElements.body) {
-            this.namedElements.body.scrollTop = scrollTop;
-        }
+        await this.update();
     }
 }
 

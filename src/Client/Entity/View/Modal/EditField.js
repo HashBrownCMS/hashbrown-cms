@@ -45,7 +45,10 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
                 this.onChangeConfig(newValue);
             });
 
-            this.state.extraFields = view.configTemplate(view.scope(), view.model, view.state);
+            view.model.label = null;
+            view.model.description = null;
+
+            this.state.extraFields = view;
 
         } else {
             this.state.extraFields = null;

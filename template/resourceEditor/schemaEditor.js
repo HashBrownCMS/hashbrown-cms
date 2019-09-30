@@ -20,16 +20,18 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
             _.field({label: 'Id'},
-                _.text({disabled: model.isLocked, value: model.id})
+                _.text({disabled: model.isLocked, value: model.id, onchange: _.onChangeId})
             ),
             _.field({label: 'Name'},
-                _.text({disabled: model.isLocked, value: model.name})
+                _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Icon'},
                 _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${model.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ?
-                null
+                _.field({label: 'Fields'},
+                    _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField})
+                )
             : null,
             model instanceof HashBrown.Entity.Resource.Schema.FieldSchema ? [
                 state.fieldConfigEditor
