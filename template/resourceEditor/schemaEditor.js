@@ -11,7 +11,7 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
         _.div({class: 'resource-editor__welcome'},
             _.h1('Schemas'),
             _.p('Click any item in the panel to edit it.'),
-            _.p('Use the context menu (right click or the <span class="fa fa-ellipsis-v"></span> button) to perform other actions.'),
+            _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
             _.button({class: 'widget widget--button', onclick: _.onClickImportSchemas, title: 'Import schemas'}, 'Import')
         )
     ),

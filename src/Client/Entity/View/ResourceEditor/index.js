@@ -6,4 +6,5 @@
 namespace('Entity.View.ResourceEditor')
 .add(require('./ResourceEditorBase'))
 .add(require('./ContentEditor'))
+.add(require('./MediaEditor'))
 .add(require('./SchemaEditor'));
