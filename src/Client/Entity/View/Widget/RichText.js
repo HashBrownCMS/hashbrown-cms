@@ -16,7 +16,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         super(params);
 
         this.template = require('template/widget/richText'); 
-    
+
+        this.model.toolbar = this.model.toolar || {};
         this.state.paragraphOptions = this.getParagraphOptions();
     }
 
@@ -24,7 +25,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Post render
      */
     postrender() {
-        this.insertHtml(this.toView(this.model.value));
+        this.namedElements.editor.innerHTML = this.toView(this.model.value);
     }
 
     /**

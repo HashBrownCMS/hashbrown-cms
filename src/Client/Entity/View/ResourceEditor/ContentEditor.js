@@ -134,6 +134,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                 await HashBrown.Service.RequestService.request('post', 'content/example');
             
                 HashBrown.Service.EventService.trigger('resource');
+                
+                UI.notifySmall('Example content loaded successfully', null, 3);
             }
         );
     }

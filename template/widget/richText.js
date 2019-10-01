@@ -61,7 +61,5 @@ _.div({class: 'editor widget--rich-text'},
         
         _.button({class: 'widget widget--button default small fa fa-remove', title: 'Remove formatting', onclick: _.onRemoveFormat})
     ),
-    _.div({name: 'editor', class: 'widget--rich-text__editor', contenteditable: true, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange},
-        state.viewHtml
-    ) 
+    _.div({name: 'editor', class: 'widget--rich-text__editor', contenteditable: true, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
 )
