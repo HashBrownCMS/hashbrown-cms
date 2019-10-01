@@ -20,6 +20,8 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Fetches the model
      */
     async fetch() {
+        await super.fetch();
+
         if(this.state.name === 'config') {
             this.state.categoryOptions = HashBrown.Service.ResourceService.getResourceCategoryNames();
             this.state.keyOptions = [];

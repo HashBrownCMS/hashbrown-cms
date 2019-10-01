@@ -112,7 +112,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         super.structure();
 
         this.def(Function, 'editorTemplate', require('template/field/editor/fieldBase'));
-        this.def(Function, 'configTemplate', require('template/field/config/fieldBase'));
+        this.def(Function, 'configTemplate', null);
     }
 
     /**

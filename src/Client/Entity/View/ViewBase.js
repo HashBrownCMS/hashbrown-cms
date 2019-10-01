@@ -233,14 +233,14 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             return content;
                         };
 
-                    // Render SVG
-                    case 'svg':
-                        return (svg) => {
-                            let element = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    // Render HTML
+                    case 'html':
+                        return (html) => {
+                            let wrapper = document.createElement('div');
 
-                            element.innerHTML = svg;
+                            wrapper.innerHTML = html;
 
-                            return element;
+                            return wrapper.firstElementChild;
                         };
 
                     // Render an included template

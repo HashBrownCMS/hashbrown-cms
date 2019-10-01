@@ -25,7 +25,7 @@ class FormService {
     }
     
     /**
-     * Starts a tour of the Forms section
+     * Starts a tour of the forms section
      */
     static async startTour() {
         if(location.hash.indexOf('forms/') < 0) {
@@ -34,17 +34,11 @@ class FormService {
        
         await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
             
-        await UI.highlight('.navbar-main__tab[data-route="/forms/"]', 'This the Forms section, where user submitted content lives.', 'right', 'next');
+        await UI.highlight('.navigation--resource-browser__tab[href="#/forms/"]', 'This the forms section, where user submitted content lives.', 'right', 'next');
 
-        await UI.highlight('.navbar-main__pane[data-route="/forms/"]', 'Here you will find all of your Forms. You can right click here to create a new Form.', 'right', 'next');
+        await UI.highlight('.panel', 'Here you will find all of your forms. You can right click here to create a new form.', 'right', 'next');
         
-        let editor = document.querySelector('.editor--form');
-
-        if(editor) {
-            await UI.highlight('.editor--form', 'This is the Form editor, where you edit Forms.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Form editor will be when you click a Form.', 'left', 'next');
-        }
+        await UI.highlight('.resource-editor', 'This is the form editor, where you edit forms.', 'left', 'next');
     }
 }
 

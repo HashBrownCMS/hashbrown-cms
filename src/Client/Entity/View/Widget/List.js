@@ -34,7 +34,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
      * Event: Drag start
      */
     onDragStart(e) {
-        let index = Array.from(this.element.children).indexOf(e.currentTarget);
+        let index = Array.from(this.element.querySelectorAll('.widget--list__item')).indexOf(e.currentTarget);
 
         e.currentTarget.classList.toggle('dragging', true);
 
@@ -47,7 +47,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onDragOver(e) {
         e.preventDefault();
 
-        for(let item of Array.from(this.element.children)) {
+        for(let item of Array.from(this.element.querySelectorAll('.widget--list__item'))) {
             delete item.dataset.dragOver;
         }
 
@@ -72,7 +72,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
         let oldIndex = parseInt(e.dataTransfer.getData('index'));
         let newIndex = 0;
 
-        let items = Array.from(this.element.children);
+        let items = Array.from(this.element.querySelectorAll('.widget--list__item'));
 
         for(let i = 0; i < items.length; i++) {
             let item = items[i];
@@ -190,8 +190,6 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
             this.model.value.push(null);
        
         }
-
-        
 
         this.render();
         this.onChange();

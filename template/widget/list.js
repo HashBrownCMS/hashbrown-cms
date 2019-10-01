@@ -13,12 +13,12 @@ _.ul({class: 'widget widget--list'},
             ),
             _.if(model.readonly,
                 model.onclick && !model.disabled ?
-                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)}, value.label || value)
+                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)}, value ? value.label || value : '(empty)')
                 :
-                    _.label({class: 'widget--list__item__label'}, value.label || value)
+                    _.label({class: 'widget--list__item__label'}, value ? value.label || value : '(empty)')
             ),
             _.if(!model.readonly,
-                _.text({disabled: model.disabled, value: value.label || value, onchange: (newValue) => _.onChangeItemValue(key, newValue)})
+                _.text({disabled: model.disabled, value: value ? value.label || value : '(empty)', onchange: (newValue) => _.onChangeItemValue(key, newValue)})
             ),
             _.if(!model.disabled,
                 _.button({class: 'widget widget--button default small fa fa-remove', title: `Remove ${model.placeholder || 'item'}`, onclick: () =>  _.onClickRemoveItem(key)})

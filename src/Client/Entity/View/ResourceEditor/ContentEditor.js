@@ -55,7 +55,14 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             delete contentFields['properties'];
         
         } else {
-            schemaFields = this.state.schema.fields.properties;
+            for(let key in this.state.schema.fields.properties) {
+                let definition = this.state.schema.fields.properties[key];
+
+                if(definition.tabId !== this.state.tab) { continue; }
+            
+                schemaFields[key] = this.state.schema.fields.properties[key];
+            }
+
             contentFields = this.model.properties;
 
         }
@@ -82,6 +89,30 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             }
 
             this.state.fields.push(field); 
+        }
+    }
+
+    /**
+     * Update
+     */
+    async update() {
+        // Cache field states
+        let fieldStates = {};
+
+        for(let field of this.state.fields || []) {
+            fieldStates[field.model.key] = field.state;
+        }
+
+        super.update();
+
+        // Restore field states
+        for(let field of this.state.fields || []) {
+            let state = fieldStates[field.model.key];
+
+            if(!state) { continue; }
+
+            field.state.isCollapsed = state.isCollapsed;
+            field.render();
         }
     }
 

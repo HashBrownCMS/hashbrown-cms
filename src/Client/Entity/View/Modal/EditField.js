@@ -40,7 +40,7 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
             }
         );
 
-        if(view.model.schema && view.model.schema.parentSchemaId === 'fieldBase') {
+        if(view.configTemplate && view.model.schema && view.model.schema.parentSchemaId === 'fieldBase') {
             view.on('change', (newValue) => {
                 this.onChangeConfig(newValue);
             });
@@ -63,6 +63,15 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
         this.model.key = newValue;
 
         this.trigger('changekey', this.model.key);
+    }
+    
+    /**
+     * Event: Change tab
+     */
+    onChangeTab(newValue) {
+        this.model.definition.tabId = newValue;
+
+        this.trigger('change', this.model.definition);
     }
     
     /**

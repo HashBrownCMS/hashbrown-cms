@@ -184,17 +184,11 @@ class ContentService extends require('Common/Service/ContentService') {
        
         await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
             
-        await UI.highlight('.navbar-main__tab[data-route="/content/"]', 'This the Content section, where you will do all of your authoring.', 'right', 'next');
+        await UI.highlight('.navigation--resource-browser__tab[href="#/content/"]', 'This the content section, where you will do all of your authoring.', 'right', 'next');
 
-        await UI.highlight('.navbar-main__pane[data-route="/content/"]', 'Here you will find all of your authored Content, like webpages. You can right click here to create a Content node.', 'right', 'next');
+        await UI.highlight('.panel', 'Here you will find all of your authored content, like web pages. You can right click here to create a content node.', 'right', 'next');
         
-        let editor = document.querySelector('.editor--content');
-
-        if(editor) {
-            await UI.highlight('.editor--content', 'This is the Content editor, where you edit Content nodes.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Content editor will be when you click a Content node.', 'left', 'next');
-        }
+        await UI.highlight('.resource-editor', 'This is the content editor, where you edit content nodes.', 'left', 'next');
     }
 }
 

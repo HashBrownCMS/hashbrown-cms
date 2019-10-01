@@ -49,17 +49,11 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
        
         await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
             
-        await UI.highlight('.navbar-main__tab[data-route="/connections/"]', 'This the Connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+        await UI.highlight('.navigation--resource-browser__tab[href="#/connections/"]', 'This the connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
 
-        await UI.highlight('.navbar-main__pane[data-route="/connections/"]', 'Here you will find all of your Connections. You can right click here to create a new Connection.', 'right', 'next');
+        await UI.highlight('.panel', 'Here you will find all of your connections. You can right click here to create a new connection.', 'right', 'next');
         
-        let editor = document.querySelector('.editor--connection');
-
-        if(editor) {
-            await UI.highlight('.editor--connection', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
-        } else {
-            await UI.highlight('.page--environment__space--editor', 'This is where the Connection editor will be when you click a Connection.', 'left', 'next');
-        }
+        await UI.highlight('.resource-editor', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
     }
 
     /**

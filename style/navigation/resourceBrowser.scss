@@ -9,10 +9,11 @@
     }
 
     &__logo {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 100%;
         margin: 0.5rem 0 1rem 0;
-        text-align: center;
 
         svg {
             fill: var(--color-decor-700);
@@ -29,8 +30,7 @@
 
     &__tab {
         display: block;
-        margin-top: 0.5rem;
-        margin-left: 1rem;
+        margin: 0.5rem 0 0 1rem;
         width: var(--size-widget-large);
         height: var(--size-widget-large);
         border-top-left-radius: var(--border-radius-small);
@@ -38,23 +38,27 @@
         line-height: var(--size-widget-large);
         text-align: center;
         font-size: 2rem;
-
+        
         &.active {
             color: var(--color-decor-text);
             background-color: var(--color-decor-600);
-            pointer-events: none;
         }
 
         &:not(.active) {
             background-color: var(--color-decor-600);
             color: var(--color-decor-800);
             border-right: 1px solid var(--color-decor-500);
-
-            &:hover {
-                background-color: var(--color-action-500);
-                color: var(--color-action-text);
-            }
         }
+        
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
+        }
+
     }
 
     &__panels {

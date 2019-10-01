@@ -26,66 +26,22 @@
         opacity: 1;
         position: relative;
         z-index: 2;
-
-        @include tablet {
-            flex-direction: column;
-        }
     }
 
     // Space
     &__space {
         position: relative;
 
-        // Menu
-        &--menu {
-            position: absolute;
-            right: 0.5rem;
-            top: 0.5rem;
-            border-top-left-radius: 0.2rem;
-            border-bottom-left-radius: 0.2rem;
-            padding: 0.5rem;
-            flex-basis: 100%;
-            flex-grow: 1;
-            z-index: 500;
-
-            @include tablet {
-                padding: 0;
-            }
-
-            // overwriting default dropdown-background
-            .widget--dropdown.has-icon {
-                background-color: var(--color-default);
-            }
-        }
-
         // Navigation
         &--nav {
-            width: 30rem;
-            flex-basis: 30rem;
             flex-shrink: 0;
             height: 100%;
-            transition: width 0.5s, flex-basis 0.5s;
-
-            @include tablet {
-                overflow: hidden;
-                width: 100%;
-                height: 80vh;
-
-                &:not(.expanded) {
-                    flex-basis: 8rem;
-                    height: 8rem;
-                }
-            }
         }
 
         // Editor
         &--editor {
             flex-grow: 1;
             height: 100%;
-
-            @include tablet {
-                height: calc(100% - 8rem);
-            }
 
             // Text presentation
             &__text {

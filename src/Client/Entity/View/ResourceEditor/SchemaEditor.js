@@ -22,6 +22,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     async fetch() {
         if(this.state.id) {
             this.model = await HashBrown.Service.SchemaService.getSchemaById(this.state.id);
+            this.state.compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(this.model.id, true);
         }    
     }
 
@@ -31,22 +32,41 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     prerender() {
         this.state.title = this.model.name;
         this.state.icon = this.model.icon;
-        this.state.fieldConfigEditor = null;
-        this.state.properties = null;
         
         if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema) {
+            this.state.tab = this.state.tab || 'content';
             this.state.properties = {};
+            this.state.parentTabs = {};
+            this.state.tabOptions = {};
 
-            if(!this.model.fields) { this.model.fields = {}; }
-            if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        
+            // Build parent tabs and tab options
+            for(let tabId in this.state.compiledSchema.tabs) {
+                this.state.tabOptions[this.state.compiledSchema.tabs[tabId]] = tabId;
+
+                if(this.model.tabs[tabId]) { continue; }
+
+                this.state.parentTabs[tabId] = this.state.compiledSchema.tabs[tabId];
+            }
+            
+            for(let tabId in this.model.tabs) {
+                this.state.tabOptions[this.model.tabs[tabId]] = tabId;
+            }
+
+            if(!this.model.fields || !this.model.fields.properties) { return; }
+
             for(let key in this.model.fields.properties) {
                 let definition = this.model.fields.properties[key];
 
+                if(!definition.tabId) { definition.tabId = 'content'; }
+
+                if(definition.tabId !== this.state.tab) { continue; }
+
                 this.state.properties[key] = definition.label;
-            } 
+            }
         
         } else if(this.model instanceof HashBrown.Entity.Resource.Schema.FieldSchema) {
+            this.state.fieldConfigEditor = null;
+            
             let fieldType = HashBrown.Entity.View.Field[this.model.editorId];
            
             if(fieldType) {
@@ -92,7 +112,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.model.icon = newIcon;
 
             this.trigger('change', this.model);
-            this.refresh();
             this.render();
         });
     }
@@ -105,10 +124,11 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     onClickEditField(key) {
         if(!this.model.fields) { this.model.fields = {}; }
         if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { schemaId: 'string' }; }
+        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { tabId: this.state.tab, schemaId: 'string' }; }
 
         let modal = new HashBrown.Entity.View.Modal.EditField({
             model: {
+                tabOptions: this.state.tabOptions,
                 key: key,
                 definition: this.model.fields.properties[key]
             }
@@ -118,11 +138,22 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.onChangeFieldKey(key, newKey);
 
             key = newKey;
+
+            this.render();
         });
 
         modal.on('change', (newValue) => {
             this.onChangeFieldDefinition(key, newValue);
+            
+            this.render();
         });
+    }
+    
+    /**
+     * Event: Click start tour
+     */
+    onClickStartTour() {
+        HashBrown.Service.SchemaService.startTour();
     }
 
     /**
@@ -165,10 +196,20 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     onChangeFieldSorting(fields) {
         let newFields = {};
 
+        // Add fields from list widget
         for(let key in fields) {
-            let value = this.model.fields.properties[key];
+            let definition = this.model.fields.properties[key];
 
-            newFields[key] = value || { label: fields[key] };
+            newFields[key] = definition || { tabId: this.state.tab, label: fields[key] };
+        }
+        
+        // Add back remaining fields not in the current view
+        for(let key in this.model.fields.properties) {
+            let definition = this.model.fields.properties[key];
+
+            if(definition.tabId === this.state.tab) { continue; }
+
+            newFields[key] = definition;
         }
 
         let isNewField = Object.keys(fields).length > Object.keys(this.model.fields.properties).length;
@@ -181,7 +222,25 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         
         this.trigger('change', this.model);
     }
-    
+
+    /**
+     * Event: Change tabs
+     */
+    onChangeTabs(tabs) {
+        this.model.tabs = tabs;
+
+        this.render();
+    }
+
+    /**
+     * Event: Switch tab
+     */
+    onSwitchTab(tab) {
+        this.state.tab = tab;
+
+        this.render();
+    }
+
     /**
      * Event: Click save
      */
