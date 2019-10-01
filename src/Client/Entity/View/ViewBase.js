@@ -457,7 +457,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         
         }
 
-        if(this.isValid()) {
+        if(this.isValid() && element) {
             this.element.parentElement.replaceChild(element, this.element); 
         }
 
