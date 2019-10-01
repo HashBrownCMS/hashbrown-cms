@@ -46,7 +46,7 @@
             border-top-left-radius: var(--border-radius-small);
             border-top-right-radius: var(--border-radius-small);
             font-weight: bold;
-            margin-right: 0.5rem;
+            margin-right: var(--padding-small);
 
             &.active {
                 background-color: var(--color-default-100);

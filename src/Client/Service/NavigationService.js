@@ -38,7 +38,9 @@ class NavigationService {
         let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.projectId, category);
         
         if(!hasScope) { return location.hash = '/content/'; }
-    
+   
+        document.body.classList.toggle('welcome', !this.getRoute(1));
+
         this.updateEditorSpace(e);
     }
    

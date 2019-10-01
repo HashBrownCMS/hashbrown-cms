@@ -30,7 +30,7 @@
 
     &__tab {
         display: block;
-        margin: 0.5rem 0 0 1rem;
+        margin: var(--padding-small) 0 0 var(--padding-medium);
         width: var(--size-widget-large);
         height: var(--size-widget-large);
         border-top-left-radius: var(--border-radius-small);
@@ -65,6 +65,5 @@
         flex-grow: 1;
         background-color: var(--color-decor-600);
         color: var(--color-decor-text);
-        width: calc(var(--width-panels) - var(--size-widget-large));
     }
 }
