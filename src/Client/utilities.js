@@ -1,20 +1,4 @@
 /**
- * Performs a submodule check
- */
-window.submoduleCheck = function submoduleCheck() {
-    let message = '';
-    
-    if(typeof Crisp === 'undefined') {
-        message = 'Git submodule "crisp-ui" not loaded. Please run "git submodule update --init" in the HashBrown root directory and reload this page';
-    }
-
-    if(message) {
-        alert(message);
-        throw new Error(message);
-    }
-}
-
-/**
  * Gets a cookie by name
  *
  * @param {String} name

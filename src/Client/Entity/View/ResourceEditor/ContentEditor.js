@@ -191,6 +191,13 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     onChangeLanguage() {
         this.update(); 
     }
+    
+    /**
+     * Event: Click new
+     */
+    async onClickNew() {
+        new HashBrown.Entity.View.Modal.CreateContent();
+    }
 }
 
 module.exports = ContentEditor;

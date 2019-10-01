@@ -98,7 +98,6 @@ module.exports = (_, model) => `
         <script src="/js/service.js"></script>
         <script src="/js/entity.js"></script>
         <script src="/js/utilities.js"></script>
-        <script src="/js/view.js"></script>
        
         <script src="/js/dashboard.js"></script>
     </body>

@@ -4,12 +4,6 @@
  * @namespace HashBrown.Client
  */
 document.addEventListener('DOMContentLoaded', async () => {
-    // Check that all submodules are loaded
-    submoduleCheck();
-    
-    // Libraries
-    window._ = Crisp.Elements;
-
     // Service shortcuts
     window.debug = HashBrown.Service.DebugService;
     window.UI = HashBrown.Service.UIService;

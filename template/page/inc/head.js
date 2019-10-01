@@ -14,9 +14,6 @@ module.exports = (_, model) => `
 <link href="/lib/normalize/normalize.css" rel="stylesheet">
 <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-<!-- TODO: Deprecate this file -->
-<link href="/css/client.css" rel="stylesheet">
-
 <link href="/css/theme.css" rel="stylesheet" id="theme">
 <link href="/css/style.css" rel="stylesheet">
 `

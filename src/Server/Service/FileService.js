@@ -4,7 +4,6 @@ const FileSystem = require('fs');
 const Path = require('path');
 const Util = require('util');
 
-// TODO: Make these GIT submodules
 const Glob = require('glob');
 
 /**

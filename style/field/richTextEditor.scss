@@ -50,7 +50,7 @@
     }
 
     &__body {
-        height: var(--height-rich-text-editor);
+        min-height: var(--height-rich-text-editor);
         background-color: var(--color-default-200);
         border-bottom-left-radius: var(--border-radius-small);
         border-bottom-right-radius: var(--border-radius-small);

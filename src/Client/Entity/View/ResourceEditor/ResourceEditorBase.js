@@ -160,6 +160,15 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         await this.update();
     }
+    
+    /**
+     * Event: Click new
+     */
+    async onClickNew() {
+        let resource = await HashBrown.Service.ResourceService.new(this.itemType, this.category);
+        
+        location.hash = `/${this.category}/${resource.id}`;
+    }
 }
 
 module.exports = ResourceEditorBase;

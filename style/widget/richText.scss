@@ -1,6 +1,6 @@
 .widget--rich-text {
-    background-color: var(--default);
-    height: 100%;
+    background-color: var(--color-default-200);
+    width: 100%;
 
     &__toolbar {
         margin-bottom: var(--padding-small);
@@ -19,7 +19,7 @@
     }
 
     &__editor {
-        height: calc(100% - var(--size-widget-small));
+        height: var(--height-rich-text-editor);
         background-color: var(--color-default);
         color: var(--color-default-text);
         overflow: auto;

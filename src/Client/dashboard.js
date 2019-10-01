@@ -89,12 +89,6 @@ async function onClickAddProject() {
  * Event: Document ready
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for required submodules
-    submoduleCheck();
-
-    // Libraries
-    window._ = Crisp.Elements;
-
     // Service shortcuts
     window.debug = HashBrown.Service.DebugService;
     window.UI = HashBrown.Service.UIService;

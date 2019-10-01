@@ -18,8 +18,7 @@ let entry = {
     common: './src/Common',
     service: './src/Client/Service',
     entity: './src/Client/Entity',
-    utilities: './src/Client/utilities',
-    view: './src/Client/View'
+    utilities: './src/Client/utilities'
 }
 
 // Process input arguments
@@ -79,7 +78,6 @@ if(isWatching) {
 
 sassArgs.push('--source-map');
 sassArgs.push('--embed-sources'),
-sassArgs.push('./src/Client/Style/client.scss:./public/css/client.css');
 sassArgs.push('./style/index.scss:./public/css/style.css');
 
 sass.run_(sassArgs);

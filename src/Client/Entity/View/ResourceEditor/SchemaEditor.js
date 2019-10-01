@@ -249,6 +249,25 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
     }
+
+    /**
+     * Event: Click import
+     */
+    onClickImport() {
+        let modal = UI.prompt(
+            'Import schemas',
+            'URL to uischema.org definitions',
+            'text',
+            'https://uischema.org/schemas.json',
+            async (url) => {
+                if(!url) { throw new Error('Please specify a URL'); }
+
+                await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
+
+                HashBrown.Service.EventService.trigger('resource');  
+            }
+        );
+    }
 }
 
 module.exports = SchemaEditor;
