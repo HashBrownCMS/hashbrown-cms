@@ -33,11 +33,11 @@ class Text extends HashBrown.Entity.View.Widget.WidgetBase {
      */
     getLineCursorIndex() {
         let cursorIndex = this.getCursorIndex();
-        let newLineIndex = this.element.value.substring(0, cursorIndex).lastIndexOf('\n');
+        let newLineIndex = this.element.value.substring(0, cursorIndex).lastIndexOf('\n') + 1;
         
         if(newLineIndex < 0) { newLineIndex = 0; }
         
-        return cursorIndex - (newLineIndex > 0 ? newLineIndex - 1 : newLineIndex);
+        return cursorIndex - newLineIndex;
     }
 
     /**

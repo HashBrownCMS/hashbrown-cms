@@ -24,20 +24,5 @@ _.div({class: 'navigaton navigation--session'},
             'User settings': _.onClickUserSettings,
             'Log out': _.onClickLogOut
         }
-    }),
-    _.if(!state.isDashboard,
-        _.popup({
-            tooltip: 'Get help',
-            color: 'secondary',
-            role: 'navigation-menu',
-            icon: 'question-circle',
-            options: {
-                'Content': _.onClickContentHelp,  
-                'Media': _.onClickMediaHelp,  
-                'Forms': _.onClickFormsHelp,  
-                'Connections': _.onClickConnectionsHelp,  
-                'Schemas': _.onClickSchemasHelp,  
-            }
-        })
-    )
+    })
 )

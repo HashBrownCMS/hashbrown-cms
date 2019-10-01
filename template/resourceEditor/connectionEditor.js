@@ -22,6 +22,9 @@ _.div({class: `resource-editor resource-editor--connection-editor ${model.isLock
     _.if(state.name === undefined,
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
+            _.field({label: 'Media provider', decription: 'Use this connection to store media'},
+                _.checkbox({value: state.isMediaProvider, onchange: _.onChangeIsMediaProvider})
+            ),
             _.field({label: 'Title'},
                 _.text({disabled: model.isLocked, value: model.title, onchange: _.onChangeTitle})
             ),

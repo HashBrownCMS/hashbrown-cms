@@ -91,7 +91,7 @@ class NavigationService {
         let editor = null;
 
         if(isJson) {
-            editor = new HashBrown.View.Editor.JSONEditor();
+            editor = new HashBrown.Entity.View.ResourceEditor.JsonEditor();
 
         } else {
             for(let name in HashBrown.Entity.View.ResourceEditor) {

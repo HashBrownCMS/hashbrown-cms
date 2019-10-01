@@ -40,7 +40,7 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
     }
     
     /**
-     * Starts a tour of the Connection section
+     * Starts a tour of the connection section
      */
     static async startTour() {
         if(location.hash.indexOf('connections/') < 0) {
@@ -53,7 +53,7 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
 
         await UI.highlight('.panel', 'Here you will find all of your connections. You can right click here to create a new connection.', 'right', 'next');
         
-        await UI.highlight('.resource-editor', 'This is the Connection editor, where you edit Connections.', 'left', 'next');
+        await UI.highlight('.resource-editor', 'This is the connection editor, where you edit connections.', 'left', 'next');
     }
 
     /**

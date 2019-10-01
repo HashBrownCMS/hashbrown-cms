@@ -155,11 +155,13 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         if(!this.partials[name]) { return null; }
 
-        let result = this.partials[name].render(this.scope(), this.model, this.state);
+        let element = this.partials[name].render(this.scope(), this.model, this.state);
 
-        this.partials[name].element.parentElement.replaceChild(result, this.partials[name].element);
+        this.partials[name].element.parentElement.replaceChild(element, this.partials[name].element);
 
-        return result;
+        this.partials[name].element = element; 
+
+        return element;
     }
 
     /**

@@ -64,51 +64,6 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
 
         }
     }
-
-    /**
-     * Event: Clicked content help
-     */
-    onClickContentHelp() {
-        HashBrown.Service.ContentService.startTour();
-    }
-
-    /**
-     * Event: Clicked media help
-     */
-    onClickMediaHelp() {
-        new HashBrown.Entity.View.Modal.ModalBase({
-            model: {
-                heading: 'Media',
-                message: 'This is a gallery of your statically hosted files, such as images, videos and PDFs. The contents of this gallery depends on which <a href="#/connections/">Connection</a> has been set up as the Media provider'
-            }
-        });
-    }
-    
-    /**
-     * Event: Clicked forms help
-     */
-    onClickFormsHelp() {
-        HashBrown.Service.FormService.startTour();
-    }
-    
-    /**
-     * Event: Clicked connections help
-     */
-    onClickConnectionsHelp() {
-        HashBrown.Service.ConnectionService.startTour();
-    }
-    
-    /**
-     * Event: Clicked schemas help
-     */
-    onClickSchemasHelp() {
-        new HashBrown.Entity.View.Modal.ModalBase({
-            model: {
-                heading: 'Schemas',
-                message: 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'
-            }
-        });
-    }
 }
 
 module.exports = Session;

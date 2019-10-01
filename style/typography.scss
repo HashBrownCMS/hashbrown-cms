@@ -27,10 +27,6 @@ html {
     @include tablet {
         font-size: 12px;
     }
-    
-    @include phone {
-        font-size: 11px;
-    }
 }
 
 button,

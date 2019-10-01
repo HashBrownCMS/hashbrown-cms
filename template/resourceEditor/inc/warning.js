@@ -2,9 +2,11 @@
 
 module.exports = (_, model, state) =>
 
-_.if(state.warning, 
-    _.div({class: 'resource-editor__warning'},
-        _.span({class: 'resource-editor__warning__icon fa fa-exclamation-circle'}),
-        state.warning
+_.partial('warning', (_, model, state) =>
+    _.details({class: 'resource-editor__footer__warning'},
+        _.if(state.warning, 
+            _.p({class: 'resource-editor__footer__warning__message'}, state.warning),
+            _.summary({class: 'resource-editor__footer__warning__icon fa fa-exclamation-circle'})
+        )
     )
 )

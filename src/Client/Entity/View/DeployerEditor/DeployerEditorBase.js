@@ -53,6 +53,7 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
         this.model.alias = newValue;
 
         this.trigger('change', this.model);
+        this.trigger('changealias');
     }
 
     /**

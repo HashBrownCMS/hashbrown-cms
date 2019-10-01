@@ -175,7 +175,7 @@ class ContentService extends require('Common/Service/ContentService') {
     }
 
     /**
-     * Starts a tour of the Content section
+     * Starts a tour of the content section
      */
     static async startTour() {
         if(location.hash.indexOf('content/') < 0) {
