@@ -30,6 +30,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Pre render
      */
     prerender() {
+        if(this.state.name) { return; }
+
         this.state.title = this.model.name;
         this.state.icon = this.state.compiledSchema.icon;
         

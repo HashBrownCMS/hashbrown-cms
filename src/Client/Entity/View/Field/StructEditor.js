@@ -42,6 +42,8 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.value = {};
         }
 
+        let fieldDefinitions = {};
+
         if(!this.model.config) { this.model.config = {}; }
         if(!this.model.config.struct) { this.model.config.struct = {}; }
 
@@ -58,7 +60,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
                     definition,
                     this.state.value ? this.state.value[key] : null
                 );
-                
+           
                 view.on('change', (newValue) => {
                     if(!this.state.value) { this.state.value = {}; }
                     this.state.value[key] = newValue;
@@ -68,7 +70,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             
                 this.state.fields.push(view);
             }
-        }
+        }        
     }
    
     /**

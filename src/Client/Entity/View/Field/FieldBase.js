@@ -18,17 +18,24 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     static async createFromFieldDefinition(definition, value = null, state = {}) {
         checkParam(definition, 'definition', Object, true);
 
+        let schema = await HashBrown.Service.SchemaService.getSchemaById(definition.schemaId, true);
+        let config = definition.config || {};
+
+        if(schema.parentSchemaId !== 'fieldBase') {
+            config = schema.config;
+        }
+
         let model = {
-            config: definition.config || {},
+            config: config,
             description: definition.description,
             isDisabled: definition.disabled,
             isMultilingual: definition.multilingual,
             label: definition.label,
-            schema: await HashBrown.Service.SchemaService.getSchemaById(definition.schemaId, true),
+            schema: schema,
             value: value
         };
         
-        let type = HashBrown.Entity.View.Field[model.schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
+        let type = HashBrown.Entity.View.Field[schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
 
         return new type({
             model: model,

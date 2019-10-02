@@ -8,7 +8,6 @@ module.exports = (_, view) => `
         ${require('./inc/head')(_, view)}
      
         <link href="/css/plugins.css" rel="stylesheet">
-        <link href="/lib/codemirror/lib/codemirror.css" rel="stylesheet">
     </head>
 
     <body class="page page--environment">

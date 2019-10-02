@@ -23,10 +23,13 @@
     }
 
     &__tools {
-        margin-right: var(--padding-medium);
-    
+        margin-right: var(--padding-small);
+        padding-right: var(--padding-small);
+        border-right: 1px solid var(--color-default-200); 
+        width: calc(var(--size-widget-small) + var(--padding-small));
+
         &:empty {
-            display: none;
+            border-right: none;
         }
     }
 
@@ -45,26 +48,6 @@
         &__description {
             color: var(--color-default-400);
             line-height: 1.5;
-        }
-        
-        &__tools {
-            margin-top: var(--padding-medium);
-
-            &::after {
-                content: '';
-                display: block;
-                clear: both;
-            }
-
-            &:empty {
-                display: none;
-            }
-        }
-
-        &__tool {
-            margin-right: var(--padding-small);
-            margin-bottom: var(--padding-small);
-            float: left;
         }
     }
 
