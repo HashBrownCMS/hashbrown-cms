@@ -17,16 +17,12 @@
 }
 
 html {
-    font-size: 14px;
+    font-size: var(--font-size-desktop);
     font-family: 'NunitoSans', sans-serif;
     
-    @include laptop {
-        font-size: 13px;
-    }
-
-    @include tablet {
-        font-size: 12px;
-    }
+    @include laptop { font-size: var(--font-size-laptop); }
+    @include tablet { font-size: var(--font-size-tablet); }
+    @include phone { font-size: var(--font-size-phone); }
 }
 
 button,

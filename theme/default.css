@@ -1,4 +1,10 @@
 :root {
+    /* Font sizes */
+    --font-size-desktop: 14px;
+    --font-size-laptop: 13px;
+    --font-size-tablet: 12px;
+    --font-size-phone: 12px;
+
     /* Colour */
     --color-action-300: #b70a2f;
     --color-action-500: #e70d3b;
