@@ -54,8 +54,8 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token);
 
-                if(!user) { return res.redirect('/login?path=/readme'); }
-                
+                if(!user) { return res.render('login'); }
+            
                 let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
                 let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
 
@@ -101,7 +101,7 @@ class ViewController extends HashBrown.Controller.Controller {
         app.get('/dashboard/:tab', async (req, res) => {
             let user = await this.authenticate(req.cookies.token);
 
-            if(!user) { return res.redirect('/login?path=/dashboard/' + req.params.tab); }
+            if(!user) { return res.render('login'); }
             
             user.clearSensitiveData();
             
@@ -132,7 +132,7 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token, null, null, true);
                 
-                if(!user) { return res.redirect('/login?path=test/' + req.params.tab); }
+                if(!user) { return res.render('login'); }
                 
                 res.render('test', {
                     user: user,
@@ -153,7 +153,7 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token, req.params.project);
 
-                if(!user) { return res.redirect('/login?path=/' + req.params.project + '/' + req.params.environment + '/'); }
+                if(!user) { return res.render('login'); }
 
                 let project = await HashBrown.Service.ProjectService.getProject(req.params.project);
 

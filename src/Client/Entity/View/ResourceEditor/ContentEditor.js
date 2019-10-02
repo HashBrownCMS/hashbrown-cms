@@ -78,13 +78,13 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             if(this.state.tab === 'meta') {
                 field.on('change', (newValue) => {  
                     this.model[key] = newValue;
-                    this.trigger('change', this.model);
+                    this.onChange();
                 });
             
             } else {
                 field.on('change', (newValue) => {  
                     this.model.properties[key] = newValue;
-                    this.trigger('change', this.model);
+                    this.onChange();
                 });
             }
 
@@ -93,9 +93,9 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     }
 
     /**
-     * Update
+     * Override render to maintain field states
      */
-    async update() {
+    render() {
         // Cache field states
         let fieldStates = {};
 
@@ -103,7 +103,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             fieldStates[field.model.key] = field.state;
         }
 
-        super.update();
+        super.render();
 
         // Restore field states
         for(let field of this.state.fields || []) {
@@ -185,6 +185,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
         }
+
+        this.setDirty(false);
     }
 
     /**

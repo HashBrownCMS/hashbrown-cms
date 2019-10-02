@@ -175,58 +175,43 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         let anchorOffset = selection.anchorOffset;
         let focusOffset = selection.focusOffset;
         let anchorNode = selection.anchorNode;
-        let url = anchorNode.parentElement.getAttribute('href');
         let range = selection.getRangeAt(0);
         let text = selection.toString();
-        let newTab = false;
 
         if(Math.abs(anchorOffset - focusOffset) < 1) {
             return UI.notify('Create link', 'Please select some text first');
         }
 
-        let modal = UI.notify(
-            'Create link for selection "' + text + '"',
-            _.div({class: 'widget-group'},
-                _.div({class: 'widget widget--label'}, 'URL'),
-                new HashBrown.Entity.View.Widget.Text({
-                    model: {
-                        value: url,
-                        onchange: (newValue) => { url = newValue; }
-                    }
-                }).element,
-                new HashBrown.Entity.View.Widget.Checkbox({
-                    model: {
-                        placeholder: 'New tab',
-                        onchange: (newValue) => { newTab = newValue; }
-                    }
-                }).element
-            ),
-            () => {
-                if(!url) { return; }
-
-                selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-
-                document.execCommand('createLink', false, url);
-
-                setTimeout(() => {
-                    let a = selection.anchorNode.parentElement.querySelector('a');
-
-                    if(!a) { return; }
-
-                    if(newTab) {
-                        a.setAttribute('target', '_blank');
-                    } else {
-                        a.removeAttribute('target');
-                    }
-
-                    this.onChange();
-                }, 10);
+        let modal = new HashBrown.Entity.View.Modal.CreateLink({
+            model: {
+                url: anchorNode.parentElement.getAttribute('href'),
+                newTab: false
             }
-        );
+        });
 
-        modal.$element.find('input:first-of-type').focus();
+        modal.on('ok', (url, newTab) => {
+            if(!url) { return; }
+
+            selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            document.execCommand('createLink', false, url);
+
+            setTimeout(() => {
+                let a = selection.anchorNode.parentElement.querySelector('a');
+
+                if(!a) { return; }
+
+                if(newTab) {
+                    a.setAttribute('target', '_blank');
+                } else {
+                    a.removeAttribute('target');
+                }
+
+                this.onChange();
+            }, 10);
+        });
     }
 
     /**

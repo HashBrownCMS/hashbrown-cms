@@ -74,6 +74,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Init
      */
     async init() {
+        this.setDirty(false);
+
         this.state.category = HashBrown.Service.NavigationService.getRoute(0);
         this.state.id = HashBrown.Service.NavigationService.getRoute(1);
        
@@ -86,7 +88,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         }
 
         await super.init();
-
+        
         this.editedCheck();
     }
 
@@ -100,7 +102,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
  
     /**
-     * Override render to maintain field states and scroll position
+     * Override render to maintain scroll position
      */
     render() {
         // Cache scroll position
@@ -131,6 +133,25 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Sets theis editor dirty/clean
+     *
+     * @param {Boolean} isDirty
+     */
+    setDirty(isDirty) {
+        this.isDirty = isDirty === true;
+
+        let title = document.querySelector('title');
+
+        if(this.isDirty && title.innerHTML.indexOf(' *') < 0) {
+            title.innerHTML += ' *';
+        
+        } else if(!this.isDirty && title.innerHTML.indexOf(' *') > -1) {
+            title.innerHTML = title.innerHTML.replace(' *', '');
+
+        }
+    }
+
+    /**
      * Event: Heartbeat
      */
     async onHeartbeat() {
@@ -151,6 +172,14 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Event: Change happened
+     */
+    onChange() {
+        this.setDirty(true);
+        this.trigger('change', this.model);
+    }
+
+    /**
      * Event: Click save
      */
     async onClickSave() {
@@ -158,6 +187,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
+        this.setDirty(false);
+        
         await this.update();
     }
     

@@ -29,7 +29,7 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
                 _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Icon'},
-                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${model.icon || ''}`, onclick: _.onClickChangeIcon})
+                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.compiledSchema.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ? [
                 _.field({label: 'Tabs'},

@@ -18,16 +18,14 @@ async function onSubmit(e) {
     try {
         await HashBrown.Service.RequestService.customRequest('post', '/api/user/login', data);
         
-        let redirect = (location.search.replace('?path=', '') || '/') + location.hash;
-
-        location.href = redirect;
+        location.reload();
     
     } catch(e) {
         let message = document.querySelector('.widget--message');
 
         if(!message) {
             message = document.createElement('div');
-            message.className = 'widget widget--message fixed fixed--top warning';
+            message.className = 'widget widget--message fixed fixed--top warn';
             document.body.insertBefore(message, form); 
         }
 

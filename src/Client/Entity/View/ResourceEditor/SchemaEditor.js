@@ -31,7 +31,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      */
     prerender() {
         this.state.title = this.model.name;
-        this.state.icon = this.model.icon;
+        this.state.icon = this.state.compiledSchema.icon;
         
         if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema) {
             this.state.tab = this.state.tab || 'content';
@@ -78,7 +78,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 this.state.fieldConfigEditor.on('change', (newValue) => {
                     this.model.config = newValue;
 
-                    this.trigger('change', this.model);
+                    this.onChange();
                 });
             }
         }
@@ -89,8 +89,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      */
     onChangeId(id) {
         this.model.id = id;
-
-        this.trigger('change', this.model);
+    
+        this.onChange();
     }
     
     /**
@@ -99,7 +99,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     onChangeName(name) {
         this.model.name = name;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -111,7 +111,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         modal.on('change', (newIcon) => {
             this.model.icon = newIcon;
 
-            this.trigger('change', this.model);
+            this.onChange();
             this.render();
         });
     }
@@ -174,7 +174,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
         this.model.fields.properties = newFields;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -187,7 +187,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
        
         this.model.fields.properties[key] = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -220,7 +220,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.onClickEditField(Object.keys(fields).pop());
         }
         
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -248,6 +248,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         await HashBrown.Service.SchemaService.setSchemaById(this.model.id, this.model);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
+        
+        this.setDirty(false);
     }
 
     /**

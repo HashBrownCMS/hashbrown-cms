@@ -100,7 +100,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     onChangeTitle(newValue) {
         this.model.title = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -109,7 +109,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     onChangeUrl(newValue) {
         this.model.url = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -120,7 +120,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
 
         this.model.processor = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -131,7 +131,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
 
         this.model.deployer = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**

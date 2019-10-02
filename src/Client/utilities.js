@@ -42,29 +42,6 @@ window.copyToClipboard = function copyToClipboard(string) {
 }
 
 /**
- * Clears the workspace
- */
-window.clearWorkspace = function clearWorkspace() {
-    $('.workspace').empty();
-};
-
-/**
- * Sets workspace content
- */
-window.populateWorkspace = function populateWorkspace($html, classes) {
-    let $workspace = $('.page--environment__space--editor');
-
-    $workspace.empty();
-    $workspace.attr('class', 'page--environment__space--editor');
-    
-    _.append($workspace, $html);
-
-    if(classes) {
-        $workspace.addClass(classes);
-    }
-};
-
-/**
  * Checks for updates
  */
 window.updateCheck = async function updateCheck() {

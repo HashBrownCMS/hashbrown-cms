@@ -71,7 +71,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onChangeTitle(newValue) {
         this.model.title = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -80,7 +80,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onChangeAllowedOrigin(newValue) {
         this.model.allowedOrigin = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -89,7 +89,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onChangeRedirect(newValue) {
         this.model.redirect = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -98,7 +98,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onChangeAppendRedirect(newValue) {
         this.model.appendRedirect = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -147,7 +147,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             this.onClickEditInput(Object.keys(inputs).pop());
         }
         
-        this.trigger('change', this.model);
+        this.onChange();
     }
     
     /**
@@ -168,7 +168,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
 
         this.model.inputs = newInputs;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 
     /**
@@ -179,7 +179,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
        
         this.model.inputs[key] = newValue;
 
-        this.trigger('change', this.model);
+        this.onChange();
     }
 }
 

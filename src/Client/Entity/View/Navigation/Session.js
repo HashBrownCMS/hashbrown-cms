@@ -33,14 +33,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
 
         HashBrown.Service.EventService.trigger('language');  
 
-        let contentEditor = Crisp.View.get('ContentEditor');
-
-        if(contentEditor) {
-            contentEditor.model = null;
-            await contentEditor.fetch();
-        }
-
-        this.fetch();
+        this.update();
     }
 
     /**
