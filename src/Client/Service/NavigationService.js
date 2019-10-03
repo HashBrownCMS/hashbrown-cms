@@ -97,6 +97,7 @@ class NavigationService {
             for(let name in HashBrown.Entity.View.ResourceEditor) {
                 let type = HashBrown.Entity.View.ResourceEditor[name];
 
+                if(type === HashBrown.Entity.View.ResourceEditor.JsonEditor) { continue; }
                 if(type.category !== category) { continue; }
 
                 editor = new type();

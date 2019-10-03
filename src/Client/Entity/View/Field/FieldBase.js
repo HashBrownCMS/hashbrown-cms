@@ -58,7 +58,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             value: value
         };
         
-        let type = HashBrown.Entity.View.Field[model.schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
+        let type = HashBrown.Entity.View.Field[schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
 
         return new type({
             model: model
@@ -78,7 +78,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         
         let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId, true);
     
-        return this.createFromSchema(schema);
+        return this.createFromSchema(schema, value);
     }
 
     /**

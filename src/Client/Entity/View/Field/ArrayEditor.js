@@ -87,7 +87,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                     item.schemaId,
                     item.value
                 );
-                
+
                 view.on('change', (newValue) => {
                     item.value = newValue;
                     this.state.value[i] = item;

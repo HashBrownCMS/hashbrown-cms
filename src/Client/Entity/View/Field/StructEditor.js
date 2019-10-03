@@ -22,9 +22,9 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Fetches view data
      */
     async fetch() {
+        this.state.fields = {};
+        
         if(this.state.name === 'config') {
-            this.state.fields = {};
-            
             // Build label options
             this.state.labelOptions = {};
 
@@ -33,9 +33,6 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 this.state.labelOptions[label] = key;
             }
-        } else {
-            this.state.fields = [];
-
         }
 
         if(!this.state.value || typeof this.state.value !== 'object' || Array.isArray(this.state.value)) {
@@ -68,7 +65,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
                     this.trigger('change', this.state.value);
                 });
             
-                this.state.fields.push(view);
+                this.state.fields[key] = view;
             }
         }        
     }

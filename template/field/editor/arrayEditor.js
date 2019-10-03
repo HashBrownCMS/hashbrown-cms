@@ -8,7 +8,7 @@ _.div({class: 'field--array-editor__items'},
     
     ] : [
         _.each(state.fields, (i, field) =>
-            _.div({class: `field--array-editor__item ${state.canRemoveItems ? 'extra-padding' : ''}`},
+            _.div({class: 'field--array-editor__item'},
                 field.view,
                 _.div({class: 'field--array-editor__item__tools'},
                     Object.keys(state.schemaOptions).length > 1 ? [

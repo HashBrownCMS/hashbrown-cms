@@ -17,6 +17,8 @@
         
         &__tools {
             display: flex;
+            border-bottom: 1px solid var(--color-default-200);
+            margin-bottom: var(--padding-medium);
         }
         
         &__tool {

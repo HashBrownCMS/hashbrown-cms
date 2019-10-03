@@ -25,24 +25,33 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         await super.fetch();
 
         if(this.state.name) { return; }
+        
+        // Cache field states
+        let fieldStates = {};
 
+        for(let key in this.state.fields || {}) {
+            fieldStates[key] = this.state.fields[key].state;
+        }
+
+        // Get schema and settings
         this.state.schema = await HashBrown.Service.SchemaService.getSchemaById(this.model.schemaId, true);
-
         this.state.publishing = await this.model.getSettings('publishing') || {};
 
         if(this.state.publishing.connectionId) {
             this.state.connection = await HashBrown.Service.ConnectionService.getConnectionById(this.state.publishing.connectionId); 
         }
 
+        // Set standard editor info
         this.state.icon = this.state.schema.icon;
         this.state.title = this.model.prop('title', HashBrown.Context.language) || this.model.id;
 
+        // Establish tabs
         this.state.tab = HashBrown.Service.NavigationService.getRoute(2) || this.state.schema.defaultTabId || 'meta';
         this.state.tabs = this.state.schema.tabs || {};
-
         this.state.tabs['meta'] = 'Meta';
 
-        this.state.fields = [];
+        // Construct fields
+        this.state.fields = {};
 
         let contentFields = {};
         let schemaFields = {};
@@ -67,12 +76,17 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
         }
 
+        // Instiantiate field views
         for(let key in schemaFields) {
             let field = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
                 schemaFields[key],
                 contentFields[key]
             );
 
+            if(fieldStates[key]) {
+                field.state.isCollapsed = fieldStates[key].isCollapsed === true;
+            }
+            
             field.model.isDisabled = this.model.isLocked;
 
             if(this.state.tab === 'meta') {
@@ -88,31 +102,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                 });
             }
 
-            this.state.fields.push(field); 
-        }
-    }
-
-    /**
-     * Override render to maintain field states
-     */
-    render() {
-        // Cache field states
-        let fieldStates = {};
-
-        for(let field of this.state.fields || []) {
-            fieldStates[field.model.key] = field.state;
-        }
-
-        super.render();
-
-        // Restore field states
-        for(let field of this.state.fields || []) {
-            let state = fieldStates[field.model.key];
-
-            if(!state) { continue; }
-
-            field.state.isCollapsed = state.isCollapsed;
-            field.render();
+            this.state.fields[key] = field;
         }
     }
 

@@ -98,6 +98,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     async fetch() {
         if(this.state.id) {
             this.model = await HashBrown.Service.ResourceService.get(this.itemType, this.state.category, this.state.id);
+        } else {
+            this.model = null;
         }
     }
  

@@ -23,7 +23,9 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
     _.if(state.name === undefined,
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
-            state.fields
+            _.each(state.fields, (key, field) =>
+                field.element
+            )
         ),
         _.div({class: 'resource-editor__footer'},
             _.include(require('./inc/warning')),

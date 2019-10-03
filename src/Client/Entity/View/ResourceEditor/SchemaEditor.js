@@ -213,8 +213,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
             newFields[key] = definition;
         }
-
-        let isNewField = Object.keys(fields).length > Object.keys(this.model.fields.properties).length;
+        
+        let isNewField = Object.keys(fields).length > Object.keys(this.state.properties).length;
 
         this.model.fields.properties = newFields;
         

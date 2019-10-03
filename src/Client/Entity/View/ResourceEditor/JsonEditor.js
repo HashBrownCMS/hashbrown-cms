@@ -4,6 +4,8 @@
  * The advanced resource editor
  */
 class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
+    static get category() { return HashBrown.Service.NavigationService.getRoute(0); }
+
     /**
      * Constructor
      */
@@ -150,8 +152,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         
         try {
             let value = this.namedElements.body.model.value;
-            this.debug(newValue);
-            this.model = JSON.parse(newValue);
+            this.debug(this.mode);
 
             await super.onClickSave();
             
