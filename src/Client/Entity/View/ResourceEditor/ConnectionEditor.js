@@ -21,16 +21,20 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
      */
     async fetch() {
         await super.fetch();
+        
+        if(this.state.name) { return; }
 
         let connection = await HashBrown.Service.ConnectionService.getMediaProvider();
 
-        this.state.isMediaProvider = connection && connection.id === this.model.id;
+        this.state.isMediaProvider = this.model && connection && connection.id === this.model.id;
     }
 
     /**
      * Pre render
      */
     prerender() {
+        if(this.state.name) { return; }
+
         this.state.icon = 'exchange';
         this.state.title = this.model.title;
 

@@ -20,6 +20,8 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      * Pre render
      */
     prerender() {
+        if(this.state.name) { return; }
+
         this.state.icon = 'wpforms';
         this.state.title = this.model.title;
         this.state.postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';

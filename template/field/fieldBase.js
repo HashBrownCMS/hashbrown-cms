@@ -7,7 +7,7 @@ _.div({class: `field ${state.className || ''}`},
         state.message
     
     ] : [
-        model.label || model.description ? [
+        !state.hideKey && (model.label || model.description) ? [
             _.div({class: 'field__key'},
                 _.div({class: 'field__key__label'}, model.label),
                 _.div({class: 'field__key__description'}, model.description)
@@ -15,11 +15,14 @@ _.div({class: `field ${state.className || ''}`},
         
         ] : null,
 
-        _.div({class: 'field__tools'},
-            _.each(state.tools, (i, tool) =>
-                _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, title: tool.tooltip, onclick: tool.handler})
+        !state.hideTools ? [
+            _.div({class: 'field__tools'},
+                _.each(state.tools, (i, tool) =>
+                    _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, title: tool.tooltip, onclick: tool.handler})
+                )
             )
-        ),
+
+        ] : null,
         
         _.div({class: 'field__value'},
             state.isCollapsed ? [

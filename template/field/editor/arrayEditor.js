@@ -12,7 +12,7 @@ _.div({class: 'field--array-editor__items'},
                 field.view,
                 _.div({class: 'field--array-editor__item__tools'},
                     Object.keys(state.schemaOptions).length > 1 ? [
-                        _.popup({class: 'field--array-editor__item__tool', tooltip: 'Change schema', icon: 'cogs', options: state.schemaOptions, value: field.view.model.schema ? field.view.model.schema.id : null, onchange: (schemaId) => _.onChangeItemSchema(i, schemaId)})
+                        _.popup({class: 'field--array-editor__item__tool', autocomplete: true, tooltip: 'Change schema', icon: 'cogs', options: state.schemaOptions, value: field.view.model.schema ? field.view.model.schema.id : null, onchange: (schemaId) => _.onChangeItemSchema(i, schemaId)})
                     
                     ] : null,
 

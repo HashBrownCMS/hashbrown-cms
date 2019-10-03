@@ -17,7 +17,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         this.template = require('template/widget/richText'); 
 
-        this.model.toolbar = this.model.toolar || {};
+        this.model.toolbar = this.model.toolbar || {};
         this.state.paragraphOptions = this.getParagraphOptions();
     }
 
@@ -145,7 +145,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Event: Change heading
      */
     onChangeHeading(newValue) {
-        document.execCommand('heading', false, newValue);
+        document.execCommand('formatBlock', false, newValue);
         this.namedElements.editor.focus();
         this.onChange();
     }

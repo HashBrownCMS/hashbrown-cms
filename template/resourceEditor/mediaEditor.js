@@ -2,12 +2,11 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `resource-editor resource-editor--media-editor ${model.isLocked ? 'locked' : ''}`},
-    _.if(state.name === 'error',
+_.div({class: 'resource-editor resource-editor--media-editor'},
+    state.name === 'error' ? [
         state.message
-    ),
-
-    _.if(state.name === 'welcome',
+    
+    ] : state.name === 'welcome' ? [
         _.div({class: 'resource-editor__welcome'},
             _.h1('Media'),
             _.p('Click any item in the panel to view it.'),
@@ -17,12 +16,12 @@ _.div({class: `resource-editor resource-editor--media-editor ${model.isLocked ? 
                 _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
             )
         )
-    ),
 
-    _.if(state.name === undefined,
+    ] : [
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body centered', name: 'body'},
             _.media({value: model.id, readonly: true})
         )
-    )
+    
+    ]
 )

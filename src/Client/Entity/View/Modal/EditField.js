@@ -36,7 +36,9 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
             this.model.definition,
             null,
             {
-                name: 'config'
+                name: 'config',
+                hideKey: true,
+                hideTools: true
             }
         );
 
@@ -44,9 +46,6 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
             view.on('change', (newValue) => {
                 this.onChangeConfig(newValue);
             });
-
-            view.model.label = null;
-            view.model.description = null;
 
             this.state.extraFields = view;
 

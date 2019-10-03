@@ -2,12 +2,11 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `resource-editor resource-editor--content-editor ${model.isLocked ? 'locked' : ''}`},
-    _.if(state.name === 'error',
+_.div({class: 'resource-editor resource-editor--content-editor'},
+    state.name === 'error' ? [
         state.message
-    ),
-
-    _.if(state.name === 'welcome',
+    
+    ] : state.name === 'welcome' ? [
         _.div({class: 'resource-editor__welcome'},
             _.h1('Content'),
             _.p('Click any item in the panel to edit it.'),
@@ -18,9 +17,8 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
                 _.button({class: 'widget widget--button', onclick: _.onClickExampleContent, title: 'Get some example content'}, 'Example')
             )
         )
-    ),
 
-    _.if(state.name === undefined,
+    ] : [
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
             _.each(state.fields, (key, field) =>
@@ -41,5 +39,6 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
                 )
             )
         )
-    )
+    
+    ]
 )
