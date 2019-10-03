@@ -1,3 +1,21 @@
+@mixin widget--number__input__thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 50%;
+    display: block;
+    width: calc(var(--size-widget-small) / 2);
+    height: calc(var(--size-widget-small) / 2);
+    border: 0;
+    background-color: var(--color-default-text);
+}
+
+@mixin widget--number__input__track {
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-default-200);
+}
+
 .widget--number {
     width: 100%;
     display: flex;  
@@ -17,6 +35,36 @@
 
         &:focus, &:hover {
             border-color: var(--color-action-500);
+            outline: none;
+        }
+
+        &[type="range"] {
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+
+            &:focus {
+                outline: none;
+            }
+
+            &:focus::-moz-range-thumb { background-color: var(--color-action-500); }
+            &:hover::-moz-range-thumb { background-color: var(--color-action-500); }
+            &:focus::-webkit-slider-thumb { background-color: var(--color-action-500); }
+            &:hover::-webkit-slider-thumb { background-color: var(--color-action-500); }
+
+            &::-moz-range-thumb { @include widget--number__input__thumb; }
+            &::-webkit-slider-thumb {
+                @include widget--number__input__thumb;
+                
+                margin-top: calc(var(--size-widget-small) / -4 + 1px);
+            }
+
+            &::-moz-range-track { @include widget--number__input__track; }
+            &::-webkit-slider-runnable-track { @include widget--number__input__track; }
         }
     }
 
