@@ -74,7 +74,11 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             if(fieldType) {
                 this.state.fieldConfigEditor = new fieldType({
                     model: this.model,
-                    state: { name: 'config' }
+                    state: {
+                        name: 'config',
+                        hideKey: true,
+                        hideTools: true
+                    }
                 });
 
                 this.state.fieldConfigEditor.on('change', (newValue) => {
