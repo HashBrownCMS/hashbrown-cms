@@ -1,13 +1,4 @@
 .list-item--panel-item {
-    &.dragging {
-        pointer-events: none;
-    }
-
-    &.defocused > &__inner {
-        opacity: 0.5;
-        pointer-events: none;
-    }
-
     &.loading > &__inner {
         @include spinner; 
     }
@@ -108,10 +99,9 @@
         border: 0;
         color: inherit;
         text-align: center;
-        line-height: var(--size-widget-large); 
         height: var(--size-widget-small); 
         width: var(--size-widget-small);
-        margin: 1rem 0;
+        margin: calc((var(--size-widget-large) - var(--size-widget-small)) / 2) 0;
         border-radius: 50%;
         flex-shrink: 0;
         display: flex;

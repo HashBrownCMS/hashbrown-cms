@@ -36,9 +36,8 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onDragStart(e) {
         let index = Array.from(this.element.querySelectorAll('.widget--list__item')).indexOf(e.currentTarget);
 
-        e.currentTarget.classList.toggle('dragging', true);
-
-        e.dataTransfer.setData('index', index);
+        e.dataTransfer.setData('index', index); // Set some data in transfer, or Firefox will ignore the drag event
+        this.state.dragIndex = index; // <- The index in data transfer gets lost in Chrome, so we'll actually be using this one
     }
 
     /**
@@ -69,7 +68,7 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
     onDragEnd(e) {
         this.sanityCheck();
         
-        let oldIndex = parseInt(e.dataTransfer.getData('index'));
+        let oldIndex = this.state.dragIndex;
         let newIndex = 0;
 
         let items = Array.from(this.element.querySelectorAll('.widget--list__item'));

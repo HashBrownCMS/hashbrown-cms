@@ -21,8 +21,6 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
     onDragStart(e) {
         e.dataTransfer.setData('source', this.model.id);
     
-        this.element.classList.toggle('dragging', true);
-        
         this.clearDragOverDatasets();
     }
     
@@ -30,8 +28,6 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Drag end
      */
     onDragEnd(e) {
-        this.element.classList.toggle('dragging', false);
-        
         this.clearDragOverDatasets();
     }
 

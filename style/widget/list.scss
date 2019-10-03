@@ -53,10 +53,6 @@
             }
         }
 
-        &.dragging {
-            pointer-events: none;
-        }
-        
         &[data-drag-over] {
             position: relative;     
 
