@@ -177,6 +177,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Change happened
      */
     onChange() {
+        if(this.model.isLocked) { return; }
+
         this.setDirty(true);
         this.trigger('change', this.model);
     }
