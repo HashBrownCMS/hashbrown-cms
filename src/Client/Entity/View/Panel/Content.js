@@ -120,8 +120,14 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
         }
 
         if(content.schemaId) {
-            let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
-            item.icon = schema.icon;
+            try {
+                let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
+                item.icon = schema.icon;
+
+            } catch(e) {
+                item.message = e.message;
+
+            }
         }
 
         item.parentId = content.parentId;

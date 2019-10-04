@@ -123,7 +123,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         this.state.name = 'error';
         this.state.message = error.message;
 
-        debug.error(error, this);
+        debug.error(error, this, true);
 
         this.render();
     }

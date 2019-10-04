@@ -24,6 +24,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     
         this.state.sortingOptions = this.getSortingOptions();
         this.state.sortingMethod = Object.values(this.state.sortingOptions || {})[0];
+        this.state.itemStates = {};
     }
 
     /**
@@ -45,21 +46,12 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         // Cache item states
-        let itemStates = {};
-
         for(let id in this.state.itemMap || {}) {
-            itemStates[id] = this.state.itemMap[id].state;
+            this.state.itemStates[id] = this.state.itemMap[id].state;
         }
 
         await super.update();        
       
-        // Restore item states
-        for(let id in this.state.itemMap || {}) {
-            this.state.itemMap[id].state = itemStates[id] || {};
-       
-            this.state.itemMap[id].render();
-        }
-
         // Restore scroll position
         if(this.namedElements.items) {
             this.namedElements.items.scrollTop = scrollTop;
@@ -82,7 +74,10 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         // Generate items and place them in the queue and map cache
         for(let resource of resources) {
             let model = await this.getItem(resource);
-            let item = new HashBrown.Entity.View.ListItem.PanelItem({model: model});
+            let item = new HashBrown.Entity.View.ListItem.PanelItem({
+                model: model,
+                state: this.state.itemStates[model.id] || {}
+            });
 
             if(this.state.searchQuery && item.model.name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) < 0) { continue; }
 

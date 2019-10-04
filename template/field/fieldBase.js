@@ -17,6 +17,11 @@ _.div({class: `field ${state.className || ''}`},
 
         !state.hideTools ? [
             _.div({class: 'field__tools'},
+                model.isCollapsible ? [
+                    _.button({class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
+
+                ] : null,
+
                 _.each(state.tools, (i, tool) =>
                     _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, title: tool.tooltip, onclick: tool.handler})
                 )

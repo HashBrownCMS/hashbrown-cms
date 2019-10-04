@@ -16,6 +16,9 @@ _.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'act
             ),
             _.if(model.isLocked,
                 _.div({class: 'list-item--panel-item__property fa fa-lock'})
+            ),
+            _.if(model.message,
+                _.div({class: 'list-item--panel-item__property fa fa-exclamation-triangle', title: model.message})
             )
         ),
         _.div({class: 'list-item--panel-item__actions'},

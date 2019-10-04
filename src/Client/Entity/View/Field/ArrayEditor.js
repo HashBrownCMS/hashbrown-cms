@@ -88,6 +88,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                     item.value
                 );
 
+                view.model.isCollapsible = true;
+
                 view.on('change', (newValue) => {
                     item.value = newValue;
                     this.state.value[i] = item;

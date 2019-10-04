@@ -128,9 +128,9 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * @return {Array} Tools
      */
     getTools() {
-        return this.model.tools || [];
+        return [];
     }
-
+   
     /**
      * Pre render
      */
@@ -168,6 +168,16 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
 
         return this.model.schema.name;
     }
+    
+    /**
+     * Event: Toggle collapsed/expanded
+     */
+    onToggleCollapsed() {
+        this.state.isCollapsed = !this.state.isCollapsed;
+
+        this.render();
+    }
+
     
     /**
      * Event: Change value

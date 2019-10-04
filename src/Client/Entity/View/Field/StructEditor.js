@@ -15,6 +15,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.editorTemplate = require('template/field/editor/structEditor');
         this.configTemplate = require('template/field/config/structEditor');
 
+        this.model.isCollapsible = true;
         this.state.isCollapsed = this.state.name !== 'config';
     }
 
@@ -77,32 +78,6 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         if(!this.model.config || !this.state.value || !this.state.value[this.model.config.label]) { return super.getValueLabel(); }
     
         return this.state.value[this.model.config.label];
-    }
-
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        if(this.state.name === 'config') { return []; }
-        
-        return [
-            {
-                icon: this.state.isCollapsed ? 'caret-right' : 'caret-down',
-                tooltip: this.state.isCollapsed ? 'Expand this field' : 'Collapse this field',
-                handler: () => this.onToggleCollapsed()
-            }
-        ];
-    }
-   
-    /**
-     * Event: Toggle collapsed/expanded
-     */
-    onToggleCollapsed() {
-        this.state.isCollapsed = !this.state.isCollapsed;
-
-        this.render();
     }
 
     /**

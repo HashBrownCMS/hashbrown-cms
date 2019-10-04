@@ -20,6 +20,7 @@ class Connections extends HashBrown.Entity.View.Panel.PanelBase {
         let item = await super.getItem(resource);
 
         item.name = resource.title;
+        item.icon = 'exchange';
 
         return item;
     }
