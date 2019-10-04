@@ -202,8 +202,6 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
     let category = path[4];
     let id = path[5];
 
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
-
     switch(category) {
         case 'connections':
             if(!id) {
