@@ -39,8 +39,6 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.value = {};
         }
 
-        let fieldDefinitions = {};
-
         if(!this.model.config) { this.model.config = {}; }
         if(!this.model.config.struct) { this.model.config.struct = {}; }
 

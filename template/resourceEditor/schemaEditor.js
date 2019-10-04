@@ -30,9 +30,18 @@ _.div({class: `resource-editor resource-editor--content-editor ${model.isLocked 
                 _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.compiledSchema.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ? [
+                _.field({label: 'Allowed at root'},
+                    _.checkbox({disabled: model.isLocked, value: model.allowedAtRoot, onchange: _.onChangeAllowedAtRoot})
+                ),
+                _.field({label: 'Allowed children'},
+                    _.popup({disabled: model.isLocked, value: model.allowedChildSchemas, options: state.childSchemaOptions, onchange: _.onChangeAllowedChildSchemas})
+                ),
                 _.field({label: 'Tabs'},
                     _.list({disabled: true, placeholder: 'tab', value: state.parentTabs}),
                     _.list({disabled: model.isLocked, placeholder: 'tab', value: model.tabs, onchange: _.onChangeTabs})
+                ),
+                _.field({label: 'Default tab'},
+                    _.popup({disabled: model.isLocked, value: model.defaultTabId, options: state.tabOptions, onchange: _.onChangeDefaultTabId})
                 ),
                 _.field({label: 'Fields'},
                     _.div({class: 'widget-group'},

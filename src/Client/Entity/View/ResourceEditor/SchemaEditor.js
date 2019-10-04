@@ -23,6 +23,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(this.state.id) {
             this.model = await HashBrown.Service.SchemaService.getSchemaById(this.state.id);
             this.state.compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(this.model.id, true);
+            
+            let allContentSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
+
+            this.state.childSchemaOptions = {};
+
+            for(let schema of allContentSchemas) {
+                this.state.childSchemaOptions[schema.name] = schema.id;
+            }
         }    
     }
 
@@ -30,7 +38,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Pre render
      */
     prerender() {
-        if(this.state.name) { return; }
+        if(!this.state.id) { return; }
 
         this.state.title = this.model.name;
         this.state.icon = this.state.compiledSchema.icon;
@@ -230,12 +238,41 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     }
 
     /**
+     * Event: Change allowed at root
+     */
+    onChangeAllowedAtRoot(newValue) {
+        this.model.allowedAtRoot = newValue;
+        
+        this.onChange();
+    }
+
+    /**
+     * Event: Change allowed child schemas
+     */
+    onChangeAllowedChildSchemas(newValue) {
+        this.model.allowedChildSchemas = newValue;
+        
+        this.onChange();
+    }
+    
+    /**
+     * Event: Change default tab id
+     */
+    onChangeDefaultTabId(newValue) {
+        this.model.defaultTabId = newValue;
+        
+        this.onChange();
+    }
+
+    /**
      * Event: Change tabs
      */
     onChangeTabs(tabs) {
         this.model.tabs = tabs;
 
         this.render();
+
+        this.onChange();
     }
 
     /**

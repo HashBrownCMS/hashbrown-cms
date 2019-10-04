@@ -119,12 +119,14 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
             }
         }
 
-        let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
+        if(content.schemaId) {
+            let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
+            item.icon = schema.icon;
+        }
 
         item.parentId = content.parentId;
         item.sort = content.sort;
         item.isDraggable = true;
-        item.icon = schema.icon;
         item.isSortable = true;
         item.isDropContainer = true;
         item.changed = content.updateDate;

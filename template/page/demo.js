@@ -6,9 +6,6 @@ module.exports = (_, view) => `
 <html>
     <head>
         ${require('./inc/head')(_, view)}
-        
-        <link href="/css/plugins.css" rel="stylesheet">
-        <link href="/lib/codemirror/lib/codemirror.css" rel="stylesheet">
     </head>
 
     <body class="page.page--environment">
@@ -39,7 +36,6 @@ module.exports = (_, view) => `
         <script src="/js/utilities.js"></script>
         
         <script src="/js/environment.js"></script>
-        <script src="/js/plugins.js"></script>
         <script src="/js/demo.js"></script>
     </body>
 </html>

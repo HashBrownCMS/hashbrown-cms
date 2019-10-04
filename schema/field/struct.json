@@ -2,8 +2,5 @@
     "parentSchemaId": "fieldBase",
     "editorId": "StructEditor",
     "icon": "cubes",
-    "name": "Struct",
-    "config": {
-        "isCollapsed": true
-    }
+    "name": "Struct"
 }

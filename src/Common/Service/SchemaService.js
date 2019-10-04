@@ -70,7 +70,7 @@ class SchemaService {
         mergedSchema.name = childSchema.name;
         mergedSchema.parentSchemaId = childSchema.parentSchemaId;
         mergedSchema.icon = childSchema.icon || mergedSchema.icon;
-        
+
         // Specific values for schema types
         switch(mergedSchema.type) {
             case 'field':
@@ -78,7 +78,7 @@ class SchemaService {
                 
                 // Merge config
                 if(!mergedSchema.config) { mergedSchema.config = {}; }
-                if(!parentSchema.config) { parentSchema.config = {}; }
+                if(!childSchema.config) { childSchema.config = {}; }
 
                 merge(mergedSchema.config, childSchema.config);
                 break;

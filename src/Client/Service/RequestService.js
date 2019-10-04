@@ -27,8 +27,8 @@ class RequestService {
      *
      * @returns {Promise} Response
      */
-    static upload(url, data) {
-        return new Promise((resolve, reject) => {
+    static async upload(url, data) {
+        await new Promise((resolve, reject) => {
             $.ajax({
                 url: this.environmentUrl(url),
                 type: 'POST',
