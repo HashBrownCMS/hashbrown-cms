@@ -1,11 +1,69 @@
 'use strict';
 
+const CACHE_EXPIRATION_TIME = 1000 * 60;
+
+let cache = {};
+
 /**
  * A helper class for accessing resources on the server
  *
  * @memberof HashBrown.Client.Service
  */
 class ResourceService {
+    /**
+     * Adds a resource to the cache
+     *
+     * @param {Object} resource
+     */
+    static setCached(id, resource) {
+        checkParam(id, 'id', String, true);
+        checkParam(resource, 'resource', Object);
+        
+        if(resource) {
+            if(resource instanceof HashBrown.Entity.EntityBase) {
+                resource = resource.getObject();
+            }
+
+            cache[id] = {
+                expires: Date.now() + CACHE_EXPIRATION_TIME,
+                data: resource
+            };
+
+        } else {
+            delete cache[id];
+        
+        }
+    }
+
+    /**
+     * Gets a resource from the cache
+     *
+     * @param {String} id
+     *
+     * @return {Object} Resource
+     */
+    static getCached(id) {
+        checkParam(id, 'id', String, true);
+        
+        if(!cache[id]) { return null; }
+        
+        if(Date.now() > cache[id].expires) {
+            this.setCached(id, null);
+            return null;
+        }
+
+        let resource = cache[id].data;
+
+        try {
+            return JSON.parse(JSON.stringify(resource));
+        
+        } catch(e) {
+            debug.error(e, this, true);
+            
+            return null;
+
+        }
+    }
     /**
      * Gets a list of all resource category names
      *
@@ -55,6 +113,8 @@ class ResourceService {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
         
+        this.setCached(id, null);
+        
         await HashBrown.Service.RequestService.request('delete', category + '/' + id);
        
         // Cancel any editor instances displaying the deleted content
@@ -83,6 +143,8 @@ class ResourceService {
    
         if(typeof model === 'function') {
             for(let i in results) {
+                this.setCached(results[i].id, results[i]);
+                
                 results[i] = new model(results[i]);
             }
         }
@@ -100,6 +162,8 @@ class ResourceService {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
         
+        this.setCached(id, null);
+        
         await HashBrown.Service.RequestService.request('post', category + '/pull/' + id);
     
         HashBrown.Service.EventService.trigger('resource', id);  
@@ -114,6 +178,8 @@ class ResourceService {
     static async push(category, id) {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
+        
+        this.setCached(id, null);
 
         await HashBrown.Service.RequestService.request('post', category + '/push/' + id);
     
@@ -133,15 +199,21 @@ class ResourceService {
         checkParam(model, 'model', HashBrown.Entity.Resource.ResourceBase);
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
+        
+        let result = this.getCached(id);
 
-        let result = await HashBrown.Service.RequestService.request('get', category + '/' + id);
+        if(!result) {
+            result = await HashBrown.Service.RequestService.request('get', category + '/' + id);
+        }
         
         if(!result) { throw new Error('Resource ' + category + '/' + id + ' not found'); }
 
+        this.setCached(id, result);
+        
         if(typeof model === 'function') {
             result = new model(result);
         }
-
+        
         return result;
     }
     
@@ -150,20 +222,20 @@ class ResourceService {
      *
      * @param {String} category
      * @param {String} id
-     * @param {HashBrown.Entity.Resource.ResourceBase} data
-     *
-     * @returns {Promise} Result
+     * @param {Object} resource
      */
-    static async set(category, id, data) {
+    static async set(category, id, resource) {
         checkParam(category, 'category', String, true);
         checkParam(id, 'id', String, true);
-        checkParam(data, 'data', Object, true);
+        checkParam(resource, 'resource', Object, true);
 
-        if(data instanceof HashBrown.Entity.Resource.ResourceBase) {
-            data = data.getObject();
+        if(resource instanceof HashBrown.Entity.Resource.ResourceBase) {
+            resource = resource.getObject();
         }
         
-        await HashBrown.Service.RequestService.request('post', category + '/' + id, data);
+        await HashBrown.Service.RequestService.request('post', category + '/' + id, resource);
+        
+        this.setCached(id, resource);
     
         HashBrown.Service.EventService.trigger('resource', id);  
     }
@@ -185,6 +257,8 @@ class ResourceService {
         checkParam(data, 'data', Object);
 
         let resource = await HashBrown.Service.RequestService.request('post', category + '/new' + query, data);
+
+        this.setCached(resource.id, resource);
     
         if(model) {
             resource = new model(resource);

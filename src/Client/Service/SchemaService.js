@@ -1,9 +1,5 @@
 'use strict';
 
-const CACHE_EXPIRATION_TIME = 1000 * 60;
-
-let cachedSchemas = {};
-
 /**
  * The client side Schema helper
  *
@@ -11,58 +7,12 @@ let cachedSchemas = {};
  */
 class SchemaService extends require('Common/Service/SchemaService') {
     /**
-     * Adds a schema to the cache
-     *
-     * @param {Schema} schema
-     */
-    static setCached(id, schema) {
-        checkParam(id, 'id', String, true);
-        checkParam(schema, 'schemas', HashBrown.Entity.Resource.Schema.SchemaBase);
-        
-        if(schema) {
-            cachedSchemas[id] = {
-                expires: Date.now() + CACHE_EXPIRATION_TIME,
-                data: schema
-            };
-
-        } else {
-            delete cachedSchemas[id];
-        
-        }
-    }
-
-    /**
-     * Gets a schema from the cache
-     *
-     * @param {String} id
-     *
-     * @return {Schema} Schema
-     */
-    static getCached(id) {
-        checkParam(id, 'id', String, true);
-        
-        if(!cachedSchemas[id]) { return null; }
-        
-        if(Date.now() > cachedSchemas[id].expires) {
-            this.setCached(id, null);
-            return null;
-        }
-
-        let schema = cachedSchemas[id].data;
-        let copy = this.getEntity(schema.getObject());
-
-        return copy;
-    }
-    
-    /**
      * Pulls a schema by id
      *
      * @param {String} id
      */
     static async pullSchemaById(id) {
         checkParam(id, 'id', String, true);
-        
-        this.setCached(id, null);
         
         await HashBrown.Service.ResourceService.pull('schemas', id);
     }
@@ -88,8 +38,6 @@ class SchemaService extends require('Common/Service/SchemaService') {
         checkParam(id, 'id', String, true);
         checkParam(schema, 'schema', HashBrown.Entity.Resource.Schema.SchemaBase);
         
-        this.setCached(id, schema);
-        
         await HashBrown.Service.ResourceService.set('schemas', id, schema);
     }
 
@@ -99,8 +47,6 @@ class SchemaService extends require('Common/Service/SchemaService') {
     static async removeSchemaById(id) {
         checkParam(id, 'id', String, true);
 
-        this.setCached(id, null);
-        
         await HashBrown.Service.ResourceService.remove('schemas', id);
     }
 
@@ -116,13 +62,9 @@ class SchemaService extends require('Common/Service/SchemaService') {
         checkParam(id, 'id', String, true);
         checkParam(withParentFields, 'withParentFields', Boolean);
 
-        let schema = this.getCached(id);
-
-        if(!schema) {
-            schema = await HashBrown.Service.ResourceService.get(null, 'schemas', id);
-            schema = this.getEntity(schema);
-            this.setCached(id, schema);
-        }
+        let schema = await HashBrown.Service.ResourceService.get(null, 'schemas', id);
+        
+        schema = this.getEntity(schema);
         
         // Get parent fields if specified
         if(withParentFields && schema.parentSchemaId) {
@@ -163,8 +105,6 @@ class SchemaService extends require('Common/Service/SchemaService') {
             } else if(schema.type === 'field') {
                 schema = new HashBrown.Entity.Resource.Schema.FieldSchema(schema);
             }
-
-            this.setCached(schema.id, schema); 
 
             schemas.push(schema);
         }

@@ -25,11 +25,20 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.state.compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(this.model.id, true);
             
             let allContentSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
+            let allFieldSchemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
 
             this.state.childSchemaOptions = {};
 
             for(let schema of allContentSchemas) {
                 this.state.childSchemaOptions[schema.name] = schema.id;
+            }
+            
+            this.state.parentSchemaOptions = {};
+
+            for(let schema of this.model.type === 'field' ? allFieldSchemas : allContentSchemas) {
+                if(schema.id === this.model.id) { continue; }
+                
+                this.state.parentSchemaOptions[schema.name] = schema.id;
             }
         }    
     }
@@ -255,6 +264,15 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         this.onChange();
     }
     
+    /**
+     * Event: Change parent schema id
+     */
+    onChangeParentSchemaId(newValue) {
+        this.model.parentSchemaId = newValue;
+
+        this.onChange();
+    }
+
     /**
      * Event: Change default tab id
      */

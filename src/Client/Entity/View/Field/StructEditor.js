@@ -15,7 +15,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.editorTemplate = require('template/field/editor/structEditor');
         this.configTemplate = require('template/field/config/structEditor');
 
-        this.model.isCollapsible = true;
+        this.state.isCollapsible = true;
         this.state.isCollapsed = this.state.name !== 'config';
     }
 

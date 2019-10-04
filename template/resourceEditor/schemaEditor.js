@@ -31,12 +31,15 @@ _.div({class: 'resource-editor resource-editor--content-editor'},
             _.field({label: 'Icon'},
                 _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.compiledSchema.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
+            _.field({label: 'Parent'},
+                _.popup({disabled: model.isLocked, value: model.parentSchemaId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})
+            ),
             model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ? [
                 _.field({label: 'Allowed at root'},
                     _.checkbox({disabled: model.isLocked, value: model.allowedAtRoot, onchange: _.onChangeAllowedAtRoot})
                 ),
                 _.field({label: 'Allowed children'},
-                    _.popup({disabled: model.isLocked, value: model.allowedChildSchemas, options: state.childSchemaOptions, onchange: _.onChangeAllowedChildSchemas})
+                    _.popup({disabled: model.isLocked, multiple: true, value: model.allowedChildSchemas, options: state.childSchemaOptions, onchange: _.onChangeAllowedChildSchemas})
                 ),
                 _.field({label: 'Tabs'},
                     _.list({disabled: true, placeholder: 'tab', value: state.parentTabs}),
