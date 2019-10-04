@@ -4,7 +4,9 @@ module.exports = (_, model, state) =>
 
 _.div({class: 'resource-editor resource-editor--form-editor'},
     state.name === 'error' ? [
-        state.message
+        _.div({class: 'widget widget--message centered warn'},
+            state.message
+        )
     
     ] : state.name === 'welcome' ? [
         _.div({class: 'resource-editor__welcome'},

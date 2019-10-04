@@ -2,9 +2,11 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `resource-editor resource-editor--content-editor ${model.isLocked ? 'locked' : ''}`},
+_.div({class: 'resource-editor resource-editor--content-editor'},
     state.name === 'error' ? [
-        state.message
+        _.div({class: 'widget widget--message centered warn'},
+            state.message
+        )
 
     ] : state.name === 'welcome' ? [
         _.div({class: 'resource-editor__welcome'},

@@ -2,12 +2,13 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `resource-editor resource-editor--connection-editor ${model.isLocked ? 'locked' : ''}`},
-    _.if(state.name === 'error',
-        state.message
-    ),
-
-    _.if(state.name === undefined,
+_.div({class: 'resource-editor resource-editor--json-editor'},
+    state.name === 'error' ? [
+        _.div({class: 'widget widget--message centered warn'},
+            state.message
+        )
+    
+    ] : [
         _.include(require('./inc/header')),
         _.text({code: true, value: JSON.stringify(model, null, 4), class: 'resource-editor__body', name: 'body', oninput: _.onChangeJson}),
         _.div({class: 'resource-editor__footer'},
@@ -19,5 +20,6 @@ _.div({class: `resource-editor resource-editor--connection-editor ${model.isLock
                 )
             )
         )
-    )
+    
+    ]
 )
