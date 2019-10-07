@@ -12,6 +12,8 @@ class ModalBase extends HashBrown.Entity.View.ViewBase {
     constructor(params) {
         super(params);
 
+        HashBrown.Service.EventService.on('escape', 'modal', () => { this.onClickClose(); });
+
         this.template = require('template/modal/modalBase'); 
 
         let similarModals = this.getSimilarModals();

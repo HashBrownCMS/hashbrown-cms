@@ -27,7 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Init router
     HashBrown.Service.NavigationService.startListening();
-    
+
+    // Init escape key handler
+    document.addEventListener('keydown', (e) => {
+        if(e.which === 27) { HashBrown.Service.EventService.trigger('escape'); }
+    });
+
     // Check for updates
     updateCheck();
 });

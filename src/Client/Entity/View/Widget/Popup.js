@@ -11,7 +11,7 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
      */
     constructor(params) {
         super(params);
-
+        
         this.template = require('template/widget/popup');
     }
 
@@ -213,6 +213,9 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
 
         if(isOpen) {
             this.trigger('opened');
+        
+            HashBrown.Service.EventService.on('escape', 'popup', () => { this.toggle(false); });
+
         } else {
             this.trigger('closed');
 

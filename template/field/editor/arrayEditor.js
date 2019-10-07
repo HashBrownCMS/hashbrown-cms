@@ -25,7 +25,7 @@ _.div({class: 'field--array-editor__items'},
         ),
 
         state.canAddItems && Object.keys(state.schemaOptions).length > 0 ? [
-            _.popup({class: 'field--array-editor__add', options: state.schemaOptions, icon: 'plus', label: 'Add item', onchange: _.onClickAddItem})
+            _.popup({class: 'field--array-editor__add', autocomplete: true, options: state.schemaOptions, icon: 'plus', label: 'Add item', onchange: _.onClickAddItem})
         
         ] : null
     
