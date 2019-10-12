@@ -32,10 +32,11 @@ _.div({class: 'modal in'},
                 _.each(model.backups, (i, timestamp) =>
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label'},
-                            isNaN(new Date(parseInt(timestamp))) ?
+                            isNaN(new Date(parseInt(timestamp))) ? [
                                 timestamp
-                            :
+                            ] : [
                                 new Date(parseInt(timestamp)).toString()
+                            ]
                         ),
                         _.popup({
                             icon: 'ellipsis-v',

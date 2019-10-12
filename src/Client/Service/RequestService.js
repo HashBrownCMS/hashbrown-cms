@@ -25,10 +25,10 @@ class RequestService {
      * @param {String} url
      * @param {FormData} data
      *
-     * @returns {Promise} Response
+     * @returns {String|Object} Response
      */
     static async upload(url, data) {
-        await new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             $.ajax({
                 url: this.environmentUrl(url),
                 type: 'POST',
