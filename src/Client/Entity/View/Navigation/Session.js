@@ -50,7 +50,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
         try {
             await HashBrown.Service.RequestService.customRequest('post', '/api/user/logout')
 
-            location = '/login';
+            location.reload();
 
         } catch(e) {
             UI.error(e);

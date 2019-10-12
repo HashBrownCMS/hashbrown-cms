@@ -54,7 +54,17 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token);
 
-                if(!user) { return res.render('login'); }
+                if(!user) {
+                    let users = await HashBrown.Service.UserService.getAllUsers();
+
+                    if(!users || users.length < 1) { 
+                        res.redirect('/setup/1');
+                    } else {
+                        res.render('login');
+                    }
+
+                    return;
+                }
             
                 let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
                 let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
@@ -82,9 +92,11 @@ class ViewController extends HashBrown.Controller.Controller {
             }
         });
 
-        // Login
-        app.get('/login/', async (req, res) => {
-            try {
+        // Dashboard
+        app.get('/dashboard/:tab', async (req, res) => {
+            let user = await this.authenticate(req.cookies.token);
+
+            if(!user) {
                 let users = await HashBrown.Service.UserService.getAllUsers();
 
                 if(!users || users.length < 1) { 
@@ -92,16 +104,9 @@ class ViewController extends HashBrown.Controller.Controller {
                 } else {
                     res.render('login');
                 }
-            } catch(e) {
-                res.status(400).render('error', { message: e.message });
+
+                return;
             }
-        });
-
-        // Dashboard
-        app.get('/dashboard/:tab', async (req, res) => {
-            let user = await this.authenticate(req.cookies.token);
-
-            if(!user) { return res.render('login'); }
             
             user.clearSensitiveData();
             
@@ -132,7 +137,17 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token, null, null, true);
                 
-                if(!user) { return res.render('login'); }
+                if(!user) {
+                    let users = await HashBrown.Service.UserService.getAllUsers();
+
+                    if(!users || users.length < 1) { 
+                        res.redirect('/setup/1');
+                    } else {
+                        res.render('login');
+                    }
+
+                    return;
+                }
                 
                 res.render('test', {
                     user: user,
@@ -153,7 +168,17 @@ class ViewController extends HashBrown.Controller.Controller {
             try {
                 let user = await this.authenticate(req.cookies.token, req.params.project);
 
-                if(!user) { return res.render('login'); }
+                if(!user) {
+                    let users = await HashBrown.Service.UserService.getAllUsers();
+
+                    if(!users || users.length < 1) { 
+                        res.redirect('/setup/1');
+                    } else {
+                        res.render('login');
+                    }
+
+                    return;
+                }
 
                 let project = await HashBrown.Service.ProjectService.getProject(req.params.project);
 
