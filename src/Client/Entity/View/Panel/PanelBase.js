@@ -51,14 +51,14 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         await super.update();        
+
+        // Highlight selected item
+        this.highlightItem(HashBrown.Service.NavigationService.getRoute(1));
       
         // Restore scroll position
         if(this.namedElements.items) {
             this.namedElements.items.scrollTop = scrollTop;
         }
-
-        // Highlight selected item
-        this.highlightItem(HashBrown.Service.NavigationService.getRoute(1));
     }
 
     /**
