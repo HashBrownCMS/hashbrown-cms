@@ -96,8 +96,13 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         className = className.replace(/[A-Z]/g, (letter) => '-' + letter.toLowerCase());
         className = 'field--' + className;
 
-        this.state.className = className;
-     
+        this.state.className = className; 
+    }
+
+    /**
+     * Update
+     */
+    async update() {
         // Multilingual sanity check
         if(this.model.isMultilingual) {
             if(!this.model.value || this.model.value.constructor !== Object) {
@@ -110,6 +115,8 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             this.state.value = this.model.value;
 
         }
+
+        await super.update();
     }
 
     /**

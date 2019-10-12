@@ -405,7 +405,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         if(this.isUpdating) { return; }
 
         this.isUpdating = true;
-
+        
         try {
             await this.fetch();
 

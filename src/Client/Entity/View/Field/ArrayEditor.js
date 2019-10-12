@@ -81,7 +81,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             if(!Array.isArray(this.state.value)) { this.state.value = []; }
 
             for(let i = 0; i < this.state.value.length; i++) {
-                let item = this.state.value[i];
+                let item = this.state.value[i] || {};
 
                 let view = await HashBrown.Entity.View.Field.FieldBase.createFromSchemaId(
                     item.schemaId,
