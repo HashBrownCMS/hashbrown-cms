@@ -306,11 +306,15 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Click save
      */
     async onClickSave() {
-        await HashBrown.Service.SchemaService.setSchemaById(this.model.id, this.model);
+        await HashBrown.Service.SchemaService.setSchemaById(this.state.id, this.model);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
         
         this.setDirty(false);
+
+        if(this.state.id !== this.model.id) {
+            location.hash = `/schemas/${this.model.id}`;
+        }
     }
 
     /**
