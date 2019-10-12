@@ -39,6 +39,7 @@ _.div({class: 'modal in'},
                         ),
                         _.popup({
                             icon: 'ellipsis-v',
+                            color: 'default',
                             role: 'item-menu',
                             options: {
                                 'Restore': () => { _.onClickRestoreBackup(timestamp); },

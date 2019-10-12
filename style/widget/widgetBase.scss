@@ -25,7 +25,7 @@
         }
 
         > .widget {
-            &:not(.small):not(.checkbox):not(.widget--checkbox) {
+            &:not(.small):not(.checkbox):not(.widget--checkbox):not(.widget--popup) {
                 flex-grow: 1;
                 flex-basis: 100%;
                 max-width: 100%;
@@ -142,6 +142,15 @@
         
         &:hover {
             background-color: var(--color-action-300);
+        }
+    }
+    
+    &.default {
+        background-color: var(--color-default-200);
+        color: var(--color-default-text);
+        
+        &:hover {
+            background-color: var(--color-default-200);
         }
     }
     
