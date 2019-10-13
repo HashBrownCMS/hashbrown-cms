@@ -31,8 +31,6 @@
     }
 
     &__add {
-        margin-top: var(--padding-medium);
-
         > .widget--popup__label {
             @extend .widget--button, .default, .expanded;
         }

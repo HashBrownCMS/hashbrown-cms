@@ -268,7 +268,7 @@ class UserService {
 
         let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { id: id }, { tokens: 0, password: 0 });
 
-        if(!user) { throw new Error('User "' + id + '" could not be found'); }
+        if(!user) { return null; }
 
         return new HashBrown.Entity.Resource.User(user);
     }

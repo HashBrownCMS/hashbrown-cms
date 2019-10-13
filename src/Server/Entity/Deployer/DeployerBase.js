@@ -40,7 +40,10 @@ class DeployerBase extends require('Common/Entity/Deployer/DeployerBase.js') {
         if(!ignoreRoot) {
             path = Path.join(this.getRootPath(), path);
         }
-       
+      
+        // If the path module removed doubles slashes for protocols, add them back
+        path = (path || '').replace(/:\/([^\/])/, '://$1');
+
         return path;
     }
 
