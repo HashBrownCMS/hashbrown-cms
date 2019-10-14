@@ -228,10 +228,6 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
                 await HashBrown.Service.ResourceService.remove(this.category, id);
                 
-                if(this.state.itemMap[id]) {
-                    this.state.itemMap[id].element.classList.toggle('loading', false);
-                }
-      
                 if(location.hash.indexOf(id) > -1) {
                     location.hash = `/${this.category}/`;
                 }

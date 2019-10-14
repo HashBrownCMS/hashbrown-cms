@@ -38,6 +38,8 @@ class RemoveContent extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click delete
      */
     async onClickDelete() {
+        this.trigger('delete');
+
         await HashBrown.Service.RequestService.request('delete', 'content/' + this.model.contentId + '?removeChildren=' + (this.state.deleteChildren || false));
 
         this.state.content.settingsSanityCheck('publishing');
@@ -47,7 +49,7 @@ class RemoveContent extends HashBrown.Entity.View.Modal.ModalBase {
         if(location.hash.indexOf(this.model.contentId) > -1) {
             location.hash = '/content/'
         }
-        
+
         this.close();
     }
 }

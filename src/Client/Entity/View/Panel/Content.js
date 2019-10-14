@@ -25,9 +25,15 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     async onClickRemove(id) {
         let content = await HashBrown.Service.ContentService.getContentById(id);
 
-        new HashBrown.Entity.View.Modal.RemoveContent({
+        let modal = new HashBrown.Entity.View.Modal.RemoveContent({
             model: {
                 contentId: content.id
+            }
+        });
+
+        modal.on('delete', () => {
+            if(this.state.itemMap[id]) {
+                this.state.itemMap[id].element.classList.toggle('loading', true);
             }
         });
     }
