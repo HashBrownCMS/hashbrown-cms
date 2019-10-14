@@ -33,7 +33,7 @@ _.div({class: 'resource-editor resource-editor--content-editor'},
                 _.a({href: `#/${state.category}/${state.id}/json`, class: 'widget widget--button embedded'}, 'Advanced'),
                 _.if(!model.isLocked,
                     _.div({class: 'widget-group'},
-                        _.button({class: 'widget widget--button', onclick: _.onClickSave}, 'Save'),
+                        _.button({class: 'widget widget--button', name: 'save', onclick: _.onClickSave}, 'Save'),
                         _.if(state.connection,
                             _.checkbox({value: model.isPublished, class: 'large', name: 'published', placeholder: 'Published'})
                         )

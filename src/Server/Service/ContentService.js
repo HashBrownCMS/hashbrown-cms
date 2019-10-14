@@ -159,7 +159,14 @@ class ContentService extends require('Common/Service/ContentService') {
         } else {
             await HashBrown.Service.ScheduleService.removeTask(project, environment, 'unpublish', id);
         }
-        
+       
+        // Publish/unpublish
+        if(content.isPublished) {
+            await HashBrown.Service.ConnectionService.publishContent(project, environment, content, user);
+        } else {
+            await HashBrown.Service.ConnectionService.unpublishContent(project, environment, content, user);
+        }
+
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(project, environment + '.content', { id: id }, content, { upsert: create });
 

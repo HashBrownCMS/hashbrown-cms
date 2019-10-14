@@ -149,34 +149,33 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Click save
      */
     async onClickSave() {
-        await HashBrown.Service.ContentService.setContentById(this.state.id, this.model);
-
         let publishedCheckbox = this.namedElements.published;
-        let shouldPublish = publishedCheckbox ? publishedCheckbox.model.value : false;
+        this.model.isPublished = publishedCheckbox ? publishedCheckbox.model.value : false;
 
-        // Unpublish
-        if(this.state.connection && !shouldPublish) {
-            await HashBrown.Service.RequestService.request('post', 'content/unpublish', this.model);
-           
-            if(this.model.isPublished) {
-                UI.notifySmall(`"${this.state.title}" unpublished successfully`, null, 3);
-            } else {
-                UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-            }
-
-        // Publish
-        } else if(this.state.connection && shouldPublish) {
-            await HashBrown.Service.RequestService.request('post', 'content/publish', this.model);
-
-            UI.notifySmall(`"${this.state.title}" published successfully`, null, 3);
-        
-        // No change made to publishing
-        } else {
-            UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', true);
         }
 
-        this.setDirty(false);
+        try {
+            await HashBrown.Service.ContentService.setContentById(this.state.id, this.model);
+        
+            if(this.model.isPublished) {
+                UI.notifySmall(`"${this.state.title}" published successfully`, null, 3);
+            
+            } else {
+                UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
+
+            }
+
+            this.setDirty(false);
+        
+        } catch(e) {
+            UI.error(e);
+        }
+        
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', false);
+        }
     }
 
     /**

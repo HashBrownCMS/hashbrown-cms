@@ -10,7 +10,7 @@
     position: relative;
     text-align: inherit;
     font-size: inherit;
-
+    
     // Group
     &-group {
         display: flex;
@@ -97,24 +97,7 @@
         white-space: nowrap;
         padding: 0 0.3rem;
     }
-
-    // Working state
-    &.working {
-        pointer-events: none;
-        cursor: not-allowed;
-
-        &:after {
-            font-family: 'FontAwesome';
-            content: '\f1ce';
-            position: absolute;
-            right: 0rem;
-            top: 50%;
-            z-index: 10;
-            display: block;
-            animation: widget__spinner 1s linear infinite;
-        }
-    }
-
+    
     // Disabled state
     &.disabled {
         opacity: 0.5;

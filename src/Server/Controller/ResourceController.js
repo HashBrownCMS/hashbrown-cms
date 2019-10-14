@@ -49,7 +49,7 @@ class ResourceController extends HashBrown.Controller.ApiController {
                 }
             
             } catch(e) {
-                res.status(e.code || 404).send(ResourceController.printError(e));
+                res.status(e.code || 404).send(this.printError(e));
 
             }
         };

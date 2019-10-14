@@ -12,8 +12,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/:project/:environment/content/publish', this.middleware(), this.getHandler('publish'));
-        app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.getHandler('unpublish'));
         app.post('/api/:project/:environment/content/example', this.middleware(), this.getHandler('example'));
         app.post('/api/:project/:environment/content/insert', this.middleware(), this.getHandler('insert'));
         
@@ -107,7 +105,7 @@ class ContentController extends HashBrown.Controller.ResourceController {
     static async set(req, res) {
         let id = req.params.id;
         let content = new HashBrown.Entity.Resource.Content(req.body);
-        let shouldCreate = req.query.create == 'true' || req.query.create == true;
+        let shouldCreate = req.query.create === 'true' || req.query.create === true;
         
         return await HashBrown.Service.ContentService.setContentById(req.project, req.environment, id, content, req.user, shouldCreate);
     }
@@ -123,9 +121,9 @@ class ContentController extends HashBrown.Controller.ResourceController {
      * @param {String} parentId
      * @param {Number} position
      *
-     * @param {Content} content The Content model to update
+     * @param {Content} content The content model to update
      *
-     * @returns {Content} The created Content node
+     * @returns {Content} The created content node
      */
     static async insert(req, res) {
         return await HashBrown.Service.ContentService.insertContent(req.project, req.environment, req.user, req.query.contentId, req.query.parentId, parseInt(req.query.position));
@@ -173,46 +171,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
         await HashBrown.Service.SyncService.setResourceItem(req.project, req.environment, 'content', id, localContent);
 
         return id;
-    }
-
-    /**
-     * @example POST /api/:project/:environment/content/publish
-     *
-     * @apiGroup Content
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @param {Content} content the Content model to publish
-     *
-     * @returns {String} The published Content
-     */
-    static async publish(req, res) {
-        let content = new HashBrown.Entity.Resource.Content(req.body);
-
-        await HashBrown.Service.ConnectionService.publishContent(req.project, req.environment, content, req.user);
-        
-        return content;
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/content/unpublish
-     *
-     * @apiGroup Content
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @param {Content} content the Content model to unpublish
-     *
-     * @returns {String} The unpublished Content
-     */
-    static async unpublish(req, res) {
-        let content = new HashBrown.Entity.Resource.Content(req.body);
-
-        await HashBrown.Service.ConnectionService.unpublishContent(req.project, req.environment, content, req.user);
-
-        return content;
     }
 
     /**

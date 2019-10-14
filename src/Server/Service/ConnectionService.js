@@ -60,12 +60,10 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
         checkParam(user, 'user', HashBrown.Entity.Resource.User);
 
-        debug.log('Publishing content "' + content.id + '"...', this);
-        
         let settings = await content.getSettings(project, environment, 'publishing');
 
         if(!settings.connectionId) {
-            return debug.log('No connections defined for content "' + content.id + '", skipping...', this);
+            return debug.log('No connection defined for content "' + content.id + '", skipping...', this);
         }
             
         let connection = await this.getConnectionById(project, environment, settings.connectionId);
@@ -75,11 +73,6 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
         await connection.publishContent(project, environment, content);
             
         debug.log('Published content "' + content.id + '" successfully!', this);
-
-        // Update published flag
-        content.isPublished = true;
-
-        await HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
     }
     
     /**
@@ -112,11 +105,6 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
         }
         
         debug.log('Unpublished content "' + content.id + '" successfully!', this);
-
-        // Update published flag
-        content.isPublished = false;
-
-        await HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
     }
 
     /**

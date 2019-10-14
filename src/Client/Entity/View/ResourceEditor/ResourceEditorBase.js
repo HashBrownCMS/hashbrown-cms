@@ -187,13 +187,19 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click save
      */
     async onClickSave() {
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', true);
+        }
+        
         await HashBrown.Service.ResourceService.set(this.category, this.state.id, this.model);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
         this.setDirty(false);
         
-        await this.update();
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', false);
+        }
     }
     
     /**

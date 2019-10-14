@@ -1,22 +1,35 @@
 @keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(359deg); }
+    0% { transform: scale(0); }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(0); }
 }
 
 @mixin spinner {
     position: relative;
     pointer-events: none;
 
-    &::after {
+    &::before, &::after {
         position: absolute;
-        content: '';
         display: block;
         font-family: 'FontAwesome';
-        content: '\f110';
+        content: '\26AB';
         z-index: 21;
         font-size: 1rem;
-        top: calc(50% - 0.5em);
-        left: calc(50% - 0.5em);
-        animation: spinner 0.5s steps(8) infinite;
+        line-height: 1rem;
+        width: 1rem;
+        height: 1rem;
+        text-align: center;
+        top: calc(50% - 0.6rem);
+        animation: spinner 1s ease infinite;
+        transform: scale(0);
+    }
+
+    &::before {
+        left: calc(50% - 1.1rem);;
+    }
+    
+    &::after {
+        left: calc(50% + 0.1rem);;
+        animation-delay: 0.25s;
     }
 }
