@@ -143,6 +143,8 @@ class ResourceService {
    
         if(typeof model === 'function') {
             for(let i in results) {
+                if(!results[i].id) { continue; }
+
                 this.setCached(results[i].id, results[i]);
                 
                 results[i] = new model(results[i]);

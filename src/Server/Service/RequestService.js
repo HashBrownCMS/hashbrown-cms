@@ -194,7 +194,7 @@ class RequestService {
                             } catch(e) {
                                 
                             }
-                            
+                           
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
                                 let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + method + ' ' + url.protocol + '//' + Path.join(url.host, url.path) + '\n\n' + str);

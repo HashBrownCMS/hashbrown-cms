@@ -68,7 +68,7 @@ class ApiDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @return {Promise} Promise
      */
     async setFile(path, base64) {
-        await HashBrown.Service.RequestService.request('put', path, base64);
+        await HashBrown.Service.RequestService.request('put', `${path}?token=${this.token}`, base64);
     }
     
     /**
@@ -78,7 +78,7 @@ class ApiDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @param {String} name
      */
     async renameFile(path, name) {
-        await HashBrown.Service.RequestService.request('patch', path, name);
+        await HashBrown.Service.RequestService.request('patch', `${path}?token=${this.token}`, name);
     }
    
     /**
@@ -87,7 +87,7 @@ class ApiDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @param {String} path
      */
     async removeFile(path) {
-        await HashBrown.Service.RequestService.request('delete', path);
+        await HashBrown.Service.RequestService.request('delete', `${path}?token=${this.token}`);
     }
 
     /**
