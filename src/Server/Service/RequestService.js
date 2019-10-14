@@ -48,45 +48,6 @@ class RequestService {
     }
 
     /**
-     * Downloads a file
-     *
-     * @param {String} url
-     * @param {String} destination
-     *
-     * @returns {Promise} Result
-     */
-    static download(url, destination) {
-        checkParam(url, 'url', String);
-        checkParam(destination, 'destination', String);
-
-        return this.request('get', url)
-        .then((data) => {
-            let stream = FileSystem.createWriteStream(destination);
-
-            stream.write(data);
-
-            stream.on('error', (e) => {
-                reject(e);
-            });
-
-            stream.on('finish', () => {
-                stream.close();
-            });
-
-            stream.on('close', () => {
-                resolve(data);
-            });
-        })
-        .catch((e) => {
-            if(FileSystem.existsSync(destination)) {
-                FileSystem.unlinkSync(destination);
-            }
-
-            return Promise.reject(e);
-        });
-    }
-
-    /**
      * Makes a paginated request
      *
      * @param {String} address

@@ -41,7 +41,7 @@ class MediaController extends HashBrown.Controller.ApiController {
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
             let media = await connection.getMedia(id);
 
-            if(!media || (!media.url && !media.path)) {
+            if(!media || !media.path) {
                 return res.status(404).send('Not found');
             }
             

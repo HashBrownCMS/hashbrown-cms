@@ -16,7 +16,6 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
 
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
-        this.def(String, 'url');
         this.def(String, 'path');
         this.def(String, 'folder', '/');
         this.def(Date, 'updateDate');
@@ -35,6 +34,11 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         delete params.remote;
         delete params.sync;
         delete params.isRemote;
+
+        if(params.url) {
+            params.path = params.url;
+            delete params.url;
+        }
 
         if(!params.folder) {
             params.folder = '/';

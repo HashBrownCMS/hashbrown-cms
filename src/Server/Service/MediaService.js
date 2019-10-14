@@ -182,36 +182,16 @@ class MediaService extends require('Common/Service/MediaService') {
     /**
      * Cleans the Media cache
      */
-    static cleanCache() {
-        let storageFolder = Path.join(APP_ROOT, 'storage');
-       
-        if(!FileSystem.existsSync(storageFolder)) { return; }
+    static async cleanCache() {
+        let files = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'storage', '*', 'cache', '*'));
 
-        FileSystem.readdir(storageFolder, (err, folders) => {
-            if(err) { return; }
-        
-            for(let folder of folders) { 
-                let cacheFolder = Path.join(storageFolder, folder, 'cache');
+        for(let file of files) {
+            let stats = await HashBrown.Service.FileService.stat(file);
 
-                if(!FileSystem.existsSync(cacheFolder)) { continue; }
-
-                FileSystem.readdir(cacheFolder, (err, files) => {
-                    if(err) { return; }
-                    
-                    for(let file of files) {
-                        let cachedFile = Path.join(cacheFolder, file);
-
-                        FileSystem.stat(cachedFile, (err, stats) => {
-                            if(err) { return; }
-
-                            if(new Date().getTime() - new Date(stats.atime).getTime() > MAX_CACHE_TIME) {
-                                FileSystem.unlink(cachedFile, (err) => { });
-                            }
-                        });
-                    }
-                });
+            if(new Date().getTime() - new Date(stats.atime).getTime() > MAX_CACHE_TIME) {
+                await HashBrown.Service.FileService.remove(file);
             }
-        });
+        }
     }
 
     /**
@@ -274,15 +254,11 @@ class MediaService extends require('Common/Service/MediaService') {
         
         // File wasn't found, copy it
         } catch(e) {
-            // Download with web request
-            if(media.url) {
-                await HashBrown.Service.RequestService.download(media.url, cachedPath);
-
-            // Copy from file system
-            } else {
-                await HashBrown.Service.FileService.copy(media.path, cachedPath);
-            
+            if(!media.path) {
+                throw new Error(`Cannot fetch media "${media.id}", no url or path specified`);
             }
+
+            await HashBrown.Service.FileService.copy(media.path, cachedPath);
 
             // Resize file
             if(width && media.isImage() && !media.isSvg()) { 

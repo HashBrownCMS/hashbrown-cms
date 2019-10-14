@@ -3,6 +3,9 @@
 const FileSystem = require('fs');
 const Path = require('path');
 const Util = require('util');
+const HTTP = require('http');
+const HTTPS = require('https');
+const URL = require('url');
 
 const Glob = require('glob');
 
@@ -20,19 +23,17 @@ class FileService {
      *
      * @return {Promise} Result
      */
-    static makeDirectory(path, position = 0) {
+    static async makeDirectory(path, position = 0) {
         checkParam(path, 'path', String);
         checkParam(position, 'position', Number);
 
         let parts = Path.normalize(path).split(Path.sep);
         
-        if(position >= parts.length) {   
-            return Promise.resolve();
-        }
+        if(position >= parts.length) { return; }
         
         let currentDirPath = parts.slice(0, position + 1).join(Path.sep);
         
-        return new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             if(!currentDirPath || FileSystem.existsSync(currentDirPath)) { return resolve(); }
        
             FileSystem.mkdir(currentDirPath, (err) => {
@@ -41,9 +42,8 @@ class FileService {
                 resolve();
             });
         })
-        .then(() => {
-            return this.makeDirectory(path, position + 1);
-        });
+            
+        await this.makeDirectory(path, position + 1);
     }
 
     /**
@@ -66,10 +66,10 @@ class FileService {
      *
      * @return {Promise} Array of file paths
      */
-    static list(path) {
+    static async list(path) {
         checkParam(path, 'path', String);
 
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             if(path.indexOf('*') > -1) {
                 Glob(path, (err, files) => {
                     if(err) { return reject(err); }
@@ -104,47 +104,34 @@ class FileService {
      *
      * @return {Promise} Buffer or array of buffers
      */
-    static read(path, encoding) {
-        checkParam(path, 'path', String);
+    static async read(path, encoding) {
+        checkParam(path, 'path', String, true);
 
-        return this.list(path)
-        .then((files) => {
-            let buffers = [];
+        let files = await this.list(path);
 
-            let readNext = () => {
-                let file = files.pop();
+        let buffers = [];
 
-                if(!file) { return Promise.resolve(buffers); }
+        for(let file of files) {
+            let buffer = await new Promise((resolve, reject) => {
+                FileSystem.readFile(file, (err, buffer) => {
+                    if(err) { return reject(err); }
 
-                return new Promise((resolve, reject) => {
-                    FileSystem.readFile(file, (err, buffer) => {
-                        if(err) { return reject(err); }
-
-                        resolve(buffer);
-                    });
-                })
-                .then((buffer) => {
-                    if(encoding) {
-                        buffer = buffer.toString(encoding);
-                    }
-
-                    buffers.push(buffer);
-
-                    return readNext();
+                    resolve(buffer);
                 });
-            };
-       
-            return readNext();
-        })
-        .then((buffers) => {
-            if(!buffers) { return Promise.resolve(null); }
+            });
 
-            if(buffers.length === 1) {
-                return Promise.resolve(buffers[0]);
+            if(encoding) {
+                buffer = buffer.toString(encoding);
             }
 
-            return Promise.resolve(buffers);
-        });
+            buffers.push(buffer);
+        }
+   
+        if(buffers.length === 1) {
+            return buffers[0];
+        }
+
+        return buffers;
     }
 
     /**
@@ -182,17 +169,16 @@ class FileService {
      * @param {String|Object} content
      * @param {String} path
      */
-    static write(content, path) {
-        if(!content) { return Promise.resolve(); }
+    static async write(content, path) {
+        if(!content) { return; }
 
         checkParam(path, 'path', String);
 
-        // Automatically turn objects into string
-        if(content instanceof Buffer === false && content instanceof Object) {
+        if(content.constructor === Object) {
             content = JSON.stringify(content);
         }
 
-        return new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             FileSystem.writeFile(path, content, (err) => {
                 if(err) { return reject(err); }
 
@@ -209,11 +195,11 @@ class FileService {
      *
      * @return {Promise} Result
      */
-    static move(from, to) {
+    static async move(from, to) {
         checkParam(from, 'from', String);
         checkParam(to, 'to', String);
 
-        return new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             FileSystem.rename(from, to, (err) => {
                 if(err) { return reject(err); }
 
@@ -230,15 +216,64 @@ class FileService {
      *
      * @return {Promise} Result
      */
-    static copy(from, to) {
+    static async copy(from, to) {
         checkParam(from, 'from', String);
         checkParam(to, 'to', String);
 
-        return new Promise((resolve, reject) => {
-            FileSystem.copyFile(from, to, (err) => {
+        await new Promise((resolve, reject) => {
+            // Cope from a URL
+            if(from.indexOf('://') > -1) {
+                let url = URL.parse(from);
+
+                let options = {
+                    host: url.hostname,
+                    port: url.port,
+                    path: url.pathname
+                };
+
+                let file = FileSystem.createWriteStream(to);
+                let protocol = from.indexOf('https://') > -1 ? HTTPS : HTTP;
+
+                protocol.get(options, (res) => {
+                    res.on('data', (data) => {
+                        file.write(data);
+                    });
+
+                    res.on('end', () => {
+                        file.end();
+                        resolve();
+                    });
+
+                    res.on('error', (e) => {
+                        reject(e);
+                    });
+                });
+
+            // Copy from a file system path
+            } else {
+                FileSystem.copyFile(from, to, (err) => {
+                    if(err) { return reject(err); }
+
+                    resolve();
+                });
+
+            }
+        });
+    }
+
+    /**
+     * Gets file stats
+     *
+     * @param {String} path
+     *
+     * @return {Object} Stats
+     */
+    static async stat(path) {
+        return await new Promise((resolve, reject) => {
+            FileSystem.stat(path, (err, stats) => {
                 if(err) { return reject(err); }
 
-                resolve();
+                resolve(stats);
             });
         });
     }

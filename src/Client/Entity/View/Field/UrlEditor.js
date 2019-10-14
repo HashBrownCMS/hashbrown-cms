@@ -44,7 +44,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
             content = await HashBrown.Service.ContentService.getContentById(content.parentId);
         }
         
-        if(HashBrown.Context.language) {
+        if(HashBrown.Context.projectSettings.languages.length > 1 && HashBrown.Context.language) {
             url = '/' + HashBrown.Context.language + url; 
         }
 

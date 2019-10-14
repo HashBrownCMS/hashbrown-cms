@@ -230,10 +230,16 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         name = Path.basename(name);
 
+        let url = file.url;
+
+        if(!url && typeof file === 'string') {
+            url = this.deployer.getPath('media', id + '/' + file);
+        }
+
         return new HashBrown.Entity.Resource.Media({
             id: id,
             name: name,
-            url: file.url,
+            url: url,
             path: file.path || file
         });
     }

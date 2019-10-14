@@ -52,6 +52,10 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
                 replaceId: replaceId
             }
         });
+        
+        modal.on('success', (ids) => {
+            HashBrown.Service.NavigationService.poke();
+        });
     }
 
     /**
