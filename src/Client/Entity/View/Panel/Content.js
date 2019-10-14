@@ -27,8 +27,7 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
 
         new HashBrown.Entity.View.Modal.RemoveContent({
             model: {
-                contentId: content.id,
-                unpublish: !content.sync.hasRemote && !content.isLocked
+                contentId: content.id
             }
         });
     }

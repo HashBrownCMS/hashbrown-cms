@@ -101,7 +101,7 @@ class ContentService extends require('Common/Service/ContentService') {
      *
      * @return {Content} Modified content
      */
-    static async setContentById(project, environment, id, content, user, create = false) {
+    static async setContentById(project, environment, id, content, user = null, create = false) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
@@ -135,7 +135,10 @@ class ContentService extends require('Common/Service/ContentService') {
         };
 
         // Content update data
-        content.updatedBy = user.id;
+        if(user) {
+            content.updatedBy = user.id;
+        }
+
         content.updateDate = Date.now();
         
         // Fallback in case of no "created by" user
@@ -379,18 +382,22 @@ class ContentService extends require('Common/Service/ContentService') {
         debug.log('Removing content "' + id + '"...', this);
 
         let collection = environment + '.content';
-        
-        await HashBrown.Service.DatabaseService.removeOne(project, collection, { id: id });
-        
-        // Remove children if specified
-        if(removeChildren) {
-            await HashBrown.Service.DatabaseService.remove(project, collection, { parentId: id });
+        let content = await this.getContentById(project, environment, id);
 
-        // If not removing children, we should unset their parent
+        if(removeChildren) {
+            let children = await HashBrown.Service.DatabaseService.find(project, collection, { parentId: id });
+
+            for(let child of children) {
+                await this.removeContentById(project, environment, child.id, removeChildren);
+            }
         } else {
             await HashBrown.Service.DatabaseService.update(project, collection, { parentId: id }, { parentId: null });
         }
+
+        await HashBrown.Service.ConnectionService.unpublishContent(project, environment, content);
         
+        await HashBrown.Service.DatabaseService.removeOne(project, collection, { id: id });
+       
         debug.log('Successfully removed content "' + id + '"...', this);
     }
     

@@ -54,37 +54,32 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
      *
      * @returns {Promise} Promise
      */
-    static publishContent(project, environment, content, user) {
+    static async publishContent(project, environment, content, user) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
         checkParam(user, 'user', HashBrown.Entity.Resource.User);
 
-        let helper = this;
-
         debug.log('Publishing content "' + content.id + '"...', this);
         
-        return content.getSettings(project, environment, 'publishing')
-        .then((settings) => {
-            if(!settings.connectionId) {
-                return Promise.reject(new Error('No connections defined for content "' + content.id + '"'));
-            }
+        let settings = await content.getSettings(project, environment, 'publishing');
+
+        if(!settings.connectionId) {
+            return debug.log('No connections defined for content "' + content.id + '", skipping...', this);
+        }
             
-            return this.getConnectionById(project, environment, settings.connectionId);
-        })
-        .then((connection) => {
-            debug.log('Publishing through connection "' + connection.id + '"...', helper);
+        let connection = await this.getConnectionById(project, environment, settings.connectionId);
 
-            return connection.publishContent(project, environment, content);
-        })
-        .then(() => {
-            debug.log('Published content "' + content.id + '" successfully!', helper);
+        debug.log('Publishing through connection "' + connection.id + '"...', this);
 
-            // Update published flag
-            content.isPublished = true;
+        await connection.publishContent(project, environment, content);
+            
+        debug.log('Published content "' + content.id + '" successfully!', this);
 
-            return HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
-        });
+        // Update published flag
+        content.isPublished = true;
+
+        await HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
     }
     
     /**
@@ -94,40 +89,34 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
      * @param {String} environment
      * @param {Content} content
      * @param {User} user
-     *
-     * @returns {Promise} promise
      */
-    static unpublishContent(project, environment, content, user, unpublishFirst = true) {
+    static async unpublishContent(project, environment, content, user, unpublishFirst = true) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
-        checkParam(user, 'user', HashBrown.Entity.Resource.User);
 
         debug.log('Unpublishing content "' + content.id + '"...', this);
         
-        return content.getSettings(project, environment, 'publishing')
-        .then((settings) => {
-            if(!settings.connectionId) {
-                return Promise.reject(new Error('No connection defined for content "' + content.id + '"'));
-            }
+        let settings = await content.getSettings(project, environment, 'publishing');
+
+        if(!settings.connectionId) { 
+            return debug.log('No connection defined for content "' + content.id + '", skipping...', this);
+        }
             
-            return this.getConnectionById(project, environment, settings.connectionId)
-        })
-        .then((connection) => {
-            if(!unpublishFirst) { return Promise.resolve(); }
-            
+        let connection = await this.getConnectionById(project, environment, settings.connectionId);
+
+        if(unpublishFirst) {
             debug.log('Unpublishing through connection "' + connection.id + '"...', this);
 
-            return connection.unpublishContent(project, environment, content);
-        })
-        .then(() => {
-            debug.log('Unpublished content "' + content.id + '" successfully!', this);
+            await connection.unpublishContent(project, environment, content);
+        }
+        
+        debug.log('Unpublished content "' + content.id + '" successfully!', this);
 
-            // Update published flag
-            content.isPublished = false;
+        // Update published flag
+        content.isPublished = false;
 
-            return HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
-        });
+        await HashBrown.Service.ContentService.setContentById(project, environment, content.id, content, user);
     }
 
     /**

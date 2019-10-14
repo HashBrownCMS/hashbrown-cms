@@ -58,7 +58,7 @@ class ScheduleService {
 
         debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);
 
-        let user = await HashBrown.Service.UserService.getUserById(task.user);
+        let user = task.user ? await HashBrown.Service.UserService.getUserById(task.user) : null;
         let content = await HashBrown.Service.ContentService.getContentById(task.project, task.environment, task.content);
         
         switch(task.type) {
@@ -123,7 +123,7 @@ class ScheduleService {
      *
      * @returns {Promise} Promise
      */
-    static updateTask(project, environment, type, contentId, date, user) {
+    static updateTask(project, environment, type, contentId, date, user = null) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(type, 'type', String);
@@ -142,7 +142,7 @@ class ScheduleService {
             date: date,
             project: project,
             environment: environment,
-            user: user.id
+            user: user ? user.id : null
         });
 
         let query = {
