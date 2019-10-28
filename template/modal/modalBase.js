@@ -13,7 +13,7 @@ _.div({class: 'modal in', role: model.role},
         _.if(state.prependedHtml || model.message,
             _.ul({class: 'modal__body'},
                 state.prependedHtml,
-                _.li({class: 'modal__body__message'}, model.message)
+                _.li({class: 'modal__body__message'}, _.html(model.message))
             )
         ),
         _.if(!model.isBlocking,

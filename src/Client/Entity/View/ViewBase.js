@@ -242,7 +242,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             wrapper.innerHTML = html;
 
-                            return wrapper.firstElementChild;
+                            return Array.from(wrapper.childNodes);
                         };
 
                     // Render an included template
