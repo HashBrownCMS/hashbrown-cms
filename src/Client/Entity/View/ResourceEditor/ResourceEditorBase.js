@@ -31,7 +31,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      */
     getPlaceholder() {
         let element = document.createElement('div');
-        element.className = 'resource-editor';
+        element.className = 'resource-editor loading';
 
         let header = document.createElement('div');
         header.className = 'resource-editor__header';

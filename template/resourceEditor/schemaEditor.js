@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: 'resource-editor resource-editor--content-editor'},
+_.div({class: 'resource-editor resource-editor--schema-editor'},
     state.name === 'error' ? [
         _.div({class: 'widget widget--message centered warn'},
             state.message
@@ -29,7 +29,7 @@ _.div({class: 'resource-editor resource-editor--content-editor'},
                 _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Icon'},
-                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.compiledSchema.icon || ''}`, onclick: _.onClickChangeIcon})
+                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             _.field({label: 'Parent'},
                 _.popup({disabled: model.isLocked, value: model.parentSchemaId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})

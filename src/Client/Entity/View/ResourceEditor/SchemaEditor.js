@@ -50,7 +50,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(this.state.name) { return; }
 
         this.state.title = this.model.name;
-        this.state.icon = this.state.compiledSchema.icon;
+        this.state.icon = this.model.icon || this.state.compiledSchema.icon;
         
         if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema) {
             this.state.tab = this.state.tab || 'content';
