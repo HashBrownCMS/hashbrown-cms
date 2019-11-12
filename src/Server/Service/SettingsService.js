@@ -58,6 +58,11 @@ class SettingsService extends require('Common/Service/SettingsService') {
             throw new Error('Environment "' + environment + '" of project "' + project + '" could not be found');
         }
 
+        // Check sync settings
+        if(settings.sync && settings.sync.enabled) {
+            HashBrown.Service.SyncService.validateSettings(settings.sync, project);
+        }
+
         // First get the existing settings object
         let oldSettings = await this.getSettings(project, environment);
         

@@ -228,19 +228,19 @@ class ServerController extends HashBrown.Controller.ApiController {
     /**
      * Update project settings
      */
-    static postProjectSettings(req, res) {
-        let settings = req.body;
-   
-        HashBrown.Service.ProjectService.checkProject(req.params.project)
-        .then(() => {
-            return HashBrown.Service.SettingsService.setSettings(req.params.project, null, req.params.section, settings);
-        })
-        .then(() => {
+    static async postProjectSettings(req, res) {
+        try {
+            let settings = req.body;
+       
+            await HashBrown.Service.ProjectService.checkProject(req.params.project);
+            await HashBrown.Service.SettingsService.setSettings(req.params.project, null, req.params.section, settings);
+            
             res.status(200).send(settings);
-        })
-        .catch((e) => {
+            
+        } catch(e) {
             res.status(502).send(ServerController.printError(e));
-        });
+        
+        }
     }
         
     /**

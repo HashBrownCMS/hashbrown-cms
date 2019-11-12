@@ -8,7 +8,7 @@ services:
         image: node
         container_name: "hashbrown-cms--node"
         ports:
-            - "8080:8080"
+            - "${NODE_PORT}:8080"
         depends_on:
             - mongodb
         networks:

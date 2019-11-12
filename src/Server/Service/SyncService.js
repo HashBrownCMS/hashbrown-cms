@@ -79,16 +79,13 @@ class SyncService {
      * @returns {Boolean} Whether the settings are valid
      */
     static validateSettings(settings, project, justUrl) {
-        if(settings && settings.project == project) {
-            throw new Error('Cyclic sync');
-        }
+        if(!settings) { throw new Error('Sync settings incomplete'); }
 
-        if(justUrl) {
-            if(settings && settings.url && settings.url.indexOf('http') === 0) { return; }
+        if(settings.project == project) { throw new Error('Cyclic sync'); }
 
-            throw new Error('Sync url not valid');
-        }
-
+        if(!settings.url || settings.url.indexOf('http') !== 0) { throw new Error('Sync url not valid'); }
+        
+        if(justUrl) { return; }
         if(settings && settings.token && settings.project) { return; }
     
         throw new Error('Sync settings incomplete');
