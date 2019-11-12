@@ -11,10 +11,10 @@ _.ul({class: 'widget widget--list'},
 
             model.readonly ? [
                 model.onclick && !model.disabled ? [
-                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)}, value ? value.label || value : '(empty)')
+                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)}, value ? value.label || value : '')
                 
                 ] : [
-                    _.label({class: 'widget--list__item__label'}, value ? value.label || value : '(empty)')
+                    _.label({class: 'widget--list__item__label'}, value ? value.label || value : '')
                 
                 ]
             
@@ -24,7 +24,7 @@ _.ul({class: 'widget widget--list'},
                 
                 ] : null,
                 
-                _.text({disabled: model.disabled, value: value ? value.label || value : '(empty)', onchange: (newValue) => _.onChangeItemValue(key, newValue)}),
+                _.text({disabled: model.disabled, value: value ? value.label || value : '', onchange: (newValue) => _.onChangeItemValue(key, newValue)}),
             ],
 
             !model.disabled && !model.sortonly ? [

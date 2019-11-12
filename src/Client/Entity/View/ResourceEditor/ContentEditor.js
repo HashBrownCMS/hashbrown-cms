@@ -136,7 +136,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * @param {String} id
      */
     onChangeContentSettings(id) {
-        if(this.model.id !== id) { return; }
+        if(!this.model || this.model.id !== id) { return; }
 
         UI.confirm(
             'Content settings changed',
