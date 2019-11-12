@@ -9,7 +9,7 @@ const Path = require('path');
  *
  * @memberof HashBrown.Server.Controller
  */
-class ViewController extends HashBrown.Controller.Controller {
+class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Initialises this controller
      */

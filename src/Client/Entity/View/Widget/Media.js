@@ -19,7 +19,11 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
      * Fetches view data
      */
     async fetch() {
-        this.state = {};
+        this.state = {
+            source: '',
+            title: '',
+            tagName: 'div'
+        };
 
         if(this.model.value) {
             let media = this.model.value;
@@ -34,8 +38,6 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.state.tagName = 'img';
             } else if(media.isVideo()) {
                 this.state.tagName = 'video';
-            } else {
-                this.state.tagName = 'div';
             }
 
             this.state.title = media.name;

@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Server.Controller
  */
-class Controller {
+class ControllerBase {
     /**
      * Initialises this controller
      */
@@ -50,7 +50,7 @@ class Controller {
      * 
      * @param {Object} req
      */
-    static setProjectVariables(req) {
+    static async setProjectVariables(req) {
         let values = req.originalUrl.split('/');
         let project = null;
         let environment = null;
@@ -64,34 +64,21 @@ class Controller {
             req.environment = values[1];
         }
         
-        // Environment sanity check
-        if(req.environment == 'settings') {
-            req.environment = null;
+        // Check if project and environment exist
+        let projectExists = await HashBrown.Service.ProjectService.projectExists(req.project);
+        
+        if(!projectExists) {
+            throw new Error('Project "' + req.project + '" could not be found');
         }
 
-        // Check if project and environment exist
-        return HashBrown.Service.ProjectService.projectExists(req.project)
-        .then((projectExists) => {
-            if(!projectExists) {
-                return Promise.reject('Project "' + req.project + '" could not be found');
+        if(req.environment) {
+            let environmentExists = await HashBrown.Service.ProjectService.environmentExists(req.project, req.environment);
+
+            if(!environmentExists) {
+                throw new Error('Environment "' + req.environment + '" was not found for project "' + req.project + '"');
             }
-
-            if(req.environment) {
-                return HashBrown.Service.ProjectService.environmentExists(req.project, req.environment)
-                .then((environmentExists) => {
-                    if(!environmentExists) {
-                        return Promise.reject(new Error('Environment "' + req.environment + '" was not found for project "' + req.project + '"'));
-                    }
-
-                    return Promise.resolve();
-                });
-
-            } else {
-                return Promise.resolve();
-
-            }
-        });
+        }
     }
 }
 
-module.exports = Controller;
+module.exports = ControllerBase;

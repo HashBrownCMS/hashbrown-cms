@@ -66,7 +66,7 @@ async function main() {
         if(
             name === 'ResourceController' ||
             name === 'ApiController' ||
-            name === 'Controller'
+            name === 'ControllerBase'
         ) { continue; }
 
         HashBrown.Controller[name].init(app);

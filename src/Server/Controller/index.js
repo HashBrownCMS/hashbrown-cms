@@ -4,7 +4,7 @@
  * @namespace HashBrown.Server.Controller
  */
 namespace('Controller')
-.add(require('./Controller'))
+.add(require('./ControllerBase'))
 .add(require('./ApiController'))
 .add(require('./ResourceController'))
 .add(require('./ConfigController'))

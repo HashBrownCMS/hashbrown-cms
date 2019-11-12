@@ -39,6 +39,11 @@ class MediaController extends HashBrown.Controller.ApiController {
 
         try {
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
+            
+            if(!connection) {
+                return res.status(404).send('Not found');
+            }
+            
             let media = await connection.getMedia(id);
 
             if(!media || !media.path) {
@@ -145,6 +150,10 @@ class MediaController extends HashBrown.Controller.ApiController {
             let id = req.params.id;
 
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
+
+            if(!connection) {
+                throw new Error('No connection has been assigned as media provider');
+            }
 
             let media = await connection.getMedia(id);
             

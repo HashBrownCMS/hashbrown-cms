@@ -35,10 +35,10 @@ class MediaService extends require('Common/Service/MediaService') {
      * Checks whether the Media provider exists
      */
     static async checkMediaProvider() {
-        let result = await HashBrown.Service.SettingsService.getSettings(HashBrown.Service.ProjectService.currentProject, HashBrown.Service.ProjectService.currentEnvironment, 'providers')
+        let result = await HashBrown.Service.SettingsService.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
         
         if(!result || !result.media) {
-            throw new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> has the "is Media provider" setting switched on.');
+            throw new Error('No Media provider has been set for this project. Please make sure one of your connections has the "is Media provider" setting switched on.');
         }  
     }
     
@@ -62,10 +62,10 @@ class MediaService extends require('Common/Service/MediaService') {
      *
      * @return {Promise} Media object
      */
-    static getMediaById(id) {
-        if(!id) { return Promise.resolve(null); }
+    static async getMediaById(id) {
+        if(!id) { return null; }
         
-        return HashBrown.Service.ResourceService.get(HashBrown.Entity.Resource.Media, 'media', id);
+        return await HashBrown.Service.ResourceService.get(HashBrown.Entity.Resource.Media, 'media', id);
     }
     
     /**
@@ -73,8 +73,8 @@ class MediaService extends require('Common/Service/MediaService') {
      *
      * @return {Promise} Media objects
      */
-    static getAllMedia(id) {
-        return HashBrown.Service.ResourceService.getAll(HashBrown.Entity.Resource.Media, 'media');
+    static async getAllMedia(id) {
+        return await HashBrown.Service.ResourceService.getAll(HashBrown.Entity.Resource.Media, 'media');
     }
     
     /**

@@ -68,17 +68,17 @@ class MediaService extends require('Common/Service/MediaService') {
      *
      * @return {Promise} Promise
      */
-    static renameMedia(project, environment, id, name) {
+    static async renameMedia(project, environment, id, name) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
 
-        // Get Media provider
-        return HashBrown.Service.ConnectionService.getMediaProvider(project, environment)
-        .then((provider) => {
-            return provider.renameMedia(id, name);
-        });
+        let provider = await HashBrown.Service.ConnectionService.getMediaProvider(project, environment);
+
+        if(!provider) { throw new Error('No connection assigned as media provider'); }
+
+        await provider.renameMedia(id, name);
     }
     
     /**

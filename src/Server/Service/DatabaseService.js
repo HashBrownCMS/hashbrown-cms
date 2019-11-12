@@ -130,7 +130,13 @@ class DatabaseService {
      * @return {Promise} Client
      */
     static async connect(databaseName) {
-        return await MongoClient.connect(this.getConnectionString(databaseName), { useNewUrlParser: true });
+        return await MongoClient.connect(
+            this.getConnectionString(databaseName),
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            }
+        );
     }
 
     /**

@@ -5,52 +5,40 @@
  *
  * @memberof HashBrown.Server.Controller
  */
-class ApiController extends HashBrown.Controller.Controller {
+class ApiController extends HashBrown.Controller.ControllerBase {
     /**
      * Check CORS
      *
      * @param {Object} settings
      * @param {Request} req
      * @param {Response} res
-     *
-     * @returns {Promise} Result
      */
     static checkCORS(settings, req, res) {
-        function getPromise() {
-            // If a string was specified, use it directly
-            if(typeof settings.allowCORS === 'string') {
-                return Promise.resolve(settings.allowCORS);
-            }
+        let allowedOrigin = '';
+        
+        // If a string was specified, use it directly
+        if(typeof settings.allowCORS === 'string') {
+            allowedOrigin = settings.allowCORS;
 
-            // a boolean value of true was specified, allow all origins
-            if(settings.allowCORS == true) {
-                return Promise.resolve('*');
-            }
+        // A boolean value of true was specified, allow all origins
+        } else if(settings.allowCORS == true) {
+            allowedOrigin = '*';
             
-            // If a function value was specified, run it
-            if(typeof settings.allowCORS === 'function') {
-                return Promise.resolve(settings.allowCORS(req, res));
-            
-            }
+        // If a function value was specified, run it
+        } else if(typeof settings.allowCORS === 'function') {
+            allowedOrigin = settings.allowCORS(req, res);
+        
+        }
 
-            // Nothing was specified, move on
-            return Promise.resolve();
-        };
+        if(!allowedOrigin) { return; }
 
-        return getPromise()
-        .then((allowedOrigin) => {
-            if(allowedOrigin) {
-                res.header('Access-Control-Allow-Origin', allowedOrigin);
-                res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-            
-                // Allowed origin did not match
-                if(allowedOrigin != '*' && allowedOrigin != req.headers.origin) {
-                    return Promise.reject(new Error('Unauthorized'));
-                }
-            }
-           
-            return Promise.resolve();
-        });
+        res.header('Access-Control-Allow-Origin', allowedOrigin);
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    
+        // Allowed origin did not match
+        if(allowedOrigin !== '*' && allowedOrigin !== req.headers.origin) {
+            throw new Error('Unauthorized');
+        }
     }
 
     /**
@@ -61,7 +49,7 @@ class ApiController extends HashBrown.Controller.Controller {
     static middleware(settings) {
         settings = settings || {};
 
-        return function middleware(req, res, next) {
+        return async (req, res, next) => {
             let token = req.cookies.token || req.query.token;
 
             // Make sure to clear double cookie values, if they occur
@@ -70,41 +58,25 @@ class ApiController extends HashBrown.Controller.Controller {
             }
 
             // Check CORS settings first
-            ApiController.checkCORS(settings, req, res)
-            .then(() => {
-                // Using project parameter
-                if(settings.setProject != false) {
-                    // Set the project variables
-                    return ApiController.setProjectVariables(req)
-                    .then(() => {
-                        // Using authentication
-                        if(settings.authenticate != false) {
-                            return ApiController.authenticate(token, req.project, settings.scope, settings.needsAdmin);
-                        
-                        // No authentication needed
-                        } else {
-                            return Promise.resolve();
-                        }
-                    });
-                
-                // Disregarding project parameter, but using authentication
-                } else if(settings.authenticate != false) {
-                    return ApiController.authenticate(token, null, settings.scope, settings.needsAdmin);
+            ApiController.checkCORS(settings, req, res);
+            
+            // Using project parameter
+            if(settings.setProject !== false) {
+                // Set the project variables
+                await ApiController.setProjectVariables(req);
 
-                // Neither project parameter nor authentication needed
-                } else {
-                    return Promise.resolve();
-                
+                // Using authentication
+                if(settings.authenticate !== false) {
+                    req.user = await ApiController.authenticate(token, req.project, settings.scope, settings.needsAdmin);
                 }
-            })
-            .then((user) => {
-                req.user = user;
+            
+            // Disregarding project parameter, but using authentication
+            } else if(settings.authenticate != false) {
+                req.user = await ApiController.authenticate(token, null, settings.scope, settings.needsAdmin);
 
-                next();
-            })
-            .catch((e) => {
-                res.status(400).send(ApiController.printError(e));
-            });
+            }
+            
+            next();
         }
     }
 
