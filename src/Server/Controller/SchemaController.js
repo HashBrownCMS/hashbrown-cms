@@ -3,7 +3,7 @@
 const Url = require('url');
 
 /**
- * The Controller for Schema
+ * The controller for schema
  *
  * @memberof HashBrown.Server.Controller
  */
@@ -61,7 +61,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Array} Schema
+     * @returns {Array} All schemas
      */
     static async getAll(req, res) {
         if(req.query.customOnly) {
@@ -80,7 +80,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} environment
      * @param {String} id
      *
-     * @returns {Schema} Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} Schema
      */
     static async get(req, res) {
         return await HashBrown.Service.SchemaService.getSchemaById(req.project, req.environment, req.params.id)
@@ -94,17 +94,18 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
+     * @param {Boolean} create Whether the schema should be created if not found
      *
-     * @param {Schema} schema The Schema model to update
+     * @param {HashBrown.Entity.Resource.SchemaBase} schema The schema model to update
      *
-     * @returns {Schema} Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} Schema
      */
     static async set(req, res) {
         let id = req.params.id;
         let schema = HashBrown.Service.SchemaService.getEntity(req.body);
-        let shouldCreate = req.query.create == 'true' || req.query.create == true;
+        let create = req.query.create == 'true' || req.query.create == true;
 
-        await HashBrown.Service.SchemaService.setSchemaById(req.project, req.environment, id, schema, shouldCreate);
+        await HashBrown.Service.SchemaService.setSchemaById(req.project, req.environment, id, schema, create);
 
         return schema;
     }
@@ -118,13 +119,13 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} environment
      * @param {String} id
      *
-     * @returns {Schema} The pulled Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} The pulled schema
      */
     static async pull(req, res) {
         let id = req.params.id;
         let resourceItem = await HashBrown.Service.SyncService.getResourceItem(req.project, req.environment, 'schemas', id)
         
-        if(!resourceItem) { throw new Error('Couldn\'t find remote Schema "' + id + '"'); }
+        if(!resourceItem) { throw new Error('Couldn\'t find remote schema "' + id + '"'); }
     
         await HashBrown.Service.SchemaService.setSchemaById(req.project, req.environment, id, HashBrown.Service.SchemaService.getEntity(resourceItem), true);
 
@@ -140,7 +141,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} environment
      * @param {String} id
      *
-     * @returns {Schema} The pushed Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} The pushed schema
      */
     static async push(req, res) {
         let id = req.params.id;
@@ -160,7 +161,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Schema} The created Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} The created schema
      */
     static async new(req, res) {
         return await HashBrown.Service.SchemaService.createSchema(req.project, req.environment, req.query.parentSchemaId);
