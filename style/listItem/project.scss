@@ -13,11 +13,14 @@
     display: flex;
     flex-direction: column;
     
+    &.loading {
+        @include spinner;
+    }
+    
     @include tablet {
         flex-basis: calc(50% - 1rem);
         width: calc(50% - 1rem);
     }
-
 
     @include phone {
         flex-basis: 0;

@@ -136,6 +136,8 @@
                 transition: transform 0.25s ease;
                 box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
                 min-height: 12rem;
+                
+                @include spinner;
             }
         }
 
