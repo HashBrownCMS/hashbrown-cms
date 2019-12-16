@@ -20,7 +20,7 @@ _.div({class: 'modal in'},
                     ),
                 ),
                 _.field({label: 'Schema'},
-                    _.popup({options: state.schemaOptions, value: model.definition.schemaId, onchange: _.onChangeSchemaId})
+                    _.popup({options: state.schemaOptions, autocomplete: true, value: model.definition.schemaId, onchange: _.onChangeSchemaId})
                 ),
                 _.field({label: 'Key'},
                     _.text({value: model.key, onchange: _.onChangeKey})
