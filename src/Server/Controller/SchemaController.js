@@ -34,10 +34,12 @@ class SchemaController extends HashBrown.Controller.ResourceController {
 
         let response = await HashBrown.Service.RequestService.request('get', url);
 
+        if(!response) { throw new Error('Response from web server was empty'); }
+        
         if(Array.isArray(response)) {
             // Sort schemas without parents first, to avoid dependency exceptions
             response.sort((a, b) => {
-                if(!a['@parent']) { return -1; }     
+                if(!a['@parent'] || a['@parent'] === 'WebPageElement') { return -1; }     
                 if(!b['@parent']) { return 1; }
 
                 return 0;

@@ -329,11 +329,17 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             async (url) => {
                 if(!url) { UI.notify('Missing URL', 'Please specify a URL'); }
 
-                await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
+                try {
+                    await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
 
-                HashBrown.Service.EventService.trigger('resource'); 
+                    HashBrown.Service.EventService.trigger('resource'); 
 
-                UI.notifySmall('Schemas imported successfully from ' + url, null, 3);
+                    UI.notifySmall('Schemas imported successfully from ' + url, null, 3);
+
+                } catch(e) {
+                    UI.error(e);
+
+                }
             }
         );
     }
