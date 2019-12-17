@@ -50,33 +50,39 @@ class ApiController extends HashBrown.Controller.ControllerBase {
         settings = settings || {};
 
         return async (req, res, next) => {
-            let token = req.cookies.token || req.query.token;
+            try {
+                let token = req.cookies.token || req.query.token;
 
-            // Make sure to clear double cookie values, if they occur
-            if(!req.cookies.token) {
-                res.clearCookie('token');
-            }
-
-            // Check CORS settings first
-            ApiController.checkCORS(settings, req, res);
-            
-            // Using project parameter
-            if(settings.setProject !== false) {
-                // Set the project variables
-                await ApiController.setProjectVariables(req);
-
-                // Using authentication
-                if(settings.authenticate !== false) {
-                    req.user = await ApiController.authenticate(token, req.project, settings.scope, settings.needsAdmin);
+                // Make sure to clear double cookie values, if they occur
+                if(!req.cookies.token) {
+                    res.clearCookie('token');
                 }
+
+                // Check CORS settings first
+                ApiController.checkCORS(settings, req, res);
+                
+                // Using project parameter
+                if(settings.setProject !== false) {
+                    // Set the project variables
+                    await ApiController.setProjectVariables(req);
+
+                    // Using authentication
+                    if(settings.authenticate !== false) {
+                        req.user = await this.authenticate(token, req.project, settings.scope, settings.needsAdmin);
+                    }
+                
+                // Disregarding project parameter, but using authentication
+                } else if(settings.authenticate !== false) {
+                    req.user = await this.authenticate(token, null, settings.scope, settings.needsAdmin);
+
+                }
+                
+                next();
             
-            // Disregarding project parameter, but using authentication
-            } else if(settings.authenticate != false) {
-                req.user = await ApiController.authenticate(token, null, settings.scope, settings.needsAdmin);
+            } catch(e) {
+                res.status(e.code || 404).send(this.printError(e, false));
 
             }
-            
-            next();
         }
     }
 

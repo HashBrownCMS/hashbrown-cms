@@ -51,21 +51,24 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         
         // Readme
         app.get('/readme', async (req, res) => {
+            let user = null;
+
             try {
-                let user = await this.authenticate(req.cookies.token);
-
-                if(!user) {
-                    let users = await HashBrown.Service.UserService.getAllUsers();
-
-                    if(!users || users.length < 1) { 
-                        res.redirect('/setup/1');
-                    } else {
-                        res.render('login');
-                    }
-
-                    return;
-                }
+                user = await this.authenticate(req.cookies.token);
             
+            } catch(e) {
+                let users = await HashBrown.Service.UserService.getAllUsers();
+
+                if(!users || users.length < 1) { 
+                    res.redirect('/setup/1');
+                } else {
+                    res.render('login');
+                }
+
+                return;
+            }
+            
+            try {
                 let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
                 let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
 
@@ -87,16 +90,21 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 }
 
                 res.render('setup', { step: req.params.step });
+
             } catch(e) {
                 res.status(400).render('error', { message: e.message });
+            
             }
         });
 
         // Dashboard
         app.get('/dashboard/:tab', async (req, res) => {
-            let user = await this.authenticate(req.cookies.token);
-
-            if(!user) {
+            let user = null;
+            
+            try {
+                user = await this.authenticate(req.cookies.token);
+            
+            } catch(e) {
                 let users = await HashBrown.Service.UserService.getAllUsers();
 
                 if(!users || users.length < 1) { 
@@ -107,25 +115,31 @@ class ViewController extends HashBrown.Controller.ControllerBase {
 
                 return;
             }
-            
-            user.clearSensitiveData();
-            
-            let themes = await HashBrown.Service.AppService.getThemes();
 
-            let uptime = {};
-            uptime['seconds'] = OS.uptime();
-            uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
-            uptime['hours'] = Math.floor(uptime['seconds'] / (60*60)) - uptime['days'] * 24;
-            uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
+            try {
+                user.clearSensitiveData();
+                
+                let themes = await HashBrown.Service.AppService.getThemes();
 
-            res.render('dashboard', {
-                tab: req.params.tab,
-                os: OS,
-                user: user,
-                app: require(APP_ROOT + '/package.json'),
-                uptime: uptime,
-                themes: themes
-            });
+                let uptime = {};
+                uptime['seconds'] = OS.uptime();
+                uptime['days'] = Math.floor(uptime['seconds'] / (60*60*24));
+                uptime['hours'] = Math.floor(uptime['seconds'] / (60*60)) - uptime['days'] * 24;
+                uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
+
+                res.render('dashboard', {
+                    tab: req.params.tab,
+                    os: OS,
+                    user: user,
+                    app: require(APP_ROOT + '/package.json'),
+                    uptime: uptime,
+                    themes: themes
+                });
+
+            } catch(e) {
+                res.status(e.code || 502).render('error', { message: e.message });
+
+            }
         });
 
         // Test
@@ -134,28 +148,27 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         });
 
         app.get('/test/:tab', async (req, res) => {
+            let user = null;
+            
             try {
-                let user = await this.authenticate(req.cookies.token, null, null, true);
-                
-                if(!user) {
-                    let users = await HashBrown.Service.UserService.getAllUsers();
-
-                    if(!users || users.length < 1) { 
-                        res.redirect('/setup/1');
-                    } else {
-                        res.render('login');
-                    }
-
-                    return;
-                }
-                
-                res.render('test', {
-                    user: user,
-                    tab: req.params.tab
-                });
+                user = await this.authenticate(req.cookies.token, null, null, true);
+            
             } catch(e) {
-                res.status(400).render('error', { message: e.message });
+                let users = await HashBrown.Service.UserService.getAllUsers();
+
+                if(!users || users.length < 1) { 
+                    res.redirect('/setup/1');
+                } else {
+                    res.render('login');
+                }
+
+                return;
             }
+                
+            res.render('test', {
+                user: user,
+                tab: req.params.tab
+            });
         });
 
         // Demo
@@ -165,21 +178,24 @@ class ViewController extends HashBrown.Controller.ControllerBase {
 
         // Environment
         app.get('/:project/:environment/', async (req, res) => {
+            let user = null;
+
             try {
-                let user = await this.authenticate(req.cookies.token, req.params.project);
+                user = await this.authenticate(req.cookies.token, req.params.project);
+            
+            } catch(e) {
+                let users = await HashBrown.Service.UserService.getAllUsers();
 
-                if(!user) {
-                    let users = await HashBrown.Service.UserService.getAllUsers();
-
-                    if(!users || users.length < 1) { 
-                        res.redirect('/setup/1');
-                    } else {
-                        res.render('login');
-                    }
-
-                    return;
+                if(!users || users.length < 1) { 
+                    res.redirect('/setup/1');
+                } else {
+                    res.render('login');
                 }
 
+                return;
+            }
+
+            try {
                 let project = await HashBrown.Service.ProjectService.getProject(req.params.project);
 
                 if(project.environments.indexOf(req.params.environment) < 0) {
@@ -196,12 +212,13 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                     currentProjectName: project.settings.info.name,
                     currentProjectSettings: project.settings,
                     currentEnvironment: req.params.environment,
-                    isMediaPicker: !!req.query.isMediaPicker,
                     user: user,
                     themes: themes
                 });
+
             } catch(e) {
-                res.status(400).render('error', { message: e.message });
+                res.status(e.code || 502).render('error', { message: e.message });
+            
             }
         });
     }

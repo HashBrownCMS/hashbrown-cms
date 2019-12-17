@@ -25,12 +25,16 @@ class ControllerBase {
      */
     static async authenticate(token, project, scope, needsAdmin) {
         // No token was provided
-        if(!token) { return null; }
+        if(!token) {
+            throw new Error('You need to be logged in to do that');
+        }
     
         let user = await HashBrown.Service.UserService.findToken(token);
         
         // No user was found
-        if(!user) { return null; }
+        if(!user) {
+            throw new Error('You need to be logged in to do that');
+        }
             
         // Admin is required, and user isn't admin
         if(needsAdmin && !user.isAdmin) {
