@@ -1,0 +1,57 @@
+/**
+ * A notification message
+ */
+.widget--message {
+    margin: 1rem auto;
+    font-weight: 700;
+    border-radius: 0.2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    max-width: calc(100% - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.centered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    &.expanded {
+        width: 100%;
+    }
+
+    &.large {
+        padding: 1rem 2rem;
+    }
+
+    &.fixed {
+        position: fixed;
+        z-index: 900;
+        
+        &--top {
+            left: 50%;
+            top: 2rem;
+            transform: translateX(-50%);
+        }
+        
+        &--bottom {
+            left: 50%;
+            bottom: 2rem;
+            transform: translateX(-50%);
+        }
+        
+        &--left {
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%);
+        }
+        
+        &--right {
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+        }
+    }
+}

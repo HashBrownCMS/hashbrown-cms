@@ -1,0 +1,54 @@
+.list-item--project {
+    padding: 1rem;
+    margin: 0.5rem;
+    position: relative;
+    flex-grow: 0;
+    flex-basis: calc(33.33% - 1rem);
+    width: calc(33.33% - 1rem);
+    color: var(--color-default-text);
+    background-color: var(--color-default);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    
+    &.loading {
+        @include spinner;
+    }
+    
+    @include tablet {
+        flex-basis: calc(50% - 1rem);
+        width: calc(50% - 1rem);
+    }
+
+    @include phone {
+        flex-basis: 0;
+        width: auto;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+        
+    &__info {
+        flex-grow: 1;
+
+        &__name {
+            margin: 0;
+        }
+    }   
+
+    &__environment {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .widget--popup[role="item-menu"] {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+}

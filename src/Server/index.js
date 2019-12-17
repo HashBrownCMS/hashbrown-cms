@@ -18,42 +18,42 @@ const AppModulePath = require('app-module-path');
 AppModulePath.addPath(APP_ROOT);
 AppModulePath.addPath(Path.join(APP_ROOT, 'src'));
 
+// Dependencies
+require('Common');
+require('Server/Service');
+require('Server/Entity');
+require('Server/Controller');
+
 // Express app
 const app = Express();
 
-app.set('view engine', 'pug');
-app.set('views', APP_ROOT + '/src/Server/Views');
+app.engine('js', HashBrown.Entity.View.ViewBase.engine);
+app.set('view engine', 'js');
+app.set('views', Path.join(APP_ROOT, 'template', 'page'));
 
-// App middlewares
 app.use(CookieParser());
 app.use(BodyParser.json({limit: '50mb'}));
-app.use(Express.static(APP_ROOT + '/public'));
-app.use('/storage/plugins', Express.static(APP_ROOT + '/storage/plugins'));
+app.use(Express.static(Path.join(APP_ROOT, 'public')));
+app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'storage', 'plugins')));
 
-// Dependencies
-require('Common');
-require('Server/Helpers');
-require('Server/Models');
-require('Server/Controllers');
+// Service shortcuts
+global.debug = HashBrown.Service.DebugService;
 
-// Register native processors
-HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.JsonProcessor);
-HashBrown.Helpers.ConnectionHelper.registerProcessor(HashBrown.Models.UISchemaProcessor);
+// HTTP error type
+global.HttpError = class HttpError extends Error {
+    constructor(code, message) {
+        super(message);
 
-// Register native deployers
-HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.ApiDeployer);
-HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.FileSystemDeployer);
-HashBrown.Helpers.ConnectionHelper.registerDeployer(HashBrown.Models.GitDeployer);
-
-// Helper shortcuts
-global.debug = HashBrown.Helpers.DebugHelper;
+        this.code = code;
+    }
+}
 
 async function main() {
     // Check CLI input
-    await HashBrown.Helpers.AppHelper.processInput();
+    await HashBrown.Service.AppService.processInput();
    
     // Init plugins
-    await HashBrown.Helpers.PluginHelper.init(app);
+    await HashBrown.Service.PluginService.init(app);
 
     // Start HTTP server
     let port = process.env.PORT || 8080;
@@ -62,25 +62,25 @@ async function main() {
     debug.log('HTTP server restarted on port ' + port, 'HashBrown');
     
     // Init controllers
-    for(let name in HashBrown.Controllers) {
+    for(let name in HashBrown.Controller) {
         if(
             name === 'ResourceController' ||
             name === 'ApiController' ||
-            name === 'Controller'
+            name === 'ControllerBase'
         ) { continue; }
 
-        HashBrown.Controllers[name].init(app);
+        HashBrown.Controller[name].init(app);
     }
 
     // Start watching schedule
-    HashBrown.Helpers.ScheduleHelper.startWatching();
+    HashBrown.Service.ScheduleService.startWatching();
     
     // Start watching media cache
-    HashBrown.Helpers.MediaHelper.startWatchingCache();
+    HashBrown.Service.MediaService.startWatchingCache();
     
     // Start watching for file changes
     if(process.env.WATCH) {
-        HashBrown.Helpers.DebugHelper.startWatching();
+        HashBrown.Service.DebugService.startWatching();
     }
 }
 

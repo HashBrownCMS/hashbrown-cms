@@ -1,0 +1,11 @@
+.widget--file {
+    &__input {
+        display: none;
+    }
+
+    &__placeholder {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}

@@ -1,0 +1,85 @@
+.widget--list {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    &__add {
+        margin-left: auto;
+    }
+
+    &__handle {
+        border-top-left-radius: var(--border-radius-small);
+        border-bottom-left-radius: var(--border-radius-small);
+        background-color: var(--color-default-200);
+        width: var(--size-widget-small);
+        line-height: var(--size-widget-small);
+        display: block;
+        text-align: center;
+        cursor: grab;
+        flex-shrink: 0;
+    }
+
+    &__item {
+        margin-bottom: var(--padding-small);
+        
+        &__edit, &__label {
+            background-color: var(--color-default-200);
+            color: var(--color-default-text);
+            font-weight: normal;
+            text-align: left;
+            line-height: var(--size-widget-small);
+            padding: 0 var(--padding-small);
+            border: 0;
+            margin: 0;
+            display: block;
+            flex-grow: 1;
+
+            &:last-child {
+                border-top-right-radius: var(--border-radius-small);
+                border-bottom-right-radius: var(--border-radius-small);
+            }
+        }
+
+        &__label {
+            cursor: grab;
+        }
+        
+        &__edit {
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--color-action-500);
+                color: var(--color-action-text);
+            }
+        }
+
+        &[data-drag-over] {
+            position: relative;     
+
+            &::before {
+                font-family: 'FontAwesome';
+                content: '\f0da';
+                position: absolute;
+                right: 100%;
+                line-height: var(--padding-small);
+                width: var(--size-widget-small);
+                display: block;
+                text-align: center;
+                color: var(--color-action-500);
+                transform: translateY(-50%);
+            }
+        }
+
+        &[data-drag-over="above"] {
+            &::before {
+                bottom: 100%;
+            }
+        }
+
+        &[data-drag-over="below"] {
+            &::before {
+                top: 100%;
+            }
+        }
+    }
+}

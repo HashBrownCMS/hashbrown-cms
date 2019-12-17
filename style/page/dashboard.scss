@@ -1,0 +1,196 @@
+.page--dashboard {
+    // Header
+    &__header {
+        background-color: var(--color-decor-500);
+        color: var(--color-decor-text);
+        padding: 1rem 0 0 5rem;
+        height: 4rem;
+        display: flex;
+
+        // Logo
+        &__logo {
+            position: absolute;
+            left: 1rem;
+            top: 0.5rem;
+            text-align: center;
+
+            svg {
+                fill: var(--color-decor-700);
+                width: var(--size-widget-medium);
+                height: var(--size-widget-medium);
+            }
+
+            &:hover {
+                svg {
+                    fill: var(--color-action-500);
+                }
+            }
+        }
+
+        // Actions
+        &__actions {
+            display: flex;
+            padding: 0.5rem 0;
+            margin-left: auto;
+
+            .widget {
+                margin-right: 0.5rem;
+            }
+        }
+            
+        // Tab
+        &__tab {
+            text-decoration: none;
+            padding: 0 2rem;
+            border-top-left-radius: 0.2rem;
+            border-top-right-radius: 0.2rem;
+            display: inline-block;
+            height: 3rem;
+            line-height: 3rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 0;
+            background-color: transparent;
+            color: var(--color-decor-text);
+            background-color: var(--color-decor-600);
+            margin-right: 0.5rem;
+
+            &:hover {
+                color: var(--color-action-text);
+                background-color: var(--color-action-500);
+                text-decoration: none;
+            }
+
+            &.active {
+                pointer-events: none;
+                color: var(--color-default-text);
+                background-color: var(--color-default-100);
+            }
+        }
+    }
+
+    // Body
+    &__body {
+        width: 100%;
+        padding-top: 4rem;
+        height: calc(100% - 4rem);
+        overflow-y: auto;
+        margin: 0;
+
+        &__container {
+            width: calc(100% - 2rem);
+            max-width: 60rem;
+            margin: 0 auto;
+        }
+    }
+
+    // Users
+    &__users {
+        &__list {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.5rem;
+
+            @include phone {
+                flex-direction: column;
+            }
+        }
+
+        &__add {
+            margin-top: 1rem;
+        }
+    }
+
+    &__user {
+        &__name {
+            margin: 0;
+        }
+    }
+
+    // Projects
+    &__projects {
+        padding-bottom: 4rem;
+        
+        &__list {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.5rem;
+            position: relative;
+            min-height: 10rem;
+
+            @include phone {
+                flex-direction: column;
+            }
+
+            // The element that is placed while waiting for the view to be fetched
+            .placeholder {
+                padding: 1rem;
+                margin: 0.5rem;
+                position: relative;
+                flex-grow: 0;
+                flex-basis: calc(33.33% - 1rem);
+                width: calc(33.33% - 1rem);
+                color: var(--color-default-text);
+                background-color: var(--color-default);
+                transform-origin: center;
+                transition: transform 0.25s ease;
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                min-height: 12rem;
+                
+                @include spinner;
+            }
+        }
+
+        &__add {
+            margin-top: 1rem;
+        }
+    }
+
+    // Server
+    &__server {
+        &__info {
+            max-width: 40rem;
+            margin: 0 auto;
+            padding: 1rem;
+            background-color: var(--color-default);
+            box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+        }
+    }
+
+    // Frontend test
+    &__frontend-test {
+        &__check {
+            position: relative;
+            line-height: 2rem;
+            padding-bottom: 0.5rem;
+
+            &:not(:last-child) {
+                margin-bottom: 0.5rem;
+                border-bottom: 1px solid var(--color-default-200);
+
+            }
+
+            ul {
+                border-top: 1px solid var(--color-default-200);
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            &__checkbox {
+                position: absolute !important;
+                top: 0;
+                right: 0;
+            }
+        }
+    }
+
+    // "Add" button
+    &__projects,
+    &__users {
+        &__add {
+            position: fixed !important;
+            bottom: 2rem;
+            right: 3rem;
+        }
+    }
+}

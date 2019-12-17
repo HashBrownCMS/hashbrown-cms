@@ -11,7 +11,7 @@ const CONTENT = {
         updateDate: Date.now(),
         createdBy: 'demoUser',
         updateddBy: 'demoUser',
-        schemaId: 'demoPage',
+        schemaId: 'webPage',
         sort: 10000,
         properties: {
             url: '/my-example-page/',
@@ -22,33 +22,54 @@ const CONTENT = {
 
 const SCHEMAS = {
     // Field
-    'array': require('../Common/Schemas/Field/array.json'),
-    'boolean': require('../Common/Schemas/Field/boolean.json'),
-    'contentReference': require('../Common/Schemas/Field/contentReference.json'),
-    'contentSchemaReference': require('../Common/Schemas/Field/contentSchemaReference.json'),
-    'date': require('../Common/Schemas/Field/date.json'),
-    'dropdown': require('../Common/Schemas/Field/dropdown.json'),
-    'fieldBase': require('../Common/Schemas/Field/fieldBase.json'),
-    'language': require('../Common/Schemas/Field/language.json'),
-    'mediaReference': require('../Common/Schemas/Field/mediaReference.json'),
-    'number': require('../Common/Schemas/Field/number.json'),
-    'resourceReference': require('../Common/Schemas/Field/resourceReference.json'),
-    'richText': require('../Common/Schemas/Field/richText.json'),
-    'string': require('../Common/Schemas/Field/string.json'),
-    'struct': require('../Common/Schemas/Field/struct.json'),
-    'tags': require('../Common/Schemas/Field/tags.json'),
-    'url': require('../Common/Schemas/Field/url.json'),
-    
+    'array': require('schema/field/array.json'),
+    'boolean': require('schema/field/boolean.json'),
+    'contentReference': require('schema/field/contentReference.json'),
+    'contentSchemaReference': require('schema/field/contentSchemaReference.json'),
+    'date': require('schema/field/date.json'),
+    'dropdown': require('schema/field/dropdown.json'),
+    'fieldBase': require('schema/field/fieldBase.json'),
+    'language': require('schema/field/language.json'),
+    'mediaReference': require('schema/field/mediaReference.json'),
+    'number': require('schema/field/number.json'),
+    'resourceReference': require('schema/field/resourceReference.json'),
+    'richText': require('schema/field/richText.json'),
+    'string': require('schema/field/string.json'),
+    'struct': require('schema/field/struct.json'),
+    'tags': require('schema/field/tags.json'),
+    'url': require('schema/field/url.json'),
+    'module': {
+        id: 'module',
+        name: 'Module',
+        type: 'field',
+        parentSchemaId: 'struct',
+        config: {
+            struct: {
+                string: {
+                    schemaId: 'string',
+                    label: 'String',
+                    description: 'A simple text string'
+                },
+                boolean: {
+                    schemaId: 'boolean',
+                    label: 'Boolean',
+                    description: 'A true/false value'
+                }
+            }
+        }
+    },
+
     // Content
-    'contentBase': require('../Common/Schemas/Content/contentBase.json'),
-    'page': require('../Common/Schemas/Content/page.json'),
-    'demoPage': {
-        id: 'demoPage',
+    'contentBase': require('schema/content/contentBase.json'),
+    'page': require('schema/content/page.json'),
+    'webPage': {
+        id: 'webPage',
         icon: 'file',
         type: 'content',
         defaultTabId: 'content',
-        allowedChildSchemas: [ 'demoPage' ],
-        name: 'Demo Page',
+        allowedChildSchemas: [ 'webPage' ],
+        allowedAtRoot: true,
+        name: 'Web Page',
         parentSchemaId: 'page',
         fields: {
             properties: {
@@ -59,8 +80,8 @@ const SCHEMAS = {
                     description: 'A list of values',
                     config: {
                         minItems: 0,
-                        maxItems: 2,
-                        allowedSchemas: [ 'string', 'richText' ]
+                        maxItems: 4,
+                        allowedSchemas: [ 'module', 'string', 'richText' ]
                     }
                 },
                 boolean: {
@@ -75,7 +96,7 @@ const SCHEMAS = {
                     label: 'Content Reference',
                     description: 'A reference to another Content node',
                     config: {
-                        allowedSchemas: [ 'demoPage' ]
+                        allowedSchemas: [ 'webPage' ]
                     }
                 },
                 contentSchemaReference: {
@@ -84,7 +105,7 @@ const SCHEMAS = {
                     label: 'Content Schema Reference',
                     description: 'A reference to a Content Schema',
                     config: {
-                        allowedSchemas: [ 'demoPage' ]
+                        allowedSchemas: [ 'webPage' ]
                     }
                 },
                 date: {
@@ -153,23 +174,9 @@ const SCHEMAS = {
                 },
                 struct: {
                     tabId: 'content',
-                    schemaId: 'struct',
+                    schemaId: 'module',
                     label: 'Struct',
-                    description: 'A combination of fields',
-                    config: {
-                        struct: {
-                            string: {
-                                schemaId: 'string',
-                                label: 'String',
-                                description: 'A simple text string'
-                            },
-                            boolean: {
-                                schemaId: 'boolean',
-                                label: 'Boolean',
-                                description: 'A true/false value'
-                            }
-                        }
-                    }
+                    description: 'A combination of fields'
                 },
                 tags: {
                     tabId: 'content',
@@ -182,13 +189,18 @@ const SCHEMAS = {
     }
 };
 
-HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, headers) => {
-    const query = url.split('?')[1];
-    const path = url.split('?')[0].split('/');
-    const category = path[4];
-    const id = path[5];
+HashBrown.Service.RequestService.upload = async () => {
+    throw new Error('Uploads not available in demo mode');
+};
 
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
+HashBrown.Service.RequestService.customRequest = async (method, url, data, headers) => {
+    if(url === '/api/server/update/check') { return; }
+    if(url.indexOf('heartbeat') > -1) { return; }
+
+    let query = url.split('?')[1];
+    let path = url.split('?')[0].split('/');
+    let category = path[4];
+    let id = path[5];
 
     switch(category) {
         case 'connections':
@@ -197,7 +209,7 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
 
             } else {
                 if(id === 'new') {
-                    let connection = HashBrown.Models.Connection.create();
+                    let connection = HashBrown.Entity.Resource.Connection.create();
                     
                     CONNECTIONS[connection.id] = connection.getObject();
 
@@ -231,16 +243,58 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
 
             } else {
                 if(id === 'new') {
-                    let schemaId = getQueryParam('schemaId', query);
-                    let content = HashBrown.Models.Content.create(schemaId);
+                    let schemaId = HashBrown.Service.NavigationService.getQuery('schemaId', query);
+                    let content = HashBrown.Entity.Resource.Content.create(schemaId);
 
-                    content.parentId = getQueryParam('parentId', query);
+                    content.parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
 
                     CONTENT[content.id] = content.getObject();
 
                     return content;
                 }
                 
+                if(id === 'insert') {
+                    let contentId = HashBrown.Service.NavigationService.getQuery('contentId', query);
+                    let parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
+                    let position = parseInt(HashBrown.Service.NavigationService.getQuery('position', query));
+                
+                    let siblings = Object.values(CONTENT).filter((x) => { return x.parentId === parentId; });
+                    let content = CONTENT[contentId];
+
+                    if(parentId) {
+                        if(parentId === contentId) { throw new Error('Content cannot be a parent of itself'); }
+                    }
+
+                    // Assign the new position
+                    let result = [];
+
+                    if(position < 0) { position = 0; }
+
+                    for(let i = 0; i < siblings.length; i++) {
+                        if(siblings[i].id === contentId) { continue; }
+
+                        if(i === position) {
+                            result.push(content);
+                        }
+
+                        result.push(siblings[i]);
+                    }
+
+                    if(result.indexOf(content) < 0) {
+                        result.push(content);
+                    }
+
+                    // Update all nodes with their new sort index
+                    for(let i = 0; i < result.length; i++) {
+                        let node = result[i];
+
+                        node.sort = i;
+                        node.parentId = parentId;
+                    }
+                
+                    return;
+                }
+               
                 if(method === 'post') {
                     CONTENT[id] = data;
                     return data;
@@ -261,7 +315,7 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
 
             } else {
                 if(id === 'new') {
-                    let form = HashBrown.Models.Form.create();
+                    let form = HashBrown.Entity.Resource.Form.create();
                     
                     FORMS[form.id] = form.getObject();
 
@@ -289,7 +343,7 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
 
             } else {
                 if(id === 'new') {
-                    let media = HashBrown.Models.Media.create();
+                    let media = HashBrown.Entity.Resource.Media.create();
                     
                     MEDIA[media.id] = media.getObject();
 
@@ -313,25 +367,15 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
         
         case 'schemas':
             if(!id) {
-                let schemas = [];
-
-                for(let id in SCHEMAS) {
-                    let schema = SCHEMAS[id];
-                  
-                    schema.id = id;
-                    schema.isLocked = id !== 'demoPage';
-                    schema.type = id === 'contentBase' || id === 'page' || id === 'demoPage' ? 'content' : 'field';
-               
-                    schemas.push(schema);
-                }
-
-                return schemas;
+                return Object.values(SCHEMAS);
     
             } else {
                 if(id === 'new') {
-                    let parentSchemaId = getQueryParam('parentSchemaId', query);
-                    let parentSchema = await HashBrown.Helpers.SchemaHelper.getSchemaById(parentSchemaId);
-                    let schema = HashBrown.Models.Schema.create(parentSchema);
+                    let parentSchemaId = HashBrown.Service.NavigationService.getQuery('parentSchemaId', query);
+                    let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentSchemaId);
+                    let schema = HashBrown.Entity.Resource.Schema.SchemaBase.create(parentSchema);
+
+                    schema.type = parentSchema.type;
 
                     SCHEMAS[schema.id] = schema;
 
@@ -344,14 +388,10 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
                 }
 
                 if(SCHEMAS[id]) {
-                    let schema = SCHEMAS[id];
-
-                    schema.type = id === 'contentBase' || id === 'page' || id === 'demoPage' ? 'content' : 'field';
-                    
                     return SCHEMAS[id];
 
                 } else {
-                    throw new Error('Custom schemas should not be requested in demo mode. Id requested was "' + id + '"');
+                    throw new Error('Schema "' + id + '" could not be found');
                 
                 }
             }
@@ -365,11 +405,22 @@ HashBrown.Helpers.RequestHelper.customRequest = async (method, url, data, header
 
             }
 
-            throw new Error('Custom users not allowed in demo');
+            throw new Error('Custom users not available in demo');
 
         case 'settings':
             return HashBrown.Context.projectSettings;
     }
 
-    throw new Error('Unknown resource category "' + category + '"');
+    throw new Error('Unknown resource category "' + category + '". URL was ' + url);
 };
+
+for(let id in SCHEMAS) {
+    let schema = SCHEMAS[id];
+
+    schema.id = id;
+    schema.isLocked = schema.parentSchemaId === 'fieldBase' || schema.parentSchemaId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
+    
+    if(!schema.type) {
+        schema.type = schema.parentSchemaId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
+    }
+}

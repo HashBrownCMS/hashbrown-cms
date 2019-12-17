@@ -1,0 +1,39 @@
+/**
+ * Environment page style
+ */
+.page--environment {
+    &__spaces {
+        display: flex;
+        height: 100%;
+        transition: opacity 0.5s ease;
+        opacity: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    &__space {
+        position: relative;
+
+        &--nav {
+            flex-shrink: 0;
+            height: 100%;
+            
+            @include tablet {
+                body.welcome & {
+                    flex-grow: 1;
+                }
+            }
+        }
+
+        &--editor {
+            flex-grow: 1;
+            height: 100%;
+
+            @include tablet {
+                body.welcome & {
+                    display: none;
+                }
+            }
+        }
+    }
+}

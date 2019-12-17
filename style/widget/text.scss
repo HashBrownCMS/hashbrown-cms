@@ -1,0 +1,35 @@
+.widget--text {
+    min-width: 0%;
+    width: 100%;
+    resize: none;
+    border: 1px solid var(--color-default-200);
+    padding: 0 0.5rem;
+    border-radius: var(--border-radius-small);
+    display: block;
+    background-color: var(--color-default);
+    color: var(--color-default-text);
+    height: var(--size-widget-small);
+    line-height: var(--size-widget-small);
+
+    &.code {
+        font-family: monospace;
+        line-height: 1.5;
+    }
+
+    &.large {
+        height: var(--size-widget-medium);
+        line-height: var(--size-widget-medium);
+    }
+
+    &:focus, &:hover {
+        border-color: var(--color-action-500);
+    }
+
+    &[disabled] {
+        opacity: 0.5;
+    }
+}
+
+textarea.widget--text {
+    height: calc(6 * var(--size-widget-small)); 
+}

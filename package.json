@@ -1,7 +1,7 @@
 {
   "name": "hashbrown-cms",
   "repository": "https://github.com/HashBrownCMS/hashbrown-cms.git",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "A free and open-source headless CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -9,14 +9,16 @@
     "watch:frontend": "webpack --watch --watch-poll --progress",
     "start": "npm run build:frontend && node hashbrown.js",
     "watch:nodemon": "nodemon hashbrown.js",
-    "start:docker": "npm run build:frontend && cd ./docker && docker-compose up --build -d",
-    "stop:docker": "cd ./docker && docker-compose down",
-    "watch:docker": "cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && docker-compose logs -f node",
+    "start:docker": "npm run build:frontend && cd ./docker && sudo docker-compose up --build -d",
+    "stop:docker": "cd ./docker && sudo docker-compose down",
+    "restart:docker": "cd ./docker && sudo docker-compose restart",
+    "watch:docker": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && sudo docker-compose logs -f node",
     "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend"
   },
   "author": "Putaitu",
   "license": "MIT",
   "dependencies": {
+    "acorn": "^7.0.0",
     "app-module-path": "^2.2.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
@@ -26,7 +28,6 @@
     "json-loader": "^0.5.4",
     "mongodb": "^3.1.10",
     "multer": "^1.4.1",
-    "pug": "^2.0.3",
     "sass": "^1.16.0",
     "semver": "^5.6.0",
     "webpack": "^4.28.1",

@@ -19,6 +19,7 @@ package-lock.json
 
 # Generated files
 /public/css/*
+!/public/css/theme.css
 /public/js/*
 !/public/js/login.js
 !/public/js/setup.js

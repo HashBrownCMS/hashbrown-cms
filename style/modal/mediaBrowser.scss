@@ -1,0 +1,102 @@
+.modal--media-browser {
+    &__dialog {
+        max-width: 100rem;
+    }
+
+    &__body {
+        display: flex;
+        padding: 0;
+        
+        @include tablet {
+            display: block;
+        }
+    }
+
+    &__folders {
+        padding: 1rem;
+        border-right: 1px solid var(--color-default-300);
+        flex-basis: 20rem;
+        flex-shrink: 0;
+
+        @include tablet {
+            flex-basis: 0;
+        }
+    }
+
+    &__items {
+        flex-grow: 1;
+        padding: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        min-height: 20rem;
+
+        &::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+    }
+
+    &__search {
+        flex-grow: 0;
+        width: auto;
+    }
+
+    &__item {
+        flex-grow: 1;
+        border: 0;
+        padding: 0.5rem;
+        cursor: pointer;
+        background-color: transparent;
+        margin: 0;
+        min-width: 20rem;
+        max-width: calc(100% / 3);
+        height: 20rem;
+        position: relative;
+        border: 1px solid transparent;
+
+        &:hover {
+            border-color: var(--color-action-500);
+        }
+        
+        @include tablet {
+            max-width: calc(100% / 2);
+        }
+        
+        @include phone {
+            max-width: 100%;
+        }
+
+        &__media {
+            position: absolute;
+            max-height: calc(100% - 1rem);
+            max-width: calc(100% - 1rem);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        &__name {
+            display: block;
+            padding: 0 0.5rem;
+            line-height: var(--size-widget-small);
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            width: calc(100% - 2rem);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            background-color: var(--color-default-100);
+            color: var(--color-default-text);
+            border-radius: var(--border-radius-small);
+        }
+        
+        &:hover &__name {
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "icon": "file",
+    "name": "Page",
+    "parentSchemaId": "contentBase",
+    "allowedAtRoot": false,
+    "fields": {
+        "properties": {
+            "description": {
+                "label": "Description",
+                "schemaId": "string",
+                "tabId": "content"
+            },
+            "url": {
+                "label": "URL",
+                "schemaId": "url",
+                "tabId": "content"
+            }
+        }
+    }
+}

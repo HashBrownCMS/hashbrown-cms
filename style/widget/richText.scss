@@ -1,0 +1,41 @@
+.widget--rich-text {
+    background-color: var(--color-default-200);
+    width: 100%;
+
+    &__toolbar {
+        margin-bottom: var(--padding-small);
+        display: flex;
+
+        .widget--popup {
+            max-width: 14rem;
+            
+            &__option {
+                &::after {
+                    font-size: 1rem;
+                    line-height: inherit !important;
+                }
+            }
+        }
+    }
+
+    &__editor {
+        height: var(--height-rich-text-editor);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        overflow: auto;
+        padding: var(--padding-medium);
+        border-radius: var(--border-radius-small);
+
+        &:focus {
+            outline: none;
+        }
+
+        a {
+            cursor: text;
+        }
+
+        *[src] {
+            max-width: 100%;
+        }
+    }
+}

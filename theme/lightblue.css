@@ -1,0 +1,61 @@
+:root {
+    /* Font sizes */
+    --font-size-desktop: 14px;
+    --font-size-laptop: 13px;
+    --font-size-tablet: 12px;
+    --font-size-phone: 12px;
+
+    /* Colour */
+    --color-action-300: #64b5f6;
+    --color-action-500: #2196f3;
+    --color-action-600: #1e88e5;
+    --color-action-text: #ffffff;
+
+    --color-decor-200: #eceff1; 
+    --color-decor-300: #cfd8dc;
+    --color-decor-400: #b0bec5;
+    --color-decor-500: #90a4ae;
+    --color-decor-600: #78909c;
+    --color-decor-700: #607d8b;
+    --color-decor-800: #546e7a;
+    --color-decor-text: #ffffff;
+
+    --color-warn-500: #f44336;
+    --color-warn-300: #e57373;
+    --color-warn-text: #ffffff;
+
+    --color-default: #ffffff;
+    --color-default-100: #f5f5f5;
+    --color-default-200: #eeeeee;
+    --color-default-300: #e0e0e0;
+    --color-default-400: #bdbdbd;
+    --color-default-text: #424242;
+
+    /* Border radius */
+    --border-radius-small: 0.4rem;
+    --border-radius-medium: 1rem;
+    --border-radius-large: 2rem;
+
+    /* Widget size */
+    --size-widget-small: 2rem;
+    --size-widget-medium: 3rem;
+    --size-widget-large: 4rem;
+    
+    /* Padding */
+    --padding-small: 0.5rem;
+    --padding-medium: 1rem;
+    --padding-large: 2rem;
+    
+    /* Box shadow */
+    --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+
+    /* Panels */
+    --width-panels: 30rem;
+    
+    /* Fields */
+    --width-field-key: 10rem;
+    --max-width-field-value: 30rem;
+
+    /* Rich text editor */
+    --height-rich-text-editor: 30rem;
+}

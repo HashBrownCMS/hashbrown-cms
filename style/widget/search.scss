@@ -1,0 +1,66 @@
+.widget--search {
+    position: relative;
+    width: 100%;
+
+    &__clear, &__icon, &__submit {
+        border: 0;
+        padding: 0;
+        line-height: var(--size-widget-small);
+        height: var(--size-widget-small);
+        display: block;
+        text-align: center;
+        background-color: transparent;
+    }
+
+    &__icon {
+        pointer-events: none;
+        z-index: 20;
+        position: absolute;
+        width: var(--size-widget-small);
+        color: var(--color-default-200);
+    }
+
+    &__input {
+        width: 10rem;
+        flex-grow: 1;
+        padding-left: var(--size-widget-small);
+        background-color: transparent;
+        display: block;
+        border-top-left-radius: var(--border-radius-small);
+        border-bottom-left-radius: var(--border-radius-small);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+        border: 1px solid var(--color-default-200);
+        border-right: 0;
+
+        &:focus, &:hover,
+        &:focus + button, &:hover + button {
+            border-color: var(--color-action-500);
+        }
+    }
+
+    &__clear {
+        border: 1px solid var(--color-default-200);
+        border-left: 0;
+        width: var(--size-widget-small);
+        color: var(--color-default-text);
+        cursor: pointer;
+        display: block;
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+    }
+
+    &__submit {
+        cursor: pointer;
+        width: var(--size-widget-small);
+        border-top-right-radius: var(--border-radius-small);
+        border-bottom-right-radius: var(--border-radius-small);
+        color: var(--color-default-text);
+        background-color: var(--color-default-200);
+
+        &:hover {
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
+        }
+    }
+}

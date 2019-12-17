@@ -1,0 +1,11 @@
+.page--setup {
+    &__step {
+        max-width: 20rem;
+        width: calc(100% - 2rem);
+        text-align: center;
+
+        .widget {
+            margin-bottom: 1rem;
+        }
+    }
+}

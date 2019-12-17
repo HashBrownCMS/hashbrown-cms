@@ -1,0 +1,85 @@
+@mixin widget--number__input__thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 50%;
+    display: block;
+    width: calc(var(--size-widget-small) / 2);
+    height: calc(var(--size-widget-small) / 2);
+    border: 0;
+    background-color: var(--color-default-text);
+}
+
+@mixin widget--number__input__track {
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-default-200);
+}
+
+.widget--number {
+    width: 100%;
+    display: flex;  
+
+    &__input {
+        display: block;
+        cursor: auto;
+        width: 100%;
+        resize: none;
+        border: 1px solid var(--color-default-200);
+        padding: 0 0.5rem;
+        border-radius: var(--border-radius-small);
+        height: var(--size-widget-small);
+        line-height: var(--size-widget-small);
+        background-color: var(--color-default);
+        color: var(--color-default-text);
+
+        &:focus, &:hover {
+            border-color: var(--color-action-500);
+            outline: none;
+        }
+
+        &[type="range"] {
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+
+            &:focus {
+                outline: none;
+            }
+
+            &:focus::-moz-range-thumb { background-color: var(--color-action-500); }
+            &:hover::-moz-range-thumb { background-color: var(--color-action-500); }
+            &:focus::-webkit-slider-thumb { background-color: var(--color-action-500); }
+            &:hover::-webkit-slider-thumb { background-color: var(--color-action-500); }
+
+            &::-moz-range-thumb { @include widget--number__input__thumb; }
+            &::-webkit-slider-thumb {
+                @include widget--number__input__thumb;
+                
+                margin-top: calc(var(--size-widget-small) / -4 + 1px);
+            }
+
+            &::-moz-range-track { @include widget--number__input__track; }
+            &::-webkit-slider-runnable-track { @include widget--number__input__track; }
+        }
+    }
+
+    &__indicator {
+        height: var(--size-widget-small);
+        flex-basis: 4rem;
+        width: 4rem;
+        min-width: 4rem;
+        line-height: var(--size-widget-small);
+        padding: 0 0.5rem;
+        text-align: center;
+        background-color: var(--color-default-200);
+        color: var(--color-default-text);
+        margin-left: 0.5rem;
+        border-radius: var(--border-radius-small);
+        white-space: nowrap;
+    }
+}

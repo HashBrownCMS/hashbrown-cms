@@ -1,0 +1,61 @@
+:root {
+    /* Font sizes */
+    --font-size-desktop: 14px;
+    --font-size-laptop: 13px;
+    --font-size-tablet: 12px;
+    --font-size-phone: 12px;
+
+    /* Colour */
+    --color-action-300: #b70a2f;
+    --color-action-500: #e70d3b;
+    --color-action-600: #f66483;
+    --color-action-text: #ffffff;
+
+    --color-decor-200: black; 
+    --color-decor-300: #0f151a;
+    --color-decor-400: #131d23;
+    --color-decor-500: #21303b;
+    --color-decor-600: #283b48;
+    --color-decor-700: #2c404f;
+    --color-decor-800: #375062;
+    --color-decor-text: #ffffff;
+
+    --color-warn-500: #FFB300;
+    --color-warn-300: #FFB300;
+    --color-warn-text: #664800;
+
+    --color-default: #ffffff;
+    --color-default-100: #eeeeee;
+    --color-default-200: #dddddd;
+    --color-default-300: #888888;
+    --color-default-400: #666666;
+    --color-default-text: #333333;
+
+    /* Border radius */
+    --border-radius-small: 0.4rem;
+    --border-radius-medium: 1rem;
+    --border-radius-large: 2rem;
+
+    /* Widget size */
+    --size-widget-small: 2rem;
+    --size-widget-medium: 3rem;
+    --size-widget-large: 4rem;
+
+    /* Padding */
+    --padding-small: 0.5rem;
+    --padding-medium: 1rem;
+    --padding-large: 2rem;
+
+    /* Box shadow */
+    --box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+
+    /* Panels */
+    --width-panels: 30rem;
+
+    /* Fields */
+    --width-field-key: 10rem;
+    --max-width-field-value: 30rem;
+
+    /* Rich text editor */
+    --height-rich-text-editor: 30rem;
+}

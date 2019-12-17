@@ -8,7 +8,7 @@ services:
         image: node
         container_name: "hashbrown-cms--node"
         ports:
-            - "8080:8080"
+            - "${NODE_PORT}:${NODE_PORT}"
         depends_on:
             - mongodb
         networks:
@@ -17,6 +17,7 @@ services:
         command: "node /opt/hashbrown-cms/hashbrown.js"
         environment:
             - MONGODB_HOST=mongodb
+            - PORT=${NODE_PORT}
         volumes:
             - "../:/opt/hashbrown-cms"
             - "./remote:/remote"

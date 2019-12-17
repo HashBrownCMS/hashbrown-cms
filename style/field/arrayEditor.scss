@@ -1,0 +1,38 @@
+.field--array-editor {
+    &__items {
+        width: 100%;
+    }
+
+    &__item {
+        position: relative;
+        display: flex;
+
+        > .field {
+            flex-grow: 1;
+        }
+
+        > .widget, >.widget-group {
+            max-width: var(--max-width-field-value);
+        }
+        
+        &__tools {
+            display: flex;
+            border-bottom: 1px solid var(--color-default-200);
+            margin-bottom: var(--padding-medium);
+        }
+        
+        &__tool {
+            margin-left: var(--padding-small);
+
+            > .widget--popup__icon {
+                @extend .widget--button, .small, .default;
+            }
+        }
+    }
+
+    &__add {
+        > .widget--popup__label {
+            @extend .widget--button, .default, .expanded;
+        }
+    }
+}

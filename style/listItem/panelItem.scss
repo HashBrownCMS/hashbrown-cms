@@ -1,0 +1,122 @@
+.list-item--panel-item {
+    &.loading > &__inner {
+        @include spinner; 
+    }
+
+    &__inner {
+        display: flex;
+        border-bottom: 1px solid var(--color-decor-800);
+        min-height: var(--size-widget-large);
+    }
+    
+    &[data-drag-over] > &__inner {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            display: block;
+            z-index: 20;
+            pointer-events: none;
+        }
+    }
+
+    &[data-drag-over="self"] > &__inner::after {
+        top: 0;
+        height: calc(100% - 2px);
+        width: calc(100% - 4px);
+        border: 2px solid var(--color-decor-text);
+    }
+    
+    &[data-drag-over="above"] > &__inner::after {
+        top: -1px;
+        height: 2px;
+        width: 100%;
+        background-color: var(--color-decor-text);
+    }
+    
+    &[data-drag-over="below"] &__inner::after {
+        bottom: -2px;
+        height: 2px;
+        width: 100%;
+        background-color: var(--color-decor-text);
+    }
+
+    &__icon {
+        display: inline-block;
+        margin-right: 0.75rem;
+        width: 1rem;
+        text-align: center;
+    }
+
+    &__name {
+        padding: 0 1rem 0 1rem;
+        line-height: var(--size-widget-large); 
+        flex-grow: 1;
+        color: inherit;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover, &:focus {
+            outline: none;
+            background-color: var(--color-decor-700);
+        }
+    }
+
+    &__name:hover ~ &__actions,
+    &__name:hover ~ &__properties,
+    &__name:focus ~ &__actions,
+    &__name:focus ~ &__properties {
+        background-color: var(--color-decor-700);
+    }
+
+    &.active > &__inner > &__name,
+    &.active > &__inner > &__actions,
+    &.active > &__inner > &__properties {
+        background-color: var(--color-decor-800);
+    }
+
+    &__actions,
+    &__properties {
+        display: flex;
+        align-items: center;
+    
+        &:last-child {
+            padding-right: 0.5rem;
+        }
+    }
+    
+    &__property {
+        opacity: 0.5;
+    } 
+
+    &__property,
+    &__action {
+        padding: 0;
+        background-color: transparent;
+        border: 0;
+        color: inherit;
+        text-align: center;
+        height: var(--size-widget-small); 
+        width: var(--size-widget-small);
+        margin: calc((var(--size-widget-large) - var(--size-widget-small)) / 2) 0;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        justify-content: center;
+
+        &:focus, &:hover {
+            outline: none;
+            background-color: var(--color-decor-700);
+        }
+    }
+
+    &__children {
+        margin-left: 1rem;
+        border-left: 1px solid var(--color-decor-800);
+    }
+}
