@@ -184,7 +184,6 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
 
         this.render();
     }
-
     
     /**
      * Event: Change value

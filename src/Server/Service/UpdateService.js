@@ -46,11 +46,14 @@ class UpdateService {
      * @returns {Boolean} Whether version a is behind version b
      */
     static isVersionBehind(a, b) {
-        a = a.replace('v', '');
-        b = b.replace('v', '');
+        a = (a || '').replace('v', '');
+        b = (b || '').replace('v', '');
+
+        while(a.split('.').length < 3) { a += '.0'; }
+        while(b.split('.').length < 3) { b += '.0'; }
 
         if(!SemanticVersion.valid(a) || !SemanticVersion.valid(b)) {
-            throw new Error('Couldn\'t compare version numbers');
+            throw new Error(`Could not compare version numbers "${a}" and "${b}"`);
         }
 
         return SemanticVersion.lt(a, b);
