@@ -77,7 +77,25 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
     getValueLabel() {
         if(!this.model.config || !this.state.value || !this.state.value[this.model.config.label]) { return super.getValueLabel(); }
     
-        return this.state.value[this.model.config.label];
+        let label = this.state.value[this.model.config.label];
+
+        if(typeof label === 'object') {
+            if(Array.isArray(label)) {
+                return '(array)';
+            }
+            
+            if(label[HashBrown.Context.language]) {
+                return label[HashBrown.Context.language];
+            }
+
+            if(Object.keys(label).length > 0) {
+                return Object.keys(label)[0] + ': ' + Object.values(label)[0];
+            }
+
+            return '(object)';
+        }
+
+        return label;
     }
 
     /**
