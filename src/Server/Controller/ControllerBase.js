@@ -65,7 +65,10 @@ class ControllerBase {
             if(values[0] === 'media') { values.shift(); }
 
             req.project = values[0];
-            req.environment = values[1];
+
+            if(values[1] !== 'settings') {
+                req.environment = values[1];
+            }
         }
         
         // Check if project and environment exist
@@ -79,7 +82,7 @@ class ControllerBase {
             let environmentExists = await HashBrown.Service.ProjectService.environmentExists(req.project, req.environment);
 
             if(!environmentExists) {
-                throw new Error('Environment "' + req.environment + '" was not found for project "' + req.project + '"');
+                throw new Error(`Environment "${req.environment}" was not found for project "${req.project}" in ${this.name} using path "${req.route.path}"`);
             }
         }
     }
