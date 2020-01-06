@@ -56,7 +56,7 @@ async function main() {
     await HashBrown.Service.PluginService.init(app);
 
     // Start HTTP server
-    let port = process.env.PORT || 8080;
+    let port = process.env.NODE_PORT || process.env.PORT || 8080;
     let server = HTTP.createServer(app).listen(port);
 
     debug.log('HTTP server restarted on port ' + port, 'HashBrown');
