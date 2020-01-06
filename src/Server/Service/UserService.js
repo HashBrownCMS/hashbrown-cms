@@ -215,8 +215,6 @@ class UserService {
 
         // Build query for project scope
         if(project) {
-            debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
-
             let projectScopeQuery = {};
             projectScopeQuery['scopes.' + project] = { $exists: true };
 
@@ -226,9 +224,6 @@ class UserService {
                 projectScopeQuery,
                 isAdminQuery
             ];
-
-        } else {
-            debug.log('Getting all users...', this, 3);
         }
 
         let users = await HashBrown.Service.DatabaseService.find('users', 'users', query, { tokens: 0, password: 0 });

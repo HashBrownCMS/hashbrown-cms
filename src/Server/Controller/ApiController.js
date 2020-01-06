@@ -64,7 +64,7 @@ class ApiController extends HashBrown.Controller.ControllerBase {
                 // Using project parameter
                 if(settings.setProject !== false) {
                     // Set the project variables
-                    await ApiController.setProjectVariables(req);
+                    await this.setProjectVariables(req);
 
                     // Using authentication
                     if(settings.authenticate !== false) {

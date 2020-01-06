@@ -21,7 +21,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
 
     ] : [
         _.include(require('./inc/header')),
-        _.div({class: 'resource-editor__body', name: 'body'},
+        _.div({class: 'resource-editor__body centered', name: 'body'},
             _.media({value: model.id, readonly: true, full: true})
         )
     

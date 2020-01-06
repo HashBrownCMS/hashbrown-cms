@@ -210,11 +210,14 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      * @returns {HashBrown.Entity.Resource.Media} Media node
      */
     async getMedia(id) {
-        checkParam(id, 'id', String);
+        checkParam(id, 'id', String, true);
 
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
-            throw new Error('This Connection has no deployer defined');
+            throw new Error('This connection has no deployer defined');
         }
+
+        // Prevent parent dir exploit
+        id = Path.basename(decodeURIComponent(id));
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
@@ -258,6 +261,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         
         let media = await this.getMedia(id);
 
+        // Prevent parent dir exploit
+        name = Path.basename(decodeURIComponent(name));
+
         await this.deployer.renameFile(media.path, name);
 
         return media;
@@ -276,6 +282,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         checkParam(base64, 'base64', String);
+        
+        // Prevent parent dir exploit
+        name = Path.basename(decodeURIComponent(name));
         
         try {
             await this.removeMedia(id)

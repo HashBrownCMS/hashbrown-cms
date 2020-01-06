@@ -377,7 +377,7 @@ class SchemaService extends require('Common/Service/SchemaService') {
         };
 
         if(!create) {
-            await this.getSchemaById(project, environment, schema.id);
+            await this.getSchemaById(project, environment, id);
         }
 
         let isDuplicate = await this.duplicateIdCheck(project, environment, id, schema.id);
