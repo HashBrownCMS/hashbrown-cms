@@ -52,14 +52,22 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
    
     /**
-     * Cleans up a string, for preventing exploits
+     * Checks a string for illegal path components
      *
-     * @param {String} string
-     *
-     * @return {String} Cleaned string
+     * @param {String} name
+     * @param {String} value
      */
-    cleanUpString(string) {
-        return Path.basename(decodeURIComponent(string));
+    pathComponentCheck(name, value) {
+        checkParam(name, 'name', String);
+        checkParam(value, 'value', String);
+
+        const illegalComponents = [ '..', '\\', '/', '*' ];
+
+        for(let component of illegalComponents) {
+            if(value.indexOf(component) > -1) {
+                throw new Error(`Illegal path component "${component}" in "${name}"`);
+            }
+        }
     }
 
     /**
@@ -124,9 +132,6 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(content,  'content', HashBrown.Entity.Resource.Content);
         checkParam(language, 'language', String);
        
-        id = this.cleanUpString(id);
-        language = this.cleanUpString(language);
-        
         if(!this.processor || typeof this.processor.process !== 'function') {
             throw new Error('This Connection has no processor defined');
         }
@@ -135,6 +140,10 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             throw new Error('This Connection has no deployer defined');
         }
 
+        this.pathComponentCheck('id', id);
+        this.pathComponentCheck('language', language);
+        this.pathComponentCheck('fileExtension', this.processor.fileExtension);
+        
         let result = await this.processor.process(project, environment, content, language);
 
         // Convert to string
@@ -161,8 +170,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
-        id = this.cleanUpString(id);
-        language = this.cleanUpString(language);
+        this.pathComponentCheck('id', id);
+        this.pathComponentCheck('language', language);
         
         if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
             throw new Error('This Connection has no deployer defined');
@@ -233,7 +242,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             throw new Error('This connection has no deployer defined');
         }
 
-        id = this.cleanUpString(id);
+        this.pathComponentCheck('id', id);
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
@@ -275,8 +284,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         
-        id = this.cleanUpString(id);
-        name = this.cleanUpString(name);
+        this.pathComponentCheck('id', id);
+        this.pathComponentCheck('name', name);
 
         let media = await this.getMedia(id);
 
@@ -299,8 +308,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(name, 'name', String);
         checkParam(base64, 'base64', String);
         
-        id = this.cleanUpString(id);
-        name = this.cleanUpString(name);
+        this.pathComponentCheck('id', id);
+        this.pathComponentCheck('name', name);
         
         try {
             await this.removeMedia(id)
@@ -319,7 +328,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     async removeMedia(id) {
         checkParam(id, 'id', String);
         
-        id = this.cleanUpString(id);
+        this.pathComponentCheck('id', id);
 
         if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');
