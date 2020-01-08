@@ -9,6 +9,7 @@
     pointer-events: none;
 
     &::before, &::after {
+        pointer-events: none;
         position: absolute;
         display: block;
         font-family: 'FontAwesome';
