@@ -31,7 +31,13 @@ base.namespace = function namespace(query) {
     });
 
     let add = (module) => {
-        current[module.name] = module;
+        if(current[module.name]) {
+            debug.error(new Error(`A module with name "${module.name}" already exists within the "${query}" namespace, skipping load`), module, true);
+        
+        } else {
+            current[module.name] = module;
+        
+        }
         
         return { add: add };
     };

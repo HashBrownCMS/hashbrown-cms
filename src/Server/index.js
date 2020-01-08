@@ -53,7 +53,7 @@ async function main() {
     await HashBrown.Service.AppService.processInput();
    
     // Init plugins
-    await HashBrown.Service.PluginService.init(app);
+    await HashBrown.Service.PluginService.init();
 
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;

@@ -9,23 +9,61 @@ const Path = require('path');
  */
 class PluginService {
     /**
-     * Initialises all plugins located at /plugins/:name/server/index.js
-     *
-     * @param {Object} app Express.js server instance
+     * Initialises all plugins located at /plugins/:name
      */
-    static async init(app) {
-        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*'));
-        
-        for(let path of paths) {
-            path = Path.join(path, 'index.js');
+    static async init() {
+        let namespaces = {
+            Controller: {
+                ApiController: {}
+            },
+            Entity: {
+                Deployer: {},
+                Processor: {},
+                Resource: {}
+            },
+            Service: {}
+        };
 
-            let indexExists = await HashBrown.Service.FileService.exists(path);
+        let path = Path.join(APP_ROOT, 'plugins');
+        let folders = await HashBrown.Service.FileService.list(path);
 
-            if(!indexExists) { continue; }
+        for(let plugin of folders) {
+            if(!HashBrown.Service.FileService.isDirectory(Path.join(path, plugin))) { continue; }
 
-            let plugin = require(path);
+            await this.initNamespaces(plugin, namespaces);
+        }
+    }
+
+    /**
+     * Initialises a list of folders recursively
+     *
+     * @param {String} plugin
+     * @param {Object} namespaces
+     * @param {String} currentNamespace
+     */
+    static async initNamespaces(plugin, namespaces, currentNamespace = '') {
+        checkParam(plugin, 'plugin', String, true);
+        checkParam(namespaces, 'namespaces', Object, true);
+        checkParam(currentNamespace, 'currentNamespace', String);
             
-            plugin.init(app);
+        for(let partialNamespace in namespaces) {
+            let folderPath = Path.join(APP_ROOT, 'plugins', plugin, 'src', 'Server', currentNamespace.replace(/\./g, '/'), partialNamespace);
+            let fullNamespace = (currentNamespace ? currentNamespace + '.' : '') + partialNamespace;
+            
+            let files = await HashBrown.Service.FileService.list(folderPath);
+                
+            for(let filePath of files) {
+                filePath = Path.join(folderPath, filePath);
+
+                if(Path.extname(filePath) !== '.js') { continue; }
+
+                namespace(fullNamespace)
+                .add(require(filePath));
+            }
+            
+            let subnamespaces = namespaces[partialNamespace];
+
+            await this.initNamespaces(plugin, subnamespaces, fullNamespace);
         }
     }
 }
