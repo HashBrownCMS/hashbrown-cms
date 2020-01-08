@@ -50,7 +50,18 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         return params;
     }
-    
+   
+    /**
+     * Cleans up a string, for preventing exploits
+     *
+     * @param {String} string
+     *
+     * @return {String} Cleaned string
+     */
+    cleanUpString(string) {
+        return Path.basename(decodeURIComponent(string));
+    }
+
     /**
      *  Unpublishes content
      *
@@ -113,6 +124,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(content,  'content', HashBrown.Entity.Resource.Content);
         checkParam(language, 'language', String);
        
+        id = this.cleanUpString(id);
+        language = this.cleanUpString(language);
+        
         if(!this.processor || typeof this.processor.process !== 'function') {
             throw new Error('This Connection has no processor defined');
         }
@@ -147,6 +161,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
+        id = this.cleanUpString(id);
+        language = this.cleanUpString(language);
+        
         if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
@@ -216,8 +233,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             throw new Error('This connection has no deployer defined');
         }
 
-        // Prevent parent dir exploit
-        id = Path.basename(decodeURIComponent(id));
+        id = this.cleanUpString(id);
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
@@ -259,10 +275,10 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(name, 'name', String);
         
-        let media = await this.getMedia(id);
+        id = this.cleanUpString(id);
+        name = this.cleanUpString(name);
 
-        // Prevent parent dir exploit
-        name = Path.basename(decodeURIComponent(name));
+        let media = await this.getMedia(id);
 
         await this.deployer.renameFile(media.path, name);
 
@@ -283,8 +299,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(name, 'name', String);
         checkParam(base64, 'base64', String);
         
-        // Prevent parent dir exploit
-        name = Path.basename(decodeURIComponent(name));
+        id = this.cleanUpString(id);
+        name = this.cleanUpString(name);
         
         try {
             await this.removeMedia(id)
@@ -302,6 +318,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      */
     async removeMedia(id) {
         checkParam(id, 'id', String);
+        
+        id = this.cleanUpString(id);
 
         if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');

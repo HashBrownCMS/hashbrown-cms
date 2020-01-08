@@ -29,8 +29,6 @@
         min-width: 6rem;
         min-height: 6rem;
 
-        @include spinner;
-
         &.readonly {
             border-radius: var(--border-radius-small);
         }
