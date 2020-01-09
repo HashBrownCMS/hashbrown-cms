@@ -99,9 +99,17 @@ The folder structure for plugins is like this:
         /index.js
       /Server
         /index.js
+      /template
+      /schema
+        /content
+        /field
 ```
 
-Plugins follow the same file and namespace structure as the main codebase. When developing plugins, use `npm run watch:frontend` to compile client-side code and `npm run watch:nodemon` or `npm run watch:docker` for server-side code. When using Docker, you can issue the command `touch package.json` to reload the daemon (you might have to exit and re-enter the `npm run watch:docker` command depending on your OS).
+Plugins follow the same file and namespace structure as the main codebase.
+
+When developing plugins, use `npm run watch:frontend` to compile client-side code and `npm run watch:nodemon` or `npm run watch:docker` for server-side code.
+
+When using Docker, issue the command `touch package.json` to reload the daemon (you might have to exit and re-enter the `npm run watch:docker` command depending on your OS).
 
 ## Contribute
 If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/HashBrownCMS/hashbrown-cms) or contact us about becoming a collaborator
