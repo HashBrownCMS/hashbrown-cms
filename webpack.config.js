@@ -1,47 +1,49 @@
 'use strict';
 
 // Libs
-const path = require('path');
-const webpack = require('webpack');
-const exec = require('child_process').exec;
-const sass = require('sass/sass.dart.js');
-
-// Are we watching for changes?
-let isWatching = false;
+const Path = require('path');
+const Webpack = require('webpack');
+const Sass = require('sass/sass.dart.js');
+const FileSystem = require('fs');
 
 // Observe changes for specific files
 let entry = {
     dashboard: './src/Client/dashboard.js',
     demo: './src/Client/demo.js',
     environment: './src/Client/environment.js',
-    
+
     common: './src/Common',
     service: './src/Client/Service',
     entity: './src/Client/Entity',
     utilities: './src/Client/utilities'
 }
 
+// Include plugins
+let pluginsPath = Path.join(__dirname, 'plugins');
+let pluginFiles = [];
+
+if(FileSystem.existsSync(pluginsPath)) {
+    for(let plugin of FileSystem.readdirSync(pluginsPath)) {
+        let indexPath = Path.join(pluginsPath, plugin, 'src', 'Client', 'index.js');
+
+        if(!FileSystem.existsSync(indexPath)) { continue; }
+
+        pluginFiles.push(indexPath);
+    }
+}
+
+if(pluginFiles.length > 0) {
+    entry.plugins = pluginFiles;
+}
+
+// Are we watching for changes?
+let isWatching = false;
+
 // Process input arguments
 if(Array.isArray(process.argv)) {
     for(let arg of process.argv) {
-        // Watching
         if(arg === '--watch') {
             isWatching = true;
-        
-        // Files
-        } else if(arg.indexOf('--files') === 0) {
-            arg = arg.replace('--files', '');
-
-            let files = {};
-
-            for(let file of arg.match(/[a-z]*/g)) {
-                if(!file) { continue; }
-                if(!entry[file]) { throw new Error('File "' + file + '.js" not found'); }
-
-                files[file] = entry[file];
-            }
-
-            entry = files;
         }
     }
 }
@@ -49,7 +51,6 @@ if(Array.isArray(process.argv)) {
 // Define settings
 module.exports = {
     mode: 'none',
-
     devtool: 'source-map',
 
     // Input .js
@@ -57,13 +58,13 @@ module.exports = {
 
     // Output .js
     output: {
-        path: path.resolve(__dirname, 'public/js'),
+        path: Path.resolve(__dirname, 'public/js'),
         filename: '[name].js'
     },
 
     // Automatically accept these extensions
     resolve: {
-        modules: [path.resolve(__dirname), path.resolve(__dirname, 'src'), 'node_modules'],
+        modules: [Path.resolve(__dirname), Path.resolve(__dirname, 'src'), 'node_modules'],
         extensions: ['.js', '.json', '.schema']
     }
 };
@@ -80,4 +81,4 @@ sassArgs.push('--source-map');
 sassArgs.push('--embed-sources'),
 sassArgs.push('./style/index.scss:./public/css/style.css');
 
-sass.run_(sassArgs);
+Sass.run_(sassArgs);

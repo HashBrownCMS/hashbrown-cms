@@ -6,8 +6,6 @@ module.exports = (_, view) => `
 <html>
     <head>
         ${require('./inc/head')(_, view)}
-     
-        <link href="/css/plugins.css" rel="stylesheet">
     </head>
 
     <body class="page page--environment">
