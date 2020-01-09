@@ -3,8 +3,8 @@ A free and open-source headless CMS built with Node.js and MongoDB
 
 ## Getting started
 - [Guides](http://hashbrowncms.org/guides)
-- [API documentation](http://hashbrowncms.org/docs/api)
-- [Developer documentation](http://hashbrowncms.org/docs/src)
+- [API documentation](http://hashbrowncms.org/docs/api/)
+- [Developer documentation](http://hashbrowncms.org/docs/src/)
 
 ## Installing and running HashBrown
 First make sure you have these dependencies met:  
