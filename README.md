@@ -110,4 +110,4 @@ If you'd like to contribute to HashBrown development, you can make a pull reques
 Matrix: #hashbrowncms:matrix.org
 
 ## Report issues
-If you have questions, bug reports or anything else of the sort, please use the [issue tracker](https://github.com/Putaitu/hashbrown-cms/issues)
+If you have questions, bug reports or anything else of the sort, please use the [issue tracker](https://github.com/HashBrownCMS/hashbrown-cms/issues)
