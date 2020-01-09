@@ -92,17 +92,17 @@ The folder structure for plugins is like this:
 
 ```
 /plugins
-  /[plugin-name]
-    package.json
-    /src
-      /Client
-        /index.js
-      /Server
-        /index.js
-      /template
-      /schema
-        /content
-        /field
+    /[plugin-name]
+        package.json
+        /src
+            /Client
+                /index.js
+            /Server
+                /index.js
+        /template
+        /schema
+            /content
+            /field
 ```
 
 Plugins follow the same file and namespace structure as the main codebase.
