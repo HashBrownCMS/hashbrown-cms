@@ -15,11 +15,7 @@ class SchemaService extends require('Common/Service/SchemaService') {
      * @returns {Promise} Array of Schema
      */
     static async getNativeSchemas() {
-        let nativeSchemas = HashBrown.Service.CacheService.getMemory('nativeSchemas');
-
-        if(nativeSchemas) { return nativeSchemas; }
-        
-        nativeSchemas = [];
+        let nativeSchemas = [];
 
         let corePath = Path.join(APP_ROOT, 'schema', '*', '*.json');
         let corePaths = await HashBrown.Service.FileService.list(corePath);
@@ -52,8 +48,6 @@ class SchemaService extends require('Common/Service/SchemaService') {
             // Add the loaded schema to the output array
             nativeSchemas.push(schema);
         }
-
-        HashBrown.Service.CacheService.setMemory('nativeSchemas', nativeSchemas);
 
         return nativeSchemas;
     }
