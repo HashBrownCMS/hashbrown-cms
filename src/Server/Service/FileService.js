@@ -78,11 +78,11 @@ class FileService {
                 });
             } else {
                 FileSystem.lstat(path, (err, stats) => {
-                    if(err) { return reject(err); }
+                    if(err) { return resolve([]); }
 
                     if(stats.isDirectory()) {
                         FileSystem.readdir(path, (err, files) => {
-                            if(err) { return reject(err); }
+                            if(err) { return resolve([]); }
 
                             resolve(files);
                         });
@@ -132,6 +132,25 @@ class FileService {
         }
 
         return buffers;
+    }
+
+    /**
+     * Checks if a file is a folder
+     *
+     * @param {String} path
+     *
+     * @return {Boolean} True/false
+     */
+    static isDirectory(path) {
+        checkParam(path, 'path', String, true);
+
+        try {
+            return FileSystem.lstatSync(path).isDirectory();
+        
+        } catch(e) {
+            return false;
+
+        }
     }
 
     /**
