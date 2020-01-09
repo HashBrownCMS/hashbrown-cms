@@ -2,9 +2,9 @@
 *.swp
 *.swo
 .idea
-node_modules/*
-npm-debug.log
-package-lock.json
+/node_modules/*
+/npm-debug.log
+/package-lock.json
 .sass-cache/*
 /docker/db/*
 /docker/remote
@@ -27,3 +27,4 @@ package-lock.json
 !/public/js/setup.js
 !/public/js/test.js
 !/public/js/browser-check.js
+/tmp/*
