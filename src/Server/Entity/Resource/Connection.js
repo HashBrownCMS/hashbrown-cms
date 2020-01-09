@@ -61,11 +61,19 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(name, 'name', String);
         checkParam(value, 'value', String);
 
-        const illegalComponents = [ '..', '\\', '/', '*' ];
+        const values = [ '.' ];
 
-        for(let component of illegalComponents) {
-            if(value.indexOf(component) > -1) {
-                throw new Error(`Illegal path component "${component}" in "${name}"`);
+        for(let v of values) {
+            if(value === v) {
+                throw new Error(`The value of "${name}" cannot be "${v}"`);
+            }
+        }
+
+        const components = [ '..', '\\', '/', '*' ];
+
+        for(let c of components) {
+            if(value.indexOf(c) > -1) {
+                throw new Error(`The value of "${name}" cannot contain "${c}"`);
             }
         }
     }
@@ -170,13 +178,14 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         checkParam(id, 'id', String);
         checkParam(language, 'language', String);
 
-        this.pathComponentCheck('id', id);
-        this.pathComponentCheck('language', language);
-        
         if(!this.deployer || typeof this.deployer.removeFile !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
 
+        this.pathComponentCheck('id', id);
+        this.pathComponentCheck('language', language);
+        this.pathComponentCheck('fileExtension', this.processor.fileExtension);
+        
         await this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
     }
     
@@ -189,7 +198,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
-
+        
         let folders = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
         
         if(!folders) { return []; }
@@ -241,7 +250,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
             throw new Error('This connection has no deployer defined');
         }
-
+        
         this.pathComponentCheck('id', id);
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
