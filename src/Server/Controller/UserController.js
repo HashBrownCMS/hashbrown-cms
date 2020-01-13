@@ -82,10 +82,10 @@ class UserController extends HashBrown.Controller.ApiController {
     static async getCurrentUser(req, res) {
         try {
             let user = await UserController.authenticate(req.cookies.token);
-            user = user.getObject();
 
-            delete user.tokens;
-            delete user.password;
+            user.clearSensitiveData();
+
+            user = user.getObject();
 
             res.status(200).send(user);
         
@@ -120,11 +120,9 @@ class UserController extends HashBrown.Controller.ApiController {
             let users = await HashBrown.Service.UserService.getAllUsers(project);
         
             for(let i in users) {
+                users[i].clearSensitiveData();
                 users[i] = users[i].getObject();
-                users[i].isCurrent = users[i].id == req.user.id;
-
-                delete users[i].tokens;
-                delete users[i].password;
+                users[i].isCurrent = users[i].id === req.user.id;
             }
 
             res.status(200).send(users);
@@ -143,6 +141,12 @@ class UserController extends HashBrown.Controller.ApiController {
 
         try {
             let user = await HashBrown.Service.UserService.getUserById(id);
+
+            user.clearSensitiveData();
+                
+            user = user.getObject();
+            
+            user.isCurrent = user.id === req.user.id;
 
             res.status(200).send(user);
         
@@ -179,6 +183,8 @@ class UserController extends HashBrown.Controller.ApiController {
 
             user = await HashBrown.Service.UserService.updateUserById(id, properties);
             
+            user.clearSensitiveData();
+
             res.status(200).send(user);
         
         } catch(e) {
@@ -194,9 +200,9 @@ class UserController extends HashBrown.Controller.ApiController {
         let id = req.params.id;
 
         try {
-            let user = await HashBrown.Service.UserService.removeUser(id);
+            await HashBrown.Service.UserService.removeUser(id);
             
-            res.status(200).send(user);
+            res.status(200).send('OK');
         
         } catch(e) {
             res.status(502).send(UserController.printError(e));
@@ -238,6 +244,8 @@ class UserController extends HashBrown.Controller.ApiController {
 
         try {
             let user = await HashBrown.Service.UserService.createUser(username, password, false, req.body);
+
+            user.clearSensitiveData();
 
             res.status(200).send(user);
         

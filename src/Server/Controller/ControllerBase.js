@@ -21,8 +21,6 @@ class ControllerBase {
      * @returns {HashBrown.Entity.Resource.User} User object
      */
     static async authenticate(token) {
-        checkParam(token, 'token', String);
-
         // No token was provided
         if(!token) {
             throw new Error('You need to be logged in to do that');
@@ -52,7 +50,7 @@ class ControllerBase {
         checkParam(scope, 'scope', String);
         checkParam(needsAdmin, 'needsAdmin', Boolean);
 
-        // No user was found
+        // No user was provided
         if(!user) {
             throw new Error('You need to be logged in to do that');
         }
