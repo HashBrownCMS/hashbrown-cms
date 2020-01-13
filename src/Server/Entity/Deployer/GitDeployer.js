@@ -1,5 +1,6 @@
 'use strict';
 
+const Url = require('url');
 const Path = require('path');
 
 /**
@@ -17,7 +18,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     constructor(params) {
         super(params);
 
-        if(this.repo.indexOf('https://') === 0) {
+        if(this.repo && this.repo.indexOf('https://') === 0) {
             this.repo = this.repo.replace('https://', '');
         }
     }
@@ -35,11 +36,25 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     }
 
     /**
+     * Performs a validation check on the provided parameters
+     */
+    validate() {
+        if(this.repo.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in repo URL'); }
+        if(this.branch.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in branch name'); }
+
+        let repoUrl = Url.parse(this.repo);
+
+        if(!repoUrl.protocol || !repoUrl.host) { throw new Error('Malformed repo URL'); }
+    }
+
+    /**
      * Pulls the repo, and clones it if necessary
      *
      * @returns {Promise} Promise
      */
     async pullRepo() {
+        this.validate();
+        
         let gitPath = Path.join(APP_ROOT, 'storage', 'git');
         
         await HashBrown.Service.FileService.makeDirectory(gitPath);
@@ -79,6 +94,8 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @returns {Promise} Promise
      */
     async pushRepo() {
+        this.validate();
+        
         let repoPath = this.getRootPath();
         
         await HashBrown.Service.AppService.exec('git add -A .', repoPath);

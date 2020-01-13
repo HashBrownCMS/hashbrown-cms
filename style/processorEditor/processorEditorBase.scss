@@ -1,0 +1,5 @@
+.processor-editor {
+    &.loading {
+        @include spinner;
+    }
+}

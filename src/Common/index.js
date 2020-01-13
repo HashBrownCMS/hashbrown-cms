@@ -82,3 +82,14 @@ base.checkParam = (value, name, type, notNull = false) => {
     console.trace();
     throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
 }
+
+/**
+ * Waits for N seconds
+ *
+ * @param {Number} seconds
+ */
+base.waitForSeconds = (seconds) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, seconds * 1000);
+    });
+}

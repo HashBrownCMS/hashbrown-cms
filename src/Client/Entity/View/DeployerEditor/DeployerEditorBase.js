@@ -27,6 +27,18 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
     }
     
     /**
+     * Gets the placeholder
+     *
+     * @return {HTMLElement} Placeholder
+     */
+    getPlaceholder() {
+        let element = document.createElement('div');
+        element.className = 'deployer-editor loading';
+
+        return element;
+    }
+    
+    /**
      * Fetch
      */
     async fetch() {

@@ -1,0 +1,5 @@
+.deployer-editor {
+    &.loading {
+        @include spinner;
+    }
+}

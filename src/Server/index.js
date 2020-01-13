@@ -27,6 +27,7 @@ require('Server/Controller');
 // Express app
 const app = Express();
 
+app.disable('etag');
 app.engine('js', HashBrown.Entity.View.ViewBase.engine);
 app.set('view engine', 'js');
 app.set('views', Path.join(APP_ROOT, 'template', 'page'));

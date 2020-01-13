@@ -163,7 +163,9 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             await HashBrown.Service.ResourceService.heartbeat(this.model);
 
         } catch(e) {
-            UI.error(e);
+            if(e && e.message) {
+                debug.error(e, this, true);
+            }
 
         } finally {
             setTimeout(() => {
