@@ -32,25 +32,25 @@
         
         &--top {
             left: 50%;
-            top: 2rem;
+            top: 4rem;
             transform: translateX(-50%);
         }
         
         &--bottom {
             left: 50%;
-            bottom: 2rem;
+            bottom: 4rem;
             transform: translateX(-50%);
         }
         
         &--left {
             top: 50%;
-            left: 2rem;
+            left: 4rem;
             transform: translateY(-50%);
         }
         
         &--right {
             top: 50%;
-            right: 2rem;
+            right: 4rem;
             transform: translateY(-50%);
         }
     }

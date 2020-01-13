@@ -9,11 +9,11 @@ module.exports = (_, view) => `
     </head>
 
     <body class="page page--setup centered logo">
-        ${_.if(view.message, `
-            <div class="widget widget--message fixed fixed--top warning">
+        ${view.message ? `
+            <div class="widget widget--message fixed fixed--top warn">
                 ${view.message}
             </div>
-        `)}
+        ` : ''}
 
         <form class="page--setup__step" data-step="${view.step}" action="/api/users/first">
             <h1>Create your first admin account</h1>
