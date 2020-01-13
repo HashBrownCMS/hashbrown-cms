@@ -17,7 +17,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * Initialise
      */
     async init() {
-        this.element = this.getPlaceholder();
+        this.element = this.getPlaceholder(this.scope(), this.model || {}, this.state || {});
 
         await this.update();
 

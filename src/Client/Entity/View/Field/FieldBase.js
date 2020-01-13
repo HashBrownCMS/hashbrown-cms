@@ -158,11 +158,13 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {HTMLElement} Placeholder
      */
-    getPlaceholder() {
-        let element = document.createElement('div');
-        element.className = 'field loading';
-
-        return element;
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'field field--resource-reference-editor loading'},
+            _.div({class: 'field__key'},
+                _.div({class: 'field__key__label'}, model.label),
+                _.div({class: 'field__key__description'}, model.description)
+            )
+        );
     }
 
     /**

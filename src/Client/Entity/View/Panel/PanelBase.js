@@ -457,11 +457,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {HTMLElement} Placeholder
      */
-    getPlaceholder() {
-        let element = document.createElement('div');
-        element.className = 'panel loading';
-
-        return element;
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'panel loading'});
     }
 }
 

@@ -9,9 +9,13 @@
     }
 
     &.loading {
-        height: var(--size-widget-small);
-
         @include spinner;
+
+        min-height: var(--size-widget-small);
+
+        &::before, &::after {
+            margin-top: -0.5rem;
+        }
     }
 
     @include tablet {
