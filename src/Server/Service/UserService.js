@@ -73,7 +73,7 @@ class UserService {
         
         user.removeToken(token);
 
-        await this.updateUser(user.username, user.getObject());
+        await this.updateUserById(user.id, user.getObject());
     }
 
     /**
@@ -341,7 +341,7 @@ class UserService {
         }
 
         delete properties.id;
-        delete proeprties.username;
+        delete properties.username;
 
         await HashBrown.Service.DatabaseService.mergeOne('users', 'users', { username: username }, properties);
     }
