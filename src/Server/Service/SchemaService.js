@@ -4,7 +4,7 @@ const FileSystem = require('fs');
 const Path = require('path');
 
 /**
- * The helpers class for Schema
+ * The helpers class for schemas
  *
  * @memberof HashBrown.Server.Service
  */
@@ -15,13 +15,15 @@ class SchemaService extends require('Common/Service/SchemaService') {
      * @returns {Promise} Array of Schema
      */
     static async getNativeSchemas() {
-        let path = Path.join(APP_ROOT, 'schema', '*', '*.json');
-        let paths = await HashBrown.Service.FileService.list(path);
-        
-        // Native Schema output
         let nativeSchemas = [];
 
-        for(let schemaPath of paths) {
+        let corePath = Path.join(APP_ROOT, 'schema', '*', '*.json');
+        let corePaths = await HashBrown.Service.FileService.list(corePath);
+        
+        let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', '*', '*.json');
+        let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
+
+        for(let schemaPath of corePaths.concat(pluginPaths)) {
             let data = await HashBrown.Service.FileService.read(schemaPath);
 
             let properties = JSON.parse(data);
@@ -102,12 +104,15 @@ class SchemaService extends require('Common/Service/SchemaService') {
     static async getNativeSchema(id) {
         checkParam(id, 'id', String, true);
         
-        let path = Path.join(APP_ROOT, 'schema', '*', id + '.json');
-        let paths = await HashBrown.Service.FileService.list(path);
+        let corePath = Path.join(APP_ROOT, 'schema', '*', id + '.json');
+        let corePaths = await HashBrown.Service.FileService.list(corePath);
+        
+        let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', '*', id + '.json');
+        let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
 
-        if(paths.length < 1) { throw new Error('Native schema "' + id + '" could not be found'); }
+        if(corePaths.length < 1 && pluginPaths.length < 1) { throw new Error('Native schema "' + id + '" could not be found'); }
 
-        let schemaPath = paths[0];
+        let schemaPath = corePaths[0] || pluginPaths[0];
         let data = await HashBrown.Service.FileService.read(schemaPath);
         let properties = JSON.parse(data);
         let parentDirName = Path.dirname(schemaPath).split('/').pop();

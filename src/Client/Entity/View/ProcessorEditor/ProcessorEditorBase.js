@@ -25,6 +25,15 @@ class ProcessorEditorBase extends HashBrown.Entity.View.ViewBase {
 
         this.def(Function, 'customTemplate', null);
     }
+    
+    /**
+     * Gets the placeholder
+     *
+     * @return {HTMLElement} Placeholder
+     */
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'processor-editor loading'});
+    }
 
     /**
      * Fetch

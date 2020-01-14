@@ -49,11 +49,8 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
      *
      * @return {HTMLElement} Placeholder
      */
-    getPlaceholder() {
-        let element = document.createElement('div');
-        element.className = 'widget--media__placeholder';
-
-        return element;
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'widget--media__placeholder'});
     }
 
     /**

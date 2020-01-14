@@ -27,6 +27,7 @@ require('Server/Controller');
 // Express app
 const app = Express();
 
+app.disable('etag');
 app.engine('js', HashBrown.Entity.View.ViewBase.engine);
 app.set('view engine', 'js');
 app.set('views', Path.join(APP_ROOT, 'template', 'page'));
@@ -53,7 +54,7 @@ async function main() {
     await HashBrown.Service.AppService.processInput();
    
     // Init plugins
-    await HashBrown.Service.PluginService.init(app);
+    await HashBrown.Service.PluginService.init();
 
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;

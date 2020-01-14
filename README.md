@@ -1,9 +1,10 @@
 # HashBrown CMS
 A free and open-source headless CMS built with Node.js and MongoDB
 
-## NOTICE: Updating to v1.2
-- The `/db` folder for the `mongodb` docker volume has been moved, along with all other docker related files, to the `/docker` folder. After you pull the latest changes, make sure to manually move your `/db` folder to `/docker/db` before you restart the container.
-- The `/plugins` folder has been unversioned, so please remove all content in this directory (except for custom plugins you want to keep, of course)
+## Getting started
+- [Guides](http://hashbrowncms.org/guides)
+- [API documentation](http://hashbrowncms.org/docs/api/)
+- [Developer documentation](http://hashbrowncms.org/docs/src/)
 
 ## Installing HashBrown
 First make sure you have these dependencies met:  
@@ -16,7 +17,7 @@ First make sure you have these dependencies met:
 
 Then clone the code and install the dependencies:  
 ```
-git clone https://github.com/HashBrownCMS/hashbrown-cms.git -b stable --single-branch --recursive
+git clone https://github.com/HashBrownCMS/hashbrown-cms.git --recursive
 cd ./hashbrown-cms
 npm install
 ```
@@ -36,6 +37,7 @@ npm run watch:frontend
 Using Docker:
 ```
 npm run start:docker
+npm run restart:docker
 npm run watch:docker
 npm run stop:docker
 ```
@@ -60,7 +62,7 @@ npm install
 webpack 
 ```
 
-Remember to restart the server after updating (see "Running HashBrown" above)
+Remember to stop and restart the server afterwards.
 
 ## Configuring MongoDB  
 Using environment variables:
@@ -86,9 +88,29 @@ Using `/config/database.cfg`
 }
 ```
 
-## Getting started
-- [Guides](http://hashbrown.rocks/guides)
-- [Documentation](http://hashbrown.rocks/docs)
+## Plugins
+The folder structure for plugins is like this:
+
+```
+/plugins
+    /[plugin-name]
+        package.json
+        /src
+            /Client
+                /index.js
+            /Server
+                /index.js
+        /template
+        /schema
+            /content
+            /field
+```
+
+Plugins follow the same file and namespace structure as the main codebase.
+
+When developing plugins, use `npm run watch:frontend` to compile client-side code and `npm run watch:nodemon` or `npm run watch:docker` for server-side code.
+
+When using Docker, issue the command `touch package.json` to reload the daemon (you might have to exit and re-enter the `npm run watch:docker` command depending on your OS).
 
 ## Contribute
 If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/HashBrownCMS/hashbrown-cms) or contact us about becoming a collaborator
@@ -97,4 +119,4 @@ If you'd like to contribute to HashBrown development, you can make a pull reques
 Matrix: #hashbrowncms:matrix.org
 
 ## Report issues
-If you have questions, bug reports or anything else of the sort, please use the [issue tracker](https://github.com/Putaitu/hashbrown-cms/issues)
+If you have questions, bug reports or anything else of the sort, please use the [issue tracker](https://github.com/HashBrownCMS/hashbrown-cms/issues)

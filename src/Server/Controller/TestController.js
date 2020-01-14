@@ -33,7 +33,7 @@ class TestController extends HashBrown.Controller.ApiController {
         }
         
         try {
-            let user = await TestController.authenticate(req.cookies.token, null, null, true);
+            let user = await TestController.authenticate(req.cookies.token);
 
             if(!user.isAdmin) {
                 throw new Error('The testing tool requires admin privileges');

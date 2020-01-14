@@ -46,8 +46,6 @@ class UserService {
      * @returns {Promise} Token
      */
     static async loginUser(username, password, persist) {
-        debug.log('Attempting login for user "' + username + '"...', this);
-
         let user = await this.findUser(username);
 
         if(!user.validatePassword(password)) {
@@ -71,13 +69,11 @@ class UserService {
      * @returns {Promise} Result
      */
     static async logoutUser(token) {
-        debug.log('Logging out user with "' + token + '"...', this);
-
         let user = await this.findToken(token);
         
         user.removeToken(token);
 
-        await this.updateUser(user.username, user.getObject());
+        await this.updateUserById(user.id, user.getObject());
     }
 
     /**
@@ -129,8 +125,6 @@ class UserService {
         
         let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { id: id });
 
-        debug.log('Removing user "' + user.username + '" from project "' + project.name + '"', this);
-
         delete user.scopes[scope];
         
         await HashBrown.Service.DatabaseService.updateOne('users', 'users', { id: id }, user);
@@ -152,6 +146,23 @@ class UserService {
         user.scopes[project] = scopes || [];
 
         await this.updateUserById(id, user);
+    }
+
+    /**
+     * Checks for duplicate usernames
+     *
+     * @param {String} id
+     * @param {String} username
+     */
+    static async duplicateUsernameCheck(id, username) {
+        checkParam(id, 'id', String, true);
+        checkParam(username, 'username', String, true);
+
+        let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username })
+
+        if(user && user.id !== id) {
+            throw new Error('Username "' + username + '" is already taken');
+        }
     }
 
     /**
@@ -179,12 +190,8 @@ class UserService {
 
         user.isAdmin = isAdmin;
 
-        let foundUser = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username })
-
-        if(foundUser) {
-            throw new Error('Username "' + username + '" is taken');
-        }
-            
+        await this.duplicateUsernameCheck(user.id, username);
+        
         await HashBrown.Service.DatabaseService.insertOne('users', 'users', user.getObject());
 
         return user;
@@ -278,8 +285,6 @@ class UserService {
     static async getUser(username) {
         let query = {};
 
-        debug.log('Getting user "' + username + '"...', this, 3);
-
         return await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username }, { tokens: 0, password: 0 });
     }
 
@@ -311,6 +316,12 @@ class UserService {
             properties.password = HashBrown.Entity.Resource.User.createPasswordHashSalt(properties.password);
         }
         
+        delete properties.id;
+       
+        if(properties.username) {
+            await this.duplicateUsernameCheck(id, properties.username);
+        }
+        
         await HashBrown.Service.DatabaseService.mergeOne('users', 'users', { id: id }, properties);
 
         return new HashBrown.Entity.Resource.User(properties);
@@ -328,6 +339,9 @@ class UserService {
         if(properties.password && properties.password.length >= 4 && typeof properties.password === 'string') {
             properties.password = HashBrown.Entity.Resource.User.createPasswordHashSalt(properties.password);
         }
+
+        delete properties.id;
+        delete properties.username;
 
         await HashBrown.Service.DatabaseService.mergeOne('users', 'users', { username: username }, properties);
     }

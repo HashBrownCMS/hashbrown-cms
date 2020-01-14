@@ -246,14 +246,11 @@ class MediaService extends require('Common/Service/MediaService') {
         // Create the cache folder, if it doesn't exist
         await HashBrown.Service.FileService.makeDirectory(cacheFolder);
 
-        let data = null;
-       
         // Read the data
-        try {
-            data = await HashBrown.Service.FileService.read(cachedPath);
-        
+        let data = await HashBrown.Service.FileService.read(cachedPath);
+       
         // File wasn't found, copy it
-        } catch(e) {
+        if(!data) {
             if(!media.path) {
                 throw new Error(`Cannot fetch media "${media.id}", no url or path specified`);
             }

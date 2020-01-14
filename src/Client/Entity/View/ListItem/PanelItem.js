@@ -187,15 +187,8 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
      *
      * @return {HTMLElement} Placeholder
      */
-    getPlaceholder() {
-        let element = document.createElement('div');
-        element.className = 'list-item--panel-item loading';
-        
-        let inner = document.createElement('div');
-        inner.className = 'list-item--panel-item__inner';
-        
-
-        return element;
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'list-item--panel-item loading'});
     }
 }
 

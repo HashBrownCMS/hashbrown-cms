@@ -28,8 +28,6 @@ class ScheduleService {
      * @returns {Promise} Promise
      */
     static async checkTasks() {
-        debug.log('Checking scheduled tasks...', this, 4);
-
         let tasks = await this.getTasks();
 
         for(let task of tasks) {

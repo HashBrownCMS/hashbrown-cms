@@ -29,23 +29,12 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {HTMLElement} Placeholder
      */
-    getPlaceholder() {
-        let element = document.createElement('div');
-        element.className = 'resource-editor loading';
-
-        let header = document.createElement('div');
-        header.className = 'resource-editor__header';
-        element.appendChild(header);
-        
-        let body = document.createElement('div');
-        body.className = 'resource-editor__body';
-        element.appendChild(body);
-
-        let footer = document.createElement('div');
-        footer.className = 'resource-editor__footer';
-        element.appendChild(footer);
-
-        return element;
+    getPlaceholder(_, model, state) {
+        return _.div({class: 'resource-editor loading'},
+            _.div({class: 'resource-editor__header'}),
+            _.div({class: 'resource-editor__body'}),
+            _.div({class: 'resource-editor__footer'})
+        );
     }
     
     /**
@@ -163,7 +152,9 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             await HashBrown.Service.ResourceService.heartbeat(this.model);
 
         } catch(e) {
-            UI.error(e);
+            if(e && e.message) {
+                debug.error(e, this, true);
+            }
 
         } finally {
             setTimeout(() => {

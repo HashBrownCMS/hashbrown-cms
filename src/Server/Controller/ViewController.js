@@ -151,7 +151,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             let user = null;
             
             try {
-                user = await this.authenticate(req.cookies.token, null, null, true);
+                user = await this.authenticate(req.cookies.token);
+                this.authorize(user, null, null, true);
             
             } catch(e) {
                 let users = await HashBrown.Service.UserService.getAllUsers();
@@ -181,7 +182,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             let user = null;
 
             try {
-                user = await this.authenticate(req.cookies.token, req.params.project);
+                user = await this.authenticate(req.cookies.token);
             
             } catch(e) {
                 let users = await HashBrown.Service.UserService.getAllUsers();
@@ -196,6 +197,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             }
 
             try {
+                this.authorize(user, req.params.project);
+
                 let project = await HashBrown.Service.ProjectService.getProject(req.params.project);
 
                 if(project.environments.indexOf(req.params.environment) < 0) {

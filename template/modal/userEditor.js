@@ -9,11 +9,10 @@ _.div({class: 'modal in'},
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
-            _.if(state.name === 'error', 
-                state.message,
-            ),
+            state.name === 'error' ? [
+                state.message
 
-            _.if(state.name === undefined, 
+            ] : [
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label small'}, 'Username'),
                     _.input({class: 'widget widget--text', type: 'text', value: model.username, onchange: (e) => _.onChangeUsername(e.target.value)})
@@ -30,19 +29,25 @@ _.div({class: 'modal in'},
                     _.label({class: 'widget widget--label small'}, 'Password'),
                     _.input({class: 'widget widget--text', type: 'password', placeholder: '●●●●●●●●', min: 3, onchange: (e) => _.onChangePassword(e.target.value)})
                 ),
-                _.if(HashBrown.Context.user.id === model.id,
+
+                // Only show theme picker to the current user
+                HashBrown.Context.user.id === model.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Theme'),
                         _.popup({options: HashBrown.Context.themes, value: model.theme || 'default', onchange: _.onChangeTheme})
                     )
-                ),
-                _.if(HashBrown.Context.user.id !== model.id,
+                ] : null,
+
+                // Only show "is admin" switch to other admins
+                HashBrown.Context.user.isAdmin ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
                         _.checkbox({value: model.isAdmin, onchange: _.onChangeAdmin})
                     )
-                ),
-                _.if(HashBrown.Context.user.id !== model.id && !model.isAdmin,
+                ] : null,
+
+                // Only show scope editors to admins for users who are not admins
+                HashBrown.Context.user.isAdmin && !model.isAdmin ? [
                     _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},
@@ -62,17 +67,15 @@ _.div({class: 'modal in'},
                             })
                         )
                     )
-                )
-            )
+                ] : null
+            ]
         ),
         _.div({class: 'modal__footer'},
-            _.if(state.name === 'error', 
+            state.name === 'error' ? [
                 _.button({class: 'widget widget--button', onclick: _.onClickReset}, 'OK')
-            ),
-            
-            _.if(state.name === undefined, 
+            ] : [
                 _.button({class: 'widget widget--button', onclick: _.onClickSave}, 'Save')
-            )
+            ]
         )
     )
 )

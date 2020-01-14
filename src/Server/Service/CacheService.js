@@ -3,6 +3,8 @@
 const FileSystem = require('fs');
 const Path = require('path');
 
+let cache = {};
+
 /**
  * A helper class for managing disk cache
  *
@@ -10,12 +12,48 @@ const Path = require('path');
  */
 class CacheService {
     /**
-     * Sets a cache object
+     * Sets a cache object in memory
+     *
+     * @param {String} key
+     * @param {*} value
+     */
+    static setMemory(key, value) {
+        checkParam(key, 'key', String);
+        
+        cache[key] = value;
+    }
+    
+    /**
+     * Gets a cache object from memory
+     *
+     * @param {String} key
+     *
+     * @returns {*} Cache value
+     */
+    static getMemory(key) {
+        checkParam(key, 'key', String);
+
+        return cache[key];
+    }
+
+    /**
+     * Removes a cache object from memory
+     *
+     * @param {String} key
+     */
+    static removeMemory(key) {
+        checkParam(key, 'key', String);
+
+        delete cache[key];
+    }
+
+    /**
+     * Sets a cache object to file
      *
      * @param {String} key
      * @param {Object} value
      */
-    static set(key, value) {
+    static setFile(key, value) {
         checkParam(key, 'key', String);
         checkParam(value, 'value', Object);
             
@@ -37,13 +75,13 @@ class CacheService {
     }
     
     /**
-     * Gets a cache object
+     * Gets a cache object from file
      *
      * @param {String} key
      *
      * @returns {*} Cache object
      */
-    static get(key) {
+    static getFile(key) {
         checkParam(key, 'key', String);
        
         return new Promise((resolve, reject) => {
@@ -79,11 +117,11 @@ class CacheService {
     }
 
     /**
-     * Removes a cache object
+     * Removes a cache object from file
      *
      * @param {String} key
      */
-    static remove(key) {
+    static removeFile(key) {
         checkParam(key, 'key', String);
        
         return new Promise((resolve, reject) => {

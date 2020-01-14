@@ -15,6 +15,12 @@ class DebugService {
      * @param {String} type
      */
     static onLog(dateString, senderString, message, type) {
+        if(!message) {
+            if(!type) { return; }
+
+            message = 'An unexpected ' + type + ' happened.';
+        }
+        
         if(type) {
             message = '[' + type.toUpperCase() + '] ' + message;
         }

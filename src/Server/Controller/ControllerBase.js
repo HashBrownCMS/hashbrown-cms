@@ -17,13 +17,10 @@ class ControllerBase {
      * Authenticates a request
      *
      * @param {String} token
-     * @param {String} project
-     * @param {String} scope
-     * @param {Boolean} needsAdmin
      *
-     * @returns {Promise} User object
+     * @returns {HashBrown.Entity.Resource.User} User object
      */
-    static async authenticate(token, project, scope, needsAdmin) {
+    static async authenticate(token) {
         // No token was provided
         if(!token) {
             throw new Error('You need to be logged in to do that');
@@ -36,17 +33,42 @@ class ControllerBase {
             throw new Error('You need to be logged in to do that');
         }
             
+        return user;
+    }
+    
+    /**
+     * Authorises a request
+     *
+     * @param {HashBrown.Entity.Resource.User} user
+     * @param {String} project
+     * @param {String} scope
+     * @param {Boolean} needsAdmin
+     */
+    static authorize(user, project = '', scope = '', needsAdmin = false) {
+        checkParam(user, 'user', HashBrown.Entity.Resource.User);
+        checkParam(project, 'project', String);
+        checkParam(scope, 'scope', String);
+        checkParam(needsAdmin, 'needsAdmin', Boolean);
+
+        // No user was provided
+        if(!user) {
+            throw new Error('You need to be logged in to do that');
+        }
+            
         // Admin is required, and user isn't admin
         if(needsAdmin && !user.isAdmin) {
             throw new Error('You need to be admin to do that');
         }
+        
+        // A project is defined, and the user doesn't have it
+        if(project && !user.hasScope(project)) {
+            throw new Error('You do not have permission to use this project');
+        }
 
         // A scope is defined, and the user doesn't have it
-        if(project && scope && !user.hasScope(project, scope)) {
-            throw new Error('You need the "' + scope + '" scope to do that');
+        if(scope && !user.hasScope(project, scope)) {
+            throw new Error(`You do not have permission to use the "${scope}" scope in this project`);
         }
-           
-        return user;
     }
 
     /**

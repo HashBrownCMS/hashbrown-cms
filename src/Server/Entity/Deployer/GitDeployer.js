@@ -1,6 +1,7 @@
 'use strict';
 
 const Path = require('path');
+const Url = require('url');
 
 /**
  * Git deployer
@@ -16,10 +17,6 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      */
     constructor(params) {
         super(params);
-
-        if(this.repo.indexOf('https://') === 0) {
-            this.repo = this.repo.replace('https://', '');
-        }
     }
     
     /**
@@ -35,11 +32,27 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     }
 
     /**
+     * Performs a validation check on the provided parameters
+     */
+    validate() {
+        if(this.repo.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in repo URL'); }
+        if(this.branch.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in branch name'); }
+        if(this.username.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in username'); }
+        if(this.password.indexOf('\'') > -1) { throw new Error('Illegal character "\'" found in password'); }
+
+        let repoUrl = new URL(this.repo);
+
+        if(!repoUrl.protocol || !repoUrl.host) { throw new Error('Malformed repo URL'); }
+    }
+
+    /**
      * Pulls the repo, and clones it if necessary
      *
      * @returns {Promise} Promise
      */
     async pullRepo() {
+        this.validate();
+        
         let gitPath = Path.join(APP_ROOT, 'storage', 'git');
         
         await HashBrown.Service.FileService.makeDirectory(gitPath);
@@ -49,26 +62,24 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
         let dirExists = await HashBrown.Service.FileService.exists(repoPath);
 
         if(!dirExists) {
-            let url = 'https://';
+            let url = new URL(this.repo);
             
             if(this.username) {
-                url += this.username;
+                url.username = this.username;
                 
                 if(this.password) {
-                    url += ':' + this.password.replace(/@/g, '%40');
+                    url.password = this.password;
                 }
-                    
-                url += '@';
             }
 
-            url += this.repo;
+            url = Url.format(url);
 
-            await HashBrown.Service.AppService.exec('git clone \'' + url + '\' \'' + repoPath + '\''); 
+            await HashBrown.Service.AppService.exec(`git clone '${url}' '${repoPath}'`); 
         }
 
         await HashBrown.Service.AppService.exec('git config user.name "HashBrown CMS"', repoPath);
         await HashBrown.Service.AppService.exec('git config user.email "git@hashbrown.cms"', repoPath);
-        await HashBrown.Service.AppService.exec('git checkout ' + (this.branch || 'master'), repoPath);
+        await HashBrown.Service.AppService.exec(`git checkout ${this.branch || 'master'}`, repoPath);
         await HashBrown.Service.AppService.exec('git reset --hard', repoPath);
         await HashBrown.Service.AppService.exec('git pull', repoPath);
     }
@@ -79,10 +90,19 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @returns {Promise} Promise
      */
     async pushRepo() {
-        let repoPath = this.getRootPath();
+        this.validate();
         
+        let repoPath = this.getRootPath();
+       
         await HashBrown.Service.AppService.exec('git add -A .', repoPath);
-        await HashBrown.Service.AppService.exec('git commit -m "Commit from HashBrown CMS"', repoPath);
+        
+        try {
+            await HashBrown.Service.AppService.exec('git commit -m "Commit from HashBrown CMS"', repoPath);
+        } catch(e) {
+            // If commit fails, it means there are no changes to push
+            return;
+        }
+        
         await HashBrown.Service.AppService.exec('git push', repoPath);
     }
 
@@ -92,7 +112,9 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @returns {String} Root
      */
     getRootPath() {
-        return Path.join(APP_ROOT, 'storage', 'plugins', 'git', Buffer.from(this.repo + (this.branch || 'master')).toString('base64'));
+        let dirName = Buffer.from(this.repo + (this.branch || 'master')).toString('base64');
+
+        return Path.join(APP_ROOT, 'storage', 'git', dirName);
     }
 
     /**
@@ -164,7 +186,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
 
         await HashBrown.Service.FileService.makeDirectory(folder);
 
-        await HashBrown.Service.FileService.write(path, Buffer.from(base64, 'base64'));
+        await HashBrown.Service.FileService.write(Buffer.from(base64, 'base64'), path);
         
         await this.pushRepo();   
     }
@@ -197,7 +219,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     async removeFile(path) {
         await this.pullRepo();
 
-        await HashBrown.Service.FileService.remove(Path.join(APP_DOOR, path));
+        await HashBrown.Service.FileService.remove(path);
 
         await this.pushRepo();
     }
@@ -212,7 +234,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     async removeFolder(path) {
         await this.pullRepo();
 
-        await HashBrown.Service.FileService.remove(Path.join(APP_DOOR, path));
+        await HashBrown.Service.FileService.remove(path);
 
         await this.pushRepo();
     }

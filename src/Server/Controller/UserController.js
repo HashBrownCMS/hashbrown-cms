@@ -45,191 +45,214 @@ class UserController extends HashBrown.Controller.ApiController {
      *
      * @returns {String} Session token
      */
-    static login(req, res) {
+    static async login(req, res) {
         let username = req.body.username;
         let password = req.body.password;
         let persist = req.query.persist == 'true' || req.query.persist == true;
 
-        HashBrown.Service.UserService.loginUser(username, password, persist)
-        .then((token) => {
+        try {
+            let token = await HashBrown.Service.UserService.loginUser(username, password, persist);
+
             res.status(200).cookie('token', token).send(token);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /** 
      * Logs out a user
      */
-    static logout(req, res) {
-        HashBrown.Service.UserService.logoutUser(req.cookies.token)
-        .then(() => {
+    static async logout(req, res) {
+        try {
+            await HashBrown.Service.UserService.logoutUser(req.cookies.token);
+
             res.status(200).cookie('token', '').redirect('/');
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /**
      * Gets current user
      */
-    static getCurrentUser(req, res) {
-        UserController.authenticate(req.cookies.token)
-        .then((user) => {
+    static async getCurrentUser(req, res) {
+        try {
+            let user = await UserController.authenticate(req.cookies.token);
+
+            user.clearSensitiveData();
+
             user = user.getObject();
 
-            delete user.tokens;
-            delete user.password;
-
             res.status(200).send(user);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
 
     /**
      * Get current scopes
      */
-    static getScopes(req, res) {
-        UserController.authenticate(req.cookies.token)
-        .then((user) => {
+    static async getScopes(req, res) {
+        try {
+            let user = await UserController.authenticate(req.cookies.token);
+            
             res.send(user.scopes);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /**
      * Get all users
      */
-    static getUsers(req, res) {
+    static async getUsers(req, res) {
         let project = req.params.project;
 
-        HashBrown.Service.UserService.getAllUsers(project)
-        .then((users) => {
+        try {
+            let users = await HashBrown.Service.UserService.getAllUsers(project);
+        
             for(let i in users) {
+                users[i].clearSensitiveData();
                 users[i] = users[i].getObject();
-                users[i].isCurrent = users[i].id == req.user.id;
-
-                delete users[i].tokens;
-                delete users[i].password;
+                users[i].isCurrent = users[i].id === req.user.id;
             }
 
             res.status(200).send(users);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /**
      * Gets s specific user
      */
-    static getUser(req, res) {
+    static async getUser(req, res) {
         let id = req.params.id;
 
-        HashBrown.Service.UserService.getUserById(id)
-        .then((user) => {
+        try {
+            let user = await HashBrown.Service.UserService.getUserById(id);
+
+            user.clearSensitiveData();
+                
+            user = user.getObject();
+            
+            user.isCurrent = user.id === req.user.id;
+
             res.status(200).send(user);
-        })
-        .catch((e) => {
-            res.status(404).send(e.message);   
-        });
+        
+        } catch(e) {
+            res.status(404).send(UserController.printError(e));   
+        
+        }
     }
 
     /**
      * Updates a user
      */
-    static postUser(req, res) {
+    static async postUser(req, res) {
         let id = req.params.id;
         let properties = req.body;
 
-        UserController.authenticate(req.cookies.token, req.params.project)
-        .then((user) => {
-            let hasScope = user.hasScope(req.params.project, 'users');
+        try {
+            let user = await UserController.authenticate(req.cookies.token);
 
-            if(user.id == id || hasScope) {
-                // If the current user does not have the "users" scope, revert any sensitive properties
-                if(!hasScope) {
-                    properties.scopes = user.scopes;
-                    properties.isAdmin = false;
-                }
-
-                return Promise.resolve();
+            if(user.id !== id && !user.isAdmin) {
+                throw new Error('You do not have sufficient privileges to change this user\'s information');
             }
 
-            return Promise.reject(new Error('User "' + user.name + '" does not have scope "user"'));
-        })
-        .then(() => {
-            HashBrown.Service.UserService.updateUserById(id, properties);
-        })
-        .then((user) => {
+            // Only admins can change scopes and admin status
+            if(!user.isAdmin) {
+                delete properties.scopes;
+                delete properties.isAdmin;
+            }
+
+            // Theme can only be changed by current users
+            if(user.id !== id) {
+                delete properties.theme;
+            }
+
+            user = await HashBrown.Service.UserService.updateUserById(id, properties);
+            
+            user.clearSensitiveData();
+
             res.status(200).send(user);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(400).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /**
      * Deletes a user from the current project scope
      */
-    static deleteUser(req, res) {
+    static async deleteUser(req, res) {
         let id = req.params.id;
 
-        HashBrown.Service.UserService.removeUser(id)
-        .then((user) => {
-            res.status(200).send(user);
-        })
-        .catch((e) => {
+        try {
+            await HashBrown.Service.UserService.removeUser(id);
+            
+            res.status(200).send('OK');
+        
+        } catch(e) {
             res.status(502).send(UserController.printError(e));
-        });
+        
+        }
     }
     
     /**
      * Creates the first admin
      */
-    static createFirstAdmin(req, res) {
+    static async createFirstAdmin(req, res) {
         let username = req.body.username;
         let password = req.body.password;
 
-        HashBrown.Service.UserService.getAllUsers()
-        .then((users) => {
+        try {
+            let users = await HashBrown.Service.UserService.getAllUsers();
+
             if(users && users.length > 0) {
-                return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.'));
+                throw new Error('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the commandline.');
             }
 
-            return HashBrown.Service.UserService.createUser(username, password, true);
-        })
-        .then((user) => {
-            return HashBrown.Service.UserService.loginUser(username, password);
-        })
-        .then((token) => {
+            let user = await HashBrown.Service.UserService.createUser(username, password, true);
+            let token = await HashBrown.Service.UserService.loginUser(username, password);
+            
             res.status(200).cookie('token', token).send(token);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(403).send(UserController.printError(e));   
-        });
+        
+        }
     }
     
     /**
      * Creates a user
      */
-    static createUser(req, res) {
+    static async createUser(req, res) {
         let username = req.body.username;
         let password = req.body.password;
 
-        HashBrown.Service.UserService.createUser(username, password, false, req.body)
-        .then((user) => {
+        try {
+            let user = await HashBrown.Service.UserService.createUser(username, password, false, req.body);
+
+            user.clearSensitiveData();
+
             res.status(200).send(user);
-        })
-        .catch((e) => {
+        
+        } catch(e) {
             res.status(400).send(UserController.printError(e));   
-        });
+        
+        }
     }
 }
 

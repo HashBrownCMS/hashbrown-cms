@@ -5,7 +5,7 @@ const Path = require('path');
 const Util = require('util');
 const HTTP = require('http');
 const HTTPS = require('https');
-const URL = require('url');
+const Url = require('url');
 
 const Glob = require('glob');
 
@@ -78,11 +78,11 @@ class FileService {
                 });
             } else {
                 FileSystem.lstat(path, (err, stats) => {
-                    if(err) { return reject(err); }
+                    if(err) { return resolve([]); }
 
                     if(stats.isDirectory()) {
                         FileSystem.readdir(path, (err, files) => {
-                            if(err) { return reject(err); }
+                            if(err) { return resolve([]); }
 
                             resolve(files);
                         });
@@ -126,12 +126,30 @@ class FileService {
 
             buffers.push(buffer);
         }
-   
-        if(buffers.length === 1) {
-            return buffers[0];
-        }
+  
+        if(buffers.length < 1) { return null; }
+        if(buffers.length === 1) { return buffers[0]; }
 
         return buffers;
+    }
+
+    /**
+     * Checks if a file is a folder
+     *
+     * @param {String} path
+     *
+     * @return {Boolean} True/false
+     */
+    static isDirectory(path) {
+        checkParam(path, 'path', String, true);
+
+        try {
+            return FileSystem.lstatSync(path).isDirectory();
+        
+        } catch(e) {
+            return false;
+
+        }
     }
 
     /**
@@ -221,9 +239,9 @@ class FileService {
         checkParam(to, 'to', String);
 
         await new Promise((resolve, reject) => {
-            // Cope from a URL
+            // Copy from a URL
             if(from.indexOf('://') > -1) {
-                let url = URL.parse(from);
+                let url = Url.parse(from);
 
                 let options = {
                     host: url.hostname,

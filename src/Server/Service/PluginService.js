@@ -9,23 +9,17 @@ const Path = require('path');
  */
 class PluginService {
     /**
-     * Initialises all plugins located at /plugins/:name/server/index.js
-     *
-     * @param {Object} app Express.js server instance
+     * Initialises all plugins located at /plugins/:name/src/Server/index.js
      */
-    static async init(app) {
-        let paths = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'plugins', '*'));
-        
-        for(let path of paths) {
-            path = Path.join(path, 'index.js');
+    static async init() {
+        let path = Path.join(APP_ROOT, 'plugins');
+        let folders = await HashBrown.Service.FileService.list(path);
 
-            let indexExists = await HashBrown.Service.FileService.exists(path);
+        for(let plugin of folders) {
+            let indexPath = Path.join(path, plugin, 'src', 'Server', 'index.js');
+            let indexExists = await HashBrown.Service.FileService.exists(indexPath);
 
-            if(!indexExists) { continue; }
-
-            let plugin = require(path);
-            
-            plugin.init(app);
+            require(indexPath);
         }
     }
 }

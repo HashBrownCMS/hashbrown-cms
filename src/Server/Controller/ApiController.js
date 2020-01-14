@@ -68,7 +68,7 @@ class ApiController extends HashBrown.Controller.ControllerBase {
 
                     // Using authentication
                     if(settings.authenticate !== false) {
-                        req.user = await this.authenticate(token, req.project, settings.scope, settings.needsAdmin);
+                        req.user = await this.authenticate(token);
                     }
                 
                 // Disregarding project parameter, but using authentication
@@ -76,7 +76,12 @@ class ApiController extends HashBrown.Controller.ControllerBase {
                     req.user = await this.authenticate(token, null, settings.scope, settings.needsAdmin);
 
                 }
-                
+              
+                // If a user is specified, authorise it
+                if(req.user) {
+                    this.authorize(req.user, req.project, settings.scope, settings.needsAdmin);
+                }
+
                 next();
             
             } catch(e) {
