@@ -5,7 +5,7 @@ const Path = require('path');
 const Util = require('util');
 const HTTP = require('http');
 const HTTPS = require('https');
-const URL = require('url');
+const Url = require('url');
 
 const Glob = require('glob');
 
@@ -126,10 +126,9 @@ class FileService {
 
             buffers.push(buffer);
         }
-   
-        if(buffers.length === 1) {
-            return buffers[0];
-        }
+  
+        if(buffers.length < 1) { return null; }
+        if(buffers.length === 1) { return buffers[0]; }
 
         return buffers;
     }
@@ -240,9 +239,9 @@ class FileService {
         checkParam(to, 'to', String);
 
         await new Promise((resolve, reject) => {
-            // Cope from a URL
+            // Copy from a URL
             if(from.indexOf('://') > -1) {
-                let url = URL.parse(from);
+                let url = Url.parse(from);
 
                 let options = {
                     host: url.hostname,

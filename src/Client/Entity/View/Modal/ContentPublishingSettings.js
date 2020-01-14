@@ -58,11 +58,17 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click OK
      */
     async onClickOK() {
-        await HashBrown.Service.ResourceService.set('content', this.model.id, this.model);
-    
-        HashBrown.Service.EventService.trigger('settings', this.model.id); 
+        try {
+            await HashBrown.Service.ResourceService.set('content', this.model.id, this.model);
+            
+            HashBrown.Service.EventService.trigger('settings', this.model.id); 
 
-        this.close();
+            this.close();
+
+        } catch(e) {
+            this.setErrorState(e);
+
+        }
     }
 }
 

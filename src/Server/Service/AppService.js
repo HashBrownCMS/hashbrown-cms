@@ -25,8 +25,6 @@ class AppService {
         if(!cwd) { cwd = APP_ROOT; }
 
         return new Promise((resolve, reject) => {
-            debug.log('Running command ' + cmd, this, 3);
-
             let process = ChildProcess.exec(cmd, { cwd: cwd });
             let result = '';
             let message = '';
