@@ -52,7 +52,12 @@ global.HttpError = class HttpError extends Error {
 async function main() {
     // Check CLI input
     await HashBrown.Service.AppService.processInput();
-   
+
+    // Register system cleanup event
+    for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'exit' ]) {
+	process.on(signal, () => { HashBrown.Service.EventService.trigger('stop'); });
+    }
+
     // Init plugins
     await HashBrown.Service.PluginService.init();
 
@@ -73,16 +78,16 @@ async function main() {
         HashBrown.Controller[name].init(app);
     }
 
+    // Start watching for file changes
+    if(process.env.WATCH) {
+        HashBrown.Service.DebugService.startWatching();
+    }
+    
     // Start watching schedule
     HashBrown.Service.ScheduleService.startWatching();
     
     // Start watching media cache
     HashBrown.Service.MediaService.startWatchingCache();
-    
-    // Start watching for file changes
-    if(process.env.WATCH) {
-        HashBrown.Service.DebugService.startWatching();
-    }
 }
 
 main();

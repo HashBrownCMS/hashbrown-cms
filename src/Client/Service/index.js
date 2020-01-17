@@ -18,4 +18,4 @@ namespace('Service')
 .add(require('./SchemaService'))
 .add(require('./SettingsService'))
 .add(require('./UIService'))
-.add(require('./EventService'));
+.add(require('../../Common/Service/EventService'));
