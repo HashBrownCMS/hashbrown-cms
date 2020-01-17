@@ -3,7 +3,7 @@
 /**
  * A helper class for triggering and registering EVENTS
  *
- * @memberof HashBrown.Client.Service
+ * @memberof HashBrown.Common.Service
  */
 class EventService {
     /**
@@ -47,7 +47,7 @@ class EventService {
      */
     static trigger(type, value) {
         checkParam(type, 'type', String);
-        
+
         if(!this.events || !this.events[type]) { return; }
 
         for(let id in this.events[type]) {

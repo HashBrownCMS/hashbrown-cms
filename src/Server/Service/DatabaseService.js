@@ -130,13 +130,34 @@ class DatabaseService {
      * @return {Promise} Client
      */
     static async connect(databaseName) {
-        return await MongoClient.connect(
+        if(this.client) { return this.client; }
+
+        debug.log('Connecting to database...', this);
+
+        this.client = await MongoClient.connect(
             this.getConnectionString(databaseName),
             {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
             }
         );
+
+        HashBrown.Service.EventService.on('stop', 'dbclient', () => {
+	    if(this.client) {
+                debug.log('Database connection closed', this);
+            	
+                this.client.close();
+	
+	        this.client = null;
+	    
+	    } else {
+                debug.error('Could not close database connection', this, true);
+	    }
+	});
+            
+	debug.log('...connection established', this);
+
+        return this.client;
     }
 
     /**
@@ -246,8 +267,6 @@ class DatabaseService {
             collections = await client.db().listCollections().toArray();
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
 
         return collections;
@@ -267,8 +286,6 @@ class DatabaseService {
             result = await client.db('admin').admin().listDatabases();
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
 
         if(!result) { return []; }
@@ -348,8 +365,6 @@ class DatabaseService {
             doc = await client.db().collection(collectionName).findOne(query, projection);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
 
         if(doc && doc['_id']) {
@@ -386,8 +401,6 @@ class DatabaseService {
 
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            if(client) { client.close(); }
         }
 
         return docs;
@@ -411,8 +424,6 @@ class DatabaseService {
             result = await client.db().collection(collectionName).count(query);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
 
         return result;
@@ -461,8 +472,6 @@ class DatabaseService {
             await client.db().collection(collectionName).updateOne(query, { $set: doc }, options || {});
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }
     
@@ -488,8 +497,6 @@ class DatabaseService {
             await client.db().collection(collectionName).updateMany(query, { $set: doc }, options || {});
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }
     
@@ -513,8 +520,6 @@ class DatabaseService {
             await client.db().collection(collectionName).insertOne(doc);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }
     
@@ -535,8 +540,6 @@ class DatabaseService {
             await client.db().collection(collectionName).deleteMany(query, true);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }    
     
@@ -557,8 +560,6 @@ class DatabaseService {
             await client.db().collection(collectionName).removeOne(query, true);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }    
     
@@ -578,8 +579,6 @@ class DatabaseService {
             await client.db().dropCollection(collectionName);
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }
 
@@ -598,8 +597,6 @@ class DatabaseService {
             await client.db().dropDatabase();
         } catch(e) {
             debug.error(e, this);
-        } finally {
-            client.close();
         }
     }
 }
