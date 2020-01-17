@@ -56,7 +56,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).cookie('token', token).send(token);
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);
         
         }
     }
@@ -71,7 +71,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).cookie('token', '').redirect('/');
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);
         
         }
     }
@@ -90,7 +90,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send(user);
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);
         
         }
     }
@@ -105,7 +105,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.send(user.scopes);
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);
         
         }
     }
@@ -128,7 +128,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send(users);
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);   
         
         }
     }
@@ -142,6 +142,10 @@ class UserController extends HashBrown.Controller.ApiController {
         try {
             let user = await HashBrown.Service.UserService.getUserById(id);
 
+            if(!user) {
+                throw new Error(`User by id ${id} not found`);
+            }
+
             user.clearSensitiveData();
                 
             user = user.getObject();
@@ -151,7 +155,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send(user);
         
         } catch(e) {
-            res.status(404).send(UserController.printError(e));   
+            res.status(e.code || 404).send(e.message);   
         
         }
     }
@@ -188,7 +192,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send(user);
         
         } catch(e) {
-            res.status(400).send(UserController.printError(e));   
+            res.status(e.code || 400).send(e.message);   
         
         }
     }
@@ -205,7 +209,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send('OK');
         
         } catch(e) {
-            res.status(502).send(UserController.printError(e));
+            res.status(e.code || 502).send(e.message);
         
         }
     }
@@ -230,7 +234,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).cookie('token', token).send(token);
         
         } catch(e) {
-            res.status(403).send(UserController.printError(e));   
+            res.status(e.code || 403).send(e.message);   
         
         }
     }
@@ -250,7 +254,7 @@ class UserController extends HashBrown.Controller.ApiController {
             res.status(200).send(user);
         
         } catch(e) {
-            res.status(400).send(UserController.printError(e));   
+            res.status(e.code || 400).send(e.message);   
         
         }
     }

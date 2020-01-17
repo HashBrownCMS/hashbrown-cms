@@ -130,11 +130,13 @@ class DatabaseService {
      * @return {Promise} Client
      */
     static async connect(databaseName) {
-        if(this.client) { return this.client; }
+        if(this.clients && this.clients[databaseName]) { return this.clients[databaseName]; }
 
-        debug.log('Connecting to database...', this);
+        debug.log(`Connecting to database "${databaseName}"...`, this);
 
-        this.client = await MongoClient.connect(
+        if(!this.clients) { this.clients = {}; }
+
+        this.clients[databaseName] = await MongoClient.connect(
             this.getConnectionString(databaseName),
             {
                 useNewUrlParser: true,
@@ -143,21 +145,24 @@ class DatabaseService {
         );
 
         HashBrown.Service.EventService.on('stop', 'dbclient', () => {
-	    if(this.client) {
-                debug.log('Database connection closed', this);
-            	
-                this.client.close();
-	
-	        this.client = null;
-	    
-	    } else {
-                debug.error('Could not close database connection', this, true);
-	    }
-	});
-            
-	debug.log('...connection established', this);
+            if(this.clients) {
+                debug.log('Database connections closed', this);
 
-        return this.client;
+                for(let databaseName in this.clients) {
+                    this.clients[databaseName].close();
+                }
+
+                this.clients = null;
+
+            } else {
+                debug.log('No database connections to close', this, true);
+            
+            }
+        });
+
+        debug.log('...connection established', this);
+
+        return this.clients[databaseName];
     }
 
     /**
