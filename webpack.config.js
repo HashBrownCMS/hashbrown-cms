@@ -10,6 +10,9 @@ const FileSystem = require('fs');
 const IS_WATCHING = Array.isArray(process.argv) && process.argv.indexOf('--watch') > -1;
 const TMP_PATH = Path.join(__dirname, 'tmp');
 const PLUGINS_PATH = Path.join(__dirname, 'plugins');
+const PUBLIC_PATH = Path.join(__dirname, 'public');
+const PUBLIC_JS_PATH = Path.join(PUBLIC_PATH, 'js');
+const PUBLIC_CSS_PATH = Path.join(PUBLIC_PATH, 'css');
 
 /**
  * Gets all .js entries
@@ -28,6 +31,8 @@ function getJsEntries() {
     }
 
     // Include plugins
+    FileSystem.writeFileSync(Path.join(PUBLIC_JS_PATH, 'plugins.js'), '/* No plugins installed */');
+    
     let pluginScripts = [];
 
     if(FileSystem.existsSync(PLUGINS_PATH)) {
