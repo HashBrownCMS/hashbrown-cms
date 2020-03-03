@@ -9,9 +9,6 @@ const FileSystem = require('fs');
 const Path = require('path');
 
 // Libs
-const Express = require('express');
-const BodyParser = require('body-parser');
-const CookieParser = require('cookie-parser');
 const AppModulePath = require('app-module-path'); 
 
 // Make sure we can require our source files conveniently
@@ -24,38 +21,33 @@ require('Server/Service');
 require('Server/Entity');
 require('Server/Controller');
 
-// Express app
-const app = Express();
-
-app.disable('etag');
-app.engine('js', HashBrown.Entity.View.ViewBase.engine);
-app.set('view engine', 'js');
-app.set('views', Path.join(APP_ROOT, 'template', 'page'));
-
-app.use(CookieParser());
-app.use(BodyParser.json({limit: '50mb'}));
-app.use(Express.static(Path.join(APP_ROOT, 'public')));
-app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'storage', 'plugins')));
-
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;
 
-// HTTP error type
+// HTTP response type
 global.HttpError = class HttpError extends Error {
-    constructor(code, message) {
+    constructor(message, code) {
         super(message);
 
+        this.code = code || 500;
+    }
+}
+
+global.HttpSuccess = class HttpSuccess {
+    constructor(data, code, headers) {
+        this.data = data;
         this.code = code;
+        this.headers = headers;
     }
 }
 
 async function main() {
     // Check CLI input
-    await HashBrown.Service.AppService.processInput();
+    await HashBrown.Controller.InputController.handle();
 
     // Register system cleanup event
     for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'exit' ]) {
-	process.on(signal, () => { HashBrown.Service.EventService.trigger('stop'); });
+        process.on(signal, () => { HashBrown.Service.EventService.trigger('stop'); });
     }
 
     // Init plugins
@@ -63,20 +55,24 @@ async function main() {
 
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
-    let server = HTTP.createServer(app).listen(port);
+    
+    let server = HTTP.createServer(async (request, response) => {
+        let result = new HttpError('Not found', 404);
+
+        for(let name in HashBrown.Controller) {
+            if(HashBrown.Controller[name].canHandle(request)) {
+                result = await HashBrown.Controller[name].handle(request, response);
+                break;
+            }
+        }
+
+        response.writeHead(result.code, result.headers || {});
+        response.end(result.trace || result.message || result.data);
+    });
+        
+    server.listen(port);
 
     debug.log('HTTP server restarted on port ' + port, 'HashBrown');
-    
-    // Init controllers
-    for(let name in HashBrown.Controller) {
-        if(
-            name === 'ResourceController' ||
-            name === 'ApiController' ||
-            name === 'ControllerBase'
-        ) { continue; }
-
-        HashBrown.Controller[name].init(app);
-    }
 
     // Start watching for file changes
     if(process.env.WATCH) {

@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Server.Controller
  */
-class ResourceController extends HashBrown.Controller.ApiController {
+class ResourceController extends HashBrown.Controller.ControllerBase {
     static get category() {
         throw new Error('The "category" getter method must be overridden');
     }

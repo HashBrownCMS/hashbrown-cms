@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Server.Controller
  */
-class SyncController extends HashBrown.Controller.ApiController {
+class SyncController extends HashBrown.Controller.ControllerBase {
     /**
      * Initialises this controller
      */

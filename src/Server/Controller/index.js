@@ -5,7 +5,7 @@
  */
 namespace('Controller')
 .add(require('./ControllerBase'))
-.add(require('./ApiController'))
+.add(require('./InputController'))
 .add(require('./ResourceController'))
 .add(require('./ConfigController'))
 .add(require('./ConnectionController'))

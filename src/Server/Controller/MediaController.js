@@ -8,7 +8,7 @@ const Path = require('path');
  *
  * @memberof HashBrown.Server.Controller
  */
-class MediaController extends HashBrown.Controller.ApiController {
+class MediaController extends HashBrown.Controller.ControllerBase {
     /**
      * Initiates this controller
      */
