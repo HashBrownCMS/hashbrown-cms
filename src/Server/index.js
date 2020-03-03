@@ -26,14 +26,18 @@ global.debug = HashBrown.Service.DebugService;
 
 // HTTP response type
 global.HttpError = class HttpError extends Error {
-    constructor(message, code) {
+    constructor(message, code, stack) {
         super(message);
 
         this.code = code || 500;
+
+        if(stack) {
+            this.stack = stack;
+        }
     }
 }
 
-global.HttpSuccess = class HttpSuccess {
+global.HttpResponse = class HttpResponse {
     constructor(data, code, headers) {
         this.data = data;
         this.code = code;

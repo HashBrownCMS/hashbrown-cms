@@ -123,15 +123,19 @@ class ControllerBase {
             // Read request body
             let requestBody = await this.getBody(request);
 
-            let responseSuccess = await route.handler(request, requestParams, requestBody, user);
+            let responseSuccess = await route.handler.call(this, request, requestParams, requestBody, user);
 
-            if(responseSuccess instanceof HttpSuccess === false) {
-                return new HttpResponse('Response was not of type HttpSuccess', 500);
+            if(responseSuccess instanceof HttpResponse === false) {
+                return new HttpResponse('Response was not of type HttpResponse', 500);
             }
 
             return responseSuccess;
 
         } catch(error) {
+            if(error instanceof HttpError === false) {
+                error = new HttpError(error.message, 500, error.stack);
+            }
+
             return this.error(error);
 
         }

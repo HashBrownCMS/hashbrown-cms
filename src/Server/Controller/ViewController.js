@@ -19,6 +19,9 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             '/': {
                 redirect: '/dashboard'
             },
+            '/login': {
+                handler: this.login,
+            },
             '/dashboard': {
                 redirect: '/dashboard/projects',
             },
@@ -80,7 +83,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      *
      * @return {HttpResponse} Rendered content
      */
-    static async render(template, model = {}, code = 200) {
+    static render(template, model = {}, code = 200) {
         checkParam(template, 'template', String, true);
         checkParam(model, 'model', Object);
         checkParam(code, 'code', Number, true);
@@ -131,13 +134,20 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Login
+     */
+    static async login(req, params, body, user) {
+        return this.render('login');
+    }
+    
+    /**
      * First time setup
      */
     static async setup(req, params, body, user) {
         let users = await HashBrown.Service.UserService.getAllUsers();
         
         if(users && users.length > 0) { 
-            return res.status(400).render('error', { message: 'Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.' });
+            return new HttpResponse('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
         }
 
         return this.render('setup', { step: params.step });
