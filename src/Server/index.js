@@ -24,7 +24,7 @@ require('Server/Controller');
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;
 
-// HTTP response type
+// HTTP framework
 global.HttpError = class HttpError extends Error {
     constructor(message, code, stack) {
         super(message);
@@ -40,9 +40,33 @@ global.HttpError = class HttpError extends Error {
 global.HttpResponse = class HttpResponse {
     constructor(data, code, headers) {
         this.data = data;
-        this.code = code;
-        this.headers = headers;
+        this.code = code || 200;
+        this.headers = headers || {};
+
+        if(typeof this.data === 'object' && !this.headers['Content-Type']) {
+            this.headers['Content-Type'] = 'application/json';
+        }
     }
+}
+
+async function serve(request, response) {
+    let result = new HttpError(`No route matched ${request.url}`, 404);
+
+    for(let name in HashBrown.Controller) {
+        let controller = HashBrown.Controller[name];
+
+        if(!controller.canHandle(request)) { continue; }
+
+        try {
+            result = await controller.handle(request, response);
+        } catch(e) {
+            result = new HttpError(`${name}: ${e.message}`, 500, e.stack);
+        }
+        break;
+    }
+
+    response.writeHead(result.code, result.headers || {});
+    response.end(result.stack || result.message || result.data);
 }
 
 async function main() {
@@ -60,22 +84,8 @@ async function main() {
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
     
-    let server = HTTP.createServer(async (request, response) => {
-        let result = new HttpError('Not found', 404);
-
-        for(let name in HashBrown.Controller) {
-            if(HashBrown.Controller[name].canHandle(request)) {
-                result = await HashBrown.Controller[name].handle(request, response);
-                break;
-            }
-        }
-
-        response.writeHead(result.code, result.headers || {});
-        response.end(result.trace || result.message || result.data);
-    });
+    HTTP.createServer(serve).listen(port);
         
-    server.listen(port);
-
     debug.log('HTTP server restarted on port ' + port, 'HashBrown');
 
     // Start watching for file changes

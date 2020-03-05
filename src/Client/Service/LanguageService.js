@@ -18,7 +18,7 @@ class LanguageService extends require('Common/Service/LanguageService') {
     static getLanguages(project) {
         project = project || HashBrown.Service.ProjectService.currentProject;
 
-        return HashBrown.Service.SettingsService.getSettings(project, null, 'languages')
+        return HashBrown.Service.SettingsService.getSettings(project, 'languages')
         .then((selected) => {
             if(!selected || !Array.isArray(selected)) {
                 selected = ['en'];
@@ -48,7 +48,7 @@ class LanguageService extends require('Common/Service/LanguageService') {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
         }
 
-        return HashBrown.Service.SettingsService.setSettings(project, null, 'languages', languages);
+        return HashBrown.Service.SettingsService.setSettings(project, 'languages', languages);
     }
 }
 

@@ -19,14 +19,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             '/': {
                 redirect: '/dashboard'
             },
-            '/login': {
-                handler: this.login,
-            },
             '/dashboard': {
                 redirect: '/dashboard/projects',
-            },
-            '/css/theme.css': {
-                handler: this.theme
             },
             '/update-browser': {
                 handler: this.updateBrowser
@@ -40,6 +34,9 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             },
             '/demo': {
                 handler: this.demo
+            },
+            '/setup': {
+                redirect: '/setup/1'
             },
             '/setup/${step}': {
                 hander: this.setup
@@ -58,9 +55,9 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Handles an error
      *
-     * TODO: Redirect to setup screen when needed
-     *
      * @param {HttpError} error
+     *
+     * @return {HttpError|HttpResponse} Response
      */
     static error(error) {
         checkParam(error, 'error', HttpError, true);
@@ -69,8 +66,14 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             default:
                 return super.error(error);
             
-            case 402:
-                return new HttpResponse(error.message, 302, { 'Location': '/login', 'Content-Type': 'text/plain' });
+            case 401:
+                let users = HashBrown.Service.UserService.getAllUsers();
+
+                if(!users || users.length < 1) {
+                    return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
+                }
+
+                return this.render('login', { message: error.message });
         }
     }
 
@@ -99,21 +102,9 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * Serve theme
-     */
-    static async theme(req, params, body, user) {
-        let theme = user && user.theme ? user.theme : 'default';
-
-        let path = Path.join(APP_ROOT, 'theme', theme + '.css');
-        let content = await HashBrown.Service.FileService.read(path);
-
-        return new HttpResponse(content, 200, { 'Content-Type': 'text/css' });
-    }
-
-    /**
      * Browser update screen
      */
-    static async updateBrowser(req, params, body, user) {
+    static async updateBrowser(request, params, body, query, user) {
         return this.render(
             'error',
             {
@@ -126,7 +117,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Readme
      */
-    static async readme(req, params, body, user) {
+    static async readme(request, params, body, query, user) {
         let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
         let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
 
@@ -136,27 +127,27 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Login
      */
-    static async login(req, params, body, user) {
+    static async login(request, params, body, query, user) {
         return this.render('login');
     }
     
     /**
      * First time setup
      */
-    static async setup(req, params, body, user) {
+    static async setup(request, params, body, query, user) {
         let users = await HashBrown.Service.UserService.getAllUsers();
         
         if(users && users.length > 0) { 
             return new HttpResponse('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
         }
 
-        return this.render('setup', { step: params.step });
+        return this.render('setup', { step: params.step || 1 });
     }
 
     /**
      * Dashboard
      */
-    static async dashboard(req, params, body, user) {
+    static async dashboard(request, params, body, query, user) {
         user.clearSensitiveData();
         
         let themes = await HashBrown.Service.AppService.getThemes();
@@ -169,7 +160,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         uptime['minutes'] = Math.floor(uptime['seconds'] % (60*60) / 60);
 
         return this.render('dashboard', {
-            tab: req.params.tab,
+            tab: params.tab,
             os: OS,
             user: user,
             app: require(Path.join(APP_ROOT, 'package.json')),
@@ -181,7 +172,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Test
      */
-    static async test(req, params, body, user) {
+    static async test(request, params, body, query, user) {
         user.clearSensitiveData();
             
         return this.render('test', {
@@ -193,14 +184,14 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Demo
      */
-    static async demo(req, params, body, user) {
+    static async demo(request, params, body, query, user) {
         return this.render('demo', { title: 'Demo | HashBrown CMS' });
     }
 
     /**
      * Environment
      */
-    static async environment(req, params, body, user) {
+    static async environment(request, params, body, query, user) {
         user.clearSensitiveData();
 
         let themes = await HashBrown.Service.AppService.getThemes();

@@ -62,10 +62,10 @@ class ConnectionService extends require('Common/Service/ConnectionService') {
      * @return {HashBrown.Entity.Resource.Connection} Connection object
      */
     static async getMediaProvider() {
-        let providers = await HashBrown.Service.SettingsService.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        let settings = await HashBrown.Service.SettingsService.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment);
         
-        if(providers && providers.media) {
-            return await this.getConnectionById(providers.media);
+        if(settings.providers && settings.providers.media) {
+            return await this.getConnectionById(settings.providers.media);
         } else {
             return null;
         }

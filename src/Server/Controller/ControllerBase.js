@@ -36,33 +36,82 @@ class ControllerBase {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
 
         let requestPath = Url.parse(request.url, true).path;
-        let paramPattern = /\${([^}]+)}/g;
-        
-        for(let routePattern in this.routes) {
-            let route = this.routes[routePattern];
-            route.pattern = routePattern;
-            route.regex = route.pattern.indexOf('${') < 0 ? null : new RegExp(route.pattern.replace(paramPattern, '([^\/]+)'));
+        let route = null;
 
-            if(
-                route.pattern === requestPath ||
-                (route.regex && route.regex.test(requestPath))
-            ) {
-                return route;
+        // First test for exact matches
+        for(let pattern in this.routes) {
+            if(pattern !== requestPath) { continue; }
+
+            route = this.routes[pattern];
+            route.pattern = pattern;
+            break;
+        }
+
+        // Then test for regex matches
+        if(!route) {
+            for(let pattern in this.routes) {
+                if(pattern.indexOf('${') < 0) { continue; }
+
+                let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
+                
+                if(!regex.test(requestPath)) { continue; }
+
+                route = this.routes[pattern];
+                route.pattern = pattern;
+                break;
             }
         }
 
-        return null;
+        // Perform sanity check
+        if(route) {
+            if(!route.methods || !Array.isArray(route.methods)) {
+                route.methods = [ 'GET' ];
+            }
+        }
+
+        return route;
+    }
+
+    /**
+     * Parses a request path and route pattern into a parameters object
+     *
+     * @param {String} path
+     * @param {String} pattern
+     *
+     * @return {Object} Parameters
+     */
+    static getRequestParameters(path, pattern) {
+        checkParam(path, 'path', String);
+        checkParam(pattern, 'pattern', String);
+
+        if(!path || !pattern) { return {}; }
+
+        let pathParts = path.split('/');
+        let patternParts = pattern.split('/');
+            
+        let params = {};
+                
+        for(let i in pathParts) {
+            let match = (patternParts[i] || '').match(/\${([^}]+)}/);
+
+            if(!match || !match[1]) { continue; }
+            
+            let key = match[1];
+            let value = pathParts[i];
+
+            params[key] = value;
+        }
+
+        return params;
     }
 
     /**
      * Handles a request
      *
      * @param {HTTP.IncomingMessage} request
-     * @param {HTTP.ServerResponse} response
      */
-    static async handle(request, response) {
+    static async handle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(response, 'response', HTTP.ServerResponse, true);
        
         let requestPath = Url.parse(request.url, true).path;
         
@@ -81,49 +130,51 @@ class ControllerBase {
                 return new HttpResponse(`Handler for route ${requestPath} is not a function`, 500);
             }
 
-            let paramPattern = new RegExp('${([^}]+)}', 'g');
-            
-            // Build request parameters
-            let requestParams = {};
-
-            if(route.regex) {
-                let routeParamNames = (route.pattern.match(paramPattern) || []).map(p => p.replace(/[\${}]/g, ''));
-                let requestParamValues = (request.url.match(route.regex) || []);
-
-                for(let i in routeParamNames) {
-                    requestParams[routeParamNames[i]] = requestParamValues[i];
-                }
+            // Check for allowed methods
+            if(route.methods.indexOf(request.method) < 0) {
+                return new HttpResponse(`Route ${requestPath} does not support method ${request.method}`, 405);
             }
 
-            // Authorise user
+            // Get request parameters
+            let requestParameters = this.getRequestParameters(requestPath, route.pattern);
+
+            // 3 levels of user auth
             let user = null;
 
-            if(route.user && (route.user === true || typeof route.user === 'object')) {
-                user = await this.authorize(request, requestParams.project, route.user.scope, route.user.isAdmin);
+            if(route.user === true) {
+                user = await this.authenticate(request);
+            
+            } else if(typeof route.user === 'object') {
+                user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
+            
+            } else {
+                user = await this.authenticate(request, true);
+
             }
 
             // Validate project
-            if(requestParams.project) {
-                let projectExists = await HashBrown.Service.ProjectService.projectExists(requestParams.project);
+            if(requestParameters.project) {
+                let projectExists = await HashBrown.Service.ProjectService.projectExists(requestParameters.project);
 
                 if(!projectExists) {
-                    return new HttpResponse(`Project "{requestParams.project}" could not be found`, 404);
+                    return new HttpResponse(`Project "{requestParameters.project}" could not be found`, 404);
                 }
 
                 // Validate environment
-                if(requestParams.environment) {
-                    let environmentExists = await HashBrown.Service.ProjectService.environmentExists(requestParams.project, requestParams.environment);
+                if(requestParameters.environment) {
+                    let environmentExists = await HashBrown.Service.ProjectService.environmentExists(requestParameters.project, requestParameters.environment);
 
                     if(!environmentExists) {
-                        return new HttpResponse(`Environment "${requestParams.environment}" was not found for project "${requestParams.project}"`, 404);
+                        return new HttpResponse(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
                     }
                 }
             }
 
             // Read request body
-            let requestBody = await this.getBody(request);
+            let requestBody = await this.getRequestBody(request);
+            let requestQuery = Url.parse(request.url, true).query || {};
 
-            let responseSuccess = await route.handler.call(this, request, requestParams, requestBody, user);
+            let responseSuccess = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
 
             if(responseSuccess instanceof HttpResponse === false) {
                 return new HttpResponse('Response was not of type HttpResponse', 500);
@@ -156,36 +207,56 @@ class ControllerBase {
      * Gets the body of a request
      *
      * @param {HTTP.IncomingMessage} request
+     * @param {Boolean} asBuffer
      *
-     * @return {Object} Body
+     * @return {Object|Buffer} Body
      */
-    static getBody(request) {
+    static getRequestBody(request, asBuffer = false) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(asBuffer, 'asBuffer', Boolean);
 
         return new Promise((resolve, reject) => {
-            switch(request.method) {
-                case 'POST': case 'PUT':
-                    let body = '';
+            let body = '';
 
-                    request.on('data', (data) => {
-                        body += data;
+            request.on('data', (data) => {
+                body += data;
 
-                        if(body.length > MAX_UPLOAD_SIZE) {
-                            request.connection.destroy();
-                            reject(new HttpError('Body exceeded maximum capacity', 413));
-                        }
-                    });
+                if(body.length > MAX_UPLOAD_SIZE) {
+                    request.connection.destroy();
+                    reject(new HttpError('Body exceeded maximum capacity', 413));
+                }
+            });
 
-                    request.on('end', () => {
-                        resolve(QueryString.parse(body));
-                    });
-                    break;
+            request.on('end', () => {
+                if(asBuffer) {
+                    body = Buffer.from(body);
 
-                case 'GET':
-                    resolve(Url.parse(request.url, true).query);
-                    break;
-            }
+                } else {
+                    try {
+                        body = JSON.parse(body);
+                    } catch(e) {
+                        body = QueryString.parse(body);
+                    }
+                }
+
+                resolve(body);
+            });
         }); 
+    }
+
+    /**
+     * Uploads a file
+     *
+     * @param {HTTP.IncomingMessage} request
+     * @param {String} path
+     */
+    static async uploadFile(request, path) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(path, 'path', String, true);
+
+        let data = await this.getBody(request, true);
+
+        await HashBrown.Service.FileService.write(data, path);
     }
 
     /**
@@ -200,7 +271,7 @@ class ControllerBase {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
         checkParam(key, 'key', String, true);
 
-        for(let kvp of request.headers.cookie.split(';')) {
+        for(let kvp of (request.headers.cookie || '').split(';')) {
             kvp = kvp.split('=');
 
             if(kvp[0] !== key) { continue; }
@@ -215,23 +286,25 @@ class ControllerBase {
      * Authenticates a request
      *
      * @param {HTTP.IncomingMessage} request
+     * @param {Boolean} ignoreErrors
      *
      * @returns {HashBrown.Entity.Resource.User} User object
      */
-    static async authenticate(request) {
+    static async authenticate(request, ignoreErrors = false) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        
+        checkParam(ignoreErrors, 'ignoreErrors', Boolean, true);
+
         let token = this.getCookie(request, 'token'); 
 
         // No token was provided
-        if(!token) {
+        if(!token && !ignoreErrors) {
             throw new HttpError('You need to be logged in to do that', 401);
         }
-    
+   
         let user = await HashBrown.Service.UserService.findToken(token);
         
         // No user was found
-        if(!user) {
+        if(!user && !ignoreErrors) {
             throw new HttpError('Your session has expired, please log in again', 401);
         }
             

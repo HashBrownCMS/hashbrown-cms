@@ -64,12 +64,12 @@ class UserService {
     /**
      * Logs out a User
      *
-     * @param {String} token
-     *
-     * @returns {Promise} Result
+     * @param {String} id
      */
-    static async logoutUser(token) {
-        let user = await this.findToken(token);
+    static async logoutUser(id) {
+        checkParam(id, 'id', String, true);
+
+        let user = await this.getUserById(id);
         
         user.removeToken(token);
 

@@ -54,63 +54,8 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      */
     getContentTypeHeader() {
         let name = (this.name || '').toLowerCase();
-        let extension = name.split('.');
-        
-        if(extension && extension.length > 0) {
-            extension = extension[extension.length - 1];
-        }
 
-        switch(extension) {
-            // Image types
-            case 'jpg':
-                return 'image/jpeg';
-            case 'png':
-                return 'image/png';
-            case 'gif':
-                return 'image/gif';
-            case 'bmp':
-                return 'image/bmp';
-            
-            // Audio types
-            case 'm4a':
-                return 'audio/m4a';
-            case 'mp3':
-                return 'audio/mp3';
-            case 'ogg':
-                return 'audio/ogg';
-            case 'wav':
-                return 'audio/wav';
-            
-            // Video types
-            case 'mp4':
-                return 'video/mp4';
-            case 'webm':
-                return 'video/webm';
-            case 'avi':
-                return 'video/avi';
-            case 'mov':
-                return 'video/quicktime';
-            case 'bmp':
-                return 'video/bmp';
-            case 'wmv':
-                return 'video/x-ms-wmv';
-            case '3gp':
-                return 'video/3gpp';
-            case 'mkv':
-                return 'video/x-matroska';
-
-            // SVG
-            case 'svg':
-                return 'image/svg+xml';
-            
-            // PDF
-            case 'pdf':
-                return 'application/pdf';
-
-            // Everything else
-            default:
-                return 'application/octet-stream';
-        }
+        return getMIMEType(name); 
     }
     
     /**

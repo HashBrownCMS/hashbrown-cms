@@ -10,23 +10,16 @@ class SettingsService extends require('Common/Service/SettingsService') {
      * Gets all settings
      *
      * @param {String} project
-     * @param {String} environment
      * @param {String} section
      *
      * @return {Promise(Object)}  settings
      */
-    static getSettings(project, environment = null, section = null) {
+    static getSettings(project, section = null) {
         checkParam(project, 'project', String);
 
         if(environment === '*') { environment = null; }
 
-        let apiUrl = '/api/' + project + '/';
-
-        if(environment) {
-            apiUrl += environment + '/'; 
-        }
-       
-        apiUrl += 'settings';
+        let apiUrl = '/api/projects/' + project + '/settings';
 
         if(section) {
             apiUrl += '/' + section;
@@ -39,29 +32,18 @@ class SettingsService extends require('Common/Service/SettingsService') {
      * Sets all settings
      *
      * @param {String} project
-     * @param {String} environment
      * @param {String} section
      * @param {Object} settings
      *
      * @return {Promise} promise
      */
-    static setSettings(project, environment = null, section = null, settings) {
+    static setSettings(project, section = null, settings) {
         checkParam(project, 'project', String);
         checkParam(settings, 'settings', Object);
 
         if(environment === '*') { environment = null; }
 
-        let apiUrl = '/api/' + project + '/';
-
-        settings.usedBy = 'project';
-
-        if(environment) {
-            apiUrl += environment + '/'; 
-
-            settings.usedBy = environment;
-        }
-       
-        apiUrl += 'settings';
+        let apiUrl = '/api/projects/' + project + '/settings';
 
         if(section) {
             apiUrl += '/' + section;

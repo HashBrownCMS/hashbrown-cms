@@ -35,9 +35,9 @@ class MediaService extends require('Common/Service/MediaService') {
      * Checks whether the Media provider exists
      */
     static async checkMediaProvider() {
-        let result = await HashBrown.Service.SettingsService.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment, 'providers');
+        let settings = await HashBrown.Service.SettingsService.getSettings(HashBrown.Context.projectId, HashBrown.Context.environment);
         
-        if(!result || !result.media) {
+        if(!settings || !settings.providers || !settings.providers.media) {
             throw new Error('No Media provider has been set for this project. Please make sure one of your connections has the "is Media provider" setting switched on.');
         }  
     }

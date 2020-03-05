@@ -314,34 +314,19 @@ class ProjectService {
      *
      * @returns {Promise} The new Project
      */
-    static createProject(name, userId) {
-        checkParam(name, 'name', String);
-        checkParam(userId, 'userId', String);
+    static async createProject(name) {
+        checkParam(name, 'name', String, true);
         
-        if(!name || !userId) {
-            return Promise.reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
-        }
-            
         let project = HashBrown.Entity.Project.create(name);
+        let exists = await this.projectExists(project.id);
 
-        return HashBrown.Service.UserService.getUserById(userId)
-        .then((user) => {
-            if(!user.isAdmin) {
-                return Promise.reject(new Error('Only admins can create projects'));
-            }
-            
-            return this.projectExists(project.id);
-        })
-        .then((exists) => {
-            if(exists === true) {
-                return Promise.reject('A project by name "' + name + '" already exists');
-            }
+        if(exists === true) {
+            throw new Error('A project by name "' + name + '" already exists');
+        }
 
-            return HashBrown.Service.DatabaseService.insertOne(project.id, 'settings', project.settings);
-        })
-        .then(() => {
-            return Promise.resolve(project);
-        });
+        await HashBrown.Service.DatabaseService.insertOne(project.id, 'settings', project.settings);
+
+        return project;
     }
 }
 

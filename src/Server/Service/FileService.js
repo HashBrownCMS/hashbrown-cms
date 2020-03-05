@@ -45,7 +45,7 @@ class FileService {
             
         await this.makeDirectory(path, position + 1);
     }
-
+    
     /**
      * Checks if a file or folder exists
      *
@@ -53,7 +53,7 @@ class FileService {
      *
      * @return {Promise} Whether or not the file/folder exists
      */
-    static async exists(path) {
+    static exists(path) {
         checkParam(path, 'path', String);
 
         return FileSystem.existsSync(path);
