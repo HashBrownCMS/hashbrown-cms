@@ -53,12 +53,6 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 user: {
                     isAdmin: true
                 }
-            },
-            
-            // Users for a project
-            '/api/${project}/users': {
-                handler: this.users,
-                user: true
             }
         };
     }    
@@ -113,11 +107,11 @@ class UserController extends HashBrown.Controller.ControllerBase {
      * Gets all users
      */
     static async users(request, params, body, query, user) {
-        let users = await HashBrown.Service.UserService.getAllUsers(params.project);
+        let users = await HashBrown.Service.UserService.getAllUsers();
     
         for(let i in users) {
             users[i].clearSensitiveData();
-            users[i].isCurrent = users[i].id === req.user.id;
+            users[i].isCurrent = users[i].id === user.id;
         }
 
         return new HttpResponse(users);

@@ -50,7 +50,14 @@ class ControllerBase {
         // Then test for regex matches
         if(!route) {
             for(let pattern in this.routes) {
-                if(pattern.indexOf('${') < 0) { continue; }
+                if(
+                    pattern.indexOf('${') < 0 ||
+                    pattern.split('/').length !== requestPath.split('/').length ||
+                    (
+                        this.routes[pattern].methods &&
+                        this.routes[pattern].methods.indexOf(request.method) < 0
+                    )
+                ) { continue; }
 
                 let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
                 
@@ -114,93 +121,84 @@ class ControllerBase {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
         let requestPath = Url.parse(request.url, true).path;
+        let route = this.getRoute(request);
+
+        if(!route) {
+            return new HttpResponse('Not found', 404);
+        }
+       
+        if(typeof route.redirect === 'string') {
+            return new HttpResponse(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
+        }
+
+        if(typeof route.handler !== 'function') {
+            return new HttpResponse(`Handler for route ${requestPath} is not a function`, 500);
+        }
+
+        // Check for allowed methods
+        if(route.methods.indexOf(request.method) < 0) {
+            return new HttpResponse(`Route ${route.pattern} does not support method ${request.method}`, 405);
+        }
+
+        // Get request parameters
+        let requestParameters = this.getRequestParameters(requestPath, route.pattern);
+
+        // 3 levels of user auth
+        let user = null;
+
+        if(route.user === true) {
+            user = await this.authenticate(request);
         
-        try {
-            let route = this.getRoute(request);
-
-            if(!route) {
-                return new HttpResponse('Not found', 404);
-            }
-           
-            if(typeof route.redirect === 'string') {
-                return new HttpResponse(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
-            }
-
-            if(typeof route.handler !== 'function') {
-                return new HttpResponse(`Handler for route ${requestPath} is not a function`, 500);
-            }
-
-            // Check for allowed methods
-            if(route.methods.indexOf(request.method) < 0) {
-                return new HttpResponse(`Route ${requestPath} does not support method ${request.method}`, 405);
-            }
-
-            // Get request parameters
-            let requestParameters = this.getRequestParameters(requestPath, route.pattern);
-
-            // 3 levels of user auth
-            let user = null;
-
-            if(route.user === true) {
-                user = await this.authenticate(request);
-            
-            } else if(typeof route.user === 'object') {
-                user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
-            
-            } else {
-                user = await this.authenticate(request, true);
-
-            }
-
-            // Validate project
-            if(requestParameters.project) {
-                let projectExists = await HashBrown.Service.ProjectService.projectExists(requestParameters.project);
-
-                if(!projectExists) {
-                    return new HttpResponse(`Project "{requestParameters.project}" could not be found`, 404);
-                }
-
-                // Validate environment
-                if(requestParameters.environment) {
-                    let environmentExists = await HashBrown.Service.ProjectService.environmentExists(requestParameters.project, requestParameters.environment);
-
-                    if(!environmentExists) {
-                        return new HttpResponse(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
-                    }
-                }
-            }
-
-            // Read request body
-            let requestBody = await this.getRequestBody(request);
-            let requestQuery = Url.parse(request.url, true).query || {};
-
-            let responseSuccess = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
-
-            if(responseSuccess instanceof HttpResponse === false) {
-                return new HttpResponse('Response was not of type HttpResponse', 500);
-            }
-
-            return responseSuccess;
-
-        } catch(error) {
-            if(error instanceof HttpError === false) {
-                error = new HttpError(error.message, 500, error.stack);
-            }
-
-            return this.error(error);
+        } else if(typeof route.user === 'object') {
+            user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
+        
+        } else {
+            user = await this.authenticate(request, true);
 
         }
+
+        // Validate project
+        if(requestParameters.project) {
+            let projectExists = await HashBrown.Service.ProjectService.projectExists(requestParameters.project);
+
+            if(!projectExists) {
+                return new HttpResponse(`Project "${requestParameters.project}" could not be found`, 404);
+            }
+
+            // Validate environment
+            if(requestParameters.environment) {
+                let environmentExists = await HashBrown.Service.ProjectService.environmentExists(requestParameters.project, requestParameters.environment);
+
+                if(!environmentExists) {
+                    return new HttpResponse(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
+                }
+            }
+        }
+
+        // Read request body
+        let requestBody = await this.getRequestBody(request);
+        let requestQuery = Url.parse(request.url, true).query || {};
+
+        let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
+
+        if(response instanceof HttpResponse === false) {
+            return new HttpResponse('Response was not of type HttpResponse', 500);
+        }
+
+        return response;
     }
 
     /**
      * Handles an error
      *
-     * @param {HttpError} error
+     * @param {Error} error
+     *
+     * @return {HttpResponse} Response
      */
     static error(error) {
-        checkParam(error, 'error', HttpError, true);
-       
-        return new HttpResponse(error.stack || error.message, error.code, { 'Content-Type': 'text/plain' });
+        checkParam(error, 'error', Error, true);
+        
+        return new HttpResponse(error.stack || error.message, error.code || 500, { 'Content-Type': 'text/plain' });
     }
 
     /**
@@ -341,6 +339,8 @@ class ControllerBase {
         if(scope && !user.hasScope(project, scope)) {
             throw new HttpError(`You do not have permission to use the "${scope}" scope in this project`, 403);
         }
+
+        return user;
     }
 }
 

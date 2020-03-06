@@ -17,7 +17,7 @@ async function initProjects() {
     if(projectList) {
         projectList.innerHTML = '';
 
-        let projectIds = await HashBrown.Service.RequestService.request('get', 'server/projects?ids=true');
+        let projectIds = await HashBrown.Service.RequestService.request('get', 'projects/ids');
        
         for(let projectId of projectIds || []) {
             let projectEditor = new HashBrown.Entity.View.ListItem.Project({

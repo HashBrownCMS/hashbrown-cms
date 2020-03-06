@@ -20,7 +20,7 @@ class DeleteProject extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickDelete() {
         try {
-            await HashBrown.Service.RequestService.request('delete', 'server/projects/' + this.model.id);
+            await HashBrown.Service.RequestService.request('delete', 'projects/' + this.model.id);
 
             this.trigger('change');
 

@@ -17,8 +17,6 @@ class SettingsService extends require('Common/Service/SettingsService') {
     static getSettings(project, section = null) {
         checkParam(project, 'project', String);
 
-        if(environment === '*') { environment = null; }
-
         let apiUrl = '/api/projects/' + project + '/settings';
 
         if(section) {
@@ -40,8 +38,6 @@ class SettingsService extends require('Common/Service/SettingsService') {
     static setSettings(project, section = null, settings) {
         checkParam(project, 'project', String);
         checkParam(settings, 'settings', Object);
-
-        if(environment === '*') { environment = null; }
 
         let apiUrl = '/api/projects/' + project + '/settings';
 

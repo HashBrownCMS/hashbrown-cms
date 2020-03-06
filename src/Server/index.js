@@ -39,18 +39,27 @@ global.HttpError = class HttpError extends Error {
 
 global.HttpResponse = class HttpResponse {
     constructor(data, code, headers) {
-        this.data = data;
-        this.code = code || 200;
-        this.headers = headers || {};
+        this.data = data || '';
+        this.code = isNaN(code) ? 200 : code;
+        this.headers = typeof headers === 'object' ? headers || {} : {};
 
         if(typeof this.data === 'object' && !this.headers['Content-Type']) {
             this.headers['Content-Type'] = 'application/json';
+            this.data = JSON.stringify(this.data);
+        }
+
+        if(!this.headers['Content-Type']) {
+            this.headers['Content-Type'] = 'text/plain';
+        }
+
+        if(typeof this.data !== 'string' && this.data instanceof Buffer === false) {
+            this.data = Buffer.from(this.data);
         }
     }
 }
 
 async function serve(request, response) {
-    let result = new HttpError(`No route matched ${request.url}`, 404);
+    let result = new HttpResponse(`No route matched ${request.url}`, 404);
 
     for(let name in HashBrown.Controller) {
         let controller = HashBrown.Controller[name];
@@ -60,13 +69,20 @@ async function serve(request, response) {
         try {
             result = await controller.handle(request, response);
         } catch(e) {
-            result = new HttpError(`${name}: ${e.message}`, 500, e.stack);
+            result = controller.error(e);
         }
         break;
     }
+    
+    if(result instanceof HttpResponse) {
+        response.writeHead(result.code || 200, result.headers || {});
+        response.end(result.data);
+    
+    } else {
+        response.writeHead(500, {});
+        response.end('Controller response was of an unknown format');
 
-    response.writeHead(result.code, result.headers || {});
-    response.end(result.stack || result.message || result.data);
+    }
 }
 
 async function main() {

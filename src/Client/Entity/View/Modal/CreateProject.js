@@ -33,7 +33,7 @@ class CreateProject extends HashBrown.Entity.View.Modal.ModalBase {
                 throw new Error('The project name is too short');
             }
 
-            await HashBrown.Service.RequestService.request('post', 'server/projects/new', { name: this.state.projectName });
+            await HashBrown.Service.RequestService.request('post', 'projects/new', { name: this.state.projectName });
 
             this.trigger('change');
 

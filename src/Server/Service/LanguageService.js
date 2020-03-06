@@ -52,7 +52,7 @@ class LanguageService extends require('Common/Service/LanguageService') {
                 return Promise.reject(new Error('Cannot change languages of a synced project'));
             }
 
-            return setSettings(project, null, 'languages', languages);
+            return setSettings(project, 'languages', languages);
         });
     }
 }

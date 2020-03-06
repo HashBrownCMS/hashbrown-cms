@@ -25,7 +25,6 @@ namespace('Service')
 .add(require('./SettingsService'))
 .add(require('./SyncService'))
 .add(require('./TestService'))
-.add(require('./UpdateService'))
 .add(require('./UserService'))
 .add(require('../../Common/Service/EventService'));
 

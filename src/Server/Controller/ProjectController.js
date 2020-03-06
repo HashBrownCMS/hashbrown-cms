@@ -17,6 +17,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 handler: this.projects,
                 user: true,
             },
+            '/api/projects/ids': {
+                handler: this.projectIds,
+                user: true,
+            },
             '/api/projects/new': {
                 handler: this.new,
                 user: {
@@ -100,6 +104,12 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     isAdmin: true
                 }
             },
+            
+            // Users
+            '/api/projects/${project}/users': {
+                handler: this.users,
+                user: true
+            },
 
             // Migration
             '/api/projects/${project}/migrate': {
@@ -124,15 +134,49 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'GET':
-                let project = await HashBrown.Service.ProjectService.getProject(project);
+                let result = await HashBrown.Service.ProjectService.getProject(project);
             
-                return new HttpResponse(project);
+                return new HttpResponse(result);
 
             case 'DELETE':
                 await HashBrown.Service.ProjectService.deleteProject(project);
                 
                 return new HttpResponse('OK');
         }
+    }
+    
+    /**
+     * Gets a list of all project ids
+     */
+    static async projectIds(request, params, body, query, user) {
+        let projects = await HashBrown.Service.ProjectService.getAllProjectIds();
+        
+        for(let i = projects.length - 1; i >= 0; i--) {
+            let id = projects[i];
+           
+            if(!user.hasScope(id)) { 
+                projects.splice(i, 1);
+            }
+        }
+
+        return new HttpResponse(projects);
+    }
+    
+    /**
+     * Gets a list of all projects
+     */
+    static async projects(request, params, body, query, user) {
+        let projects = await HashBrown.Service.ProjectService.getAllProjects();
+
+        for(let i = projects.length - 1; i >= 0; i--) {
+            let id = projects[i].id || projects[i];
+           
+            if(!user.hasScope(id)) { 
+                projects.splice(i, 1);
+            }
+        }
+
+        return new HttpResponse(projects);
     }
     
     /**
@@ -155,49 +199,17 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'POST':
-                await HashBrown.Service.SettingsService.setSettings(project, null, section, body);
+                await HashBrown.Service.SettingsService.setSettings(project, section, body);
         
                 return new HttpResponse('OK');
 
             case 'GET':
-                let settings = await HashBrown.Service.SettingsService.setSettings(project, null, section, body);
+                let settings = await HashBrown.Service.SettingsService.setSettings(project, section, body);
                 
                 return new HttpResponse(settings);
         }
     }
    
-    /**
-     * Gets a list of all projects
-     */
-    static async projects(request, params, body, query, user) {
-        let projects = [];
-        
-        if(query.ids) {
-            projects = await HashBrown.Service.ProjectService.getAllProjectIds();
-        } else {
-            projects = await HashBrown.Service.ProjectService.getAllProjects();
-        }
-
-        let scopedProjects = [];
-
-        if(!user.isAdmin) {
-            for(let scope in (user.scopes || {})) {
-                for(let project of projects) {
-                    if(project.id === scope || project === scope) {
-                        scopedProjects.push(project);
-                        break;
-                    }
-                }
-            }
-
-        } else {
-            scopedProjects = projects;
-                
-        }
-
-        return new HttpResponse(scopedProjects);
-    }
-    
     /**
      * Gets a list of all environments
      */
@@ -218,7 +230,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      */
     static async newEnvironment(request, params, body, query, user) {
         let project = params.project;
-        let environment = params.environment;
+        let environment = query.name || body.name;
 
         await HashBrown.Service.ProjectService.addEnvironment(project, environment);
 
@@ -352,6 +364,20 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
         report += '\n...done!';
 
         return new HttpResponse(report, 200);
+    }
+    
+    /**
+     * Gets all users
+     */
+    static async users(request, params, body, query, user) {
+        let users = await HashBrown.Service.UserService.getAllUsers(params.project);
+    
+        for(let i in users) {
+            users[i].clearSensitiveData();
+            users[i].isCurrent = users[i].id === user.id;
+        }
+
+        return new HttpResponse(users);
     }
 }
 

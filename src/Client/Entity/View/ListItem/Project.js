@@ -28,7 +28,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Service.RequestService.request('get', 'server/projects/' + this.modelId);
+        this.model = await HashBrown.Service.RequestService.request('get', 'projects/' + this.modelId);
         this.model = new HashBrown.Entity.Project(this.model);
     }
         
@@ -60,7 +60,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         })
         .on('ok', async () => {
             try {
-                await HashBrown.Service.RequestService.request('delete', 'server/projects/' + this.model.id + '/' + environmentName);
+                await HashBrown.Service.RequestService.request('delete', 'projects/' + this.model.id + '/environments/' + environmentName);
 
                 this.update();
 

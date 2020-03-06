@@ -44,7 +44,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
         if(!HashBrown.Context.user.isAdmin) { return; }
 
         try {
-            let timestamp = await HashBrown.Service.RequestService.request('post', '/projects/' + this.model.id + '/backups/new');
+            let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/new');
             this.model.backups.push(timestamp);
           
             this.trigger('change');

@@ -158,29 +158,30 @@ class ProjectService {
     static async getAllEnvironments(project) {
         await this.checkProject(project);
 
-        let allSettings = await HashBrown.Service.DatabaseService.find(project, 'settings', {});
-            
-        let names = [];
+        let environments = await HashBrown.Service.SettingsService.getSettings(project, 'environments');
 
-        for(let setting of allSettings) {
-            if(!setting.usedBy || setting.usedBy === 'project') { continue; }
+        // If environment list could not be found, reconstruct it from old structure
+        if(!environments || !Array.isArray(environments) || environments.length < 1) {
+            let allSettings = await HashBrown.Service.DatabaseService.find(project, 'settings', {});
+                
+            for(let setting of allSettings) {
+                if(!setting.usedBy || setting.usedBy === 'project') { continue; }
 
-            names.push(setting.usedBy);
+                environments.push(setting.usedBy);
+            }
+        
+            await HashBrown.Service.SettingsService.setSettings(project, 'environments', environments);
         }
 
-        // If we have some environments, return them
-        if(names.length > 0) { return names; }
+        let unique = { 'live': true };
 
-        // If we don't, make sure there is a "live" one
-        // NOTE: Using the HashBrown.Service.DatabaseService directly here, since using the HashBrown.Service.SettingsService would create a cyclic call stack
-        await HashBrown.Service.DatabaseService.insertOne(
-            project,
-            'settings',
-            { usedBy: 'live' },
-            { upsert: true }
-        );
+        for(let environment of environments) {
+             unique[environment] = true;
+        }
 
-        return ['live'];  
+        environments = Object.keys(unique);
+
+        return environments;
     }
 
     /**
@@ -191,23 +192,17 @@ class ProjectService {
      *
      * @returns {Promise} Promise
      */
-    static deleteProject(id, makeBackup = true) {
+    static async deleteProject(id, makeBackup = true) {
         checkParam(id, 'id', String);
+        checkParam(makeBackup, 'makeBackup', Boolean);
 
-        return this.checkProject(id)
-        .then(() => {
-            // Make backup first, if specified
-            if(makeBackup) {
-                return HashBrown.Service.BackupService.createBackup(id)
-                .then(() => {
-                    return HashBrown.Service.DatabaseService.dropDatabase(id);
-                });
+        await this.checkProject(id);
 
-            // If not, just drop the database
-            } else {
-                return HashBrown.Service.DatabaseService.dropDatabase(id);
-            }
-        });
+        if(makeBackup) {
+            await HashBrown.Service.BackupService.createBackup(id);
+        }
+
+        await HashBrown.Service.DatabaseService.dropDatabase(id);
     }
 
     /**
@@ -218,27 +213,25 @@ class ProjectService {
      *
      * @returns {Promise} New environment
      */
-    static addEnvironment(project, environment) {
+    static async addEnvironment(project, environment) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
 
-        return this.checkProject(project)
-        .then(() => {
-            // Check if project is synced first
-            return HashBrown.Service.SettingsService.getSettings(project, null, 'sync');
-        })
-        .then((sync) => {
-            if(sync.enabled) {
-                return Promise.reject(new Error('Cannot add environments to a synced project'));
-            }
+        await this.checkProject(project);
+
+        let sync = await HashBrown.Service.SettingsService.getSettings(project, 'sync');
+
+        if(sync && sync.enabled) {
+            throw new Error('Cannot add environments to a synced project');
+        }
             
-            debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
-      
-            return HashBrown.Service.SettingsService.setSettings(project, environment, null, {}, true);
-        })
-        .then(() => {
-            return Promise.resolve(environment);  
-        });
+        debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
+  
+        let environments = await this.getAllEnvironments(project);
+
+        environments.push(environment);
+
+        await HashBrown.Service.SettingsService.setSettings(project, 'environments', environments);
     }
 
     /**
@@ -246,64 +239,40 @@ class ProjectService {
      *
      * @param {String} project
      * @param {String} environment
+     * @param {Boolean} makeBackup
      *
      * @returns {Promise} Promise
      */
-    static deleteEnvironment(project, environment) {
+    static async deleteEnvironment(project, environment, makeBackup = true) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
+        checkParam(makeBackup, 'makeBackup', Boolean);
 
-        return this.checkProject(project)
-        .then(() => {
-            // Check if project is synced first
-            return HashBrown.Service.SettingsService.getSettings(project, null, 'sync');
-        })
-        .then((sync) => {
-            if(sync.enabled) {
-                return Promise.reject(new Error('Cannot delete environments from a synced project'));
-            }
+        await this.checkProject(project);
+
+        let sync = await HashBrown.Service.SettingsService.getSettings(project, 'sync');
+
+        if(sync && sync.enabled) {
+            throw new Error('Cannot delete environments from a synced project');
+        }
         
-            debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
+        debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
 
-            // Make a backup
-            return HashBrown.Service.BackupService.createBackup(project);
-        })
-
-        // Get all collections with the environment prefix
-        .then(() => {
-            return HashBrown.Service.DatabaseService.listCollections(project);
-        })
+        if(makeBackup) {
+            await HashBrown.Service.BackupService.createBackup(project);
+        }
 
         // Iterate through collections and match them with the environment name
-        .then((collections) => {
-            let next = () => {
-                let collection = collections.pop();
+        let collections = await HashBrown.Service.DatabaseService.listCollections(project);
+            
+        for(let collection of collections) {
+            if(!collection.name) { continue; }
+            if(collection.name.indexOf(environment + '.') !== 0) { continue; }
 
-                // No more collections, resolve
-                if(!collection) {
-                    debug.log('Deleted environment "' + environment + '" from project "' + project + '" successfully', this);
-                    return Promise.resolve();
-                }
-
-                // This collection matches the environment name, drop it
-                if(collection.name.indexOf(environment + '.') == 0) {
-                    return HashBrown.Service.DatabaseService.dropCollection(project, collection.name)
-                    .then(() => {
-                        return next();
-                    });
-                }
-
-                // This collection does not match the environment name, iterate again 
-                return next();
-            }
-
-            return next();
-        })
-        
-        // Remove environment settings settings
-        .then(() => {
-            return HashBrown.Service.DatabaseService.remove(project, 'settings', { usedBy: environment });
-        });
+            await HashBrown.Service.DatabaseService.dropCollection(project, collection.name);
+        }
+                
+        debug.log('Deleted environment "' + environment + '" from project "' + project + '" successfully', this);
     }
     
     /**

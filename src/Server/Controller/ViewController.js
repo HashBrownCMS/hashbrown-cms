@@ -55,13 +55,13 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Handles an error
      *
-     * @param {HttpError} error
+     * @param {Error} error
      *
-     * @return {HttpError|HttpResponse} Response
+     * @return {HttpResponse} Response
      */
     static error(error) {
-        checkParam(error, 'error', HttpError, true);
-       
+        checkParam(error, 'error', Error, true);
+        
         switch(error.code) {
             default:
                 return super.error(error);
@@ -192,16 +192,17 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Environment
      */
     static async environment(request, params, body, query, user) {
-        user.clearSensitiveData();
-
+        let project = await HashBrown.Service.ProjectService.getProject(params.project);
         let themes = await HashBrown.Service.AppService.getThemes();
         
+        user.clearSensitiveData();
+
         return this.render('environment', {
             title: project.settings.info.name,
             currentProject: project.id,
             currentProjectName: project.settings.info.name,
             currentProjectSettings: project.settings,
-            currentEnvironment: req.params.environment,
+            currentEnvironment: params.environment,
             user: user,
             themes: themes
         });

@@ -19,7 +19,7 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches the model
      */
     async fetch() {
-        this.state.projects = await HashBrown.Service.RequestService.customRequest('get', '/api/server/projects');
+        this.state.projects = await HashBrown.Service.RequestService.customRequest('get', '/api/projects');
     }
    
     /**

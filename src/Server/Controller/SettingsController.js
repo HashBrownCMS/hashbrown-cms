@@ -55,7 +55,7 @@ class SettingsController extends HashBrown.Controller.ControllerBase {
     static setSettings(req, res) {
         let settings = req.body;
 
-        HashBrown.Service.SettingsService.setSettings(req.params.project, req.params.environment, req.params.section, settings)
+        HashBrown.Service.SettingsService.setSettings(req.params.project, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })
