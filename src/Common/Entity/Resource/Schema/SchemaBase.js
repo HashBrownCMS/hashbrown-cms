@@ -7,7 +7,7 @@
  */
 class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     static get category() { return 'schemas'; }
-    
+
     /**
      * Structure
      */
@@ -49,11 +49,11 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     /**
      * Creates a new schema
      *
-     * @param {Schema} parentSchema
+     * @param {HashBrown.Entity.Resource.Schema.SchemaBase} parentSchema
      *
-     * @returns {Schema} schema
+     * @returns {HashBrown.Entity.Resource.Schema.SchemaBase} New schema
      */
-    static create(parentSchema) {
+    static create(parentSchema = null) {
         checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.Schema.SchemaBase);
 
         return HashBrown.Service.SchemaService.getEntity({

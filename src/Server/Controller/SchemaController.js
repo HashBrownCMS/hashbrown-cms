@@ -11,30 +11,35 @@ class SchemaController extends HashBrown.Controller.ResourceController {
     static get category() { return 'schemas'; }
 
     /**
-     * Initialises this controller
+     * Routes
      */
-    static init(app) {
-        app.post('/api/:project/:environment/schemas/import', this.middleware(), this.getHandler('import'));
-
-        super.init(app);
+    static get routes() {
+        return {
+            ...super.routes,
+            '/api/${project}/${environment}/schemas/import': {
+                handler: this.import,
+                user: {
+                    scope: 'schemas'
+                }
+            }
+        };
     }
 
     /**
-     * @example POST /api/:project/:environment/import
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
+     * @example POST /api/${project}/${environment}/schemas/import?url=XXX
      */
-    static async import(req, res) {
-        if(!req.query.url) { throw new Error('URL was not provided'); }
+    static async import(request, params, body, query, user) {
+        if(!query.url) {
+            return new HttpResponse('URL was not provided', 400);
+        }
 
-        let url = req.query.url;
+        let url = query.url;
 
         let response = await HashBrown.Service.RequestService.request('get', url);
 
-        if(!response) { throw new Error('Response from web server was empty'); }
+        if(!response) {
+            return new HttpResponse('Response from web server was empty', 404);
+        }
         
         if(Array.isArray(response)) {
             // Sort schemas without parents first, to avoid dependency exceptions
@@ -46,144 +51,67 @@ class SchemaController extends HashBrown.Controller.ResourceController {
             });
 
             for(let json of response) {
-                await HashBrown.Service.SchemaService.importSchema(req.project, req.environment, json);
+                await HashBrown.Service.SchemaService.importSchema(params.project, params.environment, json);
             }
         } else {
-            await HashBrown.Service.SchemaService.importSchema(req.project, req.environment, response);
+            await HashBrown.Service.SchemaService.importSchema(params.project, params.environment, response);
         }
 
-        return response;
+        return new HttpResponse('OK');
     }
 
     /**
-     * @example GET /api/:project/:environment/schema
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Array} All schemas
+     * @example GET /api/${project}/${environment}/schemas?customOnly=true|false
      */
-    static async getAll(req, res) {
-        if(req.query.customOnly) {
-            return await HashBrown.Service.SchemaService.getCustomSchema(req.project, req.environment);
+    static async resources(request, params, body, query, user) {
+        let schemas = [];
+
+        if(query.customOnly) {
+            schemas = await HashBrown.Service.SchemaService.getCustomSchemas(params.project, params.environment);
+        
+        } else {
+            schemas = await HashBrown.Service.SchemaService.getAllSchemas(params.project, params.environment);
+        
         }
 
-        return await HashBrown.Service.SchemaService.getAllSchemas(req.project, req.environment);
+        return new HttpResponse(schemas);
     }
     
     /**
-     * @example GET /api/:project/:environment/schemas/:id
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} Schema
+     * @example GET|POST|DELETE /api/${project}/${environment}/schemas/${id}
      */
-    static async get(req, res) {
-        return await HashBrown.Service.SchemaService.getSchemaById(req.project, req.environment, req.params.id)
+    static async resource(request, params, body, query, user) {
+        switch(request.method) {
+            case 'GET':
+                let result = await HashBrown.Service.SchemaService.getSchemaById(params.project, params.environment, params.id);
+
+                if(!result) {
+                    return new HttpResponse('Not found', 404);
+                }
+
+                return new HttpResponse(result);
+                
+            case 'POST':
+                let updated = await HashBrown.Service.SchemaService.setSchemaById(params.project, params.environment, params.id, body);
+                
+                return new HttpResponse(updated);
+
+            case 'DELETE':
+                await HashBrown.Service.ResourceService.removeSchemaById(params.project, params.environment, params.id);
+
+                return new HttpResponse('OK');
+        }
+
+        return new HttpResponse('Unexpected error', 500);
     }
     
     /**
-     * @example POST /api/:project/:environment/schemas/:id
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     * @param {Boolean} create Whether the schema should be created if not found
-     *
-     * @param {HashBrown.Entity.Resource.SchemaBase} schema The schema model to update
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} Schema
+     * @example POST /api/:project/:environment/schemas/new?parentSchemaId=XXX
      */
-    static async set(req, res) {
-        let id = req.params.id;
-        let schema = HashBrown.Service.SchemaService.getEntity(req.body);
-        let create = req.query.create == 'true' || req.query.create == true;
+    static async new(request, params, body, query, user) {
+        let schema = await HashBrown.Service.SchemaService.createSchema(params.project, params.environment, query.parentSchemaId);
 
-        await HashBrown.Service.SchemaService.setSchemaById(req.project, req.environment, id, schema, create);
-
-        return schema;
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/schemas/pull/:id
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} The pulled schema
-     */
-    static async pull(req, res) {
-        let id = req.params.id;
-        let resourceItem = await HashBrown.Service.SyncService.getResourceItem(req.project, req.environment, 'schemas', id)
-        
-        if(!resourceItem) { throw new Error('Couldn\'t find remote schema "' + id + '"'); }
-    
-        await HashBrown.Service.SchemaService.setSchemaById(req.project, req.environment, id, HashBrown.Service.SchemaService.getEntity(resourceItem), true);
-
-        return resourceItem;
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/schemas/push/:id
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} The pushed schema
-     */
-    static async push(req, res) {
-        let id = req.params.id;
-
-        let localSchema = await HashBrown.Service.SchemaService.getSchemaById(req.project, req.environment, id);
-
-        await HashBrown.Service.SyncService.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
-       
-        return id;
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/schemas/new
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} The created schema
-     */
-    static async new(req, res) {
-        return await HashBrown.Service.SchemaService.createSchema(req.project, req.environment, req.query.parentSchemaId);
-    }
-    
-    /**
-     * @example DELETE /api/:project/:environment/schemas/:id
-     *
-     * @apiGroup Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     */
-    static async remove(req, res) {
-        let id = req.params.id;
-        
-        await HashBrown.Service.SchemaService.removeSchemaById(req.project, req.environment, id);
-
-        return 'Schema with id "' + id + '" deleted successfully';
+        return new HttpResponse(schema);
     }
 }
 

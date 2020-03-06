@@ -16,8 +16,17 @@ class FieldSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
         this.def(Object, 'config', {});
 
         this.name = 'New field schema';        
-        this.type = 'field';
     }
+    
+    /**
+     * Gets the type as a string
+     *
+     * @return {String} Type
+     */
+    get type() {
+        return 'field';
+    }
+
 
     /**
      * Checks the format of the params

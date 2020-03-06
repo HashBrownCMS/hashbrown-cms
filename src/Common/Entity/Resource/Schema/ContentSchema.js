@@ -20,9 +20,17 @@ class ContentSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
         this.def(Array, 'allowedChildSchemas', []);
 
         this.name = 'New content schema';
-        this.type = 'content';
     }
-    
+   
+    /**
+     * Gets the type as a string
+     *
+     * @return {String} Type
+     */
+    get type() {
+        return 'content';
+    }
+
     /**
      * Checks the format of the params
      *

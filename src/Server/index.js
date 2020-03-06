@@ -62,6 +62,8 @@ async function serve(request, response) {
     let result = new HttpResponse(`No route matched ${request.url}`, 404);
 
     for(let name in HashBrown.Controller) {
+        if(name === 'ControllerBase' || name === 'ResourceController') { continue; }
+
         let controller = HashBrown.Controller[name];
 
         if(!controller.canHandle(request)) { continue; }

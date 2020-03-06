@@ -262,11 +262,6 @@ class SyncService {
                     debug.log('"' + r + '" in remote resource "' + remoteResourceName + '" is not an object: ' + remoteItem, this);
 
                 } else {
-                    // Remove old variable names
-                    delete remoteItem.locked;
-                    delete remoteItem.remote;
-                    delete remoteItem.local;
-
                     remoteItem.isLocked = true;
 
                     remoteItem.sync = {
@@ -275,7 +270,6 @@ class SyncService {
                     };
 
                     remoteIds[remoteItem.id] = true;
-
                 }
             }
 

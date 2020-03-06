@@ -95,7 +95,7 @@ class ContentService extends require('Common/Service/ContentService') {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
-     * @param {Content} content
+     * @param {Object} content
      * @param {User} user
      * @param {Boolean} create
      *
@@ -105,7 +105,7 @@ class ContentService extends require('Common/Service/ContentService') {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(id, 'id', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
+        checkParam(content, 'content', Object);
         checkParam(user, 'user', HashBrown.Entity.Resource.User);
 
         // Check for empty Content object

@@ -50,14 +50,11 @@ class ControllerBase {
         // Then test for regex matches
         if(!route) {
             for(let pattern in this.routes) {
-                if(
-                    pattern.indexOf('${') < 0 ||
-                    pattern.split('/').length !== requestPath.split('/').length ||
-                    (
-                        this.routes[pattern].methods &&
-                        this.routes[pattern].methods.indexOf(request.method) < 0
-                    )
-                ) { continue; }
+                let patternHasVariables = pattern.indexOf('${') > -1;
+                let patternMatchesRequestPathLength = pattern.split('/').length === requestPath.split('/').length;
+                let routeSupportsRequestMethod = (request.method === 'GET' && !this.routes[pattern].methods) || (this.routes[pattern].methods && this.routes[pattern].methods.indexOf(request.method) > -1);
+                
+                if(!patternHasVariables || !patternMatchesRequestPathLength || !routeSupportsRequestMethod) { continue; }
 
                 let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
                 
