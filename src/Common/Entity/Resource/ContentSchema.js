@@ -3,9 +3,9 @@
 /**
  * Schema for content nodes
  *
- * @memberof HashBrown.Common.Entity.Resource.Schema
+ * @memberof HashBrown.Common.Entity.Resource
  */
-class ContentSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
+class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
     constructor(properties) {
         super(ContentSchema.paramsCheck(properties));
     }

@@ -8,76 +8,40 @@ const Path = require('path');
  *
  * @memberof HashBrown.Server.Controller
  */
-class MediaController extends HashBrown.Controller.ControllerBase {
+class MediaController extends HashBrown.Controller.ResourceController {
     /**
      * Initiates this controller
      */
     static init(app) {
-        app.get('/media/:project/:environment/:id', this.middleware({ authenticate: false }), this.serve);
-        
-        app.get('/api/:project/:environment/media/tree', this.middleware(), this.getTree);
-        app.get('/api/:project/:environment/media', this.middleware(), this.getAll);
-        app.get('/api/:project/:environment/media/:id', this.middleware(), this.get);
-        
-        app.post('/api/:project/:environment/media/new', this.middleware(), HashBrown.Service.MediaService.getUploadHandler(), this.new);
-        app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setTree);
-        app.post('/api/:project/:environment/media/:id', this.middleware(), HashBrown.Service.MediaService.getUploadHandler(), this.set);
-        app.post('/api/:project/:environment/media/rename/:id', this.middleware(), this.rename);
-        
-        app.delete('/api/:project/:environment/media/:id', this.middleware(), this.remove);
-    }
-    
-    /**
-     * Serves Media content
-     */
-    static async serve(req, res) {
-        let id = req.params.id;
-
-        if(id.indexOf('?') > -1) {
-            id = id.substring(0, id.indexOf('?'));
-        }
-
-        try {
-            let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
-            
-            if(!connection) {
-                return res.status(404).send('Not found');
+        '/api/${project}/${environment}/media/tree': {
+            handler: this.tree,
+            user: {
+                scope: 'media'
             }
-            
-            let media = await connection.getMedia(id);
-
-            if(!media || !media.path) {
-                return res.status(404).send('Not found');
+        },
+        '/api/${project}/${environment}/media/tree/${id}', {
+            handler: this.treeItem,
+            methods: [ 'POST' ],
+            user: {
+                scope: 'media'
             }
-            
-            let data = await HashBrown.Service.MediaService.getCachedMedia(req.project, media, parseInt(req.query.width), parseInt(req.query.height));
-            
-            res.writeHead(200, {'Content-Type': media.getContentTypeHeader()});
-            res.end(data);
-
-        } catch(e) {
-            res.status(404).end(e.message); 
+        },
+        '/api/${project}/${environment}/media/${id}/rename': {
+            handler: this.rename,
+            methods: [ 'POST' ],
+            user: {
+                scope: 'media'
+            }
         }
     }
     
     /**
-     * @example GET /api/:project/:environment/media/tree
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Object} Media tree
+     * @example GET /api/${project}/${environment}/media/tree
      */
-    static async getTree(req, res) {
-        try {
-            let tree = await HashBrown.Service.MediaService.getTree(req.project, req.environment);
+    static async tree(request, params, body, query, user) {
+        let tree = await HashBrown.Service.MediaService.getTree(params.project, params.environment);
             
-            res.status(200).send(tree);
-        
-        } catch(e) {
-            res.status(404).send(MediaController.printError(e));
-        
-        }     
+        return new HttpResponse(tree);
     }
     
     /**
@@ -91,7 +55,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      *
      * @returns {Object} Media tree item
      */
-    static async setTree(req, res) {
+    static async treeItem(request, params, body, query, user) {
         let id = req.params.id;
         let item = req.body;
 
@@ -114,7 +78,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      
      * @returns {Array} All Media nodes
      */
-    static async getAll(req, res) {
+    static async getAll(request, params, body, query, user) {
         try {
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
 
@@ -145,7 +109,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      
      * @returns {Media} Media
      */
-    static async get(req, res) {
+    static async get(request, params, body, query, user) {
         try {
             let id = req.params.id;
 
@@ -180,7 +144,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      * @param {String} environment
      * @param {String} id
      */
-    static async remove(req, res) {
+    static async remove(request, params, body, query, user) {
         try {
             let id = req.params.id;
 
@@ -206,7 +170,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      * @param {String} id
      * @param {String} name
      */
-    static async rename(req, res) {
+    static async rename(request, params, body, query, user) {
         try {
             let id = req.params.id;
             let name = req.query.name;
@@ -231,7 +195,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      * @param {String} filename
      * @param {String} base64
      */
-    static async set(req, res) {
+    static async set(request, params, body, query, user) {
         try {
             let file = req.files ? req.files[0] : null;
             
@@ -265,7 +229,7 @@ class MediaController extends HashBrown.Controller.ControllerBase {
      *
      * @returns {String} Created Media id
      */
-    static async new(req, res) {
+    static async new(request, params, body, query, user) {
         try {
             let connection = await HashBrown.Service.ConnectionService.getMediaProvider(req.project, req.environment);
             
@@ -289,6 +253,94 @@ class MediaController extends HashBrown.Controller.ControllerBase {
             res.status(500).send(MediaController.printError(e));    
         
         }
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/media/${id}/heartbeat
+     */
+    static async heartbeat(request, params, body, query, user) {
+        return new HttpResponse('Heartbeat not enabled for media', 400);
+    }
+   
+    /**
+     * @example POST /api/${project}/${environment}/${category}/{$id}/pull
+     *
+     * @return {Object} The pulled resource
+     */
+    static async pull(request, params, body, query, user) {
+        return new HttpResponse('Pull not enabled for media', 400);
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/{category}/${id}/push
+     */
+    static async push(request, params, body, query, user) {
+        return new HttpResponse('Push not enabled for media', 400);
+    }
+    
+    /**
+     * @example GET /api/${project}/${environment}/${category}
+     */
+    static async resources(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resources = await model.list(params.project, params.environment, query);
+
+        return new HttpResponse(resources);
+    }
+    
+    /**
+     * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}
+     */
+    static async resource(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = null;
+
+        switch(request.method) {
+            case 'GET':
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
+                    return new HttpResponse('Not found', 404);
+                }
+                
+                return new HttpResponse(resource);
+                
+            case 'POST':
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
+                    return new HttpResponse('Not found', 404);
+                }
+                
+                resource.adopt(body);
+                    
+                await resource.save(params.project, params.environment, query);
+                
+                return new HttpResponse(updated);
+
+            case 'DELETE':
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
+                    return new HttpResponse('Not found', 404);
+                }
+                
+                await resource.remove(params.project, params.environment, query);
+
+                return new HttpResponse('OK');
+        }
+
+        return new HttpResponse('Unexpected error', 500);
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/${category}/new
+     */
+    static async new(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = await model.create(params.project, params.environment, body, query);
+
+        return new HttpResponse(resource);
     }
 }
 

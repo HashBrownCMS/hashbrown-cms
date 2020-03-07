@@ -19,17 +19,28 @@ class EntityBase {
 
         Object.seal(this);
 
+        this.adopt(params);
+    }
+
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params) {
+        checkParam(params, 'params', Object, true);
+        
         for(let k in params) {
             try {
                 if(
                     typeof this[k] !== 'undefined' &&
                     typeof params[k] !== 'undefined'
                 ) {
-                    this[k] = params[k]
+                    this[k] = params[k];
                 }
             
             } catch(e) {
-                debug.log(e.message, this, 4);
+                // Values outside the model definition will be silently ignored
             }
         }
     }

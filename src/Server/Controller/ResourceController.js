@@ -35,14 +35,14 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         };
         
         // Sync
-        routes['/api/${project}/${environment}/' + this.category + '/pull/${id}'] = {
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/pull'] = {
             handler: this.pull,
             methods: [ 'POST' ],
             user: {
                 scope: this.category
             }
         };
-        routes['/api/${project}/${environment}/' + this.category + '/push/${id}'] = {
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/push'] = {
             handler: this.pull,
             methods: [ 'POST' ],
             user: {
@@ -51,7 +51,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         };
 
         // Heartbeat
-        routes['/api/${project}/${environment}/' + this.category + '/heartbeat/${id}'] = {
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/heartbeat'] = {
             handler: this.heartbeat,
             methods: [ 'POST' ],
             user: {
@@ -63,54 +63,39 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * @example POST /api/${project}/${environment}/content/heartbeat/${id}
+     * @example POST /api/${project}/${environment}/${category}/${id}/heartbeat
      */
     static async heartbeat(request, params, body, query, user) {
-        let isLocked = await HashBrown.Service.ResourceService.isResourceLocked(params.project, params.environment, this.category, params.id);
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = await model.get(params.project, params.environment, params.id);
 
-        if(isLocked) {
-            return new HttpResponse('Resource is locked');
-        }
+        await resource.heartbeat();
         
-        await HashBrown.Service.DatabaseService.updateOne(
-            params.project,
-            params.environment + '.' + this.category,
-            {
-                id: params.id
-            },
-            {
-                viewedBy: user.id,
-                viewedOn: new Date()
-            }
-        );
-
         return new HttpResponse('OK');
     }
    
     /**
-     * @example POST /api/${project}/${environment}/${category}/pull/${id}
+     * @example POST /api/${project}/${environment}/${category}/{$id}/pull
      *
      * @return {Object} The pulled resource
      */
     static async pull(request, params, body, query, user) {
-        let resource = await HashBrown.Service.SyncService.getResourceItem(params.project, params.environment, this.category, params.id);
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = await model.get(params.project, params.environment, params.id);
         
-        if(!resource) {
-            return new HttpResponse(`Could not find remote resource ${this.category}/${id}`, 404);
-        }
-        
-        await HashBrown.Service.ResourceService.setResourceById(params.project, params.environment, this.category, id, resource, true);
+        await resource.pull(params.project, params.environment);
 
         return new HttpResponse(resource);
     }
     
     /**
-     * @example POST /api/${project}/${environment}/{category}/push/${id}
+     * @example POST /api/${project}/${environment}/{category}/${id}/push
      */
     static async push(request, params, body, query, user) {
-        let localResource = await HashBrown.Service.ResourceService.getResourceById(params.project, params.environment, params.id, true);
-
-        await HashBrown.Service.SyncService.setResourceItem(req.project, req.environment, this.category, params.id, localResource);
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = await model.get(params.project, params.environment, params.id);
+        
+        await resource.push(params.project, params.environment);
     
         return new HttpResponse('OK');
     }
@@ -119,7 +104,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/${project}/${environment}/${category}
      */
     static async resources(request, params, body, query, user) {
-        let resources = await HashBrown.Service.ResourceService.getAllResources(params.project, params.environment, this.category);
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resources = await model.list(params.project, params.environment, query);
 
         return new HttpResponse(resources);
     }
@@ -128,23 +114,40 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}
      */
     static async resource(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = null;
+
         switch(request.method) {
             case 'GET':
-                let result = await HashBrown.Service.ResourceService.getResourceById(params.project, params.environment, this.category, params.id);
-
-                if(!result) {
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
                     return new HttpResponse('Not found', 404);
                 }
-
-                return new HttpResponse(result);
+                
+                return new HttpResponse(resource);
                 
             case 'POST':
-                let updated = await HashBrown.Service.ResourceService.setResourceById(params.project, params.environment, this.category, params.id, body);
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
+                    return new HttpResponse('Not found', 404);
+                }
+                
+                resource.adopt(body);
+                    
+                await resource.save(params.project, params.environment, query);
                 
                 return new HttpResponse(updated);
 
             case 'DELETE':
-                await HashBrown.Service.ResourceService.removeResourceById(params.project, params.environment, this.category, params.id);
+                resource = await model.get(params.project, params.environment, params.id, query);
+                
+                if(!resource) {
+                    return new HttpResponse('Not found', 404);
+                }
+                
+                await resource.remove(params.project, params.environment, query);
 
                 return new HttpResponse('OK');
         }
@@ -156,7 +159,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/${project}/${environment}/${category}/new
      */
     static async new(request, params, body, query, user) {
-        let resource = await HashBrown.Service.ResourceService.createResource(params.project, params.environment, this.category, body);
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let resource = await model.create(params.project, params.environment, body, query);
 
         return new HttpResponse(resource);
     }

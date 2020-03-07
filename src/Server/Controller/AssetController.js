@@ -19,6 +19,9 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         return {
             '/css/theme.css': {
                 handler: this.theme
+            },
+            '/media/${project}/${environment}/${id}': {
+                handler: this.media
             }
         };
     }
@@ -67,7 +70,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Serve theme
+     * Serves the theme stylesheet
      */
     static async theme(request, params, body, query, user) {
         let theme = user && user.theme ? user.theme : 'default';
@@ -76,6 +79,39 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         let content = await HashBrown.Service.FileService.read(path);
 
         return new HttpResponse(content, 200, { 'Content-Type': 'text/css' });
+    }
+
+    /**
+     * Serves binary media data
+     */
+    static async media(request, params, body, query, user) {
+        let id = params.id;
+
+        let settings = await HashBrown.Service.SettingsService.getSettings(params.project, params.environment);
+
+        if(!settings || !settings.mediaConnection) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        let connection = await HashBrown.Entity.Resource.Connection.get(settings.mediaConnection);
+
+        if(!connection) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        let media = await connection.getMedia(id);
+
+        if(!media || !media.path) {
+            return new HttpResponse('Not found', 404);
+        }
+        
+        let data = await media.getData(params.project, media, parseInt(query.width), parseInt(query.height));
+        
+        if(!data) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        return new HttpResponse(data, 200, { 'Content-Type': media.getContentTypeHeader() });
     }
 }
 

@@ -3,9 +3,9 @@
 /**
  * Schema for content fields
  *
- * @memberof HashBrown.Common.Entity.Resource.Schema
+ * @memberof HashBrown.Common.Entity.Resource
  */
-class FieldSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
+class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     /**
      * Structure
      */
@@ -26,7 +26,6 @@ class FieldSchema extends HashBrown.Entity.Resource.Schema.SchemaBase {
     get type() {
         return 'field';
     }
-
 
     /**
      * Checks the format of the params

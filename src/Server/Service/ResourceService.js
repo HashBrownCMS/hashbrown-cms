@@ -55,8 +55,6 @@ class ResourceService {
         let models = this.getAllResourceModels();
         
         for(let model of models) {
-            console.log(category, '===', model.category, model.name, model.category === category);
-
             if(model.category === category) {
                 if(data) {
                     return new model(data);

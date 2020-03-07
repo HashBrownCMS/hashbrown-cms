@@ -59,60 +59,6 @@ class SchemaController extends HashBrown.Controller.ResourceController {
 
         return new HttpResponse('OK');
     }
-
-    /**
-     * @example GET /api/${project}/${environment}/schemas?customOnly=true|false
-     */
-    static async resources(request, params, body, query, user) {
-        let schemas = [];
-
-        if(query.customOnly) {
-            schemas = await HashBrown.Service.SchemaService.getCustomSchemas(params.project, params.environment);
-        
-        } else {
-            schemas = await HashBrown.Service.SchemaService.getAllSchemas(params.project, params.environment);
-        
-        }
-
-        return new HttpResponse(schemas);
-    }
-    
-    /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/schemas/${id}
-     */
-    static async resource(request, params, body, query, user) {
-        switch(request.method) {
-            case 'GET':
-                let result = await HashBrown.Service.SchemaService.getSchemaById(params.project, params.environment, params.id);
-
-                if(!result) {
-                    return new HttpResponse('Not found', 404);
-                }
-
-                return new HttpResponse(result);
-                
-            case 'POST':
-                let updated = await HashBrown.Service.SchemaService.setSchemaById(params.project, params.environment, params.id, body);
-                
-                return new HttpResponse(updated);
-
-            case 'DELETE':
-                await HashBrown.Service.ResourceService.removeSchemaById(params.project, params.environment, params.id);
-
-                return new HttpResponse('OK');
-        }
-
-        return new HttpResponse('Unexpected error', 500);
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/schemas/new?parentSchemaId=XXX
-     */
-    static async new(request, params, body, query, user) {
-        let schema = await HashBrown.Service.SchemaService.createSchema(params.project, params.environment, query.parentSchemaId);
-
-        return new HttpResponse(schema);
-    }
 }
 
 module.exports = SchemaController;
