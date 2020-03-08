@@ -5,59 +5,72 @@
  *
  * @memberof HashBrown.Common.Entity.Resource
  */
-class User extends HashBrown.Entity.Resource.ResourceBase {
-    static get category() { return 'users'; }
-
+class User extends HashBrown.Entity.EntityBase {
     constructor(params) {
         super(params);
     }
 
     structure() {
-        super.structure();
+        this.def(String, 'id');
 
         this.def(Boolean, 'isAdmin', false);
         this.def(Boolean, 'isCurrent', false);
+        
         this.def(String, 'username');
         this.def(String, 'fullName');
         this.def(String, 'email');
         this.def(String, 'theme');
+        
         this.def(Object, 'scopes', {});
     }
 
     /**
-     * Checks the parameters before they're committed
+     * Gets a human readable name
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @return {String} Name
      */
-    static paramsCheck(params) {
-        params = params || {};
-
-        delete params.sync; // This is the only resource type that can't be synced
-
-        return params;
+    getName() {
+        return this.fullName || this.username || this.id;
     }
 
     /**
      * Gets all project scopes
      *
      * @param {String} project
-     * @param {Boolean} upsert
      *
      * @returns {Array} scopes
      */
-    getScopes(project, upsert) {
+    getScopes(project) {
+        checkParam(project, 'project', String, true);
+
         if(!this.scopes) { 
             this.scopes = {};
         }
 
-        if(!this.scopes[project] && upsert) {
+        if(!this.scopes[project]) {
             this.scopes[project] = [];
         }
 
         return this.scopes[project];
     }
+    
+    /**
+     * Sets all project scopes
+     *
+     * @param {String} project
+     * @param {Array} scopes
+     */
+    setScopes(project, scopes) {
+        checkParam(project, 'project', String, true);
+        checkParam(scopes, 'scopes', Array, true);
+
+        if(!this.scopes) {
+            this.scopes = {};
+        }
+
+        this.scopes[project] = scopes;
+    }
+    
 
     /**
      * Checks if a user has a project scope
@@ -65,9 +78,12 @@ class User extends HashBrown.Entity.Resource.ResourceBase {
      * @param {String} project
      * @param {String} scope
      *
-     * @returns {Boolean} hasScope
+     * @returns {Boolean} Has scope
      */
     hasScope(project, scope) {
+        checkParam(project, 'project', String, true);
+        checkParam(scope, 'scope', String, true);
+        
         if(this.isAdmin) { return true; }
 
         if(!project) { return false; }

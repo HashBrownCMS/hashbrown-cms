@@ -85,10 +85,33 @@ class ProjectService {
     static async checkProject(project) {
         checkParam(project, 'project', String);
 
+        // Check if project exists
         let projectExists = await this.projectExists(project);
 
         if(!projectExists) {
             throw new Error('Project "' + project + '" could not be found');
+        }
+        
+        // Check environments format
+        let environments = await HashBrown.Service.SettingsService.getSettings(project, 'environments');
+        
+        // If environment list could not be found, reconstruct it from old structure
+        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
+            environments = {};
+
+            let allSettings = await HashBrown.Service.DatabaseService.find(project, 'settings', {});
+                
+            for(let settings of allSettings) {
+                if(!settings.usedBy || settings.usedBy === 'project') { continue; }
+    
+                let name = settings.usedBy;
+
+                delete settings.usedBy;
+
+                environments[name] = settings;
+            }
+        
+            await HashBrown.Service.SettingsService.setSettings(project, 'environments', environments);
         }
     }
 
@@ -160,28 +183,7 @@ class ProjectService {
 
         let environments = await HashBrown.Service.SettingsService.getSettings(project, 'environments');
 
-        // If environment list could not be found, reconstruct it from old structure
-        if(!environments || !Array.isArray(environments) || environments.length < 1) {
-            let allSettings = await HashBrown.Service.DatabaseService.find(project, 'settings', {});
-                
-            for(let setting of allSettings) {
-                if(!setting.usedBy || setting.usedBy === 'project') { continue; }
-
-                environments.push(setting.usedBy);
-            }
-        
-            await HashBrown.Service.SettingsService.setSettings(project, 'environments', environments);
-        }
-
-        let unique = { 'live': true };
-
-        for(let environment of environments) {
-             unique[environment] = true;
-        }
-
-        environments = Object.keys(unique);
-
-        return environments;
+        return Object.keys(environments);
     }
 
     /**

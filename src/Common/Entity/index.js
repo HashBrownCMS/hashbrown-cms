@@ -6,6 +6,7 @@
 namespace('Entity')
 .add(require('./EntityBase'))
 .add(require('./Project'))
+.add(require('./User'));
 
 require('./Deployer');
 require('./Processor');

@@ -85,27 +85,13 @@ class AssetController extends HashBrown.Controller.ControllerBase {
      * Serves binary media data
      */
     static async media(request, params, body, query, user) {
-        let id = params.id;
+        let media = HashBrown.Entity.Resource.Media.get(params.project, params.environment, params.id);
 
-        let settings = await HashBrown.Service.SettingsService.getSettings(params.project, params.environment);
-
-        if(!settings || !settings.mediaConnection) {
-            return new HttpResponse('Not found', 404);
-        }
-
-        let connection = await HashBrown.Entity.Resource.Connection.get(settings.mediaConnection);
-
-        if(!connection) {
-            return new HttpResponse('Not found', 404);
-        }
-
-        let media = await connection.getMedia(id);
-
-        if(!media || !media.path) {
+        if(!media) {
             return new HttpResponse('Not found', 404);
         }
         
-        let data = await media.getData(params.project, media, parseInt(query.width), parseInt(query.height));
+        let data = await media.getCache(params.project, params.environment, parseInt(query.width), parseInt(query.height));
         
         if(!data) {
             return new HttpResponse('Not found', 404);

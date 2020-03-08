@@ -15,9 +15,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         routes['/api/${project}/${environment}/' + this.category] = {
             handler: this.resources,
-            user: {
-                scope: this.category
-            }
+            user: true
         };
         routes['/api/${project}/${environment}/' + this.category + '/new'] = {
             handler: this.new,
@@ -28,7 +26,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         };
         routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
             handler: this.resource,
-            methods: [ 'GET', 'POST', 'DELETE' ],
+            user: true
+        };
+        routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
+            handler: this.resource,
+            methods: [ 'POST', 'DELETE' ],
             user: {
                 scope: this.category
             }
@@ -43,7 +45,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
             }
         };
         routes['/api/${project}/${environment}/' + this.category + '/${id}/push'] = {
-            handler: this.pull,
+            handler: this.push,
             methods: [ 'POST' ],
             user: {
                 scope: this.category

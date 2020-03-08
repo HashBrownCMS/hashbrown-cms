@@ -18,12 +18,18 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
      */
     structure() {
         this.def(String, 'id');
+
         this.def(String, 'createdBy');
         this.def(Date, 'createdOn');
+
         this.def(String, 'updatedBy');
         this.def(Date, 'updatedOn');
+
         this.def(String, 'viewedBy');
         this.def(Date, 'viewedOn');
+        
+        this.def(String, 'project');
+        this.def(String, 'environment');
     }
 
     /**

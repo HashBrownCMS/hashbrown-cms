@@ -6,7 +6,7 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class Content extends HashBrown.Entity.View.Panel.PanelBase {
-    static get itemType() { return HashBrown.Entity.Resource.Content; }
+    static get category() { return 'content'; };
     
     /**
      * Event: Click new
@@ -121,17 +121,6 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
                     item.name += ' - (' + language + ': ' + languageTitle + ')';
                     break;
                 }
-            }
-        }
-
-        if(content.schemaId) {
-            try {
-                let schema = await HashBrown.Service.SchemaService.getSchemaById(content.schemaId);
-                item.icon = schema.icon;
-
-            } catch(e) {
-                item.message = e.message;
-
             }
         }
 

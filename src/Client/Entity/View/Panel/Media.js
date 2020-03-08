@@ -6,8 +6,7 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class Media extends HashBrown.Entity.View.Panel.PanelBase {
-    static get icon() { return 'file-image-o'; }
-    static get itemType() { return HashBrown.Entity.Resource.Media; }
+    static get category() { return 'media'; }
    
     /**
      * Event: Click new
@@ -118,17 +117,8 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
 
         item.name = resource.name;
         item.parentId = resource.folder;   
-        item.icon = 'file-o';
         item.isRemote = true;
         item.isDraggable = true;
-
-        if(resource.isVideo()) {
-            item.icon = 'file-video-o';
-        }
-        
-        if(resource.isImage()) {
-            item.icon = 'file-image-o';
-        }
 
         return item;
     }

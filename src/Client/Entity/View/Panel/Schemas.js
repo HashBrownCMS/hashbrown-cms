@@ -6,8 +6,7 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
-    static get icon() { return 'cogs'; }
-    static get itemType() { return HashBrown.Entity.Resource.Schema.SchemaBase; }
+    static get category() { return 'schemas'; }
    
     /**
      * Event: Click new

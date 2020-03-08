@@ -14,11 +14,17 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
     structure() {
         super.structure();
 
-        this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
-        this.def(String, 'path');
         this.def(String, 'folder', '/');
-        this.def(Date, 'updateDate');
+    }
+
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.name;
     }
 
     /**
@@ -119,21 +125,6 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
                 }
             }
         }
-    }
-
-    /**
-     * Creates a new Media object
-     *
-     * @param {Object} file
-     *
-     * @return {Media} media
-     */
-    static create(file) {
-        let media = new Media({
-            id: Media.createId()
-        });
-    
-        return media;
     }
 }
 

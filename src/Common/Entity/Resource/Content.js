@@ -16,11 +16,8 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
 
         // Fundamental fields
         this.def(String, 'parentId');
-        this.def(String, 'createdBy');
-        this.def(String, 'updatedBy');
-        this.def(Date, 'createDate');
-        this.def(Date, 'updateDate');
         this.def(String, 'schemaId');
+        this.def(HashBrown.Entity.Resource.Schema, 'schema');
         this.def(Number, 'sort', -1);
         this.def(Boolean, 'isLocked');
         
@@ -66,8 +63,18 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
             return result;
         }
 
-        params.createDate = parseDate(params.createDate);
-        params.updateDate = parseDate(params.updateDate);
+        if(params.createDate) {
+            params.createdOn = params.createDate;
+            delete params.createDate;
+        }
+        
+        if(params.updateDate) {
+            params.updatedOn = params.updatedDate;
+            delete params.updateDate;
+        }
+
+        params.createdOn = parseDate(params.createdOn);
+        params.updatedOn = parseDate(params.updatedOn);
 
         return params;
     }
@@ -245,9 +252,12 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      * @param {String} key
      * @param {String} language
      *
-     * @returns {Object} value
+     * @returns {*} value
      */
     getPropertyValue(key, language) {
+        checkParam(key, 'key', String, true);
+        checkParam(language, 'language', String);
+        
         if(!this.properties) {
             this.properties = {};
         }

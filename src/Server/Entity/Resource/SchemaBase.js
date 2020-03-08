@@ -2,6 +2,8 @@
 
 /**
  * The base class for schemas
+ *
+ * @memberof HashBrown.Server.Entity.Resource
  */
 class SchemaBase extends require('Common/Entity/Resource/Schema') {
     /**

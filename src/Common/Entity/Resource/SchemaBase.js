@@ -15,7 +15,6 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         super.structure();
 
         this.def(String, 'name');
-        this.def(String, 'icon');
         this.def(String, 'type');
         this.def(String, 'parentSchemaId');
         this.def(Boolean, 'isLocked');
@@ -112,25 +111,6 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         }
 
         return mergedSchema;
-    }
-
-    /**
-     * Creates a new schema
-     *
-     * @param {HashBrown.Entity.Resource.Schema.SchemaBase} parentSchema
-     *
-     * @returns {HashBrown.Entity.Resource.Schema.SchemaBase} New schema
-     */
-    static create(parentSchema = null) {
-        checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.Schema.SchemaBase);
-
-        return HashBrown.Service.SchemaService.getEntity({
-            id: HashBrown.Entity.Resource.Schema.SchemaBase.createId(),
-            icon: parentSchema.icon || 'file',
-            type: parentSchema.type,
-            editorId: parentSchema.editorId,
-            parentSchemaId: parentSchema.id
-        });
     }
 }
 

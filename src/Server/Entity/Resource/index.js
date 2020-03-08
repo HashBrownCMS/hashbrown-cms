@@ -7,9 +7,8 @@ namespace('Entity.Resource')
 .add(require('./ResourceBase'))
 .add(require('./Connection'))
 .add(require('./Content'))
-.add(require('Common/Entity/Resource/Form'))
-.add(require('Common/Entity/Resource/Media'))
-.add(require('./SchemaBase'));
-.add(require('./ContentSchema'));
-.add(require('./FieldSchema'));
-.add(require('./User'));
+.add(require('./Form'))
+.add(require('./Media'))
+.add(require('./SchemaBase'))
+.add(require('Common/Entity/Resource/ContentSchema'))
+.add(require('Common/Entity/Resource/FieldSchema'));

@@ -6,13 +6,13 @@
  * @memberof HashBrown.Client.Entity.View.Panel
  */
 class PanelBase extends HashBrown.Entity.View.ViewBase {
-    static get icon() { return 'file'; }
     static get category() { return this.name.replace('Panel', '').toLowerCase(); }
-    static get itemType() { return null; }
+    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
+    static get icon() { return this.itemType.icon; }
 
     get icon() { return this.constructor.icon; }
-    get category() { return this.constructor.category; }
     get itemType() { return this.constructor.itemType; }
+    get category() { return this.constructor.category; }
 
     /**
      * Constructor

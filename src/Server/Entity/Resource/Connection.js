@@ -190,11 +190,11 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
     
     /**
-     * Gets a list of Media nodes
+     * Gets a list of media filenames
      *
-     * @returns {Array} Media
+     * @returns {Array} Media filenames
      */
-    async getAllMedia() {
+    async getAllMediaFilenames() {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
@@ -203,16 +203,16 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         
         if(!folders) { return []; }
 
-        let allMedia = [];
+        let files = {};
 
         for(let folder of folders) {
-            let name = folder.name || folder.filename || folder.path;
+            let filename = folder.name || folder.filename || folder.path;
 
-            if(!name && typeof folder === 'string') {
-                name = folder;
+            if(!filename && typeof folder === 'string') {
+                filename = folder;
             }
                 
-            name = Path.basename(name);
+            filename = Path.basename(filename);
 
             let id = folder.path || folder.id;
             
@@ -225,26 +225,20 @@ class Connection extends require('Common/Entity/Resource/Connection') {
                 id = Path.dirname(id).split(Path.sep).pop();
             }
             
-            let media = new HashBrown.Entity.Resource.Media({
-                id: id,
-                url: this.deployer.getPath('media', id + '/' + name, true),
-                name: name
-            });
-
-            allMedia.push(media);
+            files[id] = filename;
         }
 
-        return allMedia;
+        return files;
     }
     
     /**
-     * Gets a Media node by id
+     * Gets a media URL by id
      *
      * @param {String} id
      *
-     * @returns {HashBrown.Entity.Resource.Media} Media node
+     * @returns {String} Media URL
      */
-    async getMedia(id) {
+    async getMediaUrl(id) {
         checkParam(id, 'id', String, true);
 
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
@@ -258,27 +252,13 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         if(!files || files.length < 1) { throw new Error('Media "' + id + '" not found'); }
 
         let file = Array.isArray(files) ? files[0] : files;
-
-        let name = file.name || file.filename || file.url || file.path;
-        
-        if(!name && typeof file === 'string') {
-            name = file;
-        }
-
-        name = Path.basename(name);
-
         let url = file.url;
 
         if(!url && typeof file === 'string') {
             url = this.deployer.getPath('media', id + '/' + file);
         }
 
-        return new HashBrown.Entity.Resource.Media({
-            id: id,
-            name: name,
-            url: url,
-            path: file.path || file
-        });
+        return url;
     }
     
     /**
