@@ -61,7 +61,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             // Build schema options
             this.state.schemaOptions = {};
 
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('field') || []) {
+            for(let schema of await HashBrown.Entity.Resource.FieldSchema.list() || []) {
                 this.state.schemaOptions[schema.name] = schema.id;
             }
 
@@ -70,7 +70,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.schemaOptions = {};
 
             for(let schemaId of this.model.config.allowedSchemas || []) {
-                let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
+                let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId);
 
                 this.state.schemaOptions[schema.name] = schema.id;
             }

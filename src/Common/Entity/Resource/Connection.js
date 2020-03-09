@@ -28,6 +28,44 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     getName() {
         return this.title || this.id;
     }
+    
+    /**
+     * Gets a deployer
+     *
+     * @string {String} alias
+     *
+     * @returns {HashBrown.Entity.Deployer} Deployer
+     */
+    static getDeployer(alias) {
+        for(let name in HashBrown.Entity.Deployer) {
+            let deployer = HashBrown.Entity.Deployer[name];
+
+            if(deployer.alias !== alias) { continue; }
+
+            return deployer;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Gets a processor
+     *
+     * @string {String} alias
+     *
+     * @returns {HashBrown.Entity.Processor} Processor
+     */
+    static getProcessor(alias) {
+        for(let name in HashBrown.Entity.Processor) {
+            let processor = HashBrown.Entity.Processor[name];
+
+            if(processor.alias !== alias) { continue; }
+
+            return processor;
+        }
+
+        return null;
+    }
 
     /**
      * Constructs a URL from the member variable and an appendix

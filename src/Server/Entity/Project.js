@@ -167,18 +167,41 @@ class Project extends require('Common/Entity/Project') {
     }
     
     /**
+     * Sets settings for an environment
+     *
+     * @param {String} environment
+     * @param {Object} settings
+     */
+    async setEnvironmentSettings(environment, settings) {
+        checkParam(environment, 'environment', String, true);
+        checkParam(settings, 'settings', Object, true);
+
+        let settings = await this.getSettings('environments');
+
+        if(!settings || !settings[environment]) {
+            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+        }
+        
+        settings[environment] = settings;
+
+        await this.setSettings('environments', settings);
+    }
+    
+    /**
      * Gets settings for an environment
      *
      * @param {String} environment
      *
-     * @return {*} Settings
+     * @return {Object} Settings
      */
     async getEnvironmentSettings(environment) {
         checkParam(environment, 'environment', String, true);
 
         let settings = await this.getSettings('environments');
 
-        if(!settings || !settings[environment]) { return {}; }
+        if(!settings || !settings[environment]) {
+            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+        }
 
         return settings[environment];
     }

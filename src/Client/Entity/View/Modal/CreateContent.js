@@ -23,22 +23,22 @@ class CreateContent extends HashBrown.Entity.View.Modal.ModalBase {
         
         // Build schema options based on parent content
         if(this.model.parentId) {
-            let parentContent = await HashBrown.Service.ContentService.getContentById(this.model.parentId);
-            let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentContent.schemaId);
+            let parentContent = await HashBrown.Entity.Resource.Content.get(this.model.parentId);
+            let parentSchema = await HashBrown.Entity.Resource.ContentSchema.get(parentContent.schemaId);
         
             if(!parentSchema.allowedChildSchemas || parentSchema.allowedChildSchemas.length < 1) {
                 throw new Error('No child content schemas are allowed under this parent');
             }
             
             for(let id of parentSchema.allowedChildSchemas) {
-                let schema = await HashBrown.Service.SchemaService.getSchemaById(id);
+                let schema = await HashBrown.Entity.Resource.ContentSchema.get(id);
 
                 this.state.schemaOptions[schema.name] = schema.id;
             }
         
         // Build schema options with all content schemas allowed at the root
         } else {
-            let schemas = await HashBrown.Service.SchemaService.getAllSchemas('content'); 
+            let schemas = await HashBrown.Entity.Resource.ContentSchema.list();
             
             for(let schema of schemas) {
                 if(!schema.allowedAtRoot) { continue; }

@@ -372,10 +372,8 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
             } else {
                 if(id === 'new') {
                     let parentSchemaId = HashBrown.Service.NavigationService.getQuery('parentSchemaId', query);
-                    let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentSchemaId);
-                    let schema = HashBrown.Entity.Resource.Schema.SchemaBase.create(parentSchema);
-
-                    schema.type = parentSchema.type;
+                    let parentSchema = await HashBrown.Entity.Resource.SchemaBase.get(parentSchemaId);
+                    let schema = await HashBrown.Entity.Resource.Schema.SchemaBase.create({ parentId: parentSchemaId });
 
                     SCHEMAS[schema.id] = schema;
 

@@ -51,10 +51,10 @@ class SchemaController extends HashBrown.Controller.ResourceController {
             });
 
             for(let json of response) {
-                await HashBrown.Service.SchemaService.importSchema(params.project, params.environment, json);
+                await HashBrown.Entity.Resource.SchemaBase.import(user, params.project, params.environment, json);
             }
         } else {
-            await HashBrown.Service.SchemaService.importSchema(params.project, params.environment, response);
+            await HashBrown.Entity.Resource.SchemaBase.import(user, params.project, params.environment, response);
         }
 
         return new HttpResponse('OK');

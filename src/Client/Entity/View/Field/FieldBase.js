@@ -18,7 +18,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     static async createFromFieldDefinition(definition, value = null, state = {}) {
         checkParam(definition, 'definition', Object, true);
 
-        let schema = await HashBrown.Service.SchemaService.getSchemaById(definition.schemaId, true);
+        let schema = await HashBrown.Entity.Resource.FieldSchema.get(definition.schemaId, { withParentFields: true });
         let config = definition.config || {};
 
         if(schema.parentSchemaId !== 'fieldBase') {
@@ -76,7 +76,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     static async createFromSchemaId(schemaId, value) {
         checkParam(schemaId, 'schemaId', String, true);
         
-        let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId, true);
+        let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId, { withParentFields: true });
     
         return this.createFromSchema(schema, value);
     }

@@ -33,7 +33,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         
         // Process array items, if they are structs
         } else {
-            let schema = await HashBrown.Service.SchemaService.getSchemaById(project, environment, schemaId, true);
+            let schema = await HashBrown.Entity.Resource.FieldSchema.get(project, environment, schemaId, { withParentFields: true });
 
             if(!schema.config || !schema.config.struct) { return value; }
 

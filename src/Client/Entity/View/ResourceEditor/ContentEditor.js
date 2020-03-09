@@ -34,11 +34,11 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         }
 
         // Get schema and settings
-        this.state.schema = await HashBrown.Service.SchemaService.getSchemaById(this.model.schemaId, true);
+        this.state.schema = await HashBrown.Entity.Resource.ContentSchema.get(this.model.schemaId, { withParentFields: true });
         this.state.publishing = await this.model.getSettings('publishing') || {};
 
         if(this.state.publishing.connectionId) {
-            this.state.connection = await HashBrown.Service.ConnectionService.getConnectionById(this.state.publishing.connectionId); 
+            this.state.connection = await HashBrown.Entity.Resource.Connection.get(this.state.publishing.connectionId); 
         }
 
         // Set standard editor info

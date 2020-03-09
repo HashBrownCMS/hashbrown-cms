@@ -26,8 +26,8 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     async fetch() {
         await super.fetch();
 
-        this.state.schemas = await HashBrown.Service.SchemaService.getAllSchemas();
-        this.state.connections = await HashBrown.Service.ConnectionService.getAllConnections();
+        this.state.schemas = await HashBrown.Entity.Resource.SchemaBase.list();
+        this.state.connections = await HashBrown.Entity.Resource.Connection.list();
     }
 
     /**

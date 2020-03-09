@@ -20,6 +20,24 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
+     * Gets the media provider
+     *
+     * @return {HashBrown.Entity.Resource.Connection} Connection
+     */
+    static async getProvider() {
+        throw new Error('Method "getProvider" must be overridden');
+    }
+    
+    /**
+     * Sets the media provider
+     *
+     * @param {String} id
+     */
+    static async setProvider(id) {
+        throw new Error('Method "setProvider" must be overridden');
+    }
+    
+    /**
      * Gets the human readable name
      *
      * @return {String} Name

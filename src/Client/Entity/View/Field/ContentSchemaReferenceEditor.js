@@ -20,17 +20,17 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
      * Fetches view data
      */
     async fetch() {
+        let allSchemas = await HashBrown.Entity.Resource.ContentSchema.list() || [];
+
         if(this.state.name === 'config') {
             // Build schema options
             this.state.schemaOptions = {};
 
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('content') || []) {
+            for(let schema of allSchemas) {
                 this.state.schemaOptions[schema.name] = schema.id;
             }
 
         } else {
-            let allSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
-
             this.state.schemaOptions = {};
 
             let allowedSchemas = this.model.config.allowedSchemas || [];

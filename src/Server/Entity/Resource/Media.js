@@ -32,6 +32,37 @@ class Media extends require('Common/Entity/Resource/Media') {
     }
     
     /**
+     * Sets the media provider connection
+     *
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {String} connectionId
+     */
+    static async setProvider(projectId, environment, connectionId) {
+        checkParam(projectId, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(connectionId, 'connectionId', String, true);
+        
+        let project = HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+        
+        let connection = await HashBrown.Entity.Resource.Connection.get(connectionId);
+
+        if(!connection) {
+            throw new Error(`Connection ${connectionId} not found`);
+        }
+
+        let settings = await project.getEnvironmentSettings(environment) || {};
+
+        settings.mediaProvider = connectionId;
+
+        project.setEnvironmentSettings(environment, settings);
+    }
+    
+    /**
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.User} user

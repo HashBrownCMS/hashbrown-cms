@@ -31,7 +31,7 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
             throw new Error(`(Settings inherited from <a href="#/content/${content.id}">${content.prop('title', HashBrown.Context.language) || content.id}</a>)`);
         }
 
-        let connections = await HashBrown.Service.ConnectionService.getAllConnections();
+        let connections = await HashBrown.Entity.Resource.Connection.list();
 
         this.state.connections = {};
 

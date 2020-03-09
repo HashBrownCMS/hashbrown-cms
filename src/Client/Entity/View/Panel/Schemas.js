@@ -52,7 +52,7 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
         let item = await super.getItem(resource);
 
         try {
-            let compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(resource.id, true);
+            let compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(resource.id, { withParentFields: true });
             item.icon = compiledSchema.icon;
 
         } catch(e) {

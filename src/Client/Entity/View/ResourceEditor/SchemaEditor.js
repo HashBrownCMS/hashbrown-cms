@@ -21,11 +21,11 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      */
     async fetch() {
         if(this.state.id) {
-            this.model = await HashBrown.Service.SchemaService.getSchemaById(this.state.id);
-            this.state.compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(this.model.id, true);
+            this.model = await HashBrown.Entity.Resource.SchemaBase.get(this.state.id);
+            this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
             
-            let allContentSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
-            let allFieldSchemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
+            let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
+            let allFieldSchemas = await HashBrown.Entity.Resource.FieldSchema.list();
 
             this.state.childSchemaOptions = {};
 
@@ -175,8 +175,18 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.SchemaService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('schemas/') < 0) {
+            location.hash = '/schemas/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/schemas/"]', 'This the schemas section, where you will define how content is structured.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your schemas. They are divided into 2 major categories, "field base" and "content base". Content schemas define which fields are available to content authors, and field schemas define how they are presented.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the schema editor, where you can edit schemas.', 'left', 'next');
     }
 
     /**
@@ -306,7 +316,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Click save
      */
     async onClickSave() {
-        await HashBrown.Service.SchemaService.setSchemaById(this.state.id, this.model);
+        await this.model.save();
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
         

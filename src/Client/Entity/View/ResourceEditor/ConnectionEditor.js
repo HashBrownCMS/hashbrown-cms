@@ -24,7 +24,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
         
         if(this.state.name) { return; }
 
-        let connection = await HashBrown.Service.ConnectionService.getMediaProvider();
+        let connection = await HashBrown.Entity.Resource.Media.getProvider();
 
         this.state.isMediaProvider = this.model && connection && connection.id === this.model.id;
     }
@@ -94,8 +94,18 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.ConnectionService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('connections/') < 0) {
+            location.hash = '/connections/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/connections/"]', 'This the connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your connections. You can right click here to create a new connection.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the connection editor, where you edit connections.', 'left', 'next');
     }
 
     /**
@@ -142,7 +152,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
      * Event: Change is media provider
      */
     async onChangeIsMediaProvider(newValue) {
-        await HashBrown.Service.ConnectionService.setMediaProvider(newValue ? this.model.id : null);
+        await HashBrown.Entity.Resource.Media.setProvider(newValue ? this.model.id : null);
     }
 }
 

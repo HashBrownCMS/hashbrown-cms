@@ -29,7 +29,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         params = super.paramsCheck(params);
 
         if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
-            let processor = HashBrown.Service.ConnectionService.getProcessor(params.processor.alias);
+            let processor = HashBrown.Entity.Resource.Connection.getProcessor(params.processor.alias);
 
             if(processor) {
                 params.processor = new processor(params.processor);
@@ -39,7 +39,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
-            let deployer = HashBrown.Service.ConnectionService.getDeployer(params.deployer.alias);
+            let deployer = HashBrown.Entity.Resource.Connection.getDeployer(params.deployer.alias);
 
             if(deployer) {
                 params.deployer = new deployer(params.deployer);
