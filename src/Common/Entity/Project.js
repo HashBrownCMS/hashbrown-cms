@@ -6,8 +6,24 @@
  * @memberof HashBrown.Common.Entity
  */
 class Project extends HashBrown.Entity.EntityBase {
+    /**
+     * Constructor
+     */
     constructor(params) {
         super(Project.checkParams(params));
+    }
+
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        if(this.settings && this.settings.info && this.settings.info.name) {
+            return this.settings && this.settings.info && this.settings.info.name;
+        }
+
+        return this.id;
     }
 
     /**
@@ -69,25 +85,69 @@ class Project extends HashBrown.Entity.EntityBase {
     static safeName(name) {
         return name.toLowerCase().replace('.', '_').replace(/[^a-z_]/g, '');
     }
+
+    /**
+     * Gets all users
+     *
+     * @return {Array} Users
+     */
+    async getUsers() {
+        throw new Error('Method "getUsers" must be overridden');
+    }
     
     /**
-     * Creates a new project
+     * Gets all environments
      *
-     * @param {String} name
-     *
-     * @returns {Project} New Project
+     * @return {Array} Environment names
      */
-    static create(name) {
-        let project = new Project({
-            id: HashBrown.Entity.EntityBase.createId()
-        });
-        
-        project.settings.usedBy = 'project';
-        project.settings.info = {
-            name: name
-        };
+    async getEnvironments() {
+        throw new Error('Method "getEnvironments" must be overridden');
+    }
+    
+    /**
+     * Gets all backups
+     *
+     * @return {Array} Backup timestamps
+     */
+    async getBackups() {
+        throw new Error('Method "getBackups" must be overridden');
+    }
 
-        return project;
+    /**
+     * Gets a backup
+     */
+    async getBackup(timestamp) {
+        throw new Error('Method "getBackup" must be overridden');
+    }
+    
+    /**
+     * Removes a backup
+     */
+    async removeBackup(timestamp) {
+        throw new Error('Method "removeBackup" must be overridden');
+    }
+    
+    /**
+     * Restores a backup
+     */
+    async restoreBackup(timestamp) {
+        throw new Error('Method "restoreBackup" must be overridden');
+    }
+    
+    /**
+     * Adds a backup
+     */
+    async addBackup() {
+        throw new Error('Method "addBackup" must be overridden');
+    }
+   
+    /**
+     * Creates a new backup
+     *
+     * @return {Number} Timestamp
+     */
+    async createBackup() {
+        throw new Error('Method "createBackup" must be overridden');
     }
 }
 

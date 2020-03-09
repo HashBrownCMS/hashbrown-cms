@@ -34,6 +34,7 @@ class Media extends require('Common/Entity/Resource/Media') {
     /**
      * Creates a new instance of this entity type
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} data
@@ -41,7 +42,8 @@ class Media extends require('Common/Entity/Resource/Media') {
      *
      * @return {HashBrown.Entity.Resource.Media} Instance
      */
-    static async create(project, environment, data = {}, options = {}) {
+    static async create(user, project, environment, data = {}, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
@@ -55,7 +57,7 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error('No connection set as media provider');
         }
 
-        let resource = await super.create(project, environment, data, options);
+        let resource = await super.create(user, project, environment, data, options);
 
         await connection.setMedia(resource.id, data.filename, data.base64);
 
@@ -107,11 +109,13 @@ class Media extends require('Common/Entity/Resource/Media') {
     /**
      * Removes this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async remove(project, environment, options = {}) {
+    async remove(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -131,11 +135,13 @@ class Media extends require('Common/Entity/Resource/Media') {
     /**
      * Saves the current state of this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async save(project, environment, options = {}) {
+    async save(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -152,7 +158,7 @@ class Media extends require('Common/Entity/Resource/Media') {
             await connection.setMedia(this.id, this.filename, this.base64);
         }
 
-        await super.save(project, environment);
+        await super.save(user, project, environment);
         await super.clearCache();
     }
    
@@ -191,7 +197,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(height, 'height', Number);
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media', this.id);
-        let cacheFile = Path.join(cacheFolder, width + (height ? 'x' + height : '') '.jpg');
+        let cacheFile = Path.join(cacheFolder, width + (height ? 'x' + height : '') + '.jpg');
         
         // Create the cache folder, if it doesn't exist
         await HashBrown.Service.FileService.makeDirectory(cacheFolder);

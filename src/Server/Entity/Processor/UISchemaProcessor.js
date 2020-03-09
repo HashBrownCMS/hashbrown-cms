@@ -62,41 +62,39 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * @returns {Promise} Result
      */
     async process(project, environment, content, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(language, 'language', String);
 
-        let schema = await HashBrown.Service.SchemaService.getSchemaById(project, environment, content.schemaId, true);
+        let schema = await content.getSchema();
         let properties = content.getLocalizedProperties(language);
         let meta = content.getMeta();
 
         if(!properties) {
-            throw new Error('No properties for content "' + content.id + '" with language "' + language + '"');
+            throw new Error(`No properties for content "${content.getName()}" with language "${language}"`);
         }
 
-        debug.log('Processing "' + properties.title + '" as uischema.org JSON...', this);
-
-        let createdBy = await HashBrown.Service.UserService.getUserById(meta.createdBy);
-        let updatedBy = await HashBrown.Service.UserService.getUserById(meta.updatedBy);
+        let createdBy = await content.getCreatedBy();
+        let updatedBy = await content.getUpdatedBy();
 
         // We'll have to a allow unknown authors, as they could disappear between backups
         if(!createdBy) {
-            createdBy = {
+            createdBy = new HashBrown.Entity.User({
                 fullName: 'Unknown',
                 username: 'unknown'
-            };
+            });
         }
 
         if(!updatedBy) {
-            updatedBy = {
+            updatedBy = new HashBrown.Entity.User({
                 fullName: 'Unknown',
                 username: 'unknown'
-            };
+            });
         }
 
-        meta.createdBy = createdBy.fullName || createdBy.username;
-        meta.updatedBy = updatedBy.fullName || createdBy.username;
+        meta.createdBy = createdBy.getName();
+        meta.updatedBy = updatedBy.getName();
         meta.language = language;
 
         // Combine all data into one

@@ -296,7 +296,7 @@ class ControllerBase {
             throw new HttpError('You need to be logged in to do that', 401);
         }
    
-        let user = await HashBrown.Service.UserService.findToken(token);
+        let user = await HashBrown.Entity.User.getByToken(token);
         
         // No user was found
         if(!user && !ignoreErrors) {
@@ -314,9 +314,9 @@ class ControllerBase {
      * @param {String} scope
      * @param {Boolean} isAdmin
      */
-    static async authorize(request, project, scope = '', isAdmin = false) {
+    static async authorize(request, project = '', scope = '', isAdmin = false) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(project, 'project', String, true);
+        checkParam(project, 'project', String);
         checkParam(scope, 'scope', String);
         checkParam(isAdmin, 'isAdmin', Boolean);
 
@@ -328,7 +328,7 @@ class ControllerBase {
         }
         
         // A project is defined, and the user doesn't have it
-        if(!user.hasScope(project)) {
+        if(project && !user.hasScope(project)) {
             throw new HttpError('You do not have permission to use this project', 403);
         }
 

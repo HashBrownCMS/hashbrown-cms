@@ -26,22 +26,6 @@ class Form extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Creates a new Form object
-     *
-     * @return {Form} form
-     */
-    static create() {
-        let form = new Form({
-            id: Form.createId(),
-            title: 'New form',
-            inputs: {},
-            entries: []
-        });
-        
-        return form;
-    }
-
-    /**
      * Clears all entries
      */
     clearAllEntries() {

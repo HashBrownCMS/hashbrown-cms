@@ -67,7 +67,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 return super.error(error);
             
             case 401:
-                let users = HashBrown.Service.UserService.getAllUsers();
+                let users = await HashBrown.Entity.User.list();
 
                 if(!users || users.length < 1) {
                     return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
@@ -135,7 +135,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * First time setup
      */
     static async setup(request, params, body, query, user) {
-        let users = await HashBrown.Service.UserService.getAllUsers();
+        let users = await HashBrown.Entity.User.list();
         
         if(users && users.length > 0) { 
             return new HttpResponse('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
@@ -148,8 +148,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Dashboard
      */
     static async dashboard(request, params, body, query, user) {
-        user.clearSensitiveData();
-        
         let themes = await HashBrown.Service.AppService.getThemes();
 
         let uptime = {};
@@ -173,8 +171,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Test
      */
     static async test(request, params, body, query, user) {
-        user.clearSensitiveData();
-            
         return this.render('test', {
             user: user,
             tab: params.tab
@@ -195,8 +191,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         let project = await HashBrown.Service.ProjectService.getProject(params.project);
         let themes = await HashBrown.Service.AppService.getThemes();
         
-        user.clearSensitiveData();
-
         return this.render('environment', {
             title: project.settings.info.name,
             currentProject: project.id,

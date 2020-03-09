@@ -27,7 +27,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
         let resources = [];
 
         for(let file of body.files) {
-            let media = await HashBrown.Entity.Resource.Media.create(params.project, params.environment, {}, file);
+            let media = await HashBrown.Entity.Resource.Media.create(user, params.project, params.environment, {}, file);
 
             resources.push(media);
         }

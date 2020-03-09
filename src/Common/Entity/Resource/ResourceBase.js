@@ -185,6 +185,39 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     async heartbeat() {
         throw new Error('The "heartbeat" method must be overridden');
     }
+
+    /**
+     * Gets the user that created this resource
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    async getCreatedBy() {
+        if(!this.createdBy) { return null; }
+
+        return await HashBrown.Entity.User.get(this.createdBy);
+    }
+    
+    /**
+     * Gets the user that last updated this resource
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    async getUpdatedBy() {
+        if(!this.updatedBy) { return null; }
+
+        return await HashBrown.Entity.User.get(this.updatedBy);
+    }
+    
+    /**
+     * Gets the user that last viewed this resource
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    async getViewedBy() {
+        if(!this.viewedBy) { return null; }
+
+        return await HashBrown.Entity.User.get(this.viewedBy);
+    }
 }
 
 module.exports = ResourceBase;

@@ -162,10 +162,10 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      *
      * @param {String} key
      *
-     * @returns {Promise} Settings
+     * @returns {Object} Settings
      */
     getSettings(key) {
-        return Promise.resolve({});
+        throw new Error('The "getSettings" method must be overridden');
     }
 
     /**

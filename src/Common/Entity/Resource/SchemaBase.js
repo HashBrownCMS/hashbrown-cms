@@ -9,6 +9,15 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     static get category() { return 'schemas'; }
 
     /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.name || this.id;
+    }
+
+    /**
      * Structure
      */
     structure() {

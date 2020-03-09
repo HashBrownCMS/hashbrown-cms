@@ -158,7 +158,7 @@ class ProjectService {
         await this.checkProject(id);
 
         let settings = await HashBrown.Service.SettingsService.getSettings(id) || {};
-        let users = await HashBrown.Service.UserService.getAllUsers(id) || [];
+        let users = [];
         let backups = await HashBrown.Service.BackupService.getBackupsForProject(id) || [];
         let environments = await this.getAllEnvironments(id) || [];
 

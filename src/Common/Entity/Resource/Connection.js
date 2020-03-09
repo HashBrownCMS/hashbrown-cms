@@ -21,6 +21,15 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.title || this.id;
+    }
+
+    /**
      * Constructs a URL from the member variable and an appendix
      *
      * @param {String} appendix
@@ -59,18 +68,6 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
         if(!params.deployer.paths) { params.deployer.paths = {}; }
         
         return super.paramsCheck(params);
-    }
-
-    /**
-     * Creates a new Connection object
-     *
-     * @return {Connection} connection
-     */
-    static create() {
-        return new Connection({
-            id: Connection.createId(),
-            title: 'New connection'
-        });
     }
 
     /**

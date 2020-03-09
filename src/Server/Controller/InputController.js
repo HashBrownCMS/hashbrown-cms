@@ -25,36 +25,59 @@ class InputController extends HashBrown.Controller.ControllerBase {
 
         // Create a new user
         if(cmd === 'create-user') {
-            await HashBrown.Service.UserService.createUser(args.u, args.p, args.admin === 'true');
+            await HashBrown.Entity.User.create(args.u, args.p, { isAdmin: args.admin === 'true' });
 
         // Make a user an admin
         } else if(cmd === 'make-user-admin') {
-            await HashBrown.Service.UserService.makeUserAdmin(args.u);
+            let user = await HashBrown.Entity.User.get(args.u);
+
+            if(!user) {
+                throw new Error(`User "${args.u}" not found`);
+            }
+
+            user.isAdmin = true;
+            
+            await user.save();
 
         // Revoke tokens for a user
         } else if(cmd === 'revoke-tokens') {
-            await HashBrown.Service.UserService.revokeTokens(args.u);
+            let user = await HashBrown.Entity.User.get(args.u);
+
+            if(!user) {
+                throw new Error(`User "${args.u}" not found`);
+            }
+
+            user.tokens = [];
+
+            await user.save();
 
         // Set scopes for a user
         } else if(cmd === 'set-user-scopes') {
-            let user = await HashBrown.Service.UserService.findUser(args.u)
-            let obj = user.getObject();
-
-            if(!obj.scopes[args.p]) {
-                obj.scopes[args.p] = [];
+            let user = await HashBrown.Entity.User.get(args.u);
+            
+            if(!user) {
+                throw new Error(`User "${args.u}" not found`);
             }
 
-            obj.scopes[args.p] = args.s.split(',');
+            if(!user.scopes[args.p]) {
+                user.scopes[args.p] = [];
+            }
 
-            await HashBrown.Service.UserService.updateUser(args.u, obj);
+            user.scopes[args.p] = args.s.split(',');
+
+            await user.save();
 
         // Change password for a user
         } else if(cmd === 'set-user-password') {
-            let user = await HashBrown.Service.UserService.findUser(args.u);
+            let user = await HashBrown.Entity.User.get(args.u);
+            
+            if(!user) {
+                throw new Error(`User "${args.u}" not found`);
+            }
 
             user.setPassword(args.p);
 
-            await HashBrown.Service.UserService.updateUser(args.u, user.getObject());
+            await user.save();
         
         // No arguments were recognised, skip this entire check
         } else { 

@@ -148,7 +148,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async new(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
-        let resource = await model.create(params.project, params.environment, body, query);
+        let resource = await model.create(user, params.project, params.environment, body, query);
 
         return new HttpResponse(resource);
     }

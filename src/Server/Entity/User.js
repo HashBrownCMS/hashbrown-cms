@@ -32,14 +32,6 @@ class User extends require('Common/Entity/User') {
     }
 
     /**
-     * Clears all sensitive data
-     */
-    clearSensitiveData() {
-        this.password = null;
-        this.tokens = null;
-    }
-
-    /**
      * Creates a new access token
      *
      * @param {Boolean} persist
@@ -146,18 +138,113 @@ class User extends require('Common/Entity/User') {
     }
     
     /**
-     * Checks for duplicate usernames
+     * Gets a user by token
      *
-     * @param {String} username
+     * @param {String} token
      *
      * @return {HashBrown.Entity.User} User
      */
-    static async get(username) {
+    static async getByToken(token) {
+        checkParam(token, 'token', String, true);
+
+        let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
+
+        for(let user of users) {
+            user = new this(user);
+
+            if(!user.validateToken(token)) { continue; }
+
+            user.tokens = [];
+            user.password = null;
+
+            return user;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Gets all users
+     *
+     * @param {Object} options
+     *
+     * @return {Array} Users
+     */
+    static async list(options = {}) {
+        let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
+
+        for(let i in users) {
+            users[i] = new this(users[i]);
+            users[i].tokens = [];
+            users[i].password = null;
+        }
+        
+        users = users.sort((a, b) => {
+            a = a.getName();
+            b = b.getName();
+
+            a = a.toLowerCase();
+            b = b.toLowerCase();
+
+            if(a < b) { return -1; }
+            if(a > b) { return 1; }
+
+            return 0;
+        });
+
+        return users;
+    }
+    
+    /**
+     * Gets a user by id
+     *
+     * @param {String} id
+     * @param {Object} options
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    static async get(id, options = {}) {
+        checkParam(id, 'id', String, true);
+        checkParam(options, 'options', Object, true);
+
+        let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { id: id });
+
+        if(!user) { return null; }
+
+        if(!options.withTokens) {
+            user.tokens = [];
+        }
+        
+        if(!options.withPassword) {
+            user.password = null;
+        }
+
+        return new this(user);
+    }
+    
+    /**
+     * Gets a user by username
+     *
+     * @param {String} username
+     * @param {Object} options
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    static async getByUsername(username, options = {}) {
         checkParam(username, 'username', String, true);
+        checkParam(options, 'options', Object, true);
 
         let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username });
 
         if(!user) { return null; }
+
+        if(!options.withTokens) {
+            user.tokens = [];
+        }
+        
+        if(!options.withPassword) {
+            user.password = null;
+        }
 
         return new this(user);
     }
@@ -176,7 +263,7 @@ class User extends require('Common/Entity/User') {
         checkParam(password, 'password', String, true);
         checkParam(data, 'data', Object, true);
         
-        let existingUser = await this.get(username);
+        let existingUser = await this.getByUsername(username);
 
         if(existingUser) {
             throw new Error(`User with username "${username}" already exists`);
@@ -188,6 +275,9 @@ class User extends require('Common/Entity/User') {
         user.setPassword(password);
 
         await HashBrown.Service.DatabaseService.insertOne('users', 'users', user.getObject());
+
+        user.tokens = [];
+        user.password = null;
 
         return user;
     }
@@ -220,7 +310,11 @@ class User extends require('Common/Entity/User') {
         checkParam(password, 'password', String, true);
         checkParam(persist, 'persist', Boolean);
 
-        let user = await this.get(username);
+        let user = await this.getByUsername(username, { withPassword: true });
+
+        if(!user) {
+            throw new Error('User not found');
+        }
 
         if(!user.validatePassword(password)) {
             throw new Error('Invalid password');

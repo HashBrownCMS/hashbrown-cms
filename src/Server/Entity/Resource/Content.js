@@ -15,7 +15,7 @@ class Content extends require('Common/Entity/Resource/Content') {
      *
      * @returns {Promise} settings
      */
-    getSettings(project, environment, key) {
+    async getSettings(project, environment, key) {
         checkParam(project, 'project', String);
         checkParam(environment, 'environment', String);
         checkParam(key, 'key', String);
@@ -46,6 +46,7 @@ class Content extends require('Common/Entity/Resource/Content') {
     /**
      * Creates a new instance of this entity type
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} data
@@ -53,12 +54,15 @@ class Content extends require('Common/Entity/Resource/Content') {
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(project, environment, data = {}, options = {}) {
+    static async create(user, project, environment, data = {}, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(data.schemaId, 'data.schemaId', String, true);
         checkParam(options, 'options', Object, true);
+
+        let siblings = []
 
         if(data.parentId) {
             let parent = this.get(project, environment, data.parentId);
@@ -66,25 +70,32 @@ class Content extends require('Common/Entity/Resource/Content') {
             
             if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
 
-            let siblings = await parent.getChildren();
+            siblings = await parent.getChildren();
 
-            if(siblings.length < 1) {
-                data.sort = 1;
-            } else {
-                data.sort = (siblings.pop().sort || siblings.length - 1) + 1;
+        } else {
+            siblings = await this.getOrphans(project, environment);    
+
         }
 
-        return await super.create(project, environment, data, options);
+        if(siblings.length < 1) {
+            data.sort = 1;
+        } else {
+            data.sort = (siblings.pop().sort || siblings.length - 1) + 1;
+        }
+        
+        return await super.create(user, project, environment, data, options);
     }
     
     /**
      * Removes this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async remove(project, environment, options = {}) {
+    async remove(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -93,28 +104,30 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         for(let child of children) {
             if(options.removeChildren) {
-                await child.remove(project, environment, options);
+                await child.remove(user, project, environment, options);
             
             } else {
                 child.parentId = this.parentId;
-                await child.save(project, environment);
+                await child.save(user, project, environment);
             
             }
         }
 
-        await.this.unpublish(project, environment);
+        await this.unpublish(project, environment);
 
-        await super.remove(project, environment, options);
+        await super.remove(user, project, environment, options);
     }
     
     /**
      * Saves the current state of this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async save(project, environment, options = {}) {
+    async save(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -123,12 +136,44 @@ class Content extends require('Common/Entity/Resource/Content') {
             throw new Error('Schema id is required');
         }
 
-        await super.save(project, environment, options);
+        await super.save(user, project, environment, options);
 
         if(this.isPublished) {
             await this.publish(project, environment);
         } else {
-            await.this.unpublish(project, environment);
+            await this.unpublish(project, environment);
+        }
+            
+        let publishTask = await HashBrown.Entity.Task.get(project, environment, this.id, 'publish');
+
+        if(!this.isPublished && this.publishOn) {
+            if(!publishTask) {
+                publishTask = await HashBrown.Entity.Task.create(project, environment, this.id, 'publish');
+            }
+            
+            publishTask.date = new Date(this.publishOn);
+
+            await publishTask.save();
+        
+        } else if(publishTask) {
+            await publishTask.remove();
+
+        }
+
+        let unpublishTask = await HashBrown.Entity.Task.get(project, environment, this.id, 'unpublish');
+
+        if(this.isPublished && this.unpublishOn) {
+            if(!unpublishTask) {
+                unpublishTask = await HashBrown.Entity.Task.create(project, environment, this.id, 'unpublish');
+            }
+
+            unpublishTask.date = new Date(this.unpublishOn);
+
+            await unpublishTask.save();
+        
+        } else if(unpublishTask) {
+            await unpublishTask.remove();
+
         }
     }
 
@@ -149,7 +194,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         let connection = await HashBrown.Entity.Resource.Connection.get(settings.connectionId);
 
         if(!connection) {
-            throw new Error(`Publishing connection ${settings.connectionId} not found)`;
+            throw new Error(`Publishing connection ${settings.connectionId} not found`);
         }
 
         await connection.publishContent(project, environment, this); 
@@ -172,7 +217,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         let connection = await HashBrown.Entity.Resource.Connection.get(settings.connectionId);
 
         if(!connection) {
-            throw new Error(`Publishing connection ${settings.connectionId} not found)`;
+            throw new Error(`Publishing connection ${settings.connectionId} not found`);
         }
 
         await connection.unpublishContent(project, environment, this); 

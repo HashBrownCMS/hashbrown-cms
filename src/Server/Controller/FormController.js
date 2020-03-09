@@ -21,7 +21,7 @@ class FormController extends HashBrown.Controller.ResourceController {
      */
     static get routes() {
         return {
-            ..super.routes,
+            ...super.routes,
             '/api/${project}/${environment}/forms/${id}/entries': {
                 handler: this.entries,
                 user: {

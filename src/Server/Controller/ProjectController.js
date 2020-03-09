@@ -383,13 +383,14 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/projects/{project}/users
      */
     static async users(request, params, body, query, user) {
-        let users = await HashBrown.Service.UserService.getAllUsers(params.project);
-    
-        for(let i in users) {
-            users[i].clearSensitiveData();
-            users[i].isCurrent = users[i].id === user.id;
+        let project = await HashBrown.Entity.Project.get(params.project);
+
+        if(!project) {
+            return new HttpResponse('Project not found', 404);
         }
 
+        let users = await project.getUsers();
+    
         return new HttpResponse(users);
     }
 }

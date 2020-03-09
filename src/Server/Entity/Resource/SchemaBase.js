@@ -5,7 +5,39 @@
  *
  * @memberof HashBrown.Server.Entity.Resource
  */
-class SchemaBase extends require('Common/Entity/Resource/Schema') {
+class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
+    /**
+     * Creates a new instance of this entity type
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {String} project
+     * @param {String} environment
+     * @param {Object} data
+     * @param {Object} options
+     *
+     * @return {HashBrown.Entity.Resource.ResourceBase} Instance
+     */
+    static async create(user, project, environment, data = {}, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(data, 'data', Object, true);
+        checkParam(data.parentId, 'data.parentId', String, true);
+        checkParam(options, 'options', Object, true);
+
+        let parent = this.get(project, environment, data.parentId, { withParentFields: true });
+
+        if(!parent) {
+            throw new Error(`Parent schema ${data.parentId} could not be found`);
+        }
+
+        if(parent.constructor !== this) {
+            throw new Error(`Parent schema ${data.parentId} does not match schema type`);
+        }
+
+        return await super.create(user, project, environment, data, options);
+    }
+    
     /**
      * Gets a schema by id
      *
@@ -101,6 +133,15 @@ class SchemaBase extends require('Common/Entity/Resource/Schema') {
         checkParam(options, 'options', Object, true);
   
         let list = [];
+        let type = undefined;
+        
+        if(this === HashBrown.Entity.Resource.ContentSchema) {
+            type = 'content';
+
+        } else if(this === HashBrown.Entity.Resource.FieldSchema) {
+            type = 'field';
+        
+        }
 
         if(!options.customOnly) {
             let corePath = Path.join(APP_ROOT, 'schema', '*', '*.json');
@@ -144,17 +185,13 @@ class SchemaBase extends require('Common/Entity/Resource/Schema') {
             );
         }
 
-        for(let i in list) {
-            if(list[i].type === 'field') {
-                list[i] = new HashBrown.Entity.Resource.FieldSchema(list[i]);
-
-            } else if(list[i].type === 'content') {
-                list[i] = new HashBrown.Entity.Resource.ContentSchema(list[i]);
-
-            } else {
-                list[i] = new HashBrown.Entity.Resource.SchemaBase(list[i]);
-
+        for(let i = list.length - 1; i>= 0; i--) {
+            if(list[i].type !== type) {
+                delete list[i];
+                continue;
             }
+
+            list[i] = new this(list[i]);
         }
 
         return list;

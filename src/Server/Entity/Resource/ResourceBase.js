@@ -87,6 +87,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Creates a new instance of this entity type
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} data
@@ -94,11 +95,19 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(project, environment, data = {}, options = {}) {
+    static async create(user, project, environment, data = {}, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(options, 'options', Object, true);
+
+        data.createdBy = user.id;
+        data.createdOn = new Date();
+        data.updatedBy = user.id;
+        data.updatedOn = new Date();
+        data.viewedBy = user.id;
+        data.viewedOn = new Date();
 
         data.id = this.createId();
 
@@ -116,11 +125,13 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Saves the current state of this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async save(project, environment, options = {}) {
+    async save(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -134,6 +145,9 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             isRemote: false,
             hasRemote: false
         };
+
+        this.updatedBy = user.id;
+        this.updatedOn = new Date();
 
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(
@@ -152,11 +166,13 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Removes this entity
      *
+     * @param {HashBrown.Entity.User} user
      * @param {String} project
      * @param {String} environment
      * @param {Object} options
      */
-    async remove(project, environment, options = {}) {
+    async remove(user, project, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -193,7 +209,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         this.adopt(remote);
         
-        await this.save(project, environment);
+        await this.save(user, project, environment);
     }
     
     /**

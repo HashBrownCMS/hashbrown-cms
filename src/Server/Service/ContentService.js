@@ -146,20 +146,6 @@ class ContentService extends require('Common/Service/ContentService') {
             content.createdBy = content.updatedBy;
         }
         
-        // Handle scheduled publish task
-        if(content.publishOn) {
-            await HashBrown.Service.ScheduleService.updateTask(project, environment, 'publish', id, content.publishOn, user);
-        } else {
-            await HashBrown.Service.ScheduleService.removeTask(project, environment, 'publish', id);
-        }
-        
-        // Handle scheduled unpublish task
-        if(content.unpublishOn) {
-            await HashBrown.Service.ScheduleService.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
-        } else {
-            await HashBrown.Service.ScheduleService.removeTask(project, environment, 'unpublish', id);
-        }
-       
         // Publish/unpublish
         if(content.isPublished) {
             await HashBrown.Service.ConnectionService.publishContent(project, environment, content, user);

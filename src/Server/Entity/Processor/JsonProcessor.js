@@ -20,64 +20,52 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * @returns {Promise} Result
      */
     async process(project, environment, content, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
+        checkParam(language, 'language', String);
 
         let properties = content.getLocalizedProperties(language);
         let meta = content.getMeta();
 
         if(!properties) {
-            return Promise.reject(new Error('No properties for content "' + content.id + '" with language "' + language + '"'));
+            throw new Error(`No properties for content "${content.getName()}" with language "${language}"`);
         }
 
-        debug.log('Processing "' + properties.title + '" as JSON...', this);
+        let createdBy = await content.getCreatedBy();
+        let updatedBy = await content.getUpdatedBy();
 
-        let createdBy;
-        let updatedBy;
+        // We'll have to a allow unknown authors, as they could disappear between backups
+        if(!createdBy) {
+            createdBy = new HashBrown.Entity.User({
+                fullName: 'Unknown',
+                username: 'unknown'
+            });
+        }
 
-        // Get created by user
-        return HashBrown.Service.UserService.getUserById(meta.createdBy)
-        .then((user) => {
-            createdBy = user;
+        if(!updatedBy) {
+            updatedBy = new HashBrown.Entity.User({
+                fullName: 'Unknown',
+                username: 'unknown'
+            });
+        }
 
-            return HashBrown.Service.UserService.getUserById(meta.updatedBy);
-        })
-        // Get updated by user
-        .then((user) => {
-            updatedBy = user;
-            
-            // We'll have to a allow unknown authors, as they could disappear between backups
-            if(!createdBy) {
-                createdBy = {
-                    fullName: 'Unknown',
-                    username: 'unknown'
-                };
-            }
+        meta.createdBy = createdBy.getName();
+        meta.updatedBy = updatedBy.getName();
+        meta.language = language;
 
-            if(!updatedBy) {
-                updatedBy = {
-                    fullName: 'Unknown',
-                    username: 'unknown'
-                };
-            }
+        // Combine all data into one
+        let data = {};
 
-            meta.createdBy = createdBy.fullName || createdBy.username;
-            meta.updatedBy = updatedBy.fullName || createdBy.username;
-            meta.language = language;
+        for(let k in properties) {
+            data[k] = properties[k];
+        }
+        
+        for(let k in meta) {
+            data[k] = meta[k];
+        }
 
-            // Combine all data into one
-            let data = {};
-
-            for(let k in properties) {
-                data[k] = properties[k];
-            }
-            
-            for(let k in meta) {
-                data[k] = meta[k];
-            }
-
-            return Promise.resolve(data);
-        });
+        return data;
     }
 }
 

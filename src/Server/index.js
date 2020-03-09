@@ -113,9 +113,6 @@ async function main() {
     
     // Start watching schedule
     HashBrown.Service.ScheduleService.startWatching();
-    
-    // Start watching media cache
-    HashBrown.Service.MediaService.startWatchingCache();
 }
 
 main();

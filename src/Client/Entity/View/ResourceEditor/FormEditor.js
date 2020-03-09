@@ -45,8 +45,18 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.FormService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('forms/') < 0) {
+            location.hash = '/forms/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/forms/"]', 'This the forms section, where user submitted content lives.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your forms. You can right click here to create a new form.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the form editor, where you edit forms.', 'left', 'next');
     }
 
     /**

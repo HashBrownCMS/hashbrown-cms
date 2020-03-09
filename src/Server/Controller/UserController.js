@@ -58,59 +58,52 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }    
     
     /**
-     * Logs a user in
+     * @example POST /api/user/login?username=XXX&password=XXX&persist=true|false { username: XXX, password: XXX, persist: true|false }
      *
-     * @example POST /api/user/login
-     *
-     * @param {String} username
-     * @param {String} password
-     * @param {Boolean} persist
-     *
-     * @returns {String} Session token
+     * @return {String} Session token
      */
     static async login(request, params, body, query, user) {
         let username = body.username || query.username;
         let password = body.password || query.password;
         let persist = query.persist === 'true' || query.persist === true || body.persist === 'true' || body.persist === true;
 
-        let token = await HashBrown.Service.UserService.loginUser(username, password, persist);
+        let token = await HashBrown.Entity.User.login(username, password, persist);
 
         return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
     }
     
     /** 
-     * Logs out a user
+     * @example POST /api/user/logout
      */
     static async logout(request, params, body, query, user) {
-        await HashBrown.Service.UserService.logoutUser(user.id);
+        let token = this.getCookie(request, 'token'); 
+        
+        await user.logout(token);
 
         return new HttpResponse('User logged out', 302, { 'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT', 'Location': '/' });
     }
     
     /**
-     * Gets current user
+     * @example GET /api/user
      */
     static async current(request, params, body, query, user) {
-        user.clearSensitiveData();
-
         return new HttpResponse(user);
     }
 
     /**
-     * Gets current scopes
+     * @example GET /api/user/scopes
      */
     static async scopes(request, params, body, query, user) {
         return new HttpResponse(user.scopes);
     }
     
     /**
-     * Gets all users
+     * @example GET /api/users
      */
     static async users(request, params, body, query, user) {
-        let users = await HashBrown.Service.UserService.getAllUsers();
+        let users = await HashBrown.Entity.User.list();
     
         for(let i in users) {
-            users[i].clearSensitiveData();
             users[i].isCurrent = users[i].id === user.id;
         }
 
@@ -118,26 +111,23 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Handles a single user request
+     * @example GET|POST|DELETE /api/users/${id}
      */
     static async user(request, params, body, query, user) {
-        let id = params.id || body.id || query.id;
+        let subject = await HashBrown.Entity.User.get(params.id);
 
+        if(!subject) {
+            return new HttpError(`User by id ${id} not found`, 404);
+        }
+                
         switch(request.method) {
             case 'GET':
-                let result = await HashBrown.Service.UserService.getUserById(id);
+                subject.isCurrent = subject.id === user.id;
 
-                if(!result) {
-                    return new HttpError(`User by id ${id} not found`, 404);
-                }
-           
-                result.clearSensitiveData();
-                result.isCurrent = result.id === user.id;
-
-                return new HttpResponse(result);
+                return new HttpResponse(subject);
 
             case 'POST':
-                if(user.id !== id && !user.isAdmin) {
+                if(subject.id !== id && !user.isAdmin) {
                     return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
@@ -148,22 +138,21 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 }
 
                 // Theme can only be changed by current users
-                if(user.id !== id) {
+                if(subject.id !== id) {
                     delete body.theme;
                 }
             
-                let updated = await HashBrown.Service.UserService.updateUserById(id, body);
-            
-                updated.clearSensitiveData();
+                await subject.save();
 
-                return new HttpResponse(updated);
+                return new HttpResponse(subject);
 
             case 'DELETE':
                 if(!user.isAdmin) {
                     return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
-                await HashBrown.Service.UserService.removeUser(id);
+                await subject.remove();
+                
                 return new HttpResponse('OK');
         }
             
@@ -171,35 +160,33 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Creates the first admin
+     * @example POST /api/users/first?username=XXX&password=XXX { username: XXX, password: XXX }
      */
     static async first(request, params, body, query, user) {
         let username = body.username || query.username;
         let password = body.password || query.password;
 
-        let users = await HashBrown.Service.UserService.getAllUsers();
+        let users = await HashBrown.Entity.User.list();
 
         if(users && users.length > 0) {
             return new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the command line.', 403);
         }
 
-        await HashBrown.Service.UserService.createUser(username, password, true);
+        await HashBrown.Entity.User.create(username, password, { isAdmin: true });
         
-        let token = await HashBrown.Service.UserService.loginUser(username, password);
+        let token = await HashBrown.Entity.User.login(username, password);
        
-        return new HttpResponse(token, { 'Set-Cookie': `token=${token}` });
+        return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
     }
     
     /**
-     * Creates a user
+     * @example /api/users/new?username=XXX&password=XXX { username: XXX, password: XXX }
      */
     static async new(request, params, body, query, user) {
         let username = body.username || query.username;
         let password = body.password || query.password;
 
-        let newUser = await HashBrown.Service.UserService.createUser(username, password, false, body);
-
-        newUser.clearSensitiveData();
+        let newUser = await HashBrown.Entity.User.create(username, password);
 
         return new HttpResponse(newUser);
     }
