@@ -19,10 +19,6 @@ class Form extends HashBrown.Entity.Resource.ResourceBase {
         this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
         this.def(Boolean, 'appendRedirect');
-        this.def(Boolean, 'isLocked');
-        
-        // Sync
-        this.def(Object, 'sync');
         
         // Mutable fields
         this.def(Object, 'inputs', {});

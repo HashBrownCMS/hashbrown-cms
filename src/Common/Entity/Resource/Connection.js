@@ -18,10 +18,6 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
 
         this.def(String, 'title');
         this.def(String, 'url');
-        this.def(Boolean, 'isLocked');
-        
-        // Sync
-        this.def(Object, 'sync');
     }
 
     /**

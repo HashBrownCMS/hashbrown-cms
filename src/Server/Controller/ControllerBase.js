@@ -144,7 +144,7 @@ class ControllerBase {
         let user = null;
 
         if(route.user === true) {
-            user = await this.authenticate(request);
+            user = await this.authorize(request, requestParameters.project);
         
         } else if(typeof route.user === 'object') {
             user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
@@ -314,9 +314,9 @@ class ControllerBase {
      * @param {String} scope
      * @param {Boolean} isAdmin
      */
-    static async authorize(request, project = '', scope = '', isAdmin = false) {
+    static async authorize(request, project, scope = '', isAdmin = false) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(project, 'project', String);
+        checkParam(project, 'project', String, true);
         checkParam(scope, 'scope', String);
         checkParam(isAdmin, 'isAdmin', Boolean);
 
@@ -328,7 +328,7 @@ class ControllerBase {
         }
         
         // A project is defined, and the user doesn't have it
-        if(project && !user.hasScope(project)) {
+        if(!user.hasScope(project)) {
             throw new HttpError('You do not have permission to use this project', 403);
         }
 

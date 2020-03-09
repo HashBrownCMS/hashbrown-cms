@@ -14,8 +14,9 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
     structure() {
         super.structure();
 
-        this.def(String, 'name');
+        this.def(String, 'filename');
         this.def(String, 'folder', '/');
+        this.def(String, 'base64');
     }
 
     /**
@@ -24,7 +25,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      * @return {String} Name
      */
     getName() {
-        return this.name;
+        return this.filename;
     }
 
     /**
@@ -40,14 +41,14 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         delete params.remote;
         delete params.sync;
         delete params.isRemote;
-
-        if(params.url) {
-            params.path = params.url;
-            delete params.url;
-        }
+        delete params.url;
 
         if(!params.folder) {
             params.folder = '/';
+        }
+
+        if(params.name) {
+            params.filename = params.name;
         }
 
         return params;

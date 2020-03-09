@@ -16,33 +16,30 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
         this.def(String, 'name');
         this.def(String, 'type');
-        this.def(String, 'parentSchemaId');
-        this.def(Boolean, 'isLocked');
+        this.def(String, 'parentId');
+    }
 
-        // Sync
-        this.def(Object, 'sync');
+    /**
+     * Checks parameters
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = super.paramsCheck(params);
 
-        this.def(Array, 'hiddenProperties', []);
+        if(params.parentSchemaId) {
+            params.parentId = params.parentSchemaId;
+            delete params.parentSchemaId;
+        }
     }
 
     /**
      * Gets a URL safe name for this schema
-     *
-     * @return {String} URL safe name
      */
     getUrlSafeName() {
         return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    }
-
-    /**
-     * Checks whether a property is hidden
-     *
-     * @param {String} name
-     *
-     * @returns {Boolean} Is hidden
-     */
-    isPropertyHidden(name) {
-        return this.hiddenProperties.indexOf(name) > -1;
     }
     
     /**

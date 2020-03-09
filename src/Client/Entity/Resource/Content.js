@@ -51,14 +51,14 @@ class Content extends require('Common/Entity/Resource/Content') {
     }
 
     /**
-     * Gets parent Content
+     * Gets parent content
      *
-     * @returns {Content} Parent
+     * @returns {HashBrown.Entity.Resource.Content} Parent
      */
     async getParent() {
         if(!this.parentId) { return null; }
 
-        return await HashBrown.Service.ContentService.getContentById(this.parentId);
+        return await this.constructor.get(this.parentId);
     }
 }
 

@@ -30,6 +30,9 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
         
         this.def(String, 'project');
         this.def(String, 'environment');
+        
+        this.def(Boolean, 'isLocked', false);
+        this.def(Object, 'sync', {});
     }
 
     /**

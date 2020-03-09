@@ -81,20 +81,12 @@ class FormController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example POST /api/:project/:environment/forms/:id/submit
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @param {Object} entries The submitted entries
+     * @example POST /api/${project}/${environment}/forms/${id}/submit { ... }
      */
     static async submit(request, params, body, query, user) {
         // Prevent spam
         if(
-            lastIp != req.connection.remoteAddress || // This IP is not the same as the previous one
+            lastIp != request.socket.remoteAddress || // This IP is not the same as the previous one
             Date.now() - lastSubmission >= SUBMISSION_TIMEOUT_MS // Timeout has been reached
         ) {
             lastSubmission = Date.now();
@@ -127,13 +119,7 @@ class FormController extends HashBrown.Controller.ResourceController {
     }
 
     /**
-     * @example POST /api/:project/:environment/forms/clear/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
+     * @example POST /api/${project}/${environment}/forms/${id}/clear
      */
     static async clear(request, params, body, query, user) {
         let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);

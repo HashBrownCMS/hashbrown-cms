@@ -117,38 +117,24 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resource(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
-        let resource = null;
+        let resource = await model.get(params.project, params.environment, params.id, query);
+                
+        if(!resource) {
+            return new HttpResponse('Not found', 404);
+        }
 
         switch(request.method) {
             case 'GET':
-                resource = await model.get(params.project, params.environment, params.id, query);
-                
-                if(!resource) {
-                    return new HttpResponse('Not found', 404);
-                }
-                
                 return new HttpResponse(resource);
                 
             case 'POST':
-                resource = await model.get(params.project, params.environment, params.id, query);
-                
-                if(!resource) {
-                    return new HttpResponse('Not found', 404);
-                }
-                
                 resource.adopt(body);
                     
                 await resource.save(params.project, params.environment, query);
                 
-                return new HttpResponse(updated);
+                return new HttpResponse(resource);
 
             case 'DELETE':
-                resource = await model.get(params.project, params.environment, params.id, query);
-                
-                if(!resource) {
-                    return new HttpResponse('Not found', 404);
-                }
-                
                 await resource.remove(params.project, params.environment, query);
 
                 return new HttpResponse('OK');

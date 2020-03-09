@@ -45,6 +45,8 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
+        checkParam(data.filename, 'data.filename', String, true);
+        checkParam(data.base64, 'data.base64', String, true);
         checkParam(options, 'options', Object, true);
         
         let connection = await this.getProvider(project, environment);
@@ -53,15 +55,9 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error('No connection set as media provider');
         }
 
-        if(options.filename) {
-            data.name = options.filename;
-        }
-
         let resource = await super.create(project, environment, data, options);
 
-        if(options.filename && options.base64) {
-            await connection.setMedia(resource.id, options.filename, options.base64);
-        }
+        await connection.setMedia(resource.id, data.filename, data.base64);
 
         return resource;
     }
@@ -150,10 +146,10 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error('No connection set as media provider');
         }
 
-        if(options.filename && options.base64) {
-            await connection.setMedia(this.id, options.filename, options.base64);
-        
-            this.name = options.filename;
+        await connection.renameMedia(this.id, this.filename);
+
+        if(this.base64) {
+            await connection.setMedia(this.id, this.filename, this.base64);
         }
 
         await super.save(project, environment);

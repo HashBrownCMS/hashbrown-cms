@@ -29,21 +29,35 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             },
             '/api/projects/${project}': {
                 handler: this.project,
-                methods: [ 'GET', 'DELETE' ],
                 user: true
+            },
+            '/api/projects/${project}': {
+                handler: this.project,
+                methods: [ 'DELETE' ],
+                user: {
+                    isAdmin: true
+                }
             },
            
             // Settings
             '/api/projects/${project}/settings': {
                 handler: this.settings,
-                methods: [ 'GET', 'POST' ],
+                user: true
+            },
+            '/api/projects/${project}/settings': {
+                handler: this.settings,
+                methods: [ 'POST' ],
                 user: {
                     isAdmin: true
                 }
             },
             '/api/projects/${project}/settings/${section}': {
                 handler: this.settings,
-                methods: [ 'GET', 'POST' ],
+                user: true,
+            },
+            '/api/projects/${project}/settings/${section}': {
+                handler: this.settings,
+                methods: [ 'POST' ],
                 user: {
                     isAdmin: true
                 }
@@ -123,7 +137,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Gets/deletes a project
+     * @example GET|POST /api/projects/${project}
      */
     static async project(request, params, body, query, user) {
         let project = params.project;
@@ -146,7 +160,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Gets a list of all project ids
+     * @example GET /api/projects/ids
      */
     static async projectIds(request, params, body, query, user) {
         let projects = await HashBrown.Service.ProjectService.getAllProjectIds();
@@ -163,7 +177,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Gets a list of all projects
+     * @example GET /api/projects
      */
     static async projects(request, params, body, query, user) {
         let projects = await HashBrown.Service.ProjectService.getAllProjects();
@@ -180,7 +194,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Creates a new project
+     * @example POST /api/projects/new { name: XXX }
      */
     static async newProject(request, params, body, query, user) {
         let project = await HashBrown.Service.ProjectService.createProject(body.name);
@@ -189,7 +203,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Updates/gets settings
+     * @example GET|POST /api/projects/${project}/settings[/${section}] { ... }
      */
     static async settings(request, params, body, query, user) {
         let project = params.project;
@@ -211,7 +225,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
    
     /**
-     * Gets a list of all environments
+     * @example GET /api/projects/${project}/environments
      */
     static async environments(request, params, body, query, user) {
         let project = params.project;
@@ -226,7 +240,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * Adds an environment
+     * @example POST /api/projects/${project}/environments/new?name=XXX { name: XXX }
      */
     static async newEnvironment(request, params, body, query, user) {
         let project = params.project;
@@ -238,7 +252,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Deletes an environment
+     * @example DELETE /api/projects/${project}/environments/${environment}
      */
     static async deleteEnvironment(request, params, body, query, user) {
         let project = params.project;
@@ -251,7 +265,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
     
     /**
-     * Restores a backup
+     * @example POST /api/projects/{project}/backups/${timestamp}/restore
      */
     static async restoreBackup(request, params, body, query, user) {
         await HashBrown.Service.DatabaseService.restore(params.project, params.timestamp);
@@ -260,7 +274,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
   
     /**
-     * Creates a new backup
+     * @example POST /api/projects/{project}/backups/new
      */
     static async newBackup(request, params, body, query, user) {
         await HashBrown.Service.BackupService.createBackup(params.project);
@@ -270,13 +284,13 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
 
     /**
-     * Deletes/gets a backup
+     * @example GET|DELETE /api/projects/{project}/backups/${timestamp}
      */
     static async backup(request, params, body, query, user) {
         let path = Path.join(APP_ROOT , 'storage', params.project, 'dump', params.timestamp + '.hba');
         
         switch(request.method) {
-            case 'get':
+            case 'GET':
                 let data = await HashBrown.Service.FileService.read(path);
 
                 return new HttpResponse(backup, 200, {
@@ -284,7 +298,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     'Content-Disposition': `attachment; filename="${params.timestamp}.hba"`
                 });
 
-            case 'delete':
+            case 'DELETE':
                 await HashBrown.Service.FileService.remove(path);
 
                 return new HttpResponse('OK');
@@ -294,7 +308,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Uploads a backup
+     * @example POST /api/projects/{project}/backups/upload
      */
     static async uploadBackup(request, params, body, query, user) {
         if(!body.file) {
@@ -310,13 +324,12 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
         let path = Path.join(APP_ROOT , 'storage', params.project, 'dump', timestamp + '.hba');
     
         await this.uploadFile(request, path);
-
         
         return new HttpResponse(timestamp);
     } 
 
     /**
-     * Migrates content between environments
+     * @example POST /api/projects/{project}/migrate { from: XXX, to: XXX, replace: true|false }
      */
     static async migrate(request, params, body, query, user) {
         let project = params.project;
@@ -367,7 +380,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * Gets all users
+     * @example GET /api/projects/{project}/users
      */
     static async users(request, params, body, query, user) {
         let users = await HashBrown.Service.UserService.getAllUsers(params.project);
