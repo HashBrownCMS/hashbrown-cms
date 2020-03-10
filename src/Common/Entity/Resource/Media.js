@@ -47,15 +47,15 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
 
+        params = params || {};
+    
         delete params.remote;
         delete params.sync;
         delete params.isRemote;
@@ -69,7 +69,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
             params.filename = params.name;
         }
 
-        return params;
+        super.adopt(params);
     }
     
     /**

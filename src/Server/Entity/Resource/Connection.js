@@ -19,14 +19,14 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
 
         if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
             let processor = HashBrown.Entity.Resource.Connection.getProcessor(params.processor.alias);
@@ -48,7 +48,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             }
         }
 
-        return params;
+        super.adopt(params);
     }
    
     /**

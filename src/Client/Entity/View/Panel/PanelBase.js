@@ -322,6 +322,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         let options = {};
 
         options['Copy id'] = () => this.onClickCopyId(resource.id);
@@ -341,6 +343,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemSyncOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+
         let isSyncEnabled = resource.sync && HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
 
         if(!isSyncEnabled) { return {}; }
@@ -368,6 +372,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         let options = {};
 
         let baseOptions = this.getItemBaseOptions(resource);
@@ -433,12 +439,14 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
     async getItem(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         return {
             id: resource.id,
             category: this.category,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
-            name: resource.id,
+            name: resource.getName(),
             children: []
         };
     }

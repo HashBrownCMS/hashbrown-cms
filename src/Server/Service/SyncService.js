@@ -1,7 +1,6 @@
 'use strict';
 
 const Path = require('path');
-const Url = require('url');
 
 /**
  * The helper class for all synchronisation services
@@ -18,7 +17,7 @@ class SyncService {
      * @returns {String} URL
      */
     static parseUrl(base, ...parts) {
-        let url = Url.parse(base);
+        let url = new URL(base);
         
         return url.protocol + '//' + url.hostname + (url.port ? ':' + url.port : '') + '/' + Path.join('api', parts.filter((x) => { return !!x; }).join('/'));
     }
@@ -155,7 +154,7 @@ class SyncService {
             
             settings.enabled = false;
 
-            await project.setSettings('sync', settings);
+            await project.setSettings(settings, 'sync');
             
             throw new Error('Unable to get resource item via ' + url + '. Reason: ' + (e.message || 'unknown') + '. Disabling sync to avoid infinite loops.');
         }
@@ -254,7 +253,7 @@ class SyncService {
             
             settings.enabled = false;
 
-            await project.setSettings('sync', settings);
+            await project.setSettings(settings, 'sync');
 
             throw new Error('Unable to get resource via ' + url + '. Reason: ' + (e.message || 'unknown') + '. Disabling sync to avoid infinite loops.');
         }

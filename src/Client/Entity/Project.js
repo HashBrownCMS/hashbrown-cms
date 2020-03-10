@@ -97,12 +97,12 @@ class Project extends require('Common/Entity/Project') {
     /**
      * Sets all settings or a section
      *
-     * @param {String} section
      * @param {Object} settings
+     * @param {String} section
      */
-    async setSettings(section, settings) {
-        checkParam(section, 'section', String);
+    async setSettings(settings, section = '') {
         checkParam(settings, 'settings', Object, true);
+        checkParam(section, 'section', String);
 
         let apiUrl = '/api/projects/' + this.id + '/settings';
 

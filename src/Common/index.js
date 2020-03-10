@@ -77,7 +77,18 @@ base.checkParam = (value, name, type, notNull = false) => {
 
     }
     
-    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
+    if(valueTypeName === 'Object') {
+        value = JSON.stringify(object);
+    
+    } else if(typeof value.toString === 'function') {
+        value = value.toString();
+
+    } else {
+        value = '(' + valueTypeName + ')';
+
+    }
+
+    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + value);
 }
 
 /**

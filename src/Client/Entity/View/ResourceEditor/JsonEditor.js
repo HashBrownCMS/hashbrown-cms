@@ -35,7 +35,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      *
      * @param {String} id
      *
-     * @return {HashBrown.Entity.Resource.Schema.SchemaBase} Schema
+     * @return {HashBrown.Entity.Resource.SchemaBase} Schema
      */
     getSchema(id) {
         for(let schema of this.state.schemas || []) {
@@ -80,7 +80,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             let v = obj[k];
 
             switch(k) {
-                case 'schemaId': case 'parentSchemaId':
+                case 'schemaId': case 'parentId':
                     if(!v || typeof v !== 'string') { break; }
                     if(this.getSchema(v)) { break; }
 

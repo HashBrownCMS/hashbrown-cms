@@ -42,7 +42,7 @@ const SCHEMAS = {
         id: 'module',
         name: 'Module',
         type: 'field',
-        parentSchemaId: 'struct',
+        parentId: 'struct',
         config: {
             struct: {
                 string: {
@@ -70,7 +70,7 @@ const SCHEMAS = {
         allowedChildSchemas: [ 'webPage' ],
         allowedAtRoot: true,
         name: 'Web Page',
-        parentSchemaId: 'page',
+        parentId: 'page',
         fields: {
             properties: {
                 array: {
@@ -371,9 +371,9 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
     
             } else {
                 if(id === 'new') {
-                    let parentSchemaId = HashBrown.Service.NavigationService.getQuery('parentSchemaId', query);
-                    let parentSchema = await HashBrown.Entity.Resource.SchemaBase.get(parentSchemaId);
-                    let schema = await HashBrown.Entity.Resource.Schema.SchemaBase.create({ parentId: parentSchemaId });
+                    let parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
+                    let parentSchema = await HashBrown.Entity.Resource.SchemaBase.get(parentId);
+                    let schema = await HashBrown.Entity.Resource.SchemaBase.create({ parentId: parentId });
 
                     SCHEMAS[schema.id] = schema;
 
@@ -416,9 +416,9 @@ for(let id in SCHEMAS) {
     let schema = SCHEMAS[id];
 
     schema.id = id;
-    schema.isLocked = schema.parentSchemaId === 'fieldBase' || schema.parentSchemaId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
+    schema.isLocked = schema.parentId === 'fieldBase' || schema.parentId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
     
     if(!schema.type) {
-        schema.type = schema.parentSchemaId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
+        schema.type = schema.parentId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
     }
 }

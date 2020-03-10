@@ -5,7 +5,7 @@
  */
 class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'schemas'; }
-    static get itemType() { return HashBrown.Entity.Resource.Schema.SchemaBase; }
+    static get itemType() { return HashBrown.Entity.Resource.SchemaBase; }
     
     /**
      * Constructor
@@ -23,7 +23,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(this.state.id) {
             this.model = await HashBrown.Entity.Resource.SchemaBase.get(this.state.id);
             this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
-            
+
             let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
             let allFieldSchemas = await HashBrown.Entity.Resource.FieldSchema.list();
 
@@ -40,7 +40,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 
                 this.state.parentSchemaOptions[schema.name] = schema.id;
             }
-        }    
+        }   
     }
 
     /**
@@ -52,7 +52,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         this.state.title = this.model.name;
         this.state.icon = this.model.icon || this.state.compiledSchema.icon;
         
-        if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema) {
+        if(this.model instanceof HashBrown.Entity.Resource.ContentSchema) {
             this.state.tab = this.state.tab || 'content';
             this.state.properties = {};
             this.state.parentTabs = {};
@@ -83,7 +83,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 this.state.properties[key] = definition.label;
             }
         
-        } else if(this.model instanceof HashBrown.Entity.Resource.Schema.FieldSchema) {
+        } else if(this.model instanceof HashBrown.Entity.Resource.FieldSchema) {
             this.state.fieldConfigEditor = null;
             
             let fieldType = HashBrown.Entity.View.Field[this.model.editorId];
@@ -277,8 +277,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     /**
      * Event: Change parent schema id
      */
-    onChangeParentSchemaId(newValue) {
-        this.model.parentSchemaId = newValue;
+    onChangeParentId(newValue) {
+        this.model.parentId = newValue;
 
         this.onChange();
     }

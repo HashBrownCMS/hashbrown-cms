@@ -214,7 +214,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     return new HttpResponse('Only admins can change project settings', 403);
                 }
 
-                await project.setSettings(params.section, body);
+                await project.setSettings(body, params.section);
         
                 return new HttpResponse('OK');
 

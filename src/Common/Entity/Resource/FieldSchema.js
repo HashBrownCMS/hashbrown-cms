@@ -28,21 +28,21 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
 
+        params = params || {};
+    
         // Backwards compatible editor names
         if(params.editorId && params.editorId.indexOf('Editor') < 0) {
             params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
         }
 
-        return params;
+        super.adopt(params);
     }
 
     /**

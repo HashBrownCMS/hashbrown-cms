@@ -7,33 +7,26 @@
  */
 class Project extends HashBrown.Entity.EntityBase {
     /**
-     * Constructor
-     */
-    constructor(params) {
-        super(Project.checkParams(params));
-    }
-
-    /**
      * Gets the human readable name
      *
      * @return {String} Name
      */
     getName() {
         if(this.settings && this.settings.info && this.settings.info.name) {
-            return this.settings && this.settings.info && this.settings.info.name;
+            return this.settings.info.name;
         }
 
         return this.id;
     }
 
     /**
-     * Performs a sanity check of the params
+     * Adopts values into this entity
      *
      * @param {Object} params
-     *
-     * @returns {Object} Params
      */
-    static checkParams(params) {
+    adopt(params) {
+        checkParam(params, 'params', Object);
+
         params = params || {};
 
         if(!params.id) { throw new Error('No id was provided for the Project constructor'); }
@@ -61,7 +54,7 @@ class Project extends HashBrown.Entity.EntityBase {
             params.settings.languages = languages;
         }
 
-        return params;
+        super.adopt(params);
     }
 
     /**
@@ -159,7 +152,7 @@ class Project extends HashBrown.Entity.EntityBase {
         
         environments[environment] = settings;
 
-        await this.setSettings('environments', environments);
+        await this.setSettings(environments, 'environments');
     }
     
     /**
@@ -195,6 +188,24 @@ class Project extends HashBrown.Entity.EntityBase {
 
         return languages;
     }
+    
+    /**
+     * Adds a new environment
+     *
+     * @param {String} name
+     */
+    async addEnvironment() {
+        throw new Error('Method "addEnvironment" must be overridden');
+    }
+    
+    /**
+     * Removes an environment
+     *
+     * @param {String} name
+     */
+    async removeEnvironment() {
+        throw new Error('Method "removeEnvironment" must be overridden');
+    }
 
     /**
      * Gets all environment names
@@ -202,32 +213,7 @@ class Project extends HashBrown.Entity.EntityBase {
      * @return {Array} Environment names
      */
     async getEnvironments() {
-        let environments = await this.getSettings('environments');
-        
-        // Reconstruct environment list from old structure
-        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
-            environments = {};
-
-            let settings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
-                
-            for(let entry of settings) {
-                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
-    
-                let name = entry.usedBy;
-
-                delete entry.usedBy;
-
-                environments[name] = entry;
-            }
-        
-            await this.setSettings(this.id, 'environments', environments);
-        }
-
-        if(Object.keys(environments).length < 1) {
-            environments['live'] = {};
-        }
-
-        return Object.keys(environments);
+        throw new Error('Method "getEnvironments" must be overridden');
     }
 
     /**
@@ -240,9 +226,30 @@ class Project extends HashBrown.Entity.EntityBase {
     async hasEnvironment(environment) {
         checkParam(environment, 'environment', String, true);
 
-        let environments = this.getEnvironments();
+        let environments = await this.getEnvironments();
 
         return environments.indexOf(environment) > -1;
+    }
+
+    /**
+     * Sets all settings or a section
+     *
+     * @param {Object} settings
+     * @param {String} section
+     */
+    async setSettings() {
+        throw new Error('Method "setSettings" must be overridden');
+    }
+
+    /**
+     * Gets all settings or a section
+     *
+     * @param {String} section
+     *
+     * @return {Object} Settings
+     */
+    async getSettings() {
+        throw new Error('Method "getSettings" must be overridden');
     }
 }
 

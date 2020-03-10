@@ -21,7 +21,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(definition.schemaId, { withParentFields: true });
         let config = definition.config || {};
 
-        if(schema.parentSchemaId !== 'fieldBase') {
+        if(schema.parentId !== 'fieldBase') {
             config = schema.config;
         }
 
@@ -46,7 +46,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     /**
      * Creates a field based on a schema
      *
-     * @param {HashBrown.Entity.Resource.Schema.FieldSchema} schema
+     * @param {HashBrown.Entity.Resource.FieldSchema} schema
      * @param {*} value
      *
      * @return {HashBrown.Entity.View.Field.FieldBase} Field

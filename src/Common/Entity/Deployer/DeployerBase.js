@@ -22,16 +22,20 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
     }
    
     /**
-     * Parameter sanity check
+     * Adopts values into this entity
+     *
+     * @param {Object} params
      */
-    static paramsCheck(params) {
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+        
         params = params || {};
 
         delete params.title;
         delete params.name;
         delete params.alias;
 
-        return params;
+        super.adopt(params);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 const HTTP = require('http');
 const QueryString = require('querystring');
-const Url = require('url');
 
 const MAX_UPLOAD_SIZE = 20e6;
 
@@ -26,6 +25,20 @@ class ControllerBase {
     }
 
     /**
+     * Gets a WHATWG URL object from a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {URL} URL
+     */
+    static getUrl(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+
+        // NOTE: We can assume protocol here, because we aren't actually using it
+        return new URL(request.url, 'https://' + request.headers.host);
+    }
+
+    /**
      * Gets a route definition
      *
      * @param {HTTP.IncomingMessage} request
@@ -35,47 +48,45 @@ class ControllerBase {
     static getRoute(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
 
-        let requestPath = Url.parse(request.url, true).path;
+        let requestPath = this.getUrl(request).pathname;
+        let requestParts = requestPath.match(/[^\/]+/g) || [];
+       
         let route = null;
+        let routes = this.routes;
 
-        // First test for exact matches
-        for(let pattern in this.routes) {
-            if(pattern !== requestPath) { continue; }
+        for(let pattern in routes) {
+            let methods = routes[pattern].methods || [ 'GET' ];
 
-            route = this.routes[pattern];
+            if(methods.indexOf(request.method) < 0) { continue; }
+
+            let patternParts = pattern.match(/[^\/]+/g) || [];
+
+            if(patternParts.length !== requestParts.length) { continue; }
+
+            let regexMatches = 0;
+            let exactMatches = 0;
+
+            for(let i in requestParts) {
+                let requestPart = requestParts[i];
+                let patternPart = patternParts[i];
+
+                if(requestPart === patternPart) {
+                    exactMatches++;
+                }
+
+                if(patternPart.match(/\${[^}]+}/)) {
+                    regexMatches++;
+                }
+            }
+
+            let matches = regexMatches + exactMatches;
+
+            if(matches !== patternParts.length) { continue; }
+
+            route = routes[pattern];
             route.pattern = pattern;
+
             break;
-        }
-
-        // Then test for regex matches
-        if(!route) {
-            for(let pattern in this.routes) {
-                let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
-                let methods = this.routes[pattern].methods || [ 'GET' ];
-                
-                let patternHasVariables = pattern.indexOf('${') > -1;
-                let patternMatchesRequestPathLength = pattern.split('/').length === requestPath.split('/').length;
-                let routeSupportsRequestMethod = methods.indexOf(request.method) > -1;
-                let patternMatchesRequestPath = regex.test(requestPath);
-                
-                if(
-                    !patternHasVariables ||
-                    !patternMatchesRequestPathLength ||
-                    !routeSupportsRequestMethod ||
-                    !patternMatchesRequestPath
-                ) { continue; }
-
-                route = this.routes[pattern];
-                route.pattern = pattern;
-                break;
-            }
-        }
-
-        // Perform sanity check
-        if(route) {
-            if(!route.methods || !Array.isArray(route.methods)) {
-                route.methods = [ 'GET' ];
-            }
         }
 
         return route;
@@ -122,7 +133,7 @@ class ControllerBase {
     static async handle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
-        let requestPath = Url.parse(request.url, true).path;
+        let requestPath = this.getUrl(request).pathname;
         let route = this.getRoute(request);
 
         if(!route) {
@@ -135,11 +146,6 @@ class ControllerBase {
 
         if(typeof route.handler !== 'function') {
             return new HttpResponse(`Handler for route ${requestPath} is not a function`, 500);
-        }
-
-        // Check for allowed methods
-        if(route.methods.indexOf(request.method) < 0) {
-            return new HttpResponse(`Route ${route.pattern} does not support method ${request.method}`, 405);
         }
 
         // Get request parameters
@@ -179,7 +185,14 @@ class ControllerBase {
 
         // Read request body
         let requestBody = await this.getRequestBody(request);
-        let requestQuery = Url.parse(request.url, true).query || {};
+        let requestSearchParams = this.getUrl(request).searchParams;
+        let requestQuery = {};
+
+        if(requestSearchParams) {
+            requestSearchParams.forEach((value, key) => {
+                requestQuery[key] = value;
+            });
+        }
 
         let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
 

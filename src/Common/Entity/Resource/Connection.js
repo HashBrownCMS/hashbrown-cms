@@ -93,19 +93,21 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+        
         // Deployer and processor
         if(!params.processor) { params.processor = {}; }
         if(!params.deployer) { params.deployer = {}; }
         if(!params.deployer.paths) { params.deployer.paths = {}; }
         
-        return super.paramsCheck(params);
+        super.adopt(params);
     }
 
     /**

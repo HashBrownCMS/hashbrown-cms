@@ -9,8 +9,8 @@ const HEARTBEAT_TIMEOUT  = 1000 * 5; // An extra 5 seconds waiting time when che
  * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
-    static get category() { return this.name.replace('Editor', '').toLowerCase(); }
-    static get itemType() { return null; }
+    static get category() { return null; }
+    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
 
     get category() { return this.constructor.category; }
     get itemType() { return this.constructor.itemType; }

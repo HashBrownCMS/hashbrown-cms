@@ -34,7 +34,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
             _.field({label: 'Parent'},
                 _.popup({disabled: model.isLocked, value: model.parentSchemaId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})
             ),
-            model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ? [
+            model instanceof HashBrown.Entity.Resource.ContentSchema ? [
                 _.field({label: 'Allowed at root'},
                     _.checkbox({disabled: model.isLocked, value: model.allowedAtRoot, onchange: _.onChangeAllowedAtRoot})
                 ),
@@ -57,7 +57,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                     _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField})
                 )
             ] : null,
-            model instanceof HashBrown.Entity.Resource.Schema.FieldSchema ? [
+            model instanceof HashBrown.Entity.Resource.FieldSchema ? [
                 state.fieldConfigEditor
             ] : null
         ),

@@ -56,9 +56,11 @@ class Project extends require('Common/Entity/Project') {
         if(!exists) { return null; }
 
         let project = new this({
-            id: id,
-            settings: await HashBrown.Service.DatabaseService.findOne(id, 'settings', {}) || {}
+            id: id
         });
+
+        project.settings = await project.getSettings();
+        project.environments = await project.getEnvironments();
 
         return project;
     }
@@ -155,7 +157,7 @@ class Project extends require('Common/Entity/Project') {
      *
      * @return {*} Settings
      */
-    async getSettings(section) {
+    async getSettings(section = '') {
         checkParam(section, 'section', String);
 
         let settings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
@@ -167,6 +169,37 @@ class Project extends require('Common/Entity/Project') {
 
             return settings[section];
         }
+
+        return settings;
+    }
+    
+    /**
+     * Sets settings
+     *
+     * @param {Object} settings
+     * @param {String} section
+     */
+    async setSettings(settings, section = '') {
+        checkParam(settings, 'settings', Object, true);
+        checkParam(section, 'section', String);
+
+        if(section) {
+            let oldSettings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
+
+            if(!oldSettings) {
+                oldSettings = {};
+            }
+
+            if(!oldSettings[section]) {
+                oldSettings[section] = {};
+            }
+
+            oldSettings[section] = settings;
+
+            settings = oldSettings;
+        }
+            
+        await HashBrown.Service.DatabaseService.updateOne(this.id, 'settings', {}, settings);
 
         return settings;
     }
@@ -242,6 +275,82 @@ class Project extends require('Common/Entity/Project') {
         let path = Path.join(APP_ROOT, 'storage', this.id, 'dump', timestamp + '.hba');
 
         await HashBrown.Service.FileService.write(path, data);
+    }
+    
+    /**
+     * Adds a new environment
+     *
+     * @param {String} name
+     */
+    async addEnvironment(name) {
+        checkParam(name, 'name', String, true);
+
+        if(name.length < 2) {
+            throw new Error('Environment name must be at least 2 characters long');
+        }
+
+        let environments = await this.getSettings('environments');
+
+        if(environments[name]) {
+            throw new Error(`Environment ${name} already exists`);
+        }
+
+        environments[name] = {};
+
+        await this.setSettings(environments, 'environments');
+    }
+    
+    /**
+     * Removes an environment
+     *
+     * @param {String} name
+     */
+    async removeEnvironment(name) {
+        checkParam(name, 'name', String, true);
+
+        let environments = await this.getSettings('environments');
+
+        if(!environments[name]) {
+            throw new Error(`Environment ${name} could not be found`);
+        }
+
+        delete environments[name];
+
+        await this.setSettings(environments, 'environments');
+    }
+    
+    /**
+     * Gets all environment names
+     *
+     * @return {Array} Environment names
+     */
+    async getEnvironments() {
+        let environments = await this.getSettings('environments');
+        
+        // Reconstruct environment list from old structure
+        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
+            environments = {};
+
+            let settings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
+                
+            for(let entry of settings) {
+                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
+    
+                let name = entry.usedBy;
+
+                delete entry.usedBy;
+
+                environments[name] = entry;
+            }
+        
+            await this.setSettings(environments, 'environments');
+        }
+
+        if(Object.keys(environments).length < 1) {
+            environments['live'] = {};
+        }
+
+        return Object.keys(environments);
     }
 }
 

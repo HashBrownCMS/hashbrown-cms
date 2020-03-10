@@ -9,9 +9,8 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
      * Gets the category (API group) of this resource type
      */
-    static get category() {
-        throw new Error('The "category" getter must be overridden');
-    }
+    static get category() { return null; }
+    get category() { return this.constructor.category; }
 
     /**
      * Gets a list of all categories
@@ -47,9 +46,6 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
         this.def(String, 'viewedBy');
         this.def(Date, 'viewedOn');
         
-        this.def(String, 'project');
-        this.def(String, 'environment');
-        
         this.def(Boolean, 'isLocked', false);
         this.def(Object, 'sync', {});
     }
@@ -71,15 +67,16 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Resource
      */
-    static getModel(category, data) {
+    static getModel(category, data = null) {
         checkParam(category, 'category', String, true);
         checkParam(data, 'data', Object);
 
         for(let name in HashBrown.Entity.Resource) {
-            if(name.indexOf('Base') > -1) { continue; }
-
             let model = HashBrown.Entity.Resource[name];
-
+            let parentModel = Object.getPrototypeOf(model);
+            let grandParentModel = Object.getPrototypeOf(parentModel);
+            
+            if(parentModel !== this && grandParentModel !== this) { continue; }
             if(model.category !== category) { continue; }
 
             if(data) {
@@ -93,15 +90,15 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     }
     
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = params || {}
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
 
+        params = params || {};
+    
         // Remove MongoDB id
         delete params._id;
 
@@ -133,7 +130,7 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
             delete params.locked;
         }
 
-        return params;
+        super.adopt(params);
     }
 
     /**

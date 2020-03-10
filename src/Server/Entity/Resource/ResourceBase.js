@@ -61,7 +61,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         }
 
         let resources = await HashBrown.Service.DatabaseService.find(
-            options.project,
+            project,
             environment + '.' + this.category,
             {},
             {},

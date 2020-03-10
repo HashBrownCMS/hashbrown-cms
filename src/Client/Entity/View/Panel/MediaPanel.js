@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Media extends HashBrown.Entity.View.Panel.PanelBase {
+class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'media'; }
    
     /**
@@ -108,11 +108,13 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets a panel item from a resource
      *
-     * @param {HashBrown.Entity.Resource.Content} content
+     * @param {HashBrown.Entity.Resource.Media} resource
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
     async getItem(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.Media, true);
+        
         let item = await super.getItem(resource);
 
         item.name = resource.name;
@@ -127,11 +129,13 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets the basic options for a resource
      *
-     * @param {HashBrown.Entity.Resource.ResourceBase} resource
+     * @param {HashBrown.Entity.Resource.Media} resource
      *
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.Media, true);
+        
         let options = super.getItemBaseOptions(resource);
 
         options['Rename'] = () => this.onClickRename(resource);
@@ -185,4 +189,4 @@ class Media extends HashBrown.Entity.View.Panel.PanelBase {
     }
 }
 
-module.exports = Media;
+module.exports = MediaPanel;

@@ -42,7 +42,7 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
             }
         );
 
-        if(view.configTemplate && view.model.schema && view.model.schema.parentSchemaId === 'fieldBase') {
+        if(view.configTemplate && view.model.schema && view.model.schema.parentId === 'fieldBase') {
             view.on('change', (newValue) => {
                 this.onChangeConfig(newValue);
             });

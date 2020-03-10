@@ -5,7 +5,6 @@ const Path = require('path');
 const Util = require('util');
 const HTTP = require('http');
 const HTTPS = require('https');
-const Url = require('url');
 
 const Glob = require('glob');
 
@@ -241,7 +240,7 @@ class FileService {
         await new Promise((resolve, reject) => {
             // Copy from a URL
             if(from.indexOf('://') > -1) {
-                let url = Url.parse(from);
+                let url = URL(from);
 
                 let options = {
                     host: url.hostname,

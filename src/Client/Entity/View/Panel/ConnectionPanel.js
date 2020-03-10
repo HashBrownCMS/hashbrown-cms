@@ -5,8 +5,8 @@
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Connections extends HashBrown.Entity.View.Panel.PanelBase {
+class ConnectionPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'connections'; }
 }
 
-module.exports = Connections;
+module.exports = ConnectionPanel;

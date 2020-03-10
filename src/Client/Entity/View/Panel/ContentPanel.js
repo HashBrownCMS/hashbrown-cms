@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Content extends HashBrown.Entity.View.Panel.PanelBase {
+class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'content'; };
     
     /**
@@ -21,8 +21,12 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     
     /**
      * Event: Click remove
+     *
+     * @param {String} id
      */
     async onClickRemove(id) {
+        checkParam(id, 'id', String, true);
+
         let content = await HashBrown.Entity.Resource.Content.get(id);
 
         let modal = new HashBrown.Entity.View.Modal.RemoveContent({
@@ -40,8 +44,12 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
    
     /**
      * Event: Click settings
+     *
+     * @param {String} id
      */
     async onClickPublishingSettings(id) {
+        checkParam(id, 'id', String, true);
+
         let content = await HashBrown.Entity.Resource.Content.get(id);
 
         new HashBrown.Entity.View.Modal.ContentPublishingSettings({
@@ -85,11 +93,13 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets the basic options for a resource
      *
-     * @param {HashBrown.Entity.Resource.ResourceBase} resource
+     * @param {HashBrown.Entity.Resource.Content} resource
      *
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.Content, true);
+
         let options = super.getItemBaseOptions(resource);
 
         options['New child'] = () => this.onClickNew(resource.id);
@@ -102,20 +112,22 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets a panel item from a resource
      *
-     * @param {HashBrown.Entity.Resource.Content} content
+     * @param {HashBrown.Entity.Resource.Content} resource
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
-    async getItem(content) {
-        let item = await super.getItem(content);
+    async getItem(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.Content, true);
+        
+        let item = await super.getItem(resource);
 
-        item.name = content.prop('title', HashBrown.Context.language);
+        item.name = resource.prop('title', HashBrown.Context.language);
 
         if(!item.name) {
             item.name = 'Untitled';
 
-            for(let language in content.properties.title) {
-                let languageTitle = content.properties.title[language];
+            for(let language in resource.properties.title) {
+                let languageTitle = resource.properties.title[language];
 
                 if(languageTitle) {
                     item.name += ' - (' + language + ': ' + languageTitle + ')';
@@ -124,16 +136,16 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
             }
         }
 
-        item.parentId = content.parentId;
-        item.sort = content.sort;
+        item.parentId = resource.parentId;
+        item.sort = resource.sort;
         item.isDraggable = true;
         item.isSortable = true;
         item.isDropContainer = true;
-        item.changed = content.updateDate;
-        item.created = content.createDate;
+        item.changed = resource.updateDate;
+        item.created = resource.createDate;
 
         return item;
     }
 }
 
-module.exports = Content;
+module.exports = ContentPanel;

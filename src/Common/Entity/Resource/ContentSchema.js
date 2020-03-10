@@ -6,10 +6,6 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
-    constructor(properties) {
-        super(ContentSchema.paramsCheck(properties));
-    }
-    
     structure() {
         super.structure();
 
@@ -32,17 +28,19 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+        
         if(!params.fields) { params.fields = {}; }
         if(!params.fields.properties) { params.fields.properties = {}; }
 
-        return super.paramsCheck(params);
+        super.adopt(params);
     }
 
     /**

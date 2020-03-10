@@ -78,7 +78,7 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
         
             this.state.panels.push(panel);
 
-            if(panel.name.toLowerCase() === category.toLowerCase()) {
+            if(panel.category === category) {
                 this.state.panel = new panel();
             }
         }

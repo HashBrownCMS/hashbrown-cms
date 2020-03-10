@@ -1,7 +1,5 @@
 'use strict';
 
-const Url = require('url');
-
 /**
  * The controller for schema
  *

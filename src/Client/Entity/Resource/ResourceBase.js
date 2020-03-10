@@ -16,7 +16,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @param {String} id
      * @param {Object} data
      */
-    static setCache(id, data) {
+    static setCache(id, data = null) {
         checkParam(id, 'id', String, true);
         checkParam(data, 'data', Object);
         
@@ -26,6 +26,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!data) {
             delete this.cache[id];
+        
         } else {
             this.cache[id] = {
                 id: id,
@@ -64,14 +65,18 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
     static async get(id, options = {}) {
-        checkParam(id, 'id', String, true);
+        checkParam(id, 'id', String);
+
+        if(!id) { return null; }
 
         let resource = this.getCache(id);
         
         if(!resource) {
-            await HashBrown.Service.RequestService.request('get', this.category + '/' + id);
+            resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id);
         }
-       
+        
+        if(!resource) { return null; }
+
         resource = new this(resource);
         
         return resource;
@@ -92,6 +97,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         }
    
         for(let i in resources) {
+            if(!resources[i] || !resources[i].id) { continue; }
+
             this.setCache(resources[i].id, resources[i]);
 
             resources[i] = new this(resources[i]);
@@ -159,7 +166,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Pulls a synced resource
      */
     async pull() {
-        let data = await HashBrown.Service.RequestService.request('post', this.category + '/pull/' + this.id);
+        let data = await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/pull');
 
         this.adopt(data);
         this.constructor.setCache(this.id, data);
@@ -171,7 +178,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Pushes a synced resource
      */
     async push() {
-        await HashBrown.Service.RequestService.request('post', this.category + '/push/' + this.id);
+        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/push');
 
         HashBrown.Service.EventService.trigger('resource', this.id);
     }
@@ -180,7 +187,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Submits a heartbeat on this resource
      */
     async heartbeat() {
-        await HashBrown.Service.RequestService.request('post', this.category + '/heartbeat/' + this.id);      
+        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/heartbeat');      
     }
 }
 

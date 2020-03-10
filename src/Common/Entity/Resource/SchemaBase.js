@@ -9,6 +9,25 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     static get category() { return 'schemas'; }
 
     /**
+     * Constructor
+     *
+     * @param {Object} params
+     */
+    constructor(params) {
+        super(params);
+        
+        if(this.constructor === HashBrown.Entity.Resource.SchemaBase) {
+            if(params.type === 'field') {
+                return new HashBrown.Entity.Resource.FieldSchema(params);
+
+            } else if(params.type === 'content') {
+                return new HashBrown.Entity.Resource.ContentSchema(params);
+            
+            }
+        }
+    }
+
+    /**
      * Gets the human readable name
      *
      * @return {String} Name
@@ -29,19 +48,21 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Checks parameters
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
 
         if(params.parentSchemaId) {
             params.parentId = params.parentSchemaId;
             delete params.parentSchemaId;
         }
+
+        super.adopt(params);
     }
 
     /**
@@ -81,7 +102,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         // Overwrite common values 
         mergedSchema.id = childSchema.id;
         mergedSchema.name = childSchema.name;
-        mergedSchema.parentSchemaId = childSchema.parentSchemaId;
+        mergedSchema.parentId = childSchema.parentId;
         mergedSchema.icon = childSchema.icon || mergedSchema.icon;
 
         // Specific values for schema types

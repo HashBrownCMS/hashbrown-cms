@@ -1,5 +1,7 @@
 'use strict';
 
+const Path = require('path');
+
 /**
  * The base class for schemas
  *
@@ -52,7 +54,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(id, 'id', String, true);
-        checkParam(options, 'options', Options, true);
+        checkParam(options, 'options', Object, true);
 
         let data = null;
 
@@ -75,7 +77,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.isLocked = true;
             }
         }
-        
+
         if(!data && !options.nativeOnly) {
             data = await HashBrown.Service.DatabaseService.findOne(
                 project,
@@ -85,18 +87,18 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 }
             );
         }
-
+        
         if(!data && !options.localOnly && !options.nativeOnly) {
             data = await HashBrown.Service.SyncService.getResourceItem(project, environment, 'schemas', id);
         }
-
+        
         // Get parent fields if specified
-        if(data && query.withParentFields && data.parentSchemaId) {
+        if(data && options.withParentFields && data.parentId) {
             let childSchema = data;
             let mergedSchema = childSchema;
 
-            while(childSchema.parentSchemaId) {
-                let parentSchema = await this.get(project, environment, childSchema.parentSchemaId);
+            while(childSchema.parentId) {
+                let parentSchema = await this.get(project, environment, childSchema.parentId);
                 
                 mergedSchema = this.merge(mergedSchema, parentSchema);
 
@@ -105,17 +107,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             
             data = mergedSchema;
         }
-            
-        if(data.type === 'field') {
-            return new HashBrown.Entity.Resource.FieldSchema(data);
-        
-        } else if(data.type === 'content') {
-            return new HashBrown.Entity.Resource.ContentSchema(data);
-        
-        } else {
-            return new HashBrown.Entity.Resource.SchemaBase(data);
-        
-        }
+      
+        if(!data) { return null; }
+       
+        return new this(data);
     }
     
     /**
@@ -133,21 +128,12 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         checkParam(options, 'options', Object, true);
   
         let list = [];
-        let type = undefined;
-        
-        if(this === HashBrown.Entity.Resource.ContentSchema) {
-            type = 'content';
-
-        } else if(this === HashBrown.Entity.Resource.FieldSchema) {
-            type = 'field';
-        
-        }
 
         if(!options.customOnly) {
-            let corePath = Path.join(APP_ROOT, 'schema', '*', '*.json');
+            let corePath = Path.join(APP_ROOT, 'schema', type || '*', '*.json');
             let corePaths = await HashBrown.Service.FileService.list(corePath);
             
-            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', '*', '*.json');
+            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', type || '*', '*.json');
             let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
 
             for(let schemaPath of corePaths.concat(pluginPaths)) {
@@ -155,10 +141,8 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
                 data = JSON.parse(data);
 
-                let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                
                 data.id = Path.basename(schemaPath, '.json');
-                data.type = parentDirName.toLowerCase();
+                data.type = type;
                 data.isLocked = true;
 
                 list.push(data);
@@ -167,10 +151,11 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         if(!options.nativeOnly) {
             let custom = await HashBrown.Service.DatabaseService.find(
-                options.project,
+                project,
                 environment + '.schemas',
-                {},
-                {}
+                {
+                    type: type
+                }
             );
 
             list = list.concat(custom);
@@ -183,14 +168,18 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 'schemas',
                 list
             );
-        }
-
-        for(let i = list.length - 1; i>= 0; i--) {
-            if(list[i].type !== type) {
-                delete list[i];
-                continue;
+           
+            // Filter by type from remote source
+            if(type) {
+                for(let i = list.length - 1; i >= 0; i--) {
+                    if(list[i].type !== type) {
+                        list.splice(i, 1);
+                    }
+                }
             }
-
+        }
+        
+        for(let i in list) {
             list[i] = new this(list[i]);
         }
 
@@ -297,7 +286,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         await HashBrown.Entity.Resource.FieldSchema.create(user, project, environment, {
             id: getId(json['@type']),
             name: json['@i18n'][language]['@name'],
-            parentSchemaId: json['@parent'] ? getId(json['@parent']) : 'struct',
+            parentId: json['@parent'] ? getId(json['@parent']) : 'struct',
             editorId: 'StructEditor',
             config: {
                 label: json['@label'] || '',

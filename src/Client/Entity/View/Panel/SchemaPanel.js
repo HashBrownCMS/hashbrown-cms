@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
+class SchemaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'schemas'; }
    
     /**
@@ -20,11 +20,13 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets the basic options for a resource
      *
-     * @param {HashBrown.Entity.Resource.ResourceBase} resource
+     * @param {HashBrown.Entity.Resource.SchemaBase} resource
      *
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.SchemaBase, true);
+
         let options = super.getItemBaseOptions(resource);
 
         options['New child'] = () => this.onClickNew(resource.id);
@@ -44,11 +46,13 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
     /**
      * Gets a panel item from a resource
      *
-     * @param {HashBrown.Entity.Resource.Content} content
+     * @param {HashBrown.Entity.Resource.SchemaBase} resource
      *
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
     async getItem(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.SchemaBase, true);
+        
         let item = await super.getItem(resource);
 
         try {
@@ -61,10 +65,10 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
         }
 
         item.name = resource.name;
-        item.parentId = resource.parentSchemaId;
+        item.parentId = resource.parentId;
     
         return item;
     }
 }
 
-module.exports = Schemas;
+module.exports = SchemaPanel;

@@ -5,8 +5,8 @@
  *
  * @memberof HashBrown.Entity.View.Panel
  */
-class Forms extends HashBrown.Entity.View.Panel.PanelBase {
+class FormPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'forms'; }
 }
 
-module.exports = Forms;
+module.exports = FormPanel;

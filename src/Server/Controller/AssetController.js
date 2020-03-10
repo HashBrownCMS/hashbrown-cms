@@ -4,7 +4,6 @@ const FileSystem = require('fs');
 const OS = require('os');
 const Path = require('path');
 const HTTP = require('http');
-const Url = require('url');
 
 /**
  * The controller for assets
@@ -36,7 +35,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     static canHandle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
         
-        let requestPath = Url.parse(request.url, true).path.split('?')[0];
+        let requestPath = this.getUrl(request).pathname;
 
         if(requestPath.length < 2) { return false; }
         
@@ -54,7 +53,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     static async handle(request, response) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
-        let requestPath = Url.parse(request.url, true).path.split('?')[0];
+        let requestPath = this.getUrl(request).pathname;
         let publicFilePath = Path.join(APP_ROOT, 'public', requestPath);
         let publicFileExists = HashBrown.Service.FileService.exists(publicFilePath);
 

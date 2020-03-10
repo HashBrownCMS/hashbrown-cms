@@ -15,7 +15,6 @@ class EntityBase {
      */
     constructor(params) {
         this.structure();
-        params = this.constructor.paramsCheck(params);
 
         Object.seal(this);
 
@@ -31,7 +30,7 @@ class EntityBase {
         checkParam(params, 'params', Object);
 
         if(!params) { return; }
-        
+
         for(let k in params) {
             try {
                 if(
@@ -52,17 +51,6 @@ class EntityBase {
      */
     structure() {
 
-    }
-
-    /**
-     * Checks the parameters before they're committed
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    static paramsCheck(params) {
-        return params;
     }
 
     /**

@@ -65,7 +65,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resource = await model.get(params.project, params.environment, params.id);
 
-        await resource.heartbeat();
+        await resource.heartbeat(params.project, params.environment, user);
         
         return new HttpResponse('OK');
     }
