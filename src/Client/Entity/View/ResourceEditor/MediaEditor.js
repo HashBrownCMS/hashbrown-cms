@@ -43,8 +43,18 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     /**
      * Event: Clicked start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.MediaService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('media/') < 0) {
+            location.hash = '/media/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/media/"]', 'This the media section, where you will find static files, such as images, videos and documents.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here is a list of all your media. You can right click here to upload new files. If no files appear here, you may need to to configure a connection as a media provider', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the media viewer, where you can preview files.', 'left', 'next');
     }
    
     /**

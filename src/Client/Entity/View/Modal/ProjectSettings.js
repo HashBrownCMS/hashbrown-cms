@@ -104,7 +104,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickSave() {
         try {
-            await HashBrown.Service.SettingsService.setSettings(this.model.id, null, this.model.settings);
+            await this.model.save();
             
             this.close();
 

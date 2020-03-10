@@ -14,13 +14,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
     static get routes() {
         return {
             ...super.routes,
-            '/api/${project}/${environment}/content/example': {
-                handler: this.example,
-                methods: [ 'POST' ],
-                user: {
-                    scope: 'content'
-                }
-            },
             '/api/${project}/${environment}/content/${id}/insert': {
                 handler: this.insert,
                 methods: [ 'POST' ],
@@ -31,15 +24,6 @@ class ContentController extends HashBrown.Controller.ResourceController {
         };
     }
   
-    /**
-     * @example POST /api/${project}/${environment}/content/example
-     */
-    static async example(request, params, body, query, user) {
-        await HashBrown.Service.ContentService.createExampleContent(params.project, params.environment, user);
-            
-        return new HttpResponse('OK');
-    }
-
     /**
      * @example POST /api/${project}/${environment}/content/${id}/insert?parentId=XXX&position=XXX
      */

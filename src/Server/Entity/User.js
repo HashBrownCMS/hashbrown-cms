@@ -121,8 +121,8 @@ class User extends require('Common/Entity/User') {
     setPassword(password) {
         checkParam(password, 'password', String, true);
 
-        if(password.length < 5) {
-            throw new Error('Password must be at least 5 characters long');
+        if(password.length < 4) {
+            throw new Error('Password must be at least 4 characters long');
         }
 
         let salt = Crypto.randomBytes(128).toString('hex');
@@ -262,7 +262,11 @@ class User extends require('Common/Entity/User') {
         checkParam(username, 'username', String, true);
         checkParam(password, 'password', String, true);
         checkParam(data, 'data', Object, true);
-        
+     
+        if(username.length < 2) {
+            throw new Error('The username must be at least 2 characters long');
+        }
+
         let existingUser = await this.getByUsername(username);
 
         if(existingUser) {
@@ -284,8 +288,14 @@ class User extends require('Common/Entity/User') {
 
     /**
      * Saves a user in its current state
+     *
+     * @param {Object} options
      */
-    async save() {
+    async save(options = {}) {
+        if(options.password) {
+            this.setPassword(options.password);
+        }
+
         await HashBrown.Service.DatabaseService.updateOne('users', 'users', { id: this.id }, this.getObject());
     }
     

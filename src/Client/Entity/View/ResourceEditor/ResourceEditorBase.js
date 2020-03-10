@@ -86,7 +86,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      */
     async fetch() {
         if(this.state.id) {
-            this.model = await HashBrown.Service.ResourceService.get(this.itemType, this.state.category, this.state.id);
+            this.model = await this.itemType.get(this.state.id);
         } else {
             this.model = null;
         }
@@ -149,7 +149,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(typeof this === 'undefined' || !this || !this.model || Object.keys(this.model).length < 1 || !this.element || !this.element.parentElement) { return; }
 
         try {
-            await HashBrown.Service.ResourceService.heartbeat(this.model);
+            await this.model.heartbeat();
 
         } catch(e) {
             if(e && e.message) {
@@ -181,8 +181,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.namedElements.save) {
             this.namedElements.save.classList.toggle('loading', true);
         }
-        
-        await HashBrown.Service.ResourceService.set(this.category, this.state.id, this.model);
+       
+        this.model.save();
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
@@ -197,7 +197,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click new
      */
     async onClickNew() {
-        let resource = await HashBrown.Service.ResourceService.new(this.itemType, this.category);
+        let resource = await this.itemType.create();
         
         location.hash = `/${this.category}/${resource.id}`;
     }

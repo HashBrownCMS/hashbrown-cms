@@ -14,6 +14,25 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     }
 
     /**
+     * Gets a list of all categories
+     *
+     * @return {Array} Category names
+     */
+    static getAllCategories() {
+        let categories = [];
+
+        for(let i in HashBrown.Entity.Resource) {
+            let category = HashBrown.Entity.Resource[i].category;
+
+            if(categories.indexOf(category) > -1) { continue; }
+
+            categories.push(category);
+        }
+
+        return categories;
+    }
+
+    /**
      * Structure
      */
     structure() {

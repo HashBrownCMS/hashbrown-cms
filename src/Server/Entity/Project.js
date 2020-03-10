@@ -7,18 +7,24 @@ const Path = require('path');
  */
 class Project extends require('Common/Entity/Project') {
     /**
+     * Gets all project ids
+     *
+     * @return {Array} Project ids
+     */
+    static async listIds() {
+        return await HashBrown.Service.DatabaseService.listDatabases();
+    }
+
+    /**
      * Gets all projects
      *
      * @return {Array} Projects
      */
     static async list() {
-        let databases = await HashBrown.Service.DatabaseService.listDatabases();
-        let list = [];
+        let list = await this.listIds();
 
-        for(let database of databases) {
-            let project = await this.get(database);
-
-            list.push(project);
+        for(let i in list) {
+            list[i] = await this.get(list[i]);
         }
 
         // Sort by name
@@ -48,7 +54,6 @@ class Project extends require('Common/Entity/Project') {
         let exists = await HashBrown.Service.DatabaseService.databaseExists(id);
 
         if(!exists) { return null; }
-
 
         let project = new this({
             id: id,
@@ -167,77 +172,76 @@ class Project extends require('Common/Entity/Project') {
     }
     
     /**
-     * Sets settings for an environment
-     *
-     * @param {String} environment
-     * @param {Object} settings
+     * Creates a backup for this project
      */
-    async setEnvironmentSettings(environment, settings) {
-        checkParam(environment, 'environment', String, true);
-        checkParam(settings, 'settings', Object, true);
-
-        let settings = await this.getSettings('environments');
-
-        if(!settings || !settings[environment]) {
-            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
-        }
-        
-        settings[environment] = settings;
-
-        await this.setSettings('environments', settings);
+    static createBackup() {
+        return HashBrown.Service.DatabaseService.dump(this.id);
     }
     
     /**
-     * Gets settings for an environment
+     * Gets all backups
      *
-     * @param {String} environment
-     *
-     * @return {Object} Settings
+     * @return {Array} Backup timestamps
      */
-    async getEnvironmentSettings(environment) {
-        checkParam(environment, 'environment', String, true);
-
-        let settings = await this.getSettings('environments');
-
-        if(!settings || !settings[environment]) {
-            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+    async getBackups() {
+        let path = Path.join(APP_ROOT, 'storage', this.id, 'dump', '*.hba');
+        let files = await HashBrown.Service.FileService.list(path);
+        
+        for(let i in files) {
+            files[i] = Path.basename(files[i], '.hba');
         }
 
-        return settings[environment];
+        return files;
     }
 
     /**
-     * Gets all environment names
-     *
-     * @return {Array} Environment names
+     * Gets a backup
      */
-    async getEnvironments() {
-        let environments = await this.getSettings('environments');
-        
-        // Reconstruct environment list from old structure
-        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
-            environments = {};
-
-            let settings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
-                
-            for(let entry of settings) {
-                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
+    async getBackup(timestamp) {
+        throw new Error('Method "getBackup" must be overridden');
+    }
     
-                let name = entry.usedBy;
-
-                delete entry.usedBy;
-
-                environments[name] = entry;
-            }
+    /**
+     * Removes a backup
+     *
+     * @param {String} timestamp
+     */
+    async removeBackup(timestamp) {
+        checkParam(timestamp, 'timestamp', String, true);
         
-            await this.setSettings(this.id, 'environments', environments);
+        let path = Path.join(APP_ROOT, 'storage', this.id, 'dump', timestamp + '.hba');
+
+        if(!HashBrown.Service.FileService.exists(path)) {
+            throw new Error(`Backup ${timestamp} not found for project ${this.getName()}`);
         }
 
-        if(Object.keys(environments).length < 1) {
-            environments['live'] = {};
-        }
+        await HashBrown.Service.FileService.remove(path);
+    }
+    
+    /**
+     * Restores a backup
+     *
+     * @param {String} timestamp
+     */
+    async restoreBackup(timestamp) {
+        checkParam(timestamp, 'timestamp', String, true);
 
-        return Object.keys(environments);
+        await HashBrown.Service.DatabaseService.restore(this.id, timestamp);
+    }
+    
+    /**
+     * Adds a backup
+     *
+     * @param {String} timestamp
+     * @param {Buffer} data
+     */
+    async addBackup(timestamp, data) {
+        checkParam(timestamp, 'timestamp', String, true);
+        checkParam(data, 'data', Buffer, true);
+        
+        let path = Path.join(APP_ROOT, 'storage', this.id, 'dump', timestamp + '.hba');
+
+        await HashBrown.Service.FileService.write(path, data);
     }
 }
 

@@ -156,15 +156,15 @@ class ControllerBase {
 
         // Validate project
         if(requestParameters.project) {
-            let projectExists = await HashBrown.Service.ProjectService.projectExists(requestParameters.project);
+            let project = await HashBrown.Entity.Project.get(requestParameters.project);
 
-            if(!projectExists) {
+            if(!project) {
                 return new HttpResponse(`Project "${requestParameters.project}" could not be found`, 404);
             }
 
             // Validate environment
             if(requestParameters.environment) {
-                let environmentExists = await HashBrown.Service.ProjectService.environmentExists(requestParameters.project, requestParameters.environment);
+                let environmentExists = await project.hasEnvironment(requestParameters.environment);
 
                 if(!environmentExists) {
                     return new HttpResponse(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);

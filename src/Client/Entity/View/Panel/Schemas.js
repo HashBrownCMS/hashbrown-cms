@@ -12,7 +12,7 @@ class Schemas extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click new
      */
     async onClickNew(parentId) {
-        let newSchema = await HashBrown.Service.ResourceService.new(null, 'schemas', '?parentSchemaId=' + parentId);
+        let newSchema = await HashBrown.Entity.Resource.SchemaBase.create({ parentId: parentId });
 
         location.hash = '/schemas/' + newSchema.id;
     }

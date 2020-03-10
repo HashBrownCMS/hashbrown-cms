@@ -81,18 +81,24 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      *  Unpublishes content
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Content} content
      */
-    async unpublishContent(project, environment, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
+    async unpublishContent(projectId, environment, content) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         
         debug.log('Unpublishing all localised property sets...', this);
-        
-        let languages = await HashBrown.Service.LanguageService.getLanguages(project);
+       
+        let project = HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+
+        let languages = await project.getLanguages();
 
         for(let language of languages) {
             await this.removeContent(content.id, language);
@@ -104,21 +110,27 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      * Publishes content
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Content} content
      */
-    async publishContent(project, environment, content) {
-        checkParam(project, 'project', String);
+    async publishContent(projectId, environment, content) {
+        checkParam(projectId, 'projectId', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
 
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
-        let languages = await HashBrown.Service.LanguageService.getLanguages(project);
+        let project = HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+
+        let languages = await project.getLanguages();
         
         for(let language of languages) { 
-            await this.setContent(project, environment, content.id, content, language);
+            await this.setContent(projectId, environment, content.id, content, language);
         }
 
         debug.log('Published all localisations successfully!', this);

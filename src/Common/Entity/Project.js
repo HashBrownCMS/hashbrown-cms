@@ -96,15 +96,6 @@ class Project extends HashBrown.Entity.EntityBase {
     }
     
     /**
-     * Gets all environments
-     *
-     * @return {Array} Environment names
-     */
-    async getEnvironments() {
-        throw new Error('Method "getEnvironments" must be overridden');
-    }
-    
-    /**
      * Gets all backups
      *
      * @return {Array} Backup timestamps
@@ -148,6 +139,110 @@ class Project extends HashBrown.Entity.EntityBase {
      */
     async createBackup() {
         throw new Error('Method "createBackup" must be overridden');
+    }
+    
+    /**
+     * Sets settings for an environment
+     *
+     * @param {String} environment
+     * @param {Object} settings
+     */
+    async setEnvironmentSettings(environment, settings) {
+        checkParam(environment, 'environment', String, true);
+        checkParam(settings, 'settings', Object, true);
+
+        let settings = await this.getSettings('environments');
+
+        if(!settings || !settings[environment]) {
+            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+        }
+        
+        settings[environment] = settings;
+
+        await this.setSettings('environments', settings);
+    }
+    
+    /**
+     * Gets settings for an environment
+     *
+     * @param {String} environment
+     *
+     * @return {Object} Settings
+     */
+    async getEnvironmentSettings(environment) {
+        checkParam(environment, 'environment', String, true);
+
+        let settings = await this.getSettings('environments');
+
+        if(!settings || !settings[environment]) {
+            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+        }
+
+        return settings[environment];
+    }
+    
+    /**
+     * Gets all languages
+     *
+     * @return {Array} Language names
+     */
+    async getLanguages() {
+        let languages = await this.getSettings('languages');
+
+        if(languages.length < 1) {
+            languages.push('en');
+        }
+
+        return languages;
+    }
+
+    /**
+     * Gets all environment names
+     *
+     * @return {Array} Environment names
+     */
+    async getEnvironments() {
+        let environments = await this.getSettings('environments');
+        
+        // Reconstruct environment list from old structure
+        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
+            environments = {};
+
+            let settings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
+                
+            for(let entry of settings) {
+                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
+    
+                let name = entry.usedBy;
+
+                delete entry.usedBy;
+
+                environments[name] = entry;
+            }
+        
+            await this.setSettings(this.id, 'environments', environments);
+        }
+
+        if(Object.keys(environments).length < 1) {
+            environments['live'] = {};
+        }
+
+        return Object.keys(environments);
+    }
+
+    /**
+     * Checks whether this project has an environment
+     *
+     * @param {String} environment
+     *
+     * @return {Boolean} Has environment
+     */
+    async hasEnvironment(environment) {
+        checkParam(environment, 'environment', String, true);
+
+        let environments = this.getEnvironments();
+
+        return environments.indexOf(environment) > -1;
     }
 }
 

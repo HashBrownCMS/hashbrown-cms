@@ -67,14 +67,10 @@ class CreateContent extends HashBrown.Entity.View.Modal.ModalBase {
         if(!this.state.schemaId) { return; }
             
         try {
-            let query = '?schemaId=' + this.state.schemaId;
-
-            // Append parent content id to request URL
-            if(this.model.parentId) {
-                query += '&parentId=' + this.model.parentId;
-            }
-
-            let newContent = await HashBrown.Service.ResourceService.new(HashBrown.Entity.Resource.Content, 'content', query);
+            let newContent = await HashBrown.Entity.Resource.Content.create({
+                schemaId: this.state.schemaId,
+                parentId: this.model.parentId
+            });
 
             location.hash = '/content/' + newContent.id;
 

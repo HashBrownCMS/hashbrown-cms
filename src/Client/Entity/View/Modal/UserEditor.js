@@ -89,13 +89,13 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickSave() {
         try {
-            let newUserObject = this.model.getObject();
+            let options = {};
 
             if(this.state.newPassword) {
-                newUserObject.password = this.state.newPassword;
+                options.password = this.state.newPassword;
             }
 
-            await HashBrown.Service.ResourceService.set('users', this.model.id, newUserObject);
+            await HashBrown.Entity.User.save(options);
             
             this.close();
 

@@ -12,37 +12,12 @@ class RequestService {
      * @param {String} method
      * @param {String} url
      * @param {Object} data
+     * @param {Object} query
      *
-     * @returns {Promise} Response
+     * @returns {*} Response
      */
-    static request(method, url, data) {
-        return RequestService.customRequest(method, this.environmentUrl(url), data);
-    }
-
-    /**
-     * Uploads a file
-     *
-     * @param {String} url
-     * @param {FormData} data
-     *
-     * @returns {String|Object} Response
-     */
-    static async upload(url, data) {
-        return await new Promise((resolve, reject) => {
-            $.ajax({
-                url: this.environmentUrl(url),
-                type: 'POST',
-                data: data,
-                processData: false,
-                contentType: false,
-                success: (response) => {
-                    resolve(response);
-                },
-                error: (e) => {
-                    reject(e);            
-                }
-            })
-        });
+    static async request(method, url, data, query) {
+        return await this.customRequest(method, this.environmentUrl(url, query), data);
     }
 
     /**
@@ -121,8 +96,12 @@ class RequestService {
      * Wraps a URL to include environment
      *
      * @param {String} url
+     * @param {Object} query
      */
-    static environmentUrl(url) {
+    static environmentUrl(url, query) {
+        checkParam(url, 'url', String, true);
+        checkParam(query, 'query', Object);
+
         let newUrl = '/api/';
 
         if(HashBrown.Context.projectId) {
@@ -135,30 +114,12 @@ class RequestService {
 
         newUrl += url;
 
-        return newUrl;
-    }
-
-    /**
-     * Listens for server restart
-     */
-    static listenForRestart() {
-        UI.notify('Restart', 'HashBrown is restarting...', false);
-
-        function poke() {
-            $.ajax({
-                type: 'get',
-                url: '/',
-                success: () => {
-                    location.reload();
-                },
-                error: () => {
-                    poke();
-                }
-            });
+        if(query) {
+            newUrl += '?' + new URLSearchParams(query).toString();
         }
 
-        poke();
-    };
+        return newUrl;
+    }
 }
 
 module.exports = RequestService;

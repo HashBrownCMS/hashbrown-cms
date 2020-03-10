@@ -28,7 +28,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Service.ResourceService.get(HashBrown.Entity.Resource.User, 'users', this.modelId);
+        this.model = await HashBrown.Entity.User.get(this.modelId);
     }
 
     /**
@@ -56,7 +56,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
             }
         })
         .on('ok', async () => {
-            await HashBrown.Service.ResourceService.remove('users', this.model.id);
+            await this.model.remove();
 
             this.remove();
         });

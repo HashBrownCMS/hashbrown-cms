@@ -13,16 +13,22 @@ class Media extends require('Common/Entity/Resource/Media') {
     /**
      * Gets the media provider connection
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      *
      * @return {HashBrown.Entity.Resource.Connection} Connection
      */
-    static async getProvider(project, environment) {
-        checkParam(project, 'project', String, true);
+    static async getProvider(projectId, environment) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         
-        let environments = await HashBrown.Service.SettingsService.getSettings(project, 'environments');
+        let project = await HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+
+        let environments = await project.getEnvironments();
 
         if(!environments || !environments[environment] || !environments[environment].mediaProvider) { return null; }
 

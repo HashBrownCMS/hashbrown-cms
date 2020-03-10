@@ -188,7 +188,12 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Environment
      */
     static async environment(request, params, body, query, user) {
-        let project = await HashBrown.Service.ProjectService.getProject(params.project);
+        let project = await HashBrown.Entity.Project.get(params.project);
+
+        if(!project) {
+            return new HttpResponse('Not found', 404);
+        }
+        
         let themes = await HashBrown.Service.AppService.getThemes();
         
         return this.render('environment', {

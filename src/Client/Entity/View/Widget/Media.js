@@ -29,7 +29,7 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
             let media = this.model.value;
 
             if(typeof media === 'string') {
-                media = await HashBrown.Service.MediaService.getMediaById(media);
+                media = await HashBrown.Entity.Resource.Media.get(media);
             }
 
             this.state.source = `/media/${HashBrown.Context.projectId}/${HashBrown.Context.environment}/${media.id}?t=${Date.now()}${this.model.full ? '' : '&width=300'}`;

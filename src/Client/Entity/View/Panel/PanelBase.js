@@ -65,7 +65,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Fetches the models
      */
     async fetch() {
-        let resources = await HashBrown.Service.ResourceService.getAll(this.itemType, this.category);
+        let resources = await this.itemType.list();
 
         this.state.itemMap = {};
 
@@ -209,7 +209,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click new
      */
     async onClickNew() {
-        let resource = await HashBrown.Service.ResourceService.new(this.itemType, this.category);
+        let resource = await this.itemType.create();
         
         location.hash = `/${this.category}/${resource.id}`;
     }
@@ -226,11 +226,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
                     this.state.itemMap[id].element.classList.toggle('loading', true);
                 }
 
-                await HashBrown.Service.ResourceService.remove(this.category, id);
-                
-                if(location.hash.indexOf(id) > -1) {
-                    location.hash = `/${this.category}/`;
-                }
+                let resource = await this.itemType.get(id);
+
+                await resource.remove();
             }
         );
     }
@@ -239,14 +237,18 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click pull
      */
     async onClickPull(id) {
-        await HashBrown.Service.ResourceService.pull(this.category, id);
+        let resource = await this.itemType.get(id);
+        
+        await resource.pull();
     }
     
     /**
      * Event: Click push
      */
     async onClickPush(id) {
-        await HashBrown.Service.ResourceService.push(this.category, id);
+        let resource = await this.itemType.get(id);
+        
+        await resource.push();
     }
 
     /**

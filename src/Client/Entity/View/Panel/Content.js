@@ -23,7 +23,7 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click remove
      */
     async onClickRemove(id) {
-        let content = await HashBrown.Service.ContentService.getContentById(id);
+        let content = await HashBrown.Entity.Resource.Content.get(id);
 
         let modal = new HashBrown.Entity.View.Modal.RemoveContent({
             model: {
@@ -42,7 +42,7 @@ class Content extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click settings
      */
     async onClickPublishingSettings(id) {
-        let content = await HashBrown.Service.ContentService.getContentById(id);
+        let content = await HashBrown.Entity.Resource.Content.get(id);
 
         new HashBrown.Entity.View.Modal.ContentPublishingSettings({
             model: content

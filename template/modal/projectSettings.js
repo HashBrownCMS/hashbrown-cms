@@ -21,7 +21,7 @@ _.div({class: 'modal'},
                     clearable: true,
                     multiple: true,
                     min: 1,
-                    options: HashBrown.Service.LanguageService.getLanguageOptions(model.id),
+                    options: HashBrown.Service.LanguageService.getLanguageOptions(),
                     onchange: _.onChangeLanguages
                 })
             ),

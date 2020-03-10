@@ -55,15 +55,7 @@ class CreateUser extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickCreate() {
         try {
-            if(!this.model.username || this.model.username.length < 2) {
-                throw new Error('The username is too short');
-            }
-
-            if(!this.model.password || this.model.password.length < 2) {
-                throw new Error('The password is too short');
-            }
-
-            await HashBrown.Service.ResourceService.new(HashBrown.Entity.Resource.User, 'users', '', this.model);
+            await HashBrown.Entity.User.create(this.model.username, this.model.password);
 
             this.setState('success');
             

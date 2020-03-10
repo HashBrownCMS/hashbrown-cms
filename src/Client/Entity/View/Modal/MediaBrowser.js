@@ -20,7 +20,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches all media and caches folder paths
      */
     async fetch() {
-        let items = await HashBrown.Service.MediaService.getAllMedia() || [];
+        let items = await HashBrown.Entity.Resource.Media.list() || [];
         
         this.state.folders = [];
 

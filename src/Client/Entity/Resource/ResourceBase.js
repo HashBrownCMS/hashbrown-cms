@@ -125,11 +125,13 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     
     /**
      * Saves the current state of this entity
+     *
+     * @param {Object} options
      */
-    async save() {
+    async save(options = {}) {
         let data = this.getObject();
         
-        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id, data);
+        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id, data, options);
         
         this.constructor.setCache(this.id, data);
         

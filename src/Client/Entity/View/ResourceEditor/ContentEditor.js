@@ -109,25 +109,18 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     /**
      * Event: Clicked start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.ContentService.startTour();
-    }
-
-    /**
-     * Event: Click example content
-     */
-    onClickExampleContent() {
-        UI.confirm(
-            'Example content',
-            'Do you want to load some example content? This could overwrite existing schemas',
-            async () => {
-                await HashBrown.Service.RequestService.request('post', 'content/example');
+    async onClickStartTour() {
+        if(location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
             
-                HashBrown.Service.EventService.trigger('resource');
-                
-                UI.notifySmall('Example content loaded successfully', null, 3);
-            }
-        );
+        await UI.highlight('.navigation--resource-browser__tab[href="#/content/"]', 'This the content section, where you will do all of your authoring.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your authored content, like web pages. You can right click here to create a content node.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the content editor, where you edit content nodes.', 'left', 'next');
     }
 
     /**
@@ -157,7 +150,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         }
 
         try {
-            await HashBrown.Service.ContentService.setContentById(this.state.id, this.model);
+            await this.model.save();
         
             if(this.model.isPublished) {
                 UI.notifySmall(`"${this.state.title}" published successfully`, null, 3);

@@ -140,30 +140,34 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST /api/projects/${project}
      */
     static async project(request, params, body, query, user) {
-        let project = params.project;
+        if(!user.hasScope(params.project)) {
+            return new HttpResponse(`You do not have access to project ${params.project}`, 403);
+        }
+        
+        let project = await HashBrown.Entity.Project.get(params.project);
 
-        if(!user.hasScope(project)) {
-            return new HttpResponse(`You do not have access to project ${project}`, 403);
+        if(!project) {
+            return new HttpResponse('Not found', 404);
         }
 
         switch(request.method) {
             case 'GET':
-                let result = await HashBrown.Service.ProjectService.getProject(project);
-            
-                return new HttpResponse(result);
+                return new HttpResponse(project);
 
             case 'DELETE':
-                await HashBrown.Service.ProjectService.deleteProject(project);
+                await project.remove();
                 
                 return new HttpResponse('OK');
         }
+
+        return new HttpResponse('Unexpected error', 500);
     }
     
     /**
      * @example GET /api/projects/ids
      */
     static async projectIds(request, params, body, query, user) {
-        let projects = await HashBrown.Service.ProjectService.getAllProjectIds();
+        let projects = await HashBrown.Entity.Project.listIds();
         
         for(let i = projects.length - 1; i >= 0; i--) {
             let id = projects[i];
@@ -180,7 +184,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/projects
      */
     static async projects(request, params, body, query, user) {
-        let projects = await HashBrown.Service.ProjectService.getAllProjects();
+        let projects = await HashBrown.Entity.Project.list();
 
         for(let i = projects.length - 1; i >= 0; i--) {
             let id = projects[i].id || projects[i];
@@ -194,10 +198,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * @example POST /api/projects/new { name: XXX }
+     * @example POST /api/projects/new?name=XXX { name: XXX }
      */
     static async newProject(request, params, body, query, user) {
-        let project = await HashBrown.Service.ProjectService.createProject(body.name);
+        let project = await HashBrown.Entity.Project.create(query.name || body.name);
 
         return new HttpResponse(project);
     }
@@ -206,19 +210,20 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST /api/projects/${project}/settings[/${section}] { ... }
      */
     static async settings(request, params, body, query, user) {
-        let project = params.project;
-        let section = params.section;
+        let project = await HashBrown.Entity.Project.get(params.project);
         
-        await HashBrown.Service.ProjectService.checkProject(project);
+        if(!project) {
+            return new HttpResponse('Not found', 404);    
+        }
 
         switch(request.method) {
             case 'POST':
-                await HashBrown.Service.SettingsService.setSettings(project, section, body);
+                await project.setSettings(params.section, body);
         
                 return new HttpResponse('OK');
 
             case 'GET':
-                let settings = await HashBrown.Service.SettingsService.setSettings(project, section, body);
+                let settings = await project.getSettings(params.section);
                 
                 return new HttpResponse(settings);
         }
@@ -228,13 +233,17 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/projects/${project}/environments
      */
     static async environments(request, params, body, query, user) {
-        let project = params.project;
+        if(!user.hasScope(params.project)) {
+            return new HttpResponse(`You do not have access to project ${params.project}`, 403);
+        }
+        
+        let project = await HashBrown.Entity.Project.get(params.project);
 
-        if(!user.hasScope(project)) {
-            return new HttpResponse(`You do not have access to project ${project}`, 403);
+        if(!project) {
+            return new HttpResponse('Not found', 404);
         }
 
-        let environments = await HashBrown.Service.ProjectService.getAllEnvironments(project);
+        let environments = await project.getEnvironments();
 
         return new HttpResponse(environments);
     }
@@ -243,10 +252,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/${project}/environments/new?name=XXX { name: XXX }
      */
     static async newEnvironment(request, params, body, query, user) {
-        let project = params.project;
         let environment = query.name || body.name;
+        
+        let project = await HashBrown.Entity.Project.get(params.project);
 
-        await HashBrown.Service.ProjectService.addEnvironment(project, environment);
+        if(!project) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        await project.addEnvironment(environment);
 
         return new HttpResponse('OK');
     }
@@ -255,10 +269,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example DELETE /api/projects/${project}/environments/${environment}
      */
     static async deleteEnvironment(request, params, body, query, user) {
-        let project = params.project;
         let environment = params.environment;
+        
+        let project = await HashBrown.Entity.Project.get(params.project);
 
-        await HashBrown.Service.ProjectService.deleteEnvironment(project, environment);
+        if(!project) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        await project.removeEnvironment(environment);
 
         return new HttpResponse('OK');
     }
@@ -277,7 +296,13 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/{project}/backups/new
      */
     static async newBackup(request, params, body, query, user) {
-        await HashBrown.Service.BackupService.createBackup(params.project);
+        let project = await HashBrown.Entity.Project.get(params.project);
+
+        if(!project) {
+            return new HttpResponse('Not found', 404);
+        }
+        
+        await project.createBackup();
 
         return new HttpResponse('OK');
     }

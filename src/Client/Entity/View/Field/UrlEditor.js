@@ -27,7 +27,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         if(!contentId) { return; }
 
-        let content = await HashBrown.Service.ContentService.getContentById(contentId);
+        let content = await HashBrown.Entity.Resource.Content.get(contentId);
 
         let url = '/';
 
@@ -41,7 +41,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
             if(!content.parentId) { break; }
 
-            content = await HashBrown.Service.ContentService.getContentById(content.parentId);
+            content = await HashBrown.Entity.Resource.Content.get(content.parentId);
         }
         
         if(HashBrown.Context.projectSettings.languages.length > 1 && HashBrown.Context.language) {

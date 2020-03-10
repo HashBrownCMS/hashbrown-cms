@@ -33,13 +33,19 @@ class SyncService {
      *
      * @returns {String} New token
      */
-    static async renewToken(project, username, password, overrideUrl = '') {
-        checkParam(project, 'project', String);
-        checkParam(username, 'username', String);
-        checkParam(password, 'password', String);
+    static async renewToken(projectId, username, password, overrideUrl = '') {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(username, 'username', String, true);
+        checkParam(password, 'password', String, true);
         checkParam(overrideUrl, 'overrideUrl', String);
 
-        let settings = await HashBrown.Service.SettingsService.getSettings(project, '', 'sync') || {};
+        let project = await HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId not found}`);
+        }
+
+        let settings = await project.getSettings('sync') || {};
 
         if(overrideUrl) { settings.url = overrideUrl; }
 
@@ -94,31 +100,37 @@ class SyncService {
     /**
      * Get resource item
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      *
      * @returns {Object} Resource
      */
-    static async getResourceItem(project, environment, remoteResourceName, remoteItemName) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(remoteResourceName, 'remoteResourceName', String);
+    static async getResourceItem(projectId, environment, remoteResourceName, remoteItemName) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(remoteResourceName, 'remoteResourceName', String, true);
         checkParam(remoteItemName, 'remoteItemName', String);
 
         if(!remoteItemName) {
             return this.getResource(project, environment, remoteResourceName);
         }
+        
+        let project = await HashBrown.Entity.Project.get(projectId);
 
-        let settings = await HashBrown.Service.SettingsService.getSettings(project, '', 'sync') || {};
+        if(!project) {
+            throw new Error(`Project ${projectId not found}`);
+        }
+
+        let settings = await project.getSettings('sync') || {};
 
         if(!settings.enabled) { return ''; }
         
         let url = this.parseUrl(settings.url, settings.project, environment, remoteResourceName, remoteItemName);
 
         try {
-            this.validateSettings(settings, project);
+            this.validateSettings(settings, projectId);
             
             debug.log('Requesting remote resource item via ' + url + ' on behalf of project ' + project + '...', this, 3);
         
@@ -138,8 +150,13 @@ class SyncService {
             return data;
 
         } catch(e) {
-            await HashBrown.Service.ProjectService.toggleProjectSync(project, false);
+            let project = await HashBrown.Entity.Project.get(project);
+            let settings = await project.getSettings('sync');
+            
+            settings.enabled = false;
 
+            await project.setSettings('sync', settings);
+            
             throw new Error('Unable to get resource item via ' + url + '. Reason: ' + (e.message || 'unknown') + '. Disabling sync to avoid infinite loops.');
         }
     }
@@ -147,27 +164,33 @@ class SyncService {
     /**
      * Set resource item
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      * @param {Object} remoteItemData
      */
-    static async setResourceItem(project, environment, remoteResourceName, remoteItemName, remoteItemData) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(remoteResourceName, 'remoteResourceName', String);
-        checkParam(remoteItemName, 'remoteItemName', String);
-        checkParam(remoteItemData, 'remoteItemData', Object);
+    static async setResourceItem(projectId, environment, remoteResourceName, remoteItemName, remoteItemData) {
+        checkParam(projectId, 'projectId', String), true;
+        checkParam(environment, 'environment', String, true);
+        checkParam(remoteResourceName, 'remoteResourceName', String, true);
+        checkParam(remoteItemName, 'remoteItemName', String, true);
+        checkParam(remoteItemData, 'remoteItemData', Object, true);
 
-        let settings = await HashBrown.Service.SettingsService.getSettings(project, '', 'sync') || {};
+        let project = await HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId not found}`);
+        }
+        
+        let settings = await project.getSettings('sync') || {};
 
         if(!settings.enabled) { return; }
 
         let url = this.parseUrl(settings.url, settings.project, environment, remoteResourceName, remoteItemName);
         
         try {
-            this.validateSettings(settings, project);
+            this.validateSettings(settings, projectId);
 
             debug.log('Posting remote resource item via ' + url + ' on behalf of project ' + project + '...', this, 3);
            
@@ -188,26 +211,32 @@ class SyncService {
     /**
      * Get resource
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} remoteResourceName
      * @param {Object} params
      *
      * @returns {Object} Resource
      */
-    static async getResource(project, environment, remoteResourceName, params = {}) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(remoteResourceName, 'remoteResourceName', String);
+    static async getResource(projectId, environment, remoteResourceName, params = {}) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(remoteResourceName, 'remoteResourceName', String, true);
 
-        let settings = await HashBrown.Service.SettingsService.getSettings(project, '', 'sync') || {};
+        let project = await HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId not found}`);
+        }
+        
+        let settings = await project.getSettings('sync') || {};
 
         if(!settings.enabled) { return null; }
 
         let url = this.parseUrl(settings.url, settings.project, environment, remoteResourceName);
         
         try {
-            this.validateSettings(settings, project);
+            this.validateSettings(settings, projectId);
 
             debug.log('Requesting remote resource via ' + url + ' on behalf of project ' + project + '...', this, 3);
             
@@ -220,7 +249,12 @@ class SyncService {
             return data;
         
         } catch(e) {
-            await HashBrown.Service.ProjectService.toggleProjectSync(project, false);
+            let project = await HashBrown.Entity.Project.get(project);
+            let settings = await project.getSettings('sync');
+            
+            settings.enabled = false;
+
+            await project.setSettings('sync', settings);
 
             throw new Error('Unable to get resource via ' + url + '. Reason: ' + (e.message || 'unknown') + '. Disabling sync to avoid infinite loops.');
         }

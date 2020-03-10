@@ -19,7 +19,11 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches dependencies
      */
     async fetch() {
-        await HashBrown.Service.MediaService.checkMediaProvider();
+        let connection = await HashBrown.Entity.Resource.Media.getProvider();
+        
+        if(!connection) {
+            throw new Error('No media provider has been set for this project. Please make sure one of your connections has the "is media provider" setting switched on.');
+        }  
     }
 
     /**
@@ -34,15 +38,7 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
 
             if(!file.isImage && !file.isVideo) { continue; }
 
-            if(file.isImage) {
-                let base64 = await HashBrown.Service.MediaService.convertFileToBase64(file);
-                
-                file.src = 'data:' + file.type + ';base64,' + base64;
-            }
-                    
-            if(file.isVideo) {
-                file.src = window.URL.createObjectURL(file);
-            }
+            file.src = await HashBrown.Entity.Resource.Media.toSourceString(file);
 
             this.state.previews.push(file);
         }
