@@ -26,14 +26,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         };
         routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
             handler: this.resource,
+            methods: [ 'GET', 'POST', 'DELETE' ],
             user: true
-        };
-        routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
-            handler: this.resource,
-            methods: [ 'POST', 'DELETE' ],
-            user: {
-                scope: this.category
-            }
         };
         
         // Sync
@@ -128,6 +122,10 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 return new HttpResponse(resource);
                 
             case 'POST':
+                if(!user.hasScope(this.category)) {
+                    return new HttpResponse('You do not have access to edit this resource', 403);
+                }
+
                 resource.adopt(body);
                     
                 await resource.save(params.project, params.environment, query);
@@ -135,6 +133,10 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 return new HttpResponse(resource);
 
             case 'DELETE':
+                if(!user.hasScope(this.category)) {
+                    return new HttpResponse('You do not have access to remove this resource', 403);
+                }
+                
                 await resource.remove(params.project, params.environment, query);
 
                 return new HttpResponse('OK');

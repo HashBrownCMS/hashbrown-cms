@@ -66,7 +66,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         
         content = await HashBrown.Entity.Resource.Content.get(project.id, 'live', content.id);
             
-        report += `Update content ${content.getName()...\n`;
+        report += `Update content ${content.getName()}...\n`;
        
         content.title += ' (updated)';
         await content.save(user, project.id, 'live');
@@ -133,7 +133,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         
         report += '\n[Projects]\n\n';
 
-        report += `Get project ${project.getName()...\n`;
+        report += `Get project ${project.getName()}...\n`;
 
         project = await HashBrown.Entity.Project.get(project.id);
         
@@ -169,7 +169,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
     
         await project.removeBackup(timestamp);
         
-        report += `Delete project ${project.getName()}...\n`;
+        report += `Remove project ${project.getName()}...\n`;
         
         await project.remove();
         

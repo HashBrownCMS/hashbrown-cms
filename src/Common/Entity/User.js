@@ -80,9 +80,9 @@ class User extends HashBrown.Entity.EntityBase {
      *
      * @returns {Boolean} Has scope
      */
-    hasScope(project, scope) {
+    hasScope(project, scope = '') {
         checkParam(project, 'project', String, true);
-        checkParam(scope, 'scope', String, true);
+        checkParam(scope, 'scope', String);
         
         if(this.isAdmin) { return true; }
 

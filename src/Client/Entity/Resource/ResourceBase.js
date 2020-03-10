@@ -53,6 +53,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         }
 
         return this.cache[id].data;
+    }
 
     /**
      * Gets an instance of this entity type

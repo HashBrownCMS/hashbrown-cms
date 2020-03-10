@@ -23,7 +23,7 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
         // Build schema options
         this.state.schemaOptions = {};
 
-        for(let schema of await HashBrown.Entity.Resource.FieldSchema.list();
+        for(let schema of await HashBrown.Entity.Resource.FieldSchema.list()) {
             if(schema.id === 'fieldBase') { continue; }
 
             this.state.schemaOptions[schema.name] = schema.id;

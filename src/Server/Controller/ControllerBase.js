@@ -50,15 +50,20 @@ class ControllerBase {
         // Then test for regex matches
         if(!route) {
             for(let pattern in this.routes) {
+                let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
+                let methods = this.routes[pattern].methods || [ 'GET' ];
+                
                 let patternHasVariables = pattern.indexOf('${') > -1;
                 let patternMatchesRequestPathLength = pattern.split('/').length === requestPath.split('/').length;
-                let routeSupportsRequestMethod = (request.method === 'GET' && !this.routes[pattern].methods) || (this.routes[pattern].methods && this.routes[pattern].methods.indexOf(request.method) > -1);
+                let routeSupportsRequestMethod = methods.indexOf(request.method) > -1;
+                let patternMatchesRequestPath = regex.test(requestPath);
                 
-                if(!patternHasVariables || !patternMatchesRequestPathLength || !routeSupportsRequestMethod) { continue; }
-
-                let regex = new RegExp(pattern.replace(/\${([^}]+)}/g, '([^\/]+)'));
-                
-                if(!regex.test(requestPath)) { continue; }
+                if(
+                    !patternHasVariables ||
+                    !patternMatchesRequestPathLength ||
+                    !routeSupportsRequestMethod ||
+                    !patternMatchesRequestPath
+                ) { continue; }
 
                 route = this.routes[pattern];
                 route.pattern = pattern;
@@ -283,7 +288,7 @@ class ControllerBase {
      * @param {HTTP.IncomingMessage} request
      * @param {Boolean} ignoreErrors
      *
-     * @returns {HashBrown.Entity.Resource.User} User object
+     * @returns {HashBrown.Entity.User} User object
      */
     static async authenticate(request, ignoreErrors = false) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);

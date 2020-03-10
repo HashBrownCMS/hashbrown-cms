@@ -42,7 +42,7 @@ class SyncService {
         let project = await HashBrown.Entity.Project.get(projectId);
 
         if(!project) {
-            throw new Error(`Project ${projectId not found}`);
+            throw new Error(`Project ${projectId} not found`);
         }
 
         let settings = await project.getSettings('sync') || {};
@@ -120,7 +120,7 @@ class SyncService {
         let project = await HashBrown.Entity.Project.get(projectId);
 
         if(!project) {
-            throw new Error(`Project ${projectId not found}`);
+            throw new Error(`Project ${projectId} not found`);
         }
 
         let settings = await project.getSettings('sync') || {};
@@ -180,7 +180,7 @@ class SyncService {
         let project = await HashBrown.Entity.Project.get(projectId);
 
         if(!project) {
-            throw new Error(`Project ${projectId not found}`);
+            throw new Error(`Project ${projectId} not found`);
         }
         
         let settings = await project.getSettings('sync') || {};
@@ -226,7 +226,7 @@ class SyncService {
         let project = await HashBrown.Entity.Project.get(projectId);
 
         if(!project) {
-            throw new Error(`Project ${projectId not found}`);
+            throw new Error(`Project ${projectId} not found`);
         }
         
         let settings = await project.getSettings('sync') || {};

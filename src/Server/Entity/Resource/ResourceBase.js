@@ -236,12 +236,12 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {HashBrown.Entity.Resource.User} user
+     * @param {HashBrown.Entity.User} user
      */
     async heartbeat(project, environment, user) {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
-        checkParam(user, 'user', HashBrown.Entity.Resource.User, true);
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         
         if(this.isLocked) { return; }
 

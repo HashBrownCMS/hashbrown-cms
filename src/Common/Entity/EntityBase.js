@@ -27,8 +27,10 @@ class EntityBase {
      *
      * @param {Object} params
      */
-    adopt(params) {
-        checkParam(params, 'params', Object, true);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        if(!params) { return; }
         
         for(let k in params) {
             try {

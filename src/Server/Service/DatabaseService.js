@@ -119,7 +119,7 @@ class DatabaseService {
     static async init() {
         if(this.client) { return; }
         
-        debug.log(`Creating client with connection string ${this.getConnectionString()}...`, this);
+        debug.log(`Connecting to MongoDB with connection string ${this.getConnectionString()}`, this);
    
         this.client = await MongoClient.connect(
             this.getConnectionString(),
@@ -141,8 +141,6 @@ class DatabaseService {
             
             }
         });
-
-        debug.log('...connection established', this);
     }
 
     /**

@@ -29,27 +29,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             },
             '/api/projects/${project}': {
                 handler: this.project,
+                methods: [ 'GET', 'DELETE' ],
                 user: true
-            },
-            '/api/projects/${project}': {
-                handler: this.project,
-                methods: [ 'DELETE' ],
-                user: {
-                    isAdmin: true
-                }
             },
            
             // Settings
             '/api/projects/${project}/settings': {
                 handler: this.settings,
+                methods: [ 'GET', 'POST' ],
                 user: true
-            },
-            '/api/projects/${project}/settings': {
-                handler: this.settings,
-                methods: [ 'POST' ],
-                user: {
-                    isAdmin: true
-                }
             },
             '/api/projects/${project}/settings/${section}': {
                 handler: this.settings,
@@ -155,6 +143,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 return new HttpResponse(project);
 
             case 'DELETE':
+                if(!user.isAdmin) {
+                    return new HttpResponse('Only admins can remove projects', 403);
+                }
+
                 await project.remove();
                 
                 return new HttpResponse('OK');
@@ -218,6 +210,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'POST':
+                if(!user.isAdmin) {
+                    return new HttpResponse('Only admins can change project settings', 403);
+                }
+
                 await project.setSettings(params.section, body);
         
                 return new HttpResponse('OK');

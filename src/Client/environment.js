@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         HashBrown.Context.language = HashBrown.Context.projectSettings.languages[0];
     }
 
-    HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);
+    HashBrown.Context.user = new HashBrown.Entity.User(HashBrown.Context.user);
 
     // Init router
     HashBrown.Service.NavigationService.startListening();

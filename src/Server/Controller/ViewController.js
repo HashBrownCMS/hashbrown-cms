@@ -23,10 +23,12 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 redirect: '/dashboard/projects',
             },
             '/update-browser': {
-                handler: this.updateBrowser
+                handler: this.updateBrowser,
+                user: true
             },
             '/readme': {
-                handler: this.readme
+                handler: this.readme,
+                user: true
             },
             '/test': {
                 redirect: '/test/frontend',
@@ -53,6 +55,23 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Handles a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     */
+    static async handle(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        
+        let users = await HashBrown.Entity.User.list();
+
+        if(!users || users.length < 1) {
+            return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
+        }
+
+        return await super.handle(request);
+    }
+    
+    /**
      * Handles an error
      *
      * @param {Error} error
@@ -67,12 +86,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 return super.error(error);
             
             case 401:
-                let users = await HashBrown.Entity.User.list();
-
-                if(!users || users.length < 1) {
-                    return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
-                }
-
                 return this.render('login', { message: error.message });
         }
     }

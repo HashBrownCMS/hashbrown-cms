@@ -85,7 +85,7 @@ class Project extends require('Common/Entity/Project') {
     async getSettings(section) {
         checkParam(section, 'section', String);
 
-        let apiUrl = '/api/projects/' + this. + '/settings';
+        let apiUrl = '/api/projects/' + this.id + '/settings';
 
         if(section) {
             apiUrl += '/' + section;
@@ -104,7 +104,7 @@ class Project extends require('Common/Entity/Project') {
         checkParam(section, 'section', String);
         checkParam(settings, 'settings', Object, true);
 
-        let apiUrl = '/api/projects/' + project + '/settings';
+        let apiUrl = '/api/projects/' + this.id + '/settings';
 
         if(section) {
             apiUrl += '/' + section;
@@ -116,7 +116,7 @@ class Project extends require('Common/Entity/Project') {
     /**
      * Saves this entity
      */
-    await save() {
+    async save() {
         await this.setSettings(this.settings); 
     }
 }

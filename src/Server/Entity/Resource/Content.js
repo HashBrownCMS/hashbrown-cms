@@ -363,7 +363,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         checkParam(environment, 'environment', String, true);
         checkParam(parentId, 'parentId', String);
         checkParam(position, 'position', Number, true);
-        checkParam(user, 'user', HashBrown.Entity.Resource.User, true);
+        checkParam(user, 'user', HashBrown.Entity.User, true);
         
         // Get siblings
         let parent = null;

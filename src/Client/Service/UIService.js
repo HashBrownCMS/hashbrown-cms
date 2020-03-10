@@ -72,7 +72,6 @@ class UIService {
         }
        
         debug.log(error.message + ': ' + error.stack, 'HashBrown');
-        console.trace();
 
         return this.notify('Error', error.message, onClickOK, 'error');
     }

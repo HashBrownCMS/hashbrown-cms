@@ -19,7 +19,7 @@ class Task extends HashBrown.Entity.EntityBase {
      *
      * @return {HashBrown.Entity.Resource.Content} Content
      */
-    await getContent() {
+    async getContent() {
         return await HashBrown.Entity.Resource.Content.get(this.content);
     }
 

@@ -108,9 +108,11 @@ class User extends require('Common/Entity/User') {
     validatePassword(password) {
         checkParam(password, 'password', String, true);
 
-        let hashedPassword = User.sha512(password, this.password.salt);
+        let hash = Crypto.createHmac('sha512', this.password.salt);
+        hash.update(password);
+        hash = hash.digest('hex');
 
-        return this.password.hash == hashedPassword;
+        return this.password.hash == hash;
     }
 
     /**

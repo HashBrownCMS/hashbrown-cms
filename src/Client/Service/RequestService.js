@@ -98,7 +98,7 @@ class RequestService {
      * @param {String} url
      * @param {Object} query
      */
-    static environmentUrl(url, query) {
+    static environmentUrl(url, query = {}) {
         checkParam(url, 'url', String, true);
         checkParam(query, 'query', Object);
 
@@ -114,7 +114,7 @@ class RequestService {
 
         newUrl += url;
 
-        if(query) {
+        if(query && Object.keys(query).length > 0) {
             newUrl += '?' + new URLSearchParams(query).toString();
         }
 

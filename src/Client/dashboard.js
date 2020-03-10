@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onerror = (e) => { UI.error(e) };
 
     // Init current user
-    HashBrown.Context.user = new HashBrown.Entity.Resource.User(HashBrown.Context.user);
+    HashBrown.Context.user = new HashBrown.Entity.User(HashBrown.Context.user);
 
     // Run init functions
     initProjects();

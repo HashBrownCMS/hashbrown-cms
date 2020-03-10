@@ -5,7 +5,8 @@
  */
 namespace('Entity')
 .add(require('Common/Entity/EntityBase'))
-.add(require('Common/Entity/Project'))
+.add(require('./Project'))
+.add(require('./User'));
 
 require('Common/Entity/Deployer');
 require('Common/Entity/Processor');

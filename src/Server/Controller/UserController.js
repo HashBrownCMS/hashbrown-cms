@@ -29,19 +29,6 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 methods: [ 'POST' ]
             },
             
-            // All users
-            '/api/users/${id}': {
-                handler: this.user,
-                methods: [ 'GET', 'POST', 'DELETE' ],
-                user: true
-            },
-            '/api/users': {
-                handler: this.users,
-                user: {
-                    isAdmin: true
-                }
-            },
-
             // New users
             '/api/users/first': {
                 handler:  this.first,
@@ -50,6 +37,19 @@ class UserController extends HashBrown.Controller.ControllerBase {
             '/api/users/new': {
                 handler: this.new,
                 methods: [ 'POST' ],
+                user: {
+                    isAdmin: true
+                }
+            },
+
+            // All users
+            '/api/users/${id}': {
+                handler: this.user,
+                methods: [ 'GET', 'POST', 'DELETE' ],
+                user: true
+            },
+            '/api/users': {
+                handler: this.users,
                 user: {
                     isAdmin: true
                 }

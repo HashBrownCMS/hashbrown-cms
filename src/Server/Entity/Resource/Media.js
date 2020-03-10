@@ -321,7 +321,7 @@ class Media extends require('Common/Entity/Resource/Media') {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {HashBrown.Entity.Resource.User} user
+     * @param {HashBrown.Entity.User} user
      */
     async heartbeat(project, environment, user) {
         throw new Error('Heartbeat not enabled for media');

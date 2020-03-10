@@ -151,15 +151,15 @@ class Project extends HashBrown.Entity.EntityBase {
         checkParam(environment, 'environment', String, true);
         checkParam(settings, 'settings', Object, true);
 
-        let settings = await this.getSettings('environments');
+        let environments = await this.getSettings('environments');
 
-        if(!settings || !settings[environment]) {
+        if(!environments || !environments[environment]) {
             throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
         }
         
-        settings[environment] = settings;
+        environments[environment] = settings;
 
-        await this.setSettings('environments', settings);
+        await this.setSettings('environments', environments);
     }
     
     /**
