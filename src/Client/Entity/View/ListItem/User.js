@@ -37,7 +37,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickEdit() {
         if(!HashBrown.Context.user.isAdmin && this.model.id !== HashBrown.Context.user.id) { return }
         
-        new HashBrown.Entity.View.Modal.UserEditor({
+        HashBrown.Entity.View.Modal.UserEditor.new({
             model: this.model.clone()
         })
         .on('change', () => { this.update(); });
@@ -49,7 +49,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickDelete() {
         if(this.model.id === HashBrown.Context.user.id) { return; }
 
-        new HashBrown.Entity.View.Modal.ModalBase({
+        HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: `Delete user ${this.model.fullName || this.model.username || this.model.id}`,
                 message: 'Are you sure want to delete this user?'

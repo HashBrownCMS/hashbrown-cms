@@ -32,9 +32,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             let processor = HashBrown.Entity.Resource.Connection.getProcessor(params.processor.alias);
 
             if(processor) {
-                params.processor = new processor(params.processor);
+                params.processor = processor.new(params.processor);
             } else {
-                params.processor = new HashBrown.Entity.Processor.ProcessorBase(params.processor);
+                params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
             }
         }
         
@@ -42,9 +42,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             let deployer = HashBrown.Entity.Resource.Connection.getDeployer(params.deployer.alias);
 
             if(deployer) {
-                params.deployer = new deployer(params.deployer);
+                params.deployer = deployer.new(params.deployer);
             } else {
-                params.deployer = new HashBrown.Entity.Deployer.DeployerBase(params.deployer);
+                params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
             }
         }
 

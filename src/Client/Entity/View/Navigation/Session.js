@@ -40,7 +40,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Event: Clicked user settings
      */
     onClickUserSettings() {
-        new HashBrown.Entity.View.Modal.UserEditor({ model: HashBrown.Context.user });
+        HashBrown.Entity.View.Modal.UserEditor.new({ model: HashBrown.Context.user });
     }
 
     /**

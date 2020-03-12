@@ -86,7 +86,7 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
             if(model.category !== category) { continue; }
 
             if(data) {
-                return new model(data);
+                return model.new(data);
             } 
             
             return model;

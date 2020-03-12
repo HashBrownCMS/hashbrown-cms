@@ -52,7 +52,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
         }
        
         if(!this.state.processorFields) {
-            this.state.processorFields = new HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase({ model: this.model.processor });
+            this.state.processorFields = HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase.new({ model: this.model.processor });
         }
 
         this.state.processorFields.on('change', (newValue) => {
@@ -78,7 +78,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
         }
 
         if(!this.state.deployerFields) {
-            this.state.deployerFields = new HashBrown.Entity.View.DeployerEditor.DeployerEditorBase({ model: this.model.deployer });
+            this.state.deployerFields = HashBrown.Entity.View.DeployerEditor.DeployerEditorBase.new({ model: this.model.deployer });
         }
         
         this.state.deployerFields.on('change', (newValue) => {

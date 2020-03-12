@@ -86,7 +86,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         } else if(this.model instanceof HashBrown.Entity.Resource.FieldSchema) {
             this.state.fieldConfigEditor = null;
             
-            let fieldType = HashBrown.Entity.View.Field[this.model.editorId];
+            let fieldType = HashBrown.Entity.View.Field[this.state.compiledSchema.editorId];
            
             if(fieldType) {
                 this.state.fieldConfigEditor = new fieldType({
@@ -129,7 +129,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Click change icon
      */
     onClickChangeIcon() {
-        let modal = new HashBrown.Entity.View.Modal.PickIcon();
+        let modal = HashBrown.Entity.View.Modal.PickIcon.new();
 
         modal.on('change', (newIcon) => {
             this.model.icon = newIcon;
@@ -149,7 +149,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(!this.model.fields.properties) { this.model.fields.properties = {}; }
         if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { tabId: this.state.tab, schemaId: 'string' }; }
 
-        let modal = new HashBrown.Entity.View.Modal.EditField({
+        let modal = HashBrown.Entity.View.Modal.EditField.new({
             model: {
                 tabOptions: this.state.tabOptions,
                 key: key,

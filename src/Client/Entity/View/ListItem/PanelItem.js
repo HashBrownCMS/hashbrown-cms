@@ -124,7 +124,7 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
         let pageY = e.touches ? e.touches[0].pageY : e.pageY;
         let pageX = e.touches ? e.touches[0].pageX : e.pageX;
         
-        let contextMenu = new HashBrown.Entity.View.Widget.Popup({
+        let contextMenu = HashBrown.Entity.View.Widget.Popup.new({
             model: {
                 target: this.element,
                 options: this.model.options,

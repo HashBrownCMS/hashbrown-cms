@@ -13,7 +13,7 @@ class Project extends require('Common/Entity/Project') {
         let list = await HashBrown.Service.RequestService.customRequest('get', '/api/projects');
 
         for(let i in list) {
-            list[i] = new this(list[i]);
+            list[i] = this.new(list[i]);
         }
 
         return list;
@@ -31,7 +31,7 @@ class Project extends require('Common/Entity/Project') {
 
         let project = await HashBrown.Service.RequestService.customRequest('get', '/api/projects/' + id);
 
-        project = new this(project);
+        project = this.new(project);
 
         return project;
     }
@@ -48,7 +48,7 @@ class Project extends require('Common/Entity/Project') {
 
         let project = await HashBrown.Service.RequestService.customRequest('post', '/api/projects/new', { name: name });
 
-        project = new this(project);
+        project = this.new(project);
 
         return project;
     }
@@ -69,7 +69,7 @@ class Project extends require('Common/Entity/Project') {
         let users = await HashBrown.Service.RequestService.customRequest('get', '/api/projects/' + this.id + '/users');
 
         for(let i in users) {
-            users[i] = new HashBrown.Entity.User(users[i]);
+            users[i] = HashBrown.Entity.User.new(users[i]);
         }
 
         return users;

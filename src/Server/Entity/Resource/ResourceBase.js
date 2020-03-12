@@ -51,7 +51,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!resource) { return null; }
 
-        return new this(resource);
+        return this.new(resource);
     }
     
     /**
@@ -109,8 +109,12 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         }
 
         // Apply models
-        for(let i in resources) {
-            resources[i] = new this(resources[i]);
+        for(let i = resources.length - 1; i >= 0; i--) {
+            resources[i] = this.new(resources[i]);
+
+            if(!resources[i]) {
+                resources.splice(i, 1);
+            }
         }
 
         // Sort resources if specified
@@ -153,7 +157,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         data.id = this.createId();
 
-        let resource = new this(data);
+        let resource = this.new(data);
 
         await HashBrown.Service.DatabaseService.insertOne(
             project,

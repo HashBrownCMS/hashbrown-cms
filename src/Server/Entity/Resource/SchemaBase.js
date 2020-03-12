@@ -77,7 +77,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.type = parentDirName.toLowerCase();
                 data.isLocked = true;
 
-                resource = new this(data);
+                resource = this.new(data);
             }
         }
 
@@ -86,17 +86,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             resource = await super.get(projectId, environment, id, options);
         }
         
-        // If schema type couldn't be determined, try to retrieve it from the parent
-        if(!resource.type) {
-            let model = await this.getModelRecursively(projectId, environment, resource);
-
-            if(model) {
-                resource = new model(resource.getObject());
-            }
-        }
-
-        // If no type could be determined, return null
-        if(!resource.type) { return null; }
+        if(!resource) { return null; }
 
         // Get parent fields, if specified
         if(options.withParentFields && resource.parentId) {
@@ -145,8 +135,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.type = data.type || options.type || Path.basename(Path.dirname(schemaPath));
                 data.isLocked = true;
 
-                let resource = new this(data);
+                let resource = this.new(data);
                 
+                if(!resource) { continue; }
+
                 list.push(resource);
             }
         }
@@ -158,43 +150,14 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             list = list.concat(custom);
         }
 
-        // Check if all schmas have a "type" value, and try to find it if they don't
+        // Remove all schemas without a "type" value
         for(let i = list.length - 1; i >= 0 ; i--) {
-            if(!list[i].type) {
-                let model = await this.getModelRecursively(projectId, environment, list[i]);
-
-                if(model) {
-                    list[i] = new model(list[i].getObject());
-                }
-            }
-
             if(!list[i].type) {
                 list.splice(i, 1);
             }
         }
 
         return list;
-    }
-    
-    /**
-     * Try to get the schema type from the parent
-     *
-     * @param {String} projectId
-     * @param {String} environment
-     * @param {HashBrown.Entity.Resource.SchemaBase} resource
-     *
-     * @return {HashBrown.Entity.Resource.SchemaBase} Resource model
-     */
-    static async getModelRecursively(projectId, environment, resource) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
-        checkParam(resource, 'resource', HashBrown.Entity.Resource.SchemaBase, true);
-        
-        while(resource && !resource.type) {
-            resource = await this.get(projectId, environment, resource.parentId);
-        }
-
-        return resource && resource.type ? resource.constructor : null;
     }
     
     /**

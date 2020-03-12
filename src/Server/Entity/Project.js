@@ -55,7 +55,7 @@ class Project extends require('Common/Entity/Project') {
 
         if(!exists) { return null; }
 
-        let project = new this({
+        let project = this.new({
             id: id
         });
 
@@ -131,7 +131,7 @@ class Project extends require('Common/Entity/Project') {
         );
 
         for(let i in users) {
-            users[i] = new HashBrown.Entity.User(users[i]);
+            users[i] = HashBrown.Entity.User.new(users[i]);
         }  
 
         users = users.sort((a, b) => {

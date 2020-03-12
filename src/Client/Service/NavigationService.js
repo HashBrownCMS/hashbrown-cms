@@ -91,7 +91,7 @@ class NavigationService {
         let editor = null;
 
         if(isJson) {
-            editor = new HashBrown.Entity.View.ResourceEditor.JsonEditor();
+            editor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
 
         } else {
             for(let name in HashBrown.Entity.View.ResourceEditor) {
@@ -126,7 +126,7 @@ class NavigationService {
         space.innerHTML = '';
 
         space.appendChild(
-            new HashBrown.Entity.View.Navigation.ResourceBrowser().element
+            HashBrown.Entity.View.Navigation.ResourceBrowser.new().element
         );
     }
 
@@ -139,7 +139,7 @@ class NavigationService {
         space.innerHTML = '';
 
         space.appendChild(
-            new HashBrown.Entity.View.Navigation.Session().element
+            HashBrown.Entity.View.Navigation.Session.new().element
         );
     }
 

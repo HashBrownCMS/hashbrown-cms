@@ -74,7 +74,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         // Generate items and place them in the queue and map cache
         for(let resource of resources) {
             let model = await this.getItem(resource);
-            let item = new HashBrown.Entity.View.ListItem.PanelItem({
+            let item = HashBrown.Entity.View.ListItem.PanelItem.new({
                 model: model,
                 state: this.state.itemStates[model.id] || {}
             });
@@ -174,7 +174,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         let pageY = e.touches ? e.touches[0].pageY : e.pageY;
         let pageX = e.touches ? e.touches[0].pageX : e.pageX;
         
-        let contextMenu = new HashBrown.Entity.View.Widget.Popup({
+        let contextMenu = HashBrown.Entity.View.Widget.Popup.new({
             model: {
                 target: this.element,
                 options: options,

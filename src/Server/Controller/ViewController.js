@@ -106,7 +106,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
 
         let templatePath = Path.join(APP_ROOT, 'template', 'page', template);
         
-        let view = new HashBrown.Entity.View.ViewBase({
+        let view = HashBrown.Entity.View.ViewBase.new({
             template: require(templatePath),
             model: model
         });

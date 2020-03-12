@@ -118,7 +118,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onClickEditInput(key) {
         if(!this.model.inputs) { this.model.inputs = {}; }
 
-        let modal = new HashBrown.Entity.View.Modal.EditFormInput({
+        let modal = HashBrown.Entity.View.Modal.EditFormInput.new({
             model: {
                 key: key,
                 definition: this.model.inputs[key]

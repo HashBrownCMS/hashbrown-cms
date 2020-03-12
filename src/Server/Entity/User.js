@@ -152,7 +152,7 @@ class User extends require('Common/Entity/User') {
         let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
 
         for(let user of users) {
-            user = new this(user);
+            user = this.new(user);
 
             if(!user.validateToken(token)) { continue; }
 
@@ -176,7 +176,7 @@ class User extends require('Common/Entity/User') {
         let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
 
         for(let i in users) {
-            users[i] = new this(users[i]);
+            users[i] = this.new(users[i]);
             users[i].tokens = [];
             users[i].password = null;
         }
@@ -221,7 +221,7 @@ class User extends require('Common/Entity/User') {
             user.password = null;
         }
 
-        return new this(user);
+        return this.new(user);
     }
     
     /**
@@ -248,7 +248,7 @@ class User extends require('Common/Entity/User') {
             user.password = null;
         }
 
-        return new this(user);
+        return this.new(user);
     }
 
     /**
@@ -275,7 +275,7 @@ class User extends require('Common/Entity/User') {
             throw new Error(`User with username "${username}" already exists`);
         }
       
-        let user = new this(data);
+        let user = this.new(data);
       
         user.id = this.createId();
         user.setPassword(password);

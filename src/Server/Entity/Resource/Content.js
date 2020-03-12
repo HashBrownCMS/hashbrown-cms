@@ -303,7 +303,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         for(let child of result) {
             if(excludeIds && excludeIds.indexOf(child.id) > -1) { continue; }
 
-            child = new this.constructor(child);
+            child = this.constructor.new(child);
 
             children.push(child);
         }
@@ -342,7 +342,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         for(let orphan of result) {
             if(excludeIds && excludeIds.indexOf(orphan.id) > -1) { continue; }
 
-            oprhan = new this.constructor(orphan);
+            oprhan = this.constructor.new(orphan);
 
             orphans.push(orphan);
         }

@@ -61,7 +61,7 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      * Event: Click new
      */
     onClickNew() {
-        let modal = new HashBrown.Entity.View.Modal.UploadMedia();
+        let modal = HashBrown.Entity.View.Modal.UploadMedia.new();
             
         modal.on('success', (ids) => {
             if(ids) {

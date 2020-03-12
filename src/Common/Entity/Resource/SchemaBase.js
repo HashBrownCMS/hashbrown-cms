@@ -14,6 +14,32 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     
     static get type() { return null; }
     get type() { return this.constructor.type; }
+   
+
+    /**
+     * Instantiates a resource
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.Resource.SchemaBase} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object)
+
+        params = params || {};
+        
+        if(!params.type) {
+            return null;
+        }
+        
+        if(params.type === 'field') {
+            return new HashBrown.Entity.Resource.FieldSchema(params);
+        } else if(params.type === 'content') {
+            return new HashBrown.Entity.Resource.ContentSchema(params);
+        }
+            
+        throw new Error(`Invalid schema type "${params.type}"`);
+    }
 
     /**
      * Constructor
@@ -21,21 +47,12 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
      * @param {Object} params
      */
     constructor(params) {
+        super();
+
         params = params || {};
 
-        let type = params.type;
-
-        super(params);
-
-        // Automatically return the correct model for schema types
         if(this.constructor === HashBrown.Entity.Resource.SchemaBase) {
-            if(type === 'field') {
-                return new HashBrown.Entity.Resource.FieldSchema(params);
-
-            } else if(type === 'content') {
-                return new HashBrown.Entity.Resource.ContentSchema(params);
-
-            }
+            throw new Error('The HashBrown.Entity.Resource.SchemaBase constructor cannot be used directly');
         }
     }
     

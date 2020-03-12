@@ -143,7 +143,7 @@ class Task extends HashBrown.Entity.EntityBase {
 
         if(!task) { return null; }
 
-        return new this(task);
+        return this.new(task);
     }
     
     /**
@@ -165,7 +165,7 @@ class Task extends HashBrown.Entity.EntityBase {
         let task = await this.get(project, environment, content, type);
 
         if(!task) {
-            task = new this({
+            task = this.new({
                 type: type,
                 content: content,
                 project: project,
@@ -193,7 +193,7 @@ class Task extends HashBrown.Entity.EntityBase {
         );
         
         for(let i in tasks) {
-            tasks[i] = new this(tasks[i]);
+            tasks[i] = this.new(tasks[i]);
         }
 
         return tasks;

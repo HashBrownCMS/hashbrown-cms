@@ -182,7 +182,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Click new
      */
     async onClickNew() {
-        new HashBrown.Entity.View.Modal.CreateContent();
+        HashBrown.Entity.View.Modal.CreateContent.new();
     }
 }
 

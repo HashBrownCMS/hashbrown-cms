@@ -20,7 +20,7 @@ async function initProjects() {
         let projectIds = await HashBrown.Service.RequestService.request('get', 'projects/ids');
        
         for(let projectId of projectIds || []) {
-            let projectEditor = new HashBrown.Entity.View.ListItem.Project({
+            let projectEditor = HashBrown.Entity.View.ListItem.Project.new({
                 modelId: projectId
             });
 
@@ -52,7 +52,7 @@ async function initUsers() {
         
         for(let user of users || []) {
             userList.appendChild(
-                new HashBrown.Entity.View.ListItem.User({
+                HashBrown.Entity.View.ListItem.User.new({
                     modelId: user.id
                 }).element
             );
@@ -65,7 +65,7 @@ async function initUsers() {
  */
 function initUser() {
     document.querySelector('header').appendChild(
-        new HashBrown.Entity.View.Navigation.Session().element
+        HashBrown.Entity.View.Navigation.Session.new().element
     );
 }
 
@@ -73,7 +73,7 @@ function initUser() {
  * Event: Click add user
  */
 async function onClickAddUser() {
-    new HashBrown.Entity.View.Modal.CreateUser()
+    HashBrown.Entity.View.Modal.CreateUser.new()
     .on('change', initUsers);
 }
 
@@ -81,7 +81,7 @@ async function onClickAddUser() {
  * Event: Click create project
  */
 async function onClickAddProject() {
-    new HashBrown.Entity.View.Modal.CreateProject()
+    HashBrown.Entity.View.Modal.CreateProject.new()
     .on('change', initProjects);
 }
 
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onerror = (e) => { UI.error(e) };
 
     // Init current user
-    HashBrown.Context.user = new HashBrown.Entity.User(HashBrown.Context.user);
+    HashBrown.Context.user = HashBrown.Entity.User.new(HashBrown.Context.user);
 
     // Run init functions
     initProjects();

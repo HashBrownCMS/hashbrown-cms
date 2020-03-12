@@ -12,7 +12,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click new
      */
     onClickNew(folder) {
-        let modal = new HashBrown.Entity.View.Modal.UploadMedia({
+        let modal = HashBrown.Entity.View.Modal.UploadMedia.new({
             model: {
                 folder: folder
             }
@@ -29,7 +29,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click rename
      */
     onClickRename(media) {
-        let modal = new HashBrown.Entity.View.Modal.Rename({
+        let modal = HashBrown.Entity.View.Modal.Rename.new({
             model: {
                 value: media.name
             }
@@ -46,7 +46,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click replace
      */
     onClickReplace(replaceId) {
-        let modal = new HashBrown.Entity.View.Modal.UploadMedia({
+        let modal = HashBrown.Entity.View.Modal.UploadMedia.new({
             model: {
                 replaceId: replaceId
             }
@@ -71,7 +71,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             folders.push(item.model.id);
         }
 
-        let modal = new HashBrown.Entity.View.Modal.Folders({
+        let modal = HashBrown.Entity.View.Modal.Folders.new({
             model: {
                 folders: folders,
                 canAdd: true,
@@ -168,7 +168,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             parentFolderPath += parts.join('/') + '/';
         }
 
-        let item = new HashBrown.Entity.View.ListItem.PanelItem({
+        let item = HashBrown.Entity.View.ListItem.PanelItem.new({
             model: {
                 name: folderName,
                 id: path,

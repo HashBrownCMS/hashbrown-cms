@@ -29,7 +29,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      */
     async fetch() {
         this.model = await HashBrown.Service.RequestService.request('get', 'projects/' + this.modelId);
-        this.model = new HashBrown.Entity.Project(this.model);
+        this.model = HashBrown.Entity.Project.new(this.model);
     }
         
     /**
@@ -38,7 +38,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickRemove() {
         if(!HashBrown.Context.user.isAdmin) { return; }
         
-        new HashBrown.Entity.View.Modal.DeleteProject({
+        HashBrown.Entity.View.Modal.DeleteProject.new({
             model: this.model
         })
         .on('change', () => { this.remove(); });
@@ -52,7 +52,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickRemoveEnvironment(environmentName) {
         if(this.model.environments.length < 1) { return; }
 
-        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+        let modal = HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: `Remove environment "${environmentName}"`,
                 message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.settings.info.name || this.model.id}"?`
@@ -77,7 +77,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickSettings() {
         if(!HashBrown.Context.user.isAdmin) { return; }
         
-        new HashBrown.Entity.View.Modal.ProjectSettings({
+        HashBrown.Entity.View.Modal.ProjectSettings.new({
             model: this.model
         })
         .on('change', () => { this.update(); });
@@ -89,7 +89,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickBackups() {
         if(!HashBrown.Context.user.isAdmin) { return; }
         
-        new HashBrown.Entity.View.Modal.ProjectBackups({
+        HashBrown.Entity.View.Modal.ProjectBackups.new({
             model: this.model
         })
         .on('change', () => { this.update(); });
@@ -106,7 +106,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
             return;
         }
     
-        new HashBrown.Entity.View.Modal.MigrateResources({
+        HashBrown.Entity.View.Modal.MigrateResources.new({
             model: this.model
         })
         .on('change', () => { this.update(); });
@@ -116,7 +116,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click add environment button
      */
     onClickAddEnvironment() {
-        new HashBrown.Entity.View.Modal.AddEnvironment({
+        HashBrown.Entity.View.Modal.AddEnvironment.new({
             model: this.model
         })
         .on('change', () => { this.update(); });

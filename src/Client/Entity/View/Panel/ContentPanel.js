@@ -12,7 +12,7 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
      * Event: Click new
      */
     async onClickNew(parentId) {
-        new HashBrown.Entity.View.Modal.CreateContent({
+        HashBrown.Entity.View.Modal.CreateContent.new({
             model: {
                 parentId: parentId
             }
@@ -29,7 +29,7 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
 
         let content = await HashBrown.Entity.Resource.Content.get(id);
 
-        let modal = new HashBrown.Entity.View.Modal.RemoveContent({
+        let modal = HashBrown.Entity.View.Modal.RemoveContent.new({
             model: {
                 contentId: content.id
             }
@@ -52,7 +52,7 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
 
         let content = await HashBrown.Entity.Resource.Content.get(id);
 
-        new HashBrown.Entity.View.Modal.ContentPublishingSettings({
+        HashBrown.Entity.View.Modal.ContentPublishingSettings.new({
             model: content
         });
     }

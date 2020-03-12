@@ -182,7 +182,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             return UI.notify('Create link', 'Please select some text first');
         }
 
-        let modal = new HashBrown.Entity.View.Modal.CreateLink({
+        let modal = HashBrown.Entity.View.Modal.CreateLink.new({
             model: {
                 url: anchorNode.parentElement.getAttribute('href'),
                 newTab: false

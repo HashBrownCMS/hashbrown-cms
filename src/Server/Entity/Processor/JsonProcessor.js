@@ -37,14 +37,14 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         // We'll have to a allow unknown authors, as they could disappear between backups
         if(!createdBy) {
-            createdBy = new HashBrown.Entity.User({
+            createdBy = HashBrown.Entity.User.new({
                 fullName: 'Unknown',
                 username: 'unknown'
             });
         }
 
         if(!updatedBy) {
-            updatedBy = new HashBrown.Entity.User({
+            updatedBy = HashBrown.Entity.User.new({
                 fullName: 'Unknown',
                 username: 'unknown'
             });

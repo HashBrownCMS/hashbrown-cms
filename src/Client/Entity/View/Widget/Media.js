@@ -66,7 +66,7 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
      * Event: Click browse
      */
     onClickBrowse() {
-        new HashBrown.Entity.View.Modal.MediaBrowser({
+        HashBrown.Entity.View.Modal.MediaBrowser.new({
             model: {
                 value: this.model.value
             }

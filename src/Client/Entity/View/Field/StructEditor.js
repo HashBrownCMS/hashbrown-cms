@@ -107,7 +107,7 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         if(!this.model.config.struct) { this.model.config.struct = {}; }
         if(!this.model.config.struct[key]) { this.model.config.struct[key] = { schemaId: 'string' }; }
 
-        let modal = new HashBrown.Entity.View.Modal.EditField({
+        let modal = HashBrown.Entity.View.Modal.EditField.new({
             model: {
                 key: key,
                 definition: this.model.config.struct[key]

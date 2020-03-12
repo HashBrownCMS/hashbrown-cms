@@ -75,6 +75,22 @@ class EntityBase {
     getObject() {
         return JSON.parse(JSON.stringify(this));
     }
+    
+    /**
+     * Instantiates an entity
+     * This is used in order to be able to customise construction more easily
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.EntityBase} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object)
+
+        params = params || {};
+
+        return new this(params);
+    }
 
     /**
      * Clones this entity
