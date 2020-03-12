@@ -149,6 +149,39 @@ class Project extends require('Common/Entity/Project') {
 
         return users;
     }
+    
+    /**
+     * Gets a new sync token
+     *
+     * @param {String} username
+     * @param {String} password
+     * @param {String} url
+     *
+     * @return {String} Token
+     */
+    async getSyncToken(username, password, url) {
+        checkParam(username, 'username', String, true);
+        checkParam(password, 'password', String, true);
+        checkParam(url, 'url', String);
+
+        let settings = await this.getSyncSettings(true);
+
+        if(url) { settings.url = url; }
+
+        if(!settings.url || !settings.project) {
+            throw new Error('Invalid sync settings');
+        }
+
+        return await HashBrown.Service.RequestService.request(
+            'get',
+            settings.url + '/api/user/login',
+            {
+                persist: true,
+                username: username,
+                password: password
+            }
+        );
+    }
 
     /**
      * Gets settings
@@ -159,8 +192,25 @@ class Project extends require('Common/Entity/Project') {
      */
     async getSettings(section = '') {
         checkParam(section, 'section', String);
+        
+        let settings = null;
 
-        let settings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
+        // Attempt remote fetch of project settings
+        if(section !== 'sync') {
+            let sync = await this.getSyncSettings();
+            
+            if(sync) { 
+                settings = await HashBrown.Service.RequestService.request(
+                    'get',
+                    sync.url + '/api/projects/' + this.id + '/settings',
+                    { token: sync.token }
+                );
+            }
+        }
+
+        if(!settings) {
+            settings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
+        }
 
         if(!settings) { return null; }
 

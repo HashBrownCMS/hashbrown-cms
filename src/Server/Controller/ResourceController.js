@@ -1,5 +1,7 @@
 'use strict';
 
+const HTTP = require('http');
+
 /**
  * A controller for resource endpoints
  *
@@ -57,6 +59,21 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         return routes;
     }
+    
+    /**
+     * Checks whether this controller can handle a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {Boolean} Can handle request
+     */
+    static canHandle(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+
+        if(this === HashBrown.Controller.ResourceController) { return false; }
+
+        return super.canHandle(request);
+    }
 
     /**
      * @example POST /api/${project}/${environment}/${category}/${id}/heartbeat
@@ -64,6 +81,10 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     static async heartbeat(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resource = await model.get(params.project, params.environment, params.id);
+
+        if(!resource) {
+            return new HttpResponse('Not found', 404);
+        }
 
         await resource.heartbeat(params.project, params.environment, user);
         
@@ -79,7 +100,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resource = await model.get(params.project, params.environment, params.id);
         
-        await resource.pull(params.project, params.environment);
+        await resource.pull(user, params.project, params.environment);
 
         return new HttpResponse(resource);
     }
@@ -91,7 +112,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resource = await model.get(params.project, params.environment, params.id);
         
-        await resource.push(params.project, params.environment);
+        await resource.push(user, params.project, params.environment);
     
         return new HttpResponse('OK');
     }
@@ -103,7 +124,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resources = await model.list(params.project, params.environment, query);
 
-        return new HttpResponse(resources);
+        return new HttpResponse(resources, 200, { 'Cache-Control': 'no-store' });
     }
     
     /**
@@ -128,7 +149,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
                 resource.adopt(body);
                     
-                await resource.save(params.project, params.environment, query);
+                await resource.save(user, params.project, params.environment, query);
                 
                 return new HttpResponse(resource);
 
@@ -137,7 +158,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                     return new HttpResponse('You do not have access to remove this resource', 403);
                 }
                 
-                await resource.remove(params.project, params.environment, query);
+                await resource.remove(user, params.project, params.environment, query);
 
                 return new HttpResponse('OK');
         }

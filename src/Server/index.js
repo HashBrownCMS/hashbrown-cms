@@ -42,7 +42,12 @@ global.HttpResponse = class HttpResponse {
         this.data = data || '';
         this.code = isNaN(code) ? 200 : code;
         this.headers = typeof headers === 'object' ? headers || {} : {};
+        this.time = new Date();
 
+        if(this.data instanceof HashBrown.Entity.EntityBase) {
+            this.data = this.data.getObject();
+        }
+        
         if(typeof this.data === 'object' && !this.headers['Content-Type']) {
             this.headers['Content-Type'] = 'application/json';
             this.data = JSON.stringify(this.data);
@@ -62,29 +67,18 @@ async function serve(request, response) {
     let result = new HttpResponse(`No route matched ${request.url}`, 404);
 
     for(let name in HashBrown.Controller) {
-        if(name === 'ControllerBase' || name === 'ResourceController') { continue; }
-
         let controller = HashBrown.Controller[name];
 
-        if(!controller.canHandle(request)) { continue; }
+        let thisResponse = await controller.getResponse(request);
 
-        try {
-            result = await controller.handle(request, response);
-        } catch(e) {
-            result = controller.error(e);
-        }
+        if(!thisResponse) { continue; }
+
+        result = thisResponse;
         break;
     }
     
-    if(result instanceof HttpResponse) {
-        response.writeHead(result.code || 200, result.headers || {});
-        response.end(result.data);
-    
-    } else {
-        response.writeHead(500, {});
-        response.end('Controller response was of an unknown format');
-
-    }
+    response.writeHead(result.code || 200, result.headers || {});
+    response.end(result.data);
 }
 
 async function main() {

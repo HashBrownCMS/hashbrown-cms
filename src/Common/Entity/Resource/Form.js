@@ -6,6 +6,7 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Form extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'wpforms'; }
     static get category() { return 'forms'; }
 
     /**

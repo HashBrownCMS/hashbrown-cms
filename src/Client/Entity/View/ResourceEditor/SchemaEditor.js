@@ -5,7 +5,6 @@
  */
 class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'schemas'; }
-    static get itemType() { return HashBrown.Entity.Resource.SchemaBase; }
     
     /**
      * Constructor
@@ -25,7 +24,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
 
             let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
-            let allFieldSchemas = await HashBrown.Entity.Resource.FieldSchema.list();
 
             this.state.childSchemaOptions = {};
 
@@ -35,7 +33,9 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             
             this.state.parentSchemaOptions = {};
 
-            for(let schema of this.model.type === 'field' ? allFieldSchemas : allContentSchemas) {
+            let parentSchemas = await this.model.constructor.list();
+
+            for(let schema of parentSchemas) {
                 if(schema.id === this.model.id) { continue; }
                 
                 this.state.parentSchemaOptions[schema.name] = schema.id;

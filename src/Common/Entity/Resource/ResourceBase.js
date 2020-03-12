@@ -7,6 +7,12 @@
  */
 class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
+     * Gets the representative icon of this resource type
+     */
+    static get icon() { return 'file-o'; }
+    get icon() { return this.constructor.icon; }
+
+    /**
      * Gets the category (API group) of this resource type
      */
     static get category() { return null; }
@@ -101,6 +107,9 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     
         // Remove MongoDB id
         delete params._id;
+
+        // Remove icon
+        delete params.icon;
 
         // Convert from old sync variables
         params.sync = params.sync || {};

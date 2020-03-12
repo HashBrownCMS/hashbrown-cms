@@ -288,7 +288,7 @@ class FileService {
     static async stat(path) {
         return await new Promise((resolve, reject) => {
             FileSystem.stat(path, (err, stats) => {
-                if(err) { return reject(err); }
+                if(err) { return resolve(null); }
 
                 resolve(stats);
             });

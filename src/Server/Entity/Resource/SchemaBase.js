@@ -27,15 +27,13 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         checkParam(data.parentId, 'data.parentId', String, true);
         checkParam(options, 'options', Object, true);
 
-        let parent = this.get(project, environment, data.parentId, { withParentFields: true });
+        let parent = await this.get(project, environment, data.parentId, { withParentFields: true });
 
         if(!parent) {
             throw new Error(`Parent schema ${data.parentId} could not be found`);
         }
 
-        if(parent.constructor !== this) {
-            throw new Error(`Parent schema ${data.parentId} does not match schema type`);
-        }
+        data.type = parent.type;
 
         return await super.create(user, project, environment, data, options);
     }
@@ -43,21 +41,24 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     /**
      * Gets a schema by id
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} id
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Schema.SchemaBase} Schema
      */
-    static async get(project, environment, id, options = {}) {
-        checkParam(project, 'project', String, true);
+    static async get(projectId, environment, id, options = {}) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
-        checkParam(id, 'id', String, true);
-        checkParam(options, 'options', Object, true);
+        checkParam(id, 'id', String);
+        checkParam(options, 'options', Object);
 
-        let data = null;
+        if(!id) { return null; }
 
+        let resource = null;
+
+        // First attempt fetch from disk
         if(!options.customOnly) {
             let corePath = Path.join(APP_ROOT, 'schema', '*', id + '.json');
             let corePaths = await HashBrown.Service.FileService.list(corePath);
@@ -67,7 +68,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             let schemaPath = corePaths[0] || pluginPaths[0];
        
             if(schemaPath) {
-                data = await HashBrown.Service.FileService.read(schemaPath);
+                let data = await HashBrown.Service.FileService.read(schemaPath);
                 data = JSON.parse(data);
 
                 let parentDirName = Path.dirname(schemaPath).split('/').pop();
@@ -75,65 +76,64 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.id = id;
                 data.type = parentDirName.toLowerCase();
                 data.isLocked = true;
+
+                resource = new this(data);
             }
         }
 
-        if(!data && !options.nativeOnly) {
-            data = await HashBrown.Service.DatabaseService.findOne(
-                project,
-                environment + '.schemas',
-                {
-                    id: id
-                }
-            );
+        // Then attempt normal fetch
+        if(!resource && !options.nativeOnly) {
+            resource = await super.get(projectId, environment, id, options);
         }
         
-        if(!data && !options.localOnly && !options.nativeOnly) {
-            data = await HashBrown.Service.SyncService.getResourceItem(project, environment, 'schemas', id);
-        }
-        
-        // Get parent fields if specified
-        if(data && options.withParentFields && data.parentId) {
-            let childSchema = data;
-            let mergedSchema = childSchema;
+        // If schema type couldn't be determined, try to retrieve it from the parent
+        if(!resource.type) {
+            let model = await this.getModelRecursively(projectId, environment, resource);
 
-            while(childSchema.parentId) {
-                let parentSchema = await this.get(project, environment, childSchema.parentId);
-                
-                mergedSchema = this.merge(mergedSchema, parentSchema);
-
-                childSchema = parentSchema;
+            if(model) {
+                resource = new model(resource.getObject());
             }
+        }
+
+        // If no type could be determined, return null
+        if(!resource.type) { return null; }
+
+        // Get parent fields, if specified
+        if(options.withParentFields && resource.parentId) {
+            let parent = await this.get(projectId, environment, resource.parentId, options);
             
-            data = mergedSchema;
+            resource = this.merge(resource, parent);
         }
       
-        if(!data) { return null; }
-       
-        return new this(data);
+        return resource;
     }
     
     /**
      * Gets a list of instances of this entity type
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Object} options
      *
      * @return {Array} Instances
      */
-    static async list(project, environment, options = {}) {
-        checkParam(project, 'project', String, true);
+    static async list(projectId, environment, options = {}) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
   
         let list = [];
 
+        if(this.type) {
+            options.type = this.type;
+        }
+
+        // Read from disk
         if(!options.customOnly) {
-            let corePath = Path.join(APP_ROOT, 'schema', type || '*', '*.json');
+            let corePath = Path.join(APP_ROOT, 'schema', this.type || '*', '*.json');
             let corePaths = await HashBrown.Service.FileService.list(corePath);
             
-            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', type || '*', '*.json');
+            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', this.type || '*', '*.json');
             let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
 
             for(let schemaPath of corePaths.concat(pluginPaths)) {
@@ -142,48 +142,59 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data = JSON.parse(data);
 
                 data.id = Path.basename(schemaPath, '.json');
-                data.type = type;
+                data.type = data.type || options.type || Path.basename(Path.dirname(schemaPath));
                 data.isLocked = true;
 
-                list.push(data);
+                let resource = new this(data);
+                
+                list.push(resource);
             }
         }
 
+        // Read normally
         if(!options.nativeOnly) {
-            let custom = await HashBrown.Service.DatabaseService.find(
-                project,
-                environment + '.schemas',
-                {
-                    type: type
-                }
-            );
+            let custom = await super.list(projectId, environment, options);
 
             list = list.concat(custom);
         }
 
-        if(!options.localOnly) {
-            list = await HashBrown.Service.SyncService.mergeResource(
-                project,
-                environment,
-                'schemas',
-                list
-            );
-           
-            // Filter by type from remote source
-            if(type) {
-                for(let i = list.length - 1; i >= 0; i--) {
-                    if(list[i].type !== type) {
-                        list.splice(i, 1);
-                    }
+        // Check if all schmas have a "type" value, and try to find it if they don't
+        for(let i = list.length - 1; i >= 0 ; i--) {
+            if(!list[i].type) {
+                let model = await this.getModelRecursively(projectId, environment, list[i]);
+
+                if(model) {
+                    list[i] = new model(list[i].getObject());
                 }
             }
-        }
-        
-        for(let i in list) {
-            list[i] = new this(list[i]);
+
+            if(!list[i].type) {
+                list.splice(i, 1);
+            }
         }
 
         return list;
+    }
+    
+    /**
+     * Try to get the schema type from the parent
+     *
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {HashBrown.Entity.Resource.SchemaBase} resource
+     *
+     * @return {HashBrown.Entity.Resource.SchemaBase} Resource model
+     */
+    static async getModelRecursively(projectId, environment, resource) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.SchemaBase, true);
+        
+        while(resource && !resource.type) {
+            resource = await this.get(projectId, environment, resource.parentId);
+        }
+
+        return resource && resource.type ? resource.constructor : null;
     }
     
     /**

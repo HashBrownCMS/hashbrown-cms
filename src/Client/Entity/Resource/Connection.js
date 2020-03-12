@@ -6,8 +6,6 @@
  * @memberof HashBrown.Client.Entity.Resource
  */
 class Connection extends require('Common/Entity/Resource/Connection') {
-    static get icon() { return 'exchange'; }
-    
     /**
      * Structure
      */

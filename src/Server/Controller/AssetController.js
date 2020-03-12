@@ -20,7 +20,8 @@ class AssetController extends HashBrown.Controller.ControllerBase {
                 handler: this.theme
             },
             '/media/${project}/${environment}/${id}': {
-                handler: this.media
+                handler: this.media,
+                user: true
             }
         };
     }
@@ -54,15 +55,24 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
         let requestPath = this.getUrl(request).pathname;
-        let publicFilePath = Path.join(APP_ROOT, 'public', requestPath);
-        let publicFileExists = HashBrown.Service.FileService.exists(publicFilePath);
 
-        // If file exists in the /public directory, service it statically
-        if(publicFileExists) {
-            let content = await HashBrown.Service.FileService.read(publicFilePath);
-            let type = getMIMEType(publicFilePath);
-            
-            return new HttpResponse(content, 200, { 'Content-Type': type });
+        let path = Path.join(APP_ROOT, 'public', requestPath);
+        let stats = await HashBrown.Service.FileService.stat(path);
+        let type = getMIMEType(path);
+
+        // If file exists in the /public directory, serve it statically
+        if(stats) {
+            let data = await HashBrown.Service.FileService.read(path);
+
+            return new HttpResponse(
+                data,
+                200,
+                {
+                    'Content-Type': type,
+                    'Cache-Control': 'no-cache',
+                    'ETag': this.getETag(request, stats.mtime.getTime()) 
+                }
+            );
         }
 
         return await super.handle(request);

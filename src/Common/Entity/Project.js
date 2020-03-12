@@ -173,7 +173,43 @@ class Project extends HashBrown.Entity.EntityBase {
 
         return settings[environment];
     }
-    
+   
+    /**
+     * Gets sync settings
+     *
+     * @param {Boolean} skipValidation
+     *
+     * @return {Object} Settings
+     */
+    async getSyncSettings(skipValidation = false) {
+        checkParam(skipValidation, 'skipValidation', Boolean);
+
+        let sync = await this.getSettings('sync') || {};
+
+        if(skipValidation) { return sync; }
+
+        if(!sync.enabled) { return null; }
+
+        if(
+            !sync.project ||
+            !sync.url ||
+            !sync.token ||
+            sync.project === this.id
+        ) {
+            throw new Error('Invalid sync settings');
+        }
+
+        try {
+            new URL(sync.url);
+        
+        } catch(e) {
+            throw new Error('Invalid sync URL');
+
+        }
+
+        return sync;
+    }
+
     /**
      * Gets all languages
      *

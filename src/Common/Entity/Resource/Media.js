@@ -6,6 +6,9 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Media extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'file-image-o'; }
+    get icon() { return this.isVideo() ? 'file-video-o' : this.isImage() ? 'file-image-o' : super.icon; }
+    
     static get category() { return 'media'; }
     
     /**

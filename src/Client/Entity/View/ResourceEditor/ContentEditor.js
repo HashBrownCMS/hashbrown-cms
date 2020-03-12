@@ -4,8 +4,8 @@
  * The editor for content resources
  */
 class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get itemType() { return HashBrown.Entity.Resource.Content; }
-    
+    static get category() { return 'content'; }
+
     /**
      * Constructor
      */

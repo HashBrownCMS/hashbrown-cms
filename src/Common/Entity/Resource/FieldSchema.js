@@ -6,6 +6,8 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
+    static get type() { return 'field'; }
+
     /**
      * Structure
      */
@@ -18,15 +20,6 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
         this.name = 'New field schema';        
     }
     
-    /**
-     * Gets the type as a string
-     *
-     * @return {String} Type
-     */
-    get type() {
-        return 'field';
-    }
-
     /**
      * Adopts values into this entity
      *

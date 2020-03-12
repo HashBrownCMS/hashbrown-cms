@@ -6,6 +6,8 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
+    static get type() { return 'content'; }
+    
     structure() {
         super.structure();
 
@@ -18,15 +20,6 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
         this.name = 'New content schema';
     }
    
-    /**
-     * Gets the type as a string
-     *
-     * @return {String} Type
-     */
-    get type() {
-        return 'content';
-    }
-
     /**
      * Adopts values into this entity
      *

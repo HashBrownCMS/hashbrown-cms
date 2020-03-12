@@ -48,7 +48,7 @@ class NavigationService {
      * Manually dispatches a hash change event
      */
     static poke() {
-        window.dispatchEvent(new HashChangeEvent("hashchange"));
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
 
     /**
@@ -102,18 +102,6 @@ class NavigationService {
 
                 editor = new type();
                 break;
-            }
-            
-            if(!editor) {
-                for(let name in HashBrown.View.Editor) {
-                    let type = HashBrown.View.Editor[name];
-
-                    if(type.prototype instanceof HashBrown.View.Editor.ResourceEditor === false) { continue; }
-                    if(type.category !== category) { continue; }
-
-                    editor = new type();
-                    break;
-                }
             }
         }
 

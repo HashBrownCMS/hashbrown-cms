@@ -6,10 +6,6 @@ const CACHE_TIME_MINUTES = 1;
  * The base class for resources
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
-    static get icon() { return 'file-o'; }
-
-    get icon() { return this.constructor.icon; }
-
     /**
      * Sets a cache item
      *
@@ -119,8 +115,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         checkParam(data, 'data', Object, true);
         checkParam(options, 'options', Object, true);
         
-        let query = new URLSearchParams(options).toString();
-        let resource = await HashBrown.Service.RequestService.request('post', this.category + '/new' + query, data);
+        let resource = await HashBrown.Service.RequestService.request('post', this.category + '/new', data, options);
 
         this.setCache(resource.id, resource);
 
@@ -137,9 +132,10 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @param {Object} options
      */
     async save(options = {}) {
+        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
         let data = this.getObject();
-        
-        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id, data, options);
+
+        await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data, options);
         
         this.constructor.setCache(this.id, data);
         
@@ -150,12 +146,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Removes this entity
      */
     async remove() {
-        await HashBrown.Service.RequestService.request('delete', this.category + '/' + this.id);
+        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
+        
+        await HashBrown.Service.RequestService.request('delete', this.category + '/' + id);
         
         this.constructor.setCache(this.id, null);
        
         // Cancel any editor instances displaying the deleted content
-        if(location.hash == '#/' + this.category + '/' + this.id) {
+        if(location.hash == '#/' + this.category + '/' + id) {
             location.hash = '/' + this.category + '/';
         } 
 

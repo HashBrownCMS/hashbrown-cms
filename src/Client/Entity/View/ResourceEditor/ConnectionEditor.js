@@ -5,7 +5,6 @@
  */
 class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'connections'; }
-    static get itemType() { return HashBrown.Entity.Resource.Connection; }
     
     /**
      * Constructor

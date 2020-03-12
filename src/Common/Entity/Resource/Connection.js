@@ -8,6 +8,7 @@ const Path = require('path');
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Connection extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'exchange'; }
     static get category() { return 'connections'; }
 
     /**

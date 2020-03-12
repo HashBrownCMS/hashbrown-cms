@@ -107,6 +107,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 }
             },
             
+            // Sync
+            '/api/projects/${project}/sync/token': {
+                handler: this.syncToken,
+                methods: [ 'POST' ],
+                user: {
+                    isAdmin: true
+                }
+            },
+
             // Users
             '/api/projects/${project}/users': {
                 handler: this.users,
@@ -169,7 +178,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             }
         }
 
-        return new HttpResponse(projects);
+        return new HttpResponse(projects, 200, { 'Cache-Control': 'no-store' });
     }
     
     /**
@@ -186,7 +195,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             }
         }
 
-        return new HttpResponse(projects);
+        return new HttpResponse(projects, 200, { 'Cache-Control': 'no-store' });
     }
     
     /**
@@ -197,7 +206,26 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         return new HttpResponse(project);
     }
-    
+   
+    /**
+     * @example POST /api/projects/${project}/sync/token?username=XXX&password=XXX&url=XXX { username: XXX, password: XXX, url: XXX }
+     */
+    static async syncToken(request, params, body, query, user) {
+        let username = query.username || body.username;
+        let password = query.password || body.password;
+        let url = query.url || body.url;
+
+        let project = await HashBrown.Entity.Project.get(params.project);
+        
+        if(!project) {
+            return new HttpResponse('Not found', 404);    
+        }
+
+        let token = await project.getSyncToken(username, password, url);
+
+        return new HttpResponse(token, 200, { 'Cache-Control': 'no-store' });
+    }
+
     /**
      * @example GET|POST /api/projects/${project}/settings[/${section}] { ... }
      */
@@ -221,7 +249,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             case 'GET':
                 let settings = await project.getSettings(params.section);
                 
-                return new HttpResponse(settings);
+                return new HttpResponse(settings, 200, { 'Cache-Control': 'no-store' });
         }
     }
    
@@ -241,7 +269,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         let environments = await project.getEnvironments();
 
-        return new HttpResponse(environments);
+        return new HttpResponse(environments, 200, { 'Cache-Control': 'no-store' });
     }
 
     /**
@@ -412,7 +440,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
         let users = await project.getUsers();
     
-        return new HttpResponse(users);
+        return new HttpResponse(users, 200, { 'Cache-Control': 'no-store' });
     }
 }
 

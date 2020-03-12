@@ -7,17 +7,6 @@
  */
 class Content extends require('Common/Entity/Resource/Content') {
     /**
-     * Gets the icon name
-     *
-     * @return {String} Icon
-     */
-    get icon() {
-        if(this.schema) { return this.schema.icon; }
-
-        return super.icon;
-    }
-    
-    /**
      * Gets settings
      *
      * @param {String} key

@@ -14,6 +14,5 @@ namespace('Service')
 .add(require('./PluginService'))
 .add(require('./RequestService'))
 .add(require('./ScheduleService'))
-.add(require('./SyncService'))
 .add(require('../../Common/Service/EventService'));
 

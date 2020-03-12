@@ -6,7 +6,14 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'cogs'; }
+    set icon(name) { this.customIcon = name; }
+    get icon() { return this.customIcon || super.icon; }
+
     static get category() { return 'schemas'; }
+    
+    static get type() { return null; }
+    get type() { return this.constructor.type; }
 
     /**
      * Constructor
@@ -14,19 +21,24 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
      * @param {Object} params
      */
     constructor(params) {
+        params = params || {};
+
+        let type = params.type;
+
         super(params);
-        
+
+        // Automatically return the correct model for schema types
         if(this.constructor === HashBrown.Entity.Resource.SchemaBase) {
-            if(params.type === 'field') {
+            if(type === 'field') {
                 return new HashBrown.Entity.Resource.FieldSchema(params);
 
-            } else if(params.type === 'content') {
+            } else if(type === 'content') {
                 return new HashBrown.Entity.Resource.ContentSchema(params);
-            
+
             }
         }
     }
-
+    
     /**
      * Gets the human readable name
      *
@@ -34,6 +46,19 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
      */
     getName() {
         return this.name || this.id;
+    }
+    
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        object.type = this.type;
+
+        return object;
     }
 
     /**
@@ -43,7 +68,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         super.structure();
 
         this.def(String, 'name');
-        this.def(String, 'type');
+        this.def(String, 'customIcon');
         this.def(String, 'parentId');
     }
 
@@ -62,6 +87,13 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
             delete params.parentSchemaId;
         }
 
+        if(params.icon) {
+            params.customIcon = params.icon;
+            delete params.icon;
+        }
+
+        delete params.type;
+
         super.adopt(params);
     }
 
@@ -71,18 +103,18 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     getUrlSafeName() {
         return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     }
-    
+   
     /**
      * Merges two sets of schema data
      *
-     * @param {Object} childSchema
-     * @param {Object} parentSchema
+     * @param {HashBrown.Entity.Resource.SchemaBase} childSchema
+     * @param {HashBrown.Entity.Resource.SchemaBase} parentSchema
      *
-     * @returns {Schema} Merged Schema
+     * @returns {HashBrown.Entity.Resource.SchemaBase} Merged Schema
      */
     static merge(childSchema, parentSchema) {
-        checkParam(childSchema, 'childSchema', Object, true);
-        checkParam(parentSchema, 'parentSchema', Object, true);
+        checkParam(childSchema, 'childSchema', HashBrown.Entity.Resource.SchemaBase, true);
+        checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.SchemaBase, true);
 
         let mergedSchema = parentSchema;
 

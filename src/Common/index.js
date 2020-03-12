@@ -78,7 +78,7 @@ base.checkParam = (value, name, type, notNull = false) => {
     }
     
     if(valueTypeName === 'Object') {
-        value = JSON.stringify(object);
+        value = JSON.stringify(value);
     
     } else if(typeof value.toString === 'function') {
         value = value.toString();
