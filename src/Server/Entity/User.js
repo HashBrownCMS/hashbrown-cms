@@ -70,15 +70,11 @@ class User extends require('Common/Entity/User') {
 
         for(let i = this.tokens.length - 1; i >= 0; i--) {
             let existingToken = this.tokens[i];
-            let isExpired = existingToken.expires != false && existingToken.expires < Date.now();
+            let isExpired = existingToken.expires !== false && existingToken.expires < Date.now();
 
-            if(isExpired) {
-                this.tokens.splice(i, 1);
+            if(isExpired || existingToken.key !== token) { continue; }
 
-            } else if(existingToken.key == token) {
-                return true;
-
-            }
+            return true;
         }
 
         return false;
@@ -147,7 +143,9 @@ class User extends require('Common/Entity/User') {
      * @return {HashBrown.Entity.User} User
      */
     static async getByToken(token) {
-        checkParam(token, 'token', String, true);
+        checkParam(token, 'token', String);
+
+        if(!token) { return null; }
 
         let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
 
@@ -294,6 +292,8 @@ class User extends require('Common/Entity/User') {
      * @param {Object} options
      */
     async save(options = {}) {
+        this.cleanUpTokens();
+        
         if(options.password) {
             this.setPassword(options.password);
         }
@@ -322,7 +322,7 @@ class User extends require('Common/Entity/User') {
         checkParam(password, 'password', String, true);
         checkParam(persist, 'persist', Boolean);
 
-        let user = await this.getByUsername(username, { withPassword: true });
+        let user = await this.getByUsername(username, { withPassword: true, withTokens: true });
 
         if(!user) {
             throw new Error('User not found');
@@ -334,10 +334,8 @@ class User extends require('Common/Entity/User') {
         
         let token = user.generateToken(persist);
        
-        user.cleanUpTokens();
-
         await user.save();
-
+        
         return token;
     }
     

@@ -182,7 +182,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.namedElements.save.classList.toggle('loading', true);
         }
        
-        this.model.save();
+        await this.model.save();
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 

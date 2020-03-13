@@ -12,33 +12,49 @@ const MAX_UPLOAD_SIZE = 20e6;
  */
 class ControllerBase {
     /**
-     * Cleans out the cache
-     */
-    static clearCache() {
-        if(!this.cache) { return; }
-
-        for(let etag in this.cache) {
-            let response = this.cache[etag];
-
-            if(response && !response.headers['Expires'] || response.headers['Expires'] > new Date()) { continue; }
-
-            delete this.cache[etag];
-        }
-    }
-
-    /**
-     * Creates an ETag from a request
+     * Gets the last modified time from a request
      *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {Date} Time
      */
-    static getETag(request, timestamp = 0) {
+    static async getLastModified(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(timestamp, 'timestamp', Number);
+        
+        if(!this.lastModified) { 
+            this.lastModified = {};
+        }
+        
+        let key = this.getUrl(request).pathname;
 
-        if(!timestamp) {
-            timestamp = Date.now();
+        // Mutation: Reset last modifed dates on any other request methods than GET
+        if(request.method !== 'GET') {
+            this.resetLastModified(key);
         }
 
-        return '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + timestamp + '"';
+        // Mutation: Set a new last modified date if needed
+        if(!this.lastModified[key]) {
+            this.lastModified[key] = new Date();
+        }
+
+        return this.lastModified[key];
+    }
+    
+    /**
+     * Resets last modified dates related to a key
+     *
+     * @param {String} key
+     */
+    static resetLastModified(key) {
+        checkParam(key, 'key', String);
+        
+        if(!key || !this.lastModified) { return; }
+
+        for(let k in this.lastModified) {
+            if(k.indexOf(key) < 0 && key.indexOf(k) < 0) { continue; }
+
+            delete this.lastModified[k];
+        }
     }
 
     /**
@@ -62,51 +78,34 @@ class ControllerBase {
                
         // Check if this controller can handle the request
         if(!this.canHandle(request)) { return null; }
-    
-        // Attempt getting response from cache
-        if(!this.cache) {
-            this.cache = {};
+   
+        // Get cache info
+        let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
+        let lastModified = await this.getLastModified(request);
+        let responseETag = '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + lastModified.getTime() + '"';
+
+        // ETag was matched, return 304
+        if(request.method === 'GET' && requestETag && responseETag && requestETag === responseETag) {
+            return new HttpResponse('Not modified', 304);
         }
 
-        let etag = request.headers['If-None-Match'];
+        // Generate response
+        try {
+            let response = await this.handle(request);
 
-        // If request method isn't GET, clear the cache
-        if(request.method !== 'GET') {
-            delete this.cache[etag];
-        }
-        
-        let response = this.cache[etag];
-        
-        // If cached response was not found, generate a new one
-        if(!response) {
-            try {
-                response = await this.handle(request, response);
-
-                // Include ETag and cache response, if allowed to store
-                if(response.headers['Cache-Control'] !== 'no-store') {
-                    if(!response.headers['ETag']) {
-                        response.headers['ETag'] = this.getETag(request);
-                    }
-                    
-                    if(!response.headers['Expires']) {
-                        response.headers['Expires'] = new Date(response.time.getTime() + 60000);
-                    }
-
-                    this.cache[response.headers['ETag']] = response;
-                }
-
-            } catch(e) {
-                response = this.error(e);
-            
+            // Include ETag and cache response, if allowed to store
+            if(request.method === 'GET' && response.headers['Cache-Control'] !== 'no-store') {
+                response.headers['ETag'] = responseETag;
             }
+
+            response.headers['Last-Modified'] = lastModified.toString();
+
+            return response;
+
+        } catch(e) {
+            return this.error(e);
         
-        // If cached response was found, set 304 response code
-        } else {
-            response.code = 304;
-
         }
-
-        return response;
     }
 
     /**

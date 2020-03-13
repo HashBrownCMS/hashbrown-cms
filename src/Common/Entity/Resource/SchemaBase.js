@@ -47,9 +47,9 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
      * @param {Object} params
      */
     constructor(params) {
-        super();
-
         params = params || {};
+
+        super(params);
 
         if(this.constructor === HashBrown.Entity.Resource.SchemaBase) {
             throw new Error('The HashBrown.Entity.Resource.SchemaBase constructor cannot be used directly');

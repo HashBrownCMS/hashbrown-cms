@@ -44,8 +44,16 @@ global.HttpResponse = class HttpResponse {
         this.headers = typeof headers === 'object' ? headers || {} : {};
         this.time = new Date();
 
+        // Serialise entities
         if(this.data instanceof HashBrown.Entity.EntityBase) {
             this.data = this.data.getObject();
+        
+        } else if(Array.isArray(this.data)) {
+            for(let i in this.data) {
+                if(this.data[i] instanceof HashBrown.Entity.EntityBase) {
+                    this.data[i] = this.data[i].getObject();
+                }
+            }
         }
         
         if(typeof this.data === 'object' && !this.headers['Content-Type']) {

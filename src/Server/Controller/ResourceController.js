@@ -61,6 +61,21 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Resets last modified dates related to a key
+     *
+     * @param {String} key
+     */
+    static resetLastModified(key) {
+        checkParam(key, 'key', String);
+    
+        // Ignore heartbeat requests
+        if(key && key.indexOf('heartbeat') > -1) { return; }
+
+        super.resetLastModified(key);
+    }
+
+    
+    /**
      * Checks whether this controller can handle a request
      *
      * @param {HTTP.IncomingMessage} request
@@ -124,7 +139,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         let resources = await model.list(params.project, params.environment, query);
 
-        return new HttpResponse(resources, 200, { 'Cache-Control': 'no-store' });
+        return new HttpResponse(resources);
     }
     
     /**
@@ -148,6 +163,9 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 }
 
                 resource.adopt(body);
+
+                // In case the id was changed, make sure to include the old id in the options
+                query.id = params.id;
                     
                 await resource.save(user, params.project, params.environment, query);
                 

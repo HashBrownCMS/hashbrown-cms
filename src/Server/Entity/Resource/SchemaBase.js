@@ -91,8 +91,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         // Get parent fields, if specified
         if(options.withParentFields && resource.parentId) {
             let parent = await this.get(projectId, environment, resource.parentId, options);
-            
-            resource = this.merge(resource, parent);
+           
+            if(parent) {
+                resource = this.merge(resource, parent);
+            }
         }
       
         return resource;

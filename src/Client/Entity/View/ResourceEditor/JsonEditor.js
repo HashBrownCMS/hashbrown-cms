@@ -131,13 +131,15 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         
         try {
             this.debug(newValue);
-            this.model = JSON.parse(newValue);
+            this.model = this.itemType.new(JSON.parse(newValue));
             this.trigger('change', this.model);
         
         } catch(e) {
             this.state.warning = e.message;
             this.namedElements.save.setAttribute('disabled', true);
         
+            debug.error(e, this, true);
+
         }
         
         this.renderPartial('warning');
@@ -149,10 +151,10 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     async onClickSave() {
         this.state.warning = null;
         this.namedElements.save.removeAttribute('disabled');
-        
+       
         try {
             let value = this.namedElements.body.model.value;
-            this.debug(this.mode);
+            this.debug(this.model);
 
             await super.onClickSave();
             
@@ -160,6 +162,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             this.state.warning = e.message;
             this.namedElements.save.setAttribute('disabled', true);
 
+            debug.error(e, this, true);
         }
         
         this.renderPartial('warning');

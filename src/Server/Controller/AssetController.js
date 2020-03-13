@@ -47,6 +47,39 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Gets the last modified time from a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {Date} Time
+     */
+    static async getLastModified(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+
+        let path = this.getFilePath(request);
+        let stats = await HashBrown.Service.FileService.stat(path);
+
+        if(!stats) { return new Date(); }
+
+        return stats.mtime;
+    }
+
+    /**
+     * Gets the file path from a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {String} Path
+     */
+    static getFilePath(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+
+        let requestPath = this.getUrl(request).pathname;
+
+        return Path.join(APP_ROOT, 'public', requestPath);
+    }
+
+    /**
      * Handles a request
      *
      * @param {HTTP.IncomingMessage} request
@@ -54,23 +87,19 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     static async handle(request, response) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
-        let requestPath = this.getUrl(request).pathname;
-
-        let path = Path.join(APP_ROOT, 'public', requestPath);
-        let stats = await HashBrown.Service.FileService.stat(path);
+        let path = this.getFilePath(request);
+        let exists = HashBrown.Service.FileService.exists(path);
         let type = getMIMEType(path);
 
         // If file exists in the /public directory, serve it statically
-        if(stats) {
+        if(exists) {
             let data = await HashBrown.Service.FileService.read(path);
 
             return new HttpResponse(
                 data,
                 200,
                 {
-                    'Content-Type': type,
-                    'Cache-Control': 'no-cache',
-                    'ETag': this.getETag(request, stats.mtime.getTime()) 
+                    'Content-Type': type
                 }
             );
         }

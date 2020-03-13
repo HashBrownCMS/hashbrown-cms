@@ -55,15 +55,6 @@ class SchemaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let item = await super.getItem(resource);
 
-        try {
-            let compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(resource.id, { withParentFields: true });
-            item.icon = compiledSchema.icon;
-
-        } catch(e) {
-            item.message = e.message;
-
-        }
-
         item.name = resource.name;
         item.parentId = resource.parentId;
     

@@ -10,7 +10,7 @@ module.exports = (_, model) => `
 <meta name="description" content="A free and open-source headless CMS">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 
-<link href="/favicon.png?v=2" rel="icon" type="image/png">
+<link href="/favicon.png" rel="icon" type="image/png">
 <link href="/lib/normalize/normalize.css" rel="stylesheet">
 <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 

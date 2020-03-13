@@ -1,57 +1,9 @@
 'use strict';
 
-const CACHE_TIME_MINUTES = 1;
-
 /**
  * The base class for resources
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
-    /**
-     * Sets a cache item
-     *
-     * @param {String} id
-     * @param {HashBrown.Entity.Resource.ResourceBase} resource
-     */
-    static setCache(id, resource = null) {
-        checkParam(id, 'id', String, true);
-        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase);
-        
-        if(!this.cache) {
-            this.cache = {};
-        }
-
-        if(!resource) {
-            delete this.cache[id];
-        
-        } else {
-            this.cache[id] = {
-                id: id,
-                data: resource.getObject(),
-                expires: Date.now() + (CACHE_TIME_MINUTES * 60000)
-            };
-        }
-    }
-    
-    /**
-     * Gets a cache item
-     *
-     * @param {String} id
-     *
-     * @return {HashBrown.Entity.Resource.ResourceBase} Resource
-     */
-    static getCache(id) {
-        checkParam(id, 'id', String, true);
-        
-        if(!this.cache || !this.cache[id]) { return null; }
-        
-        if(!this.cache[id].expires || this.cache[id].expires <= Date.now()) {
-            this.setCache(id, null);
-            return null;
-        }
-
-        return this.cache[id].data;
-    }
-
     /**
      * Gets an instance of this entity type
      *
@@ -66,11 +18,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!id) { return null; }
 
-        let resource = this.getCache(id);
-        
-        if(!resource) {
-            resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
-        }
+        let resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
         
         if(!resource) { return null; }
 
@@ -93,12 +41,18 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             throw new Error('Resource list ' + this.category + ' not found');
         }
    
-        for(let i in resources) {
-            if(!resources[i] || !resources[i].id) { continue; }
+        for(let i = resources.length - 1; i >= 0; i--) {
+            if(!resources[i] || !resources[i].id) {
+                resources.splice(i, 1);
+                continue;
+            }
 
             resources[i] = this.new(resources[i]);
-            
-            this.setCache(resources[i].id, resources[i]);
+          
+            if(!resources[i]) {
+                resources.splice(i, 1);
+                continue;
+            }
         }
 
         return resources;
@@ -120,8 +74,6 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         resource = this.new(resource);
 
-        this.setCache(resource.id, resource);
-
         HashBrown.Service.EventService.trigger('resource', resource.id);  
 
         return resource;
@@ -138,8 +90,6 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data, options);
         
-        this.constructor.setCache(this.id, this);
-        
         HashBrown.Service.EventService.trigger('resource', this.id);
     }
     
@@ -151,8 +101,6 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         await HashBrown.Service.RequestService.request('delete', this.category + '/' + id);
         
-        this.constructor.setCache(this.id, null);
-       
         // Cancel any editor instances displaying the deleted content
         if(location.hash == '#/' + this.category + '/' + id) {
             location.hash = '/' + this.category + '/';
@@ -168,7 +116,6 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         let data = await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/pull');
 
         this.adopt(data);
-        this.constructor.setCache(this.id, this.new(data));
     
         HashBrown.Service.EventService.trigger('resource', this.id);
     }

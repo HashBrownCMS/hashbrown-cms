@@ -111,7 +111,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             model: model
         });
     
-        return new HttpResponse(view.render(), code, { 'Content-Type': 'text/html' });
+        return new HttpResponse(view.render(), code, { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' });
     }
 
     /**

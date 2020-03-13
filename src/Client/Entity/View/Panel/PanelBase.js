@@ -446,6 +446,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             category: this.category,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
+            icon: resource.icon,
             name: resource.getName(),
             children: []
         };

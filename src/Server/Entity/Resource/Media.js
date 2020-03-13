@@ -117,9 +117,7 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         let connection = await this.getProvider(project, environment);
 
-        if(!connection) {
-            throw new Error('No connection set as media provider');
-        }
+        if(!connection) { return []; }
 
         // Make sure we include all media items, even ones not in the database
         let filenames = await connection.getAllMediaFilenames();
