@@ -135,6 +135,20 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     async heartbeat() {
         await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/heartbeat');      
     }
+
+    /**
+     * Gets whether sync is enabled for this resource
+     *
+     * @return {Boolean} Is sync enabled
+     */
+    isSyncEnabled() {
+        return this.sync &&
+            HashBrown.Context.project.settings.sync.enabled &&
+            (
+                !this.isLocked ||
+                this.sync.isRemote
+            );
+    }
 }
 
 module.exports = ResourceBase;

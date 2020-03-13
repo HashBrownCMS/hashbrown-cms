@@ -220,6 +220,8 @@ class Project extends require('Common/Entity/Project') {
             return settings[section];
         }
 
+        delete settings.usedBy;
+
         return settings;
     }
     

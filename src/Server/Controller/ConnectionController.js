@@ -13,7 +13,6 @@ class ConnectionController extends HashBrown.Controller.ResourceController {
      */
     static get routes() {
         return {
-            ...super.routes,
             '/api/${project}/${environment}/connections/deployers': {
                 handler: this.deployers,
                 user: {
@@ -25,7 +24,8 @@ class ConnectionController extends HashBrown.Controller.ResourceController {
                 user: {
                     scope: 'connections'
                 }
-            }
+            },
+            ...super.routes,
         };
     }        
     
@@ -49,7 +49,7 @@ class ConnectionController extends HashBrown.Controller.ResourceController {
     /**
      * @example GET /api/${project}/${environment}/connections/processors
      */
-    static processors(request, params, body, query, user) {
+    static async processors(request, params, body, query, user) {
         let processors = {};
 
         for(let name in HashBrown.Entity.Processor) {

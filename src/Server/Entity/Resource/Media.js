@@ -49,13 +49,13 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(connectionId, 'connectionId', String, true);
         
-        let project = HashBrown.Entity.Project.get(projectId);
+        let project = await HashBrown.Entity.Project.get(projectId);
 
         if(!project) {
             throw new Error(`Project ${projectId} not found`);
         }
         
-        let connection = await HashBrown.Entity.Resource.Connection.get(connectionId);
+        let connection = await HashBrown.Entity.Resource.Connection.get(projectId, environment, connectionId);
 
         if(!connection) {
             throw new Error(`Connection ${connectionId} not found`);

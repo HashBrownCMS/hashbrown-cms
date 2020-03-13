@@ -38,8 +38,10 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
             content = await HashBrown.Entity.Resource.Content.get(content.parentId);
         }
-        
-        if(HashBrown.Context.projectSettings.languages.length > 1 && HashBrown.Context.language) {
+       
+        let languages = HashBrown.Context.project.settings.languages;
+
+        if(languages.length > 1 && HashBrown.Context.language) {
             url = '/' + HashBrown.Context.language + url; 
         }
 

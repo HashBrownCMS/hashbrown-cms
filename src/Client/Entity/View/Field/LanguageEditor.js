@@ -21,11 +21,7 @@ class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
     async fetch() {
         await super.fetch();
 
-        this.state.languageOptions = [ 'en' ];
-        
-        if(HashBrown.Context.projectSettings) {
-            this.state.languageOptions = HashBrown.Context.projectSettings.languages || [ 'en' ];
-        }
+        this.state.languageOptions = HashBrown.Context.project.settings.languages;
     }
     
     /**

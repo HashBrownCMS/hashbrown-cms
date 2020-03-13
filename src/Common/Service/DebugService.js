@@ -147,18 +147,7 @@ class DebugService {
             error = new Error(error);
         }
 
-        let method = '';
-        
-        try { throw error; } catch (e) { 
-            let re = /(\w+)@|at (\w+) \(/g, st = e.stack, m;
-            re.exec(st), m = re.exec(st);
-           
-            if(m) {
-                method = '::' +  (m[1] || m[2]);
-            }
-        }
-
-        this.onLog(this.getDateString(), this.parseSender(sender) + method, error.message || error.trace , 'error');
+        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
    
         if(suppress) {
             if(error.trace) {

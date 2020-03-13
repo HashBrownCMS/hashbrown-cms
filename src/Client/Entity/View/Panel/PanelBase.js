@@ -345,9 +345,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     getItemSyncOptions(resource) {
         checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
 
-        let isSyncEnabled = resource.sync && HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
-
-        if(!isSyncEnabled) { return {}; }
+        if(!resource.isSyncEnabled()) { return {}; }
 
         let options = {};
 

@@ -29,26 +29,33 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         params = params || {};
 
         if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
-            let processor = HashBrown.Entity.Resource.Connection.getProcessor(params.processor.alias);
-
-            if(processor) {
-                params.processor = processor.new(params.processor);
-            } else {
-                params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
-            }
+            params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
-            let deployer = HashBrown.Entity.Resource.Connection.getDeployer(params.deployer.alias);
-
-            if(deployer) {
-                params.deployer = deployer.new(params.deployer);
-            } else {
-                params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
-            }
+            params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
         }
 
         super.adopt(params);
+    }
+    
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        if(this.processor) {
+            object.processor = this.processor.getObject();
+        }
+
+        if(this.deployer) {
+            object.deployer = this.deployer.getObject();
+        }
+
+        return object;
     }
    
     /**
@@ -336,6 +343,27 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         }
 
         await this.deployer.removeFolder(this.deployer.getPath('media', id));
+    }
+    
+    /**
+     * Saves the current state of this entity
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {Object} options
+     */
+    async save(user, projectId, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(options, 'options', Object, true);
+
+        await super.save(user, projectId, environment, options);
+
+        if(options.isMediaProvider) {
+            await HashBrown.Entity.Resource.Media.setProvider(projectId, environment, this.id);
+        }
     }
 }
 

@@ -22,7 +22,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         if(this.state.name) { return; }
 
         this.state.icon = 'wpforms';
-        this.state.postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
+        this.state.postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
 
         this.state.inputs = {};
 

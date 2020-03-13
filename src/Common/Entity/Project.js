@@ -37,7 +37,7 @@ class Project extends HashBrown.Entity.EntityBase {
         if(!params.settings.languages) { params.settings.languages = [ 'en' ]; }
         if(!params.settings.sync) { params.settings.sync = {}; }
 
-        // Delete old flags
+        // Delete old values
         delete params.useAutoBackup;
         delete params.backupStorage;
 

@@ -8,7 +8,5 @@ namespace('Entity')
 .add(require('./Project'))
 .add(require('./User'));
 
-require('Common/Entity/Deployer');
-require('Common/Entity/Processor');
 require('./Resource');
 require('./View');

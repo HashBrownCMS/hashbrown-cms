@@ -35,7 +35,7 @@ class NavigationService {
 
         if(!category) { return location.hash = '/content/'; }
 
-        let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.projectId, category);
+        let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.project.id, category);
         
         if(!hasScope) { return location.hash = '/content/'; }
    

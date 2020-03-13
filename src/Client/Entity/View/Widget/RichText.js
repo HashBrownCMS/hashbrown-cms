@@ -105,7 +105,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         return html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
             cache[id] = filename;
         
-            return 'src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/' + id + '"';
+            return 'src="/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/' + id + '"';
         });
     }
 
@@ -120,7 +120,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(!html) { return ''; }
         
         // Replace media references
-        html = html.replace(new RegExp('src="/media/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
+        html = html.replace(new RegExp('src="/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
             let filename = cache ? cache[id] : null;
 
             if(!filename) { return original; }

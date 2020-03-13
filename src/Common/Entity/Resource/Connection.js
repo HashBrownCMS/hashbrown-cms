@@ -17,7 +17,7 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     structure() {
         super.structure();
 
-        this.def(String, 'title');
+        this.def(String, 'name', 'New connection');
         this.def(String, 'url');
     }
 
@@ -27,45 +27,7 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
      * @return {String} Name
      */
     getName() {
-        return this.title || this.id;
-    }
-    
-    /**
-     * Gets a deployer
-     *
-     * @string {String} alias
-     *
-     * @returns {HashBrown.Entity.Deployer} Deployer
-     */
-    static getDeployer(alias) {
-        for(let name in HashBrown.Entity.Deployer) {
-            let deployer = HashBrown.Entity.Deployer[name];
-
-            if(deployer.alias !== alias) { continue; }
-
-            return deployer;
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Gets a processor
-     *
-     * @string {String} alias
-     *
-     * @returns {HashBrown.Entity.Processor} Processor
-     */
-    static getProcessor(alias) {
-        for(let name in HashBrown.Entity.Processor) {
-            let processor = HashBrown.Entity.Processor[name];
-
-            if(processor.alias !== alias) { continue; }
-
-            return processor;
-        }
-
-        return null;
+        return this.name || this.id;
     }
 
     /**
@@ -108,6 +70,11 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
         if(!params.deployer) { params.deployer = {}; }
         if(!params.deployer.paths) { params.deployer.paths = {}; }
         
+        if(params.title) {
+            params.name = params.title;
+            delete params.title;
+        }
+
         super.adopt(params);
     }
 

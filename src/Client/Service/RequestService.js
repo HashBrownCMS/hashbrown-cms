@@ -104,8 +104,8 @@ class RequestService {
 
         let newUrl = '/api/';
 
-        if(HashBrown.Context.projectId) {
-            newUrl += HashBrown.Context.projectId + '/';
+        if(HashBrown.Context.project) {
+            newUrl += HashBrown.Context.project.id + '/';
         }
 
         if(HashBrown.Context.environment) {

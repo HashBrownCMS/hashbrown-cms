@@ -44,7 +44,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
                 let type = HashBrown.Entity.View.DeployerEditor[name];
 
                 if(type && type.alias === this.model.processor.alias) {
-                    this.state.processorFields = new type({ model: this.model.processor });
+                    this.state.processorFields = type.new({ model: this.model.processor });
                     break;
                 }
             }
@@ -70,7 +70,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
                 let type = HashBrown.Entity.View.DeployerEditor[name];
 
                 if(type && type.alias === this.model.deployer.alias) {
-                    this.state.deployerFields = new type({ model: this.model.deployer }); 
+                    this.state.deployerFields = type.new({ model: this.model.deployer }); 
                     break;
                 }
             }
@@ -107,10 +107,10 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     }
 
     /**
-     * Event: Change title
+     * Event: Change name
      */
-    onChangeTitle(newValue) {
-        this.model.title = newValue;
+    onChangeName(newValue) {
+        this.model.name = newValue;
 
         this.onChange();
     }
@@ -150,7 +150,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
      * Event: Change is media provider
      */
     async onChangeIsMediaProvider(newValue) {
-        await HashBrown.Entity.Resource.Media.setProvider(newValue ? this.model.id : null);
+        this.setSaveOption('isMediaProvider', newValue);
     }
 }
 

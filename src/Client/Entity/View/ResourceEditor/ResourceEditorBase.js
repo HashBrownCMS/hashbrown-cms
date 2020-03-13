@@ -129,6 +129,24 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Sets a save option
+     *
+     * @param {String} key
+     * @param {*} value
+     */
+    setSaveOption(key, value) {
+        this.state.saveOptions = this.state.saveOptions || {};
+
+        if(value === false || value === null || value === undefined) {
+            delete this.state.saveOptions;
+        
+        } else {
+            this.state.saveOptions[key] = value;
+
+        }
+    }
+
+    /**
      * Sets theis editor dirty/clean
      *
      * @param {Boolean} isDirty
@@ -187,7 +205,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.namedElements.save.classList.toggle('loading', true);
         }
        
-        await this.model.save();
+        await this.model.save(this.state.saveOptions);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 

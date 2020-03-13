@@ -22,12 +22,9 @@ module.exports = (_, view) => `
         <script>
             window.HashBrown = {};
             HashBrown.Context = {
-                projectName: '${view.currentProjectName}',
-                projectId: '${view.currentProject}',
-                projectSettings: ${JSON.stringify(view.currentProjectSettings)},
+                project: ${JSON.stringify(view.currentProject)},
                 environment: '${view.currentEnvironment}',
                 user: ${JSON.stringify(view.user)},
-                isMediaPicker: ${view.isMediaPicker},
                 themes: ${JSON.stringify(view.themes)}
             };
         </script>

@@ -406,7 +406,7 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
             throw new Error('Custom users not available in demo');
 
         case 'settings':
-            return HashBrown.Context.projectSettings;
+            return HashBrown.Context.project.settings;
     }
 
     throw new Error('Unknown resource category "' + category + '". URL was ' + url);

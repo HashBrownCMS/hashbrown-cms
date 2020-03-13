@@ -211,9 +211,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         
         return this.render('environment', {
             title: project.settings.info.name,
-            currentProject: project.id,
-            currentProjectName: project.settings.info.name,
-            currentProjectSettings: project.settings,
+            currentProject: project.getObject(),
             currentEnvironment: params.environment,
             user: user,
             themes: themes
