@@ -70,7 +70,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         let resources = await HashBrown.Service.DatabaseService.find(
             projectId,
-            environment + '.' + this.category
+            environment + '.' + this.category,
+            options
         );
 
         // Attempt remote fetch

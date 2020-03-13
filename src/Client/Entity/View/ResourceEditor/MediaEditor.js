@@ -24,7 +24,6 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
         if(this.state.name) { return; }
 
         this.state.icon = 'file-o';
-        this.state.title = this.model ? this.model.name || this.model.id : '';
 
         if(this.model && this.model.isVideo()) {
             this.state.icon = 'file-video-o';

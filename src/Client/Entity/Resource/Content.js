@@ -7,6 +7,30 @@
  */
 class Content extends require('Common/Entity/Resource/Content') {
     /**
+     * Gets the human readable name
+     *
+     * @return {String} 
+     */
+    getName() {
+        let name = this.getPropertyValue('title', HashBrown.Context.language);
+
+        if(!name) {
+            name = 'Untitled';
+
+            for(let language in this.properties.title) {
+                let languageTitle = this.properties.title[language];
+
+                if(languageTitle) {
+                    name += ' - (' + language + ': ' + languageTitle + ')';
+                    break;
+                }
+            }
+        }
+
+        return name;
+    }
+
+    /**
      * Gets settings
      *
      * @param {String} key

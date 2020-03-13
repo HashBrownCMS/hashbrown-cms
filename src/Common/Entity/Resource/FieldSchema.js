@@ -21,6 +21,21 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
     
     /**
+     * Instantiates a resource
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.Resource.FieldSchema} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object)
+
+        params = params || {};
+    
+        return new this(params);
+    }
+    
+    /**
      * Adopts values into this entity
      *
      * @param {Object} params

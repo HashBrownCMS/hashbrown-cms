@@ -64,7 +64,6 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      * Pre render
      */
     prerender() {
-        this.state.title = this.model.id;
         this.state.icon = 'code';
     }
 

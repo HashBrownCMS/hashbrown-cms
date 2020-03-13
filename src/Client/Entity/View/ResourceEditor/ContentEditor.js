@@ -43,7 +43,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
         // Set standard editor info
         this.state.icon = this.state.schema.icon;
-        this.state.title = this.model.prop('title', HashBrown.Context.language) || this.model.id;
 
         // Establish tabs
         this.state.tab = HashBrown.Service.NavigationService.getRoute(2) || this.state.schema.defaultTabId || 'meta';

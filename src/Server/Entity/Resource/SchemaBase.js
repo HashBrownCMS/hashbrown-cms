@@ -116,16 +116,16 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
   
         let list = [];
 
-        if(this.type) {
+        if(this.type && !options.type) {
             options.type = this.type;
         }
 
         // Read from disk
         if(!options.customOnly) {
-            let corePath = Path.join(APP_ROOT, 'schema', this.type || '*', '*.json');
+            let corePath = Path.join(APP_ROOT, 'schema', options.type || '*', '*.json');
             let corePaths = await HashBrown.Service.FileService.list(corePath);
             
-            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', this.type || '*', '*.json');
+            let pluginPath = Path.join(APP_ROOT, 'plugins', '*', 'schema', options.type || '*', '*.json');
             let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
 
             for(let schemaPath of corePaths.concat(pluginPaths)) {

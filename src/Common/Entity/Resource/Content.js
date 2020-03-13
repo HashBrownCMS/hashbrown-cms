@@ -8,7 +8,16 @@
 class Content extends HashBrown.Entity.Resource.ResourceBase {
     get icon() { return this.schema ? this.schema.icon : super.icon; }
     static get category() { return 'content'; }
-    
+
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} 
+     */
+    getName() {
+        return this.id;
+    }
+
     /**
      * Structure
      */
@@ -18,7 +27,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         // Fundamental fields
         this.def(String, 'parentId');
         this.def(String, 'schemaId');
-        this.def(HashBrown.Entity.Resource.Schema, 'schema');
         this.def(Number, 'sort', -1);
         
         // Publishing
@@ -104,38 +112,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      */
     async getParent() {
         throw new Error('Method "getParent" must be overridden');
-    }
-
-    /**
-     * Gets all parents
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Promise} parents
-     */
-    getParents(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        let parents = [];
-
-        let getNextParent = (content) => {
-            return content.getParent(project, environment)
-            .then((parentContent) => {
-                if(parentContent) {
-                    parents.push(parentContent);
-
-                    return getNextParent(parentContent);
-                
-                } else {
-                    return Promise.resolve(parents);
-                
-                }
-            });
-        }
-
-        return getNextParent(this);
     }
 
     /**

@@ -49,7 +49,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.title = this.model.name;
         this.state.icon = this.model.icon || this.state.compiledSchema.icon;
         
         if(this.model instanceof HashBrown.Entity.Resource.ContentSchema) {

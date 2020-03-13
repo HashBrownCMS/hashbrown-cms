@@ -110,7 +110,7 @@ class EntityBase {
      */
     def(type, name, defaultValue) {
         if(typeof type !== 'function') {
-            throw new TypeError('Parameter \'type\' cannot be of type \'' + (typeof type) + '\'.');
+            throw new TypeError('Parameter \'type\' cannot be of type \'' + type + '\'.');
         }
         
         if(typeof name !== 'string') {

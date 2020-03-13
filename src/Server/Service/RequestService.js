@@ -47,44 +47,6 @@ class RequestService {
     }
 
     /**
-     * Makes a paginated request
-     *
-     * @param {String} address
-     * @param {Object} data
-     * @param {Number} maxPages
-     *
-     * @returns {Promise} Response
-     */
-    static getPaginated(url, data = null, maxPages = 10) {
-        checkParam(url, 'url', String);
-
-        if(!data) {
-            data = {};
-        }
-
-        data.page = 0;
-
-        let combinedResult = [];
-
-        let getNext = () => {
-            return this.request('get', url, data)
-            .then((result) => {
-                if(!result || !Array.isArray(result) || result.length < 1) {
-                    return Promise.resolve(combinedResult);
-                }
-
-                combinedResult = combinedResult.concat(result);
-
-                data.page++;
-
-                return getNext();
-            });
-        };
-
-        return getNext();
-    }
-
-    /**
      * Makes a generic request
      *
      * @param {String} method

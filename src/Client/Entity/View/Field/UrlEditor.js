@@ -19,16 +19,11 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Clicked regenerate
      */
     async onClickRegenerate() {
-        let category = HashBrown.Service.NavigationService.getRoute(0);
+        let editor = HashBrown.Context.currentResourceEditor;
 
-        if(!category) { return; }
+        if(!editor || !editor.model) { return; }
 
-        let contentId = HashBrown.Service.NavigationService.getRoute(1);
-
-        if(!contentId) { return; }
-
-        let content = await HashBrown.Entity.Resource.Content.get(contentId);
-
+        let content = editor.model;
         let url = '/';
 
         while(content) {

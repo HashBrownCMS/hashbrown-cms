@@ -19,6 +19,21 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
 
         this.name = 'New content schema';
     }
+    
+    /**
+     * Instantiates a resource
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.Resource.ContentSchema} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object)
+
+        params = params || {};
+    
+        return new this(params);
+    }
    
     /**
      * Adopts values into this entity

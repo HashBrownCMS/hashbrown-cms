@@ -121,21 +121,7 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let item = await super.getItem(resource);
 
-        item.name = resource.prop('title', HashBrown.Context.language);
-
-        if(!item.name) {
-            item.name = 'Untitled';
-
-            for(let language in resource.properties.title) {
-                let languageTitle = resource.properties.title[language];
-
-                if(languageTitle) {
-                    item.name += ' - (' + language + ': ' + languageTitle + ')';
-                    break;
-                }
-            }
-        }
-
+        item.name = resource.getName();
         item.parentId = resource.parentId;
         item.sort = resource.sort;
         item.isDraggable = true;
