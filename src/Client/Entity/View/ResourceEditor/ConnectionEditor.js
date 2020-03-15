@@ -34,8 +34,6 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.icon = 'exchange';
-
         // Get processor fields
         this.state.processorFields = null;
 

@@ -19,27 +19,30 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Fetches the model
      */
     async fetch() {
-        if(this.state.id) {
-            this.model = await HashBrown.Entity.Resource.SchemaBase.get(this.state.id);
-            this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
+        await super.fetch();
 
-            let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
+        if(!this.model) { return; }
 
-            this.state.childSchemaOptions = {};
+        this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
 
-            for(let schema of allContentSchemas) {
-                this.state.childSchemaOptions[schema.name] = schema.id;
-            }
+        let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
+
+        this.state.childSchemaOptions = {};
+
+        for(let schema of allContentSchemas) {
+            if(schema.id === 'contentBase' || schema.id === 'page') { continue; }
+
+            this.state.childSchemaOptions[schema.name] = schema.id;
+        }
+        
+        this.state.parentSchemaOptions = {};
+
+        let parentSchemas = await this.model.constructor.list();
+
+        for(let schema of parentSchemas) {
+            if(schema.id === this.model.id) { continue; }
             
-            this.state.parentSchemaOptions = {};
-
-            let parentSchemas = await this.model.constructor.list();
-
-            for(let schema of parentSchemas) {
-                if(schema.id === this.model.id) { continue; }
-                
-                this.state.parentSchemaOptions[schema.name] = schema.id;
-            }
+            this.state.parentSchemaOptions[schema.name] = schema.id;
         }   
     }
 
@@ -49,8 +52,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.icon = this.model.icon || this.state.compiledSchema.icon;
-        
         if(this.model instanceof HashBrown.Entity.Resource.ContentSchema) {
             this.state.tab = this.state.tab || 'content';
             this.state.properties = {};

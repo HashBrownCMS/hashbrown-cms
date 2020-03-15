@@ -33,32 +33,33 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @param {Boolean} useCache
      */
     async update(useCache = true) {
-        if(!useCache) { 
-            await super.update();
-            return;
-        }
-        
-        // Cache scroll position
         let scrollTop = 0;
+        
+        // Cache scroll position and item states
+        if(useCache) { 
+            if(this.namedElements.items) {
+                scrollTop = this.namedElements.items.scrollTop;
+            }
 
-        if(this.namedElements.items) {
-            scrollTop = this.namedElements.items.scrollTop;
+            for(let id in this.state.itemMap || {}) {
+                this.state.itemStates[id] = this.state.itemMap[id].state;
+            }
         }
 
-        // Cache item states
-        for(let id in this.state.itemMap || {}) {
-            this.state.itemStates[id] = this.state.itemMap[id].state;
-        }
-
+        // Fetch models
         await super.update();        
 
-        // Highlight selected item
-        this.highlightItem(HashBrown.Service.NavigationService.getRoute(1));
-      
         // Restore scroll position
-        if(this.namedElements.items) {
-            this.namedElements.items.scrollTop = scrollTop;
+        if(useCache) {
+            if(this.namedElements.items) {
+                this.namedElements.items.scrollTop = scrollTop;
+            }
         }
+        
+        // Highlight selected item
+        let itemId = HashBrown.Service.NavigationService.getRoute(1);
+
+        this.highlightItem(itemId);
     }
 
     /**
@@ -444,6 +445,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             category: this.category,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
+            changed: resource.updatedOn,
+            created: resource.createdOn,
             icon: resource.icon,
             name: resource.getName(),
             children: []

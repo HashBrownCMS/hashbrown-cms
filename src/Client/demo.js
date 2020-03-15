@@ -7,10 +7,10 @@ const FORMS = {};
 const CONTENT = {
     '3217ea5955478c0b': {
         id: '3217ea5955478c0b',
-        createDate: Date.now(),
-        updateDate: Date.now(),
+        createdOn: Date.now(),
+        updatedOn: Date.now(),
         createdBy: 'demoUser',
-        updateddBy: 'demoUser',
+        updatedBy: 'demoUser',
         schemaId: 'webPage',
         sort: 10000,
         properties: {

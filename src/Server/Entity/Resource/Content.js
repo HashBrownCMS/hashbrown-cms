@@ -65,12 +65,23 @@ class Content extends require('Common/Entity/Resource/Content') {
         let siblings = []
 
         if(data.parentId) {
-            let parent = this.get(project, environment, data.parentId);
-            let isAllowed = parent.isSchemaAllowedAsChild(project, environment, data.schemaId);
+            let parent = await this.get(project, environment, data.parentId);
             
-            if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
+            if(!parent) {
+                throw new Error(`Parent content ${data.parentId} could not be found`);
+            }
+            
+            let parentSchema = await HashBrown.Entity.Resource.ContentSchema.get(project, environment, parent.schemaId);
+           
+            if(!parentSchema) {
+                throw new Error(`Schema ${parent.schemaId} for parent content ${data.parentId} could not be found`);
+            }
 
-            siblings = await parent.getChildren();
+            if(parentSchema.allowedChildSchemas.indexOf(data.schemaId) < 0) {
+                throw new Error('This type of content is not allowed here');
+            }
+
+            siblings = await parent.getChildren(project, environment);
 
         } else {
             siblings = await this.getOrphans(project, environment);    
@@ -373,7 +384,7 @@ class Content extends require('Common/Entity/Resource/Content') {
             parent = await this.constructor.get(project, environment, parentId);
         
             if(parent) {
-                siblings = await parent.getChildren(project, environment, parentId);
+                siblings = await parent.getChildren(project, environment);
             }
         
         } else {

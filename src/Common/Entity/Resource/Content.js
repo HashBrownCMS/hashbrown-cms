@@ -6,6 +6,7 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Content extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'file'; }
     get icon() { return this.schema ? this.schema.icon : super.icon; }
     static get category() { return 'content'; }
 
@@ -155,8 +156,8 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
             id: this.id,
             parentId: this.parentId,
             schemaId: this.schemaId,
-            createdOn: this.createDate,
-            updatedOn: this.updateDate,
+            createdOn: this.createdOn,
+            updatedOn: this.updatedOn,
             createdBy: this.createdBy,
             updatedBy: this.updatedBy,
             sort: this.sort

@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
     "editorId": "ContentSchemaReferenceEditor",
-    "icon": "gears",
+    "customIcon": "gears",
     "name": "Content Schema Reference"
 }

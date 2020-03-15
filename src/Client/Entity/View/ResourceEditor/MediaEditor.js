@@ -16,25 +16,6 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     }
 
     /**
-     * Fetches the view data
-     */
-    async fetch() {
-        await super.fetch();
-
-        if(this.state.name) { return; }
-
-        this.state.icon = 'file-o';
-
-        if(this.model && this.model.isVideo()) {
-            this.state.icon = 'file-video-o';
-        }
-        
-        if(this.model && this.model.isImage()) {
-            this.state.icon = 'file-image-o';
-        }
-    }
-    
-    /**
      * Override this check, as it's not relevant to media
      */
     editedCheck() {}

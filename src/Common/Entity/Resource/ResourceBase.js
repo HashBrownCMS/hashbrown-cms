@@ -9,7 +9,7 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
      * Gets the representative icon of this resource type
      */
-    static get icon() { return 'file-o'; }
+    static get icon() { return ''; }
     get icon() { return this.constructor.icon; }
 
     /**

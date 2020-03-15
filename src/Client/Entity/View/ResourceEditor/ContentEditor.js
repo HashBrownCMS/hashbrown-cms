@@ -41,9 +41,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             this.state.connection = await HashBrown.Entity.Resource.Connection.get(this.state.publishing.connectionId); 
         }
 
-        // Set standard editor info
-        this.state.icon = this.state.schema.icon;
-
         // Establish tabs
         this.state.tab = HashBrown.Service.NavigationService.getRoute(2) || this.state.schema.defaultTabId || 'meta';
         this.state.tabs = this.state.schema.tabs || {};
@@ -141,6 +138,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Click save
      */
     async onClickSave() {
+        this.state.title = this.model.getName();
+        
         let publishedCheckbox = this.namedElements.published;
         this.model.isPublished = publishedCheckbox ? publishedCheckbox.model.value : false;
 

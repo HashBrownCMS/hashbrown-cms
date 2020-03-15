@@ -9,6 +9,15 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
     static get category() { return 'content'; };
     
     /**
+     * Fetches the models
+     */
+    async fetch() {
+        this.state.icons = await HashBrown.Service.RequestService.request('get', 'schemas/icons');
+
+        await super.fetch();
+    }
+
+    /**
      * Event: Click new
      */
     async onClickNew(parentId) {
@@ -121,14 +130,13 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let item = await super.getItem(resource);
 
+        item.icon = this.state.icons[resource.schemaId] || resource.icon;
         item.name = resource.getName();
         item.parentId = resource.parentId;
         item.sort = resource.sort;
         item.isDraggable = true;
         item.isSortable = true;
         item.isDropContainer = true;
-        item.changed = resource.updateDate;
-        item.created = resource.createDate;
 
         return item;
     }

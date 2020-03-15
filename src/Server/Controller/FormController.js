@@ -76,7 +76,8 @@ class FormController extends HashBrown.Controller.ResourceController {
 
         return new HttpResponse(csv, 200, {
             'Content-Type': 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${filename}"`
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Cache-Control': 'no-store'
         });
     }
     

@@ -94,6 +94,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         if(this.model) {
             this.state.title = this.model.getName();
+            this.state.icon = this.model.icon;
         }
     }
  
@@ -201,10 +202,12 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click save
      */
     async onClickSave() {
+        this.state.title = this.model.getName();
+
         if(this.namedElements.save) {
             this.namedElements.save.classList.toggle('loading', true);
         }
-       
+
         await this.model.save(this.state.saveOptions);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);

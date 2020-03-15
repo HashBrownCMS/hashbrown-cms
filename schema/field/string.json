@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
     "editorId": "StringEditor",
-    "icon": "font",
+    "customIcon": "font",
     "name": "String"
 }

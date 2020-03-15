@@ -33,6 +33,8 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             throw new Error(`Parent schema ${data.parentId} could not be found`);
         }
 
+        data.defaultTabId = parent.defaultTabId;
+        data.customIcon = parent.icon;
         data.type = parent.type;
 
         return await super.create(user, project, environment, data, options);
@@ -96,7 +98,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 resource = this.merge(resource, parent);
             }
         }
-      
+     
         return resource;
     }
     

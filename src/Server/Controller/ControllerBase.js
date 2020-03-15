@@ -39,7 +39,7 @@ class ControllerBase {
 
         return this.lastModified[key];
     }
-    
+
     /**
      * Resets last modified dates related to a key
      *
@@ -80,12 +80,16 @@ class ControllerBase {
         if(!this.canHandle(request)) { return null; }
    
         // Get cache info
+        let requestMTime = request.headers['If-Modified-Since'] || request.headers['if-modified-since'];
+        let responseMTime = await this.getLastModified(request);
         let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
-        let lastModified = await this.getLastModified(request);
-        let responseETag = '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + lastModified.getTime() + '"';
+        let responseETag = '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + responseMTime.getTime() + '"';
+
+        let mTimeMatch = requestMTime && responseMTime && new Date(requestMTime) >= new Date(responseMTime);
+        let eTagMatch = requestETag && responseETag && requestETag === responseETag;
 
         // ETag was matched, return 304
-        if(request.method === 'GET' && requestETag && responseETag && requestETag === responseETag) {
+        if(request.method === 'GET' && (eTagMatch || mTimeMatch)) {
             return new HttpResponse('Not modified', 304);
         }
 
@@ -98,7 +102,7 @@ class ControllerBase {
                 response.headers['ETag'] = responseETag;
             }
 
-            response.headers['Last-Modified'] = lastModified.toString();
+            response.headers['Last-Modified'] = responseMTime.toString();
 
             return response;
 

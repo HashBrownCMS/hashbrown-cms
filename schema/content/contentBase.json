@@ -1,6 +1,5 @@
 {
-    "defaultTabId": "meta",
-    "icon": "cogs",
+    "customIcon": "cogs",
     "allowedAtRoot": false,
     "name": "Content Base",
     "tabs": {

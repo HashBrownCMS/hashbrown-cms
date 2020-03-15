@@ -29,7 +29,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                 _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Icon'},
-                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.icon || ''}`, onclick: _.onClickChangeIcon})
+                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${model.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             _.field({label: 'Parent'},
                 _.popup({disabled: model.isLocked, value: model.parentId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})

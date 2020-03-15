@@ -67,13 +67,17 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static resetLastModified(key) {
         checkParam(key, 'key', String);
-    
+   
+        if(!key) { return; }
+
         // Ignore heartbeat requests
-        if(key && key.indexOf('heartbeat') > -1) { return; }
+        if(key.indexOf('/heartbeat') > -1) { return; }
+
+        // Modify key to widen search for similar keys
+        key = key.split('/' + this.category + '/').shift() + '/' + this.category;
 
         super.resetLastModified(key);
     }
-
     
     /**
      * Checks whether this controller can handle a request

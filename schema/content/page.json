@@ -1,8 +1,9 @@
 {
-    "icon": "file",
+    "customIcon": "file",
     "name": "Page",
     "parentSchemaId": "contentBase",
     "allowedAtRoot": false,
+    "defaultTabId": "content",
     "fields": {
         "properties": {
             "description": {

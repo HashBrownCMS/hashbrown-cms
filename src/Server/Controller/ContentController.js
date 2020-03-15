@@ -23,7 +23,7 @@ class ContentController extends HashBrown.Controller.ResourceController {
             }
         };
     }
-  
+    
     /**
      * @example POST /api/${project}/${environment}/content/${id}/insert?parentId=XXX&position=XXX
      */
