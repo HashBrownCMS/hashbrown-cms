@@ -51,7 +51,9 @@ class ControllerBase {
         if(!key || !this.lastModified) { return; }
 
         for(let k in this.lastModified) {
-            if(k.indexOf(key) < 0 && key.indexOf(k) < 0) { continue; }
+            if(k.indexOf(key) < 0 && key.indexOf(k) < 0) {
+                continue;
+            }
 
             delete this.lastModified[k];
         }
