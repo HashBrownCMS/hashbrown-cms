@@ -13,6 +13,7 @@
     "stop:docker": "cd ./docker && sudo docker-compose down",
     "restart:docker": "cd ./docker && sudo docker-compose restart",
     "watch:docker": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && sudo docker-compose logs -f node",
+    "db:docker": "cd ./docker && sudo docker-compose exec mongodb mongo",
     "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend"
   },
   "author": "Putaitu",

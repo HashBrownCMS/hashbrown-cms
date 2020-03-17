@@ -218,36 +218,20 @@ class Connection extends require('Common/Entity/Resource/Connection') {
             throw new Error('This Connection has no deployer defined');
         }
         
-        let folders = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
+        let files = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
         
-        if(!folders) { return []; }
+        if(!files) { return []; }
 
-        let files = {};
+        let names = {};
 
-        for(let folder of folders) {
-            let filename = folder.name || folder.filename || folder.path;
-
-            if(!filename && typeof folder === 'string') {
-                filename = folder;
-            }
-                
-            filename = Path.basename(filename);
-
-            let id = folder.path || folder.id;
+        for(let file of files) {
+            let filename = Path.basename(file);
+            let folder = Path.basename(Path.dirname(file));
             
-            if(!id && typeof folder === 'string') {
-                id = folder;
-            }
-            
-            // Get last bit of the path, if it's a path
-            if(id.indexOf(Path.sep) > -1) {
-                id = Path.dirname(id).split(Path.sep).pop();
-            }
-            
-            files[id] = filename;
+            names[folder] = filename;
         }
 
-        return files;
+        return names;
     }
     
     /**
@@ -268,10 +252,10 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
-        if(!files || files.length < 1) { throw new Error('Media "' + id + '" not found'); }
+        if(!files || files.length < 1) { throw new HttpError(`Media ${id} not found`, 404); }
 
         let file = Array.isArray(files) ? files[0] : files;
-        let url = file.url;
+        let url = file.url || file.path;
 
         if(!url && typeof file === 'string') {
             url = this.deployer.getPath('media', id + '/' + file);

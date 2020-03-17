@@ -56,7 +56,7 @@ global.HttpResponse = class HttpResponse {
             }
         }
         
-        if(typeof this.data === 'object' && !this.headers['Content-Type']) {
+        if(this.data && (this.data.constructor === Object || this.data.constructor === Array)) {
             this.headers['Content-Type'] = 'application/json';
             this.data = JSON.stringify(this.data);
         }
@@ -64,9 +64,26 @@ global.HttpResponse = class HttpResponse {
         if(!this.headers['Content-Type']) {
             this.headers['Content-Type'] = 'text/plain';
         }
+    }
 
-        if(typeof this.data !== 'string' && this.data instanceof Buffer === false) {
-            this.data = Buffer.from(this.data);
+    /**
+     * Handles the request
+     *
+     * @param {HTTP.ServerResponse} request
+     */
+    end(response) {
+        checkParam(response, 'response', HTTP.ServerResponse, true);
+   
+        response.writeHead(this.code, this.headers);
+
+        if(this.data instanceof FileSystem.ReadStream) {
+            this.data.on('open', () => {
+                this.data.pipe(response);
+            });
+            
+        } else {
+            response.end(this.data);
+        
         }
     }
 }
@@ -81,12 +98,9 @@ async function serve(request, response) {
 
         if(!thisResponse) { continue; }
 
-        result = thisResponse;
+        thisResponse.end(response);
         break;
     }
-    
-    response.writeHead(result.code || 200, result.headers || {});
-    response.end(result.data);
 }
 
 async function main() {
@@ -95,7 +109,13 @@ async function main() {
 
     // Register system cleanup event
     for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'exit' ]) {
-        process.on(signal, () => { HashBrown.Service.EventService.trigger('stop'); });
+        process.on(signal, (e) => {
+            if(e instanceof Error) {
+                debug.error(e);
+            }
+
+            HashBrown.Service.EventService.trigger('stop');
+        });
     }
 
     // Init plugins

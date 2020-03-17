@@ -28,12 +28,16 @@ class RequestService {
      * @param {Object} data
      * @param {Object} headers
      *
-     * @returns {Promise} Response
+     * @returns {Object} Response
      */
     static customRequest(method, url, data, headers) {
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };
+
+        if(data instanceof FormData) {
+            delete headers['Content-Type'];
+        }
 
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();

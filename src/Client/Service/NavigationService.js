@@ -88,10 +88,10 @@ class NavigationService {
 
         space.innerHTML = '';
 
-        let editor = null;
+        HashBrown.Context.currentResourceEditor = null;
 
         if(isJson) {
-            editor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
+            HashBrown.Context.currentResourceEditor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
 
         } else {
             for(let name in HashBrown.Entity.View.ResourceEditor) {
@@ -100,20 +100,18 @@ class NavigationService {
                 if(type === HashBrown.Entity.View.ResourceEditor.JsonEditor) { continue; }
                 if(type.category !== category) { continue; }
 
-                editor = new type();
+                HashBrown.Context.currentResourceEditor = type.new();
                 break;
             }
         }
 
-        if(!editor) {
+        if(!HashBrown.Context.currentResourceEditor) {
             space.innerHTML = `No resource editor for category "${category}" was found`;
             return;
         }
 
-        HashBrown.Context.currentResourceEditor = editor;
-
         space.appendChild(
-            editor.element
+            HashBrown.Context.currentResourceEditor.element
         );
     }
 

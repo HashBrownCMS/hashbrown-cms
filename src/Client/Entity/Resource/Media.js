@@ -40,8 +40,6 @@ class Media extends require('Common/Entity/Resource/Media') {
                 reader.onload = (e) => {
                     let base64 = e.target.result;
 
-                    base64 = base64.replace('data:' + file.type + ';base64,', '');
-
                     resolve(base64);
                 }
                 

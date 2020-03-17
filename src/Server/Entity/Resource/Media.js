@@ -28,11 +28,11 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error(`Project ${projectId} not found`);
         }
 
-        let environments = await project.getEnvironments();
+        let environments = await project.getSettings('environments');
 
         if(!environments || !environments[environment] || !environments[environment].mediaProvider) { return null; }
 
-        let connection = await HashBrown.Entity.Resource.Connection.get(project, environment, environments[environment].mediaProvider);
+        let connection = await HashBrown.Entity.Resource.Connection.get(projectId, environment, environments[environment].mediaProvider);
 
         return connection;
     }
@@ -85,8 +85,8 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(data.filename, 'data.filename', String, true);
-        checkParam(data.base64, 'data.base64', String, true);
         checkParam(options, 'options', Object, true);
+        checkParam(options.base64, 'options.base64', String, true);
         
         let connection = await this.getProvider(project, environment);
 
@@ -96,7 +96,7 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         let resource = await super.create(user, project, environment, data, options);
 
-        await connection.setMedia(resource.id, data.filename, data.base64);
+        await connection.setMedia(resource.id, data.filename, options.base64);
 
         return resource;
     }
@@ -120,9 +120,10 @@ class Media extends require('Common/Entity/Resource/Media') {
         if(!connection) { return []; }
 
         // Make sure we include all media items, even ones not in the database
-        let filenames = await connection.getAllMediaFilenames();
-        let resources = await super.list();
+        let resources = await super.list(project, environment, options);
 
+        let filenames = await connection.getAllMediaFilenames();
+        
         for(let resource of resources) {
             if(filenames[resource.id]) { 
                 delete filenames[resource.id];
@@ -132,10 +133,10 @@ class Media extends require('Common/Entity/Resource/Media') {
         for(let id in filenames) {
             let resource = new Media({
                 id: id,
-                name: filename
+                name: filenames[id]
             });
 
-            resources.append(resource);
+            resources.push(resource);
         }
 
         return resources;
@@ -155,10 +156,10 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        await this.clearCache();
-        await super.remove(options);
+        await this.clearCache(project, environment);
+        await super.remove(user, project, environment, options);
         
-        let connection = await this.getProvider(project, environment);
+        let connection = await this.constructor.getProvider(project, environment);
 
         if(!connection) {
             throw new Error('No connection set as media provider');
@@ -194,7 +195,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         }
 
         await super.save(user, project, environment);
-        await super.clearCache();
+        await super.clearCache(project, environment);
     }
    
     /**
@@ -223,9 +224,9 @@ class Media extends require('Common/Entity/Resource/Media') {
      * @param {Number} width
      * @param {Number} height
      *
-     * @returns {Buffer} Binary data
+     * @returns {FileSystem.ReadStream} Binary data stream
      */
-    async getCache(project, media, width, height = 0) {
+    async getCache(project, environment, media, width, height = 0) {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(width, 'width', Number, true);
@@ -240,40 +241,36 @@ class Media extends require('Common/Entity/Resource/Media') {
         // Get file stats
         let stats = await HashBrown.Service.FileService.stat(cacheFile);
 
-        // File was OK
+        // File was OK, return it
         if(stats && new Date().getTime() - new Date(stats.atime).getTime() < MAX_CACHE_TIME) {
-            data = await HashBrown.Service.FileService.read(cacheFile);
+            return HashBrown.Service.FileService.readStream(cacheFile);
+        }
+        
+        // Remove file, if it exists
+        await HashBrown.Service.FileService.remove(cacheFile);
+        
+        // Procure the URL from the providing connection
+        let connection = await this.constructor.getProvider(project, environment);
 
-        // File was not OK, copy and resize it
-        } else {
-            // Remove it, if it exists
-            await HashBrown.Service.FileService.remove(cacheFile);
-            
-            // Procure the URL from the providing connection
-            let connection = await this.constructor.getProvider();
-
-            if(!connection) {
-                throw new Error('No connection set as media provider');
-            }
-
-            let url = await connection.getMediaUrl(this.id);
-
-            if(!url) {
-                throw new Error(`Cannot fetch media "${this.id}", no URL available from provider`);
-            }
-
-            await HashBrown.Service.FileService.copy(url, cacheFile);
-
-            // Resize file
-            if(width && this.isImage() && !this.isSvg()) { 
-                await HashBrown.Service.AppService.exec('convert ' + cacheFile + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cacheFile);
-            }
-            
-            // Read file
-            data = await HashBrown.Service.FileService.read(cacheFile);
+        if(!connection) {
+            throw new Error('No connection set as media provider');
         }
 
-        return data;
+        let url = await connection.getMediaUrl(this.id);
+
+        if(!url) {
+            throw new Error(`Cannot fetch media "${this.id}", no URL available from provider`);
+        }
+
+        await HashBrown.Service.FileService.copy(url, cacheFile);
+
+        // Resize file
+        if(width && this.isImage() && !this.isSvg()) { 
+            await HashBrown.Service.AppService.exec('convert ' + cacheFile + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cacheFile);
+        }
+        
+        // Read file
+        return HashBrown.Service.FileService.readStream(cacheFile);
     }
     
     /**

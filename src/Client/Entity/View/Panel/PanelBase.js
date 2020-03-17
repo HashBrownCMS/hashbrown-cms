@@ -9,7 +9,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     static get category() { return this.name.replace('Panel', '').toLowerCase(); }
     static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
     static get icon() { return this.itemType.icon; }
+    static get title() { return this.name.replace('Panel', ''); }
 
+    get title() { return this.constructor.title; }
     get icon() { return this.constructor.icon; }
     get itemType() { return this.constructor.itemType; }
     get category() { return this.constructor.category; }

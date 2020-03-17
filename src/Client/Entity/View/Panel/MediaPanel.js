@@ -18,8 +18,8 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             }
         });
             
-        modal.on('success', (ids) => {
-            if(ids) {
+        modal.on('success', (resources) => {
+            if(resources && resources[0] && resources[0].id) {
                 location.hash = '/media/' + ids[0];
             }
         });
@@ -117,7 +117,6 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let item = await super.getItem(resource);
 
-        item.name = resource.name;
         item.parentId = resource.folder;   
         item.isRemote = true;
         item.isDraggable = true;

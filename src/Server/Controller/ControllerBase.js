@@ -256,15 +256,18 @@ class ControllerBase {
         // Get request parameters
         let requestParameters = this.getRequestParameters(requestPath, route.pattern);
 
-        // 3 levels of user auth
+        // Authorise/authenticate user
         let user = null;
 
+        // ^ Authenticated user
         if(route.user === true) {
             user = await this.authorize(request, requestParameters.project);
         
+        // ^ Permissions specified
         } else if(typeof route.user === 'object') {
             user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
         
+        // ^ Anonymous
         } else {
             user = await this.authenticate(request, true);
 
@@ -288,24 +291,22 @@ class ControllerBase {
             }
         }
 
-        // Read request body
-        let requestBody = await this.getRequestBody(request);
-        let requestSearchParams = this.getUrl(request).searchParams;
-        let requestQuery = {};
+        // Read request and produce response
+        try {
+            let requestBody = await this.getRequestBody(request);
+            let requestQuery = this.getRequestQuery(request);
+            let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
 
-        if(requestSearchParams) {
-            requestSearchParams.forEach((value, key) => {
-                requestQuery[key] = value;
-            });
+            if(response instanceof HttpResponse === false) {
+                throw new HttpError('Response was not of type HttpResponse', 500);
+            }
+
+            return response;
+
+        } catch(e) {
+            return new HttpResponse(e.message, e.code || 500); 
+
         }
-
-        let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
-
-        if(response instanceof HttpResponse === false) {
-            return new HttpResponse('Response was not of type HttpResponse', 500);
-        }
-
-        return response;
     }
 
     /**
@@ -322,20 +323,40 @@ class ControllerBase {
     }
 
     /**
+     * Gets the query of a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {Object} Query
+     */
+    static getRequestQuery(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        
+        let requestSearchParams = this.getUrl(request).searchParams;
+        let requestQuery = {};
+
+        if(requestSearchParams) {
+            requestSearchParams.forEach((value, key) => {
+                requestQuery[key] = value;
+            });
+        }
+
+        return requestQuery;
+    }
+
+    /**
      * Gets the body of a request
      *
      * @param {HTTP.IncomingMessage} request
-     * @param {Boolean} asBuffer
      *
      * @return {Object|Buffer} Body
      */
-    static getRequestBody(request, asBuffer = false) {
+    static async getRequestBody(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(asBuffer, 'asBuffer', Boolean);
 
-        return new Promise((resolve, reject) => {
-            let body = '';
+        let body = '';
 
+        await new Promise((resolve, reject) => {
             request.on('data', (data) => {
                 body += data;
 
@@ -346,35 +367,75 @@ class ControllerBase {
             });
 
             request.on('end', () => {
-                if(asBuffer) {
-                    body = Buffer.from(body);
+                resolve();
+            });
+        });
 
-                } else {
-                    try {
-                        body = JSON.parse(body);
-                    } catch(e) {
-                        body = QueryString.parse(body);
+        if(!body) { return {}; }
+
+        let contentTypeHeaderParts = (request.headers['Content-Type'] || request.headers['content-type'] || '').split(';').map((x) => x.trim());
+        let contentTypeName = contentTypeHeaderParts.shift();
+        let contentTypeSettings = QueryString.parse(contentTypeHeaderParts.join('&'));
+
+        switch(contentTypeName) {
+            case 'multipart/form-data':
+                if(!contentTypeSettings.boundary) {
+                    throw new HttpError('Boundary parameter is required for multipart/form-data');
+                }
+
+                let files = [];
+
+                console.log('BOUNDARY  ', contentTypeSettings.boundary);
+
+                for(let line of body.split('\n')) {
+                    line = (line || '').trim();
+
+                    if(!line) { continue; }
+
+                    // End of the body data
+                    if(line === '--' + contentTypeSettings.boundary + '--') {
+                        break;
+                    }
+
+                    // Start of a new file
+                    if(line === '--' + contentTypeSettings.boundary) {
+                        files.push({
+                            filename: '',
+                            type: '',
+                            data: Buffer.from('')
+                        });
+                        continue;
+                    }
+
+                    let file = files[files.length - 1];
+
+                    if(!file) { continue; }
+
+                    if(line.indexOf('Content-Disposition') > -1) {
+                        file.filename = (line.match(/filename="([^"]+)"/) || [])[1];
+                    } else if(line.indexOf('Content-Type') > -1) {
+                        file.type = line.replace('Content-Type: ', '').trim();
+                    } else {
+                        file.data = Buffer.concat([file.data, Buffer.from(line)]);
                     }
                 }
 
-                resolve(body);
-            });
-        }); 
-    }
+                return {
+                    files: files
+                };
 
-    /**
-     * Uploads a file
-     *
-     * @param {HTTP.IncomingMessage} request
-     * @param {String} path
-     */
-    static async uploadFile(request, path) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
-        checkParam(path, 'path', String, true);
+            case 'application/json':
+                try {
+                    return JSON.parse(body);
+                } catch(e) {
+                    return {};
+                }
 
-        let data = await this.getBody(request, true);
+            case 'text/plain':
+                return QueryString.parse(body);
+        }
 
-        await HashBrown.Service.FileService.write(data, path);
+        return {};
     }
 
     /**
@@ -420,7 +481,7 @@ class ControllerBase {
 
         // No token was provided
         if(!token && !ignoreErrors) {
-            throw new HttpError('You need to be logged in to do that', 401);
+            throw new HttpError('Please log in to continue', 401);
         }
    
         let user = await HashBrown.Entity.User.getByToken(token);

@@ -36,8 +36,6 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
             file.isImage = file.type.indexOf('image') === 0;
             file.isVideo = file.type.indexOf('video') === 0;
 
-            if(!file.isImage && !file.isVideo) { continue; }
-
             file.src = await HashBrown.Entity.Resource.Media.toSourceString(file);
 
             this.state.previews.push(file);
@@ -57,11 +55,11 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
 
         try {
             let apiPath = 'media/' + (this.model.replaceId ? this.model.replaceId : 'new');
-            let ids = await HashBrown.Service.RequestService.upload(apiPath, data);
+            let resources = await HashBrown.Service.RequestService.request('post', apiPath, data);
 
             if(this.model.folder && this.model.folder !== '/') {
-                for(let id of ids) {
-                    await HashBrown.Service.RequestService.request('post', 'media/tree/' + id, { id: id, folder: this.model.folder });
+                for(let resource of resources) {
+                    await HashBrown.Service.RequestService.request('post', 'media/tree/' + resource.id, { id: resource.id, folder: this.model.folder });
                 }
             }
 
@@ -69,7 +67,7 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
 
             this.setLoading(false);
             
-            this.trigger('success', ids);
+            this.trigger('success', resources);
                 
             this.close();
         

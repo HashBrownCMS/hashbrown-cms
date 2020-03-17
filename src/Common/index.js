@@ -110,7 +110,9 @@ base.waitForSeconds = (seconds) => {
  * @return {String} MIME type
  */
 base.getMIMEType = (filename) => {
-    checkParam(filename, 'filename', String, true);
+    checkParam(filename, 'filename', String);
+
+    if(!filename) { return ''; }
     
     let extension = filename.split('.');
     

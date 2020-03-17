@@ -19,7 +19,6 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
 
         this.def(String, 'filename');
         this.def(String, 'folder', '/');
-        this.def(String, 'base64');
     }
 
     /**
@@ -46,7 +45,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      * @return {String} Name
      */
     getName() {
-        return this.filename;
+        return this.filename || this.id;
     }
 
     /**
@@ -81,7 +80,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      * @returns {String} Content-Type header
      */
     getContentTypeHeader() {
-        let name = (this.name || '').toLowerCase();
+        let name = (this.filename || '').toLowerCase();
 
         return getMIMEType(name); 
     }

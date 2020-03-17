@@ -96,12 +96,25 @@ class FileService {
     }
 
     /**
+     * Creates a read stream
+     *
+     * @param {String} path
+     *
+     * @return {FileSystem.ReadStream} Stream
+     */
+    static readStream(path) {
+        checkParam(path, 'path', String, true);
+
+        return FileSystem.createReadStream(path);
+    }
+
+    /**
      * Reads a file or files in a folder
      *
      * @param {String} path
      * @param {String} encoding
      *
-     * @return {Promise} Buffer or array of buffers
+     * @return {Buffer|Array} Data
      */
     static async read(path, encoding) {
         checkParam(path, 'path', String, true);

@@ -69,7 +69,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Submitted backup
      */
     async onSubmitBackup(formData) {
-        let timestamp = await HashBrown.Service.RequestService.upload('projects/' + this.model.id + '/backups/upload', formData);
+        let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/upload', formData);
 
         this.model.backups.push(timestamp);
 
