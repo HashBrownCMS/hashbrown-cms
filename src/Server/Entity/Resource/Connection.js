@@ -262,21 +262,19 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      *
      * @param {String} id
      * @param {String} name
-     *
-     * @returns {HashBrown.Entity.Resource.Media} Media node
      */
     async renameMedia(id, name) {
-        checkParam(id, 'id', String);
-        checkParam(name, 'name', String);
+        checkParam(id, 'id', String, true);
+        checkParam(name, 'name', String, true);
         
         this.pathComponentCheck('id', id);
         this.pathComponentCheck('name', name);
 
-        let media = await this.getMedia(id);
+        let path = await this.getMediaUrl(id);
 
-        await this.deployer.renameFile(media.path, name);
-
-        return media;
+        if(name === Path.basename(path)) { return; }
+        
+        await this.deployer.renameFile(path, name);
     }
     
     /**

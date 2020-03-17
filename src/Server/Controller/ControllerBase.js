@@ -385,8 +385,6 @@ class ControllerBase {
 
                 let files = [];
 
-                console.log('BOUNDARY  ', contentTypeSettings.boundary);
-
                 for(let line of body.split('\n')) {
                     line = (line || '').trim();
 
@@ -402,7 +400,7 @@ class ControllerBase {
                         files.push({
                             filename: '',
                             type: '',
-                            data: Buffer.from('')
+                            data: ''
                         });
                         continue;
                     }
@@ -416,8 +414,12 @@ class ControllerBase {
                     } else if(line.indexOf('Content-Type') > -1) {
                         file.type = line.replace('Content-Type: ', '').trim();
                     } else {
-                        file.data = Buffer.concat([file.data, Buffer.from(line)]);
+                        file.data += line + '\n';
                     }
+                }
+
+                for(let file of files) {
+                    file.data = Buffer.from(file.data, 'utf8');
                 }
 
                 return {

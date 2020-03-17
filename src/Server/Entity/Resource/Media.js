@@ -182,7 +182,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        let connection = await this.constructor.getProvider();
+        let connection = await this.constructor.getProvider(project, environment);
 
         if(!connection) {
             throw new Error('No connection set as media provider');
@@ -195,7 +195,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         }
 
         await super.save(user, project, environment);
-        await super.clearCache(project, environment);
+        await this.clearCache(project, environment);
     }
    
     /**
