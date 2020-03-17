@@ -226,14 +226,28 @@ class Media extends require('Common/Entity/Resource/Media') {
      *
      * @returns {FileSystem.ReadStream} Binary data stream
      */
-    async getCache(project, environment, media, width, height = 0) {
+    async getCache(project, environment, width, height = 0) {
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
-        checkParam(width, 'width', Number, true);
+        checkParam(width, 'width', Number);
         checkParam(height, 'height', Number);
 
+        let size = '';
+
+        if(width) {
+            size += 'w' + width;
+        }
+        
+        if(height) {
+            size += 'h' + height;
+        }
+
+        if(size) {
+            size = '_' + size;
+        }
+
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media', this.id);
-        let cacheFile = Path.join(cacheFolder, width + (height ? 'x' + height : '') + '.jpg');
+        let cacheFile = Path.join(cacheFolder, 'img' + size + '.jpg');
         
         // Create the cache folder, if it doesn't exist
         await HashBrown.Service.FileService.makeDirectory(cacheFolder);

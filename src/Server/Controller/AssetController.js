@@ -93,15 +93,9 @@ class AssetController extends HashBrown.Controller.ControllerBase {
 
         // If file exists in the /public directory, serve it statically
         if(exists) {
-            let data = await HashBrown.Service.FileService.read(path);
+            let data = HashBrown.Service.FileService.readStream(path);
 
-            return new HttpResponse(
-                data,
-                200,
-                {
-                    'Content-Type': type
-                }
-            );
+            return new HttpResponse(data, 200, { 'Content-Type': type });
         }
 
         return await super.handle(request);
@@ -114,9 +108,9 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         let theme = user && user.theme ? user.theme : 'default';
 
         let path = Path.join(APP_ROOT, 'theme', theme + '.css');
-        let content = await HashBrown.Service.FileService.read(path);
+        let data = HashBrown.Service.FileService.readStream(path);
 
-        return new HttpResponse(content, 200, { 'Content-Type': 'text/css' });
+        return new HttpResponse(data, 200, { 'Content-Type': 'text/css' });
     }
 
     /**

@@ -57,7 +57,11 @@ base.checkParam = (value, name, type, notNull = false) => {
         throw new Error('Parameter "' + name + '" is required');
     }
     
-    if(notNull && (value === null || value === '')) {
+    if(notNull && (
+        value === null ||
+        value === '' ||
+        (type === Number && isNaN(value))
+    )) {
         throw new Error('Parameter "' + name + '" cannot be null');
     }
 

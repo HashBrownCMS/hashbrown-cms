@@ -186,11 +186,7 @@ class Task extends HashBrown.Entity.EntityBase {
      * @returns {Array} Tasks
      */
     static async list(options = {}) {
-        let tasks = await HashBrown.Service.DatabaseService.find(
-            'schedule',
-            'tasks',
-            options
-        );
+        let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks', options);
         
         for(let i in tasks) {
             tasks[i] = this.new(tasks[i]);

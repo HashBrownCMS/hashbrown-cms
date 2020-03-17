@@ -254,14 +254,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         if(!files || files.length < 1) { throw new HttpError(`Media ${id} not found`, 404); }
 
-        let file = Array.isArray(files) ? files[0] : files;
-        let url = file.url || file.path;
-
-        if(!url && typeof file === 'string') {
-            url = this.deployer.getPath('media', id + '/' + file);
-        }
-
-        return url;
+        return files.shift();
     }
     
     /**

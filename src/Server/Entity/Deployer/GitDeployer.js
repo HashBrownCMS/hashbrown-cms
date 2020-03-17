@@ -156,19 +156,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
 
         await this.pullRepo();
         
-        let files = await HashBrown.Service.FileService.list(path);
-        
-        for(let i = 0; i < files.length; i++) {
-            let fullPath = files[i];
-            let relativePath = fullPath.replace(this.getRootPath(), '');
-
-            files[i] = {
-                name: Path.basename(relativePath),
-                path: fullPath
-            };
-        }
-
-        return files;
+        return await HashBrown.Service.FileService.list(path);
     }
 
     /**

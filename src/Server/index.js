@@ -74,14 +74,19 @@ global.HttpResponse = class HttpResponse {
     end(response) {
         checkParam(response, 'response', HTTP.ServerResponse, true);
    
-        response.writeHead(this.code, this.headers);
-
         if(this.data instanceof FileSystem.ReadStream) {
             this.data.on('open', () => {
+                response.writeHead(this.code, this.headers);
                 this.data.pipe(response);
             });
             
+            this.data.on('error', (e) => {
+                response.writeHead(e.code || 404, { 'Content-Type': 'text/plain' });
+                response.end(e.message);
+            });
+            
         } else {
+            response.writeHead(this.code, this.headers);
             response.end(this.data);
         
         }
