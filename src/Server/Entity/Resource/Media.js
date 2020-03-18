@@ -157,6 +157,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(options, 'options', Object, true);
 
         await this.clearCache(project, environment);
+        
         await super.remove(user, project, environment, options);
         
         let connection = await this.constructor.getProvider(project, environment);
@@ -190,12 +191,13 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         await connection.renameMedia(this.id, this.filename);
 
-        if(this.base64) {
-            await connection.setMedia(this.id, this.filename, this.base64);
+        if(options.base64) {
+            await connection.setMedia(this.id, this.filename, options.base64);
         }
 
-        await super.save(user, project, environment);
         await this.clearCache(project, environment);
+        
+        await super.save(user, project, environment);
     }
    
     /**
@@ -209,11 +211,8 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
 
         let cacheFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media', this.id);
-        let files = await HashBrown.Service.FileService.list(cacheFolder);
 
-        for(let file of files) {
-            await HashBrown.Service.FileService.remove(Path.join(cacheFolder, file));
-        }
+        await HashBrown.Service.FileService.remove(cacheFolder);
     }
 
     /**

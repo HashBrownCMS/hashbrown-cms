@@ -13,7 +13,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
 
     /**
      * @example GET /api/${project}/${environment}/media/${id}
-     * @example POST /api/${project}/${environment}/media/${id} (multipart/form-data)}
+     * @example POST /api/${project}/${environment}/media/${id} { folder: XXX, filename: XXX, files: [ { filename: XXX, base64: XXX } ] }
      * @example DELETE /api/${project}/${environment}/media/${id}
      */
     static async resource(request, params, body, query, user) {
@@ -27,7 +27,8 @@ class MediaController extends HashBrown.Controller.ResourceController {
             return new HttpResponse('Not found', 404);
         }
 
-        media.filename = query.filename || media.filename;
+        media.filename = body.filename || media.filename;
+        media.folder = body.folder || media.folder;
         
         let options = {};
 
@@ -35,7 +36,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
             let file = body.files[0];
 
             media.filename = file.filename;
-            options.base64 = file.data.toString('base64');
+            options.base64 = file.base64;
         }
 
         await media.save(user, params.project, params.environment, options);
@@ -44,7 +45,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example POST /api/${project}/${environment}/media/new (multipart/form-data)
+     * @example POST /api/${project}/${environment}/media/new { folder: XXX, files: [ { filename: XXX, base64: XXX } ] }
      */
     static async new(request, params, body, query, user) {
         let resources = [];
@@ -58,7 +59,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
                     filename: file.filename
                 },
                 {
-                    base64: file.data.toString('base64')
+                    base64: file.base64
                 }
             );
 

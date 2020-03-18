@@ -51,7 +51,7 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
      *
      * @param {Event} e
      */
-    onSubmit(e) {
+    async onSubmit(e) {
         e.preventDefault();
 
         let input = this.namedElements[this.model.name];
@@ -60,7 +60,20 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
 
         if(typeof this.model.onsubmit !== 'function') { return; }
 
-        this.model.onsubmit(new FormData(e.target), input.files);
+        let files = [];
+
+        for(let data of input.files) {
+            let file = {
+                filename: data.name,
+                size: data.size,
+                type: data.type,
+                base64: await HashBrown.Entity.Resource.Media.toBase64(data)
+            };
+
+            files.push(file);
+        }
+
+        this.model.onsubmit(files);
 
         return false;
     }

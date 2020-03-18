@@ -21,7 +21,32 @@ class Media extends require('Common/Entity/Resource/Media') {
     }
 
     /**
-     * Converts a file to base64 or object URL
+     * Converts a file to base64
+     *
+     * @param {File} file
+     *
+     * @return {String} Base64
+     */
+    static async toBase64(file) {
+        checkParam(file, 'file', File, true);
+
+        return await new Promise((resolve) => {
+            let reader = new FileReader();
+           
+            reader.onload = (e) => {
+                let base64 = e.target.result;
+
+                base64 = base64.split('base64,')[1];
+
+                resolve(base64);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Converts a file to a string representation
      *
      * @param {File} file
      *

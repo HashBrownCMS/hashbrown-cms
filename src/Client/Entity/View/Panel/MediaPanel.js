@@ -20,7 +20,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             
         modal.on('success', (resources) => {
             if(resources && resources[0] && resources[0].id) {
-                location.hash = '/media/' + ids[0];
+                location.hash = '/media/' + resources[0].id;
             }
         });
     }
@@ -31,12 +31,12 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     onClickRename(media) {
         let modal = HashBrown.Entity.View.Modal.Rename.new({
             model: {
-                value: media.name
+                value: media.filename
             }
         });
             
         modal.on('submit', async (newName) => {
-            await HashBrown.Service.RequestService.request('post', 'media/rename/' + media.id + '?name=' + newName);
+            await HashBrown.Service.RequestService.request('post', 'media/' + media.id, { filename: newName });
 
             HashBrown.Service.EventService.trigger('resource', media.id); 
         });
@@ -52,7 +52,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             }
         });
         
-        modal.on('success', (ids) => {
+        modal.on('success', () => {
             HashBrown.Service.NavigationService.poke();
         });
     }
@@ -80,7 +80,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         });
 
         modal.on('picked', async (path) => {
-            await HashBrown.Service.RequestService.request('post', 'media/tree/' + media.id, { id: media.id, folder: path });
+            await HashBrown.Service.RequestService.request('post', 'media/' + media.id, { folder: path });
             
             HashBrown.Service.EventService.trigger('resource');  
         });
@@ -95,7 +95,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
      */
     async onDropItem(itemId, parentId, position) {
         try {
-            await HashBrown.Service.RequestService.request('post', 'media/tree/' + itemId, { id: itemId, folder: parentId });
+            await HashBrown.Service.RequestService.request('post', 'media/' + itemId, { folder: parentId });
 
             this.update();
 

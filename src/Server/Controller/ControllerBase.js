@@ -373,59 +373,9 @@ class ControllerBase {
 
         if(!body) { return {}; }
 
-        let contentTypeHeaderParts = (request.headers['Content-Type'] || request.headers['content-type'] || '').split(';').map((x) => x.trim());
-        let contentTypeName = contentTypeHeaderParts.shift();
-        let contentTypeSettings = QueryString.parse(contentTypeHeaderParts.join('&'));
+        let contentType = (request.headers['Content-Type'] || request.headers['content-type'] || '').split(';').shift().trim();
 
-        switch(contentTypeName) {
-            case 'multipart/form-data':
-                if(!contentTypeSettings.boundary) {
-                    throw new HttpError('Boundary parameter is required for multipart/form-data');
-                }
-
-                let files = [];
-
-                for(let line of body.split('\n')) {
-                    line = (line || '').trim();
-
-                    if(!line) { continue; }
-
-                    // End of the body data
-                    if(line === '--' + contentTypeSettings.boundary + '--') {
-                        break;
-                    }
-
-                    // Start of a new file
-                    if(line === '--' + contentTypeSettings.boundary) {
-                        files.push({
-                            filename: '',
-                            type: '',
-                            data: ''
-                        });
-                        continue;
-                    }
-
-                    let file = files[files.length - 1];
-
-                    if(!file) { continue; }
-
-                    if(line.indexOf('Content-Disposition') > -1) {
-                        file.filename = (line.match(/filename="([^"]+)"/) || [])[1];
-                    } else if(line.indexOf('Content-Type') > -1) {
-                        file.type = line.replace('Content-Type: ', '').trim();
-                    } else {
-                        file.data += line + '\n';
-                    }
-                }
-
-                for(let file of files) {
-                    file.data = Buffer.from(file.data, 'utf8');
-                }
-
-                return {
-                    files: files
-                };
-
+        switch(contentType) {
             case 'application/json':
                 try {
                     return JSON.parse(body);
@@ -435,9 +385,10 @@ class ControllerBase {
 
             case 'text/plain':
                 return QueryString.parse(body);
+
         }
 
-        return {};
+        throw new HttpError(`Content type ${contentType} is unsupported`, 415);
     }
 
     /**

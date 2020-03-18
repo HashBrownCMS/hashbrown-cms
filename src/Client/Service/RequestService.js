@@ -35,10 +35,6 @@ class RequestService {
             'Content-Type': 'application/json; charset=utf-8'
         };
 
-        if(data instanceof FormData) {
-            delete headers['Content-Type'];
-        }
-
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open(method.toUpperCase(), url);
