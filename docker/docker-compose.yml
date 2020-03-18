@@ -6,7 +6,7 @@ networks:
 services:
     node:
         image: node
-        container_name: "4002-hashbrown-cms--node"
+        container_name: "hashbrown-cms--node"
         ports:
             - "${NODE_PORT:-8080}:${NODE_PORT:-8080}"
         depends_on:
@@ -24,7 +24,7 @@ services:
 
     mongodb:
         image: mongo
-        container_name: "4002-hashbrown-cms--mongodb"
+        container_name: "hashbrown-cms--mongodb"
         networks:
             - hashbrown-cms--network
         restart: unless-stopped
