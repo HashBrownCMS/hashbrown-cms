@@ -95,7 +95,7 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
                 options.password = this.state.newPassword;
             }
 
-            await HashBrown.Entity.User.save(options);
+            await this.model.save(options);
             
             this.close();
 

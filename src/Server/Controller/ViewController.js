@@ -41,7 +41,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 redirect: '/setup/1'
             },
             '/setup/${step}': {
-                hander: this.setup
+                handler: this.setup
             },
             '/dashboard/${tab}': {
                 handler: this.dashboard,
@@ -61,11 +61,13 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      */
     static async handle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-        
-        let users = await HashBrown.Entity.User.list();
+       
+        if(this.getUrl(request).pathname.indexOf('/setup') !== 0) {
+            let users = await HashBrown.Entity.User.list();
 
-        if(!users || users.length < 1) {
-            return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
+            if(!users || users.length < 1) {
+                return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
+            }
         }
 
         return await super.handle(request);

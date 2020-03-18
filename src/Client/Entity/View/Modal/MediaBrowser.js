@@ -45,7 +45,10 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
             for(let item of items) {
                 if(!item.folder) { item.folder = '/'; }
 
-                if(this.state.folder !== item.folder) { continue; }
+                let currentFolder = this.state.folder.split('/').filter(Boolean).join('/');
+                let itemFolder = item.folder.split('/').filter(Boolean).join('/');
+
+                if(currentFolder !== itemFolder) { continue; }
 
                 this.state.items.push(item);
             }

@@ -8,12 +8,6 @@
         &:empty {
             display: none;
         }
-
-        &::after {
-            content: '';
-            display: block;
-            clear: both;
-        }
     }
 
     &__preview {

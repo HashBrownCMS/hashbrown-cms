@@ -48,7 +48,7 @@ async function initUsers() {
     if(userList) {
         userList.innerHTML = '';
 
-        let users = await HashBrown.Service.RequestService.request('get', 'users');
+        let users = await HashBrown.Entity.User.list();
         
         for(let user of users || []) {
             userList.appendChild(

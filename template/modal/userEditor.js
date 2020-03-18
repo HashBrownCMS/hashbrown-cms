@@ -39,7 +39,7 @@ _.div({class: 'modal in'},
                 ] : null,
 
                 // Only show "is admin" switch to other admins
-                HashBrown.Context.user.isAdmin ? [
+                HashBrown.Context.user.isAdmin && model.id !== HashBrown.Context.user.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
                         _.checkbox({value: model.isAdmin, onchange: _.onChangeAdmin})

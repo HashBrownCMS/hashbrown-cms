@@ -104,6 +104,8 @@ class User extends require('Common/Entity/User') {
     validatePassword(password) {
         checkParam(password, 'password', String, true);
 
+        if(!this.password) { return false; }
+
         let hash = Crypto.createHmac('sha512', this.password.salt);
         hash.update(password);
         hash = hash.digest('hex');
@@ -272,7 +274,10 @@ class User extends require('Common/Entity/User') {
         if(existingUser) {
             throw new Error(`User with username "${username}" already exists`);
         }
-      
+    
+        data.username = username;
+        data.password = password;
+
         let user = this.new(data);
       
         user.id = this.createId();

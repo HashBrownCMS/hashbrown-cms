@@ -52,6 +52,8 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * @return {HashBrown.Entity.View.Field.FieldBase} Field
      */
     static createFromSchema(schema, value) {
+        checkParam(schema, 'schema', HashBrown.Entity.Resource.SchemaBase, true);
+
         let model = {
             schema: schema,
             config: schema.config,
@@ -78,6 +80,8 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId, { withParentFields: true });
     
+        if(!schema) { return null; }
+        
         return this.createFromSchema(schema, value);
     }
 

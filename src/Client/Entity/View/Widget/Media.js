@@ -40,7 +40,7 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.state.tagName = 'video';
             }
 
-            this.state.title = media.name;
+            this.state.title = media.filename;
         }
     }
     

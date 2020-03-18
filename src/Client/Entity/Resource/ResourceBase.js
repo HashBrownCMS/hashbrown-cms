@@ -18,8 +18,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!id) { return null; }
 
-        let resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
-        
+        let resource = null;
+
+        try {
+            resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
+        } catch(e) {
+            debug.error(e, this, true);
+        }
+            
         if(!resource) { return null; }
 
         resource = this.new(resource);

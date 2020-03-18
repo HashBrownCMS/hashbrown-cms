@@ -15,7 +15,7 @@ _.div({class: 'list-item--user'},
             }
         }),
         _.h3({class: 'list-item--user__name'},
-            (model.fullName || model.username || model.email || model.id) + (model.id == HashBrown.Context.user.id ? ' (you)' : '')
+            model.getName() + (model.id == HashBrown.Context.user.id ? ' (you)' : '')
         ),
         _.div({class: 'list-item--user__type'},
             _.if(model.isAdmin,

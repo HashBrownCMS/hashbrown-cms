@@ -114,20 +114,28 @@ class UserController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST|DELETE /api/users/${id}
      */
     static async user(request, params, body, query, user) {
-        let subject = await HashBrown.Entity.User.get(params.id);
+        let subject = null;
 
-        if(!subject) {
-            return new HttpError(`User by id ${id} not found`, 404);
-        }
-                
         switch(request.method) {
             case 'GET':
+                subject = await HashBrown.Entity.User.get(params.id);
+
+                if(!subject) {
+                    return new HttpError(`User by id ${id} not found`, 404);
+                }
+                
                 subject.isCurrent = subject.id === user.id;
 
                 return new HttpResponse(subject);
 
             case 'POST':
-                if(subject.id !== id && !user.isAdmin) {
+                subject = await HashBrown.Entity.User.get(params.id, { withTokens: true, withPassword: true });
+
+                if(!subject) {
+                    return new HttpError(`User by id ${id} not found`, 404);
+                }
+                
+                if(subject.id !== user.id && !user.isAdmin) {
                     return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
@@ -138,11 +146,24 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 }
 
                 // Theme can only be changed by current users
-                if(subject.id !== id) {
+                if(subject.id !== user.id) {
                     delete body.theme;
                 }
-            
-                await subject.save();
+           
+                // Passwords should be part of the query
+                if(body.password) {
+                    query.password = body.password;
+                    delete body.password;
+                }
+
+                // Remove other unsafe fields
+                delete body.id;
+                delete body.tokens;
+                delete body.isCurrent;
+
+                subject.adopt(body);
+
+                await subject.save(query);
 
                 return new HttpResponse(subject);
 
@@ -151,6 +172,12 @@ class UserController extends HashBrown.Controller.ControllerBase {
                     return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
+                subject = await HashBrown.Entity.User.get(params.id);
+
+                if(!subject) {
+                    return new HttpError(`User by id ${id} not found`, 404);
+                }
+                
                 await subject.remove();
                 
                 return new HttpResponse('OK');
@@ -162,7 +189,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
     /**
      * @example POST /api/users/first?username=XXX&password=XXX { username: XXX, password: XXX }
      */
-    static async first(request, params, body, query, user) {
+    static async first(request, params, body, query) {
         let username = body.username || query.username;
         let password = body.password || query.password;
 
@@ -172,8 +199,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
             return new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the command line.', 403);
         }
 
-        await HashBrown.Entity.User.create(username, password, { isAdmin: true });
-        
+        let user = await HashBrown.Entity.User.create(username, password, { isAdmin: true });
         let token = await HashBrown.Entity.User.login(username, password);
        
         return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });

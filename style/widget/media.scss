@@ -28,9 +28,10 @@
         background-color: var(--color-default-200);
         min-width: 6rem;
         min-height: 6rem;
+        width: 100%;
 
-        &.readonly {
-            border-radius: var(--border-radius-small);
+        &:not(.full) {
+            height: 16rem;
         }
 
         &:not(.readonly) {
@@ -45,11 +46,9 @@
 
         &__source {
             max-width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            max-height: 100%;
+            display: block;
             font-size: 2rem;
-            position: relative;
             z-index: 100;
         }
     }
@@ -68,6 +67,10 @@
         overflow: hidden;
         line-height: var(--size-widget-small);
         text-overflow: ellipsis;
+
+        &:last-child {
+            border-bottom-right-radius: var(--border-radius-small);
+        }
     }
 
     &__clear {

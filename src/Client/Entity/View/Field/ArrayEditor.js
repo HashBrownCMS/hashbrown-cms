@@ -72,7 +72,9 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             for(let schemaId of this.model.config.allowedSchemas || []) {
                 let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId);
 
-                this.state.schemaOptions[schema.name] = schema.id;
+                if(schema) {
+                    this.state.schemaOptions[schema.name] = schema.id;
+                }
             }
 
             // Build fields
@@ -90,13 +92,15 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                     item.value
                 );
 
+                if(!view) { continue; }
+
                 view.state.isCollapsible = true;
 
                 view.on('change', (newValue) => {
                     item.value = newValue;
                     this.state.value[i] = item;
 
-                    this.trigger('change', this.state.value);
+                    this.onChange(this.state.value);
                 });
 
                 this.state.fields.push({
@@ -116,6 +120,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     onClickCollapseItems() {
         for(let field of this.state.fields || []) {
+            if(!field.view) { continue; }
+
             field.view.state.isCollapsed = true;
             field.view.render();
         }
@@ -126,6 +132,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     onClickExpandItems() {
         for(let field of this.state.fields || []) {
+            if(!field.view) { continue; }
+            
             field.view.state.isCollapsed = false;
             field.view.render();
         }
@@ -208,6 +216,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.state.value = [];
 
         for(let field of fields || []) {
+            if(!field.view) { continue; }
+
             this.state.value.push({
                 schemaId: field.view.model.schema.id,
                 value: field.view.state.value

@@ -103,9 +103,11 @@ async function serve(request, response) {
 
         if(!thisResponse) { continue; }
 
-        thisResponse.end(response);
+        result = thisResponse;
         break;
     }
+
+    result.end(response);
 }
 
 async function main() {
