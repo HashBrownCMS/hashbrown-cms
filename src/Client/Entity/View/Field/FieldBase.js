@@ -106,7 +106,11 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         // Multilingual sanity check
         if(this.model.isMultilingual) {
             if(!this.model.value || this.model.value.constructor !== Object) {
+                let rawValue = this.model.value;
+
                 this.model.value = {};
+                this.model.value[HashBrown.Context.language] = rawValue;
+                this.model.value['_multilingual'] = true;
             }
 
             this.state.value = this.model.value[HashBrown.Context.language];
