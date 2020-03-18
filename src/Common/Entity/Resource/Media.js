@@ -64,6 +64,8 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
             // Image types
             case 'jpg':
                 return 'image/jpeg';
+            case 'jpeg':
+                return 'image/jpeg';
             case 'png':
                 return 'image/png';
             case 'gif':

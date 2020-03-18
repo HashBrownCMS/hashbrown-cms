@@ -96,7 +96,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                     item.value = newValue;
                     this.state.value[i] = item;
 
-                    this.trigger('change', this.state.value);
+                    this.onChange(this.state.value);
                 });
 
                 this.state.fields.push({
