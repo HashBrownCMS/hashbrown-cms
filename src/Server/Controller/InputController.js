@@ -7,6 +7,29 @@
  */
 class InputController extends HashBrown.Controller.ControllerBase {
     /**
+     * Routes
+     */
+    static get routes() {
+        return {
+            'create-user': {
+                handler: this.createUser
+            },
+            'make-user-admin': {
+                handler: this.makeUserAdmin
+            },
+            'revoke-tokens': {
+                handler: this.revokeTokens
+            },
+            'set-user-scopes': {
+                handler: this.setUserScopes
+            },
+            'set-user-password': {
+                handler: this.setUserPassword
+            }
+        }
+    }
+
+    /**
      * Handles a request
      */
     static async handle() {
@@ -23,72 +46,86 @@ class InputController extends HashBrown.Controller.ControllerBase {
             }
         }
 
-        // Create a new user
-        if(cmd === 'create-user') {
-            await HashBrown.Entity.User.create(args.u, args.p, { isAdmin: args.admin === 'true' });
+        if(!this.routes[cmd] || typeof this.routes[cmd].handler !== 'function') { return; }
 
-        // Make a user an admin
-        } else if(cmd === 'make-user-admin') {
-            let user = await HashBrown.Entity.User.get(args.u);
+        try {
+            await this.routes[cmd].handler(args);
+        } catch(e) {
+            console.log(e.message);
+        } finally {
+            process.exit();
+        }
+    }
 
-            if(!user) {
-                throw new Error(`User "${args.u}" not found`);
-            }
+    /**
+     * @example create-user u=XXX p=XXX admin=true|false
+     */
+    static async createUser(args) {
+        await HashBrown.Entity.User.create(args.u, args.p, { isAdmin: args.admin === 'true' });
+    }
 
-            user.isAdmin = true;
-            
-            await user.save();
+    /**
+     * @example make-user-admin u=XXX
+     */
+    static async makeUserAdmin(args) {
+        let user = await HashBrown.Entity.User.getByUsername(args.u);
 
-        // Revoke tokens for a user
-        } else if(cmd === 'revoke-tokens') {
-            let user = await HashBrown.Entity.User.get(args.u);
-
-            if(!user) {
-                throw new Error(`User "${args.u}" not found`);
-            }
-
-            user.tokens = [];
-
-            await user.save();
-
-        // Set scopes for a user
-        } else if(cmd === 'set-user-scopes') {
-            let user = await HashBrown.Entity.User.get(args.u);
-            
-            if(!user) {
-                throw new Error(`User "${args.u}" not found`);
-            }
-
-            if(!user.scopes[args.p]) {
-                user.scopes[args.p] = [];
-            }
-
-            user.scopes[args.p] = args.s.split(',');
-
-            await user.save();
-
-        // Change password for a user
-        } else if(cmd === 'set-user-password') {
-            let user = await HashBrown.Entity.User.get(args.u);
-            
-            if(!user) {
-                throw new Error(`User "${args.u}" not found`);
-            }
-
-            user.setPassword(args.p);
-
-            await user.save();
-        
-        // No arguments were recognised, skip this entire check
-        } else { 
-            return false;
-        
+        if(!user) {
+            throw new Error(`User "${args.u}" not found`);
         }
 
-        // If any arguments were recognised, exit the process after execution
-        process.exit();
+        user.isAdmin = true;
 
-        return true;
+        await user.save();
+    }
+
+    /**
+     * @example revoke-tokens u=XXX
+     */
+    static async revokeTokens(args) {
+        let user = await HashBrown.Entity.User.getByUsername(args.u);
+
+        if(!user) {
+            throw new Error(`User "${args.u}" not found`);
+        }
+
+        user.tokens = [];
+
+        await user.save();
+    }
+
+    /**
+     * @example set-user-scopes u=XXX p=XXX s=XXX,XXX,XXX
+     */
+    static async setUserScopes(args) {
+        let user = await HashBrown.Entity.User.getByUsername(args.u);
+        
+        if(!user) {
+            throw new Error(`User "${args.u}" not found`);
+        }
+
+        if(!user.scopes[args.p]) {
+            user.scopes[args.p] = [];
+        }
+
+        user.scopes[args.p] = args.s.split(',');
+
+        await user.save();
+    }
+
+    /**
+     * @example set-user-password u=XXX p=XXX
+     */
+    static async setUserPassword(args) {
+        let user = await HashBrown.Entity.User.getByUsername(args.u);
+        
+        if(!user) {
+            throw new Error(`User "${args.u}" not found`);
+        }
+
+        user.setPassword(args.p);
+
+        await user.save();
     }
 }
 

@@ -279,7 +279,7 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         // Resize file
         if(width && this.isImage() && !this.isSvg()) { 
-            await HashBrown.Service.AppService.exec('convert ' + cacheFile + ' -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cacheFile);
+            await HashBrown.Service.AppService.exec('convert ' + cacheFile + ' -auto-orient -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cacheFile);
         }
         
         // Read file

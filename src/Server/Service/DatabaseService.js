@@ -119,8 +119,6 @@ class DatabaseService {
     static async init() {
         if(this.client) { return; }
         
-        debug.log(`Connecting to MongoDB with connection string ${this.getConnectionString()}`, this);
-   
         this.client = await MongoClient.connect(
             this.getConnectionString(),
             {
@@ -135,10 +133,6 @@ class DatabaseService {
 
                 this.client.close();
                 this.client = null;
-
-            } else {
-                debug.log('No database client to close', this, true);
-            
             }
         });
     }

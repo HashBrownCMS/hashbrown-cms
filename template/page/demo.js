@@ -31,7 +31,7 @@ module.exports = (_, view) => `
                     }
                 },
                 environment: 'live',
-                user: {id:'demouser',isAdmin:true,isCurrent:true,username:'demouser',fullName:'Demo user',scopes:{}},
+                user: {id:'demouser',isAdmin:true,username:'demouser',fullName:'Demo user',scopes:{}},
                 isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1,
                 isDemo: true
             };

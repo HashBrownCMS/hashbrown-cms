@@ -20,12 +20,9 @@ _.div({class: 'modal modal--media-browser in'},
 
             _.if(state.name === undefined || state.name === 'searching',
                 _.div({class: 'modal--media-browser__items', name: 'items'},
-                    _.if(state.items.length < 1,
-                        state.name === 'searching' ?
-                            `No results matching "${state.searchQuery}"`
-                        :
-                            'No media items yet. Did you set up a connection as media provider?'
-                    ),
+                    state.items.length < 1 && state.name === 'searching' ? [
+                        `No results matching "${state.searchQuery}"`
+                    ] : null,
 
                     _.each(state.items, (i, item) =>
                         _.button({class: 'modal--media-browser__item', 'data-folder': item.folder, title: item.name, onclick: (e) => _.onClickItem(item.id)},

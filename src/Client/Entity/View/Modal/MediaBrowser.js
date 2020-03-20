@@ -36,7 +36,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
             let query = (this.state.searchQuery || '').toLowerCase();
 
             for(let item of items) {
-                if(query && (item.name || '').toLowerCase().indexOf(query) < 0) { continue; }
+                if(query && (item.filename || '').toLowerCase().indexOf(query) < 0) { continue; }
 
                 this.state.items.push(item);
             }

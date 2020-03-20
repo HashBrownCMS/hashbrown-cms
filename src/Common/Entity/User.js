@@ -14,7 +14,6 @@ class User extends HashBrown.Entity.EntityBase {
         this.def(String, 'id');
 
         this.def(Boolean, 'isAdmin', false);
-        this.def(Boolean, 'isCurrent', false);
         
         this.def(String, 'username');
         this.def(String, 'fullName');

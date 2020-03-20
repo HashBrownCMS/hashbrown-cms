@@ -109,8 +109,8 @@ class User extends require('Common/Entity/User') {
         let hash = Crypto.createHmac('sha512', this.password.salt);
         hash.update(password);
         hash = hash.digest('hex');
-
-        return this.password.hash == hash;
+        
+        return this.password.hash === hash;
     }
 
     /**
@@ -141,11 +141,13 @@ class User extends require('Common/Entity/User') {
      * Gets a user by token
      *
      * @param {String} token
+     * @param {Object} options
      *
      * @return {HashBrown.Entity.User} User
      */
-    static async getByToken(token) {
+    static async getByToken(token, options) {
         checkParam(token, 'token', String);
+        checkParam(options, 'options', Object, true);
 
         if(!token) { return null; }
 
@@ -156,8 +158,13 @@ class User extends require('Common/Entity/User') {
 
             if(!user.validateToken(token)) { continue; }
 
-            user.tokens = [];
-            user.password = null;
+            if(!options.withTokens) {
+                user.tokens = [];
+            }
+            
+            if(!options.withPassword) {
+                user.password = null;
+            }
 
             return user;
         }
@@ -173,12 +180,20 @@ class User extends require('Common/Entity/User') {
      * @return {Array} Users
      */
     static async list(options = {}) {
+        checkParam(options, 'options', Object, true);
+
         let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
 
         for(let i in users) {
             users[i] = this.new(users[i]);
-            users[i].tokens = [];
-            users[i].password = null;
+        
+            if(!options.withTokens) {
+                users[i].tokens = [];
+            }
+        
+            if(!options.withPassword) {
+                users[i].password = null;
+            }
         }
         
         users = users.sort((a, b) => {
@@ -298,9 +313,13 @@ class User extends require('Common/Entity/User') {
      */
     async save(options = {}) {
         this.cleanUpTokens();
-        
+           
         if(options.password) {
             this.setPassword(options.password);
+        }
+
+        if(this.username.length < 2) {
+            throw new Error('Username must be minimum 2 characters long'); 
         }
 
         await HashBrown.Service.DatabaseService.updateOne('users', 'users', { id: this.id }, this.getObject());

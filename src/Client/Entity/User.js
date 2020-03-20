@@ -7,6 +7,15 @@
  */
 class User extends require('Common/Entity/User') {
     /**
+     * Gets whether this user is the current one
+     *
+     * @return {Boolean} Is current
+     */
+    get isCurrent() {
+        return this.id === HashBrown.Context.user.id;
+    }
+
+    /**
      * Saves the current state of this entity
      *
      * @param {Object} options

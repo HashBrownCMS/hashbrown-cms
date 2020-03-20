@@ -437,7 +437,7 @@ class ControllerBase {
             throw new HttpError('Please log in to continue', 401);
         }
    
-        let user = await HashBrown.Entity.User.getByToken(token);
+        let user = await HashBrown.Entity.User.getByToken(token, { withPassword: true, withTokens: true });
         
         // No user was found
         if(!user && !ignoreErrors) {

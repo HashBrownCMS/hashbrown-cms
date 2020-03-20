@@ -76,7 +76,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/user/logout
      */
     static async logout(request, params, body, query, user) {
-        let token = this.getCookie(request, 'token'); 
+        let token = this.getToken(request); 
         
         await user.logout(token);
 
@@ -87,6 +87,9 @@ class UserController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/user
      */
     static async current(request, params, body, query, user) {
+        user.tokens = [];
+        user.password = null;
+
         return new HttpResponse(user);
     }
 
@@ -103,10 +106,6 @@ class UserController extends HashBrown.Controller.ControllerBase {
     static async users(request, params, body, query, user) {
         let users = await HashBrown.Entity.User.list();
     
-        for(let i in users) {
-            users[i].isCurrent = users[i].id === user.id;
-        }
-
         return new HttpResponse(users);
     }
     
@@ -124,8 +123,6 @@ class UserController extends HashBrown.Controller.ControllerBase {
                     return new HttpError(`User by id ${id} not found`, 404);
                 }
                 
-                subject.isCurrent = subject.id === user.id;
-
                 return new HttpResponse(subject);
 
             case 'POST':
@@ -149,23 +146,19 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 if(subject.id !== user.id) {
                     delete body.theme;
                 }
-           
-                // Passwords should be part of the query
-                if(body.password) {
-                    query.password = body.password;
-                    delete body.password;
-                }
-
-                // Remove other unsafe fields
+       
+                // Remove unsafe fields
                 delete body.id;
                 delete body.tokens;
-                delete body.isCurrent;
+                delete body.password;
 
+                // Adopt values
                 subject.adopt(body);
 
+                // Save user
                 await subject.save(query);
 
-                return new HttpResponse(subject);
+                return new HttpResponse('OK');
 
             case 'DELETE':
                 if(!user.isAdmin) {
