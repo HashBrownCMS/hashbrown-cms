@@ -1,7 +1,5 @@
 'use strict';
 
-const BodyParser = require('body-parser');
-
 const SUBMISSION_TIMEOUT_MS = 1000;
 
 // Private vars
