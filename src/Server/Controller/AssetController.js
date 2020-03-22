@@ -106,8 +106,24 @@ class AssetController extends HashBrown.Controller.ControllerBase {
      */
     static async theme(request, params, body, query, user) {
         let theme = user && user.theme ? user.theme : 'default';
+        let path = '';
 
-        let path = Path.join(APP_ROOT, 'theme', theme + '.css');
+        // If a theme name contains a slash, it's from a plugin
+        if(theme.indexOf('/') > -1) {
+            theme = theme.split('/');
+            path = Path.join(APP_ROOT, 'plugins', theme[0], 'theme', theme[1] + '.css');
+
+        // If not, it's built in
+        } else {
+            path = Path.join(APP_ROOT, 'theme', theme + '.css');
+
+        }
+        
+        // Fall back to default theme if not found
+        if(!HashBrown.Service.FileService.exists(path)) {
+            path = Path.join(APP_ROOT, 'theme', 'default.css');
+        }
+
         let data = HashBrown.Service.FileService.readStream(path);
 
         return new HttpResponse(data, 200, { 'Content-Type': 'text/css' });

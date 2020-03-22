@@ -62,6 +62,10 @@ class AppService {
             themes.push(Path.basename(file, '.css'));
         }
 
+        let pluginThemes = await HashBrown.Service.PluginService.getThemes();
+
+        themes = themes.concat(pluginThemes);
+
         return themes;
     }
 }
