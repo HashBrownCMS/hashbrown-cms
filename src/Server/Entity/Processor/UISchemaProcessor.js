@@ -101,9 +101,9 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         let data = {};
 
         for(let k in properties) {
-            if(!schema.fields.properties[k]) { continue; }
+            if(!schema.config[k]) { continue; }
             
-            data[k] = await this.check(project, environment, properties[k], schema.fields.properties[k].schemaId);
+            data[k] = await this.check(project, environment, properties[k], schema.config[k].schemaId);
         }
         
         for(let k in meta) {

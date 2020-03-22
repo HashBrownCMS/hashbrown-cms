@@ -40,8 +40,9 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
             
             if(allowedSchemas === 'fromParent' && thisContent.parentId) {
                 let parentContent = await HashBrown.Entity.Resource.Content.get(thisContent.parentId);
-            
-                allowedSchemas = parentContent.allowedChildSchemas || [];
+                let parentContentSchema = await HashBrown.Entity.Resource.ContentSchema.get(parentContent.schemaId);
+           
+                allowedSchemas = parentContentSchema.allowedChildSchemas || [];
             }
 
             if(!Array.isArray(allowedSchemas)) { allowedSchemas = []; }

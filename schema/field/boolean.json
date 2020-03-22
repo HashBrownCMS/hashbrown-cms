@@ -1,5 +1,5 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "BooleanEditor",
     "customIcon": "toggle-on",
     "name": "Boolean"

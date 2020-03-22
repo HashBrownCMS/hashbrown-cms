@@ -15,7 +15,6 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
         super.structure();
 
         this.def(String, 'editorId');
-        this.def(Object, 'config', {});
 
         this.name = 'New field schema';        
     }
@@ -31,7 +30,7 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
         checkParam(params, 'params', Object)
 
         params = params || {};
-    
+
         return new this(params);
     }
     
@@ -48,6 +47,31 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
         // Backwards compatible editor names
         if(params.editorId && params.editorId.indexOf('Editor') < 0) {
             params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
+        }
+        
+        // Adopt uischema.org fields
+        if(params['@type']) {
+            let i18n = params['@i18n'] && params['@i18n']['en'] ? params['@i18n']['en'] : {};
+
+            params.id = params['@type'];
+            params.name = i18n['@name'];
+            params.parentId = params['@parent'] || 'struct';
+
+            let config = {
+                label: params['@label'],
+                struct: {}
+            };
+            
+            for(let key in params) {
+                if(
+                    key[0] === '@' ||
+                    typeof this[key] !== 'undefined'
+                ) { continue; }
+
+                config.struct[key] = this.constructor.getFieldFromUISchema(params[key], i18n[key]);
+            }
+
+            params.config = config;
         }
 
         super.adopt(params);

@@ -1,21 +1,19 @@
 {
     "customIcon": "file",
     "name": "Page",
-    "parentSchemaId": "contentBase",
+    "parentId": "contentBase",
     "allowedAtRoot": false,
     "defaultTabId": "content",
-    "fields": {
-        "properties": {
-            "description": {
-                "label": "Description",
-                "schemaId": "string",
-                "tabId": "content"
-            },
-            "url": {
-                "label": "URL",
-                "schemaId": "url",
-                "tabId": "content"
-            }
+    "config": {
+        "description": {
+            "label": "Description",
+            "schemaId": "string",
+            "tabId": "content"
+        },
+        "url": {
+            "label": "URL",
+            "schemaId": "url",
+            "tabId": "content"
         }
     }
 }

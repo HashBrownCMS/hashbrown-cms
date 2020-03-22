@@ -139,6 +139,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.type = data.type || options.type || Path.basename(Path.dirname(schemaPath));
                 data.isLocked = true;
 
+                if(!data.parentId && data.id !== data.type + 'Base') {
+                    data.parentId = data.type + 'Base';
+                }
+
                 let resource = this.new(data);
                 
                 if(!resource) { continue; }
@@ -162,115 +166,6 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         }
 
         return list;
-    }
-    
-    /**
-     * Imports a uischema.org schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Object} json
-     * @param {String} language
-     */
-    static async import(project, environment, json, language = 'en') {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
-        checkParam(json, 'json', Object, true);
-        checkParam(environment, 'environment', String, true);
-       
-        let getId = (type) => {
-            return type[0].toLowerCase() + type.substring(1);
-        }
-
-        let getFields = (json, i18n) => {
-            let fields = {};
-           
-            for(let key in json) {
-                if(key[0] === '@') { continue; }
-
-                let info = i18n[key] || {};
-                let type = json[key];
-
-                if(type && type['@type']) {
-                    type = type['@type'];
-                }
-
-                if(!type) { throw new Error('Type for key "' + key + '" was null'); }
-
-                let def = {
-                    label: info['@name'] || '(no name)',
-                    description: info['@description'] || '(no description)'
-                };
-
-                if(Array.isArray(type)) {
-                    let allowedSchemas = [];
-
-                    for(let t of type) {
-                        allowedSchemas.push(getId(t));
-                    }
-
-                    def.schemaId = 'array';
-                    def.config = {
-                        allowedSchemas: allowedSchemas 
-                    };
-
-                } else if(typeof type === 'string') {
-                    if(json['@type'] === 'Image' && key === 'src') {
-                        def.schemaId = 'mediaReference';
-                    
-                    } else if(type === 'int') {
-                        def.schemaId = 'number';
-                        def.config = {
-                            step: 0
-                        };
-                   
-                    } else if(type === 'float') {
-                        def.schemaId = 'number';
-                        def.config = {
-                            step: false
-                        };
-                    
-                    } else if(type === 'bool') {
-                        def.schemaId = 'boolean';
-                    
-                    } else if(type === 'text') {
-                        def.schemaId = 'string';
-                        def.config = {
-                            isMultiLine: true
-                        };
-                    
-                    } else if(type === 'html') {
-                        def.schemaId = 'richText';
-
-                    } else {
-                        def.schemaId = getId(type);
-
-                    }
-                
-                } else if(typeof type === 'object') {
-                    def.schemaId = 'struct';
-                    def.config = {
-                        struct: getFields(type, i18n[key] || {})
-                    };
-                
-                }
-
-                fields[key] = def;
-            }
-
-            return fields;
-        }
-
-        await HashBrown.Entity.Resource.FieldSchema.create(user, project, environment, {
-            id: getId(json['@type']),
-            name: json['@i18n'][language]['@name'],
-            parentId: json['@parent'] ? getId(json['@parent']) : 'struct',
-            editorId: 'StructEditor',
-            config: {
-                label: json['@label'] || '',
-                struct: getFields(json, json['@i18n'][language])
-            }
-        });
     }
 }
 

@@ -6,7 +6,7 @@
         "content": "Content"
     },
     "defaultTabId": "content",
-    "fields": {
+    "config": {
         "publishOn": {
             "label": "Publish on",
             "schemaId": "date"
@@ -22,12 +22,10 @@
                 "allowedSchemas": "fromParent"
             }
         },
-        "properties": {
-            "title": {
-                "label": "Title",
-                "schemaId": "string",
-                "tabId": "content"
-            }
+        "title": {
+            "label": "Title",
+            "schemaId": "string",
+            "tabId": "content"
         }
     }
 }

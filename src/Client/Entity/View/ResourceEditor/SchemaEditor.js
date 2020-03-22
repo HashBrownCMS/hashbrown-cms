@@ -71,10 +71,10 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 this.state.tabOptions[this.model.tabs[tabId]] = tabId;
             }
 
-            if(!this.model.fields || !this.model.fields.properties) { return; }
+            if(!this.model.config) { return; }
 
-            for(let key in this.model.fields.properties) {
-                let definition = this.model.fields.properties[key];
+            for(let key in this.model.config) {
+                let definition = this.model.config[key];
 
                 if(!definition.tabId) { definition.tabId = 'content'; }
 
@@ -145,15 +145,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * @param {String} key
      */
     onClickEditField(key) {
-        if(!this.model.fields) { this.model.fields = {}; }
-        if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { tabId: this.state.tab, schemaId: 'string' }; }
+        if(!this.model.config) { this.model.config = {}; }
+        if(!this.model.config[key]) { this.model.config[key] = { tabId: this.state.tab, schemaId: 'string' }; }
 
         let modal = HashBrown.Entity.View.Modal.EditField.new({
             model: {
                 tabOptions: this.state.tabOptions,
                 key: key,
-                definition: this.model.fields.properties[key]
+                definition: this.model.config[key]
             }
         });
         
@@ -193,19 +192,19 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Change field key
      */
     onChangeFieldKey(oldKey, newKey) {
-        let keys = Object.keys(this.model.fields.properties);
+        let keys = Object.keys(this.model.config);
 
         let newFields = {};
 
         for(let key of keys) {
-            let value = this.model.fields.properties[key];
+            let value = this.model.config[key];
 
             if(key === oldKey) { key = newKey; }
 
             newFields[key] = value;
         }
 
-        this.model.fields.properties = newFields;
+        this.model.config = newFields;
 
         this.onChange();
     }
@@ -214,11 +213,10 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Change field definition
      */
     onChangeFieldDefinition(key, newValue) {
-        if(!this.model.fields) { this.model.fields = {}; }
-        if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { schemaId: 'string' }; }
+        if(!this.model.config) { this.model.config = {}; }
+        if(!this.model.config[key]) { this.model.config[key] = { schemaId: 'string' }; }
        
-        this.model.fields.properties[key] = newValue;
+        this.model.config[key] = newValue;
 
         this.onChange();
     }
@@ -231,14 +229,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
         // Add fields from list widget
         for(let key in fields) {
-            let definition = this.model.fields.properties[key];
+            let definition = this.model.config[key];
 
             newFields[key] = definition || { tabId: this.state.tab, label: fields[key] };
         }
         
         // Add back remaining fields not in the current view
-        for(let key in this.model.fields.properties) {
-            let definition = this.model.fields.properties[key];
+        for(let key in this.model.config) {
+            let definition = this.model.config[key];
 
             if(definition.tabId === this.state.tab) { continue; }
 
@@ -247,7 +245,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         
         let isNewField = Object.keys(fields).length > Object.keys(this.state.properties).length;
 
-        this.model.fields.properties = newFields;
+        this.model.config = newFields;
         
         if(isNewField) {
             this.onClickEditField(Object.keys(fields).pop());
@@ -325,33 +323,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(this.state.id !== this.model.id) {
             location.hash = `/schemas/${this.model.id}`;
         }
-    }
-
-    /**
-     * Event: Click import
-     */
-    onClickImport() {
-        let modal = UI.prompt(
-            'Import schemas',
-            'URL to uischema.org definitions',
-            'text',
-            'https://uischema.org/schemas.json',
-            async (url) => {
-                if(!url) { UI.notify('Missing URL', 'Please specify a URL'); }
-
-                try {
-                    await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
-
-                    HashBrown.Service.EventService.trigger('resource'); 
-
-                    UI.notifySmall('Schemas imported successfully from ' + url, null, 3);
-
-                } catch(e) {
-                    UI.error(e);
-
-                }
-            }
-        );
     }
 }
 

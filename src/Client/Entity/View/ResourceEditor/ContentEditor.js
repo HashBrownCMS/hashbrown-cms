@@ -49,26 +49,25 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         // Construct fields
         this.state.fields = {};
 
-        let contentFields = {};
+        let contentFields = this.model.getObject();
         let schemaFields = {};
+            
+        for(let key in this.state.schema.config) {
+            let definition = this.state.schema.config[key];
+
+            if(
+                (this.state.tab === 'meta' && definition.tabId && definition.tabId !== 'meta') ||
+                (this.state.tab !== 'meta' && this.state.tab !== definition.tabId)
+            ) { continue; }
+            
+            schemaFields[key] = this.state.schema.config[key];
+        }
 
         if(this.state.tab === 'meta') {
-            schemaFields = JSON.parse(JSON.stringify(this.state.schema.fields));
-            delete schemaFields['properties'];
-            
-            contentFields = JSON.parse(JSON.stringify(this.model));
-            delete contentFields['properties'];
-        
+            delete contentFields.properties;
+
         } else {
-            for(let key in this.state.schema.fields.properties) {
-                let definition = this.state.schema.fields.properties[key];
-
-                if(definition.tabId !== this.state.tab) { continue; }
-            
-                schemaFields[key] = this.state.schema.fields.properties[key];
-            }
-
-            contentFields = this.model.properties;
+            contentFields = contentFields.properties;
 
         }
 
