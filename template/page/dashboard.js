@@ -27,18 +27,19 @@ module.exports = (_, model) => `
             <div class="page--dashboard__body__container">
                 ${model.tab === 'projects' ? `
                     <div class="page--dashboard__projects">
-                        <div class="page--dashboard__projects__list"></div>
-
-                        ${model.user.isAdmin ? `
-                            <button class="page--dashboard__projects__add widget widget--button round fa fa-plus" title="Create project"></button>
-                        ` : ''}
+                        <div class="page--dashboard__projects__list">
+                        
+                            ${model.user.isAdmin ? `
+                                <button class="page--dashboard__projects__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>Add project</button>
+                            ` : ''}
+                        </div>
                     </div>
 
                 ` : model.user.isAdmin && model.tab === 'users' ? `
                     <div class="page--dashboard__users">
-                        <div class="page--dashboard__users__list"></div>
-
-                        <button class="page--dashboard__users__add widget widget--button round fa fa-plus" title="Add user"></button>
+                        <div class="page--dashboard__users__list">
+                            <button class="page--dashboard__users__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>Add user</button>
+                        </div>
                     </div>
 
                 ` : model.user.isAdmin && model.tab === 'server' ? `

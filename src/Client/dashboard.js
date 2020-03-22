@@ -26,6 +26,10 @@ async function initProjects() {
 
             document.querySelector('.page--dashboard__projects__list').appendChild(projectEditor.element);
         }
+
+        if(projectAddButton) {
+            projectList.appendChild(projectAddButton);
+        }
     }
 }
 
@@ -56,6 +60,10 @@ async function initUsers() {
                     modelId: user.id
                 }).element
             );
+        }
+
+        if(userAddButton) {
+            userList.appendChild(userAddButton);
         }
     }
 }

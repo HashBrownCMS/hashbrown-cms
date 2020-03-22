@@ -37,7 +37,7 @@ class DeleteProject extends HashBrown.Entity.View.Modal.ModalBase {
      */
     onInputName(projectName) {
         let btn = this.element.querySelector('.modal__footer .widget--button');
-        let isMatch = projectName == this.model.settings.info.name;
+        let isMatch = projectName == this.model.getName();
 
         btn.classList.toggle('disabled', !isMatch);
     }

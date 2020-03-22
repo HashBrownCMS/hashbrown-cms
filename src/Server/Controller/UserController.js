@@ -192,20 +192,17 @@ class UserController extends HashBrown.Controller.ControllerBase {
             return new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the command line.', 403);
         }
 
-        let user = await HashBrown.Entity.User.create(username, password, { isAdmin: true });
+        let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
         let token = await HashBrown.Entity.User.login(username, password);
        
         return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
     }
     
     /**
-     * @example /api/users/new?username=XXX&password=XXX { username: XXX, password: XXX }
+     * @example /api/users/new { username: XXX, password: XXX }
      */
     static async new(request, params, body, query, user) {
-        let username = body.username || query.username;
-        let password = body.password || query.password;
-
-        let newUser = await HashBrown.Entity.User.create(username, password);
+        let newUser = await HashBrown.Entity.User.create(body);
 
         return new HttpResponse(newUser);
     }

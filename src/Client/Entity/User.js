@@ -7,6 +7,25 @@
  */
 class User extends require('Common/Entity/User') {
     /**
+     * Creates a user
+     *
+     * @param {Object} options
+     *
+     * @return {HashBrown.Entity.User} User
+     */
+    static async create(options = {}) {
+        checkParam(options, 'options', Object, true);
+        checkParam(options.username, 'options.username', String, true);
+        checkParam(options.password, 'options.password', String, true);
+
+        let user = await HashBrown.Service.RequestService.customRequest('post', '/api/users/new', options);
+
+        user = this.new(user);
+
+        return user;
+    }
+    
+    /**
      * Gets whether this user is the current one
      *
      * @return {Boolean} Is current

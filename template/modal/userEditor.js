@@ -52,7 +52,7 @@ _.div({class: 'modal in'},
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},
                             _.checkbox({value: model.hasScope(project.id), onchange: (isEnabled) => _.onChangeProjectScope(project.id, isEnabled)}),
-                            _.div({class: 'widget widget--label'}, project.settings.info.name),
+                            _.div({class: 'widget widget--label'}, project.getName()),
                             _.popup({
                                 value: model.getScopes(project.id),
                                 multiple: true,

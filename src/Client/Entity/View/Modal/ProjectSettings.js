@@ -19,7 +19,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Change name
      */
     onChangeName(projectName) {
-        this.model.settings.info.name = projectName;
+        this.model.settings.name = projectName;
     }
 
     /**

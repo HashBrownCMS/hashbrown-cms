@@ -23,9 +23,7 @@ module.exports = (_, view) => `
                 project: {
                     id: 'demo',
                     settings: {
-                        info: {
-                            name:'Demo'
-                        },
+                        name:'Demo',
                         languages: ['en'],
                         sync: {}
                     }

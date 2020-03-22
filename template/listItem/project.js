@@ -8,7 +8,7 @@ _.div({class: 'list-item--project'},
             _.popup({
                 icon: 'ellipsis-v',
                 role: 'item-menu',
-                tooltip: `Options for ${model.settings.info.name || model.id}`,
+                tooltip: `Options for ${model.getName()}`,
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
@@ -18,7 +18,7 @@ _.div({class: 'list-item--project'},
             })
         ),
         _.div({class: 'list-item--project__info'},
-            _.h3({class: 'list-item--project__info__name'}, model.settings.info.name || model.id),
+            _.h3({class: 'list-item--project__info__name'}, model.getName()),
             _.p(model.users.length + ' user' + (model.users.length != 1 ? 's' : '')),
             _.p(model.settings.languages.length + ' language' + (model.settings.languages.length != 1 ? 's' : '') + ' (' + model.settings.languages.join(', ') + ')')
         ),

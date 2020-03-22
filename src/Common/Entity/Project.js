@@ -12,8 +12,8 @@ class Project extends HashBrown.Entity.EntityBase {
      * @return {String} Name
      */
     getName() {
-        if(this.settings && this.settings.info && this.settings.info.name) {
-            return this.settings.info.name;
+        if(this.settings && this.settings.name) {
+            return this.settings.name;
         }
 
         return this.id;
@@ -32,26 +32,12 @@ class Project extends HashBrown.Entity.EntityBase {
         if(!params.id) { throw new Error('No id was provided for the Project constructor'); }
 
         if(!params.settings) { params.settings = {}; }
-        if(!params.settings.info) { params.settings.info = {}; }
-        if(!params.settings.info.name) { params.settings.info.name = params.id; }
-        if(!params.settings.languages) { params.settings.languages = [ 'en' ]; }
         if(!params.settings.sync) { params.settings.sync = {}; }
+        if(!params.settings.languages || params.settings.languages.length < 1) { params.settings.languages = [ 'en' ]; }
 
-        // Delete old values
-        delete params.useAutoBackup;
-        delete params.backupStorage;
-
-        // Restore from old languages structure
-        if(!Array.isArray(params.settings.languages)) {
-            let languages = [];
-            
-            for(let key in params.settings.languages) {
-                if(key === 'section') { continue; }
-
-                languages.push(params.settings.languages[key]);
-            }
-
-            params.settings.languages = languages;
+        if(params.settings.info && params.settings.info.name) {
+            params.settings.name = params.settings.info.name;
+            delete params.settings.info;
         }
 
         super.adopt(params);

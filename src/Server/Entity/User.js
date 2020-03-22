@@ -269,34 +269,29 @@ class User extends require('Common/Entity/User') {
     /**
      * Creates a new user object
      *
-     * @param {String} username
-     * @param {String} password
-     * @param {Object} data
+     * @param {Object} options
      *
-     * @returns {HashBrown.Entity.User} user
+     * @returns {HashBrown.Entity.User} User
      */
-    static async create(username, password, data = {}) {
-        checkParam(username, 'username', String, true);
-        checkParam(password, 'password', String, true);
-        checkParam(data, 'data', Object, true);
+    static async create(options = {}) {
+        checkParam(options, 'options', Object, true);
+        checkParam(options.username, 'options.username', String, true);
+        checkParam(options.password, 'options.password', String, true);
      
-        if(username.length < 2) {
+        if(options.username.length < 2) {
             throw new Error('The username must be at least 2 characters long');
         }
 
-        let existingUser = await this.getByUsername(username);
+        let existingUser = await this.getByUsername(options.username);
 
         if(existingUser) {
-            throw new Error(`User with username "${username}" already exists`);
+            throw new Error(`User with username "${options.username}" already exists`);
         }
     
-        data.username = username;
-        data.password = password;
-
-        let user = this.new(data);
+        let user = this.new(options);
       
         user.id = this.createId();
-        user.setPassword(password);
+        user.setPassword(options.password);
 
         await HashBrown.Service.DatabaseService.insertOne('users', 'users', user.getObject());
 

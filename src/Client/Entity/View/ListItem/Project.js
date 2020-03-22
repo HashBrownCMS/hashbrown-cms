@@ -28,8 +28,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Service.RequestService.request('get', 'projects/' + this.modelId);
-        this.model = HashBrown.Entity.Project.new(this.model);
+        this.model = await HashBrown.Entity.Project.get(this.modelId);
     }
         
     /**
@@ -55,7 +54,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         let modal = HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: `Remove environment "${environmentName}"`,
-                message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.settings.info.name || this.model.id}"?`
+                message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.getName()}"?`
             }
         })
         .on('ok', async () => {

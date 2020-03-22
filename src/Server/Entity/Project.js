@@ -61,6 +61,7 @@ class Project extends require('Common/Entity/Project') {
 
         project.settings = await project.getSettings();
         project.environments = await project.getEnvironments();
+        project.users = await project.getUsers();
 
         return project;
     }
@@ -75,18 +76,16 @@ class Project extends require('Common/Entity/Project') {
     static async create(name) {
         checkParam(name, 'name', String, true);
 
-        let data = {
-            id: this.createId(),
-            settings: {
-                info: {
-                    name: name
-                }
-            }
-        };
+        let id = this.createId();
+        let settings = { name: name };
 
-        await HashBrown.Service.DatabaseService.insertOne(project.id, 'settings', data);
+        await HashBrown.Service.DatabaseService.insertOne(
+            id,
+            'settings',
+            settings
+        );
 
-        return project;
+        return this.new({ id: id, settings: settings });
     }
 
     /**

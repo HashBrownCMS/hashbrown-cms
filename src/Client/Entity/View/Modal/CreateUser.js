@@ -55,7 +55,7 @@ class CreateUser extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickCreate() {
         try {
-            await HashBrown.Entity.User.create(this.model.username, this.model.password);
+            await HashBrown.Entity.User.create(this.model);
 
             this.setState('success');
             

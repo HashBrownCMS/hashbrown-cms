@@ -35,66 +35,62 @@ class User extends HashBrown.Entity.EntityBase {
     /**
      * Gets all project scopes
      *
-     * @param {String} project
+     * @param {String} projectId
      *
-     * @returns {Array} scopes
+     * @returns {Array} Scopes
      */
-    getScopes(project) {
-        checkParam(project, 'project', String, true);
+    getScopes(projectId) {
+        checkParam(projectId, 'projectId', String, true);
 
         if(!this.scopes) { 
             this.scopes = {};
         }
 
-        if(!this.scopes[project]) {
-            this.scopes[project] = [];
-        }
-
-        return this.scopes[project];
+        return this.scopes[projectId];
     }
     
     /**
      * Sets all project scopes
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {Array} scopes
      */
-    setScopes(project, scopes) {
-        checkParam(project, 'project', String, true);
+    setScopes(projectId, scopes) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(scopes, 'scopes', Array, true);
 
         if(!this.scopes) {
             this.scopes = {};
         }
 
-        this.scopes[project] = scopes;
+        this.scopes[projectId] = scopes;
     }
     
 
     /**
      * Checks if a user has a project scope
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} scope
      *
      * @returns {Boolean} Has scope
      */
-    hasScope(project, scope = '') {
-        checkParam(project, 'project', String, true);
+    hasScope(projectId, scope = '') {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(scope, 'scope', String);
         
         if(this.isAdmin) { return true; }
 
-        if(!project) { return false; }
-        if(!scope && !this.scopes[project]) { return false; }
+        if(!projectId) { return false; }
+        if(!this.scopes[projectId]) { return false; }
 
-        if(!Array.isArray(this.scopes[project])) {
-            this.scopes[project] = [];
+        if(!Array.isArray(this.scopes[projectId])) {
+            this.scopes[projectId] = [];
         }
 
         if(!scope || scope === 'content' || scope === 'media') { return true; }
 
-        return this.scopes[project].indexOf(scope) > -1;
+        return this.scopes[projectId].indexOf(scope) > -1;
     }
 
     /**

@@ -14,12 +14,22 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
 
         this.template = require('template/modal/userEditor');
     }
+    
+    /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+        
+        this.def(String, 'modelId');
+    }
 
     /**
      * Fetches the model
      */
     async fetch() {
-        this.state.projects = await HashBrown.Service.RequestService.customRequest('get', '/api/projects');
+        this.model = await HashBrown.Entity.User.get(this.modelId);
+        this.state.projects = await HashBrown.Entity.Project.list();
     }
    
     /**
@@ -99,10 +109,12 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
             
             this.close();
 
-            let link = document.getElementById('theme');
+            if(this.model.isCurrent) {
+                let link = document.getElementById('theme');
 
-            if(link) {
-                link.setAttribute('href', '/css/theme.css?t=' + Date.now());
+                if(link) {
+                    link.setAttribute('href', '/css/theme.css?t=' + Date.now());
+                }
             }
 
             this.trigger('change', this.model);

@@ -38,7 +38,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
         if(!HashBrown.Context.user.isAdmin && this.model.id !== HashBrown.Context.user.id) { return }
         
         HashBrown.Entity.View.Modal.UserEditor.new({
-            model: this.model.clone()
+            modelId: this.model.id
         })
         .on('change', () => { this.update(); });
     }

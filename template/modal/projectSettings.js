@@ -5,13 +5,13 @@ module.exports = (_, model) =>
 _.div({class: 'modal'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Settings for ${model.settings.info.name}`),
+            _.h4({class: 'modal__title'}, `Settings for ${model.getName()}`),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Name'),
-                _.input({class: 'widget widget--text', type: 'text', value: model.settings.info.name, onchange: (e) => _.onChangeName(e.target.value)})
+                _.input({class: 'widget widget--text', type: 'text', value: model.getName(), onchange: (e) => _.onChangeName(e.target.value)})
             ),
             _.div({class: 'widget-group'},
                 _.label({class: 'widget widget--label small'}, 'Languages'),

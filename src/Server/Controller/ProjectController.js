@@ -23,6 +23,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             },
             '/api/projects/new': {
                 handler: this.new,
+                methods: [ 'POST' ],
                 user: {
                     isAdmin: true
                 }
@@ -201,7 +202,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     /**
      * @example POST /api/projects/new?name=XXX { name: XXX }
      */
-    static async newProject(request, params, body, query, user) {
+    static async new(request, params, body, query, user) {
         let project = await HashBrown.Entity.Project.create(query.name || body.name);
 
         return new HttpResponse(project);

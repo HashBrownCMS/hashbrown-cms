@@ -37,7 +37,7 @@ class Project extends require('Common/Entity/Project') {
     }
     
     /**
-     * Creates a projects
+     * Creates a project
      *
      * @param {String} name
      *
