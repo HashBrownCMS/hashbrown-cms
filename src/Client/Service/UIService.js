@@ -18,7 +18,9 @@ class UIService {
      */
     static highlight(element, label, direction = 'right', buttonLabel) {
         if(element === false) {
-            $('.widget--highlight').remove();
+            for(let el of Array.from(document.querySelectorAll('.widget--highlight') || [])) {
+                el.parentElement.removeChild(el);   
+            }
 
             return;
         }
