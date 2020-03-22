@@ -26,6 +26,13 @@ class User extends require('Common/Entity/User') {
     }
     
     /**
+     * Removes this user
+     */
+    async remove() {
+        await HashBrown.Service.RequestService.customRequest('delete', '/api/users/' + this.id);
+    }
+    
+    /**
      * Gets whether this user is the current one
      *
      * @return {Boolean} Is current

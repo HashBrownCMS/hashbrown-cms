@@ -54,7 +54,7 @@ class Project extends require('Common/Entity/Project') {
     }
     
     /**
-     * Removes this projects
+     * Removes this project
      */
     async remove() {
         await HashBrown.Service.RequestService.customRequest('delete', '/api/projects/' + this.id);
