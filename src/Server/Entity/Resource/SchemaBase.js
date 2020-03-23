@@ -70,6 +70,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             let schemaPath = corePaths[0] || pluginPaths[0];
        
             if(schemaPath) {
+                let stats = await HashBrown.Service.FileService.stat(schemaPath);
                 let data = await HashBrown.Service.FileService.read(schemaPath);
                 data = JSON.parse(data);
 
@@ -78,6 +79,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.id = id;
                 data.type = parentDirName.toLowerCase();
                 data.isLocked = true;
+                data.updatedOn = stats.mtime;
 
                 resource = this.new(data);
             }

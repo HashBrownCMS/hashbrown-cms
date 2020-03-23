@@ -59,9 +59,14 @@ class Project extends require('Common/Entity/Project') {
             id: id
         });
 
-        project.settings = await project.getSettings();
-        project.environments = await project.getEnvironments();
-        project.users = await project.getUsers();
+        let data = {
+            id: project.id,
+            settings: await project.getSettings(),
+            environments: await project.getEnvironments(),
+            users: await project.getUsers()
+        };
+
+        project.adopt(data);
 
         return project;
     }

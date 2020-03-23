@@ -68,6 +68,10 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
             params.id = params['@type'];
             params.name = i18n['@name'];
             params.parentId = params['@parent'] || 'contentBase';
+            
+            for(let key in params['@config'] || {}) {
+                params[key] = params['@config'][key];
+            }
 
             let config = {};
             
@@ -77,7 +81,7 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
                     typeof this[key] !== 'undefined'
                 ) { continue; }
 
-                config[key] = this.constructor.getFieldFromUISchema(params[key], i18n[key]);
+                config[key] = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
             }
 
             params.config = config;

@@ -49,26 +49,51 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         // Construct fields
         this.state.fields = {};
 
-        let contentFields = this.model.getObject();
+        let contentFields = {};
         let schemaFields = {};
-            
-        for(let key in this.state.schema.config) {
-            let definition = this.state.schema.config[key];
-
-            if(
-                (this.state.tab === 'meta' && definition.tabId && definition.tabId !== 'meta') ||
-                (this.state.tab !== 'meta' && this.state.tab !== definition.tabId)
-            ) { continue; }
-            
-            schemaFields[key] = this.state.schema.config[key];
-        }
-
+        
         if(this.state.tab === 'meta') {
-            delete contentFields.properties;
+            contentFields = {
+                publishOn: this.model.publishOn,
+                unpublishOn: this.model.unpublishOn,
+                schemaId: this.model.schemaId
+            };
+
+            schemaFields = {
+                publishOn: {
+                    label: 'Publish on',
+                    schemaId: 'date',
+                    tabId: 'meta'
+                },
+                unpublishOn: {
+                    label: 'Unpublish on',
+                    schemaId: 'date',
+                    tabId: 'meta'
+                },
+                schemaId: {
+                    label: 'Schema',
+                    schemaId: 'contentSchemaReference',
+                    tabId: 'meta',
+                    config: {
+                        allowedSchemas: 'fromParent'
+                    }
+                }
+            };
 
         } else {
-            contentFields = contentFields.properties;
+            contentFields = this.model.getObject().properties || {};
 
+            for(let key in this.state.schema.config) {
+                let definition = this.state.schema.config[key];
+              
+                if(!definition.tabId || definition.tabId === 'meta') {
+                    definition.tabId = 'content';
+                }
+
+                if(this.state.tab !== definition.tabId) { continue; }
+
+                schemaFields[key] = this.state.schema.config[key];
+            }
         }
 
         // Instiantiate field views

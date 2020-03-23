@@ -57,6 +57,10 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
             params.name = i18n['@name'];
             params.parentId = params['@parent'] || 'struct';
 
+            for(let key in params['@config'] || {}) {
+                params[key] = params['@config'][key];
+            }
+
             let config = {
                 label: params['@label'],
                 struct: {}
@@ -68,7 +72,7 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
                     typeof this[key] !== 'undefined'
                 ) { continue; }
 
-                config.struct[key] = this.constructor.getFieldFromUISchema(params[key], i18n[key]);
+                config.struct[key] = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
             }
 
             params.config = config;

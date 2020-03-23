@@ -159,7 +159,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'GET':
-                return new HttpResponse(resource);
+                return new HttpResponse(resource, 200, { 'Last-Modified': (resource.updatedOn || new Date()).toString() });
                 
             case 'POST':
                 if(!user.hasScope(this.category)) {

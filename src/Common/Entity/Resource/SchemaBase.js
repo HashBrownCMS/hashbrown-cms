@@ -187,12 +187,13 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     /**
      * Transforms a uischema.org definition to the HashBrown standard
      *
+     * @param {String} key
      * @param {*} definition
      * @param {Object} i18n
      *
      * @return {Object} Definition
      */
-    static getFieldFromUISchema(definition, i18n) {
+    static getFieldFromUISchema(key, definition, i18n) {
         // First a sanity check
         if(!definition) { return null; }
 
@@ -212,7 +213,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
             };
         
         } else if(definition.constructor === Object && !definition['@type']) {
-            definition['@type'] = 'Intangible';
+            definition['@type'] = 'StructuredValue';
         
         }
 
@@ -223,7 +224,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         switch(definition['@type']) {
             case 'ItemList':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'array',
                     config: {
                         allowedSchemas: definition['@options']
@@ -232,11 +233,11 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'Number': 
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'number'
                 };
 
-            case 'Intangible':
+            case 'StructuredValue':
                 let struct = {};
 
                 for(let key in definition) {
@@ -246,7 +247,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
                 }
 
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'struct',
                     config: {
                         struct: struct
@@ -255,19 +256,19 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'Boolean':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'boolean'
                 };
 
             case 'Article': case 'WebPage':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'contentReference'
                 };
 
             case 'AudioObject':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'mediaReference',
                     config: {
                         allowedTypes: [ 'audio/*' ]
@@ -276,7 +277,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
             
             case 'VideoObject':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'mediaReference',
                     config: {
                         allowedTypes: [ 'video/*' ]
@@ -285,7 +286,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'DataDownload':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'mediaReference',
                     config: {
                         allowedTypes: [ 'application/*' ]
@@ -294,7 +295,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'ImageObject':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'mediaReference',
                     config: {
                         allowedTypes: [ 'image/*' ]
@@ -303,25 +304,25 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'MediaObject':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'mediaReference'
                 };
 
             case 'Text':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'string'
                 };
 
             case 'URL':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'url'
                 };
 
             case 'MultiLineText':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'string',
                     config: {
                         isMultiLine: true
@@ -330,13 +331,13 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'RichText':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'richText'
                 };
 
             case 'Enumeration':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'dropdown',
                     config: {
                         options: i18n['@options'] || {}
@@ -345,7 +346,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'Date':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'date',
                     config: {
                         isDateOnly: true
@@ -354,13 +355,13 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
             case 'DateTime':
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: 'date'
                 };
 
             default:
                 return {
-                    label: i18n['@name'],
+                    label: i18n['@name'] || key,
                     schemaId: definition['@type']
                 };
         }

@@ -210,7 +210,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         }
         
         let themes = await HashBrown.Service.AppService.getThemes();
-        
+       
         return this.render('environment', {
             title: project.getName(),
             currentProject: project.getObject(),

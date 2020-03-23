@@ -43,7 +43,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         let publicFilePath = Path.join(APP_ROOT, 'public', requestPath);
         let publicFileExists = HashBrown.Service.FileService.exists(publicFilePath);
 
-        return publicFileExists || !!this.getRoute(request);
+        return publicFileExists || super.canHandle(request);
     }
 
     /**

@@ -7,21 +7,6 @@
     },
     "defaultTabId": "content",
     "config": {
-        "publishOn": {
-            "label": "Publish on",
-            "schemaId": "date"
-        },
-        "unpublishOn": {
-            "label": "Unpublish on",
-            "schemaId": "date"
-        },
-        "schemaId": {
-            "label": "Schema",
-            "schemaId": "contentSchemaReference",
-            "config": {
-                "allowedSchemas": "fromParent"
-            }
-        },
         "title": {
             "label": "Title",
             "schemaId": "string",
