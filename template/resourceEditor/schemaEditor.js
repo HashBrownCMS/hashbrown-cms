@@ -14,7 +14,6 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
             _.p('Click any item in the panel to edit it.'),
             _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
             _.div({class: 'widget-group'},
-                _.button({class: 'widget widget--button', onclick: _.onClickImport, title: 'Import schemas'}, 'Import'),
                 _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
             )
         )

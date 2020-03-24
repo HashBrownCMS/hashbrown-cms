@@ -198,18 +198,15 @@ class Project extends require('Common/Entity/Project') {
         checkParam(section, 'section', String);
         
         let settings = null;
+        let sync = (await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {}) || {}).sync;
 
         // Attempt remote fetch of project settings
-        if(section !== 'sync') {
-            let sync = await this.getSyncSettings();
-            
-            if(sync) { 
-                settings = await HashBrown.Service.RequestService.request(
-                    'get',
-                    sync.url + '/api/projects/' + this.id + '/settings',
-                    { token: sync.token }
-                );
-            }
+        if(sync && sync.enabled && section !== 'sync') {
+            settings = await HashBrown.Service.RequestService.request(
+                'get',
+                sync.url + '/api/projects/' + this.id + '/settings',
+                { token: sync.token }
+            );
         }
 
         if(!settings) {
@@ -224,6 +221,34 @@ class Project extends require('Common/Entity/Project') {
             return settings[section];
         }
 
+        // Reconstruct environment list from old structure
+        if(!settings.environments || settings.environments.constructor !== Object || Object.keys(settings.environments).length < 1) {
+            settings.environments = {};
+            
+            let allSettings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
+
+            for(let entry of allSettings) {
+                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
+    
+                let name = entry.usedBy;
+
+                delete entry.usedBy;
+
+                settings.environments[name] = entry;
+            }
+            
+            if(Object.keys(settings.environments).length < 1) {
+                settings.environments = { live: {} };
+            }
+        
+            if(!sync || !sync.enabled) {
+                await HashBrown.Service.DatabaseService.remove(this.id, 'settings', {});
+                
+                await HashBrown.Service.DatabaseService.insertOne(this.id, 'settings', settings);
+            }
+        }
+
+        // Remove old "usedBy" field
         delete settings.usedBy;
 
         return settings;
@@ -383,29 +408,6 @@ class Project extends require('Common/Entity/Project') {
     async getEnvironments() {
         let environments = await this.getSettings('environments');
         
-        // Reconstruct environment list from old structure
-        if(!environments || environments.constructor !== Object || Object.keys(environments).length < 1) {
-            environments = {};
-
-            let settings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
-                
-            for(let entry of settings) {
-                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
-    
-                let name = entry.usedBy;
-
-                delete entry.usedBy;
-
-                environments[name] = entry;
-            }
-        
-            await this.setSettings(environments, 'environments');
-        }
-
-        if(Object.keys(environments).length < 1) {
-            environments['live'] = {};
-        }
-
         return Object.keys(environments);
     }
 }
