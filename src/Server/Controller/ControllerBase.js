@@ -383,7 +383,7 @@ class ControllerBase {
                     return {};
                 }
 
-            case 'text/plain':
+            case 'application/x-www-form-urlencoded':
                 return QueryString.parse(body);
 
         }

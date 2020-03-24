@@ -24,7 +24,7 @@ class DeleteProject extends HashBrown.Entity.View.Modal.ModalBase {
 
             this.trigger('change');
 
-            this.setState('success');
+            this.close();
 
         } catch(e) {
             this.setErrorState(e);

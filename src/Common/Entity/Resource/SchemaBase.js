@@ -260,7 +260,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
                     schemaId: 'boolean'
                 };
 
-            case 'Article': case 'WebPage':
+            case 'CreativeWork':
                 return {
                     label: i18n['@name'] || key,
                     schemaId: 'contentReference'

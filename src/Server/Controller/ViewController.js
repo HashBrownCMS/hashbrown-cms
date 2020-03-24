@@ -38,10 +38,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 handler: this.demo
             },
             '/setup': {
-                redirect: '/setup/1'
-            },
-            '/setup/${step}': {
-                handler: this.setup
+                handler: this.setup,
+                methods: [ 'GET', 'POST' ]
             },
             '/dashboard/${tab}': {
                 handler: this.dashboard,
@@ -153,10 +151,29 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         let users = await HashBrown.Entity.User.list();
         
         if(users && users.length > 0) { 
-            return new HttpResponse('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
+            throw new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
         }
 
-        return this.render('setup', { step: params.step || 1 });
+        if(request.method === 'POST') {
+            let username = body.username || query.username;
+            let password = body.password || query.password;
+            
+            let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
+            let token = await HashBrown.Entity.User.login(username, password);
+            
+            return new HttpResponse(
+                'Redirecting to dashboard...',
+                302,
+                {
+                    'Location': '/dashboard',
+                    'Set-Cookie': `token=${token}; path=/;`
+                }
+            );
+
+        } else {
+            return this.render('setup');
+        
+        }
     }
 
     /**

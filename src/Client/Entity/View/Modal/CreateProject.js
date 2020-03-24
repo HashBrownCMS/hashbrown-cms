@@ -37,7 +37,7 @@ class CreateProject extends HashBrown.Entity.View.Modal.ModalBase {
 
             this.trigger('change');
 
-            this.setState('success', { projectName: this.state.projectName });
+            this.close();
 
         } catch(e) {
             this.setErrorState(e);
