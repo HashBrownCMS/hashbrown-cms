@@ -6,7 +6,6 @@
     height: var(--size-widget-medium);
     line-height: var(--size-widget-medium);
     padding: 0 1rem;
-    text-transform: uppercase;
     display: block;
     min-width: 10rem;
     text-align: center;
@@ -14,6 +13,10 @@
     max-width: 20rem;
     position: relative;
 
+    &:not(.nocaps) {
+        text-transform: uppercase;
+    }
+    
     &:not(.fa) {
         font-weight: bold;
     }

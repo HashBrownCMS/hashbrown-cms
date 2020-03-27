@@ -361,19 +361,28 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/{project}/backups/upload
      */
     static async uploadBackup(request, params, body, query, user) {
-        if(!body.file) {
+        if(!body.files || !body.files[0] || !body.files[0].filename || !body.files[0].base64) {
             return new HttpResponse('File was not provided', 400);
         }
         
-        let timestamp = Path.basename(body.filename, Path.extname(body.filename));
+        let file = body.files[0];
+
+        let timestamp = Path.basename(file.filename, Path.extname(file.filename));
 
         if(isNaN(timestamp)) { 
             timestamp = Date.now();
         }
 
-        let path = Path.join(APP_ROOT , 'storage', params.project, 'dump', timestamp + '.hba');
-    
-        await this.uploadFile(request, path);
+        let dirPath = Path.join(APP_ROOT , 'storage', params.project, 'dump');
+        let filePath = Path.join(dirPath, timestamp + '.hba');
+
+        if(!HashBrown.Service.FileService.exists(dirPath)) {
+            await HashBrown.Service.FileService.makeDirectory(dirPath);
+        }
+
+        let fileData = Buffer.from(file.base64, 'base64');
+
+        await HashBrown.Service.FileService.write(fileData, filePath);
         
         return new HttpResponse(timestamp);
     } 

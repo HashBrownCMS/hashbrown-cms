@@ -27,8 +27,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
             return new HttpResponse('Not found', 404);
         }
 
-        media.filename = body.filename || media.filename;
-        media.folder = body.folder || media.folder;
+        media.adopt(body);
         
         let options = {};
 

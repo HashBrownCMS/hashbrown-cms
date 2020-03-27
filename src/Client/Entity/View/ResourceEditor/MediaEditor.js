@@ -49,6 +49,82 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
             }
         });
     }
+    
+    /**
+     * Event: Click move
+     */
+    async onChangeFolder() {
+        let resources = await HashBrown.Entity.Resource.Media.list();
+        
+        let folders = [];
+
+        for(let resource of resources) {
+            folders.push(resource.folder);
+        }
+
+        let modal = HashBrown.Entity.View.Modal.Folders.new({
+            model: {
+                folders: folders,
+                canAdd: true,
+                heading: `Move ${this.model.getName()} to...`
+            }
+        });
+
+        modal.on('picked', async (path) => {
+            this.model.folder = path;
+        
+            this.render();
+        });
+    }
+    
+    /**
+     * Event: Change filename
+     */
+    onChangeFilename(newValue) {
+        this.model.filename = newValue;
+    }
+
+    /**
+     * Event: Change caption
+     */
+    onChangeCaption(newValue) {
+        this.model.caption = newValue;
+    }
+    
+    /**
+     * Event: Change author name
+     */
+    onChangeAuthorName(newValue) {
+        this.model.author.name = newValue;
+    }
+    
+    /**
+     * Event: Change author URL
+     */
+    onChangeAuthorUrl(newValue) {
+        this.model.author.url = newValue;
+    }
+    
+    /**
+     * Event: Change copyright holder name
+     */
+    onChangeCopyrightHolderName(newValue) {
+        this.model.copyrightHolder.name = newValue;
+    }
+    
+    /**
+     * Event: Change copyright holder URL
+     */
+    onChangeCopyrightHolderUrl(newValue) {
+        this.model.copyrightHolder.url = newValue;
+    }
+    
+    /**
+     * Event: Change copyright year
+     */
+    onChangeCopyrightYear(newValue) {
+        this.model.copyrightYear = newValue;
+    }
 }
 
 module.exports = MediaEditor;

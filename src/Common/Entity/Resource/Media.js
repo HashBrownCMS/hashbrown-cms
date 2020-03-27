@@ -19,6 +19,10 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
 
         this.def(String, 'filename');
         this.def(String, 'folder', '/');
+        this.def(String, 'caption');
+        this.def(Object, 'author', {});
+        this.def(Object, 'copyrightHolder', {});
+        this.def(Number, 'copyrightYear');
     }
 
     /**
@@ -69,6 +73,14 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
 
         if(params.name) {
             params.filename = params.name;
+        }
+
+        if(!params.author) {
+            params.author = {};
+        }
+        
+        if(!params.copyrightHolder) {
+            params.copyrightHolder = {};
         }
 
         super.adopt(params);
