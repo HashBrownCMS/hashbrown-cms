@@ -6,13 +6,15 @@
  * @memberof HashBrown.Client.Entity.View.Panel
  */
 class PanelBase extends HashBrown.Entity.View.ViewBase {
-    static get icon() { return 'file'; }
     static get category() { return this.name.replace('Panel', '').toLowerCase(); }
-    static get itemType() { return null; }
+    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
+    static get icon() { return this.itemType ? this.itemType.icon : 'question'; }
+    static get title() { return this.name.replace('Panel', ''); }
 
+    get title() { return this.constructor.title; }
     get icon() { return this.constructor.icon; }
-    get category() { return this.constructor.category; }
     get itemType() { return this.constructor.itemType; }
+    get category() { return this.constructor.category; }
 
     /**
      * Constructor
@@ -33,39 +35,40 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @param {Boolean} useCache
      */
     async update(useCache = true) {
-        if(!useCache) { 
-            await super.update();
-            return;
-        }
-        
-        // Cache scroll position
         let scrollTop = 0;
+        
+        // Cache scroll position and item states
+        if(useCache) { 
+            if(this.namedElements.items) {
+                scrollTop = this.namedElements.items.scrollTop;
+            }
 
-        if(this.namedElements.items) {
-            scrollTop = this.namedElements.items.scrollTop;
+            for(let id in this.state.itemMap || {}) {
+                this.state.itemStates[id] = this.state.itemMap[id].state;
+            }
         }
 
-        // Cache item states
-        for(let id in this.state.itemMap || {}) {
-            this.state.itemStates[id] = this.state.itemMap[id].state;
-        }
-
+        // Fetch models
         await super.update();        
 
-        // Highlight selected item
-        this.highlightItem(HashBrown.Service.NavigationService.getRoute(1));
-      
         // Restore scroll position
-        if(this.namedElements.items) {
-            this.namedElements.items.scrollTop = scrollTop;
+        if(useCache) {
+            if(this.namedElements.items) {
+                this.namedElements.items.scrollTop = scrollTop;
+            }
         }
+        
+        // Highlight selected item
+        let itemId = HashBrown.Service.NavigationService.getRoute(1);
+
+        this.highlightItem(itemId);
     }
 
     /**
      * Fetches the models
      */
     async fetch() {
-        let resources = await HashBrown.Service.ResourceService.getAll(this.itemType, this.category);
+        let resources = this.itemType ? await this.itemType.list() : [];
 
         this.state.itemMap = {};
 
@@ -74,7 +77,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         // Generate items and place them in the queue and map cache
         for(let resource of resources) {
             let model = await this.getItem(resource);
-            let item = new HashBrown.Entity.View.ListItem.PanelItem({
+            let item = HashBrown.Entity.View.ListItem.PanelItem.new({
                 model: model,
                 state: this.state.itemStates[model.id] || {}
             });
@@ -174,7 +177,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         let pageY = e.touches ? e.touches[0].pageY : e.pageY;
         let pageX = e.touches ? e.touches[0].pageX : e.pageX;
         
-        let contextMenu = new HashBrown.Entity.View.Widget.Popup({
+        let contextMenu = HashBrown.Entity.View.Widget.Popup.new({
             model: {
                 target: this.element,
                 options: options,
@@ -209,7 +212,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click new
      */
     async onClickNew() {
-        let resource = await HashBrown.Service.ResourceService.new(this.itemType, this.category);
+        if(!this.itemType) { return; }
+
+        let resource = await this.itemType.create();
         
         location.hash = `/${this.category}/${resource.id}`;
     }
@@ -218,6 +223,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click remove
      */
     onClickRemove(id) {
+        if(!this.itemType) { return; }
+
         UI.confirm(
             'Remove item',
             'Are you sure you want to remove this item?',
@@ -226,11 +233,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
                     this.state.itemMap[id].element.classList.toggle('loading', true);
                 }
 
-                await HashBrown.Service.ResourceService.remove(this.category, id);
-                
-                if(location.hash.indexOf(id) > -1) {
-                    location.hash = `/${this.category}/`;
-                }
+                let resource = await this.itemType.get(id);
+
+                await resource.remove();
             }
         );
     }
@@ -239,14 +244,22 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click pull
      */
     async onClickPull(id) {
-        await HashBrown.Service.ResourceService.pull(this.category, id);
+        if(!this.itemType) { return; }
+
+        let resource = await this.itemType.get(id);
+        
+        await resource.pull();
     }
     
     /**
      * Event: Click push
      */
     async onClickPush(id) {
-        await HashBrown.Service.ResourceService.push(this.category, id);
+        if(!this.itemType) { return; }
+
+        let resource = await this.itemType.get(id);
+        
+        await resource.push();
     }
 
     /**
@@ -320,6 +333,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemBaseOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         let options = {};
 
         options['Copy id'] = () => this.onClickCopyId(resource.id);
@@ -339,9 +354,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemSyncOptions(resource) {
-        let isSyncEnabled = resource.sync && HashBrown.Context.projectSettings.sync.enabled && (!resource.isLocked || resource.sync.isRemote);
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
 
-        if(!isSyncEnabled) { return {}; }
+        if(!resource.isSyncEnabled()) { return {}; }
 
         let options = {};
 
@@ -366,6 +381,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {Object} Options
      */
     getItemOptions(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         let options = {};
 
         let baseOptions = this.getItemBaseOptions(resource);
@@ -431,12 +448,17 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * @return {HashBrown.Entity.View.ListItem.PanelItem} Item
      */
     async getItem(resource) {
+        checkParam(resource, 'resource', HashBrown.Entity.Resource.ResourceBase, true);
+        
         return {
             id: resource.id,
             category: this.category,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
-            name: resource.id,
+            changed: resource.updatedOn,
+            created: resource.createdOn,
+            icon: resource.icon,
+            name: resource.getName(),
             children: []
         };
     }

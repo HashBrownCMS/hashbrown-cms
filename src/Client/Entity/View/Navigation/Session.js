@@ -13,15 +13,20 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
         super(params);
 
         this.template = require('template/navigation/session');
-
-        this.state.isDashboard = !HashBrown.Context.projectId;
+    }
+   
+    /**
+     * Fetches the model data
+     */
+    async fetch() {
+        this.state.isDashboard = !HashBrown.Context.project;
         this.state.languageOptions = [];
         
-        if(HashBrown.Context.projectSettings) {
-            this.state.languageOptions = HashBrown.Context.projectSettings.languages;
+        if(HashBrown.Context.project) {
+            this.state.languageOptions = HashBrown.Context.project.settings.languages;
         }
     }
-    
+
     /**
      * Event: Changed language
      *
@@ -40,7 +45,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Event: Clicked user settings
      */
     onClickUserSettings() {
-        new HashBrown.Entity.View.Modal.UserEditor({ model: HashBrown.Context.user });
+        HashBrown.Entity.View.Modal.UserEditor.new({ modelId: HashBrown.Context.user.id });
     }
 
     /**

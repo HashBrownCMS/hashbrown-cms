@@ -54,12 +54,14 @@ base.namespace = function namespace(query) {
  */
 base.checkParam = (value, name, type, notNull = false) => {
     if(value === undefined) {
-        console.trace();
         throw new Error('Parameter "' + name + '" is required');
     }
     
-    if(notNull && (value === null || value === '')) {
-        console.trace();
+    if(notNull && (
+        value === null ||
+        value === '' ||
+        (type === Number && isNaN(value))
+    )) {
         throw new Error('Parameter "' + name + '" cannot be null');
     }
 
@@ -79,8 +81,18 @@ base.checkParam = (value, name, type, notNull = false) => {
 
     }
     
-    console.trace();
-    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + (valueTypeName === 'Object' ? JSON.stringify(value) : value.toString()));
+    if(valueTypeName === 'Object') {
+        value = JSON.stringify(value);
+    
+    } else if(typeof value.toString === 'function') {
+        value = value.toString();
+
+    } else {
+        value = '(' + valueTypeName + ')';
+
+    }
+
+    throw new TypeError('Parameter "' + name + '" is of type "' + valueTypeName + '", should be "' + type.name + '". Value was: ' + value);
 }
 
 /**
@@ -92,4 +104,89 @@ base.waitForSeconds = (seconds) => {
     return new Promise((resolve) => {
         setTimeout(resolve, seconds * 1000);
     });
+}
+    
+/**
+ * Gets the MIME type for a filename
+ *
+ * @param {String} filename
+ *
+ * @return {String} MIME type
+ */
+base.getMIMEType = (filename) => {
+    checkParam(filename, 'filename', String);
+
+    if(!filename) { return ''; }
+    
+    let extension = filename.split('.');
+    
+    if(extension && extension.length > 0) {
+        extension = extension[extension.length - 1];
+    } else {
+        extension = '';
+    }
+
+    extension = extension.split('?')[0];
+
+    switch(extension) {
+        // Client types
+        case 'css':
+            return 'text/css';
+        case 'js':
+            return 'application/javascript';
+            
+        // Image types
+        case 'jpg':
+            return 'image/jpeg';
+        case 'png':
+            return 'image/png';
+        case 'gif':
+            return 'image/gif';
+        case 'bmp':
+            return 'image/bmp';
+        
+        // Audio types
+        case 'm4a':
+            return 'audio/m4a';
+        case 'mp3':
+            return 'audio/mp3';
+        case 'ogg':
+            return 'audio/ogg';
+        case 'wav':
+            return 'audio/wav';
+        
+        // Video types
+        case 'mp4':
+            return 'video/mp4';
+        case 'webm':
+            return 'video/webm';
+        case 'avi':
+            return 'video/avi';
+        case 'mov':
+            return 'video/quicktime';
+        case 'bmp':
+            return 'video/bmp';
+        case 'wmv':
+            return 'video/x-ms-wmv';
+        case '3gp':
+            return 'video/3gpp';
+        case 'mkv':
+            return 'video/x-matroska';
+
+        // Font types
+        case 'woff': case 'woff2': case 'ttf':
+            return `font/${extension}`;
+
+        // SVG
+        case 'svg':
+            return 'image/svg+xml';
+        
+        // PDF
+        case 'pdf':
+            return 'application/pdf';
+
+        // Everything else
+        default:
+            return 'application/octet-stream';
+    }
 }

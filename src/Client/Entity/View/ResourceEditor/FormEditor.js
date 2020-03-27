@@ -5,7 +5,6 @@
  */
 class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'forms'; }
-    static get itemType() { return HashBrown.Entity.Resource.Form; }
     
     /**
      * Constructor
@@ -22,9 +21,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.icon = 'wpforms';
-        this.state.title = this.model.title;
-        this.state.postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.projectId + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
+        this.state.postUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/forms/' + this.model.id + '/submit';
 
         this.state.inputs = {};
 
@@ -45,15 +42,25 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.FormService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('forms/') < 0) {
+            location.hash = '/forms/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/forms/"]', 'This the forms section, where user submitted content lives.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your forms. You can right click here to create a new form.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the form editor, where you edit forms.', 'left', 'next');
     }
 
     /**
      * Event: Click clear entries
      */
     async onClickClearEntries() {
-        UI.confirm('Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', async () => {
+        UI.confirm('Clear "' + this.model.getName() + '"', 'Are you sure you want to clear all entries?', async () => {
             await HashBrown.Service.RequestService.request('post', 'forms/clear/' + this.model.id);
 
             this.model.entries = [];
@@ -68,10 +75,10 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     }
 
     /**
-     * Event: Change title
+     * Event: Change name
      */
-    onChangeTitle(newValue) {
-        this.model.title = newValue;
+    onChangeName(newValue) {
+        this.model.name = newValue;
 
         this.onChange();
     }
@@ -109,7 +116,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     onClickEditInput(key) {
         if(!this.model.inputs) { this.model.inputs = {}; }
 
-        let modal = new HashBrown.Entity.View.Modal.EditFormInput({
+        let modal = HashBrown.Entity.View.Modal.EditFormInput.new({
             model: {
                 key: key,
                 definition: this.model.inputs[key]

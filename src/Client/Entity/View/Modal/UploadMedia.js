@@ -19,7 +19,11 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches dependencies
      */
     async fetch() {
-        await HashBrown.Service.MediaService.checkMediaProvider();
+        let connection = await HashBrown.Entity.Resource.Media.getProvider();
+        
+        if(!connection) {
+            throw new Error('No media provider has been set for this project. Please make sure one of your connections has the "is media provider" setting switched on.');
+        }  
     }
 
     /**
@@ -32,17 +36,7 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
             file.isImage = file.type.indexOf('image') === 0;
             file.isVideo = file.type.indexOf('video') === 0;
 
-            if(!file.isImage && !file.isVideo) { continue; }
-
-            if(file.isImage) {
-                let base64 = await HashBrown.Service.MediaService.convertFileToBase64(file);
-                
-                file.src = 'data:' + file.type + ';base64,' + base64;
-            }
-                    
-            if(file.isVideo) {
-                file.src = window.URL.createObjectURL(file);
-            }
+            file.src = await HashBrown.Entity.Resource.Media.toSourceString(file);
 
             this.state.previews.push(file);
         }
@@ -54,26 +48,20 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Submit
      *
-     * @param {FormData} data
+     * @param {Array} files
      */
-    async onSubmit(data) {
+    async onSubmit(files) {
         this.setLoading(true);
 
         try {
             let apiPath = 'media/' + (this.model.replaceId ? this.model.replaceId : 'new');
-            let ids = await HashBrown.Service.RequestService.upload(apiPath, data);
-
-            if(this.model.folder && this.model.folder !== '/') {
-                for(let id of ids) {
-                    await HashBrown.Service.RequestService.request('post', 'media/tree/' + id, { id: id, folder: this.model.folder });
-                }
-            }
+            let resources = await HashBrown.Service.RequestService.request('post', apiPath, { folder: this.model.folder, files: files });
 
             HashBrown.Service.EventService.trigger('resource');  
 
             this.setLoading(false);
             
-            this.trigger('success', ids);
+            this.trigger('success', resources);
                 
             this.close();
         

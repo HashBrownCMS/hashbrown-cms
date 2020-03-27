@@ -15,9 +15,21 @@ class EntityBase {
      */
     constructor(params) {
         this.structure();
-        params = this.constructor.paramsCheck(params);
 
         Object.seal(this);
+
+        this.adopt(params);
+    }
+
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        if(!params) { return; }
 
         for(let k in params) {
             try {
@@ -25,11 +37,11 @@ class EntityBase {
                     typeof this[k] !== 'undefined' &&
                     typeof params[k] !== 'undefined'
                 ) {
-                    this[k] = params[k]
+                    this[k] = params[k];
                 }
             
             } catch(e) {
-                debug.log(e.message, this, 4);
+                // Values outside the model definition will be silently ignored
             }
         }
     }
@@ -39,17 +51,6 @@ class EntityBase {
      */
     structure() {
 
-    }
-
-    /**
-     * Checks the parameters before they're committed
-     *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
-     */
-    static paramsCheck(params) {
-        return params;
     }
 
     /**
@@ -74,6 +75,22 @@ class EntityBase {
     getObject() {
         return JSON.parse(JSON.stringify(this));
     }
+    
+    /**
+     * Instantiates an entity
+     * This is used in order to be able to customise construction more easily
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.EntityBase} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object)
+
+        params = params || {};
+
+        return new this(params);
+    }
 
     /**
      * Clones this entity
@@ -93,7 +110,7 @@ class EntityBase {
      */
     def(type, name, defaultValue) {
         if(typeof type !== 'function') {
-            throw new TypeError('Parameter \'type\' cannot be of type \'' + (typeof type) + '\'.');
+            throw new TypeError('Parameter \'type\' cannot be of type \'' + type + '\'.');
         }
         
         if(typeof name !== 'string') {

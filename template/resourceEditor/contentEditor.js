@@ -15,8 +15,7 @@ _.div({class: 'resource-editor resource-editor--content-editor'},
             _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
             _.div({class: 'widget-group'},
                 _.button({class: 'widget widget--button', onclick: _.onClickNew, title: 'Create new content'}, 'New content'),
-                _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour'),
-                _.button({class: 'widget widget--button', onclick: _.onClickExampleContent, title: 'Get some example content'}, 'Example')
+                _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
             )
         )
 

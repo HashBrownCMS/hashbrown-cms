@@ -12,10 +12,10 @@ _.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'act
         ), 
         _.div({class: 'list-item--panel-item__properties'},
             _.if(model.isRemote,
-                _.div({class: 'list-item--panel-item__property fa fa-external-link'})
+                _.div({class: 'list-item--panel-item__property fa fa-external-link', title: 'This resource is on a remote server'})
             ),
             _.if(model.isLocked,
-                _.div({class: 'list-item--panel-item__property fa fa-lock'})
+                _.div({class: 'list-item--panel-item__property fa fa-lock', title: 'This resource is locked'})
             ),
             _.if(model.message,
                 _.div({class: 'list-item--panel-item__property fa fa-exclamation-triangle', title: model.message})

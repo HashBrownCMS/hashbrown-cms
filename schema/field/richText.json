@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "RichTextEditor",
-    "icon": "font",
+    "customIcon": "font",
     "name": "Rich Text"
 }

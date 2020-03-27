@@ -8,6 +8,7 @@ const Path = require('path');
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Connection extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'exchange'; }
     static get category() { return 'connections'; }
 
     /**
@@ -16,12 +17,17 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     structure() {
         super.structure();
 
-        this.def(String, 'title');
+        this.def(String, 'name', 'New connection');
         this.def(String, 'url');
-        this.def(Boolean, 'isLocked');
-        
-        // Sync
-        this.def(Object, 'sync');
+    }
+
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.name || this.id;
     }
 
     /**
@@ -50,31 +56,26 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+        
         // Deployer and processor
         if(!params.processor) { params.processor = {}; }
         if(!params.deployer) { params.deployer = {}; }
         if(!params.deployer.paths) { params.deployer.paths = {}; }
         
-        return super.paramsCheck(params);
-    }
+        if(params.title) {
+            params.name = params.title;
+            delete params.title;
+        }
 
-    /**
-     * Creates a new Connection object
-     *
-     * @return {Connection} connection
-     */
-    static create() {
-        return new Connection({
-            id: Connection.createId(),
-            title: 'New connection'
-        });
+        super.adopt(params);
     }
 
     /**

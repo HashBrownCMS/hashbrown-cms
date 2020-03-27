@@ -9,6 +9,12 @@ module.exports = (_, view) => `
     </head>
 
     <body class="page page--login logo centered">
+        ${view.message ? `
+            <div class="widget widget--message fixed fixed--top warn">
+                ${view.message}
+            </div>
+        ` : ''}
+        
         <form class="page--login__login">
             <input class="widget widget--text large" name="username" type="text" placeholder="Username">
             <input class="widget widget--text large" name="password" type="password" placeholder="Password">

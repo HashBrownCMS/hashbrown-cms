@@ -10,7 +10,7 @@ _.div({class: 'navigation navigation--resource-browser'},
             </svg>`)
         ),
         _.each(state.panels, (name, panel) =>
-            _.a({title: panel.name, href: `#/${panel.category}/`, class: `navigation--resource-browser__tab fa fa-${panel.icon} ${state.panel instanceof panel ? 'active' : ''}`})
+            _.a({title: panel.title, href: `#/${panel.category}/`, class: `navigation--resource-browser__tab fa fa-${panel.icon} ${state.panel instanceof panel ? 'active' : ''}`})
         )
     ),
     _.div({class: 'navigation--resource-browser__panels'},

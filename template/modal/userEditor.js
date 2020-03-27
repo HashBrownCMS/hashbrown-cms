@@ -5,7 +5,7 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal in'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Settings for ${model.fullName || model.username || model.id}`),
+            _.h4({class: 'modal__title'}, `Settings for ${model.getName()}`),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
@@ -39,7 +39,7 @@ _.div({class: 'modal in'},
                 ] : null,
 
                 // Only show "is admin" switch to other admins
-                HashBrown.Context.user.isAdmin ? [
+                HashBrown.Context.user.isAdmin && model.id !== HashBrown.Context.user.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
                         _.checkbox({value: model.isAdmin, onchange: _.onChangeAdmin})
@@ -52,7 +52,7 @@ _.div({class: 'modal in'},
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},
                             _.checkbox({value: model.hasScope(project.id), onchange: (isEnabled) => _.onChangeProjectScope(project.id, isEnabled)}),
-                            _.div({class: 'widget widget--label'}, project.settings.info.name),
+                            _.div({class: 'widget widget--label'}, project.getName()),
                             _.popup({
                                 value: model.getScopes(project.id),
                                 multiple: true,

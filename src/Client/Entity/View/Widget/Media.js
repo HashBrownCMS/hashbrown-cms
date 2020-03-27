@@ -29,18 +29,23 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
             let media = this.model.value;
 
             if(typeof media === 'string') {
-                media = await HashBrown.Service.MediaService.getMediaById(media);
+                media = await HashBrown.Entity.Resource.Media.get(media);
             }
 
-            this.state.source = `/media/${HashBrown.Context.projectId}/${HashBrown.Context.environment}/${media.id}?t=${Date.now()}${this.model.full ? '' : '&width=300'}`;
-            
-            if(media.isImage()) {
-                this.state.tagName = 'img';
-            } else if(media.isVideo()) {
-                this.state.tagName = 'video';
-            }
+            if(!media) {
+                this.setErrorState(new Error('Not found'));
+                
+            } else {
+                this.state.source = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${media.id}?t=${Date.now()}${this.model.full ? '' : '&width=300'}`;
+                
+                if(media.isImage()) {
+                    this.state.tagName = 'img';
+                } else if(media.isVideo()) {
+                    this.state.tagName = 'video';
+                }
 
-            this.state.title = media.name;
+                this.state.title = media.filename;
+            }
         }
     }
     
@@ -66,7 +71,7 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
      * Event: Click browse
      */
     onClickBrowse() {
-        new HashBrown.Entity.View.Modal.MediaBrowser({
+        HashBrown.Entity.View.Modal.MediaBrowser.new({
             model: {
                 value: this.model.value
             }

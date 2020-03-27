@@ -26,8 +26,8 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     async fetch() {
         await super.fetch();
 
-        this.state.schemas = await HashBrown.Service.SchemaService.getAllSchemas();
-        this.state.connections = await HashBrown.Service.ConnectionService.getAllConnections();
+        this.state.schemas = await HashBrown.Entity.Resource.SchemaBase.list();
+        this.state.connections = await HashBrown.Entity.Resource.Connection.list();
     }
 
     /**
@@ -35,7 +35,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      *
      * @param {String} id
      *
-     * @return {HashBrown.Entity.Resource.Schema.SchemaBase} Schema
+     * @return {HashBrown.Entity.Resource.SchemaBase} Schema
      */
     getSchema(id) {
         for(let schema of this.state.schemas || []) {
@@ -61,14 +61,6 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     }
 
     /**
-     * Pre render
-     */
-    prerender() {
-        this.state.title = this.model.id;
-        this.state.icon = 'code';
-    }
-
-    /**
      * Debugs JSON
      */
     debug(obj) {
@@ -80,7 +72,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             let v = obj[k];
 
             switch(k) {
-                case 'schemaId': case 'parentSchemaId':
+                case 'schemaId': case 'parentId':
                     if(!v || typeof v !== 'string') { break; }
                     if(this.getSchema(v)) { break; }
 
@@ -131,13 +123,15 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         
         try {
             this.debug(newValue);
-            this.model = JSON.parse(newValue);
+            this.model = this.itemType.new(JSON.parse(newValue));
             this.trigger('change', this.model);
         
         } catch(e) {
             this.state.warning = e.message;
             this.namedElements.save.setAttribute('disabled', true);
         
+            debug.error(e, this, true);
+
         }
         
         this.renderPartial('warning');
@@ -149,10 +143,10 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     async onClickSave() {
         this.state.warning = null;
         this.namedElements.save.removeAttribute('disabled');
-        
+       
         try {
             let value = this.namedElements.body.model.value;
-            this.debug(this.mode);
+            this.debug(this.model);
 
             await super.onClickSave();
             
@@ -160,6 +154,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             this.state.warning = e.message;
             this.namedElements.save.setAttribute('disabled', true);
 
+            debug.error(e, this, true);
         }
         
         this.renderPartial('warning');

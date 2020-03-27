@@ -61,7 +61,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             // Build schema options
             this.state.schemaOptions = {};
 
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('field') || []) {
+            for(let schema of await HashBrown.Entity.Resource.FieldSchema.list() || []) {
                 this.state.schemaOptions[schema.name] = schema.id;
             }
 
@@ -70,9 +70,11 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.schemaOptions = {};
 
             for(let schemaId of this.model.config.allowedSchemas || []) {
-                let schema = await HashBrown.Service.SchemaService.getSchemaById(schemaId);
+                let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId);
 
-                this.state.schemaOptions[schema.name] = schema.id;
+                if(schema) {
+                    this.state.schemaOptions[schema.name] = schema.id;
+                }
             }
 
             // Build fields
@@ -89,6 +91,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                     item.schemaId,
                     item.value
                 );
+
+                if(!view) { continue; }
 
                 view.state.isCollapsible = true;
 
@@ -116,6 +120,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     onClickCollapseItems() {
         for(let field of this.state.fields || []) {
+            if(!field.view) { continue; }
+
             field.view.state.isCollapsed = true;
             field.view.render();
         }
@@ -126,6 +132,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     onClickExpandItems() {
         for(let field of this.state.fields || []) {
+            if(!field.view) { continue; }
+            
             field.view.state.isCollapsed = false;
             field.view.render();
         }
@@ -208,6 +216,8 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.state.value = [];
 
         for(let field of fields || []) {
+            if(!field.view) { continue; }
+
             this.state.value.push({
                 schemaId: field.view.model.schema.id,
                 value: field.view.state.value

@@ -14,7 +14,6 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
             _.p('Click any item in the panel to edit it.'),
             _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
             _.div({class: 'widget-group'},
-                _.button({class: 'widget widget--button', onclick: _.onClickImport, title: 'Import schemas'}, 'Import'),
                 _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
             )
         )
@@ -29,12 +28,12 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                 _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Icon'},
-                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${state.icon || ''}`, onclick: _.onClickChangeIcon})
+                _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${model.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             _.field({label: 'Parent'},
-                _.popup({disabled: model.isLocked, value: model.parentSchemaId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})
+                _.popup({disabled: model.isLocked, value: model.parentId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})
             ),
-            model instanceof HashBrown.Entity.Resource.Schema.ContentSchema ? [
+            model instanceof HashBrown.Entity.Resource.ContentSchema ? [
                 _.field({label: 'Allowed at root'},
                     _.checkbox({disabled: model.isLocked, value: model.allowedAtRoot, onchange: _.onChangeAllowedAtRoot})
                 ),
@@ -56,9 +55,10 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                     _.div({class: 'widget widget--separator'}),
                     _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField})
                 )
-            ] : null,
-            model instanceof HashBrown.Entity.Resource.Schema.FieldSchema ? [
+
+            ] : model instanceof HashBrown.Entity.Resource.FieldSchema ? [
                 state.fieldConfigEditor
+
             ] : null
         ),
         _.div({class: 'resource-editor__footer'},

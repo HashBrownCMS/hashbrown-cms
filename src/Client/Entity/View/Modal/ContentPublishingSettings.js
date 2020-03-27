@@ -26,12 +26,12 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
         this.state.title = this.model.prop('title', HashBrown.Context.language) || this.model.id;
 
         if(this.state.value.governedBy) {
-            let content = await HashBrown.Service.ContentService.getContentById(this.state.value.governedBy);
+            let content = await HashBrown.Entity.Resource.Content.get(this.state.value.governedBy);
         
             throw new Error(`(Settings inherited from <a href="#/content/${content.id}">${content.prop('title', HashBrown.Context.language) || content.id}</a>)`);
         }
 
-        let connections = await HashBrown.Service.ConnectionService.getAllConnections();
+        let connections = await HashBrown.Entity.Resource.Connection.list();
 
         this.state.connections = {};
 
@@ -59,7 +59,7 @@ class ContentPublishingSettings extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickOK() {
         try {
-            await HashBrown.Service.ResourceService.set('content', this.model.id, this.model);
+            await this.model.save();
             
             HashBrown.Service.EventService.trigger('settings', this.model.id); 
 

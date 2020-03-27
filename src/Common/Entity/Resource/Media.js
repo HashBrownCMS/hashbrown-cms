@@ -6,6 +6,9 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Media extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'file-image-o'; }
+    get icon() { return this.isVideo() ? 'file-video-o' : this.isImage() ? 'file-image-o' : super.icon; }
+    
     static get category() { return 'media'; }
     
     /**
@@ -14,37 +17,73 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
     structure() {
         super.structure();
 
-        this.def(String, 'icon', 'file-image-o');
-        this.def(String, 'name');
-        this.def(String, 'path');
+        this.def(String, 'filename');
         this.def(String, 'folder', '/');
-        this.def(Date, 'updateDate');
+        this.def(String, 'caption');
+        this.def(Object, 'author', {});
+        this.def(Object, 'copyrightHolder', {});
+        this.def(Number, 'copyrightYear');
     }
 
     /**
-     * Checks the format of the params
+     * Gets the media provider
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @return {HashBrown.Entity.Resource.Connection} Connection
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    static async getProvider() {
+        throw new Error('Method "getProvider" must be overridden');
+    }
+    
+    /**
+     * Sets the media provider
+     *
+     * @param {String} id
+     */
+    static async setProvider(id) {
+        throw new Error('Method "setProvider" must be overridden');
+    }
+    
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.filename || this.id;
+    }
 
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+    
         delete params.remote;
         delete params.sync;
         delete params.isRemote;
-
-        if(params.url) {
-            params.path = params.url;
-            delete params.url;
-        }
+        delete params.url;
 
         if(!params.folder) {
             params.folder = '/';
         }
 
-        return params;
+        if(params.name) {
+            params.filename = params.name;
+        }
+
+        if(!params.author) {
+            params.author = {};
+        }
+        
+        if(!params.copyrightHolder) {
+            params.copyrightHolder = {};
+        }
+
+        super.adopt(params);
     }
     
     /**
@@ -53,66 +92,9 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      * @returns {String} Content-Type header
      */
     getContentTypeHeader() {
-        let name = (this.name || '').toLowerCase();
-        let extension = name.split('.');
-        
-        if(extension && extension.length > 0) {
-            extension = extension[extension.length - 1];
-        }
+        let name = (this.filename || '').toLowerCase();
 
-        switch(extension) {
-            // Image types
-            case 'jpg':
-                return 'image/jpeg';
-            case 'jpeg':
-                return 'image/jpeg';
-            case 'png':
-                return 'image/png';
-            case 'gif':
-                return 'image/gif';
-            case 'bmp':
-                return 'image/bmp';
-            
-            // Audio types
-            case 'm4a':
-                return 'audio/m4a';
-            case 'mp3':
-                return 'audio/mp3';
-            case 'ogg':
-                return 'audio/ogg';
-            case 'wav':
-                return 'audio/wav';
-            
-            // Video types
-            case 'mp4':
-                return 'video/mp4';
-            case 'webm':
-                return 'video/webm';
-            case 'avi':
-                return 'video/avi';
-            case 'mov':
-                return 'video/quicktime';
-            case 'bmp':
-                return 'video/bmp';
-            case 'wmv':
-                return 'video/x-ms-wmv';
-            case '3gp':
-                return 'video/3gpp';
-            case 'mkv':
-                return 'video/x-matroska';
-
-            // SVG
-            case 'svg':
-                return 'image/svg+xml';
-            
-            // PDF
-            case 'pdf':
-                return 'application/pdf';
-
-            // Everything else
-            default:
-                return 'application/octet-stream';
-        }
+        return getMIMEType(name); 
     }
     
     /**
@@ -176,21 +158,6 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
                 }
             }
         }
-    }
-
-    /**
-     * Creates a new Media object
-     *
-     * @param {Object} file
-     *
-     * @return {Media} media
-     */
-    static create(file) {
-        let media = new Media({
-            id: Media.createId()
-        });
-    
-        return media;
     }
 }
 

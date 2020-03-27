@@ -19,36 +19,43 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
 
         if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
-            let processor = HashBrown.Service.ConnectionService.getProcessor(params.processor.alias);
-
-            if(processor) {
-                params.processor = new processor(params.processor);
-            } else {
-                params.processor = new HashBrown.Entity.Processor.ProcessorBase(params.processor);
-            }
+            params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
-            let deployer = HashBrown.Service.ConnectionService.getDeployer(params.deployer.alias);
-
-            if(deployer) {
-                params.deployer = new deployer(params.deployer);
-            } else {
-                params.deployer = new HashBrown.Entity.Deployer.DeployerBase(params.deployer);
-            }
+            params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
         }
 
-        return params;
+        super.adopt(params);
+    }
+    
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        if(this.processor) {
+            object.processor = this.processor.getObject();
+        }
+
+        if(this.deployer) {
+            object.deployer = this.deployer.getObject();
+        }
+
+        return object;
     }
    
     /**
@@ -81,18 +88,24 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      *  Unpublishes content
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Content} content
      */
-    async unpublishContent(project, environment, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
+    async unpublishContent(projectId, environment, content) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         
         debug.log('Unpublishing all localised property sets...', this);
-        
-        let languages = await HashBrown.Service.LanguageService.getLanguages(project);
+       
+        let project = HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+
+        let languages = await project.getLanguages();
 
         for(let language of languages) {
             await this.removeContent(content.id, language);
@@ -104,21 +117,27 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      * Publishes content
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Content} content
      */
-    async publishContent(project, environment, content) {
-        checkParam(project, 'project', String);
+    async publishContent(projectId, environment, content) {
+        checkParam(projectId, 'projectId', String);
         checkParam(environment, 'environment', String);
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
 
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
-        let languages = await HashBrown.Service.LanguageService.getLanguages(project);
+        let project = HashBrown.Entity.Project.get(projectId);
+
+        if(!project) {
+            throw new Error(`Project ${projectId} not found`);
+        }
+
+        let languages = await project.getLanguages();
         
         for(let language of languages) { 
-            await this.setContent(project, environment, content.id, content, language);
+            await this.setContent(projectId, environment, content.id, content, language);
         }
 
         debug.log('Published all localisations successfully!', this);
@@ -190,61 +209,39 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
     
     /**
-     * Gets a list of Media nodes
+     * Gets a list of media filenames
      *
-     * @returns {Array} Media
+     * @returns {Array} Media filenames
      */
-    async getAllMedia() {
+    async getAllMediaFilenames() {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
         
-        let folders = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
+        let files = await this.deployer.getFolder(this.deployer.getPath('media'), 2)
         
-        if(!folders) { return []; }
+        if(!files) { return []; }
 
-        let allMedia = [];
+        let names = {};
 
-        for(let folder of folders) {
-            let name = folder.name || folder.filename || folder.path;
-
-            if(!name && typeof folder === 'string') {
-                name = folder;
-            }
-                
-            name = Path.basename(name);
-
-            let id = folder.path || folder.id;
+        for(let file of files) {
+            let filename = Path.basename(file);
+            let folder = Path.basename(Path.dirname(file));
             
-            if(!id && typeof folder === 'string') {
-                id = folder;
-            }
-            
-            // Get last bit of the path, if it's a path
-            if(id.indexOf(Path.sep) > -1) {
-                id = Path.dirname(id).split(Path.sep).pop();
-            }
-            
-            let media = new HashBrown.Entity.Resource.Media({
-                id: id,
-                url: this.deployer.getPath('media', id + '/' + name, true),
-                name: name
-            });
-
-            allMedia.push(media);
+            names[folder] = filename;
         }
 
-        return allMedia;
+        return names;
     }
     
     /**
-     * Gets a Media node by id
+     * Gets a media URL by id
      *
      * @param {String} id
      *
-     * @returns {HashBrown.Entity.Resource.Media} Media node
+     * @returns {String} Media URL
      */
-    async getMedia(id) {
+    async getMediaUrl(id) {
         checkParam(id, 'id', String, true);
 
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
@@ -255,30 +252,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
-        if(!files || files.length < 1) { throw new Error('Media "' + id + '" not found'); }
+        if(!files || files.length < 1) { throw new HttpError(`Media ${id} not found`, 404); }
 
-        let file = Array.isArray(files) ? files[0] : files;
-
-        let name = file.name || file.filename || file.url || file.path;
-        
-        if(!name && typeof file === 'string') {
-            name = file;
-        }
-
-        name = Path.basename(name);
-
-        let url = file.url;
-
-        if(!url && typeof file === 'string') {
-            url = this.deployer.getPath('media', id + '/' + file);
-        }
-
-        return new HashBrown.Entity.Resource.Media({
-            id: id,
-            name: name,
-            url: url,
-            path: file.path || file
-        });
+        return files.shift();
     }
     
     /**
@@ -286,21 +262,19 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      *
      * @param {String} id
      * @param {String} name
-     *
-     * @returns {HashBrown.Entity.Resource.Media} Media node
      */
     async renameMedia(id, name) {
-        checkParam(id, 'id', String);
-        checkParam(name, 'name', String);
+        checkParam(id, 'id', String, true);
+        checkParam(name, 'name', String, true);
         
         this.pathComponentCheck('id', id);
         this.pathComponentCheck('name', name);
 
-        let media = await this.getMedia(id);
+        let path = await this.getMediaUrl(id);
 
-        await this.deployer.renameFile(media.path, name);
-
-        return media;
+        if(name === Path.basename(path)) { return; }
+        
+        await this.deployer.renameFile(path, name);
     }
     
     /**
@@ -344,6 +318,27 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         }
 
         await this.deployer.removeFolder(this.deployer.getPath('media', id));
+    }
+    
+    /**
+     * Saves the current state of this entity
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {Object} options
+     */
+    async save(user, projectId, environment, options = {}) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(options, 'options', Object, true);
+
+        await super.save(user, projectId, environment, options);
+
+        if(options.isMediaProvider) {
+            await HashBrown.Entity.Resource.Media.setProvider(projectId, environment, this.id);
+        }
     }
 }
 

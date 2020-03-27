@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "StructEditor",
-    "icon": "cubes",
+    "customIcon": "cubes",
     "name": "Struct"
 }

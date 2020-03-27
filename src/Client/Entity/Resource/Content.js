@@ -7,6 +7,30 @@
  */
 class Content extends require('Common/Entity/Resource/Content') {
     /**
+     * Gets the human readable name
+     *
+     * @return {String} 
+     */
+    getName() {
+        let name = this.getPropertyValue('title', HashBrown.Context.language);
+
+        if(!name) {
+            name = 'Untitled';
+
+            for(let language in this.properties.title) {
+                let languageTitle = this.properties.title[language];
+
+                if(languageTitle) {
+                    name += ' - (' + language + ': ' + languageTitle + ')';
+                    break;
+                }
+            }
+        }
+
+        return name;
+    }
+
+    /**
      * Gets settings
      *
      * @param {String} key
@@ -40,14 +64,14 @@ class Content extends require('Common/Entity/Resource/Content') {
     }
 
     /**
-     * Gets parent Content
+     * Gets parent content
      *
-     * @returns {Content} Parent
+     * @returns {HashBrown.Entity.Resource.Content} Parent
      */
     async getParent() {
         if(!this.parentId) { return null; }
 
-        return await HashBrown.Service.ContentService.getContentById(this.parentId);
+        return await this.constructor.get(this.parentId);
     }
 }
 

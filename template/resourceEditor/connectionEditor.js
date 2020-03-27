@@ -25,8 +25,8 @@ _.div({class: 'resource-editor resource-editor--connection-editor'},
             _.field({label: 'Media provider', decription: 'Use this connection to store media'},
                 _.checkbox({value: state.isMediaProvider, onchange: _.onChangeIsMediaProvider})
             ),
-            _.field({label: 'Title'},
-                _.text({disabled: model.isLocked, value: model.title, onchange: _.onChangeTitle})
+            _.field({label: 'Name'},
+                _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'URL'},
                 _.text({disabled: model.isLocked, value: model.url, onchange: _.onChangeUrl})

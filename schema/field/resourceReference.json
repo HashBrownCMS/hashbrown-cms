@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "ResourceReferenceEditor",
-    "icon": "book",
+    "customIcon": "book",
     "name": "Resource Reference"
 }

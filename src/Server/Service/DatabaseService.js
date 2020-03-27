@@ -70,18 +70,15 @@ class DatabaseService {
     /**
      * Gets the connection string
      *
-     * @param {String} databaseName
-     *
      * @returns {String} Connection string
      */
-    static getConnectionString(databaseName) {
+    static getConnectionString() {
         let connectionString = this.getConfig('protocol') + '://';
       
         let username = this.getConfig('username');
         let password = this.getConfig('password');
         let host = this.getConfig('host');
         let port = this.getConfig('port');
-        let prefix = this.getConfig('prefix');
         let options = this.getConfig('options');
 
         let hosts = Array.isArray(host) ? host : host.split(',');
@@ -107,19 +104,37 @@ class DatabaseService {
             }
         });
 
-        if(databaseName) {
-            connectionString += '/' + prefix + databaseName;
-
-        } else {
-            connectionString += '/';
-        
-        }
+        connectionString += '/';
         
         if(options && Object.keys(options).length > 0) {
             connectionString += '?' + QueryString.stringify(options);
         }
 
         return connectionString;
+    }
+
+    /**
+     * Initialises the database client
+     */
+    static async init() {
+        if(this.client) { return; }
+        
+        this.client = await MongoClient.connect(
+            this.getConnectionString(),
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            }
+        );
+        
+        HashBrown.Service.EventService.on('stop', 'dbclient', () => {
+            if(this.client) {
+                debug.log('Database client closed', this);
+
+                this.client.close();
+                this.client = null;
+            }
+        });
     }
 
     /**
@@ -130,39 +145,23 @@ class DatabaseService {
      * @return {Promise} Client
      */
     static async connect(databaseName) {
-        if(this.clients && this.clients[databaseName]) { return this.clients[databaseName]; }
+        checkParam(databaseName, 'databaseName', String, true);
 
-        debug.log(`Connecting to database "${databaseName}"...`, this);
+        if(!this.client) {
+            await this.init();
+        }
 
-        if(!this.clients) { this.clients = {}; }
-
-        this.clients[databaseName] = await MongoClient.connect(
-            this.getConnectionString(databaseName),
-            {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            }
-        );
-
-        HashBrown.Service.EventService.on('stop', 'dbclient', () => {
-            if(this.clients) {
-                debug.log('Database connections closed', this);
-
-                for(let databaseName in this.clients) {
-                    this.clients[databaseName].close();
-                }
-
-                this.clients = null;
-
-            } else {
-                debug.log('No database connections to close', this, true);
+        if(
+            databaseName === 'admin' ||
+            databaseName === 'config' ||
+            databaseName === 'local'
+        ) {   
+            return this.client.db(databaseName);
+        }
+        
+        let prefix = this.getConfig('prefix');
             
-            }
-        });
-
-        debug.log('...connection established', this);
-
-        return this.clients[databaseName];
+        return this.client.db(prefix + databaseName);
     }
 
     /**
@@ -170,44 +169,39 @@ class DatabaseService {
      *
      * @param {String} databaseName
      * @param {String} timestamp
-     *
-     * @returns {Promise} Data string
      */
     static async restore(databaseName, timestamp) {
+        checkParam(databaseName, 'databaseName', String);
+
         let archivePath = Path.join(APP_ROOT, 'storage', databaseName, 'dump', timestamp + '.hba');
        
-        try {
-            let archiveContent = await HashBrown.Service.FileService.read(archivePath, 'utf8'); 
-            let collections = JSON.parse(archiveContent);
+        let archiveContent = await HashBrown.Service.FileService.read(archivePath, 'utf8'); 
+        let collections = JSON.parse(archiveContent);
 
-            await this.dropDatabase(databaseName);
+        await this.dropDatabase(databaseName);
 
-            let collectionNames = Object.keys(collections);
-           
-            let insertCollection = async (index) => {
-                if(index >= collectionNames.length) { return; }
+        let collectionNames = Object.keys(collections);
+       
+        let insertCollection = async (index) => {
+            if(index >= collectionNames.length) { return; }
+        
+            let collectionName = collectionNames[index];
+            let documents = collections[collectionName];
+
+            let insertDocument = async (index) => {
+                if(index >= documents.length) { return; }
             
-                let collectionName = collectionNames[index];
-                let documents = collections[collectionName];
-
-                let insertDocument = async (index) => {
-                    if(index >= documents.length) { return; }
-                
-                    await this.insertOne(databaseName, collectionName, documents[index])
-                    await insertDocument(index + 1);
-                };
-
-                await insertDocument(0);
-                await insertCollection(index + 1);    
+                await this.insertOne(databaseName, collectionName, documents[index])
+                await insertDocument(index + 1);
             };
 
-            await insertCollection(0);
-        
-            debug.log('Database restored successfully', this);
+            await insertDocument(0);
+            await insertCollection(index + 1);    
+        };
 
-        } catch(e) {
-            debug.error(e, this);
-        }
+        await insertCollection(0);
+    
+        debug.log('Database restored successfully', this);
     }
    
     /**
@@ -215,7 +209,7 @@ class DatabaseService {
      *
      * @param {String} databaseName
      *
-     * @returns {Promise} Timestamp
+     * @returns {Number} Timestamp
      */
     static async dump(databaseName) {
         checkParam(databaseName, 'databaseName', String);
@@ -259,20 +253,11 @@ class DatabaseService {
      *
      * @param {String} databaseName
      *
-     * @return {Promise} Array of collections
+     * @return {Array} Array of collections
      */
     static async listCollections(databaseName) {
-        checkParam(databaseName, 'databaseName', String);
-
-        let collections = [];
-        let client = null;
-
-        try {
-            client = await this.connect(databaseName);
-            collections = await client.db().listCollections().toArray();
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+        let collections = await db.listCollections().toArray();
 
         return collections;
     }
@@ -283,18 +268,16 @@ class DatabaseService {
      * @returns {Promise} Array of databases
      */
     static async listDatabases() {
-        let result = null;
-        let client = null;
-
-        try { 
-            client = await this.connect();
-            result = await client.db('admin').admin().listDatabases();
-        } catch(e) {
-            debug.error(e, this);
+        if(!this.client) {
+            await this.init();
         }
+        
+        let db = await this.connect('admin');
+        let result = await db.admin().listDatabases();
 
         if(!result) { return []; }
 
+        let prefix = this.getConfig('prefix');
         let databases = [];
 
         for(let i = 0; i < result.databases.length; i++) {
@@ -305,11 +288,15 @@ class DatabaseService {
                 database.name !== 'admin' &&
                 database.name !== 'local' &&
                 database.name !== 'config' &&
-                database.name !== this.getConfig('prefix') + 'users' &&
-                database.name !== this.getConfig('prefix') + 'schedule' &&
-                database.name.indexOf(this.getConfig('prefix')) === 0
+                database.name !== prefix + 'users' &&
+                database.name !== prefix + 'schedule' &&
+                database.name.indexOf(prefix) === 0
             ) {
-                databases[databases.length] = database.name.replace(this.getConfig('prefix'), '');
+                let name = database.name.replace(prefix, '');
+
+                if(!name) { continue; }
+
+                databases.push(name);
             }
         }
 
@@ -362,15 +349,8 @@ class DatabaseService {
     static async findOne(databaseName, collectionName, query, projection = {}) {
         projection._id = 0;
 
-        let doc = null;
-        let client = null;
-
-        try {
-            client = await this.connect(databaseName);
-            doc = await client.db().collection(collectionName).findOne(query, projection);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+        let doc = await db.collection(collectionName).findOne(query, projection);
 
         if(doc && doc['_id']) {
             delete doc['_id'];
@@ -390,23 +370,20 @@ class DatabaseService {
      *
      * @return {Promise} Documents
      */
-    static async find(databaseName, collectionName, query, projection = {}, sort = null) {
+    static async find(databaseName, collectionName, query = {}, projection = {}, sort = null) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+
         projection._id = 0;
 
-        let docs = [];
-        let client = null;
+        let db = await this.connect(databaseName);
+        let docs = await db.collection(collectionName).find(query, { projection: projection })
 
-        try {
-            client = await this.connect(databaseName);
-            docs = await client.db().collection(collectionName).find(query, { projection: projection })
-
-            if(sort) { docs = await docs.sort(sort); }
-
-            docs = docs.toArray();
-
-        } catch(e) {
-            debug.error(e, this);
+        if(sort) {
+            docs = await docs.sort(sort);
         }
+
+        docs = await docs.toArray();
 
         return docs;
     }
@@ -421,15 +398,8 @@ class DatabaseService {
      * @return {Promise} Number of matching documents
      */
     static async count(databaseName, collectionName, query) {
-        let client = null;
-        let result = 0;
-
-        try {
-            client = await this.connect(databaseName);
-            result = await client.db().collection(collectionName).count(query);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+        let result = await db.collection(collectionName).count(query);
 
         return result;
     }
@@ -470,14 +440,9 @@ class DatabaseService {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        let client = null;
+        let db = await this.connect(databaseName);
 
-        try {
-            client = await this.connect(databaseName);
-            await client.db().collection(collectionName).updateOne(query, { $set: doc }, options || {});
-        } catch(e) {
-            debug.error(e, this);
-        }
+        await db.collection(collectionName).updateOne(query, { $set: doc }, options || {});
     }
     
     /**
@@ -495,14 +460,9 @@ class DatabaseService {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        let client = null;
-       
-        try {
-            client = await this.connect(databaseName);
-            await client.db().collection(collectionName).updateMany(query, { $set: doc }, options || {});
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+        
+        await db.collection(collectionName).updateMany(query, { $set: doc }, options || {});
     }
     
     /**
@@ -518,14 +478,9 @@ class DatabaseService {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        let client = null;
-       
-        try {
-            client = await this.connect(databaseName);
-            await client.db().collection(collectionName).insertOne(doc);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+    
+        await db.collection(collectionName).insertOne(doc);
     }
     
     /**
@@ -538,14 +493,9 @@ class DatabaseService {
      * @return {Promise} promise
      */
     static async remove(databaseName, collectionName, query) {
-        let client = null;
-       
-        try {
-            client = await this.connect(databaseName);
-            await client.db().collection(collectionName).deleteMany(query, true);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+        
+        await db.collection(collectionName).deleteMany(query, true);
     }    
     
     /**
@@ -558,14 +508,9 @@ class DatabaseService {
      * @return {Promise} promise
      */
     static async removeOne(databaseName, collectionName, query) {
-        let client = null;
-        
-        try {
-            client = await this.connect(databaseName);
-            await client.db().collection(collectionName).removeOne(query, true);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+    
+        await db.collection(collectionName).removeOne(query, true);
     }    
     
     /**
@@ -577,14 +522,9 @@ class DatabaseService {
      * @return {Promise} promise
      */
     static async dropCollection(databaseName, collectionName) {
-        let client = null;
-        
-        try {
-            client = await this.connect(databaseName);
-            await client.db().dropCollection(collectionName);
-        } catch(e) {
-            debug.error(e, this);
-        }
+        let db = await this.connect(databaseName);
+
+        await db.dropCollection(collectionName);
     }
 
     /**
@@ -595,14 +535,9 @@ class DatabaseService {
      * @returns {Promise}
      */
     static async dropDatabase(databaseName) {
-        let client = null;
+        let db = await this.connect(databaseName);
         
-        try {
-            client = await this.connect(databaseName);
-            await client.db().dropDatabase();
-        } catch(e) {
-            debug.error(e, this);
-        }
+        await db.dropDatabase();
     }
 }
 

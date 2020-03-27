@@ -84,68 +84,6 @@
         }
     }
 
-    // Users
-    &__users {
-        &__list {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -0.5rem;
-
-            @include phone {
-                flex-direction: column;
-            }
-        }
-
-        &__add {
-            margin-top: 1rem;
-        }
-    }
-
-    &__user {
-        &__name {
-            margin: 0;
-        }
-    }
-
-    // Projects
-    &__projects {
-        padding-bottom: 4rem;
-        
-        &__list {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -0.5rem;
-            position: relative;
-            min-height: 10rem;
-
-            @include phone {
-                flex-direction: column;
-            }
-
-            // The element that is placed while waiting for the view to be fetched
-            .placeholder {
-                padding: 1rem;
-                margin: 0.5rem;
-                position: relative;
-                flex-grow: 0;
-                flex-basis: calc(33.33% - 1rem);
-                width: calc(33.33% - 1rem);
-                color: var(--color-default-text);
-                background-color: var(--color-default);
-                transform-origin: center;
-                transition: transform 0.25s ease;
-                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
-                min-height: 12rem;
-                
-                @include spinner;
-            }
-        }
-
-        &__add {
-            margin-top: 1rem;
-        }
-    }
-
     // Server
     &__server {
         &__info {
@@ -184,13 +122,38 @@
         }
     }
 
-    // "Add" button
+    // List views
     &__projects,
     &__users {
+        &__list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 1rem;
+            grid-auto-rows: 1fr;
+    
+            @include tablet {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @include phone {
+                grid-template-columns: 1fr;
+            }
+            
+            // The element that is placed while waiting for the view to be fetched
+            .placeholder {
+                padding: 1rem;
+                position: relative;
+                color: var(--color-default-text);
+                background-color: var(--color-default);
+                box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+                min-height: 12rem;
+                
+                @include spinner;
+            }
+        }
+
         &__add {
-            position: fixed !important;
-            bottom: 2rem;
-            right: 3rem;
+            height: auto !important;
         }
     }
 }

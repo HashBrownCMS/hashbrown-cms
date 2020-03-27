@@ -20,28 +20,29 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
      * Fetches view data
      */
     async fetch() {
+        let allSchemas = await HashBrown.Entity.Resource.ContentSchema.list() || [];
+
         if(this.state.name === 'config') {
             // Build schema options
             this.state.schemaOptions = {};
 
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('content') || []) {
+            for(let schema of allSchemas) {
                 this.state.schemaOptions[schema.name] = schema.id;
             }
 
         } else {
-            let allSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
-
             this.state.schemaOptions = {};
 
             let allowedSchemas = this.model.config.allowedSchemas || [];
 
             let thisContentId = HashBrown.Service.NavigationService.getRoute(1);
-            let thisContent = await HashBrown.Service.ContentService.getContentById(thisContentId);
+            let thisContent = await HashBrown.Entity.Resource.Content.get(thisContentId);
             
             if(allowedSchemas === 'fromParent' && thisContent.parentId) {
-                let parentContent = await HashBrown.Service.ContentService.getContentById(thisContent.parentId);
-            
-                allowedSchemas = parentContent.allowedChildSchemas || [];
+                let parentContent = await HashBrown.Entity.Resource.Content.get(thisContent.parentId);
+                let parentContentSchema = await HashBrown.Entity.Resource.ContentSchema.get(parentContent.schemaId);
+           
+                allowedSchemas = parentContentSchema.allowedChildSchemas || [];
             }
 
             if(!Array.isArray(allowedSchemas)) { allowedSchemas = []; }

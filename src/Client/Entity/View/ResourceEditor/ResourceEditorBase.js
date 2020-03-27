@@ -9,8 +9,8 @@ const HEARTBEAT_TIMEOUT  = 1000 * 5; // An extra 5 seconds waiting time when che
  * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
-    static get category() { return this.name.replace('Editor', '').toLowerCase(); }
-    static get itemType() { return null; }
+    static get category() { return null; }
+    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
 
     get category() { return this.constructor.category; }
     get itemType() { return this.constructor.itemType; }
@@ -86,9 +86,15 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      */
     async fetch() {
         if(this.state.id) {
-            this.model = await HashBrown.Service.ResourceService.get(this.itemType, this.state.category, this.state.id);
+            this.model = await this.itemType.get(this.state.id);
+
         } else {
             this.model = null;
+        }
+
+        if(this.model) {
+            this.state.title = this.model.getName();
+            this.state.icon = this.model.icon;
         }
     }
  
@@ -124,6 +130,24 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Sets a save option
+     *
+     * @param {String} key
+     * @param {*} value
+     */
+    setSaveOption(key, value) {
+        this.state.saveOptions = this.state.saveOptions || {};
+
+        if(value === false || value === null || value === undefined) {
+            delete this.state.saveOptions;
+        
+        } else {
+            this.state.saveOptions[key] = value;
+
+        }
+    }
+
+    /**
      * Sets theis editor dirty/clean
      *
      * @param {Boolean} isDirty
@@ -149,7 +173,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(typeof this === 'undefined' || !this || !this.model || Object.keys(this.model).length < 1 || !this.element || !this.element.parentElement) { return; }
 
         try {
-            await HashBrown.Service.ResourceService.heartbeat(this.model);
+            await this.model.heartbeat();
 
         } catch(e) {
             if(e && e.message) {
@@ -178,11 +202,13 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click save
      */
     async onClickSave() {
+        this.state.title = this.model.getName();
+
         if(this.namedElements.save) {
             this.namedElements.save.classList.toggle('loading', true);
         }
-        
-        await HashBrown.Service.ResourceService.set(this.category, this.state.id, this.model);
+
+        await this.model.save(this.state.saveOptions);
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
 
@@ -197,7 +223,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click new
      */
     async onClickNew() {
-        let resource = await HashBrown.Service.ResourceService.new(this.itemType, this.category);
+        let resource = await this.itemType.create();
         
         location.hash = `/${this.category}/${resource.id}`;
     }

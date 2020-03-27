@@ -5,7 +5,6 @@
  */
 class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'connections'; }
-    static get itemType() { return HashBrown.Entity.Resource.Connection; }
     
     /**
      * Constructor
@@ -24,7 +23,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
         
         if(this.state.name) { return; }
 
-        let connection = await HashBrown.Service.ConnectionService.getMediaProvider();
+        let connection = await HashBrown.Entity.Resource.Media.getProvider();
 
         this.state.isMediaProvider = this.model && connection && connection.id === this.model.id;
     }
@@ -35,9 +34,6 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.icon = 'exchange';
-        this.state.title = this.model.title;
-
         // Get processor fields
         this.state.processorFields = null;
 
@@ -46,14 +42,14 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
                 let type = HashBrown.Entity.View.DeployerEditor[name];
 
                 if(type && type.alias === this.model.processor.alias) {
-                    this.state.processorFields = new type({ model: this.model.processor });
+                    this.state.processorFields = type.new({ model: this.model.processor });
                     break;
                 }
             }
         }
        
         if(!this.state.processorFields) {
-            this.state.processorFields = new HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase({ model: this.model.processor });
+            this.state.processorFields = HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase.new({ model: this.model.processor });
         }
 
         this.state.processorFields.on('change', (newValue) => {
@@ -72,14 +68,14 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
                 let type = HashBrown.Entity.View.DeployerEditor[name];
 
                 if(type && type.alias === this.model.deployer.alias) {
-                    this.state.deployerFields = new type({ model: this.model.deployer }); 
+                    this.state.deployerFields = type.new({ model: this.model.deployer }); 
                     break;
                 }
             }
         }
 
         if(!this.state.deployerFields) {
-            this.state.deployerFields = new HashBrown.Entity.View.DeployerEditor.DeployerEditorBase({ model: this.model.deployer });
+            this.state.deployerFields = HashBrown.Entity.View.DeployerEditor.DeployerEditorBase.new({ model: this.model.deployer });
         }
         
         this.state.deployerFields.on('change', (newValue) => {
@@ -94,15 +90,25 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.ConnectionService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('connections/') < 0) {
+            location.hash = '/connections/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/connections/"]', 'This the connections section, where you will configure how HashBrown talks to the outside world.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your connections. You can right click here to create a new connection.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the connection editor, where you edit connections.', 'left', 'next');
     }
 
     /**
-     * Event: Change title
+     * Event: Change name
      */
-    onChangeTitle(newValue) {
-        this.model.title = newValue;
+    onChangeName(newValue) {
+        this.model.name = newValue;
 
         this.onChange();
     }
@@ -142,7 +148,7 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
      * Event: Change is media provider
      */
     async onChangeIsMediaProvider(newValue) {
-        await HashBrown.Service.ConnectionService.setMediaProvider(newValue ? this.model.id : null);
+        this.setSaveOption('isMediaProvider', newValue);
     }
 }
 

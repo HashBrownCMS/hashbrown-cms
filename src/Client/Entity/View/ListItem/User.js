@@ -28,7 +28,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Fetches the model
      */
     async fetch() {
-        this.model = await HashBrown.Service.ResourceService.get(HashBrown.Entity.Resource.User, 'users', this.modelId);
+        this.model = await HashBrown.Entity.User.get(this.modelId);
     }
 
     /**
@@ -37,8 +37,8 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickEdit() {
         if(!HashBrown.Context.user.isAdmin && this.model.id !== HashBrown.Context.user.id) { return }
         
-        new HashBrown.Entity.View.Modal.UserEditor({
-            model: this.model.clone()
+        HashBrown.Entity.View.Modal.UserEditor.new({
+            modelId: this.model.id
         })
         .on('change', () => { this.update(); });
     }
@@ -49,14 +49,14 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
     onClickDelete() {
         if(this.model.id === HashBrown.Context.user.id) { return; }
 
-        new HashBrown.Entity.View.Modal.ModalBase({
+        HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: `Delete user ${this.model.fullName || this.model.username || this.model.id}`,
                 message: 'Are you sure want to delete this user?'
             }
         })
         .on('ok', async () => {
-            await HashBrown.Service.ResourceService.remove('users', this.model.id);
+            await this.model.remove();
 
             this.remove();
         });

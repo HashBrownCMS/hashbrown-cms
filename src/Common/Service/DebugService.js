@@ -158,6 +158,7 @@ class DebugService {
         
         } else {
             throw error;
+
         }
     }
 

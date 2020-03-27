@@ -24,12 +24,12 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
             // Build schema options
             this.state.schemaOptions = {};
 
-            for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('content') || []) {
+            for(let schema of await HashBrown.Entity.Resource.ContentSchema.list() || []) {
                 this.state.schemaOptions[schema.name] = schema.id;
             }
 
         } else {
-            let allContent = await HashBrown.Service.ContentService.getAllContent();
+            let allContent = await HashBrown.Entity.Resource.Content.list();
 
             this.state.contentOptions = {};
 

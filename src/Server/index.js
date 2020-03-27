@@ -9,9 +9,6 @@ const FileSystem = require('fs');
 const Path = require('path');
 
 // Libs
-const Express = require('express');
-const BodyParser = require('body-parser');
-const CookieParser = require('cookie-parser');
 const AppModulePath = require('app-module-path'); 
 
 // Make sure we can require our source files conveniently
@@ -24,38 +21,108 @@ require('Server/Service');
 require('Server/Entity');
 require('Server/Controller');
 
-// Express app
-const app = Express();
-
-app.disable('etag');
-app.engine('js', HashBrown.Entity.View.ViewBase.engine);
-app.set('view engine', 'js');
-app.set('views', Path.join(APP_ROOT, 'template', 'page'));
-
-app.use(CookieParser());
-app.use(BodyParser.json({limit: '50mb'}));
-app.use(Express.static(Path.join(APP_ROOT, 'public')));
-app.use(Path.join('storage', 'plugins'), Express.static(Path.join(APP_ROOT, 'storage', 'plugins')));
-
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;
 
-// HTTP error type
+// HTTP framework
 global.HttpError = class HttpError extends Error {
-    constructor(code, message) {
+    constructor(message, code, stack) {
         super(message);
 
-        this.code = code;
+        this.code = code || 500;
+
+        if(stack) {
+            this.stack = stack;
+        }
     }
+}
+
+global.HttpResponse = class HttpResponse {
+    constructor(data, code, headers) {
+        this.data = data || '';
+        this.code = isNaN(code) ? 200 : code;
+        this.headers = typeof headers === 'object' ? headers || {} : {};
+        this.time = new Date();
+
+        // Serialise entities
+        if(this.data instanceof HashBrown.Entity.EntityBase) {
+            this.data = this.data.getObject();
+        
+        } else if(Array.isArray(this.data)) {
+            for(let i in this.data) {
+                if(this.data[i] instanceof HashBrown.Entity.EntityBase) {
+                    this.data[i] = this.data[i].getObject();
+                }
+            }
+        }
+        
+        if(this.data && (this.data.constructor === Object || this.data.constructor === Array)) {
+            this.headers['Content-Type'] = 'application/json';
+            this.data = JSON.stringify(this.data);
+        }
+
+        if(!this.headers['Content-Type']) {
+            this.headers['Content-Type'] = 'text/plain';
+        }
+    }
+
+    /**
+     * Handles the request
+     *
+     * @param {HTTP.ServerResponse} request
+     */
+    end(response) {
+        checkParam(response, 'response', HTTP.ServerResponse, true);
+   
+        if(this.data instanceof FileSystem.ReadStream) {
+            this.data.on('open', () => {
+                response.writeHead(this.code, this.headers);
+                this.data.pipe(response);
+            });
+            
+            this.data.on('error', (e) => {
+                response.writeHead(e.code || 404, { 'Content-Type': 'text/plain' });
+                response.end(e.message);
+            });
+            
+        } else {
+            response.writeHead(this.code, this.headers);
+            response.end(this.data);
+        
+        }
+    }
+}
+
+async function serve(request, response) {
+    let result = new HttpResponse(`No route matched ${request.url}`, 404);
+
+    for(let name in HashBrown.Controller) {
+        let controller = HashBrown.Controller[name];
+
+        let thisResponse = await controller.getResponse(request);
+
+        if(!thisResponse) { continue; }
+
+        result = thisResponse;
+        break;
+    }
+
+    result.end(response);
 }
 
 async function main() {
     // Check CLI input
-    await HashBrown.Service.AppService.processInput();
+    await HashBrown.Controller.InputController.handle();
 
     // Register system cleanup event
     for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'exit' ]) {
-	process.on(signal, () => { HashBrown.Service.EventService.trigger('stop'); });
+        process.on(signal, (e) => {
+            if(e instanceof Error) {
+                debug.error(e);
+            }
+
+            HashBrown.Service.EventService.trigger('stop');
+        });
     }
 
     // Init plugins
@@ -63,20 +130,10 @@ async function main() {
 
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
-    let server = HTTP.createServer(app).listen(port);
-
-    debug.log('HTTP server restarted on port ' + port, 'HashBrown');
     
-    // Init controllers
-    for(let name in HashBrown.Controller) {
-        if(
-            name === 'ResourceController' ||
-            name === 'ApiController' ||
-            name === 'ControllerBase'
-        ) { continue; }
-
-        HashBrown.Controller[name].init(app);
-    }
+    HTTP.createServer(serve).listen(port);
+        
+    debug.log('HTTP server restarted on port ' + port, 'HashBrown');
 
     // Start watching for file changes
     if(process.env.WATCH) {
@@ -85,9 +142,6 @@ async function main() {
     
     // Start watching schedule
     HashBrown.Service.ScheduleService.startWatching();
-    
-    // Start watching media cache
-    HashBrown.Service.MediaService.startWatchingCache();
 }
 
 main();

@@ -35,7 +35,7 @@ class NavigationService {
 
         if(!category) { return location.hash = '/content/'; }
 
-        let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.projectId, category);
+        let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.project.id, category);
         
         if(!hasScope) { return location.hash = '/content/'; }
    
@@ -48,7 +48,7 @@ class NavigationService {
      * Manually dispatches a hash change event
      */
     static poke() {
-        window.dispatchEvent(new HashChangeEvent("hashchange"));
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
 
     /**
@@ -88,10 +88,10 @@ class NavigationService {
 
         space.innerHTML = '';
 
-        let editor = null;
+        HashBrown.Context.currentResourceEditor = null;
 
         if(isJson) {
-            editor = new HashBrown.Entity.View.ResourceEditor.JsonEditor();
+            HashBrown.Context.currentResourceEditor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
 
         } else {
             for(let name in HashBrown.Entity.View.ResourceEditor) {
@@ -100,32 +100,18 @@ class NavigationService {
                 if(type === HashBrown.Entity.View.ResourceEditor.JsonEditor) { continue; }
                 if(type.category !== category) { continue; }
 
-                editor = new type();
+                HashBrown.Context.currentResourceEditor = type.new();
                 break;
-            }
-            
-            if(!editor) {
-                for(let name in HashBrown.View.Editor) {
-                    let type = HashBrown.View.Editor[name];
-
-                    if(type.prototype instanceof HashBrown.View.Editor.ResourceEditor === false) { continue; }
-                    if(type.category !== category) { continue; }
-
-                    editor = new type();
-                    break;
-                }
             }
         }
 
-        if(!editor) {
+        if(!HashBrown.Context.currentResourceEditor) {
             space.innerHTML = `No resource editor for category "${category}" was found`;
             return;
         }
 
-        HashBrown.Context.currentResourceEditor = editor;
-
         space.appendChild(
-            editor.element
+            HashBrown.Context.currentResourceEditor.element
         );
     }
 
@@ -138,7 +124,7 @@ class NavigationService {
         space.innerHTML = '';
 
         space.appendChild(
-            new HashBrown.Entity.View.Navigation.ResourceBrowser().element
+            HashBrown.Entity.View.Navigation.ResourceBrowser.new().element
         );
     }
 
@@ -151,7 +137,7 @@ class NavigationService {
         space.innerHTML = '';
 
         space.appendChild(
-            new HashBrown.Entity.View.Navigation.Session().element
+            HashBrown.Entity.View.Navigation.Session.new().element
         );
     }
 

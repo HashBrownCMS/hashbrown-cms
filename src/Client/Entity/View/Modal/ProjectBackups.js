@@ -34,7 +34,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Clicked download backup
      */
     onClickDownloadBackup(backup) {
-        location = HashBrown.Service.RequestService.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba');
+        location = HashBrown.Service.RequestService.environmentUrl('projects/' + this.model.id + '/backups/' + backup);
     }
     
     /**
@@ -44,7 +44,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
         if(!HashBrown.Context.user.isAdmin) { return; }
 
         try {
-            let timestamp = await HashBrown.Service.RequestService.request('post', 'server/backups/' + this.model.id + '/new');
+            let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/new');
             this.model.backups.push(timestamp);
           
             this.trigger('change');
@@ -68,8 +68,8 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
     /**
      * Event: Submitted backup
      */
-    async onSubmitBackup(formData) {
-        let timestamp = await HashBrown.Service.RequestService.upload('server/backups/' + this.model.id + '/upload', formData);
+    async onSubmitBackup(files) {
+        let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/upload', { files: files });
 
         this.model.backups.push(timestamp);
 
@@ -97,7 +97,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickConfirmRestoreBackup(e) {
         try {
-            let timestamp = await HashBrown.Service.RequestService.request('post', 'server/backups/' + this.model.id + '/' + this.state.backupTimestamp + '/restore');
+            let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/' + this.state.backupTimestamp + '/restore');
 
             this.trigger('change');
             this.reset();
@@ -126,7 +126,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickConfirmDeleteBackup(e) {
         try {
-            await HashBrown.Service.RequestService.request('delete', 'server/backups/' + this.model.id + '/' + this.state.backupTimestamp);
+            await HashBrown.Service.RequestService.request('delete', 'projects/' + this.model.id + '/backups/' + this.state.backupTimestamp);
             
             let index = this.model.backups.indexOf(this.state.backupTimestamp);
 

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * The editor for the API deployer
+ * The editor for the file system deployer
  *
  * @memberof HashBrown.Client.Entity.View.DeployerEditor
  */

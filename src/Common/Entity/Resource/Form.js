@@ -6,6 +6,7 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Form extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'wpforms'; }
     static get category() { return 'forms'; }
 
     /**
@@ -15,34 +16,41 @@ class Form extends HashBrown.Entity.Resource.ResourceBase {
         super.structure();
         
         // Fundamental fields
-        this.def(String, 'title');
+        this.def(String, 'name', 'New form');
         this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
         this.def(Boolean, 'appendRedirect');
-        this.def(Boolean, 'isLocked');
-        
-        // Sync
-        this.def(Object, 'sync');
         
         // Mutable fields
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
     }
-
+    
     /**
-     * Creates a new Form object
+     * Gets the human readable name
      *
-     * @return {Form} form
+     * @return {String} Name
      */
-    static create() {
-        let form = new Form({
-            id: Form.createId(),
-            title: 'New form',
-            inputs: {},
-            entries: []
-        });
-        
-        return form;
+    getName() {
+        return this.name || this.id;
+    }
+    
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+
+        // Adopt old value names
+        if(params.title) {
+            params.name = params.title;
+        }
+
+        super.adopt(params);
     }
 
     /**

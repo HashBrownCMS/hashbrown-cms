@@ -7,62 +7,6 @@
  */
 class LanguageService {
     /**
-     * Gets all selected languages
-     *
-     * @param {String} project
-     *
-     * @returns {Array} List of language names
-     */
-    static getLanguages(project) {
-        checkParam(project, 'project', String);
-
-        return Promise.resolve([]);
-    }
-    
-    /**
-     * Sets all languages
-     *
-     * @param {String} project
-     * @param {Array} languages
-     *
-     * @returns {Promise} Promise
-     */
-    static setLanguages(project, languages) {
-        checkParam(project, 'project', String);
-        checkParam(languages, 'languages', Array);
-
-        return Promise.resolve();
-    }
-
-    /**
-     * Gets localised sets of properties for a Content object
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Content} content
-     *
-     * @return {Promise} Properties
-     */
-    static getAllLocalizedPropertySets(project, environment, content) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        checkParam(content, 'content', HashBrown.Entity.Resource.Content);
-
-        return this.getLanguages(project)
-        .then((languages) => {
-            let sets = {};
-
-            for(let language of languages) {
-                let properties = content.getLocalizedProperties(language);
-                
-                sets[language] = properties;
-            }
-
-            return Promise.resolve(sets);
-        });
-    }
-    
-    /**
      * Gets all languages
      *
      * @returns {Array} List of language names

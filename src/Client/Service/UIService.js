@@ -18,7 +18,9 @@ class UIService {
      */
     static highlight(element, label, direction = 'right', buttonLabel) {
         if(element === false) {
-            $('.widget--highlight').remove();
+            for(let el of Array.from(document.querySelectorAll('.widget--highlight') || [])) {
+                el.parentElement.removeChild(el);   
+            }
 
             return;
         }
@@ -30,7 +32,7 @@ class UIService {
         if(!element) { return Promise.resolve(); }
 
         return new Promise((resolve) => {
-            let highlight = new HashBrown.Entity.View.Modal.Highlight({
+            let highlight = HashBrown.Entity.View.Modal.Highlight.new({
                 model: {
                     element: element,
                     label: label,
@@ -72,7 +74,6 @@ class UIService {
         }
        
         debug.log(error.message + ': ' + error.stack, 'HashBrown');
-        console.trace();
 
         return this.notify('Error', error.message, onClickOK, 'error');
     }
@@ -85,7 +86,7 @@ class UIService {
      * @param {Number} timeout
      */
     static notifySmall(heading, message, timeout) {
-        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+        let modal = HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: heading,
                 message: message,
@@ -108,7 +109,7 @@ class UIService {
      * @param {Function} onClickOK
      */
     static notify(heading, message, onClickOK) {
-        let modal = new HashBrown.Entity.View.Modal.ModalBase({
+        let modal = HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: heading,
                 message: message,
@@ -133,7 +134,7 @@ class UIService {
      * @param {Function} onClickOK
      */
     static prompt(heading, message, widget, value, onClickOK) {
-        let modal = new HashBrown.Entity.View.Modal.Prompt({
+        let modal = HashBrown.Entity.View.Modal.Prompt.new({
             model: {
                 heading: heading,
                 message: message,
@@ -158,7 +159,7 @@ class UIService {
      * @param {Function} onClickNo
      */
     static confirm(heading, message, onClickYes, onClickNo) {
-        let modal = new HashBrown.Entity.View.Modal.Confirm({
+        let modal = HashBrown.Entity.View.Modal.Confirm.new({
             model: {
                 heading: heading,
                 message: message

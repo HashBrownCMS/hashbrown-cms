@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "ArrayEditor",
-    "icon": "list-ol",
+    "customIcon": "list-ol",
     "name": "Array"
 }

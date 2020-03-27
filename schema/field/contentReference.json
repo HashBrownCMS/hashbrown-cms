@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "ContentReferenceEditor",
-    "icon": "file",
+    "customIcon": "file",
     "name": "Content Reference"
 }

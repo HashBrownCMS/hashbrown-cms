@@ -1,7 +1,5 @@
 'use strict';
 
-const BodyParser = require('body-parser');
-
 const SUBMISSION_TIMEOUT_MS = 1000;
 
 // Private vars
@@ -17,130 +15,40 @@ class FormController extends HashBrown.Controller.ResourceController {
     static get category() { return 'forms'; }
     
     /**
-     * Initialises this controller
+     * Routes
      */
-    static init(app) {
-        app.get('/api/:project/:environment/forms/:id/entries', this.middleware(), this.getHandler('entries'));
-
-        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: this.checkCORS }), BodyParser.urlencoded({extended: true}), this.getHandler('submit'));
-        app.post('/api/:project/:environment/forms/clear/:id', this.middleware(), this.getHandler('clear'));
-
-        super.init(app);
-
-        // Init spam prevention timer
-        lastSubmission = Date.now();
+    static get routes() {
+        return {
+            ...super.routes,
+            '/api/${project}/${environment}/forms/${id}/entries': {
+                handler: this.entries,
+                user: {
+                    scope: 'forms'
+                }
+            },
+            '/api/${project}/${environment}/forms/${id}/submit': {
+                handler: this.submit,
+                methods: [ 'POST' ]
+            },
+            '/api/${project}/${environment}/forms/${id}/clear': {
+                handler: this.clear,
+                methods: [ 'POST' ],
+                user: {
+                    scope: 'forms'
+                }
+            }
+        };
     }
       
     /**
-     * Check CORS
-     *
-     * @returns {String} Allowed origin
+     * @example GET /api/${project}/${environment}/forms/${id}/entries
      */
-    static async checkCORS(req, res) {
-        let form = await HashBrown.Service.FormService.getForm(req.params.project, req.params.environment, req.params.id);
+    static async entries(request, params, body, query, user) {
+        let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
 
-        return form.allowedOrigin || '*';
-    }
-
-    /**
-     * @example GET /api/:project/:environment/forms
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Array} Forms
-     */
-    static async getAll(req, res) {
-        return await HashBrown.Service.FormService.getAllForms(req.project, req.environment);
-    }
-    
-    /**
-     * @example DELETE /api/:project/:environment/forms/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     */
-    static async remove(req, res) {
-        let id = req.params.id;
-        
-        await HashBrown.Service.FormService.deleteForm(req.project, req.environment, id)
-
-        return 'Form with id "' + id + '" deleted successfully';
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/forms/pull/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {Form} The pulled Form
-     */
-    static async pull(req, res) {
-        let id = req.params.id;
-
-        let resourceItem = await HashBrown.Service.SyncService.getResourceItem(req.project, req.environment, 'forms', id);
-    
-        if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Form "' + id + '"')); }
-   
-        return await HashBrown.Service.FormService.setForm(req.project, req.environment, id, new HashBrown.Entity.Resource.Form(resourceItem));
-    }
-    
-    /**
-     * @example POST /api/:project/:environment/forms/push/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {Form} The pushed Form id
-     */
-    static async push(req, res) {
-        let id = req.params.id;
-
-        let localForm = await HashBrown.Service.FormService.getForm(req.project, req.environment, id);
-
-        return await HashBrown.Service.SyncService.setResourceItem(req.project, req.environment, 'forms', id, localForm);
-    }
-
-    /**
-     * @example GET /api/:project/:environment/forms/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {Form} Form
-     */
-    static async get(req, res) {
-        return await HashBrown.Service.FormService.getForm(req.project, req.environment, req.params.id);
-    }
-    
-    /**
-     * @example GET /api/:project/:environment/forms/:id/entries
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @returns {String} CSV string
-     */
-    static async entries(req, res) {
-        let form = await HashBrown.Service.FormService.getForm(req.project, req.environment, req.params.id);
+        if(!form) {
+            return new HttpResponse('Not found', 404);
+        }
 
         let csv = '';
 
@@ -162,95 +70,68 @@ class FormController extends HashBrown.Controller.ResourceController {
             csv += '\r\n';
         }
 
-        res.attachment(form.title.toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv');
+        let filename = form.getName().toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv';
 
-        return csv;
+        return new HttpResponse(csv, 200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Cache-Control': 'no-store'
+        });
     }
     
     /**
-     * @example POST /api/:project/:environment/forms/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @param {Form} The Form model to update
-     *
-     * @returns {Form} Form
+     * @example POST /api/${project}/${environment}/forms/${id}/submit { ... }
      */
-    static async set(req, res) {
-        let shouldCreate = req.query.create == 'true' || req.query.create == true;
-        
-        await HashBrown.Service.FormService.setForm(req.project, req.environment, req.params.id, new HashBrown.Entity.Resource.Form(req.body), shouldCreate);
-    }
-
-    /**
-     * @example POST /api/:project/:environment/forms/new
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {String} The created Form id
-     */
-    static async new(req, res) {
-        return await HashBrown.Service.FormService.createForm(req.project, req.environment);
-    }
-
-    /**
-     * @example POST /api/:project/:environment/forms/:id/submit
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @param {Object} entries The submitted entries
-     */
-    static async submit(req, res) {
+    static async submit(request, params, body, query, user) {
         // Prevent spam
         if(
-            lastIp != req.connection.remoteAddress || // This IP is not the same as the previous one
+            lastIp != request.socket.remoteAddress || // This IP is not the same as the previous one
             Date.now() - lastSubmission >= SUBMISSION_TIMEOUT_MS // Timeout has been reached
         ) {
             lastSubmission = Date.now();
-            lastIp = req.connection.remoteAddress;
+            lastIp = request.socket.remoteAddress;
 
-            let form = await HashBrown.Service.FormService.addEntry(req.project, req.environment, req.params.id, req.body);
+            let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
+
+            if(!form) {
+                return new HttpResponse('Not found', 404);
+            }
+            
+            form.addEntry(body);
+
+            await form.save(user, params.project, params.environment);
 
             if(form.redirect) {
                 let redirectUrl = form.redirect;
 
-                if(form.appendRedirect && req.headers.referer) {
-                    redirectUrl = req.headers.referer + redirectUrl;
+                if(form.appendRedirect && request.headers.referer) {
+                    redirectUrl = request.headers.referer + redirectUrl;
                 }
                 
-                res.status(302).redirect(redirectUrl);
+                return new HttpResponse('Redirecting...', 302, { 'Location': redirectUrl });
             }
 
-            return false;
+            return new HttpResponse('OK');
         
         } else {
-            throw new Error('Spam prevention triggered. Please try again later.');
+            return new HttpResponse('Spam prevention triggered. Please try again later.', 400);
         
         }
     }
 
     /**
-     * @example POST /api/:project/:environment/forms/clear/:id
-     *
-     * @apiGroup Forms
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
+     * @example POST /api/${project}/${environment}/forms/${id}/clear
      */
-    static async clear(req, res) {
-        await HashBrown.Service.FormService.clearAllEntries(req.project, req.environment, req.params.id);
+    static async clear(request, params, body, query, user) {
+        let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
+
+        if(!form) {
+            return new HttpResponse('Not found', 404);
+        }
+        
+        await form.clear(params.project, params.environment);
+
+        return new HttpResponse('OK');
     }
 }
 

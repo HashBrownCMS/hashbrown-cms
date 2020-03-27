@@ -5,7 +5,6 @@
  */
 class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get category() { return 'schemas'; }
-    static get itemType() { return HashBrown.Entity.Resource.Schema.SchemaBase; }
     
     /**
      * Constructor
@@ -20,27 +19,31 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Fetches the model
      */
     async fetch() {
-        if(this.state.id) {
-            this.model = await HashBrown.Service.SchemaService.getSchemaById(this.state.id);
-            this.state.compiledSchema = await HashBrown.Service.SchemaService.getSchemaById(this.model.id, true);
+        await super.fetch();
+
+        if(!this.model) { return; }
+
+        this.state.compiledSchema = await HashBrown.Entity.Resource.SchemaBase.get(this.model.id, { withParentFields: true });
+
+        let allContentSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
+
+        this.state.childSchemaOptions = {};
+
+        for(let schema of allContentSchemas) {
+            if(schema.id === 'contentBase' || schema.id === 'page') { continue; }
+
+            this.state.childSchemaOptions[schema.name] = schema.id;
+        }
+        
+        this.state.parentSchemaOptions = {};
+
+        let parentSchemas = await this.model.constructor.list();
+
+        for(let schema of parentSchemas) {
+            if(schema.id === this.model.id) { continue; }
             
-            let allContentSchemas = await HashBrown.Service.SchemaService.getAllSchemas('content');
-            let allFieldSchemas = await HashBrown.Service.SchemaService.getAllSchemas('field');
-
-            this.state.childSchemaOptions = {};
-
-            for(let schema of allContentSchemas) {
-                this.state.childSchemaOptions[schema.name] = schema.id;
-            }
-            
-            this.state.parentSchemaOptions = {};
-
-            for(let schema of this.model.type === 'field' ? allFieldSchemas : allContentSchemas) {
-                if(schema.id === this.model.id) { continue; }
-                
-                this.state.parentSchemaOptions[schema.name] = schema.id;
-            }
-        }    
+            this.state.parentSchemaOptions[schema.name] = schema.id;
+        }   
     }
 
     /**
@@ -49,10 +52,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     prerender() {
         if(this.state.name) { return; }
 
-        this.state.title = this.model.name;
-        this.state.icon = this.model.icon || this.state.compiledSchema.icon;
-        
-        if(this.model instanceof HashBrown.Entity.Resource.Schema.ContentSchema) {
+        if(this.model instanceof HashBrown.Entity.Resource.ContentSchema) {
             this.state.tab = this.state.tab || 'content';
             this.state.properties = {};
             this.state.parentTabs = {};
@@ -71,10 +71,10 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 this.state.tabOptions[this.model.tabs[tabId]] = tabId;
             }
 
-            if(!this.model.fields || !this.model.fields.properties) { return; }
+            if(!this.model.config) { return; }
 
-            for(let key in this.model.fields.properties) {
-                let definition = this.model.fields.properties[key];
+            for(let key in this.model.config) {
+                let definition = this.model.config[key];
 
                 if(!definition.tabId) { definition.tabId = 'content'; }
 
@@ -83,10 +83,10 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
                 this.state.properties[key] = definition.label;
             }
         
-        } else if(this.model instanceof HashBrown.Entity.Resource.Schema.FieldSchema) {
+        } else if(this.model instanceof HashBrown.Entity.Resource.FieldSchema) {
             this.state.fieldConfigEditor = null;
             
-            let fieldType = HashBrown.Entity.View.Field[this.model.editorId];
+            let fieldType = HashBrown.Entity.View.Field[this.state.compiledSchema.editorId];
            
             if(fieldType) {
                 this.state.fieldConfigEditor = new fieldType({
@@ -129,7 +129,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Click change icon
      */
     onClickChangeIcon() {
-        let modal = new HashBrown.Entity.View.Modal.PickIcon();
+        let modal = HashBrown.Entity.View.Modal.PickIcon.new();
 
         modal.on('change', (newIcon) => {
             this.model.icon = newIcon;
@@ -145,15 +145,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * @param {String} key
      */
     onClickEditField(key) {
-        if(!this.model.fields) { this.model.fields = {}; }
-        if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { tabId: this.state.tab, schemaId: 'string' }; }
+        if(!this.model.config) { this.model.config = {}; }
+        if(!this.model.config[key]) { this.model.config[key] = { tabId: this.state.tab, schemaId: 'string' }; }
 
-        let modal = new HashBrown.Entity.View.Modal.EditField({
+        let modal = HashBrown.Entity.View.Modal.EditField.new({
             model: {
                 tabOptions: this.state.tabOptions,
                 key: key,
-                definition: this.model.fields.properties[key]
+                definition: this.model.config[key]
             }
         });
         
@@ -175,27 +174,37 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     /**
      * Event: Click start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.SchemaService.startTour();
+    async onClickStartTour() {
+        if(location.hash.indexOf('schemas/') < 0) {
+            location.hash = '/schemas/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
+            
+        await UI.highlight('.navigation--resource-browser__tab[href="#/schemas/"]', 'This the schemas section, where you will define how content is structured.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your schemas. They are divided into 2 major categories, "field base" and "content base". Content schemas define which fields are available to content authors, and field schemas define how they are presented.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the schema editor, where you can edit schemas.', 'left', 'next');
     }
 
     /**
      * Event: Change field key
      */
     onChangeFieldKey(oldKey, newKey) {
-        let keys = Object.keys(this.model.fields.properties);
+        let keys = Object.keys(this.model.config);
 
         let newFields = {};
 
         for(let key of keys) {
-            let value = this.model.fields.properties[key];
+            let value = this.model.config[key];
 
             if(key === oldKey) { key = newKey; }
 
             newFields[key] = value;
         }
 
-        this.model.fields.properties = newFields;
+        this.model.config = newFields;
 
         this.onChange();
     }
@@ -204,11 +213,10 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Change field definition
      */
     onChangeFieldDefinition(key, newValue) {
-        if(!this.model.fields) { this.model.fields = {}; }
-        if(!this.model.fields.properties) { this.model.fields.properties = {}; }
-        if(!this.model.fields.properties[key]) { this.model.fields.properties[key] = { schemaId: 'string' }; }
+        if(!this.model.config) { this.model.config = {}; }
+        if(!this.model.config[key]) { this.model.config[key] = { schemaId: 'string' }; }
        
-        this.model.fields.properties[key] = newValue;
+        this.model.config[key] = newValue;
 
         this.onChange();
     }
@@ -221,14 +229,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
         // Add fields from list widget
         for(let key in fields) {
-            let definition = this.model.fields.properties[key];
+            let definition = this.model.config[key];
 
             newFields[key] = definition || { tabId: this.state.tab, label: fields[key] };
         }
         
         // Add back remaining fields not in the current view
-        for(let key in this.model.fields.properties) {
-            let definition = this.model.fields.properties[key];
+        for(let key in this.model.config) {
+            let definition = this.model.config[key];
 
             if(definition.tabId === this.state.tab) { continue; }
 
@@ -237,7 +245,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         
         let isNewField = Object.keys(fields).length > Object.keys(this.state.properties).length;
 
-        this.model.fields.properties = newFields;
+        this.model.config = newFields;
         
         if(isNewField) {
             this.onClickEditField(Object.keys(fields).pop());
@@ -267,8 +275,8 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     /**
      * Event: Change parent schema id
      */
-    onChangeParentSchemaId(newValue) {
-        this.model.parentSchemaId = newValue;
+    onChangeParentId(newValue) {
+        this.model.parentId = newValue;
 
         this.onChange();
     }
@@ -306,7 +314,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
      * Event: Click save
      */
     async onClickSave() {
-        await HashBrown.Service.SchemaService.setSchemaById(this.state.id, this.model);
+        await this.model.save();
 
         UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
         
@@ -315,33 +323,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
         if(this.state.id !== this.model.id) {
             location.hash = `/schemas/${this.model.id}`;
         }
-    }
-
-    /**
-     * Event: Click import
-     */
-    onClickImport() {
-        let modal = UI.prompt(
-            'Import schemas',
-            'URL to uischema.org definitions',
-            'text',
-            'https://uischema.org/schemas.json',
-            async (url) => {
-                if(!url) { UI.notify('Missing URL', 'Please specify a URL'); }
-
-                try {
-                    await HashBrown.Service.RequestService.request('post', 'schemas/import?url=' + url);
-
-                    HashBrown.Service.EventService.trigger('resource'); 
-
-                    UI.notifySmall('Schemas imported successfully from ' + url, null, 3);
-
-                } catch(e) {
-                    UI.error(e);
-
-                }
-            }
-        );
     }
 }
 

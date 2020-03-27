@@ -15,7 +15,7 @@ module.exports = (_, view) => `
             </div>
         ` : ''}
 
-        <form class="page--setup__step" data-step="${view.step}" action="/api/users/first">
+        <form class="page--setup__step" method="POST">
             <h1>Create your first admin account</h1>
             <input class="widget widget--text large" required title="Your username" type="text" name="username" placeholder="Username">
             <input class="widget widget--text large" required title="Your password" type="password" name="password" placeholder="Password">

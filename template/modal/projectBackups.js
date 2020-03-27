@@ -5,7 +5,7 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal in'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Backups for ${model.settings.info.name}`),
+            _.h4({class: 'modal__title'}, `Backups for ${model.getName()}`),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},

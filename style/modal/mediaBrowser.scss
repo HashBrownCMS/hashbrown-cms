@@ -26,10 +26,9 @@
     &__items {
         flex-grow: 1;
         padding: 0.5rem;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 1rem;
         min-height: 20rem;
 
         &::after {
@@ -41,24 +40,19 @@
 
     &__search {
         flex-grow: 0;
-        width: auto;
+        width: auto !important;
     }
 
     &__item {
-        flex-grow: 1;
         border: 0;
-        padding: 0.5rem;
-        cursor: pointer;
         background-color: transparent;
-        margin: 0;
-        min-width: 20rem;
-        max-width: calc(100% / 3);
-        height: 20rem;
-        position: relative;
-        border: 1px solid transparent;
+        padding: 0;
+        cursor: pointer;
 
         &:hover {
-            border-color: var(--color-action-500);
+            .widget--media__preview {
+                background-color: var(--color-action-500);
+            }
         }
         
         @include tablet {

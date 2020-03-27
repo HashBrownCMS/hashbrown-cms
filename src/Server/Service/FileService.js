@@ -5,7 +5,6 @@ const Path = require('path');
 const Util = require('util');
 const HTTP = require('http');
 const HTTPS = require('https');
-const Url = require('url');
 
 const Glob = require('glob');
 
@@ -45,7 +44,7 @@ class FileService {
             
         await this.makeDirectory(path, position + 1);
     }
-
+    
     /**
      * Checks if a file or folder exists
      *
@@ -53,7 +52,7 @@ class FileService {
      *
      * @return {Promise} Whether or not the file/folder exists
      */
-    static async exists(path) {
+    static exists(path) {
         checkParam(path, 'path', String);
 
         return FileSystem.existsSync(path);
@@ -97,12 +96,25 @@ class FileService {
     }
 
     /**
+     * Creates a read stream
+     *
+     * @param {String} path
+     *
+     * @return {FileSystem.ReadStream} Stream
+     */
+    static readStream(path) {
+        checkParam(path, 'path', String, true);
+
+        return FileSystem.createReadStream(path);
+    }
+
+    /**
      * Reads a file or files in a folder
      *
      * @param {String} path
      * @param {String} encoding
      *
-     * @return {Promise} Buffer or array of buffers
+     * @return {Buffer|Array} Data
      */
     static async read(path, encoding) {
         checkParam(path, 'path', String, true);
@@ -241,7 +253,7 @@ class FileService {
         await new Promise((resolve, reject) => {
             // Copy from a URL
             if(from.indexOf('://') > -1) {
-                let url = Url.parse(from);
+                let url = URL(from);
 
                 let options = {
                     host: url.hostname,
@@ -289,7 +301,7 @@ class FileService {
     static async stat(path) {
         return await new Promise((resolve, reject) => {
             FileSystem.stat(path, (err, stats) => {
-                if(err) { return reject(err); }
+                if(err) { return resolve(null); }
 
                 resolve(stats);
             });

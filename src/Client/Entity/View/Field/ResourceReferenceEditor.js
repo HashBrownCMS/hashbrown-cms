@@ -23,7 +23,7 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
         await super.fetch();
 
         if(this.state.name === 'config') {
-            this.state.categoryOptions = HashBrown.Service.ResourceService.getResourceCategoryNames();
+            this.state.categoryOptions = HashBrown.Entity.Resource.ResourceBase.getAllCategories();
             this.state.keyOptions = [];
 
             if(this.model.config.resource) {
@@ -39,7 +39,9 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         } else {
             if(this.model.config.resource && this.state.value) {
-                this.state.resource = await HashBrown.Service.ResourceService.get(null, this.model.config.resource, this.state.value); 
+                let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.model.config.resource);
+
+                this.state.resource = model ? await model.get(this.state.value) : null;
             }
 
             this.state.label = this.getValueLabel();

@@ -19,16 +19,11 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Clicked regenerate
      */
     async onClickRegenerate() {
-        let category = HashBrown.Service.NavigationService.getRoute(0);
+        let editor = HashBrown.Context.currentResourceEditor;
 
-        if(!category) { return; }
+        if(!editor || !editor.model) { return; }
 
-        let contentId = HashBrown.Service.NavigationService.getRoute(1);
-
-        if(!contentId) { return; }
-
-        let content = await HashBrown.Service.ContentService.getContentById(contentId);
-
+        let content = editor.model;
         let url = '/';
 
         while(content) {
@@ -41,10 +36,12 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
             if(!content.parentId) { break; }
 
-            content = await HashBrown.Service.ContentService.getContentById(content.parentId);
+            content = await HashBrown.Entity.Resource.Content.get(content.parentId);
         }
-        
-        if(HashBrown.Context.projectSettings.languages.length > 1 && HashBrown.Context.language) {
+       
+        let languages = HashBrown.Context.project.settings.languages;
+
+        if(languages.length > 1 && HashBrown.Context.language) {
             url = '/' + HashBrown.Context.language + url; 
         }
 

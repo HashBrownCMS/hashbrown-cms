@@ -1,116 +1,231 @@
 'use strict';
 
+const HTTP = require('http');
+
 /**
  * A controller for resource endpoints
  *
  * @memberof HashBrown.Server.Controller
  */
-class ResourceController extends HashBrown.Controller.ApiController {
+class ResourceController extends HashBrown.Controller.ControllerBase {
     static get category() {
         throw new Error('The "category" getter method must be overridden');
     }
-   
-    /**
-     * Initialises this controller
-     */
-    static init(app) {
-        app.get('/api/:project/:environment/' + this.category, this.middleware(), this.getHandler('getAll'));
-        app.get('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('get'));
 
-        app.post('/api/:project/:environment/' + this.category + '/new', this.middleware(), this.getHandler('new'));
-        app.post('/api/:project/:environment/' + this.category + '/pull/:id', this.middleware(), this.getHandler('pull'));
-        app.post('/api/:project/:environment/' + this.category + '/push/:id', this.middleware(), this.getHandler('push'));
-        app.post('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('set'));
-        app.post('/api/:project/:environment/' + this.category + '/heartbeat/:id', this.middleware(), this.getHandler('heartbeat'));
+    static get routes() {
+        let routes = {};
 
-        app.delete('/api/:project/:environment/' + this.category + '/:id', this.middleware(), this.getHandler('remove'));
-    }
-
-    /**
-     * Gets an endpoint handler
-     *
-     * @param {String} name
-     *
-     * @return {Function} Handler reference
-     */
-    static getHandler(name) {
-        if(typeof this[name] !== 'function') { throw new Error('Handler method "' + name + '" could not be found'); }
-
-        return async (req, res) => {
-            try {
-                let response = await this[name](req, res);
-
-                if(response !== false) {
-                    res.status(200).send(response || 'OK');
-                
-                } else {
-                    res.status(404).send('Not found');
-
-                }
-            
-            } catch(e) {
-                res.status(e.code || 404).send(this.printError(e));
-
+        routes['/api/${project}/${environment}/' + this.category] = {
+            handler: this.resources,
+            user: true
+        };
+        routes['/api/${project}/${environment}/' + this.category + '/new'] = {
+            handler: this.new,
+            methods: [ 'POST' ],
+            user: {
+                scope: this.category
             }
         };
+        routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
+            handler: this.resource,
+            methods: [ 'GET', 'POST', 'DELETE' ],
+            user: true
+        };
+        
+        // Sync
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/pull'] = {
+            handler: this.pull,
+            methods: [ 'POST' ],
+            user: {
+                scope: this.category
+            }
+        };
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/push'] = {
+            handler: this.push,
+            methods: [ 'POST' ],
+            user: {
+                scope: this.category
+            }
+        };
+
+        // Heartbeat
+        routes['/api/${project}/${environment}/' + this.category + '/${id}/heartbeat'] = {
+            handler: this.heartbeat,
+            methods: [ 'POST' ],
+            user: {
+                scope: this.category
+            }
+        };
+
+        return routes;
+    }
+    
+    /**
+     * Resets last modified dates related to a key
+     *
+     * @param {String} key
+     */
+    static resetLastModified(key) {
+        checkParam(key, 'key', String);
+   
+        if(!key) { return; }
+
+        // Ignore heartbeat requests
+        if(key.indexOf('/heartbeat') > -1) { return; }
+
+        // Modify key to widen search for similar keys
+        key = key.split('/' + this.category + '/').shift() + '/' + this.category;
+
+        super.resetLastModified(key);
+    }
+    
+    /**
+     * Checks whether this controller can handle a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     *
+     * @return {Boolean} Can handle request
+     */
+    static canHandle(request) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+
+        if(this === HashBrown.Controller.ResourceController) { return false; }
+
+        return super.canHandle(request);
     }
 
     /**
-     * Updates the edited time of a resource
+     * @example POST /api/${project}/${environment}/${category}/${id}/heartbeat
      */
-    static async heartbeat(req, res) {
-        if(req.body && req.user) {
-            await HashBrown.Service.DatabaseService.updateOne(req.project, req.environment + '.' + this.category, { id: req.params.id }, { viewedBy: req.user.id, viewedOn: new Date() });
+    static async heartbeat(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
         }
-    }
+        
+        let resource = await model.get(params.project, params.environment, params.id);
 
-    /**
-     * Gets all resources
-     */
-    static async getAll(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::getAll');
-    }
+        if(!resource) {
+            return new HttpResponse('Not found', 404);
+        }
 
+        await resource.heartbeat(params.project, params.environment, user);
+        
+        return new HttpResponse('OK');
+    }
+   
     /**
-     * Gets a resource item
+     * @example POST /api/${project}/${environment}/${category}/{$id}/pull
+     *
+     * @return {Object} The pulled resource
      */
-    static async get(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::get');
+    static async pull(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
+        let resource = await model.get(params.project, params.environment, params.id);
+        
+        await resource.pull(user, params.project, params.environment);
+
+        return new HttpResponse(resource);
     }
     
     /**
-     * Creates a new resource item
+     * @example POST /api/${project}/${environment}/{category}/${id}/push
      */
-    static async new(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::new');
-    }
+    static async push(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
 
-    /**
-     * Pulls a resource item from remote
-     */
-    static async pull(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::pull');
-    }
-
-    /**
-     * Pushes a resource item to remote
-     */
-    static async push(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::push');
+        let resource = await model.get(params.project, params.environment, params.id);
+        
+        await resource.push(user, params.project, params.environment);
+    
+        return new HttpResponse('OK');
     }
     
     /**
-     * Updates a resource item
+     * @example GET /api/${project}/${environment}/${category}
      */
-    static async set(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::set');
-    }
+    static async resources(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
+        let resources = await model.list(params.project, params.environment, query);
 
+        return new HttpResponse(resources);
+    }
+    
     /**
-     * Removes a resource item
+     * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}
      */
-    static async remove(req, res) {
-        throw new HttpError(404, 'No method defined for ' + this.name + '::remove');
+    static async resource(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
+        let resource = await model.get(params.project, params.environment, params.id, query);
+                
+        if(!resource) {
+            return new HttpResponse('Not found', 404);
+        }
+
+        switch(request.method) {
+            case 'GET':
+                return new HttpResponse(resource, 200, { 'Last-Modified': (resource.updatedOn || new Date()).toString() });
+                
+            case 'POST':
+                if(!user.hasScope(this.category)) {
+                    return new HttpResponse('You do not have access to edit this resource', 403);
+                }
+
+                resource.adopt(body);
+
+                // In case the id was changed, make sure to include the old id in the options
+                query.id = params.id;
+                    
+                await resource.save(user, params.project, params.environment, query);
+                
+                return new HttpResponse(resource);
+
+            case 'DELETE':
+                if(!user.hasScope(this.category)) {
+                    return new HttpResponse('You do not have access to remove this resource', 403);
+                }
+                
+                await resource.remove(user, params.project, params.environment, query);
+
+                return new HttpResponse('OK');
+        }
+
+        return new HttpResponse('Unexpected error', 500);
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/${category}/new
+     */
+    static async new(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
+        let resource = await model.create(user, params.project, params.environment, body, query);
+
+        return new HttpResponse(resource);
     }
 }
 

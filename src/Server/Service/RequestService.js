@@ -4,7 +4,6 @@ const HTTP = require('http');
 const HTTPS = require('https');
 const QueryString = require('querystring');
 const FileSystem = require('fs');
-const URL = require('url');
 const Path = require('path');
 
 const MAX_REDIRECTS = 10;
@@ -48,44 +47,6 @@ class RequestService {
     }
 
     /**
-     * Makes a paginated request
-     *
-     * @param {String} address
-     * @param {Object} data
-     * @param {Number} maxPages
-     *
-     * @returns {Promise} Response
-     */
-    static getPaginated(url, data = null, maxPages = 10) {
-        checkParam(url, 'url', String);
-
-        if(!data) {
-            data = {};
-        }
-
-        data.page = 0;
-
-        let combinedResult = [];
-
-        let getNext = () => {
-            return this.request('get', url, data)
-            .then((result) => {
-                if(!result || !Array.isArray(result) || result.length < 1) {
-                    return Promise.resolve(combinedResult);
-                }
-
-                combinedResult = combinedResult.concat(result);
-
-                data.page++;
-
-                return getNext();
-            });
-        };
-
-        return getNext();
-    }
-
-    /**
      * Makes a generic request
      *
      * @param {String} method
@@ -124,7 +85,7 @@ class RequestService {
             }
           
             // Parse URL
-            url = URL.parse(url);
+            url = new URL(url);
             
             let headers = {
                 'Accept': '*/*',
@@ -146,7 +107,7 @@ class RequestService {
                 let options = {
                     port: url.port,
                     host: url.hostname,
-                    path: url.path,
+                    path: url.pathname,
                     method: method,
                     headers: headers
                 };
@@ -159,11 +120,11 @@ class RequestService {
                             return reject(new Error('Max amount of redirects exceeded'));
                         }
 
-                        let newUrl = URL.parse(res.headers.location);
+                        let newUrl = new URL(res.headers.location);
 
                         // Host name not found, prepend old one
-                        if(!newUrl.host) {
-                            newUrl.host = url.host;
+                        if(!newUrl.hostname) {
+                            newUrl.hostname = url.hostname;
                         }
                        
                         url = newUrl;

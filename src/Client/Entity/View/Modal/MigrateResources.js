@@ -61,7 +61,7 @@ class MigrateResources extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickMigrate() {
         try {
-            await HashBrown.Service.RequestService.request('post', 'server/migrate/' + this.model.id, this.state)
+            await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/migrate', this.state)
        
             this.trigger('change');
             

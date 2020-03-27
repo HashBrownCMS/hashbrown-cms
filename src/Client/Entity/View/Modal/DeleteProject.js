@@ -20,11 +20,11 @@ class DeleteProject extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickDelete() {
         try {
-            await HashBrown.Service.RequestService.request('delete', 'server/projects/' + this.model.id);
+            await HashBrown.Service.RequestService.request('delete', 'projects/' + this.model.id);
 
             this.trigger('change');
 
-            this.setState('success');
+            this.close();
 
         } catch(e) {
             this.setErrorState(e);
@@ -37,7 +37,7 @@ class DeleteProject extends HashBrown.Entity.View.Modal.ModalBase {
      */
     onInputName(projectName) {
         let btn = this.element.querySelector('.modal__footer .widget--button');
-        let isMatch = projectName == this.model.settings.info.name;
+        let isMatch = projectName == this.model.getName();
 
         btn.classList.toggle('disabled', !isMatch);
     }

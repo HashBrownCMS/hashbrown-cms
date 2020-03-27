@@ -7,10 +7,10 @@ const FORMS = {};
 const CONTENT = {
     '3217ea5955478c0b': {
         id: '3217ea5955478c0b',
-        createDate: Date.now(),
-        updateDate: Date.now(),
+        createdOn: Date.now(),
+        updatedOn: Date.now(),
         createdBy: 'demoUser',
-        updateddBy: 'demoUser',
+        updatedBy: 'demoUser',
         schemaId: 'webPage',
         sort: 10000,
         properties: {
@@ -42,7 +42,7 @@ const SCHEMAS = {
         id: 'module',
         name: 'Module',
         type: 'field',
-        parentSchemaId: 'struct',
+        parentId: 'struct',
         config: {
             struct: {
                 string: {
@@ -70,7 +70,7 @@ const SCHEMAS = {
         allowedChildSchemas: [ 'webPage' ],
         allowedAtRoot: true,
         name: 'Web Page',
-        parentSchemaId: 'page',
+        parentId: 'page',
         fields: {
             properties: {
                 array: {
@@ -371,11 +371,9 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
     
             } else {
                 if(id === 'new') {
-                    let parentSchemaId = HashBrown.Service.NavigationService.getQuery('parentSchemaId', query);
-                    let parentSchema = await HashBrown.Service.SchemaService.getSchemaById(parentSchemaId);
-                    let schema = HashBrown.Entity.Resource.Schema.SchemaBase.create(parentSchema);
-
-                    schema.type = parentSchema.type;
+                    let parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
+                    let parentSchema = await HashBrown.Entity.Resource.SchemaBase.get(parentId);
+                    let schema = await HashBrown.Entity.Resource.SchemaBase.create({ parentId: parentId });
 
                     SCHEMAS[schema.id] = schema;
 
@@ -408,7 +406,7 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
             throw new Error('Custom users not available in demo');
 
         case 'settings':
-            return HashBrown.Context.projectSettings;
+            return HashBrown.Context.project.settings;
     }
 
     throw new Error('Unknown resource category "' + category + '". URL was ' + url);
@@ -418,9 +416,9 @@ for(let id in SCHEMAS) {
     let schema = SCHEMAS[id];
 
     schema.id = id;
-    schema.isLocked = schema.parentSchemaId === 'fieldBase' || schema.parentSchemaId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
+    schema.isLocked = schema.parentId === 'fieldBase' || schema.parentId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
     
     if(!schema.type) {
-        schema.type = schema.parentSchemaId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
+        schema.type = schema.parentId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
     }
 }

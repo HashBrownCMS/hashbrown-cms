@@ -4,8 +4,8 @@
  * The editor for content resources
  */
 class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get itemType() { return HashBrown.Entity.Resource.Content; }
-    
+    static get category() { return 'content'; }
+
     /**
      * Constructor
      */
@@ -34,16 +34,12 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         }
 
         // Get schema and settings
-        this.state.schema = await HashBrown.Service.SchemaService.getSchemaById(this.model.schemaId, true);
+        this.state.schema = await HashBrown.Entity.Resource.ContentSchema.get(this.model.schemaId, { withParentFields: true });
         this.state.publishing = await this.model.getSettings('publishing') || {};
 
         if(this.state.publishing.connectionId) {
-            this.state.connection = await HashBrown.Service.ConnectionService.getConnectionById(this.state.publishing.connectionId); 
+            this.state.connection = await HashBrown.Entity.Resource.Connection.get(this.state.publishing.connectionId); 
         }
-
-        // Set standard editor info
-        this.state.icon = this.state.schema.icon;
-        this.state.title = this.model.prop('title', HashBrown.Context.language) || this.model.id;
 
         // Establish tabs
         this.state.tab = HashBrown.Service.NavigationService.getRoute(2) || this.state.schema.defaultTabId || 'meta';
@@ -55,25 +51,49 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
         let contentFields = {};
         let schemaFields = {};
-
-        if(this.state.tab === 'meta') {
-            schemaFields = JSON.parse(JSON.stringify(this.state.schema.fields));
-            delete schemaFields['properties'];
-            
-            contentFields = JSON.parse(JSON.stringify(this.model));
-            delete contentFields['properties'];
         
+        if(this.state.tab === 'meta') {
+            contentFields = {
+                publishOn: this.model.publishOn,
+                unpublishOn: this.model.unpublishOn,
+                schemaId: this.model.schemaId
+            };
+
+            schemaFields = {
+                publishOn: {
+                    label: 'Publish on',
+                    schemaId: 'date',
+                    tabId: 'meta'
+                },
+                unpublishOn: {
+                    label: 'Unpublish on',
+                    schemaId: 'date',
+                    tabId: 'meta'
+                },
+                schemaId: {
+                    label: 'Schema',
+                    schemaId: 'contentSchemaReference',
+                    tabId: 'meta',
+                    config: {
+                        allowedSchemas: 'fromParent'
+                    }
+                }
+            };
+
         } else {
-            for(let key in this.state.schema.fields.properties) {
-                let definition = this.state.schema.fields.properties[key];
+            contentFields = this.model.getObject().properties || {};
 
-                if(definition.tabId !== this.state.tab) { continue; }
-            
-                schemaFields[key] = this.state.schema.fields.properties[key];
+            for(let key in this.state.schema.config) {
+                let definition = this.state.schema.config[key];
+              
+                if(!definition.tabId || definition.tabId === 'meta') {
+                    definition.tabId = 'content';
+                }
+
+                if(this.state.tab !== definition.tabId) { continue; }
+
+                schemaFields[key] = this.state.schema.config[key];
             }
-
-            contentFields = this.model.properties;
-
         }
 
         // Instiantiate field views
@@ -109,25 +129,18 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     /**
      * Event: Clicked start tour
      */
-    onClickStartTour() {
-        HashBrown.Service.ContentService.startTour();
-    }
-
-    /**
-     * Event: Click example content
-     */
-    onClickExampleContent() {
-        UI.confirm(
-            'Example content',
-            'Do you want to load some example content? This could overwrite existing schemas',
-            async () => {
-                await HashBrown.Service.RequestService.request('post', 'content/example');
+    async onClickStartTour() {
+        if(location.hash.indexOf('content/') < 0) {
+            location.hash = '/content/';
+        }
+       
+        await new Promise((resolve) => { setTimeout(() => { resolve(); }, 500); });
             
-                HashBrown.Service.EventService.trigger('resource');
-                
-                UI.notifySmall('Example content loaded successfully', null, 3);
-            }
-        );
+        await UI.highlight('.navigation--resource-browser__tab[href="#/content/"]', 'This the content section, where you will do all of your authoring.', 'right', 'next');
+
+        await UI.highlight('.panel', 'Here you will find all of your authored content, like web pages. You can right click here to create a content node.', 'right', 'next');
+        
+        await UI.highlight('.resource-editor', 'This is the content editor, where you edit content nodes.', 'left', 'next');
     }
 
     /**
@@ -149,6 +162,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Click save
      */
     async onClickSave() {
+        this.state.title = this.model.getName();
+        
         let publishedCheckbox = this.namedElements.published;
         this.model.isPublished = publishedCheckbox ? publishedCheckbox.model.value : false;
 
@@ -157,7 +172,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         }
 
         try {
-            await HashBrown.Service.ContentService.setContentById(this.state.id, this.model);
+            await this.model.save();
         
             if(this.model.isPublished) {
                 UI.notifySmall(`"${this.state.title}" published successfully`, null, 3);
@@ -189,7 +204,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Click new
      */
     async onClickNew() {
-        new HashBrown.Entity.View.Modal.CreateContent();
+        HashBrown.Entity.View.Modal.CreateContent.new();
     }
 }
 

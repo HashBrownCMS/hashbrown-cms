@@ -23,7 +23,7 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
         // Build schema options
         this.state.schemaOptions = {};
 
-        for(let schema of await HashBrown.Service.SchemaService.getAllSchemas('field') || []) {
+        for(let schema of await HashBrown.Entity.Resource.FieldSchema.list()) {
             if(schema.id === 'fieldBase') { continue; }
 
             this.state.schemaOptions[schema.name] = schema.id;
@@ -42,7 +42,7 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
             }
         );
 
-        if(view.configTemplate && view.model.schema && view.model.schema.parentSchemaId === 'fieldBase') {
+        if(view.configTemplate && view.model.schema && view.model.schema.parentId === 'fieldBase') {
             view.on('change', (newValue) => {
                 this.onChangeConfig(newValue);
             });

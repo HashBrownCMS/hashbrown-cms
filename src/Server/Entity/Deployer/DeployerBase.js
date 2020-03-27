@@ -7,7 +7,98 @@ const Path = require('path');
  *
  * @memberof HashBrown.Server.Entity
  */
-class DeployerBase extends require('Common/Entity/Deployer/DeployerBase.js') {
+class DeployerBase extends HashBrown.Entity.EntityBase {
+    static get title() { return null; }
+    static get alias() { return null; }
+    
+    get name() { return this.constructor.name; }
+    get alias() { return this.constructor.alias; }
+    
+    /**
+     * Constructor
+     */
+    constructor(params) {
+        super(params);
+    }
+   
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+        
+        params = params || {};
+
+        delete params.title;
+        delete params.name;
+        delete params.alias;
+        
+        params.paths = params.paths || {};
+
+        super.adopt(params);
+    }
+
+    /**
+     * Structure
+     */
+    structure() {
+        this.def(Object, 'paths', {
+            media: '',
+            content: ''
+        });
+    }
+    
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        object.alias = this.alias;
+
+        return object;
+    }
+    
+    /**
+     * Instantiates a new deployer
+     *
+     * @param {Object} params
+     *
+     * @return {HashBrown.Entity.Deployer} Instance
+     */
+    static new(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+
+        let model = this.getByAlias(params.alias) || this;
+
+        return new model(params);
+    }
+
+    /**
+     * Gets a deployer by alias
+     *
+     * @string {String} alias
+     *
+     * @returns {HashBrown.Entity.Deployer} Deployer
+     */
+    static getByAlias(alias) {
+        for(let name in HashBrown.Entity.Deployer) {
+            let deployer = HashBrown.Entity.Deployer[name];
+
+            if(deployer.alias !== alias) { continue; }
+
+            return deployer;
+        }
+        
+        return null;
+    }
+    
     /**
      * Gets the root path
      *
@@ -52,8 +143,8 @@ class DeployerBase extends require('Common/Entity/Deployer/DeployerBase.js') {
      *
      * @returns {Promise} Result
      */
-    test() {
-        return Promise.reject(new Error('The "test" method should be overridden.'));
+    async test() {
+        throw new Error('The "test" method must be overridden.');
     }
     
     /**

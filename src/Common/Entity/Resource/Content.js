@@ -6,8 +6,19 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Content extends HashBrown.Entity.Resource.ResourceBase {
+    static get icon() { return 'file'; }
+    get icon() { return this.schema ? this.schema.icon : super.icon; }
     static get category() { return 'content'; }
-    
+
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} 
+     */
+    getName() {
+        return this.id;
+    }
+
     /**
      * Structure
      */
@@ -16,21 +27,13 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
 
         // Fundamental fields
         this.def(String, 'parentId');
-        this.def(String, 'createdBy');
-        this.def(String, 'updatedBy');
-        this.def(Date, 'createDate');
-        this.def(Date, 'updateDate');
         this.def(String, 'schemaId');
         this.def(Number, 'sort', -1);
-        this.def(Boolean, 'isLocked');
         
         // Publishing
         this.def(Date, 'publishOn');
         this.def(Date, 'unpublishOn');
         this.def(Boolean, 'isPublished');
-
-        // Sync
-        this.def(Object, 'sync');
 
         // Extensible properties
         this.def(Object, 'properties', {});
@@ -44,14 +47,14 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Checks the format of the params
+     * Adopts values into this entity
      *
-     * @params {Object} params
-     *
-     * @returns {Object} Params
+     * @param {Object} params
      */
-    static paramsCheck(params) {
-        params = super.paramsCheck(params);
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -66,38 +69,20 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
             return result;
         }
 
-        params.createDate = parseDate(params.createDate);
-        params.updateDate = parseDate(params.updateDate);
-
-        return params;
-    }
-
-    /**
-     * Creates a new Content object
-     *
-     * @param {String} schemaId
-     * @param {Object} properties
-     *
-     * @returns {Content} New Content object
-     */
-    static create(schemaId, properties) {
-        if(typeof schemaId !== 'string') {
-            throw new Error('Schema ID was not provided');
+        if(params.createDate) {
+            params.createdOn = params.createDate;
+            delete params.createDate;
+        }
+        
+        if(params.updateDate) {
+            params.updatedOn = params.updatedDate;
+            delete params.updateDate;
         }
 
-        let defaultProperties = {
-            title: 'New content'
-        };
+        params.createdOn = parseDate(params.createdOn);
+        params.updatedOn = parseDate(params.updatedOn);
 
-        let content = new Content({
-            id: Content.createId(),
-            createDate: new Date(),
-            updateDate: new Date(),
-            schemaId: schemaId,
-            properties: properties || defaultProperties
-        });
-
-        return content;
+        super.adopt(params);
     }
 
     /**
@@ -124,58 +109,10 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
     /**
      * Gets parent Content
      *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Promise} Parent
+     * @returns {HashBrown.Entity.Resource.Content} Parent
      */
-    getParent(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        if(!this.parentId) {
-            return Promise.resolve(null);
-        }
-        
-        return HashBrown.Service.ContentService.getContentById(project, environment, this.parentId)
-        .then((parentContent) => {
-            return Promise.resolve(parentContent);
-        })
-        .catch((e) => {
-            return Promise.resolve(null);
-        });
-    }
-
-    /**
-     * Gets all parents
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Promise} parents
-     */
-    getParents(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        let parents = [];
-
-        let getNextParent = (content) => {
-            return content.getParent(project, environment)
-            .then((parentContent) => {
-                if(parentContent) {
-                    parents.push(parentContent);
-
-                    return getNextParent(parentContent);
-                
-                } else {
-                    return Promise.resolve(parents);
-                
-                }
-            });
-        }
-
-        return getNextParent(this);
+    async getParent() {
+        throw new Error('Method "getParent" must be overridden');
     }
 
     /**
@@ -203,10 +140,10 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      *
      * @param {String} key
      *
-     * @returns {Promise} Settings
+     * @returns {Object} Settings
      */
     getSettings(key) {
-        return Promise.resolve({});
+        throw new Error('The "getSettings" method must be overridden');
     }
 
     /**
@@ -219,8 +156,8 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
             id: this.id,
             parentId: this.parentId,
             schemaId: this.schemaId,
-            createDate: this.createDate,
-            updateDate: this.updateDate,
+            createdOn: this.createdOn,
+            updatedOn: this.updatedOn,
             createdBy: this.createdBy,
             updatedBy: this.updatedBy,
             sort: this.sort
@@ -245,9 +182,12 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      * @param {String} key
      * @param {String} language
      *
-     * @returns {Object} value
+     * @returns {*} value
      */
     getPropertyValue(key, language) {
+        checkParam(key, 'key', String, true);
+        checkParam(language, 'language', String);
+        
         if(!this.properties) {
             this.properties = {};
         }
@@ -335,24 +275,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         flattenRecursively(allProperties, localizedProperties);
 
         return localizedProperties;
-    }
-
-    /**
-     * Gets the content type
-     *
-     * @returns {String} type
-     */
-    getType() {
-        return this.constructor.name;
-    }
-
-    /**
-     * Gets the schema information
-     *
-     * @returns {Promise} Schema
-     */
-    getSchema() {
-        return Promise.resolve();
     }
 }
 

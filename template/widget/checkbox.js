@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) => 
 
-_.label({class: `widget widget--checkbox ${model.placeholder ? 'placeholder' : ''} ${model.class || ''}`, title: model.tooltip},
+_.label({class: `widget widget--checkbox ${model.placeholder ? 'placeholder' : ''} ${model.class || ''} ${model.disabled ? 'disabled' : ''}`, title: model.tooltip},
     _.if(model.placeholder,
         _.span({class: 'widget--checkbox__placeholder'}, model.placeholder),
     ),

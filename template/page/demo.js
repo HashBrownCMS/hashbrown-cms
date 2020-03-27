@@ -20,11 +20,16 @@ module.exports = (_, view) => `
         <script>
             window.HashBrown = {};
             HashBrown.Context = {
-                projectName: 'Demo',
-                projectId: 'demo',
-                projectSettings: {info:{name:'Demo'},languages:['en'],sync:{}},
+                project: {
+                    id: 'demo',
+                    settings: {
+                        name:'Demo',
+                        languages: ['en'],
+                        sync: {}
+                    }
+                },
                 environment: 'live',
-                user: {id:'demouser',isAdmin:true,isCurrent:true,username:'demouser',fullName:'Demo user',scopes:{}},
+                user: {id:'demouser',isAdmin:true,username:'demouser',fullName:'Demo user',scopes:{}},
                 isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1,
                 isDemo: true
             };

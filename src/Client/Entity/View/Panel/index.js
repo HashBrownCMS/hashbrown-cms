@@ -5,8 +5,8 @@
  */
 namespace('Entity.View.Panel')
 .add(require('./PanelBase'))
-.add(require('./Connections'))
-.add(require('./Content'))
-.add(require('./Forms'))
-.add(require('./Media'))
-.add(require('./Schemas'));
+.add(require('./ConnectionPanel'))
+.add(require('./ContentPanel'))
+.add(require('./FormPanel'))
+.add(require('./MediaPanel'))
+.add(require('./SchemaPanel'));

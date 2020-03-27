@@ -18,12 +18,19 @@ _.div({class: 'modal modal--upload-media in'},
                     _.div({name: 'preview', class: 'modal--upload-media__previews'},
                         _.each(state.previews, (i, file) =>
                             _.div({class: 'modal--upload-media__preview'},
-                                file.isImage ? 
-                                    _.img({src: file.src})
-                                : null,
-                                file.isVideo ?
-                                    _.video({src: file.src, controls: true})
-                                : null
+                                _.div({class: 'modal--upload-media__preview__display'},
+                                    file.isImage ? [
+                                        _.img({class: 'modal--upload-media__preview__source', src: file.src})
+
+                                    ] : file.isVideo ? [
+                                        _.video({class: 'modal--upload-media__preview__source', src: file.src, controls: true})
+
+                                    ] : [
+                                        _.span({class: 'modal--upload-media__preview__source fa fa-file'})
+
+                                    ]
+                                ),
+                                _.p({class: 'modal--upload-media__preview__name'}, file.name)
                             )
                         )
                     )

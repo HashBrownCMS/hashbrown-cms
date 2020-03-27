@@ -34,8 +34,8 @@ _.div({class: 'resource-editor resource-editor--form-editor'},
                     _.button({class: 'widget widget--button small fa fa-copy', onclick: _.onClickCopyPostUrl})
                 )
             ),
-            _.field({label: 'Title'},
-                _.text({disabled: model.isLocked, value: model.title, onchange: _.onChangeTitle})
+            _.field({label: 'Name'},
+                _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
             _.field({label: 'Allowed origin', description: 'The address from which submissions will be accepted. Leave blank to accept all.'},
                 _.text({disabled: model.isLocked, value: model.allowedOrigin, onchange: _.onChangeAllowedOrigin})

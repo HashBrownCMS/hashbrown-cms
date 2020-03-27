@@ -20,7 +20,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
      * Fetches all media and caches folder paths
      */
     async fetch() {
-        let items = await HashBrown.Service.MediaService.getAllMedia() || [];
+        let items = await HashBrown.Entity.Resource.Media.list() || [];
         
         this.state.folders = [];
 
@@ -36,7 +36,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
             let query = (this.state.searchQuery || '').toLowerCase();
 
             for(let item of items) {
-                if(query && (item.name || '').toLowerCase().indexOf(query) < 0) { continue; }
+                if(query && (item.filename || '').toLowerCase().indexOf(query) < 0) { continue; }
 
                 this.state.items.push(item);
             }
@@ -45,7 +45,10 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
             for(let item of items) {
                 if(!item.folder) { item.folder = '/'; }
 
-                if(this.state.folder !== item.folder) { continue; }
+                let currentFolder = this.state.folder.split('/').filter(Boolean).join('/');
+                let itemFolder = item.folder.split('/').filter(Boolean).join('/');
+
+                if(currentFolder !== itemFolder) { continue; }
 
                 this.state.items.push(item);
             }
@@ -56,7 +59,7 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click upload
      */
     onClickUpload() {
-        let modal = new HashBrown.Entity.View.Modal.UploadMedia({
+        let modal = HashBrown.Entity.View.Modal.UploadMedia.new({
             model: {
                 folder: this.state.folder 
             }

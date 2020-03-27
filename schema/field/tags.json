@@ -1,6 +1,6 @@
 {
-    "parentSchemaId": "fieldBase",
+    "parentId": "fieldBase",
     "editorId": "TagsEditor",
-    "icon": "tag",
+    "customIcon": "tag",
     "name": "Tags"
 }

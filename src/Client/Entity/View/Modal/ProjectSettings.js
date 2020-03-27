@@ -19,7 +19,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Change name
      */
     onChangeName(projectName) {
-        this.model.settings.info.name = projectName;
+        this.model.settings.name = projectName;
     }
 
     /**
@@ -104,7 +104,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
      */
     async onClickSave() {
         try {
-            await HashBrown.Service.SettingsService.setSettings(this.model.id, null, null, this.model.settings);
+            await this.model.save();
             
             this.close();
 
