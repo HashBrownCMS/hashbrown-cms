@@ -9,7 +9,7 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
      * Gets the representative icon of this resource type
      */
-    static get icon() { return ''; }
+    static get icon() { return 'question'; }
     get icon() { return this.constructor.icon; }
 
     /**
@@ -92,7 +92,7 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
             return model;
         }
 
-        throw new Error(`No resource model found for category "${category}"`);
+        return null;
     }
     
     /**

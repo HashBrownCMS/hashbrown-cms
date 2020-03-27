@@ -8,7 +8,7 @@
 class PanelBase extends HashBrown.Entity.View.ViewBase {
     static get category() { return this.name.replace('Panel', '').toLowerCase(); }
     static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
-    static get icon() { return this.itemType.icon; }
+    static get icon() { return this.itemType ? this.itemType.icon : 'question'; }
     static get title() { return this.name.replace('Panel', ''); }
 
     get title() { return this.constructor.title; }
@@ -68,7 +68,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Fetches the models
      */
     async fetch() {
-        let resources = await this.itemType.list();
+        let resources = this.itemType ? await this.itemType.list() : [];
 
         this.state.itemMap = {};
 
@@ -212,6 +212,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click new
      */
     async onClickNew() {
+        if(!this.itemType) { return; }
+
         let resource = await this.itemType.create();
         
         location.hash = `/${this.category}/${resource.id}`;
@@ -221,6 +223,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click remove
      */
     onClickRemove(id) {
+        if(!this.itemType) { return; }
+
         UI.confirm(
             'Remove item',
             'Are you sure you want to remove this item?',
@@ -240,6 +244,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click pull
      */
     async onClickPull(id) {
+        if(!this.itemType) { return; }
+
         let resource = await this.itemType.get(id);
         
         await resource.pull();
@@ -249,6 +255,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Event: Click push
      */
     async onClickPush(id) {
+        if(!this.itemType) { return; }
+
         let resource = await this.itemType.get(id);
         
         await resource.push();

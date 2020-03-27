@@ -99,6 +99,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async heartbeat(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
         let resource = await model.get(params.project, params.environment, params.id);
 
         if(!resource) {
@@ -117,6 +122,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async pull(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
         let resource = await model.get(params.project, params.environment, params.id);
         
         await resource.pull(user, params.project, params.environment);
@@ -129,6 +139,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async push(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+
         let resource = await model.get(params.project, params.environment, params.id);
         
         await resource.push(user, params.project, params.environment);
@@ -141,6 +156,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resources(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
         let resources = await model.list(params.project, params.environment, query);
 
         return new HttpResponse(resources);
@@ -151,6 +171,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resource(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
         let resource = await model.get(params.project, params.environment, params.id, query);
                 
         if(!resource) {
@@ -193,6 +218,11 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async new(request, params, body, query, user) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
         let resource = await model.create(user, params.project, params.environment, body, query);
 
         return new HttpResponse(resource);
