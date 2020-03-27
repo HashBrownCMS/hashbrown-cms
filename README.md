@@ -39,6 +39,7 @@ npm run start:docker
 npm run restart:docker
 npm run watch:docker
 npm run stop:docker
+npm run db:docker
 ```
 
 Using nodemon:
