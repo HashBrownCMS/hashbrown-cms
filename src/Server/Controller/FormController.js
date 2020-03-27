@@ -70,7 +70,7 @@ class FormController extends HashBrown.Controller.ResourceController {
             csv += '\r\n';
         }
 
-        let filename = form.getTitle().toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv';
+        let filename = form.getName().toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv';
 
         return new HttpResponse(csv, 200, {
             'Content-Type': 'application/octet-stream',
@@ -97,7 +97,9 @@ class FormController extends HashBrown.Controller.ResourceController {
                 return new HttpResponse('Not found', 404);
             }
             
-            await form.addEntry(params.project, params.environment, body);
+            form.addEntry(body);
+
+            await form.save(user, params.project, params.environment);
 
             if(form.redirect) {
                 let redirectUrl = form.redirect;

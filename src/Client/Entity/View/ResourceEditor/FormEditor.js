@@ -60,7 +60,7 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      * Event: Click clear entries
      */
     async onClickClearEntries() {
-        UI.confirm('Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', async () => {
+        UI.confirm('Clear "' + this.model.getName() + '"', 'Are you sure you want to clear all entries?', async () => {
             await HashBrown.Service.RequestService.request('post', 'forms/clear/' + this.model.id);
 
             this.model.entries = [];
@@ -75,10 +75,10 @@ class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     }
 
     /**
-     * Event: Change title
+     * Event: Change name
      */
-    onChangeTitle(newValue) {
-        this.model.title = newValue;
+    onChangeName(newValue) {
+        this.model.name = newValue;
 
         this.onChange();
     }

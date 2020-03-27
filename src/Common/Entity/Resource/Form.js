@@ -16,7 +16,7 @@ class Form extends HashBrown.Entity.Resource.ResourceBase {
         super.structure();
         
         // Fundamental fields
-        this.def(String, 'title');
+        this.def(String, 'name', 'New form');
         this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
         this.def(Boolean, 'appendRedirect');
@@ -24,6 +24,33 @@ class Form extends HashBrown.Entity.Resource.ResourceBase {
         // Mutable fields
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
+    }
+    
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} Name
+     */
+    getName() {
+        return this.name || this.id;
+    }
+    
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        params = params || {};
+
+        // Adopt old value names
+        if(params.title) {
+            params.name = params.title;
+        }
+
+        super.adopt(params);
     }
 
     /**

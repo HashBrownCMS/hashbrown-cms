@@ -178,7 +178,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @param {Object} options
      */
     async save(user, project, environment, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(user, 'user', HashBrown.Entity.User);
         checkParam(project, 'project', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
@@ -193,8 +193,10 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             hasRemote: false
         };
 
-        this.updatedBy = user.id;
-        this.updatedOn = new Date();
+        if(user) {
+            this.updatedBy = user.id;
+            this.updatedOn = new Date();
+        }
 
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(

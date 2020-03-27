@@ -56,7 +56,12 @@
         flex-grow: 1;
         line-height: var(--size-widget-small);
         text-align: left;
-        
+       
+        &[disabled] {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         &:not(:last-child) {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;

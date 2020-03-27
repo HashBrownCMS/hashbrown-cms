@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.ul({class: 'widget widget--list'},
+_.ul({class: `widget widget--list ${model.disabled ? 'disabled' : ''}`},
     _.each(model.value, (key, value) =>
         _.li({class: 'widget--list__item widget-group', draggable: model.sortable, ondragstart: model.sortable ? _.onDragStart : null, ondragend: model.sortable ? _.onDragEnd : null, ondragover: model.sortable ? _.onDragOver : null},
             model.sortable && !model.disabled ? [
