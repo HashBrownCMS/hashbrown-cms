@@ -1,5 +1,7 @@
 'use strict';
 
+const Path = require('path');
+
 /**
  * The controller for publications
  *
@@ -34,17 +36,19 @@ class PublicationController extends HashBrown.Controller.ResourceController {
 
         if(!publication) { return new HttpResponse('Publication not found', 404); }
 
-        let result = await publication.getContent(params.project, params.environment, query);
+        let results = await publication.getContent(params.project, params.environment, query);
+        let app = require(Path.join(APP_ROOT, 'package.json'));
 
         return new HttpResponse({
+            version: app.version, 
             name: publication.getName(),
             config: {
                 rootContent: publication.rootContent,
                 allowedSchemas: publication.allowedSchemas
             },
             query: query,
-            result: result,
-            count: result.length,
+            results: results,
+            count: results.length,
         }, 200, { 'Cache-Control': 'no-store' });
     }
     

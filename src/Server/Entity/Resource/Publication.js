@@ -20,6 +20,24 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     }
         
     /**
+     * Gets whether a query matches some data
+     *
+     * @param {Object} query
+     * @param {Object} data
+     *
+     * @return {Boolean} Match
+     */
+    isQueryMatch(query, data) {
+        for(let key in data) {
+            if(query[key] && query[key] != data[key]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Gets content in published format
      *
      * @param {String} projectId
@@ -39,25 +57,25 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
         // TODO: Enable cache
 
-        let search = {};
+        let items = await HashBrown.Entity.Resource.Content.list(projectId, environment);
+        let result = [];
 
-        for(let k in query) {
-            search[k] = query[k];
-        }
+        for(let item of items) {
+            if(this.allowedSchemas.length > 0 && this.allowedSchemas.indexOf(item.schemaId) < 0) { continue; }
+            
+            if(this.rootContent) {
+                let isDescendant = await item.isDescendantOf(projectId, environment, this.rootContent);
 
-        let rootItems = [];
+                if(!isDescendant) { continue; }
+            }
+            
+            let output = await this.processor.process(projectId, environment, item, query.language || 'en');
 
-        if(this.rootContent) {
-            rootItems.push(await HashBrown.Entity.Resource.Content.get(projectId, environment, this.rootContent));
-        } else {
-            rootItems = await HashBrown.Entity.Resource.Content.getOrphans(projectId, environment);
-        }
+            let isMatch = this.isQueryMatch(query, output);
 
-        // TODO: Improve this logic
-        let result = rootItems;
+            if(!isMatch) { continue; }
 
-        for(let i in result) {
-            result[i] = await this.processor.process(projectId, environment, result[i], query.language || 'en');
+            result.push(output);
         }
 
         return result;
