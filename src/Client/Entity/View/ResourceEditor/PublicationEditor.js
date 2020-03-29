@@ -38,7 +38,7 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
         }
         
         // Get schemas
-        this.state.schemaOptions = [];
+        this.state.schemaOptions = {};
 
         let allSchemas = await HashBrown.Entity.Resource.ContentSchema.list();
 
