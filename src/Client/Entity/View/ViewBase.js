@@ -127,7 +127,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
         this.render();
         
-        debug.error(error, this.constructor, true);
+        debug.log(error.message, this);
     }
 
     /**

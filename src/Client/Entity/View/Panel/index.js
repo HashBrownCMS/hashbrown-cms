@@ -9,4 +9,5 @@ namespace('Entity.View.Panel')
 .add(require('./ContentPanel'))
 .add(require('./FormPanel'))
 .add(require('./MediaPanel'))
+.add(require('./PublicationPanel'))
 .add(require('./SchemaPanel'));

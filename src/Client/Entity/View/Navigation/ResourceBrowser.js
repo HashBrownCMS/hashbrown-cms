@@ -53,7 +53,11 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Event: Route changed
      */
     onChangeRoute() {
-        if(!this.state.panel || this.state.panel.category !== HashBrown.Service.NavigationService.getRoute(0)) {
+        let category = HashBrown.Service.NavigationService.getRoute(0);
+
+        if(!category) { return; }
+
+        if(!this.state.panel || this.state.panel.category !== category) {
             this.update();
 
         } else {

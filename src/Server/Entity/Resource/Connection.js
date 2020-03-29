@@ -29,7 +29,11 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         params = params || {};
 
         if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
-            params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
+            if(params.processor.alias) {
+                params.processor = params.processor.alias;
+            }
+
+            params.processor = HashBrown.Entity.Processor.ProcessorBase.new({ alias: params.processor });
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
@@ -169,7 +173,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         this.pathComponentCheck('id', id);
         this.pathComponentCheck('language', language);
-        this.pathComponentCheck('fileExtension', this.processor.fileExtension);
+        this.pathComponentCheck('fileExtension', this.deployer.fileExtension);
         
         let result = await this.processor.process(project, environment, content, language);
 
@@ -184,7 +188,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         result = Buffer.from(result, 'utf8').toString('base64');
 
-        await this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension), result);
+        await this.deployer.setFile(this.deployer.getPath('content', language + '/' + id + this.deployer.fileExtension), result);
     }
     
     /**
@@ -203,9 +207,9 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         this.pathComponentCheck('id', id);
         this.pathComponentCheck('language', language);
-        this.pathComponentCheck('fileExtension', this.processor.fileExtension);
+        this.pathComponentCheck('fileExtension', this.deployer.fileExtension);
         
-        await this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.processor.fileExtension));
+        await this.deployer.removeFile(this.deployer.getPath('content', language + '/' + id + this.deployer.fileExtension));
     }
     
     /**

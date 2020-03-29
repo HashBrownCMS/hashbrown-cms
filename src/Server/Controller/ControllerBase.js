@@ -278,7 +278,7 @@ class ControllerBase {
             let project = await HashBrown.Entity.Project.get(requestParameters.project);
 
             if(!project) {
-                return new HttpResponse(`Project "${requestParameters.project}" could not be found`, 404);
+                throw new HttpError(`Project "${requestParameters.project}" could not be found`, 404);
             }
 
             // Validate environment
@@ -286,7 +286,7 @@ class ControllerBase {
                 let environmentExists = await project.hasEnvironment(requestParameters.environment);
 
                 if(!environmentExists) {
-                    return new HttpResponse(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
+                    throw new HttpError(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
                 }
             }
         }
@@ -304,7 +304,7 @@ class ControllerBase {
             return response;
 
         } catch(e) {
-            return new HttpResponse(e.message, e.code || 500); 
+            return this.error(e);
 
         }
     }

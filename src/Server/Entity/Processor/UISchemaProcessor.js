@@ -67,7 +67,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(language, 'language', String);
 
-        let schema = await content.getSchema();
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(project, environment, content.schemaId);
         let properties = content.getLocalizedProperties(language);
         let meta = content.getMeta();
 

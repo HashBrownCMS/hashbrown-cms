@@ -340,7 +340,7 @@ class Content extends require('Common/Entity/Resource/Content') {
             project,
             environment + '.content',
             {
-                parentId: null
+                parentId: ''
             },
             {},
             {
@@ -353,7 +353,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         for(let orphan of result) {
             if(excludeIds && excludeIds.indexOf(orphan.id) > -1) { continue; }
 
-            oprhan = this.constructor.new(orphan);
+            orphan = this.new(orphan);
 
             orphans.push(orphan);
         }

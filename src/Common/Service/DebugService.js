@@ -9,23 +9,25 @@ class DebugService {
     /**
      * Event: Log
      *
-     * @param {String} dateString
-     * @param {String} senderString
+     * @param {*} sender
      * @param {String} message
-     * @param {String} type
      */
-    static onLog(dateString, senderString, message, type) {
+    static onLog(sender, message) {
+        let dateString = this.getDateString();
+        let senderString = this.getSenderName(sender);
+        let senderReference = this.getSenderReference(sender);
+
         if(!message) {
             if(!type) { return; }
 
             message = 'An unexpected ' + type + ' happened.';
         }
         
-        if(type) {
-            message = '[' + type.toUpperCase() + '] ' + message;
+        if(senderReference) {
+            console.log(dateString + ' | ' + senderString + ' | ' + message, senderReference);
+        } else {
+            console.log(dateString + ' | ' + senderString + ' | ' + message);
         }
-
-        console.log(dateString + ' | ' + senderString + ' | ' + message);
     }
 
     /**
@@ -78,13 +80,32 @@ class DebugService {
     }
     
     /**
-     * Parse sender
+     * Gets sender reference
      *
      * @param {Object} sender
      *
-     * @returns {String} name
+     * @returns {Object} Reference
      */
-    static parseSender(sender, ignoreLast) {
+    static getSenderReference(sender) {
+        if(!sender) { return null; }
+
+        let isClient = typeof window !== 'undefined';
+
+        if(sender instanceof HashBrown.Entity.View.ViewBase && isClient) {
+            return sender.element;
+        }
+
+        return null;
+    }
+    
+    /**
+     * Get sender name
+     *
+     * @param {Object} sender
+     *
+     * @return {String} Name
+     */
+    static getSenderName(sender) {
         let senderName = '';
 
         if(sender) {
@@ -131,7 +152,7 @@ class DebugService {
         }
 
         if(this.getDebugVerbosity() >= verbosity) {
-            this.onLog(this.getDateString(), this.parseSender(sender), message);
+            this.onLog(sender, message);
         }
     }
 
@@ -147,7 +168,7 @@ class DebugService {
             error = new Error(error);
         }
 
-        this.onLog(this.getDateString(), this.parseSender(sender), error.message || error.trace , 'error');
+        this.onLog(sender, error.message || error.trace);
    
         if(suppress) {
             if(error.trace) {
@@ -166,7 +187,7 @@ class DebugService {
      * Shows a warning
      */
     static warning(message, sender) {
-        this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
+        this.onLog(sender, message);
     }
 
     /**

@@ -11,4 +11,5 @@ namespace('Entity.Resource')
 .add(require('./Media'))
 .add(require('./SchemaBase'))
 .add(require('Common/Entity/Resource/ContentSchema'))
-.add(require('Common/Entity/Resource/FieldSchema'));
+.add(require('Common/Entity/Resource/FieldSchema'))
+.add(require('./Publication'));

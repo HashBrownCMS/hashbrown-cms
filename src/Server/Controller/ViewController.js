@@ -83,7 +83,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         
         switch(error.code) {
             default:
-                return super.error(error);
+                return this.render('error', { message: error.message }, error.code || 500);
             
             case 401:
                 return this.render('login', { message: error.message });

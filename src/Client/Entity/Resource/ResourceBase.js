@@ -23,7 +23,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         try {
             resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
         } catch(e) {
-            debug.error(e, this, true);
+            return null;
         }
             
         if(!resource) { return null; }

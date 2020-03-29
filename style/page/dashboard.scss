@@ -3,29 +3,10 @@
     &__header {
         background-color: var(--color-decor-500);
         color: var(--color-decor-text);
-        padding: 1rem 0 0 5rem;
+        padding: 1rem 0 0 0;
         height: 4rem;
         display: flex;
-
-        // Logo
-        &__logo {
-            position: absolute;
-            left: 1rem;
-            top: 0.5rem;
-            text-align: center;
-
-            svg {
-                fill: var(--color-decor-700);
-                width: var(--size-widget-medium);
-                height: var(--size-widget-medium);
-            }
-
-            &:hover {
-                svg {
-                    fill: var(--color-action-500);
-                }
-            }
-        }
+        justify-content: center;
 
         // Actions
         &__actions {

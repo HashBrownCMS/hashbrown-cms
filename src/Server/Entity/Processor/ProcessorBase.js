@@ -20,13 +20,6 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
     }
     
     /**
-     * Structure
-     */
-    structure() {
-        this.def(String, 'fileExtension');
-    }
-    
-    /**
      * Gets a copy of every field in this object as a mutable object
      *
      * @returns {Object} object

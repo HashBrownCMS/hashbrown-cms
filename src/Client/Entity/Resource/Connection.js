@@ -12,8 +12,8 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     structure() {
         super.structure();
 
-        this.def(Object, 'processor', {});
         this.def(Object, 'deployer', {});
+        this.def(String, 'processor');
     }
 }
 

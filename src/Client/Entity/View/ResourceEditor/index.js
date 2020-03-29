@@ -10,4 +10,5 @@ namespace('Entity.View.ResourceEditor')
 .add(require('./FormEditor'))
 .add(require('./JsonEditor'))
 .add(require('./MediaEditor'))
+.add(require('./PublicationEditor'))
 .add(require('./SchemaEditor'));

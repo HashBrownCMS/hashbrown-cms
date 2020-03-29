@@ -44,6 +44,7 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      * Structure
      */
     structure() {
+        this.def(String, 'fileExtension');
         this.def(Object, 'paths', {
             media: '',
             content: ''

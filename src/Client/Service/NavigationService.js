@@ -13,9 +13,9 @@ class NavigationService {
         window.addEventListener('hashchange', (e) => this.onChangeRoute(e)); 
        
         this.onChangeRoute();
-
-        this.updateBrowserSpace();
-        this.updateMenuSpace();
+       
+        this.initBrowserSpace();
+        this.initMenuSpace();
     }
 
     /**
@@ -118,7 +118,7 @@ class NavigationService {
     /**
      * Updates the browser space (the panel on the left)
      */
-    static updateBrowserSpace() {
+    static initBrowserSpace() {
         let space = document.querySelector('.page--environment__space--nav');
 
         space.innerHTML = '';
@@ -131,7 +131,7 @@ class NavigationService {
     /**
      * Updates the menu space (menu on the top right)
      */
-    static updateMenuSpace() {
+    static initMenuSpace() {
         let space = document.querySelector('.page--environment__space--menu');
 
         space.innerHTML = '';

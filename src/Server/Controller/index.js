@@ -16,5 +16,6 @@ namespace('Controller')
 .add(require('./ServerController'))
 .add(require('./TestController'))
 .add(require('./ProjectController'))
+.add(require('./PublicationController'))
 .add(require('./UserController'))
 .add(require('./ViewController'));

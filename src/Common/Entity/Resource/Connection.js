@@ -3,7 +3,7 @@
 const Path = require('path');
 
 /**
- * The Connection class
+ * The connection class
  *
  * @memberof HashBrown.Common.Entity.Resource
  */
@@ -66,13 +66,17 @@ class Connection extends HashBrown.Entity.Resource.ResourceBase {
         params = params || {};
         
         // Deployer and processor
-        if(!params.processor) { params.processor = {}; }
         if(!params.deployer) { params.deployer = {}; }
         if(!params.deployer.paths) { params.deployer.paths = {}; }
         
         if(params.title) {
             params.name = params.title;
             delete params.title;
+        }
+
+        // Move file extension from processor to deployer
+        if(params.processor && params.processor.fileExtension) {
+            params.deployer.fileExtension = params.processor.fileExtension;
         }
 
         super.adopt(params);

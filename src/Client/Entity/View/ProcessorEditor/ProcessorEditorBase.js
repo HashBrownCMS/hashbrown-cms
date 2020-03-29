@@ -63,15 +63,6 @@ class ProcessorEditorBase extends HashBrown.Entity.View.ViewBase {
 
         this.trigger('change', this.model);
     }
-    
-    /**
-     * Event: Change file extension
-     */
-    onChangeFileExtension(newValue) {
-        this.model.fileExtension = newValue;
-
-        this.trigger('change', this.model);
-    }
 }
 
 module.exports = ProcessorEditorBase;
