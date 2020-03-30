@@ -36,12 +36,21 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.setErrorState(new Error('Not found'));
                 
             } else {
-                this.state.source = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${media.id}?t=${Date.now()}${this.model.full ? '' : '&width=300'}`;
+                this.state.source = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${media.id}?t=${Date.now()}` 
+
+                if(!this.model.full || this.model.thumbnail) {
+                    this.state.source += '&thumbnail';
+                }
                 
-                if(media.isImage()) {
+                if(this.model.thumbnail) {
                     this.state.tagName = 'img';
-                } else if(media.isVideo()) {
-                    this.state.tagName = 'video';
+
+                } else {
+                    if(media.isImage()) {
+                        this.state.tagName = 'img';
+                    } else if(media.isVideo()) {
+                        this.state.tagName = 'video';
+                    }
                 }
 
                 this.state.title = media.filename;

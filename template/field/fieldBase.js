@@ -22,8 +22,8 @@ _.div({class: `field ${state.className || ''}`},
 
                 ] : null,
 
-                _.each(state.tools, (i, tool) =>
-                    _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, title: tool.tooltip, onclick: tool.handler})
+                _.each(state.tools || model.tools, (name, tool) =>
+                    _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
                 )
             )
 

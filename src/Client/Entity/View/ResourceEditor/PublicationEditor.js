@@ -19,7 +19,9 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
      * Pre render
      */
     prerender() {
-        this.state.getUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/publications/' + this.model.id + '/query';
+        if(this.model) {
+            this.state.getUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/publications/' + this.model.id + '/query';
+        }
     }
     
     /**

@@ -65,12 +65,17 @@
     &.loading {
         @include spinner;
 
-        color: transparent;
-
-        &::after, &::before { color: var(--color-action-text); }
-        &.default::after, &.default::before { color: var(--color-default-text); }
-        &.decor::after, &.decor::before { color: var(--color-decor-text); }
-        &.action::after, &.action::before { color: var(--color-action-text); }
+        &::after {
+            position: absolute;
+            content: '';
+            display: block;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: inherit;
+            border-radius: inherit;
+        }
     }
 
     &.condensed {

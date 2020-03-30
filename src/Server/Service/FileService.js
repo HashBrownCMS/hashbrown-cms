@@ -103,8 +103,26 @@ class FileService {
      * @return {FileSystem.ReadStream} Stream
      */
     static readStream(path) {
-        checkParam(path, 'path', String, true);
+        checkParam(path, 'path', String);
 
+        if(!path) { return null; }
+
+        // Stream data from URL
+        if(path.indexOf('://') > -1) {
+            let protocol = url.indexOf('https://') > -1 ? HTTPS : HTTP;
+                
+            let url = new URL(path);
+
+            let options = {
+                host: url.hostname,
+                port: url.port,
+                path: url.pathname
+            };
+
+            return protocol.get(options);
+        }
+        
+        // Stream data from disk
         return FileSystem.createReadStream(path);
     }
 
@@ -253,7 +271,7 @@ class FileService {
         await new Promise((resolve, reject) => {
             // Copy from a URL
             if(from.indexOf('://') > -1) {
-                let url = URL(from);
+                let url = new URL(from);
 
                 let options = {
                     host: url.hostname,

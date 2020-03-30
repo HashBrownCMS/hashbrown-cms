@@ -6,9 +6,6 @@
  * @memberof HashBrown.Server.Entity
  */
 class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
-    static get title() { return 'JSON'; }
-    static get alias() { return 'json'; }
-    
     /**
      * Compiles content as JSON
      *

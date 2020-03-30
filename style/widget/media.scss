@@ -30,6 +30,10 @@
         min-height: 6rem;
         width: 100%;
 
+        &:last-child {
+            border-radius: var(--border-radius-small);
+        }
+
         &:not(.full) {
             height: 16rem;
         }

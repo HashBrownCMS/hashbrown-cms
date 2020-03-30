@@ -49,7 +49,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      * @return {String} Name
      */
     getName() {
-        return this.filename || this.id;
+        return this.caption || this.filename || this.id;
     }
 
     /**
@@ -62,17 +62,8 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
 
         params = params || {};
     
-        delete params.remote;
-        delete params.sync;
-        delete params.isRemote;
-        delete params.url;
-
         if(!params.folder) {
             params.folder = '/';
-        }
-
-        if(params.name) {
-            params.filename = params.name;
         }
 
         if(!params.author) {
@@ -81,6 +72,10 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         
         if(!params.copyrightHolder) {
             params.copyrightHolder = {};
+        }
+
+        if(!params.copyrightYear) {
+            params.copyrightYear = new Date().getFullYear();
         }
 
         super.adopt(params);
@@ -131,6 +126,15 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
      */
     isSvg() {
         return this.getContentTypeHeader().indexOf('svg') > -1;
+    }
+    
+    /**
+     * Gets whether this is a document
+     *
+     * @returns {Boolean} Is document
+     */
+    isDocument() {
+        return this.getContentTypeHeader().indexOf('application') > -1;
     }
 
     /**

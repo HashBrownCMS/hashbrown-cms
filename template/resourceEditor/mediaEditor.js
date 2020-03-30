@@ -22,11 +22,14 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
     ] : [
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
-            _.field({label: 'Filename'},
-                _.text({disabled: model.isLocked, value: model.filename, onchange: _.onChangeFilename})
+            _.field({label: 'Full', tools: { replace: { icon: 'upload', tooltip: 'Replace', handler: () => { _.onClickReplaceFull(); } } }},
+                _.media({readonly: true, value: model.id, full: true}),
             ),
-            _.field({label: 'Folder'},
-                _.button({class: 'widget widget--button low nocaps', disabled: model.isLocked, onclick: _.onChangeFolder}, model.folder)
+            _.field({label: 'Thumbnail', tools: { replace: { icon: 'upload', tooltip: 'Replace', handler: () => { _.onClickReplaceThumbnail(); } } }},
+                _.media({readonly: true, value: model.id, thumbnail: true}),
+            ),
+            _.field({label: 'Folder', tools: { move: { icon: 'folder', tooltip: 'Move', handler: _.onClickMove } }},
+                _.text({value: model.folder, onchange: _.onChangeFolder})
             ),
             _.field({label: 'Caption'},
                 _.text({disabled: model.isLocked, value: model.caption, onchange: _.onChangeCaption})
@@ -49,9 +52,6 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                 _.field({label: 'Year'},
                     _.number({disabled: model.isLocked, value: model.copyrightYear, onchange: _.onChangeCopyrightYear})
                 ),
-            ),
-            _.field({label: 'Source'},
-                _.media({value: model.id, readonly: true})
             )
         ),
         _.div({class: 'resource-editor__footer'},

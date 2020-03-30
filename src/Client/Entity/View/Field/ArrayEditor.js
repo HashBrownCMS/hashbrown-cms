@@ -25,32 +25,32 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
         if(this.state.name === 'config') { return []; }
 
         if(this.state.name === 'sorting') {
-            return [
-                {
+            return {
+                sort: {
                     icon: 'check',
                     tooltip: 'Done sorting items',
                     handler: () => this.onClickDoneSortingItems()
                 }
-            ];
+            };
         }
 
-        return [
-            {
+        return {
+            sort: {
                 icon: 'sort',
                 tooltip: 'Sort items',
                 handler: () => this.onClickSortItems()
             },
-            {
+            expand: {
                 icon: 'expand',
                 tooltip: 'Expand all items',
                 handler: () => this.onClickExpandItems()
             },
-            {
+            collapse: {
                 icon: 'compress',
                 tooltip: 'Collapse all items',
                 handler: () => this.onClickCollapseItems()
             }
-        ];
+        };
     }
 
     /**
@@ -142,19 +142,27 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
     /**
      * Event: Click sort items
      */
-    onClickSortItems() {
+    async onClickSortItems() {
         this.state.name = 'sorting'; 
     
-        this.update();
+        this.namedElements.sort.classList.toggle('loading', true);
+
+        await this.update();
+        
+        this.namedElements.sort.classList.toggle('loading', false);
     }
 
     /**
      * Event: Click done sorting
      */
-    onClickDoneSortingItems() {
+    async onClickDoneSortingItems() {
         this.state.name = undefined;
+        
+        this.namedElements.sort.classList.toggle('loading', true);
     
-        this.update();
+        await this.update();
+        
+        this.namedElements.sort.classList.toggle('loading', false);
     }
 
     /**

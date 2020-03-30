@@ -106,6 +106,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         let result = [];
 
         for(let item of items) {
+            if(!item.isPublished) { continue; }
+
             if(this.allowedSchemas.length > 0 && this.allowedSchemas.indexOf(item.schemaId) < 0) { continue; }
             
             if(this.rootContent && (!this.includeRoot || this.rootContent !== item.id)) {
@@ -113,7 +115,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
                 if(!isDescendant) { continue; }
             }
-            
+           
             let output = await this.processor.process(projectId, environment, item, query.language || 'en');
 
             let isMatch = this.isQueryMatch(query, output);

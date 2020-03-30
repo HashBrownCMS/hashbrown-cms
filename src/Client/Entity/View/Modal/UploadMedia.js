@@ -55,7 +55,22 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
 
         try {
             let apiPath = 'media/' + (this.model.replaceId ? this.model.replaceId : 'new');
-            let resources = await HashBrown.Service.RequestService.request('post', apiPath, { folder: this.model.folder, files: files });
+
+            let resources = [];
+            
+            for(let file of files) {
+                let resource = await HashBrown.Service.RequestService.request(
+                    'post',
+                    apiPath,
+                    {
+                        folder: this.model.folder,
+                        filename: file.filename,
+                        full: file.base64
+                    }
+                );
+
+                resources.push(resource);
+            }
 
             HashBrown.Service.EventService.trigger('resource');  
 

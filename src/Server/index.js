@@ -73,7 +73,7 @@ global.HttpResponse = class HttpResponse {
      */
     end(response) {
         checkParam(response, 'response', HTTP.ServerResponse, true);
-   
+  
         if(this.data instanceof FileSystem.ReadStream) {
             this.data.on('open', () => {
                 response.writeHead(this.code, this.headers);
@@ -81,7 +81,11 @@ global.HttpResponse = class HttpResponse {
             });
             
             this.data.on('error', (e) => {
-                response.writeHead(e.code || 404, { 'Content-Type': 'text/plain' });
+                if(isNaN(e.code) || e.code < 400) {
+                    e.code = 404;
+                }
+
+                response.writeHead(e.code, { 'Content-Type': 'text/plain' });
                 response.end(e.message);
             });
             

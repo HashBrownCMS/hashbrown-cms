@@ -4,6 +4,7 @@ const FileSystem = require('fs');
 const OS = require('os');
 const Path = require('path');
 const HTTP = require('http');
+const HTTPS = require('https');
 
 /**
  * The controller for assets
@@ -138,9 +139,10 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         if(!media) {
             return new HttpResponse('Not found', 404);
         }
-        
-        let data = await media.getCache(params.project, params.environment, parseInt(query.width), parseInt(query.height));
-        
+              
+        let url = ('thumbnail' in query) ? media.thumbnailUrl : media.contentUrl;
+        let data = HashBrown.Service.FileService.readStream(url);
+
         if(!data) {
             return new HttpResponse('Not found', 404);
         }

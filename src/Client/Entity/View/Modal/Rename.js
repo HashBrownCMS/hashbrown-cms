@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * The modal for adding environments to projects
+ * The modal for renaming things
  *
  * @memberof HashBrown.Client.Entity.View.Modal
  */

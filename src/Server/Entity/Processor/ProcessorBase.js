@@ -6,10 +6,12 @@
  * @memberof HashBrown.Common.Entity
  */
 class ProcessorBase extends HashBrown.Entity.EntityBase {
-    static get title() { return null; }
-    static get alias() { return null; }
+    static get alias() {
+        if(this === ProcessorBase) { return null; }
+
+        return this.name.replace('Processor', '').toLowerCase();
+    }
   
-    get name() { return this.constructor.name; }
     get alias() { return this.constructor.alias; }
 
     /**
@@ -32,25 +34,6 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
         return object;
     }
    
-    /**
-     * Adopts values into this entity
-     *
-     * @param {Object} params
-     */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
-
-        params = params || {};
-
-        delete params.title;
-        delete params.name;
-        delete params.alias;
-
-        super.adopt(params);
-    }
-
-    
-
     /**
      * Instantiates a new processor
      *

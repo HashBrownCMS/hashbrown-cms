@@ -155,6 +155,7 @@ class Content extends require('Common/Entity/Resource/Content') {
             await this.unpublish(project, environment);
         }
             
+        // Update publish task
         let publishTask = await HashBrown.Entity.Task.get(project, environment, this.id, 'publish');
 
         if(!this.isPublished && this.publishOn) {
@@ -171,6 +172,7 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         }
 
+        // Update unpublish task
         let unpublishTask = await HashBrown.Entity.Task.get(project, environment, this.id, 'unpublish');
 
         if(this.isPublished && this.unpublishOn) {
@@ -185,6 +187,13 @@ class Content extends require('Common/Entity/Resource/Content') {
         } else if(unpublishTask) {
             await unpublishTask.remove();
 
+        }
+
+        // Clear publication cache
+        let publications = await HashBrown.Entity.Resource.Publication.list(project, environment);
+
+        for(let publication of publications) {
+            await publication.clearCache(project, environment);
         }
     }
 

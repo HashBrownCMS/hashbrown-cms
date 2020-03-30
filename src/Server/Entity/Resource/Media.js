@@ -2,14 +2,50 @@
 
 const Path = require('path');
 
-const MAX_CACHE_TIME = 1000 * 60 * 60 * 24 * 10 // 10 days
-
 /**
  * The media resource
  *
  * @memberof HashBrown.Server.Entity.Resource
  */
 class Media extends require('Common/Entity/Resource/Media') {
+    /**
+     * Gets the thumbnail URL
+     *
+     * @return {String} Thumbnail URL
+     */
+    get thumbnailUrl() {
+        if(!this.contentUrl) { return null; }
+
+        let url = null;
+
+        if(!this.isImage()) {
+            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail.jpg');
+
+        } else if(this.isSvg()) {
+            url = this.contentUrl;
+
+        } else {
+            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail' + Path.extname(this.contentUrl));
+
+        }
+
+        if(!url) { return null }
+
+        // If the path module removed doubles slashes for protocols, add them back
+        url = url.replace(/:\/([^\/])/, '://$1');
+
+        return url;
+    }
+    
+    /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(String, 'contentUrl');
+    }
+
     /**
      * Gets the media provider connection
      *
@@ -86,7 +122,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(data, 'data', Object, true);
         checkParam(data.filename, 'data.filename', String, true);
         checkParam(options, 'options', Object, true);
-        checkParam(options.base64, 'options.base64', String, true);
+        checkParam(options.full, 'options.full', String, true);
         
         let connection = await this.getProvider(project, environment);
 
@@ -96,7 +132,49 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         let resource = await super.create(user, project, environment, data, options);
 
-        await connection.setMedia(resource.id, data.filename, options.base64);
+        await connection.setMedia(resource.id, options.filename, options.full, true);
+        
+        let thumbnail = await this.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
+       
+        if(thumbnail) {
+            await connection.setMedia(resource.id, `thumbnail${Path.extname(options.filename)}`, thumbnail.toString('base64'));
+        }
+
+        return resource;
+    }
+    
+    /**
+     * Gets an instance of this entity type
+     *
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {String} id
+     * @param {Object} options
+     *
+     * @return {HashBrown.Entity.Resource.ResourceBase} Instance
+     */
+    static async get(projectId, environment, id, options = {}) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(id, 'id', String, true);
+        checkParam(options, 'options', Object, true);
+
+        let resource = await super.get(projectId, environment, id, options);
+        
+        let connection = await this.getProvider(projectId, environment);
+
+        if(connection) {
+            let contentUrl = await connection.getMediaUrl(id);
+
+            if(contentUrl) {
+                if(!resource) {
+                    resource = this.new({ id: id });
+                }
+
+                resource.filename = Path.basename(contentUrl);
+                resource.contentUrl = contentUrl;
+            }
+        }
 
         return resource;
     }
@@ -121,19 +199,28 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         // Make sure we include all media items, even ones not in the database
         let resources = await super.list(project, environment, options);
-
-        let filenames = await connection.getAllMediaFilenames();
-        
+        let urls = await connection.getAllMediaUrls();
+       
+        // Adopt media URLs into resources
         for(let resource of resources) {
-            if(filenames[resource.id]) { 
-                delete filenames[resource.id];
-            }
-        }
+            let url = urls[resource.id];
 
-        for(let id in filenames) {
+            delete urls[resource.id];
+
+            if(!url) { continue; }
+
+            resource.filename = Path.basename(url);
+            resource.contentUrl = url;
+        }
+       
+        // Create resources for leftover URLs
+        for(let id in urls) {
+            let url = urls[id];
+
             let resource = new Media({
                 id: id,
-                name: filenames[id]
+                filename: Path.basename(url),
+                contentUrl: url
             });
 
             resources.push(resource);
@@ -156,8 +243,6 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        await this.clearCache(project, environment);
-        
         await super.remove(user, project, environment, options);
         
         let connection = await this.constructor.getProvider(project, environment);
@@ -189,119 +274,65 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error('No connection set as media provider');
         }
 
-        await connection.renameMedia(this.id, this.filename);
-
-        if(options.base64) {
-            await connection.setMedia(this.id, this.filename, options.base64);
+        if(this.filename && options.full) {
+            await connection.setMedia(this.id, this.filename, options.full, true);
+        }
+        
+        // Save thumbnail if specified
+        if(options.thumbnail) {
+            await connection.setMedia(this.id, `thumbnail${Path.extname(this.filename)}`, options.thumbnail);
+        
+        // If no thumbnail was specified, attempt to generate one
+        } else if(options.full && options.filename) {
+            let thumbnail = await this.constructor.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
+           
+            if(thumbnail) {
+                await connection.setMedia(this.id, `thumbnail${Path.extname(options.filename)}`, thumbnail.toString('base64'));
+            }
         }
 
-        await this.clearCache(project, environment);
-        
         await super.save(user, project, environment);
     }
+
+    /**
+     * Generates a thumbnail, if possible
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} filename
+     * @param {Buffer} data
+     *
+     * @return {Buffer} Thumbnail
+     */
+    static async generateThumbnail(project, environment, filename, data, width = 200, height = 200) {
+        checkParam(project, 'project', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(filename, 'filename', String, true);
+        checkParam(data, 'data', Buffer, true);
+
+        let type = getMIMEType(filename);
+        
+        // If not an image, or SVG, we won't be generating anything
+        if(type.indexOf('image') < 0 || type.indexOf('svg') > -1) { return null; }
+
+        let tempFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media');
+        let tempFile = Path.join(tempFolder, 'thumbnail' + Path.extname(filename));
+        
+        // Write the temporary file of the full source
+        await HashBrown.Service.FileService.makeDirectory(tempFolder);
+
+        await HashBrown.Service.FileService.write(data, tempFile);
    
-    /**
-     * Clears the cache for this media item
-     *
-     * @param {String} project
-     * @param {String} environment
-     */
-    async clearCache(project, environment) {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
-
-        let cacheFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media', this.id);
-
-        await HashBrown.Service.FileService.remove(cacheFolder);
-    }
-
-    /**
-     * Get the cache for this media item
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Number} width
-     * @param {Number} height
-     *
-     * @returns {FileSystem.ReadStream} Binary data stream
-     */
-    async getCache(project, environment, width, height = 0) {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
-        checkParam(width, 'width', Number);
-        checkParam(height, 'height', Number);
-
-        let size = '';
-
-        if(width) {
-            size += 'w' + width;
-        }
+        // Scale down the image
+        await HashBrown.Service.AppService.exec('convert ' + tempFile + ' -auto-orient -resize ' + width + (height ? 'x' + height : '') + '\\> ' + tempFile);
+       
+        // Read the scaled down image
+        data = await HashBrown.Service.FileService.read(tempFile);
         
-        if(height) {
-            size += 'h' + height;
-        }
-
-        if(size) {
-            size = '_' + size;
-        }
-
-        let cacheFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media', this.id);
-        let cacheFile = Path.join(cacheFolder, 'img' + size + '.jpg');
+        // Remove the temporary folder
+        await HashBrown.Service.FileService.remove(tempFolder);
         
-        // Create the cache folder, if it doesn't exist
-        await HashBrown.Service.FileService.makeDirectory(cacheFolder);
-
-        // Get file stats
-        let stats = await HashBrown.Service.FileService.stat(cacheFile);
-
-        // File was OK, return it
-        if(stats && new Date().getTime() - new Date(stats.atime).getTime() < MAX_CACHE_TIME) {
-            return HashBrown.Service.FileService.readStream(cacheFile);
-        }
-        
-        // Remove file, if it exists
-        await HashBrown.Service.FileService.remove(cacheFile);
-        
-        // Procure the URL from the providing connection
-        let connection = await this.constructor.getProvider(project, environment);
-
-        if(!connection) {
-            throw new Error('No connection set as media provider');
-        }
-
-        let url = await connection.getMediaUrl(this.id);
-
-        if(!url) {
-            throw new Error(`Cannot fetch media "${this.id}", no URL available from provider`);
-        }
-
-        await HashBrown.Service.FileService.copy(url, cacheFile);
-
-        // Resize file
-        if(width && this.isImage() && !this.isSvg()) { 
-            await HashBrown.Service.AppService.exec('convert ' + cacheFile + ' -auto-orient -resize ' + width + (height ? 'x' + height : '') + '\\> ' + cacheFile);
-        }
-        
-        // Read file
-        return HashBrown.Service.FileService.readStream(cacheFile);
-    }
-    
-    /**
-     * Cleans the entire media cache
-     *
-     * @param {String} project
-     * @param {String} environment
-     */
-    static async clearCache(project, environment) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-
-        let cacheFolders = Path.join(APP_ROOT, 'storage', project, environment, 'media', '*');
-        let files = await HashBrown.Service.FileService.list(cacheFolders);
-        
-        for(let file of files) {
-            await HashBrown.Service.FileService.remove(Path.join(cacheFolder, file));
-        }
+        return data;
     }
 }
 

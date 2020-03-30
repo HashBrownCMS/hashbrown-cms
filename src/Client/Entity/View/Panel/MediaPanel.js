@@ -26,23 +26,6 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     }
     
     /**
-     * Event: Click rename
-     */
-    onClickRename(media) {
-        let modal = HashBrown.Entity.View.Modal.Rename.new({
-            model: {
-                value: media.filename
-            }
-        });
-            
-        modal.on('submit', async (newName) => {
-            await HashBrown.Service.RequestService.request('post', 'media/' + media.id, { filename: newName });
-
-            HashBrown.Service.EventService.trigger('resource', media.id); 
-        });
-    }
-    
-    /**
      * Event: Click replace
      */
     onClickReplace(replaceId) {
@@ -137,7 +120,6 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let options = super.getItemBaseOptions(resource);
 
-        options['Rename'] = () => this.onClickRename(resource);
         options['Move'] = () => this.onClickMove(resource);
         options['Replace'] = () => this.onClickReplace(resource.id);
 

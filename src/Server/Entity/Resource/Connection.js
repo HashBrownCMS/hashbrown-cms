@@ -90,7 +90,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
 
     /**
-     *  Unpublishes content
+     * Unpublishes content
      *
      * @param {String} projectId
      * @param {String} environment
@@ -213,11 +213,11 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
     
     /**
-     * Gets a list of media filenames
+     * Gets a list of media urls
      *
-     * @returns {Array} Media filenames
+     * @returns {Array} Media urls
      */
-    async getAllMediaFilenames() {
+    async getAllMediaUrls() {
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
             throw new Error('This Connection has no deployer defined');
         }
@@ -226,20 +226,23 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         
         if(!files) { return []; }
 
-        let names = {};
+        let urls = {};
 
         for(let file of files) {
-            let filename = Path.basename(file);
+            if(Path.basename(file, Path.extname(file)) === 'thumbnail') { continue; }
+
             let folder = Path.basename(Path.dirname(file));
-            
-            names[folder] = filename;
+
+            if(urls[folder]) { continue; }
+           
+            urls[folder] = file;
         }
 
-        return names;
+        return urls;
     }
     
     /**
-     * Gets a media URL by id
+     * Gets media URL by id
      *
      * @param {String} id
      *
@@ -256,59 +259,49 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         let files = await this.deployer.getFolder(this.deployer.getPath('media', id + '/'), 1);
 
-        if(!files || files.length < 1) { throw new HttpError(`Media ${id} not found`, 404); }
+        if(!files || files.length < 1) { return null; }
 
-        return files.shift();
+        for(let file of files) {
+            if(Path.basename(file, Path.extname(file)) === 'thumbnail') { continue; }
+
+            return file;
+        }
+
+        return null;
     }
     
     /**
-     * Renames a Media node by id
-     *
-     * @param {String} id
-     * @param {String} name
-     */
-    async renameMedia(id, name) {
-        checkParam(id, 'id', String, true);
-        checkParam(name, 'name', String, true);
-        
-        this.pathComponentCheck('id', id);
-        this.pathComponentCheck('name', name);
-
-        let path = await this.getMediaUrl(id);
-
-        if(name === Path.basename(path)) { return; }
-        
-        await this.deployer.renameFile(path, name);
-    }
-    
-    /**
-     * Sets a Media node by id
+     * Sets a media node by id
      *
      * @param {String} id
      * @param {String} name
      * @param {String} base64
+     * @param {Boolean} clear
      *
      * @returns {HashBrown.Entity.Resource.Media} Media node
      */
-    async setMedia(id, name, base64) {
-        checkParam(id, 'id', String);
-        checkParam(name, 'name', String);
-        checkParam(base64, 'base64', String);
+    async setMedia(id, name, base64, clear = false) {
+        checkParam(id, 'id', String, true);
+        checkParam(name, 'name', String, true);
+        checkParam(base64, 'base64', String, true);
+        checkParam(clear, 'clear', Boolean);
         
         this.pathComponentCheck('id', id);
         this.pathComponentCheck('name', name);
         
-        try {
-            await this.removeMedia(id)
-        } catch(e) {
-            // It doesn't matter if the file was not found, we don't want it there anyway
+        if(clear) {
+            try {
+                await this.removeMedia(id)
+            } catch(e) {
+                // It doesn't matter if the file was not found, we don't want it there anyway
+            }
         }
         
-        await this.deployer.setFile(this.deployer.getPath('media', id + '/' + name), base64);
+        await this.deployer.setFile(this.deployer.getPath('media', `${id}/${name}`), base64);
     }
     
     /**
-     * Removes a Media node by id
+     * Removes a media node by id
      *
      * @param {String} id
      */
@@ -318,7 +311,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         this.pathComponentCheck('id', id);
 
         if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
-            throw new Error('This Connection has no deployer defined');
+            throw new Error('This connection has no deployer defined');
         }
 
         await this.deployer.removeFolder(this.deployer.getPath('media', id));

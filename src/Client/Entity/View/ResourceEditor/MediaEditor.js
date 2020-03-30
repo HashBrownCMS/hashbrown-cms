@@ -53,7 +53,7 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     /**
      * Event: Click move
      */
-    async onChangeFolder() {
+    async onClickMove() {
         let resources = await HashBrown.Entity.Resource.Media.list();
         
         let folders = [];
@@ -78,12 +78,34 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     }
     
     /**
-     * Event: Change filename
+     * Event: Click replace full media file
      */
-    onChangeFilename(newValue) {
-        this.model.filename = newValue;
+    onClickReplaceFull() {
+        let modal = HashBrown.Entity.View.Modal.UploadMedia.new({
+            model: {
+                replaceId: this.model.id
+            }
+        });
+        
+        modal.on('success', () => {
+            HashBrown.Service.NavigationService.poke();
+        });
+    }
+    
+    /**
+     * Event: Click replace thumbnail media file
+     */
+    onClickReplaceThumbnail() {
+
     }
 
+    /**
+     * Event: Change folder
+     */
+    onChangeFolder(newValue) {
+        this.model.folder = newValue;
+    }
+    
     /**
      * Event: Change caption
      */
