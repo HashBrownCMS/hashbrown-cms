@@ -100,7 +100,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
         let cache = await this.getCache(projectId, environment, query);
 
-        if(cache) { console.log('CACHED!'); return cache; }
+        if(cache) { return cache; }
         
         let items = await HashBrown.Entity.Resource.Content.list(projectId, environment);
         let result = [];
