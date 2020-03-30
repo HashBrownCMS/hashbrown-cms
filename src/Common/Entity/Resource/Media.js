@@ -61,23 +61,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         checkParam(params, 'params', Object);
 
         params = params || {};
-    
-        if(!params.folder) {
-            params.folder = '/';
-        }
-
-        if(!params.author) {
-            params.author = {};
-        }
         
-        if(!params.copyrightHolder) {
-            params.copyrightHolder = {};
-        }
-
-        if(!params.copyrightYear) {
-            params.copyrightYear = new Date().getFullYear();
-        }
-
         super.adopt(params);
     }
     

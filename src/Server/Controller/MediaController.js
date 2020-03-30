@@ -28,7 +28,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
         }
 
         media.adopt(body);
-        
+
         let options = {
             full: body.full,
             filename: body.filename,
