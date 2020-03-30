@@ -37,6 +37,11 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             _.field({label: 'Root content', description: 'The root content item to expose'},
                 _.popup({disabled: model.isLocked, clearable: true, value: model.rootContent, options: state.contentOptions, onchange: _.onChangeRootContent})
             ),
+            model.rootContent ? [
+                _.field({label: 'Include root', description: 'Include the root item in this publication'},
+                    _.checkbox({disabled: model.isLocked, value: model.includeRoot, onchange: _.onChangeIncludeRoot})
+                )
+            ] : null,
             _.field({label: 'Allowed schemas'},
                 _.popup({disabled: model.isLocked, multiple: true, value: model.allowedSchemas, options: state.schemaOptions, onchange: _.onChangeAllowedSchemas})
             )

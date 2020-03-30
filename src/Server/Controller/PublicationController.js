@@ -39,17 +39,7 @@ class PublicationController extends HashBrown.Controller.ResourceController {
         let results = await publication.getContent(params.project, params.environment, query);
         let app = require(Path.join(APP_ROOT, 'package.json'));
 
-        return new HttpResponse({
-            version: app.version, 
-            name: publication.getName(),
-            config: {
-                rootContent: publication.rootContent,
-                allowedSchemas: publication.allowedSchemas
-            },
-            query: query,
-            results: results,
-            count: results.length,
-        }, 200, { 'Cache-Control': 'no-store' });
+        return new HttpResponse(results, 200, { 'Cache-Control': 'no-store', 'Content-Type': 'application/json' });
     }
     
     /**

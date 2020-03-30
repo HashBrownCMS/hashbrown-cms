@@ -89,6 +89,17 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
         this.model.rootContent = newValue;
 
         this.onChange();
+
+        this.render();
+    }
+    
+    /**
+     * Event: Change whether root content should be included
+     */
+    onChangeIncludeRoot(newValue) {
+        this.model.includeRoot = newValue;
+
+        this.onChange();
     }
     
     /**
