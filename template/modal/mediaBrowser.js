@@ -26,7 +26,7 @@ _.div({class: 'modal modal--media-browser in'},
 
                     _.each(state.items, (i, item) =>
                         _.button({class: 'modal--media-browser__item', 'data-folder': item.folder, title: item.name, onclick: (e) => _.onClickItem(item.id)},
-                            _.media({disabled: true, value: item})
+                            _.media({disabled: true, value: item, thumbnail: true})
                         )
                     )
                 )

@@ -162,7 +162,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         let connection = await this.getProvider(projectId, environment);
 
         if(connection) {
-            let contentUrl = await connection.getMediaUrl(id);
+            let contentUrl = await connection.getMediaUrl(id, options.ensureWebUrl === true);
 
             if(contentUrl) {
                 if(!resource) {

@@ -63,7 +63,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'mediaReference':
-                let media = await HashBrown.Entity.Resource.Media.get(project, environment, value);
+                let media = await HashBrown.Entity.Resource.Media.get(project, environment, value, { ensureWebUrl: true });
 
                 if(media.isImage()) {
                     parsed['@type'] = 'ImageObject';
@@ -86,7 +86,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 parsed['copyrightHolder'] = media.copyrightHolder;
 
                 if(parsed['copyrightHolder']) {
-                    parsed['author']['@type'] = 'Organization';
+                    parsed['copyrightHolder']['@type'] = 'Organization';
                 }
 
                 parsed['copyrightYear'] = media.copyrightYear;

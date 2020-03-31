@@ -22,16 +22,12 @@ _.div({class: `widget widget--media ${model.class || ''}`},
             ] : [
                 _.button({class: 'widget--media__preview' + (model.full ? ' full' : ''), title: state.message || 'Pick media item', onclick: _.onClickBrowse},
                     _[state.tagName]({src: state.source, class: `widget--media__preview__source ${!state.source ? 'fa fa-plus' : ''}`})        
-                ),
-                _.div({class: 'widget--media__tools'},
-                    state.message || state.title ? [
-                        _.label({class: 'widget--media__name', title: state.message || state.title}, state.message || state.title)
-                    ] : null,
-
-                    _.button({class: 'widget--media__clear fa fa-remove', title: 'Clear selection', onclick: _.onClickClear})
                 )
-
-            ]
+            ],
+            _.div({class: 'widget--media__tools'},
+                _.label({class: 'widget--media__name', title: state.message || state.title}, state.message || state.title),
+                _.button({class: 'widget--media__clear fa fa-remove', title: 'Clear selection', onclick: _.onClickClear})
+            )
         )
     ]
 )

@@ -245,10 +245,11 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      * Gets media URL by id
      *
      * @param {String} id
+     * @param {Boolean} ensureWebUrl
      *
      * @returns {String} Media URL
      */
-    async getMediaUrl(id) {
+    async getMediaUrl(id, ensureWebUrl = false) {
         checkParam(id, 'id', String, true);
 
         if(!this.deployer || typeof this.deployer.getFolder !== 'function') {
@@ -263,6 +264,14 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
         for(let file of files) {
             if(Path.basename(file) === 'thumbnail.jpg') { continue; }
+
+            // Ensure that this URL can be reached from a web browser
+            if(ensureWebUrl && file.indexOf('://') < 0) {
+                file = Path.join(this.url, this.deployer.paths.media, id, Path.basename(file));
+
+                // If the path module removed doubles slashes for protocols, add them back
+                file = file.replace(/:\/([^\/])/, '://$1');
+            }
 
             return file;
         }
