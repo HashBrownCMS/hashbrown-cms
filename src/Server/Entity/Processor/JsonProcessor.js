@@ -9,16 +9,12 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     /**
      * Compiles content as JSON
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {Content} content
      * @param {String} language
      *
      * @returns {Promise} Result
      */
-    async process(project, environment, content, language) {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
+    async process(content, language) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(language, 'language', String);
 

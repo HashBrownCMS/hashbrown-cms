@@ -95,23 +95,6 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
     }
 
     /**
-     * Event: Click migration button
-     */
-    onClickMigrate() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
-
-        if(this.model.environments.length < 2) {
-            UI.error(new Error('You need at least 2 environments to migrate resources'));
-            return;
-        }
-    
-        HashBrown.Entity.View.Modal.MigrateResources.new({
-            model: this.model
-        })
-        .on('change', () => { this.update(); });
-    }
-
-    /**
      * Event: Click add environment button
      */
     onClickAddEnvironment() {

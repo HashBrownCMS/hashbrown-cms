@@ -14,7 +14,23 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
     static get routes() {
         let routes = {};
-
+        
+        // Migration
+        routes['/api/${project}/${environment}/' + this.category + '/dependencies'] = {
+            handler: this.dependencies,
+            user: {
+                scope: this.category
+            }
+        };
+        routes['/api/${project}/${environment}/' + this.category + '/migrate'] = {
+            handler: this.migrate,
+            methods: [ 'POST' ],
+            user: {
+                scope: this.category
+            }
+        };
+        
+        // Regular operations
         routes['/api/${project}/${environment}/' + this.category] = {
             handler: this.resources,
             user: true
@@ -110,7 +126,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
             return new HttpResponse('Not found', 404);
         }
 
-        await resource.heartbeat(params.project, params.environment, user);
+        await resource.heartbeat(user);
         
         return new HttpResponse('OK');
     }
@@ -129,7 +145,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         
         let resource = await model.get(params.project, params.environment, params.id);
         
-        await resource.pull(user, params.project, params.environment);
+        await resource.pull(user);
 
         return new HttpResponse(resource);
     }
@@ -146,7 +162,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         let resource = await model.get(params.project, params.environment, params.id);
         
-        await resource.push(user, params.project, params.environment);
+        await resource.push(user);
     
         return new HttpResponse('OK');
     }
@@ -196,7 +212,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 // In case the id was changed, make sure to include the old id in the options
                 query.id = params.id;
                     
-                await resource.save(user, params.project, params.environment, query);
+                await resource.save(user, query);
                 
                 return new HttpResponse(resource);
 
@@ -205,7 +221,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                     return new HttpResponse('You do not have access to remove this resource', 403);
                 }
                 
-                await resource.remove(user, params.project, params.environment, query);
+                await resource.remove(user, query);
 
                 return new HttpResponse('OK');
         }
@@ -226,6 +242,58 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let resource = await model.create(user, params.project, params.environment, body, query);
 
         return new HttpResponse(resource);
+    }
+
+    /**
+     * @example GET /api/${project}/${environment}/${category}/dependencies?resources=XXX,XXX
+     */
+    static async dependencies(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+       
+        let allDependencies = {};
+        let ids = (query.resources || '').split(',');
+
+        for(let id of ids) {
+            let resource = await model.get(params.project, params.environment, id);
+            let dependencies = await resource.getDependencies();
+
+            for(let category in dependencies) {
+                if(!allDependencies[category]) {
+                    allDependencies[category] = [];
+                }
+
+                for(let dependency of dependencies[category]) {
+                    if(allDependencies[category].indexOf(dependency) > -1) { continue; }
+
+                    allDependencies[category].push(dependency);
+                }
+            }
+        }
+
+        return new HttpResponse(allDependencies);
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/${category}/migrate { project: XXX, environment: XXX, resources: [ XXX,XXX ] }
+     */
+    static async migrate(request, params, body, query, user) {
+        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        
+        if(!model) {
+            return new HttpResponse(`No model found for category ${this.category}`, 404);
+        }
+        
+        for(let id of body.resources) {
+            let resource = await model.get(params.project, params.environment, params.id, query);
+
+            await resource.migrate(body.project, body.environment);
+        }
+
+        return new HttpResponse('OK');
     }
 }
 

@@ -28,6 +28,9 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      */
     adopt(params = {}) {
         checkParam(params, 'params', Object);
+        checkParam(params.context, 'params.context', Object, true);
+        checkParam(params.context.project, 'params.context.project', String, true);
+        checkParam(params.context.environment, 'params.context.environment', String, true);
         
         params = params || {};
 
@@ -38,6 +41,8 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
         params.paths = params.paths || {};
 
         super.adopt(params);
+        
+        Object.seal(this.context);
     }
 
     /**
@@ -49,8 +54,9 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
             media: '',
             content: ''
         });
+        this.def(Object, 'context');
     }
-    
+
     /**
      * Gets a copy of every field in this object as a mutable object
      *
@@ -60,6 +66,7 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
         let object = super.getObject();
 
         object.alias = this.alias;
+        delete object.context;
 
         return object;
     }

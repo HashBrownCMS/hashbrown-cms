@@ -121,15 +121,6 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             '/api/projects/${project}/users': {
                 handler: this.users,
                 user: true
-            },
-
-            // Migration
-            '/api/projects/${project}/migrate': {
-                handler: this.migrate,
-                methods: [ 'POST'],
-                user: {
-                    isAdmin: true
-                }
             }
         };
     }
@@ -387,57 +378,6 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
         return new HttpResponse(timestamp);
     } 
 
-    /**
-     * @example POST /api/projects/{project}/migrate { from: XXX, to: XXX, replace: true|false }
-     */
-    static async migrate(request, params, body, query, user) {
-        let project = params.project;
-        let from = body.from || query.from;
-        let to = body.to || query.to;
-        let replace = body.replace === 'true' || body.replace === true || query.replace === 'true' || query.replace === true;
-
-        let report = `Migrating resources from ${from} to ${to}...`;
-
-        let collections = await HashBrown.Service.DatabaseService.listCollections(project);
-        
-        for(let collection of collections) {
-            if(collection.name.indexOf(from) + '.' !== 0) { continue; }
-
-            let fromCollectionName = collection.name;
-            let toCollectionName = fromCollectionName.replace(from, to);
-
-            report += `\n${fromCollectionName} -> ${toCollectionName}`;
-
-            let fromCollectionItems = await HashBrown.Service.DatabaseService.find(project, fromCollectionName);
-
-            for(let fromCollectionItem of fromCollectionItems) {
-                if(!fromCollectionItem.id) { continue; }
-
-                if(replace) {
-                    report += `\n    UPDATE ${fromCollectionItem.id}`;
-
-                    await HashBrown.Service.DatabaseService.updateOne(project, toCollectionName, { id: fromCollectionItem.id }, fromCollectionItem, { upsert: true });
-
-                } else {
-                    let count = await HashBrown.Service.DatabaseService.count(project, toCollectionName, { id: fromCollectionItem.id });
-
-                    if(count > 0) {
-                        report += `\n    SKIP ${fromCollectionItem.id}`;
-                        continue;
-                    }
-
-                    report += `\n    INSERT ${fromCollectionItem.id}`;
-
-                    await HashBrown.Service.DatabaseService.insertOne(project, toCollectionName, fromCollectionItem);
-                }
-            }
-        }
-
-        report += '\n...done!';
-
-        return new HttpResponse(report, 200);
-    }
-    
     /**
      * @example GET /api/projects/{project}/users
      */

@@ -9,18 +9,13 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     /**
      * Performs a value check
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {*} value
      * @param {String} schemaId
      * @param {String} language
      *
      * @return {*} Value
      */
-    async check(project, environment, value, schemaId, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
-        
+    async check(value, schemaId, language) {
         if(value === null || value === undefined || value === '') { return null; }
 
         if(Array.isArray(value)) {
@@ -29,7 +24,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         
         if(!schemaId) { return value; }
 
-        let schema = await HashBrown.Entity.Resource.FieldSchema.get(project, environment, schemaId, { withParentFields: true });
+        let schema = await HashBrown.Entity.Resource.FieldSchema.get(this.context.project, this.context.environment, schemaId, { withParentFields: true });
 
         if(!schema) { return value; }
 
@@ -49,7 +44,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                     parsed['itemListElement'].push({
                         '@type': 'ItemListElement',
                         'position': i,
-                        'item': await this.check(project, environment, value[i].value, value[i].schemaId)
+                        'item': await this.check(value[i].value, value[i].schemaId)
                     });
                 }
                 break;
@@ -58,12 +53,12 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 parsed['@type'] = 'StructuredValue';
 
                 for(let k in value) {
-                    parsed[k] = await this.check(project, environment, value[k], schema.config.struct[k].schemaId);
+                    parsed[k] = await this.check(value[k], schema.config.struct[k].schemaId);
                 }
                 break;
 
             case 'mediaReference':
-                let media = await HashBrown.Entity.Resource.Media.get(project, environment, value, { ensureWebUrl: true });
+                let media = await HashBrown.Entity.Resource.Media.get(this.context.project, this.context.environment, value, { ensureWebUrl: true });
 
                 if(media.isImage()) {
                     parsed['@type'] = 'ImageObject';
@@ -96,9 +91,9 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'contentReference':
-                let content = await HashBrown.Entity.Resource.Content.get(project, environment, value);
+                let content = await HashBrown.Entity.Resource.Content.get(this.context.project, this.context.environment, value);
                 
-                content = await this.process(project, environment, content, language, [ 'url', 'description', 'image' ]);
+                content = await this.process(content, language, [ 'url', 'description', 'image' ]);
         
                 for(let key in content) {
                     parsed[key] = content[key];
@@ -116,22 +111,18 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     /**
      * Compiles content as uischema.org JSON
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {Content} content
      * @param {String} language
      * @param {Array} filter
      *
      * @returns {Promise} Result
      */
-    async process(project, environment, content, language = 'en', filter = []) {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
+    async process(content, language = 'en', filter = []) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(language, 'language', String, true);
         checkParam(filter, 'filter', Array, true);
 
-        let schema = await HashBrown.Entity.Resource.ContentSchema.get(project, environment, content.schemaId);
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context.project, this.context.environment, content.schemaId);
         let properties = content.getLocalizedProperties(language);
         let meta = content.getMeta();
 
@@ -183,7 +174,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         for(let key in schema.config) {
             if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
 
-            data[key] = await this.check(project, environment, properties[key], schema.config[key].schemaId, language);
+            data[key] = await this.check(properties[key], schema.config[key].schemaId, language);
         }
         
         return data;

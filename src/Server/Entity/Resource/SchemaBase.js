@@ -12,22 +12,22 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Object} data
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(user, project, environment, data = {}, options = {}) {
+    static async create(user, projectId, environment, data = {}, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(data.parentId, 'data.parentId', String, true);
         checkParam(options, 'options', Object, true);
 
-        let parent = await this.get(project, environment, data.parentId, { withParentFields: true });
+        let parent = await this.get(projectId, environment, data.parentId, { withParentFields: true });
 
         if(!parent) {
             throw new Error(`Parent schema ${data.parentId} could not be found`);
@@ -37,7 +37,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         data.customIcon = parent.icon;
         data.type = parent.type;
 
-        return await super.create(user, project, environment, data, options);
+        return await super.create(user, projectId, environment, data, options);
     }
     
     /**
@@ -80,6 +80,11 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.type = parentDirName.toLowerCase();
                 data.isLocked = true;
                 data.updatedOn = stats.mtime;
+
+                data.context = {
+                    project: projectId,
+                    environment: environment
+                };
 
                 resource = this.new(data);
             }
@@ -145,6 +150,11 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     data.parentId = data.type + 'Base';
                 }
 
+                data.context = {
+                    project: projectId,
+                    environment: environment
+                };
+                
                 let resource = this.new(data);
                 
                 if(!resource) { continue; }
@@ -168,6 +178,62 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         }
 
         return list;
+    }
+    
+    /**
+     * Gets a nested list of dependencies
+     *
+     * @return {Object} Dependencies
+     */
+    async getDependencies() {
+        let dependencies = {
+            schemas: []
+        };
+
+        // NOTE: The quickest way to find all schema references is
+        // to stringify this schema and look up keywords, since they can be nested infinitely
+        let string = JSON.stringify(this);
+
+        let schemaIdRegex = /"schemaId": "([^"]+)"/;
+        let schemaIdMatch = schemaIdRegex.exec(string);
+
+        while(schemaIdMatch && schemaIdMatch[1]) {
+            if(dependencies.schemas.indexOf(schemaIdMatch[1]) < 0) {
+                dependencies.schemas.push(schemaIdMatch[1]);
+            }
+
+            schemaIdMatch = schemaIdRegex.exec(string);
+        }
+        
+        let allowedSchemasRegex = /"allowedSchemas": \[([^\]]+)\]/;
+        let allowedSchemasMatch = allowedSchemasRegex.exec(string);
+
+        while(allowedSchemasMatch && allowedSchemasMatch[1]) {
+            let allowedSchemas = JSON.parse(allowedSchemasMatch[1]);
+
+            for(let allowedSchema of allowedSchemas) {
+                if(dependencies.schemas.indexOf(allowedSchema) < 0) {
+                    dependencies.schemas.push(allowedSchema);
+                }
+            }
+
+            allowedSchemasMatch = allowedSchemasRegex.exec(string);
+        }
+
+        // Recurse up through parents
+        let schema = this;
+
+        while(schema) {
+            schema = schema.parentId ? await this.constructor.get(this.context.project, this.context.environment, schema.parentId) : null;
+
+            if(!schema) { break; }
+
+            dependencies.schemas.push(schema.id);
+
+            dependencies.schemas.concat(await schema.getDependencies()['schemas']);
+        }
+
+        return dependencies;
     }
 }
 

@@ -5,6 +5,36 @@
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(Object, 'context', {});
+    }
+    
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+
+        if(!this.context) {
+            checkParam(params.context, 'params.context', Object, true);
+            checkParam(params.context.project, 'params.context.project', String, true);
+            checkParam(params.context.environment, 'params.context.environment', String, true);
+        }
+
+        super.adopt(params);
+
+        if(!this.context) {
+            Object.seal(this.context);
+        }
+    }
+   
+    /**
      * Gets an instance of this entity type
      *
      * @param {String} projectId
@@ -51,6 +81,11 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!resource) { return null; }
 
+        resource.context = {
+            project: projectId, 
+            environment: environment
+        };
+        
         return this.new(resource);
     }
     
@@ -109,10 +144,15 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             }
         }
 
-        // Apply models
+        // Apply models and context
         for(let i = resources.length - 1; i >= 0; i--) {
+            resources[i].context = {
+                project: projectId, 
+                environment: environment
+            };
+            
             resources[i] = this.new(resources[i]);
-
+        
             if(!resources[i]) {
                 resources.splice(i, 1);
             }
@@ -135,16 +175,16 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Object} data
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(user, project, environment, data = {}, options = {}) {
+    static async create(user, projectId, environment, data = {}, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(options, 'options', Object, true);
@@ -157,11 +197,16 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         data.viewedOn = new Date();
 
         data.id = this.createId();
+            
+        resource.context = {
+            project: projectId,
+            environment: environment
+        };
 
         let resource = this.new(data);
 
         await HashBrown.Service.DatabaseService.insertOne(
-            project,
+            projectId,
             environment + '.' + this.category,
             resource.getObject()
         );
@@ -173,14 +218,10 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Saves the current state of this entity
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
-     * @param {String} environment
      * @param {Object} options
      */
-    async save(user, project, environment, options = {}) {
+    async save(user, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User);
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
         if(this.isLocked) {
@@ -200,8 +241,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(
-            project,
-            environment + '.' + this.category,
+            this.context.project,
+            this.context.environment + '.' + this.category,
             {
                 id: options.id || this.id
             },
@@ -216,19 +257,15 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Removes this entity
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
-     * @param {String} environment
      * @param {Object} options
      */
-    async remove(user, project, environment, options = {}) {
+    async remove(user, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
         await HashBrown.Service.DatabaseService.removeOne(
-            project,
-            environment + '.' + this.category,
+            this.context.project,
+            this.context.environment + '.' + this.category,
             {
                 id: this.id
             }
@@ -239,15 +276,11 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Pulls a synced resource
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} projectId
-     * @param {String} environment
      */
-    async pull(user, projectId, environment) {
+    async pull(user) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
 
-        let project = await HashBrown.Entity.Project.get(projectId);
+        let project = await HashBrown.Entity.Project.get(this.context.project);
         let sync = await project.getSyncSettings();
 
         if(!sync) {
@@ -256,7 +289,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         let resource = await HashBrown.Service.RequestService.request(
             'get',
-            sync.url + '/api/' + this.category + '/' + this.id,
+            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id,
             { token: sync.token }
         );
         
@@ -266,22 +299,18 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         this.adopt(resource);
         
-        await this.save(user, project, environment);
+        await this.save(user);
     }
     
     /**
      * Pushes a synced resource
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} projectId
-     * @param {String} environment
      */
-    async push(user, projectId, environment) {
+    async push(user) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
         
-        let project = await HashBrown.Entity.Project.get(projectId);
+        let project = await HashBrown.Entity.Project.get(this.context.project);
         let sync = await project.getSyncSettings();
 
         if(!sync) {
@@ -290,30 +319,26 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.RequestService.request(
             'post',
-            sync.url + '/api/' + this.category + '/' + this.id + '?token=' + sync.token,
+            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id + '?token=' + sync.token,
             this.getObject()
         );
 
-        await this.remove(user, projectId, environment);
+        await this.remove(user);
     }
     
     /**
      * Submits a heartbeat on this resource
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {HashBrown.Entity.User} user
      */
-    async heartbeat(project, environment, user) {
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
+    async heartbeat(user) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
         
         if(this.isLocked) { return; }
 
         await HashBrown.Service.DatabaseService.updateOne(
-            project,
-            environment + '.' + this.category,
+            this.context.project,
+            this.context.environment + '.' + this.category,
             {
                 id: this.id
             },
@@ -322,6 +347,28 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
                 viewedOn: new Date()
             }
         );
+    }
+
+    /**
+     * Gets a mutable object of this entity
+     *
+     * @return {Object} Object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        delete object.context;
+
+        return object;
+    }
+
+    /**
+     * Gets a nested list of dependencies
+     *
+     * @return {Object} Dependencies
+     */
+    async getDependencies() {
+        throw new Error('Method "getDependencies" must be overridden');
     }
 }
 

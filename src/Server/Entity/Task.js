@@ -117,15 +117,15 @@ class Task extends HashBrown.Entity.EntityBase {
     /**
      * Gets a task
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} content
      * @param {String} type
      *
      * @return {HashBrown.Entity.Task} Task
      */
-    static async get(project, environment, content, type) {
-        checkParam(project, 'project', String, true);
+    static async get(projectId, environment, content, type) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
@@ -136,7 +136,7 @@ class Task extends HashBrown.Entity.EntityBase {
             {
                 type: type,
                 content: content,
-                project: project,
+                project: projectId,
                 environment: environment
             }
         );
@@ -149,26 +149,26 @@ class Task extends HashBrown.Entity.EntityBase {
     /**
      * Creates a task
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} content
      * @param {String} type
      *
      * @return {HashBrown.Entity.Task} Task
      */
-    static async create(project, environment, content, type) {
-        checkParam(project, 'project', String, true);
+    static async create(projectId, environment, content, type) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
 
-        let task = await this.get(project, environment, content, type);
+        let task = await this.get(projectId, environment, content, type);
 
         if(!task) {
             task = this.new({
                 type: type,
                 content: content,
-                project: project,
+                project: projectId,
                 environment: environment
             });
 

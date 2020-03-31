@@ -35,7 +35,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
             thumbnail: body.thumbnail
         };
 
-        await media.save(user, params.project, params.environment, options);
+        await media.save(user, options);
 
         return new HttpResponse('OK', 200);
     }

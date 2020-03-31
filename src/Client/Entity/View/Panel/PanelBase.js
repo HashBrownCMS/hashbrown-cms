@@ -281,6 +281,15 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Event: Click migrate
+     */
+    onClickMigrate() {
+        let modal = HashBrown.Entity.View.Modal.MigrateResources.new({
+            category: this.category
+        });
+    }
+
+    /**
      * Sorts items based on the given sorting method
      *
      * @param {HashBrown.Entity.View.ListItem.PanelItem} a
@@ -436,7 +445,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     getPanelOptions() {
         return {
-            'New': () => this.onClickNew()
+            'New': () => this.onClickNew(),
+            'Migrate': () => this.onClickMigrate()
         }
     }
 

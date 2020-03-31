@@ -12,7 +12,6 @@ _.div({class: 'list-item--project'},
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
-                    'Migrate resources': _.onClickMigrate,
                     'Delete': _.onClickRemove
                 }
             })

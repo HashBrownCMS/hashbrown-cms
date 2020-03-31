@@ -231,19 +231,15 @@ class Media extends require('Common/Entity/Resource/Media') {
      * Removes this entity
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
-     * @param {String} environment
      * @param {Object} options
      */
-    async remove(user, project, environment, options = {}) {
+    async remove(user, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        await super.remove(user, project, environment, options);
+        await super.remove(user, options);
         
-        let connection = await this.constructor.getProvider(project, environment);
+        let connection = await this.constructor.getProvider(this.context.project, this.context.environment);
 
         if(!connection) {
             throw new Error('No connection set as media provider');
@@ -256,17 +252,13 @@ class Media extends require('Common/Entity/Resource/Media') {
      * Saves the current state of this entity
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
-     * @param {String} environment
      * @param {Object} options
      */
-    async save(user, project, environment, options = {}) {
+    async save(user, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        let connection = await this.constructor.getProvider(project, environment);
+        let connection = await this.constructor.getProvider(this.context.project, this.context.environment);
 
         if(!connection) {
             throw new Error('No connection set as media provider');
@@ -282,28 +274,28 @@ class Media extends require('Common/Entity/Resource/Media') {
         
         // If no thumbnail was specified, attempt to generate one
         } else if(options.full && options.filename) {
-            let thumbnail = await this.constructor.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
+            let thumbnail = await this.constructor.generateThumbnail(this.context.project, this.context.environment, options.filename, Buffer.from(options.full, 'base64'));
            
             if(thumbnail) {
                 await connection.setMedia(this.id, 'thumbnail.jpg', thumbnail.toString('base64'));
             }
         }
 
-        await super.save(user, project, environment);
+        await super.save(user, options);
     }
 
     /**
      * Generates a thumbnail, if possible
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {String} filename
      * @param {Buffer} data
      *
      * @return {Buffer} Thumbnail
      */
-    static async generateThumbnail(project, environment, filename, data, width = 200, height = 200) {
-        checkParam(project, 'project', String, true);
+    static async generateThumbnail(projectId, environment, filename, data, width = 200, height = 200) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(filename, 'filename', String, true);
         checkParam(data, 'data', Buffer, true);
@@ -313,7 +305,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         // If not an image, or SVG, we won't be generating anything
         if(type.indexOf('image') < 0 || type.indexOf('svg') > -1) { return null; }
 
-        let tempFolder = Path.join(APP_ROOT, 'storage', project, environment, 'media');
+        let tempFolder = Path.join(APP_ROOT, 'storage', projectId, environment, 'media');
         let tempFile = Path.join(tempFolder, 'thumbnail' + Path.extname(filename));
         
         // Write the temporary file of the full source

@@ -15,10 +15,28 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
     get alias() { return this.constructor.alias; }
 
     /**
-     * Constructor
+     * Structure
      */
-    constructor(params) {
-        super(params);
+    structure() {
+        super.structure();
+
+        this.def(Object, 'context');
+    }
+
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        checkParam(params, 'params', Object);
+        checkParam(params.context, 'params.context', Object, true);
+        checkParam(params.context.project, 'params.context.project', String, true);
+        checkParam(params.context.environment, 'params.context.environment', String, true);
+
+        super.adopt(params);
+
+        Object.seal(this.context);
     }
     
     /**
@@ -30,6 +48,7 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
         let object = super.getObject();
 
         object.alias = this.alias;
+        delete object.context;
 
         return object;
     }

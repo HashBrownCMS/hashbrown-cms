@@ -99,7 +99,7 @@ class FormController extends HashBrown.Controller.ResourceController {
             
             form.addEntry(body);
 
-            await form.save(user, params.project, params.environment);
+            await form.save(user);
 
             if(form.redirect) {
                 let redirectUrl = form.redirect;

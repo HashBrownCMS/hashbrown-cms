@@ -45,7 +45,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         report += `Update connection ${connection.getName()}...\n`;
 
         connection.title += ' (updated)';
-        connection.save(user, project.id, 'live');
+        connection.save(user);
         
         report += 'Get all connections...';
 
@@ -53,14 +53,14 @@ class TestController extends HashBrown.Controller.ControllerBase {
 
         report += `Remove connection ${connection.getName()}...\n`;
 
-        await connection.remove(user, project.id, 'live');
+        await connection.remove(user);
 
         // Test content
         report += '\n[Content]\n\n';
         
         report += 'Create content...\n';
         
-        let content = await HashBrown.Entity.Resource.Content.create(user, project.id, 'live', { schemaId: 'contentBase', title: 'Test content' });
+        let content = await HashBrown.Entity.Resource.Content.create(user, { schemaId: 'contentBase', title: 'Test content' });
             
         report += `Get content ${content.getName()}...\n`;
         
@@ -69,7 +69,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         report += `Update content ${content.getName()}...\n`;
        
         content.title += ' (updated)';
-        await content.save(user, project.id, 'live');
+        await content.save(user);
             
         report += 'Get all content...\n';
         
@@ -77,14 +77,14 @@ class TestController extends HashBrown.Controller.ControllerBase {
         
         report += `Remove content ${content.getName()}...\n`;
         
-        await content.remove(user, project.id, 'live');
+        await content.remove(user);
 
         // Test forms
         report += '\n[Forms]\n\n';
         
         report += 'Create form...\n';
 
-        let form = await HashBrown.Entity.Resource.Form.create(user, project.id, 'live', { title: 'Test form' });
+        let form = await HashBrown.Entity.Resource.Form.create(user, { title: 'Test form' });
 
         report += `Get form ${form.getName()}\n`;
         
@@ -93,7 +93,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         report += `Update form ${form.getName()}...\n`;
         
         form.title += ' (updated)';
-        await form.save(user, project.id, 'live');
+        await form.save(user);
             
         report += `Add entry to form ${form.getName()}...\n`;
     
@@ -105,7 +105,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
             
         report += `Remove form ${form.getName()}...\n`;
         
-        await form.remove(user, project.id, 'live');
+        await form.remove(user);
 
         // Test schemas
         report += '\n[Schemas]\n\n';
@@ -121,7 +121,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         report += `Update schema ${schema.getName()}...\n`;
        
         schema.name += ' (updated)';
-        await schema.save(user, project.id, 'live');
+        await schema.save(user);
         
         report += 'Get all schemas...\n';
         
@@ -129,7 +129,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
 
         report += `Remove schema ${schema.getName()}...\n`;
         
-        await schema.remove(user, project.id, 'live');
+        await schema.remove(user);
         
         report += '\n[Projects]\n\n';
 

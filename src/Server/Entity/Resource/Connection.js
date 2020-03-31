@@ -33,10 +33,16 @@ class Connection extends require('Common/Entity/Resource/Connection') {
                 params.processor = params.processor.alias;
             }
 
-            params.processor = HashBrown.Entity.Processor.ProcessorBase.new({ alias: params.processor });
+            params.processor = HashBrown.Entity.Processor.ProcessorBase.new({
+                alias: params.processor,
+                context: params.context
+            });
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
+            params.deployer = params.deployer || {};
+            params.deployer.context = params.context;
+
             params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
         }
 
@@ -92,21 +98,17 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      * Unpublishes content
      *
-     * @param {String} projectId
-     * @param {String} environment
      * @param {Content} content
      */
-    async unpublishContent(projectId, environment, content) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    async unpublishContent(content) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         
         debug.log('Unpublishing all localised property sets...', this);
        
-        let project = HashBrown.Entity.Project.get(projectId);
+        let project = HashBrown.Entity.Project.get(this.context.project);
 
         if(!project) {
-            throw new Error(`Project ${projectId} not found`);
+            throw new Error(`Project ${this.context.project} not found`);
         }
 
         let languages = await project.getLanguages();
@@ -121,44 +123,36 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     /**
      * Publishes content
      *
-     * @param {String} projectId
-     * @param {String} environment
      * @param {Content} content
      */
-    async publishContent(projectId, environment, content) {
-        checkParam(projectId, 'projectId', String);
-        checkParam(environment, 'environment', String);
+    async publishContent(content) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content);
 
         debug.log('Publishing all localisations of content "' + content.id + '"...', this);
 
-        let project = HashBrown.Entity.Project.get(projectId);
+        let project = HashBrown.Entity.Project.get(this.context.project);
 
         if(!project) {
-            throw new Error(`Project ${projectId} not found`);
+            throw new Error(`Project ${this.context.project} not found`);
         }
 
         let languages = await project.getLanguages();
         
         for(let language of languages) { 
-            await this.setContent(projectId, environment, content.id, content, language);
+            await this.setContent(this.context.project, this.context.environment, content.id, content, language);
         }
 
         debug.log('Published all localisations successfully!', this);
     }
     
     /**
-     * Sets a Content node by id
+     * Sets a content node by id
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} id
      * @param {Content} content
      * @param {String} language
      */
-    async setContent(project, environment, id, content, language) {
-        checkParam(project, 'project', String);
-        checkParam(environment, 'environment', String);
+    async setContent(id, content, language) {
         checkParam(id, 'id', String);
         checkParam(content,  'content', HashBrown.Entity.Resource.Content);
         checkParam(language, 'language', String);
@@ -175,7 +169,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         this.pathComponentCheck('language', language);
         this.pathComponentCheck('fileExtension', this.deployer.fileExtension);
         
-        let result = await this.processor.process(project, environment, content, language);
+        let result = await this.processor.process(content, language);
 
         // Convert to string
         if(typeof result !== 'string') {
@@ -192,7 +186,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
     }
     
     /**
-     * Removes a Content node by id
+     * Removes a content node by id
      *
      * @param {String} id
      * @param {String} language
@@ -330,20 +324,16 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      * Saves the current state of this entity
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} projectId
-     * @param {String} environment
      * @param {Object} options
      */
-    async save(user, projectId, environment, options = {}) {
+    async save(user, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
 
-        await super.save(user, projectId, environment, options);
+        await super.save(user, options);
 
         if(options.isMediaProvider) {
-            await HashBrown.Entity.Resource.Media.setProvider(projectId, environment, this.id);
+            await HashBrown.Entity.Resource.Media.setProvider(this.context.project, this.context.environment, this.id);
         }
     }
 }
