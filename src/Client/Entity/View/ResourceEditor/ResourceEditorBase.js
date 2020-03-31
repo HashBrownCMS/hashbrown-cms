@@ -41,17 +41,14 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Checks whether this resource is currently being edited by someone else, and displays a warning if it is
      */
     editedCheck() {
-        // The check succeeded, just start the heartbeat
-        if(!this.model || !this.model.viewedBy || !this.model.viewedOn || this.model.viewedBy === HashBrown.Context.user.id || new Date() - this.model.viewedOn > HEARTBEAT_INTERVAL + HEARTBEAT_TIMEOUT) {
-            this.onHeartbeat();
-        
-        // The check failed, ask the user if they want to proceed
-        } else {
+        if(
+            this.model &&
+            this.model.viewedBy &&
+            this.model.viewedOn &&
+            this.model.viewedBy !== HashBrown.Context.user.id &&
+            new Date() - this.model.viewedOn < HEARTBEAT_INTERVAL + HEARTBEAT_TIMEOUT
+        ) {
             let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
-
-            modal.on('yes', () => {
-                this.onHeartbeat();
-            });
 
             modal.on('no', () => {
                 location.hash = '/' + this.category + '/';
@@ -170,7 +167,14 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Heartbeat
      */
     async onHeartbeat() {
-        if(typeof this === 'undefined' || !this || !this.model || Object.keys(this.model).length < 1 || !this.element || !this.element.parentElement) { return; }
+        if(
+            typeof this === 'undefined' ||
+            !this ||
+            !this.model ||
+            Object.keys(this.model).length < 1 ||
+            !this.element ||
+            !this.element.parentElement
+        ) { return; }
 
         try {
             await this.model.heartbeat();
@@ -179,11 +183,9 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             if(e && e.message) {
                 debug.error(e, this, true);
             }
-
+        
         } finally {
-            setTimeout(() => {
-                this.onHeartbeat();
-            }, HEARTBEAT_INTERVAL);
+            this.state.lastHeartbeat = Date.now();
 
         }
     }
@@ -193,6 +195,10 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      */
     onChange() {
         if(this.model.isLocked) { return; }
+
+        if((this.state.lastHeartbeat || 0) + HEARTBEAT_INTERVAL < Date.now()) {
+            this.onHeartbeat();
+        }
 
         this.setDirty(true);
         this.trigger('change', this.model);
@@ -217,6 +223,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.namedElements.save) {
             this.namedElements.save.classList.toggle('loading', false);
         }
+
+        this.render();
     }
     
     /**

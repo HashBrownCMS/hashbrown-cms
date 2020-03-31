@@ -72,31 +72,41 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
 
         modal.on('picked', async (path) => {
             this.model.folder = path;
+    
+            this.onChange();
         
             this.render();
         });
     }
     
     /**
-     * Event: Click replace full media file
+     * Event: Change full media file
      */
-    onClickReplaceFull() {
-        let modal = HashBrown.Entity.View.Modal.UploadMedia.new({
-            model: {
-                replaceId: this.model.id
-            }
-        });
-        
-        modal.on('success', () => {
-            HashBrown.Service.NavigationService.poke();
-        });
+    async onChangeFull(newValue) {
+        if(!newValue || !newValue[0]) { return; }
+
+        this.state.saveOptions = this.state.saveOptions || {};
+
+        this.model.filename = newValue[0].name;
+        this.state.saveOptions.filename = newValue[0].name;
+        this.state.saveOptions.full = await HashBrown.Entity.Resource.Media.toBase64(newValue[0]);
+
+        this.onChange();
+
+        this.render();
     }
     
     /**
-     * Event: Click replace thumbnail media file
+     * Event: Change thumbnail media file
      */
-    onClickReplaceThumbnail() {
+    async onChangeThumbnail(newValue) {
+        if(!newValue || !newValue[0]) { return; }
 
+        this.state.saveOptions = this.state.saveOptions || {};
+        
+        this.state.saveOptions.thumbnail = await HashBrown.Entity.Resource.Media.toBase64(newValue[0]);
+
+        this.onChange();
     }
 
     /**
@@ -104,6 +114,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeFolder(newValue) {
         this.model.folder = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -111,6 +123,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeCaption(newValue) {
         this.model.caption = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -118,6 +132,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeAuthorName(newValue) {
         this.model.author.name = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -125,6 +141,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeAuthorUrl(newValue) {
         this.model.author.url = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -132,6 +150,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeCopyrightHolderName(newValue) {
         this.model.copyrightHolder.name = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -139,6 +159,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeCopyrightHolderUrl(newValue) {
         this.model.copyrightHolder.url = newValue;
+    
+        this.onChange();
     }
     
     /**
@@ -146,6 +168,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      */
     onChangeCopyrightYear(newValue) {
         this.model.copyrightYear = newValue;
+    
+        this.onChange();
     }
 }
 

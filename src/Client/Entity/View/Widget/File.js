@@ -42,7 +42,7 @@ class File extends HashBrown.Entity.View.Widget.WidgetBase {
         } else {
             placeholder.innerHTML = this.model.placeholder || '(no files selected)';
         }
-
+       
         super.onChange(files);
     }
 

@@ -40,7 +40,9 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
 
             this.state.previews.push(file);
         }
-        
+       
+        this.trigger('change', files);
+
         this.renderPartial('preview');
 
     }

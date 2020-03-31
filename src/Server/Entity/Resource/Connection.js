@@ -229,7 +229,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         let urls = {};
 
         for(let file of files) {
-            if(Path.basename(file, Path.extname(file)) === 'thumbnail') { continue; }
+            if(Path.basename(file) === 'thumbnail.jpg') { continue; }
 
             let folder = Path.basename(Path.dirname(file));
 
@@ -262,7 +262,7 @@ class Connection extends require('Common/Entity/Resource/Connection') {
         if(!files || files.length < 1) { return null; }
 
         for(let file of files) {
-            if(Path.basename(file, Path.extname(file)) === 'thumbnail') { continue; }
+            if(Path.basename(file) === 'thumbnail.jpg') { continue; }
 
             return file;
         }

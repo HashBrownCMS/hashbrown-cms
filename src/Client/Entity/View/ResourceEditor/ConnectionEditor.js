@@ -149,6 +149,8 @@ class ConnectionEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdit
      */
     async onChangeIsMediaProvider(newValue) {
         this.setSaveOption('isMediaProvider', newValue);
+
+        this.onChange();
     }
 }
 

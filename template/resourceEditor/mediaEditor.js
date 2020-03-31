@@ -22,12 +22,16 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
     ] : [
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
-            _.field({label: 'Full', tools: { replace: { icon: 'upload', tooltip: 'Replace', handler: () => { _.onClickReplaceFull(); } } }},
+            _.field({label: 'Full'},
                 _.media({readonly: true, value: model.id, full: true}),
+                _.file({class: 'margin-top', placeholder: model.filename, onchange: _.onChangeFull})
             ),
-            _.field({label: 'Thumbnail', tools: { replace: { icon: 'upload', tooltip: 'Replace', handler: () => { _.onClickReplaceThumbnail(); } } }},
-                _.media({readonly: true, value: model.id, thumbnail: true}),
-            ),
+            !model.isSvg() ? [
+                _.field({label: 'Thumbnail'},
+                    _.media({readonly: true, value: model.id, thumbnail: true}),
+                    _.file({class: 'margin-top', accept: '.jpg,.jpeg,.JPG,.JPEG', placeholder: '(thumbnail)', onchange: _.onChangeThumbnail})
+                )
+            ] : null,
             _.field({label: 'Folder', tools: { move: { icon: 'folder', tooltip: 'Move', handler: _.onClickMove } }},
                 _.text({value: model.folder, onchange: _.onChangeFolder})
             ),

@@ -18,15 +18,13 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         let url = null;
 
-        if(!this.isImage()) {
-            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail.jpg');
-
-        } else if(this.isSvg()) {
+        // SVGs don't use thumbnails
+        if(this.isSvg()) {
             url = this.contentUrl;
-
+        
         } else {
-            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail' + Path.extname(this.contentUrl));
-
+            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail.jpg');
+        
         }
 
         if(!url) { return null }
@@ -137,7 +135,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         let thumbnail = await this.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
        
         if(thumbnail) {
-            await connection.setMedia(resource.id, `thumbnail${Path.extname(options.filename)}`, thumbnail.toString('base64'));
+            await connection.setMedia(resource.id, 'thumbnail.jpg', thumbnail.toString('base64'));
         }
 
         return resource;
@@ -280,14 +278,14 @@ class Media extends require('Common/Entity/Resource/Media') {
         
         // Save thumbnail if specified
         if(options.thumbnail) {
-            await connection.setMedia(this.id, `thumbnail${Path.extname(this.filename)}`, options.thumbnail);
+            await connection.setMedia(this.id, 'thumbnail.jpg', options.thumbnail);
         
         // If no thumbnail was specified, attempt to generate one
         } else if(options.full && options.filename) {
             let thumbnail = await this.constructor.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
            
             if(thumbnail) {
-                await connection.setMedia(this.id, `thumbnail${Path.extname(options.filename)}`, thumbnail.toString('base64'));
+                await connection.setMedia(this.id, 'thumbnail.jpg', thumbnail.toString('base64'));
             }
         }
 

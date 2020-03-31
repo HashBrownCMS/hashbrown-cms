@@ -75,6 +75,26 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         return '';
     }
+    
+    /**
+     * Saves the current state of this entity
+     *
+     * @param {Object} options
+     */
+    async save(options = {}) {
+        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
+        let data = this.getObject();
+
+        // Parts of the options object are long base64 strings,
+        // so we're including them as part of the body instead of a query
+        for(let key in options) {
+            data[key] = options[key];
+        }
+
+        await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data);
+        
+        HashBrown.Service.EventService.trigger('resource', this.id);
+    }
 }
 
 module.exports = Media;
