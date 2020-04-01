@@ -166,7 +166,13 @@ class Media extends require('Common/Entity/Resource/Media') {
 
             if(contentUrl) {
                 if(!resource) {
-                    resource = this.new({ id: id });
+                    resource = this.new({
+                        id: id,
+                        context: {
+                            project: projectId,
+                            environment: environment
+                        }
+                    });
                 }
 
                 resource.filename = Path.basename(contentUrl);

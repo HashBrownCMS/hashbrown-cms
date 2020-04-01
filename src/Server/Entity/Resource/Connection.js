@@ -35,13 +35,13 @@ class Connection extends require('Common/Entity/Resource/Connection') {
 
             params.processor = HashBrown.Entity.Processor.ProcessorBase.new({
                 alias: params.processor,
-                context: params.context
+                context: params.context || this.context
             });
         }
         
         if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
             params.deployer = params.deployer || {};
-            params.deployer.context = params.context;
+            params.deployer.context = params.context || this.context;
 
             params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
         }
