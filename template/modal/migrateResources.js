@@ -18,14 +18,18 @@ _.div({class: 'modal in'},
                 ),
                 state.dependencies && Object.keys(state.dependencies).length > 0 ? [
                     _.field({label: 'Dependencies'},
-                        _.each(state.dependencies, (category, items) =>
-                            _.h4(category),
-                            _.ul(
-                                _.each(items, (i, item) =>
-                                    _.li(item.getName())
+                        _.each(state.dependencies, (category, items) => {
+                            return [
+                                _.h4(category),
+                                _.ul(
+                                    _.each(items, (i, item) => {
+                                        if(!item) { return; }
+
+                                        return _.li(item.getName());
+                                    })
                                 )
-                            )
-                        )
+                            ];
+                        })
                     )
                 ] : null
             ]

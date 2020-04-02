@@ -254,25 +254,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
             return new HttpResponse(`No model found for category ${this.category}`, 404);
         }
        
-        let allDependencies = {};
         let ids = (query.resources || '').split(',');
-
-        for(let id of ids) {
-            let resource = await model.get(params.project, params.environment, id);
-            let dependencies = await resource.getDependencies();
-
-            for(let category in dependencies) {
-                if(!allDependencies[category]) {
-                    allDependencies[category] = [];
-                }
-
-                for(let dependency of dependencies[category]) {
-                    if(allDependencies[category].indexOf(dependency) > -1) { continue; }
-
-                    allDependencies[category].push(dependency);
-                }
-            }
-        }
+        let allDependencies = await model.getDependencies(params.project, params.environment, ids);
 
         return new HttpResponse(allDependencies);
     }

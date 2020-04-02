@@ -428,13 +428,18 @@ class Content extends require('Common/Entity/Resource/Content') {
         }
 
         let dependencies = {
-            content: [],
-            schemas: [],
-            media: []
+            content: {},
+            schemas: {},
+            media: {}
         };
 
-        dependencies.schemas.push(schema.id);
-        dependencies.schemas = dependencies.schemas.concat(await schema.getDependencies()['schemas']);
+        dependencies.schemas[schema.id] = schema;
+
+        let schemaDependencies = await schema.getDependencies();
+
+        for(let id in schemaDependencies.schemas) {
+            dependencies.schemas[id] = schemaDependencies.schemas[id];
+        }
 
         let content = this;
 
@@ -443,7 +448,7 @@ class Content extends require('Common/Entity/Resource/Content') {
 
             if(!content) { break; }
 
-            dependencies.content.push(content.id);
+            dependencies.content[content.id] = content;
         }
 
         return dependencies;

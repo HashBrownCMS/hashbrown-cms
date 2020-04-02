@@ -187,19 +187,20 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
      */
     async getDependencies() {
         let dependencies = {
-            schemas: []
+            schemas: {}
         };
 
         // NOTE: The quickest way to find all schema references is
         // to stringify this schema and look up keywords, since they can be nested infinitely
         let string = JSON.stringify(this);
 
+        let schemaIds = [];
         let schemaIdRegex = /"schemaId": "([^"]+)"/;
         let schemaIdMatch = schemaIdRegex.exec(string);
 
         while(schemaIdMatch && schemaIdMatch[1]) {
-            if(dependencies.schemas.indexOf(schemaIdMatch[1]) < 0) {
-                dependencies.schemas.push(schemaIdMatch[1]);
+            if(!schemaIds.indexOf(schemaIdMatch[1]) < 0) {
+                schemaIds.push(schemaIdMatch[1]);
             }
 
             schemaIdMatch = schemaIdRegex.exec(string);
@@ -209,17 +210,11 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         let allowedSchemasMatch = allowedSchemasRegex.exec(string);
 
         while(allowedSchemasMatch && allowedSchemasMatch[1]) {
-            let allowedSchemas = JSON.parse(allowedSchemasMatch[1]);
-
-            for(let allowedSchema of allowedSchemas) {
-                if(dependencies.schemas.indexOf(allowedSchema) < 0) {
-                    dependencies.schemas.push(allowedSchema);
-                }
-            }
+            schemaIds = schemaIds.concat(JSON.parse(allowedSchemasMatch[1]));
 
             allowedSchemasMatch = allowedSchemasRegex.exec(string);
         }
-
+        
         // Recurse up through parents
         let schema = this;
 
@@ -228,9 +223,24 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
             if(!schema) { break; }
 
-            dependencies.schemas.push(schema.id);
+            if(!dependencies.schemas[schema.id]) {
+                dependencies.schemas[schema.id] = schema;
+            }
 
-            dependencies.schemas.concat(await schema.getDependencies()['schemas']);
+            let parentDependencies = await schema.getDependencies();
+
+            schemaIds = schemaIds.concat(Object.keys(parentDependencies.schemas));
+        }
+
+        // Load all schema dependencies
+        for(let id of schemaIds) {
+            if(dependencies.schemas[id]) { continue; }
+
+            let schema = await this.constructor.get(id);
+
+            if(!schema) { continue; }
+
+            dependencies.schemas[schema.id] = schema;
         }
 
         return dependencies;

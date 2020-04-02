@@ -370,6 +370,45 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     async getDependencies() {
         throw new Error('Method "getDependencies" must be overridden');
     }
+
+    /**
+     * Gets a nested list of dependencies for multiple resources
+     *
+     * @param {String} projectId
+     * @param {String} environment
+     * @param {Array} resourceIds
+     *
+     * @return {Object} Dependencies
+     */
+    static async getDependencies(projectId, environment, resourceIds) {
+        checkParam(projectId, 'projectId', String, true);
+        checkParam(environment, 'environment', String, true);
+        checkParam(resourceIds, 'resourceIds', Array, true);
+
+        let allDependencies = {};
+
+        for(let resourceId of resourceIds) {
+            let resource = await this.get(projectId, environment, resourceId);
+
+            if(!resource) { continue; }
+
+            let dependencies = await resource.getDependencies();
+
+            for(let category in dependencies) {
+                if(!allDependencies[category]) {
+                    allDependencies[category] = {};
+                }
+
+                for(let dependencyId in dependencies[category]) {
+                    if(allDependencies[category][dependencyId]) { continue; }
+
+                    allDependencies[category][dependencyId] = dependencies[category][dependencyId];
+                }
+            }
+        }
+    
+        return allDependencies;
+    }
 }
 
 module.exports = ResourceBase;

@@ -51,7 +51,17 @@ class MigrateResources extends HashBrown.Entity.View.Modal.ModalBase {
                     resources: this.state.resources.join(',')
                 }
             );
-        
+       
+            for(let category in this.state.dependencies) {
+                let model = HashBrown.Entity.Resource.ResourceBase.getModel(category);
+
+                if(!model) { continue; }
+
+                for(let id in this.state.dependencies[category]) {
+                    this.state.dependencies[category][id] = model.new(this.state.dependencies[category][id]);
+                }
+            }
+
         } else {
             this.state.dependencies = {};
 
