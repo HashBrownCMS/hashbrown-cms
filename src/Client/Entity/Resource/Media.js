@@ -28,7 +28,7 @@ class Media extends require('Common/Entity/Resource/Media') {
     getHtml() {
         let html = '';
 
-        let fullUrl = `/media/${HashBrown.Context.project.id}/${HashBrwon.Context.environment}/{this.id}`;
+        let fullUrl = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${this.id}`;
         let thumbnailUrl = `${fullUrl}?thumbnail`;
 
         if(this.isImage()) {

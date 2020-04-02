@@ -1,8 +1,5 @@
 'use strict';
 
-// Parser cache
-let cache = {};
-
 /**
  * A rich text widget
  *
@@ -111,19 +108,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * @return {String} HTML
      */
     toView(html) {
-        cache = {};
-        
-        if(!html) { return ''; }
-        
-        // Replace media references
-        let regexp = new RegExp(`src="${this.state.mediaPath}/([a-z0-9]+)/([^"]+)"`, 'g');
-
-        return html.replace(regexp, (original, id, filename) => {
-            cache[id] = filename;
-
-            console.log('toView', id, filename);
-
-            return `src="/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${id}"`;
+        return this.replaceMediaReferences(html, (id, filename) => {
+            return `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${id}`;
         });
     }
 
@@ -137,23 +123,56 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     toValue(html) {
         if(!html) { return ''; }
         
-        // Replace media references
-        let regexp = new RegExp(`src="/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/([a-z0-9]+)"`, 'g');
-
-        html = html.replace(regexp, (original, id) => {
-            let filename = cache ? cache[id] : null;
-
-            console.log('toValue', id, filename);
-            
-            if(!filename) { return original; }
-        
-            return `src="${this.state.mediaPath}/${id}/${filename}"`;
-        });
-
         // Replace empty divs with pararaphs
         html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
 
-        return html;
+        // Replace media references
+        return this.replaceMediaReferences(html, (id, filename) => {
+            return `${this.state.mediaPath}/${id}/${filename}`;
+        });
+    }
+
+    /**
+     * Replaces media references
+     *
+     * @param {String} html
+     * @param {Function} urlHandler
+     *
+     * @return {String} HTML
+     */
+    replaceMediaReferences(html, urlHandler) {
+        if(!html || !urlHandler) { return html; }
+        
+        return html.replace(/<[^>]*src="[^"]+"[^>]*>(<\/[^>]*>)?/g, (elementHtml) => {
+            let temp = document.createElement('div');
+            temp.innerHTML = elementHtml;
+
+            let element = temp.firstChild;
+
+            let id = null;
+            let filename = element.getAttribute('title') || element.getAttribute('alt');
+            let source = element.getAttribute('src');
+
+            if(source.indexOf('http') === 0 || source.indexOf('//') === 0) {
+                return elementHtml;
+            }
+
+            let sourceParts = element.getAttribute('src').split('/');
+
+            for(let part of sourceParts) {
+                if(part.indexOf('.') > -1) {
+                    filename = part;
+                } else {
+                    id = part;
+                }
+            }
+
+            element.setAttribute('title', filename);
+            element.setAttribute('alt', filename);
+            element.setAttribute('src', urlHandler(id, filename));
+            
+            return element.outerHTML;
+        });
     }
 
     /**
