@@ -1,0 +1,11 @@
+.widget--image {
+    width: 100%;
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-default-200);
+    border: 1px solid var(--color-default-200);
+    width: 10rem;
+
+    &:not([src]) {
+        height: 10rem;
+    }
+}

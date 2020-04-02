@@ -13,12 +13,9 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
         super(params);
         
         this.template = require('template/resourceEditor/mediaEditor.js');    
-    }
 
-    /**
-     * Override this check, as it's not relevant to media
-     */
-    editedCheck() {}
+        this.state.thumbnailSource = '/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/' + this.state.id + '/?thumbnail';
+    }
 
     /**
      * Event: Clicked start tour
@@ -100,13 +97,17 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      * Event: Change thumbnail media file
      */
     async onChangeThumbnail(newValue) {
-        if(!newValue || !newValue[0]) { return; }
-
-        this.state.saveOptions = this.state.saveOptions || {};
+        if(!newValue || !newValue[0]) {
+            this.state.saveOptions.thumbnail = false;
+            this.state.thumbnailSource = null;
+        } else {
+            this.state.saveOptions.thumbnail = await HashBrown.Entity.Resource.Media.toBase64(newValue[0]);
+            this.state.thumbnailSource = 'data:image/jpeg;base64,' + this.state.saveOptions.thumbnail;
+        }
         
-        this.state.saveOptions.thumbnail = await HashBrown.Entity.Resource.Media.toBase64(newValue[0]);
-
         this.onChange();
+
+        this.renderPartial('thumbnail');
     }
 
     /**

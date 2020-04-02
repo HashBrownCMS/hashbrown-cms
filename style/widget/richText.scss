@@ -1,6 +1,8 @@
 .widget--rich-text {
     background-color: var(--color-default-200);
     width: 100%;
+    display: flex;
+    flex-direction: column;
 
     &__toolbar {
         margin-bottom: var(--padding-small);
@@ -19,7 +21,8 @@
     }
 
     &__editor {
-        height: var(--height-rich-text-editor);
+        min-height: var(--height-rich-text-editor);
+        flex-grow: 1;
         background-color: var(--color-default);
         color: var(--color-default-text);
         overflow: auto;

@@ -17,6 +17,21 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
+     * Gets the field tools
+     *
+     * @return {Object} Tools
+     */
+    getTools() {
+        return {
+            fullscreen: {
+                icon: this.state.isFullscreen ? 'compress' : 'expand',
+                tooltip: 'Toggle full screen',
+                handler: () => this.onClickFullscreen()
+            }
+        };
+    }
+
+    /**
      * Fetches view data
      */
     async fetch() {
@@ -105,7 +120,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
         
         this.render();
     }
-    
+   
     /**
      * Event: Click markdown tab
      */
@@ -139,14 +154,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
             
             if(!media) { return; }
 
-            let html = '';
-
-            if(media.isImage()) {
-                html = '<img alt="' + media.name + '" src="/media/' + id + '/' + media.name + '">';
-            } else if(media.isVideo()) {
-                html = '<video alt="' + media.name + '" src="/media/' + id + '/' + media.name + '">';
-            }
-
+            let html = media.getHtml();
             let input = this.namedElements.input;
 
             if(input instanceof HashBrown.Entity.View.Widget.RichText) {

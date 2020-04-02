@@ -18,6 +18,17 @@
         }
     }
 
+    &.fullscreen {
+        position: fixed;
+        z-index: 999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--color-default-100);
+        padding: var(--padding-large);
+    }
+
     @include tablet {
         display: block;
         
@@ -70,6 +81,11 @@
        
         > .widget, >.widget-group {
             max-width: var(--max-width-field-value);
+
+            & + .widget,
+            & + .widget-group {
+                margin-top: var(--padding-small);
+            }
         }
 
         &__label {

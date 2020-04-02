@@ -22,6 +22,19 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
+     * Fetches the model
+     */
+    async fetch() {
+        let provider = await HashBrown.Entity.Resource.Media.getProvider();
+
+        if(provider) {
+            this.state.mediaPath = '/' + provider.deployer.paths.media.split('/').filter(Boolean).join('/');
+        } else {
+            this.state.mediaPath = '/media';
+        }
+    }
+
+    /**
      * Post render
      */
     postrender() {
@@ -101,11 +114,16 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         cache = {};
         
         if(!html) { return ''; }
-
-        return html.replace(/src=".*media\/([a-z0-9]+)\/([^"]+)"/g, (original, id, filename) => {
-            cache[id] = filename;
         
-            return 'src="/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/' + id + '"';
+        // Replace media references
+        let regexp = new RegExp(`src="${this.state.mediaPath}/([a-z0-9]+)/([^"]+)"`, 'g');
+
+        return html.replace(regexp, (original, id, filename) => {
+            cache[id] = filename;
+
+            console.log('toView', id, filename);
+
+            return `src="/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${id}"`;
         });
     }
 
@@ -120,12 +138,16 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(!html) { return ''; }
         
         // Replace media references
-        html = html.replace(new RegExp('src="/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/([a-z0-9]+)"', 'g'), (original, id) => {
+        let regexp = new RegExp(`src="/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/([a-z0-9]+)"`, 'g');
+
+        html = html.replace(regexp, (original, id) => {
             let filename = cache ? cache[id] : null;
 
+            console.log('toValue', id, filename);
+            
             if(!filename) { return original; }
         
-            return 'src="/media/' + id + '/' + filename + '"';
+            return `src="${this.state.mediaPath}/${id}/${filename}"`;
         });
 
         // Replace empty divs with pararaphs

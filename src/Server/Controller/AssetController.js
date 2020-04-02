@@ -57,6 +57,16 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     static async getLastModified(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
 
+        // Check for media request
+        let parts = this.getUrl(request).pathname.split('/').filter(Boolean);
+
+        if(parts[0] === 'media' && parts[1] && parts[2] && parts[3]) {
+            let media = await HashBrown.Entity.Resource.Media.get(parts[1], parts[2], parts[3]);
+
+            if(media) { return media.updatedOn; }
+        }
+
+        // Check for file on disk
         let path = this.getFilePath(request);
         let stats = await HashBrown.Service.FileService.stat(path);
 
@@ -139,15 +149,17 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         if(!media) {
             return new HttpResponse('Not found', 404);
         }
-              
-        let url = ('thumbnail' in query) ? media.thumbnailUrl : media.contentUrl;
+            
+        let isThumbnail = ('thumbnail' in query);
+        let url = isThumbnail ? media.thumbnailUrl : media.contentUrl;
         let data = HashBrown.Service.FileService.readStream(url);
+        let type = isThumbnail ? 'image/jpeg' : media.getContentTypeHeader();
 
         if(!data) {
             return new HttpResponse('Not found', 404);
         }
 
-        return new HttpResponse(data, 200, { 'Content-Type': media.getContentTypeHeader() });
+        return new HttpResponse(data, 200, { 'Content-Type': type });
     }
 }
 

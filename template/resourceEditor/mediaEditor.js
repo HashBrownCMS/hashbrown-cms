@@ -23,13 +23,15 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
         _.include(require('./inc/header')),
         _.div({class: 'resource-editor__body', name: 'body'},
             _.field({label: 'Full'},
-                _.media({readonly: true, value: model.id, full: true}),
-                _.file({class: 'margin-top', placeholder: model.filename, onchange: _.onChangeFull})
+                _.media({nocache: true, readonly: true, value: model.id, full: true}),
+                _.file({class: 'margin-top', filenames: [ model.filename ], onchange: _.onChangeFull})
             ),
             !model.isSvg() ? [
                 _.field({label: 'Thumbnail'},
-                    _.media({readonly: true, value: model.id, thumbnail: true}),
-                    _.file({class: 'margin-top', accept: '.jpg,.jpeg,.JPG,.JPEG', placeholder: '(thumbnail)', onchange: _.onChangeThumbnail})
+                    _.partial('thumbnail', (_, model, state) =>
+                        _.img({class: 'widget widget--image', src: state.thumbnailSource})
+                    ),
+                    _.file({accept: '.jpg,.jpeg,.JPG,.JPEG', clearable: true, filenames: [ 'thumbnail.jpg' ], onchange: _.onChangeThumbnail})
                 )
             ] : null,
             _.field({label: 'Folder', tools: { move: { icon: 'folder', tooltip: 'Move', handler: _.onClickMove } }},

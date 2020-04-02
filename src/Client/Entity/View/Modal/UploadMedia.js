@@ -55,12 +55,20 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
     async onSubmit(files) {
         this.setLoading(true);
 
-        try {
-            let apiPath = 'media/' + (this.model.replaceId ? this.model.replaceId : 'new');
+        let apiPath = 'media/' + (this.model.replaceId ? this.model.replaceId : 'new');
 
-            let resources = [];
-            
-            for(let file of files) {
+        let resources = [];
+        let errors = 0;
+        
+        for(let i in files) {
+            let file = files[i];
+            let element = this.namedElements.previews.children[i];
+       
+            if(element) {
+                element.dataset.state = 'uploading';
+            }
+
+            try {
                 let resource = await HashBrown.Service.RequestService.request(
                     'post',
                     apiPath,
@@ -70,21 +78,27 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
                         full: file.base64
                     }
                 );
+                
+                element.dataset.state = 'success';
 
                 resources.push(resource);
+
+            } catch(e) {
+                element.dataset.state = 'error';
+                element.setAttribute('title', e.message);
+
+                errors++;
             }
+        }
 
-            HashBrown.Service.EventService.trigger('resource');  
+        HashBrown.Service.EventService.trigger('resource');  
 
-            this.setLoading(false);
+        this.setLoading(false);
+        
+        this.trigger('success', resources);
             
-            this.trigger('success', resources);
-                
+        if(errors < 1) {
             this.close();
-        
-        } catch(e) {
-            this.setErrorState(e);
-        
         }
     }
 }

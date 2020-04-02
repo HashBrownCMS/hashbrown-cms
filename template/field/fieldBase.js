@@ -2,7 +2,7 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `field ${state.className || ''}`},
+_.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen' : ''}`},
     state.name === 'error' ? [
         state.message
     

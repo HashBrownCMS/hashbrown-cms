@@ -16,6 +16,49 @@
         background-color: var(--color-default-200);
         border-radius: var(--border-radius-small);
 
+        &[data-state]::before,
+        &[data-state]::after {
+            content: '';
+            display: block;
+            position: absolute;
+        }
+        
+        &[data-state]::before {
+            background-color: var(--color-default);
+            opacity: 0.5;
+            z-index: 20;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+       
+        &[data-state]::after {
+            font-size: 2rem;
+            color: var(--color-default-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'FontAwesome';
+            z-index: 30;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        &[data-state="uploading"]::after {
+            content: '\f1ce';
+            animation: spinner 2s linear infinite;
+        }
+        
+        &[data-state="error"]::after {
+            content: '\f071';
+        }
+
+        &[data-state="success"]::after {
+            content: '\f00c';
+        }
+
         &__display {
             align-items: center;
             display: flex;

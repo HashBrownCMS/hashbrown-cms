@@ -15,7 +15,7 @@ _.div({class: 'modal modal--upload-media in'},
 
             _.if(state.name === undefined,
                 _.partial('preview',  (_, model, state) =>
-                    _.div({name: 'preview', class: 'modal--upload-media__previews'},
+                    _.div({name: 'preview', class: 'modal--upload-media__previews', name: 'previews'},
                         _.each(state.previews, (i, file) =>
                             _.div({class: 'modal--upload-media__preview'},
                                 _.div({class: 'modal--upload-media__preview__display'},
@@ -23,7 +23,7 @@ _.div({class: 'modal modal--upload-media in'},
                                         _.img({class: 'modal--upload-media__preview__source', src: file.src})
 
                                     ] : file.isVideo ? [
-                                        _.video({class: 'modal--upload-media__preview__source', src: file.src, controls: true})
+                                        _.video({class: 'modal--upload-media__preview__source', src: file.src})
 
                                     ] : [
                                         _.span({class: 'modal--upload-media__preview__source fa fa-file'})

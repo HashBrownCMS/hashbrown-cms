@@ -274,8 +274,13 @@ class Media extends require('Common/Entity/Resource/Media') {
             await connection.setMedia(this.id, this.filename, options.full, true);
         }
         
+
+        // Remove thumbnail if specified
+        if(options.thumbnail === false) {
+            await connection.removeMedia(this.id, 'thumbnail.jpg');
+
         // Save thumbnail if specified
-        if(options.thumbnail) {
+        } else if(options.thumbnail) {
             await connection.setMedia(this.id, 'thumbnail.jpg', options.thumbnail);
         
         // If no thumbnail was specified, attempt to generate one

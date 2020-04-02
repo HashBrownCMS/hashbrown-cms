@@ -149,7 +149,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
 
         return {};
     }
-   
+     
     /**
      * Pre render
      */
@@ -195,6 +195,15 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      */
     onToggleCollapsed() {
         this.state.isCollapsed = !this.state.isCollapsed;
+
+        this.render();
+    }
+    
+    /**
+     * Event: Click fullscreen
+     */
+    onClickFullscreen() {
+        this.state.isFullscreen = !this.state.isFullscreen;
 
         this.render();
     }

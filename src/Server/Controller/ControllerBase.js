@@ -104,7 +104,9 @@ class ControllerBase {
                 response.headers['ETag'] = responseETag;
             }
 
-            response.headers['Last-Modified'] = responseMTime.toString();
+            if(!response.headers['Last-Modified']) {
+                response.headers['Last-Modified'] = responseMTime.toString();
+            }
 
             return response;
 

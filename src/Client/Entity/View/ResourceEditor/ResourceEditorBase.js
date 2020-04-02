@@ -16,6 +16,15 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     get itemType() { return this.constructor.itemType; }
 
     /**
+     * Constructor
+     */
+    constructor(params) {
+        super(params);
+
+        this.state.saveOptions = this.state.saveOptions || {};
+    }
+
+    /**
      * Structure
      */
     structure() {

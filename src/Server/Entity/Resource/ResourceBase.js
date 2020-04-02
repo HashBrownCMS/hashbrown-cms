@@ -198,11 +198,11 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         data.id = this.createId();
             
-        resource.context = {
+        data.context = {
             project: projectId,
             environment: environment
         };
-
+        
         let resource = this.new(data);
 
         await HashBrown.Service.DatabaseService.insertOne(

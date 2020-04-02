@@ -16,7 +16,6 @@
     }
 
     &__preview {
-        padding: var(--padding-small);
         margin: 0;
         border-top-left-radius: var(--border-radius-small);
         border-top-right-radius: var(--border-radius-small);
@@ -24,8 +23,6 @@
         align-items: center;
         justify-content: center;
         flex-grow: 1;
-        border: 1px solid var(--color-default-200);
-        background-color: var(--color-default-200);
         min-width: 6rem;
         min-height: 6rem;
         width: 100%;
@@ -39,7 +36,10 @@
         }
 
         &:not(.readonly) {
+            padding: var(--padding-small);
             cursor: pointer;
+            border: 1px solid var(--color-default-200);
+            background-color: var(--color-default-200);
             
             &:hover {
                 border-color: var(--color-action-500);
@@ -54,6 +54,7 @@
             display: block;
             font-size: 2rem;
             z-index: 100;
+            border-radius: var(--border-radius-small);
         }
     }
 

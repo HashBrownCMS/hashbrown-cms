@@ -21,6 +21,34 @@ class Media extends require('Common/Entity/Resource/Media') {
     }
 
     /**
+     * Gets the markup for diplaying this media entity
+     *
+     * @return {String} HTML
+     */
+    getHtml() {
+        let html = '';
+
+        let fullUrl = `/media/${HashBrown.Context.project.id}/${HashBrwon.Context.environment}/{this.id}`;
+        let thumbnailUrl = `${fullUrl}?thumbnail`;
+
+        if(this.isImage()) {
+            html = `<img title="${this.filename}" alt="${this.filename}" src="${fullUrl}">`;
+        
+        } else if(this.isVideo()) {
+            html = `<video controls title="${this.filename}" src="${fullUrl}" poster="${thumbnailUrl}">`;
+        
+        } else if(this.isAudio()) {
+            html = `<audio title="${this.filename}" src="${fullUrl}">`;
+        
+        } else {
+            html = `<embed title="${this.filename}" src="${fullUrl}" type="${this.getContentTypeHeader()}">`;
+
+        }
+
+        return html;
+    }
+
+    /**
      * Converts a file to base64
      *
      * @param {File} file

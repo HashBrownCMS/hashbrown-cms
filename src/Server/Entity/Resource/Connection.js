@@ -307,17 +307,27 @@ class Connection extends require('Common/Entity/Resource/Connection') {
      * Removes a media node by id
      *
      * @param {String} id
+     * @param {String} name
      */
-    async removeMedia(id) {
-        checkParam(id, 'id', String);
+    async removeMedia(id, name = '') {
+        checkParam(id, 'id', String, true);
+        checkParam(name, 'name', String);
         
         this.pathComponentCheck('id', id);
+        this.pathComponentCheck('name', name);
 
         if(!this.deployer || typeof this.deployer.removeFolder !== 'function') {
             throw new Error('This connection has no deployer defined');
         }
 
-        await this.deployer.removeFolder(this.deployer.getPath('media', id));
+        // Remove the specific file
+        if(name) {
+            await this.deployer.removeFile(this.deployer.getPath('media', Path.join(id, name)));
+
+        // Remove any file associated with the media
+        } else {
+            await this.deployer.removeFolder(this.deployer.getPath('media', id));
+        }
     }
     
     /**
