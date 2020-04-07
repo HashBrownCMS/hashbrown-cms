@@ -52,21 +52,6 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
     }
    
     /**
-     * Event: Click settings
-     *
-     * @param {String} id
-     */
-    async onClickPublishingSettings(id) {
-        checkParam(id, 'id', String, true);
-
-        let content = await HashBrown.Entity.Resource.Content.get(id);
-
-        HashBrown.Entity.View.Modal.ContentPublishingSettings.new({
-            model: content
-        });
-    }
-
-    /**
      * Event: Drop item
      *
      * @param {String} itemId
@@ -112,8 +97,6 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
         let options = super.getItemBaseOptions(resource);
 
         options['New child'] = () => this.onClickNew(resource.id);
-        options['Settings'] = '---';
-        options['Publishing'] = () => this.onClickPublishingSettings(resource.id);
 
         return options;
     }

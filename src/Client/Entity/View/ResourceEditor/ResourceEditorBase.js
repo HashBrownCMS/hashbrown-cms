@@ -22,6 +22,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         super(params);
 
         this.state.saveOptions = this.state.saveOptions || {};
+        this.state.settings = this.state.settings || {};
     }
 
     /**
@@ -73,11 +74,14 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         this.state.category = HashBrown.Service.NavigationService.getRoute(0);
         this.state.id = HashBrown.Service.NavigationService.getRoute(1);
-       
-        if(!this.state.id) {
+
+        if(!this.state.id || this.state.id === 'settings' || this.state.id === 'overview') {
+            this.state.tab = this.state.id || 'overview';
+            this.state.id = null;
             this.state.name = 'welcome';
-                    
+        
         } else {
+            this.state.tab = HashBrown.Service.NavigationService.getRoute(2);
             this.state.name = undefined;
        
         }
@@ -100,7 +104,26 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         if(this.model) {
             this.state.title = this.model.getName();
-            this.state.icon = this.model.icon;
+        
+        } else {
+            this.state.title = this.category[0].toUpperCase() + this.category.substring(1);
+
+        }
+
+        this.state.icon = this.itemType.icon;
+    
+        if(this.state.name === 'welcome') {
+            this.state.tabs = {
+                overview: 'Overview'
+            };
+
+            if(HashBrown.Context.user.isAdmin) {
+                this.state.tabs.settings = 'Settings';
+            }
+        
+        } else {
+            this.state.tabs = null;
+
         }
     }
  
@@ -203,7 +226,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      * Event: Change happened
      */
     onChange() {
-        if(this.model.isLocked) { return; }
+        if(!this.model || this.model.isLocked) { return; }
 
         if((this.state.lastHeartbeat || 0) + HEARTBEAT_INTERVAL < Date.now()) {
             this.onHeartbeat();
@@ -212,11 +235,32 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         this.setDirty(true);
         this.trigger('change', this.model);
     }
+    
+    /**
+     * Event: Click save settings
+     */
+    async onClickSaveSettings() {
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', true);
+        }
+
+        await HashBrown.Context.project.setEnvironmentSettings(HashBrown.Context.environment, this.state.settings);
+
+        UI.notifySmall(`${this.state.title} settings saved successfully`, null, 3);
+
+        if(this.namedElements.save) {
+            this.namedElements.save.classList.toggle('loading', false);
+        }
+
+        this.render();
+    }
 
     /**
      * Event: Click save
      */
     async onClickSave() {
+        if(!this.model) { return; }
+
         this.state.title = this.model.getName();
 
         if(this.namedElements.save) {

@@ -27,7 +27,6 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         await super.fetch();
 
         this.state.schemas = await HashBrown.Entity.Resource.SchemaBase.list();
-        this.state.connections = await HashBrown.Entity.Resource.Connection.list();
     }
 
     /**
@@ -45,21 +44,6 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         return null;
     }
     
-    /**
-     * Gets a connection synchronously
-     *
-     * @param {String} id
-     *
-     * @return {HashBrown.Entity.Resource.Connection} Connection
-     */
-    getConnection(id) {
-        for(let connection of this.state.connections || []) {
-            if(connection.id === id) { return connection; }
-        }
-
-        return null;
-    }
-
     /**
      * Debugs JSON
      */
@@ -97,14 +81,6 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
                     
                     }
 
-                    break;
-                    
-                case 'connectionId':
-                    if(!v || typeof v !== 'string') { break; }
-                    if(this.getConnection(v)) { break; }
-
-                    throw new Error('Connection "' + v + '" not found');
-                   
                     break;
             }
 

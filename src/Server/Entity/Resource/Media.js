@@ -7,34 +7,7 @@ const Path = require('path');
  *
  * @memberof HashBrown.Server.Entity.Resource
  */
-class Media extends require('Common/Entity/Resource/Media') {
-    /**
-     * Gets the thumbnail URL
-     *
-     * @return {String} Thumbnail URL
-     */
-    get thumbnailUrl() {
-        if(!this.contentUrl) { return null; }
-
-        let url = null;
-
-        // SVGs don't use thumbnails
-        if(this.isSvg()) {
-            url = this.contentUrl;
-        
-        } else {
-            url = Path.join(Path.dirname(this.contentUrl), 'thumbnail.jpg');
-        
-        }
-
-        if(!url) { return null }
-
-        // If the path module removed doubles slashes for protocols, add them back
-        url = url.replace(/:\/([^\/])/, '://$1');
-
-        return url;
-    }
-    
+class Media extends require('Common/Entity/Resource/Media') { 
     /**
      * Structure
      */
@@ -42,17 +15,18 @@ class Media extends require('Common/Entity/Resource/Media') {
         super.structure();
 
         this.def(String, 'contentUrl');
+        this.def(String, 'thumbnailUrl');
     }
 
     /**
-     * Gets the media provider connection
+     * Gets the media deployer
      *
      * @param {String} projectId
      * @param {String} environment
      *
-     * @return {HashBrown.Entity.Resource.Connection} Connection
+     * @return {HashBrown.Entity.Deployer.DeployerBase} Deployer
      */
-    static async getProvider(projectId, environment) {
+    static async getDeployer(projectId, environment) {
         checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         
@@ -62,83 +36,114 @@ class Media extends require('Common/Entity/Resource/Media') {
             throw new Error(`Project ${projectId} not found`);
         }
 
-        let environments = await project.getSettings('environments');
+        let deployer = await project.getEnvironmentSettings(environment, 'mediaDeployer');
 
-        if(!environments || !environments[environment] || !environments[environment].mediaProvider) { return null; }
+        if(!deployer || !deployer.alias) { return null; }
 
-        let connection = await HashBrown.Entity.Resource.Connection.get(projectId, environment, environments[environment].mediaProvider);
+        deployer.context = {
+            project: projectId,
+            environment: environment
+        };
 
-        return connection;
-    }
-    
-    /**
-     * Sets the media provider connection
-     *
-     * @param {String} projectId
-     * @param {String} environment
-     * @param {String} connectionId
-     */
-    static async setProvider(projectId, environment, connectionId) {
-        checkParam(projectId, 'project', String, true);
-        checkParam(environment, 'environment', String, true);
-        checkParam(connectionId, 'connectionId', String, true);
-        
-        let project = await HashBrown.Entity.Project.get(projectId);
-
-        if(!project) {
-            throw new Error(`Project ${projectId} not found`);
-        }
-        
-        let connection = await HashBrown.Entity.Resource.Connection.get(projectId, environment, connectionId);
-
-        if(!connection) {
-            throw new Error(`Connection ${connectionId} not found`);
-        }
-
-        let settings = await project.getEnvironmentSettings(environment) || {};
-
-        settings.mediaProvider = connectionId;
-
-        project.setEnvironmentSettings(environment, settings);
+        return HashBrown.Entity.Deployer.DeployerBase.new(deployer);
     }
     
     /**
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.User} user
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Object} data
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.Media} Instance
      */
-    static async create(user, project, environment, data = {}, options = {}) {
+    static async create(user, projectId, environment, data = {}, options = {}) {
         checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', String, true);
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(data, 'data', Object, true);
         checkParam(data.filename, 'data.filename', String, true);
         checkParam(options, 'options', Object, true);
         checkParam(options.full, 'options.full', String, true);
         
-        let connection = await this.getProvider(project, environment);
+        let deployer = await this.getDeployer(projectId, environment);
 
-        if(!connection) {
-            throw new Error('No connection set as media provider');
+        if(!deployer) {
+            throw new Error('No media deployer configured');
         }
 
-        let resource = await super.create(user, project, environment, data, options);
+        let resource = await super.create(user, projectId, environment, data, options);
 
-        await connection.setMedia(resource.id, options.filename, options.full, true);
+        await deployer.removeFolder(deployer.getPath(resource.id));
+        await deployer.setFile(deployer.getPath(resource.id, options.filename), options.full);
         
-        let thumbnail = await this.generateThumbnail(project, environment, options.filename, Buffer.from(options.full, 'base64'));
+        let thumbnail = await this.generateThumbnail(projectId, environment, options.filename, Buffer.from(options.full, 'base64'));
        
         if(thumbnail) {
-            await connection.setMedia(resource.id, 'thumbnail.jpg', thumbnail.toString('base64'));
+            await deployer.setFile(deployer.getPath(resource.id, 'thumbnail.jpg'), thumbnail.toString('base64'));
         }
 
         return resource;
+    }
+    
+    /**
+     * Gets the content URL
+     *
+     * @param {Boolean} ensureWebUrl
+     *
+     * @return {String} Content URL
+     */
+    async getContentUrl(ensureWebUrl = false) {
+        checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
+       
+        let deployer = await this.constructor.getDeployer(this.context.project, this.context.environment);
+
+        if(!deployer) { return null; }
+                
+        let files = await deployer.getFolder(deployer.getPath(this.id));
+        
+        if(!files || files.length < 1) { return null; }
+        
+        for(let file of files) {
+            if(Path.basename(file) === 'thumbnail.jpg') { continue; }
+
+            // Ensure that this URL can be reached from a web browser
+            if(ensureWebUrl && file.indexOf('://') < 0) {
+                file = Path.join(deployer.publicUrl, deployer.path, this.id, Path.basename(file));
+
+                // If the path module removed doubles slashes for protocols, add them back
+                file = file.replace(/:\/([^\/])/, '://$1');
+            }
+
+            return file;
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the thumbnail URL
+     *
+     * @return {String} Thumbnail URL
+     */
+    async getThumbnailUrl(ensureWebUrl = false) {
+        checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
+
+        let url = await this.getContentUrl(ensureWebUrl);
+
+        if(!url) { return null }
+
+        // SVGs don't use thumbnails
+        if(!this.isSvg()) {
+            url = Path.join(Path.dirname(url), 'thumbnail.jpg');
+        }
+
+        // If the path module removed doubles slashes for protocols, add them back
+        url = url.replace(/:\/([^\/])/, '://$1');
+
+        return url;
     }
     
     /**
@@ -159,26 +164,19 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         let resource = await super.get(projectId, environment, id, options);
         
-        let connection = await this.getProvider(projectId, environment);
-
-        if(connection) {
-            let contentUrl = await connection.getMediaUrl(id, options.ensureWebUrl === true);
-
-            if(contentUrl) {
-                if(!resource) {
-                    resource = this.new({
-                        id: id,
-                        context: {
-                            project: projectId,
-                            environment: environment
-                        }
-                    });
+        if(!resource) {
+            resource = this.new({
+                id: id,
+                context: {
+                    project: projectId,
+                    environment: environment
                 }
-
-                resource.filename = Path.basename(contentUrl);
-                resource.contentUrl = contentUrl;
-            }
+            });
         }
+
+        resource.contentUrl = await resource.getContentUrl();
+        resource.thumbnailUrl = await resource.getThumbnailUrl();
+        resource.filename = Path.basename(resource.contentUrl);
 
         return resource;
     }
@@ -186,48 +184,71 @@ class Media extends require('Common/Entity/Resource/Media') {
     /**
      * Gets a list of instances of this entity type
      *
-     * @param {String} project
+     * @param {String} projectId
      * @param {String} environment
      * @param {Object} options
      *
      * @return {Array} Instances
      */
-    static async list(project, environment, options = {}) {
-        checkParam(project, 'project', String, true);
+    static async list(projectId, environment, options = {}) {
+        checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
+        
+        // Get resources from database
+        let resources = await super.list(projectId, environment, options);
 
-        let connection = await this.getProvider(project, environment);
+        // Also get resources from files
+        let deployer = await this.getDeployer(projectId, environment);
 
-        if(!connection) { return []; }
-
-        // Make sure we include all media items, even ones not in the database
-        let resources = await super.list(project, environment, options);
-        let urls = await connection.getAllMediaUrls();
+        if(deployer) {
+            let files = await deployer.getFolder(deployer.getPath(), 2) || [];
+            let urls = {};
        
-        // Adopt media URLs into resources
-        for(let resource of resources) {
-            let url = urls[resource.id];
+            for(let file of files) {
+                if(Path.basename(file) === 'thumbnail.jpg') { continue; }
 
-            delete urls[resource.id];
+                let folder = Path.basename(Path.dirname(file));
 
-            if(!url) { continue; }
+                if(urls[folder]) { continue; }
+               
+                urls[folder] = file;
+            }
 
-            resource.filename = Path.basename(url);
-            resource.contentUrl = url;
+            // Adopt media URLs into resources
+            for(let resource of resources) {
+                let url = urls[resource.id];
+
+                delete urls[resource.id];
+
+                if(!url) { continue; }
+
+                resource.filename = Path.basename(url);
+                resource.contentUrl = url;
+            }
+       
+            // Create resources for leftover URLs
+            for(let id in urls) {
+                let url = urls[id];
+
+                let resource = new Media({
+                    id: id,
+                    filename: Path.basename(url),
+                    contentUrl: url
+                });
+
+                resources.push(resource);
+            }
         }
-       
-        // Create resources for leftover URLs
-        for(let id in urls) {
-            let url = urls[id];
 
-            let resource = new Media({
-                id: id,
-                filename: Path.basename(url),
-                contentUrl: url
-            });
+        // Get thumbnail URLs
+        for(let resource of resources) {
+            resource.context = {
+                project: projectId,
+                environment: environment
+            };
 
-            resources.push(resource);
+            resource.thumbnailUrl = await resource.getThumbnailUrl();
         }
 
         return resources;
@@ -245,13 +266,13 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         await super.remove(user, options);
         
-        let connection = await this.constructor.getProvider(this.context.project, this.context.environment);
+        let deployer = await this.constructor.getDeployer(this.context.project, this.context.environment);
 
-        if(!connection) {
-            throw new Error('No connection set as media provider');
+        if(!deployer) {
+            throw new Error('No media deployer configured');
         }
 
-        await connection.removeMedia(this.id);
+        await deployer.removeFolder(deployer.getPath(this.id));
     }
 
     /**
@@ -264,31 +285,31 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(user, 'user', HashBrown.Entity.User, true);
         checkParam(options, 'options', Object, true);
 
-        let connection = await this.constructor.getProvider(this.context.project, this.context.environment);
+        let deployer = await this.constructor.getDeployer(this.context.project, this.context.environment);
 
-        if(!connection) {
-            throw new Error('No connection set as media provider');
+        if(!deployer) {
+            throw new Error('No media deployer configured');
         }
 
         if(this.filename && options.full) {
-            await connection.setMedia(this.id, this.filename, options.full, true);
+            await deployer.removeFolder(deployer.getPath(this.id));
+            await deployer.setFile(deployer.getPath(this.id, options.filename), options.full);
         }
-        
 
         // Remove thumbnail if specified
         if(options.thumbnail === false) {
-            await connection.removeMedia(this.id, 'thumbnail.jpg');
+            await deployer.removeFile(deployer.getPath(this.id, 'thumbnail.jpg'));
 
         // Save thumbnail if specified
         } else if(options.thumbnail) {
-            await connection.setMedia(this.id, 'thumbnail.jpg', options.thumbnail);
+            await deployer.setFile(deployer.getPath(this.id, 'thumbnail.jpg'), options.thumbnail);
         
         // If no thumbnail was specified, attempt to generate one
         } else if(options.full && options.filename) {
-            let thumbnail = await this.constructor.generateThumbnail(this.context.project, this.context.environment, options.filename, Buffer.from(options.full, 'base64'));
+            let thumbnail = await this.generateThumbnail(this.context.project, this.context.environment, options.filename, Buffer.from(options.full, 'base64'));
            
             if(thumbnail) {
-                await connection.setMedia(this.id, 'thumbnail.jpg', thumbnail.toString('base64'));
+                await deployer.setFile(deployer.getPath(this.id, 'thumbnail.jpg'), thumbnail.toString('base64'));
             }
         }
 

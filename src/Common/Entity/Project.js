@@ -125,39 +125,22 @@ class Project extends HashBrown.Entity.EntityBase {
      *
      * @param {String} environment
      * @param {Object} settings
+     * @param {String} section
      */
-    async setEnvironmentSettings(environment, settings) {
-        checkParam(environment, 'environment', String, true);
-        checkParam(settings, 'settings', Object, true);
-
-        let environments = await this.getSettings('environments');
-
-        if(!environments || !environments[environment]) {
-            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
-        }
-        
-        environments[environment] = settings;
-
-        await this.setSettings(environments, 'environments');
+    async setEnvironmentSettings(environment, settings, section) {
+        throw new Error('Method "getEnvironmentSettings" must be overridden');
     }
     
     /**
      * Gets settings for an environment
      *
      * @param {String} environment
+     * @param {String} section
      *
      * @return {Object} Settings
      */
-    async getEnvironmentSettings(environment) {
-        checkParam(environment, 'environment', String, true);
-
-        let settings = await this.getSettings('environments');
-
-        if(!settings || !settings[environment]) {
-            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
-        }
-
-        return settings[environment];
+    async getEnvironmentSettings(environment, section) {
+        throw new Error('Method "getEnvironmentSettings" must be overridden');
     }
    
     /**

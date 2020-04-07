@@ -1,6 +1,5 @@
 'use strict';
 
-const CONNECTIONS = {}; 
 const MEDIA = {};
 const FORMS = {};
 
@@ -203,40 +202,6 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
     let id = path[5];
 
     switch(category) {
-        case 'connections':
-            if(!id) {
-                return Object.values(CONNECTIONS);
-
-            } else {
-                if(id === 'new') {
-                    let connection = HashBrown.Entity.Resource.Connection.create();
-                    
-                    CONNECTIONS[connection.id] = connection.getObject();
-
-                    return connection;
-                }
-                
-                if(method === 'post') {
-                    CONNECTIONS[id] = data;
-                    return data;
-                }
-
-                if(CONNECTIONS[id]) {
-                    return CONNECTIONS[id];
-                
-                } else if(id === 'processors') {
-                    return [{"alias":"jekyll","name":"Jekyll"},{"alias":"json","name":"JSON"},{"alias":"uischema","name":"uischema.org"}];
-                
-                } else if(id === 'deployers') {
-                    return [{"alias":"api","name":"API"},{"alias":"filesystem","name":"File system"},{"alias":"git","name":"Git"}];
-
-                } else {
-                    throw new Error('Connection "' + id + '" not found');
-
-                }
-
-            }
-
         case 'content':
             if(!id) {
                 return Object.values(CONTENT);

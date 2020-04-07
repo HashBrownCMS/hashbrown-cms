@@ -21,6 +21,28 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
     prerender() {
         if(this.model) {
             this.state.getUrl = location.protocol + '//' + location.hostname + '/api/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/publications/' + this.model.id + '/query';
+
+            // Processor
+            this.state.processorEditor = HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase.new({ model: this.model.processor || {} });
+            
+            this.state.processorEditor.on('change', (newValue) => {
+                this.onChangeProcessor(newValue);
+            });
+
+            this.state.processorEditor.on('changealias', () => {
+                this.render();
+            });
+           
+            // Deployer
+            this.state.deployerEditor = HashBrown.Entity.View.DeployerEditor.DeployerEditorBase.new({ model: this.model.deployer || {} });
+            
+            this.state.deployerEditor.on('change', (newValue) => {
+                this.onChangeDeployer(newValue);
+            });
+
+            this.state.deployerEditor.on('changealias', () => {
+                this.render();
+            });
         }
     }
     
@@ -46,15 +68,6 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
 
         for(let schema of allSchemas) {
             this.state.schemaOptions[schema.getName()] = schema.id;
-        }
-        
-        // Get processor options
-        this.state.processorOptions = {};
-        
-        let processors = await HashBrown.Service.RequestService.request('get', 'publications/processors');
-
-        for(let alias in processors) {
-            this.state.processorOptions[processors[alias]] = alias;
         }
     }   
 
@@ -114,12 +127,23 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
     }
     
     /**
+     * Event: Change deployer
+     */
+    onChangeDeployer(newValue) {
+        if(!newValue) { return; }
+
+        this.model.deployer = newValue;
+
+        this.onChange();
+    }
+    
+    /**
      * Event: Change processor
      */
     onChangeProcessor(newValue) {
         if(!newValue) { return; }
 
-        this.model.processorAlias = newValue;
+        this.model.processor = newValue;
 
         this.onChange();
     }

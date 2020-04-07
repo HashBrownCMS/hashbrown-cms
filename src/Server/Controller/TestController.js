@@ -31,30 +31,6 @@ class TestController extends HashBrown.Controller.ControllerBase {
         
         let project = await HashBrown.Entity.Project.create(user, 'test ' + new Date().toString());
 
-        // Test connections
-        report += '\n[Connections]\n\n';
-
-        report += 'Create connection...\n';
-        
-        let connection = await HashBrown.Entity.Resource.Connection.create(project.id, 'live', { title: 'Test connection' });
-
-        report += `Get connection ${connection.getName()}...\n`;
-
-        connection = await HashBrown.Entity.Resource.Connection.get(project.id, 'live', connection.id);
-
-        report += `Update connection ${connection.getName()}...\n`;
-
-        connection.title += ' (updated)';
-        connection.save(user);
-        
-        report += 'Get all connections...';
-
-        HashBrown.Entity.Resource.Connection.list(project.id, 'live');
-
-        report += `Remove connection ${connection.getName()}...\n`;
-
-        await connection.remove(user);
-
         // Test content
         report += '\n[Content]\n\n';
         

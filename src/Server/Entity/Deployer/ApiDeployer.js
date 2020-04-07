@@ -6,9 +6,6 @@
  * @memberof HashBrown.Server.Entity
  */
 class ApiDeployer extends HashBrown.Entity.Deployer.DeployerBase {
-    static get title() { return 'API'; }
-    static get alias() { return 'api'; }
-
     /**
      * Gets the root path
      *

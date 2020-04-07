@@ -8,9 +8,6 @@ const Path = require('path');
  * @memberof HashBrown.Server.Entity
  */
 class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
-    static get title() { return 'File system'; }
-    static get alias() { return 'filesystem'; }
-
     /**
      * Gets the root path
      *
@@ -43,7 +40,7 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      *
      * @param {String} path
      *
-     * @return {Promise} Promise
+     * @return {Object} File
      */
     async getFile(path) {
         let data = await HashBrown.Service.FileService.read(path);
@@ -61,13 +58,13 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      * @param {String} path
      * @param {Number} recursions
      *
-     * @returns {Promise} Result
+     * @returns {Array} Result
      */
     async getFolder(path, recursions = 0) {
         for(let i = 0; i < recursions; i++) {
             path = Path.join(path, '*');
         }
-
+            
         return await HashBrown.Service.FileService.list(path);
     }
     
@@ -76,8 +73,6 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      *
      * @param {String} oldPath
      * @param {String} name
-     *
-     * @return {Promise} Promise
      */
     async renameFile(oldPath, name) {
         let newPath = Path.join(Path.dirname(oldPath), name);

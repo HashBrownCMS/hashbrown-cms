@@ -83,6 +83,10 @@ class FileService {
                         FileSystem.readdir(path, (err, files) => {
                             if(err) { return resolve([]); }
 
+                            for(let i in files) {
+                                files[i] = Path.join(path, files[i]);
+                            }
+
                             resolve(files);
                         });
                     } else if(stats.isFile()) {
@@ -109,10 +113,10 @@ class FileService {
 
         // Stream data from URL
         if(path.indexOf('://') > -1) {
-            let protocol = url.indexOf('https://') > -1 ? HTTPS : HTTP;
-                
             let url = new URL(path);
 
+            let protocol = url.protocol === 'https:' ? HTTPS : HTTP;
+                
             let options = {
                 host: url.hostname,
                 port: url.port,

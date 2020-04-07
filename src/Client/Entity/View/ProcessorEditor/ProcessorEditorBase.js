@@ -41,10 +41,10 @@ class ProcessorEditorBase extends HashBrown.Entity.View.ViewBase {
     async fetch() {
         this.state.processorOptions = {};
         
-        let processors = await HashBrown.Service.RequestService.request('get', 'connections/processors');
+        let processors = await HashBrown.Service.RequestService.customRequest('get', '/api/processors');
 
-        for(let alias in processors) {
-            this.state.processorOptions[processors[alias]] = alias;
+        for(let processor of processors) {
+            this.state.processorOptions[processor] = processor;
         }
     }
 

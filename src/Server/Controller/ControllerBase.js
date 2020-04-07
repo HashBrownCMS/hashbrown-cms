@@ -85,7 +85,7 @@ class ControllerBase {
         let requestMTime = request.headers['If-Modified-Since'] || request.headers['if-modified-since'];
         let responseMTime = await this.getLastModified(request);
         let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
-        let responseETag = '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + responseMTime.getTime() + '"';
+        let responseETag = responseMTime ? '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + responseMTime.getTime() + '"' : null;
 
         let mTimeMatch = requestMTime && responseMTime && new Date(requestMTime) >= new Date(responseMTime);
         let eTagMatch = requestETag && responseETag && requestETag === responseETag;
@@ -104,7 +104,7 @@ class ControllerBase {
                 response.headers['ETag'] = responseETag;
             }
 
-            if(!response.headers['Last-Modified']) {
+            if(!response.headers['Last-Modified'] && responseMTime) {
                 response.headers['Last-Modified'] = responseMTime.toString();
             }
 

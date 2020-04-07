@@ -7,39 +7,6 @@
  */
 class Content extends require('Common/Entity/Resource/Content') {
     /**
-     * Gets settings
-     *
-     * @param {String} key
-     *
-     * @returns {Promise} settings
-     */
-    async getSettings(key) {
-        checkParam(key, 'key', String);
-
-        let parentContent = await this.getParent();
-
-        // Loop through parents to find governing setting
-        while(parentContent != null) {
-            parentContent.settingsSanityCheck(key);
-
-            // We found a governing parent, return those settings
-            if(parentContent.settings[key].applyToChildren) {
-                let settings = parentContent.settings;
-
-                settings[key].governedBy = parentContent.id;
-
-                return settings[key];
-            }
-
-            parentContent = await parentContent.getParent();
-        }
-    
-        this.settingsSanityCheck(key);
-
-        return this.settings[key];
-    }
-    
-    /**
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.User} user
@@ -189,38 +156,48 @@ class Content extends require('Common/Entity/Resource/Content') {
      * Publishes this content
      */
     async publish() {
-        let settings = await this.getSettings('publishing');
-        
-        if(!settings.connectionId) { return; }
-
-        let connection = await HashBrown.Entity.Resource.Connection.get(this.context.project, this.context.environment, settings.connectionId);
-
-        if(!connection) {
-            throw new Error(`Publishing connection ${settings.connectionId} not found`);
-        }
-
-        await connection.publishContent(this); 
-
         this.isPublished = true;
 
         await this.save(null);
+
+        let project = await HashBrown.Entity.Project.get(this.context.project);
+
+        if(!project) {
+            throw new Error(`Project ${this.context.project} not found`);
+        }
+        
+        let languages = await project.getLanguages();
+        let publications = await HashBrown.Entity.Resource.Publications.list(this.context.project, this.context.environment);
+        
+        for(publication of publications) {
+            for(let language of languages) {
+                await publication.deployContent(this, language);
+            }
+        }
     }
     
     /**
      * Unpublishes this content
      */
     async unpublish() {
-        let settings = await this.getSettings('publishing');
+        this.isPublished = false;
+
+        await this.save(null);
         
-        if(!settings.connectionId) { return; }
+        let project = await HashBrown.Entity.Project.get(this.context.project);
 
-        let connection = await HashBrown.Entity.Resource.Connection.get(this.context.project, this.context.environment, settings.connectionId);
-
-        if(!connection) {
-            throw new Error(`Publishing connection ${settings.connectionId} not found`);
+        if(!project) {
+            throw new Error(`Project ${this.context.project} not found`);
         }
-
-        await connection.unpublishContent(this); 
+        
+        let languages = await project.getLanguages();
+        let publications = await HashBrown.Entity.Resource.Publications.list(this.context.project, this.context.environment);
+        
+        for(publication of publications) {
+            for(let language of languages) {
+                await publication.removeContent(this, language);
+            }
+        }
     }
 
     /**

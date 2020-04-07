@@ -32,7 +32,10 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
                 )
             ),
             _.field({label: 'Processor', description: 'The format to expose content in'},
-                _.popup({value: model.processorAlias, options: state.processorOptions, onchange: _.onChangeProcessor})
+                state.processorEditor,
+            ),
+            _.field({label: 'Deployer', description: 'Where to deploy published content'},
+                state.deployerEditor
             ),
             _.field({label: 'Root content', description: 'The root content item to expose'},
                 _.popup({disabled: model.isLocked, clearable: true, value: model.rootContent, options: state.contentOptions, onchange: _.onChangeRootContent})

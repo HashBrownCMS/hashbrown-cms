@@ -22,6 +22,15 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
 
         this.def(Object, 'context');
     }
+    
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} name
+     */
+    getName() {
+        return this.title;
+    }
 
     /**
      * Adopts values into this entity

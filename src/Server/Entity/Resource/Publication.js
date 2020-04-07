@@ -12,18 +12,55 @@ const MAX_CACHE_TIME = 1000 * 60 * 60 * 24 * 10 // 10 days
  */
 class Publication extends require('Common/Entity/Resource/Publication') {
     /**
-     * Gets the processor
-     *
-     * @return {HashBrown.Entity.Processor.ProcessorBase} Processor
+     * Structure
      */
-    get processor() {
-        let model = HashBrown.Entity.Processor.ProcessorBase.getByAlias(this.processorAlias);
-
-        if(!model) { return null; }
-
-        return model.new();
-    }
+    structure() {
+        super.structure();
         
+        this.def(HashBrown.Entity.Processor.ProcessorBase, 'processor');
+        this.def(HashBrown.Entity.Deployer.DeployerBase, 'deployer');
+    }
+    
+    /**
+     * Adopts values into this entity
+     *
+     * @param {Object} params
+     */
+    adopt(params = {}) {
+        params = params || {};
+
+        if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
+            params.deployer.context = params.context || this.context;
+            params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
+        }
+        
+        if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
+            params.processor.context = params.context || this.context;
+            params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
+        }
+        
+        super.adopt(params);
+    }
+
+    /**
+     * Gets a mutable object from this entity
+     *
+     * @return {Object} Object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        if(this.processor) {
+            object.processor = this.processor.getObject();
+        }
+        
+        if(this.deployer) {
+            object.deployer = this.deployer.getObject();
+        }
+
+        return object;
+    }
+
     /**
      * Gets whether a query matches some data
      *
@@ -42,6 +79,20 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         return true;
     }
     
+    /**
+     * Checks whether content can be deployed
+     *
+     * @return {Boolean} Can deploy
+     */
+    canDeploy() {
+        return
+            this.processor && this.processor.alias &&
+            this.deployer && this.deployer.alias;
+    }
+
+    /**
+     *
+
     /**
      * Saves the current state of this entity
      *
@@ -73,11 +124,59 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     }
 
     /**
+     * Deploys a content entity
+     *
+     * @param {String} contentId
+     * @param {String} language
+     */
+    async deployContent(contentId, language) {
+        checkParam(contentId, 'contentId', String, true);
+        checkParam(language, 'language', String, true);
+
+        if(!this.canDeploy()) { return; }
+
+        let data = await this.getContent({ id: contentId, language: language });
+
+        if(!data) { return; }
+
+        data = data.pop();
+        
+        if(!data) { return; }
+
+        if(typeof data !== 'string') {
+            try {
+                data = JSON.stringify(data);
+            } catch(e) {
+                data = data.toString();
+            }
+        }
+
+        data = Buffer.from(data, 'utf8').toString('base64');
+
+        await this.deployer.setFile(this.deployer.getPath(language, contentId + '.json'), data);
+    }
+    
+    /**
+     * Removes a content entity
+     *
+     * @param {String} contentId
+     * @param {String} language
+     */
+    async removeContent(contentId, language) {
+        checkParam(contentId, 'contentId', String, true);
+        checkParam(language, 'language', String, true);
+
+        if(!this.canDeploy()) { return; }
+
+        await this.deployer.removeFile(this.deployer.getPath(language, contentId + '.json'));
+    }
+
+    /**
      * Gets content in published format
      *
      * @param {Object} query
      *
-     * @return {Array|FileSystem.ReadStream} Items
+     * @return {Array} Items
      */
     async getContent(query = {}) {
         checkParam(query, 'query', Object, true);

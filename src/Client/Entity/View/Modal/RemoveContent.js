@@ -42,8 +42,6 @@ class RemoveContent extends HashBrown.Entity.View.Modal.ModalBase {
 
         await HashBrown.Service.RequestService.request('delete', 'content/' + this.model.contentId + '?removeChildren=' + (this.state.deleteChildren || false));
 
-        this.state.content.settingsSanityCheck('publishing');
-        
         HashBrown.Service.EventService.trigger('resource', this.model.contentId);  
 
         if(location.hash.indexOf(this.model.contentId) > -1) {

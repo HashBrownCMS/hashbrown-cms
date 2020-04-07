@@ -37,13 +37,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
 
         // Extensible properties
         this.def(Object, 'properties', {});
-
-        // Settings
-        this.def(Object, 'settings', {
-            publishing: {
-                connectionId: ''
-            }
-        }); 
     }
 
     /**
@@ -113,37 +106,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      */
     async getParent() {
         throw new Error('Method "getParent" must be overridden');
-    }
-
-    /**
-     * Settings sanity check
-     *
-     * @param {String} key
-     */
-    settingsSanityCheck(key) {
-        this.settings = this.settings || {};
-
-        if(key) {
-            this.settings[key] = this.settings[key] || {};
-        }
-
-        this.settings.publishing = this.settings.publishing || {};
-
-        if(Array.isArray(this.settings.publishing.connections)) {
-            this.settings.publishing.connectionId = this.settings.publishing.connections[0];
-            delete this.settings.publishing.connections;
-        }
-    }
-
-    /**
-     * Gets settings
-     *
-     * @param {String} key
-     *
-     * @returns {Object} Settings
-     */
-    getSettings(key) {
-        throw new Error('The "getSettings" method must be overridden');
     }
 
     /**

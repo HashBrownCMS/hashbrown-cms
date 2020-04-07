@@ -112,6 +112,43 @@ class Project extends require('Common/Entity/Project') {
 
         await HashBrown.Service.RequestService.customRequest('post', apiUrl, settings);
     }
+    
+    /**
+     * Gets settings for an environment
+     *
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @return {Object} Settings
+     */
+    async getEnvironmentSettings(environment, section = '') {
+        checkParam(environment, 'environment', String, true);
+        checkParam(section, 'section', String);
+
+        return await HashBrown.Service.RequestService.customRequest(
+            'get',
+            `/api/projects/${this.id}/environments/${environment}${section ? `/${section}` : ''}`
+        );
+    }
+    
+    /**
+     * Sets settings for an environment
+     *
+     * @param {String} environment
+     * @param {Object} settings
+     * @param {String} section
+     */
+    async setEnvironmentSettings(environment, settings, section = '') {
+        checkParam(environment, 'environment', String, true);
+        checkParam(settings, 'settings', Object, true);
+        checkParam(section, 'section', String);
+
+        await HashBrown.Service.RequestService.customRequest(
+            'post',
+            `/api/projects/${this.id}/environments/${environment}${section ? `/${section}` : ''}`,
+            settings
+        );
+    }
 
     /**
      * Saves this entity

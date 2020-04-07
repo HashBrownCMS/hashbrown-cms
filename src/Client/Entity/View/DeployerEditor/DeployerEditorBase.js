@@ -18,6 +18,25 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Creates a new instance
+     *
+     * @return {HashBrown.Entity.View.DeployerEditor.DeployerEditorBase} Editor
+     */
+    static new(params = {}) {
+        if(params.model && params.model.alias) {
+            for(let name in HashBrown.Entity.View.DeployerEditor) {
+                let type = HashBrown.Entity.View.DeployerEditor[name];
+
+                if(type && type.alias === params.model.alias) {
+                    return new type(params);
+                }
+            }
+        }
+    
+        return new this(params);
+    }
+
+    /**
      * Structure
      */
     structure() {
@@ -41,10 +60,10 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
     async fetch() {
         this.state.deployerOptions = {};
         
-        let deployers = await HashBrown.Service.RequestService.request('get', 'connections/deployers');
+        let deployers = await HashBrown.Service.RequestService.customRequest('get', '/api/deployers');
 
-        for(let alias in deployers) {
-            this.state.deployerOptions[deployers[alias]] = alias;
+        for(let deployer of deployers) {
+            this.state.deployerOptions[deployer] = deployer;
         }
     }
     
@@ -64,34 +83,21 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
         this.trigger('change', this.model);
         this.trigger('changealias');
     }
-
+    
     /**
-     * Event: Change content path
+     * Event: Change public URL
      */
-    onChangeContentPath(newValue) {
-        if(!this.model.paths) { this.model.paths = {}; }
-
-        this.model.paths.content = newValue;
+    onChangePublicUrl(newValue) {
+        this.model.publicUrl = newValue;
 
         this.trigger('change', this.model);
     }
     
     /**
-     * Event: Change media path
+     * Event: Change path
      */
-    onChangeMediaPath(newValue) {
-        if(!this.model.paths) { this.model.paths = {}; }
-
-        this.model.paths.media = newValue;
-
-        this.trigger('change', this.model);
-    }
-    
-    /**
-     * Event: Change file extension
-     */
-    onChangeFileExtension(newValue) {
-        this.model.fileExtension = newValue;
+    onChangePath(newValue) {
+        this.model.path = newValue;
 
         this.trigger('change', this.model);
     }

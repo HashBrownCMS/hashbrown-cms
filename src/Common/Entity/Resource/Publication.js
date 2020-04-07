@@ -19,7 +19,6 @@ class Publication extends HashBrown.Entity.Resource.ResourceBase {
         this.def(String, 'rootContent');
         this.def(Boolean, 'includeRoot', false);
         this.def(Array, 'allowedSchemas', []);
-        this.def(String, 'processorAlias');
     }
 
     /**

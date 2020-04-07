@@ -42,14 +42,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             },
             '/api/projects/${project}/settings/${section}': {
                 handler: this.settings,
-                user: true,
-            },
-            '/api/projects/${project}/settings/${section}': {
-                handler: this.settings,
-                methods: [ 'POST' ],
-                user: {
-                    isAdmin: true
-                }
+                methods: [ 'GET', 'POST' ],
+                user: true
             },
 
             // Environments
@@ -64,12 +58,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     isAdmin: true
                 }
             },            
-            '/api/projects/${project}/environment/${environment}': {
-                handler: this.deleteEnvironment,
-                methods: [ 'DELETE' ],
-                user: {
-                    isAdmin: true
-                }
+            '/api/projects/${project}/environments/${environment}': {
+                handler: this.environment,
+                methods: [ 'GET', 'POST', 'DELETE' ],
+                user: true
+            },
+            '/api/projects/${project}/environments/${environment}/${section}': {
+                handler: this.environment,
+                methods: [ 'GET', 'POST' ],
+                user: true
             },
 
             // Backups
@@ -240,7 +237,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
             case 'GET':
                 let settings = await project.getSettings(params.section);
-                
+               
                 return new HttpResponse(settings, 200, { 'Cache-Control': 'no-store' });
         }
     }
@@ -282,20 +279,43 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * @example DELETE /api/projects/${project}/environments/${environment}
+     * @example GET|POST|DELETE /api/projects/${project}/environments/${environment}
      */
-    static async deleteEnvironment(request, params, body, query, user) {
-        let environment = params.environment;
-        
+    static async environment(request, params, body, query, user) {
         let project = await HashBrown.Entity.Project.get(params.project);
 
         if(!project) {
-            return new HttpResponse('Not found', 404);
+            return new HttpResponse('Project not found', 404);
+        }
+                
+        let settings = await project.getEnvironmentSettings(params.environment, params.section);
+        
+        if(!settings) {
+            return new HttpResponse('Environment not found', 404);
         }
 
-        await project.removeEnvironment(environment);
+        switch(request.method) {
+            case 'GET':
+                return new HttpResponse(settings);
 
-        return new HttpResponse('OK');
+            case 'POST':
+                if(!user.isAdmin) {
+                    return new HttpResponse('Only admins can edit environments', 403);
+                }
+                
+                await project.setEnvironmentSettings(params.environment, body, params.section);
+
+                return new HttpResponse('OK');
+                
+            case 'DELETE':
+                if(!user.isAdmin) {
+                    return new HttpResponse('Only admins can remove environments', 403);
+                }
+
+                await project.removeEnvironment(params.environment);
+
+                return new HttpResponse('OK');
+        }
     }
 
     

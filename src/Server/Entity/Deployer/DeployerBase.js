@@ -8,10 +8,12 @@ const Path = require('path');
  * @memberof HashBrown.Server.Entity
  */
 class DeployerBase extends HashBrown.Entity.EntityBase {
-    static get title() { return null; }
-    static get alias() { return null; }
+    static get alias() {
+        if(this === DeployerBase) { return null; }
+
+        return this.name.replace('Deployer', '').toLowerCase();
+    }
     
-    get name() { return this.constructor.name; }
     get alias() { return this.constructor.alias; }
     
     /**
@@ -21,6 +23,15 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
         super(params);
     }
    
+    /**
+     * Gets the human readable name
+     *
+     * @return {String} name
+     */
+    getName() {
+        return this.alias;
+    }
+
     /**
      * Adopts values into this entity
      *
@@ -38,8 +49,6 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
         delete params.name;
         delete params.alias;
         
-        params.paths = params.paths || {};
-
         super.adopt(params);
         
         Object.seal(this.context);
@@ -49,11 +58,8 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      * Structure
      */
     structure() {
-        this.def(String, 'fileExtension');
-        this.def(Object, 'paths', {
-            media: '',
-            content: ''
-        });
+        this.def(String, 'publicUrl');
+        this.def(String, 'path');
         this.def(Object, 'context');
     }
 
@@ -87,6 +93,33 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
 
         return new model(params);
     }
+    
+    /**
+     * Checks a string for illegal path components
+     *
+     * @param {String} name
+     * @param {String} value
+     */
+    pathComponentCheck(name, value) {
+        checkParam(name, 'name', String);
+        checkParam(value, 'value', String);
+
+        let values = [ '.' ];
+
+        for(let v of values) {
+            if(value === v) {
+                throw new Error(`The value of "${name}" cannot be "${v}"`);
+            }
+        }
+
+        let components = [ '..', '\\', '/', '*' ];
+
+        for(let c of components) {
+            if(value.indexOf(c) > -1) {
+                throw new Error(`The value of "${name}" cannot contain "${c}"`);
+            }
+        }
+    }
 
     /**
      * Gets a deployer by alias
@@ -119,27 +152,15 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
     /**
      * Gets a deployment path
      *
-     * @param {String} name
-     * @param {String} filename
-     * @param {Boolean} ignoreRoot
+     * @param {Array} parts
      *
      * @returns {String} Path
      */
-    getPath(name, filename = '', ignoreRoot = false) {
-        let path = '';
+    getPath(...parts) {
+        let path = (parts || []).join('/');
         
-        if(this.paths[name]) {
-            path = Path.join(path, this.paths[name]);
-        }
-
-        if(filename) {
-            path = Path.join(path, filename);
-        }
-        
-        if(!ignoreRoot) {
-            path = Path.join(this.getRootPath(), path);
-        }
-      
+        path = Path.join(this.getRootPath(), this.path, path);
+    
         // If the path module removed doubles slashes for protocols, add them back
         path = (path || '').replace(/:\/([^\/])/, '://$1');
 

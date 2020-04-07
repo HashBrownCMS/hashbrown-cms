@@ -9,9 +9,6 @@ const Url = require('url');
  * @memberof HashBrown.Server.Entity
  */
 class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
-    static get title() { return 'Git'; }
-    static get alias() { return 'git'; }
-
     /**
      * Constructor
      */

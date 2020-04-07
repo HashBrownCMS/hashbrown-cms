@@ -129,6 +129,9 @@ async function main() {
         });
     }
 
+    // Perform migration tasks
+    await HashBrown.Service.MigrationService.migrate();
+
     // Init plugins
     await HashBrown.Service.PluginService.init();
 

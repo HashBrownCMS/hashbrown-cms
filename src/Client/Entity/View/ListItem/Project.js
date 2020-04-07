@@ -49,6 +49,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
+        if(!HashBrown.Context.user.isAdmin) { return; }
         if(this.model.environments.length < 1) { return; }
 
         let modal = HashBrown.Entity.View.Modal.ModalBase.new({

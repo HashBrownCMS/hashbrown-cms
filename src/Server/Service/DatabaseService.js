@@ -22,6 +22,8 @@ class DatabaseService {
      * @return {String} Value
      */
     static getConfig(key) {
+        checkParam(key, 'key', String, true);
+
         let value = process.env['MONGODB_' + key.toUpperCase()];
 
         // Config value was found in the environment variables, return it
@@ -129,8 +131,6 @@ class DatabaseService {
         
         HashBrown.Service.EventService.on('stop', 'dbclient', () => {
             if(this.client) {
-                debug.log('Database client closed', this);
-
                 this.client.close();
                 this.client = null;
             }
@@ -142,7 +142,7 @@ class DatabaseService {
      *
      * @param {String} databaseName
      *
-     * @return {Promise} Client
+     * @return {MongoClient} Client
      */
     static async connect(databaseName) {
         checkParam(databaseName, 'databaseName', String, true);
@@ -200,8 +200,6 @@ class DatabaseService {
         };
 
         await insertCollection(0);
-    
-        debug.log('Database restored successfully', this);
     }
    
     /**
@@ -222,8 +220,6 @@ class DatabaseService {
         let timestamp = Date.now();
         let archivePath = Path.join(dumpPath, timestamp + '.hba'); 
 
-        debug.log('Dumping database "' + databaseName + '" to ' + archivePath + '...', this);
-    
         let collectionNames = await this.listCollections(databaseName);
     
         let getDocuments = async (index) => {
@@ -242,8 +238,6 @@ class DatabaseService {
         await getDocuments(0); 
         
         await HashBrown.Service.FileService.write(collections, archivePath);
-                    
-        debug.log('Database dumped successfully', this);
 
         return timestamp;
     }
@@ -256,6 +250,8 @@ class DatabaseService {
      * @return {Array} Array of collections
      */
     static async listCollections(databaseName) {
+        checkParam(databaseName, 'databaseName', String, true);
+        
         let db = await this.connect(databaseName);
         let collections = await db.listCollections().toArray();
 
@@ -265,7 +261,7 @@ class DatabaseService {
     /**
      * Lists all databases
      *
-     * @returns {Promise} Array of databases
+     * @returns {Array} Database names
      */
     static async listDatabases() {
         if(!this.client) {
@@ -308,9 +304,11 @@ class DatabaseService {
      *
      * @param {String} databaseName
      *
-     * @returns {Promise} Whether or not database exists
+     * @returns {Boolean} Whether or not database exists
      */
     static async databaseExists(databaseName) {
+        checkParam(databaseName, 'databaseName', String, true);
+        
         let databases = await this.listDatabases();
 
         return databases.indexOf(databaseName) > -1;
@@ -322,9 +320,12 @@ class DatabaseService {
      * @param {String} databaseName
      * @param {String} collectionName
      *
-     * @returns {Promise} Whether or not collection exists
+     * @returns {Boolean} Whether or not collection exists
      */
     static async collectionExists(databaseName, collectionName) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        
         let collections = await this.listCollections(databaseName);
 
         for(let collection of collections || []) {
@@ -344,10 +345,23 @@ class DatabaseService {
      * @param {Object} query
      * @param {Object} projection
      *
-     * @return {Promise} Document
+     * @return {Object} Document
      */
     static async findOne(databaseName, collectionName, query, projection = {}) {
-        projection._id = 0;
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(projection, 'projection', Object, true);
+
+        // Don't include _id in projection unless specified
+        if(!projection._id) {
+            projection._id = 0;
+        }
+
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
 
         let db = await this.connect(databaseName);
         let doc = await db.collection(collectionName).findOne(query, projection);
@@ -368,13 +382,24 @@ class DatabaseService {
      * @param {Object} projection
      * @param {Object} sort
      *
-     * @return {Promise} Documents
+     * @return {Array} Documents
      */
     static async find(databaseName, collectionName, query = {}, projection = {}, sort = null) {
         checkParam(databaseName, 'databaseName', String, true);
         checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(projection, 'projection', Object, true);
+        checkParam(sort, 'sort', Object);
 
-        projection._id = 0;
+        // Don't include _id in projection unless specified
+        if(!projection._id) { 
+            projection._id = 0;
+        }
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
 
         let db = await this.connect(databaseName);
         let docs = await db.collection(collectionName).find(query, { projection: projection })
@@ -395,11 +420,20 @@ class DatabaseService {
      * @param {String} collectionName
      * @param {Object} query
      *
-     * @return {Promise} Number of matching documents
+     * @return {Number} Number of matching documents
      */
     static async count(databaseName, collectionName, query) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         let db = await this.connect(databaseName);
-        let result = await db.collection(collectionName).count(query);
+        let result = await db.collection(collectionName).countDocuments(query);
 
         return result;
     }
@@ -412,10 +446,19 @@ class DatabaseService {
      * @param {Object} query
      * @param {Object} doc
      * @param {Object} options
-     *
-     * @return {Promise}
      */
-    static async mergeOne(databaseName, collectionName, query, doc, options) {
+    static async mergeOne(databaseName, collectionName, query, doc, options = {}) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(doc, 'doc', Object, true);
+        checkParam(options, 'options', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         let foundDoc = await this.findOne(databaseName, collectionName, query) || {};
 
         for(let k in doc) {
@@ -433,10 +476,19 @@ class DatabaseService {
      * @param {Object} query
      * @param {Object} doc
      * @param {Object} options
-     *
-     * @return {Promise} promise
      */
-    static async updateOne(databaseName, collectionName, query, doc, options) {
+    static async updateOne(databaseName, collectionName, query, doc, options = {}) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(doc, 'doc', Object, true);
+        checkParam(options, 'options', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
@@ -453,10 +505,19 @@ class DatabaseService {
      * @param {Object} query
      * @param {Object} doc
      * @param {Object} options
-     *
-     * @return {Promise} promise
      */
     static async update(databaseName, collectionName, query, doc, options) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(doc, 'doc', Object, true);
+        checkParam(options, 'options', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
@@ -471,10 +532,12 @@ class DatabaseService {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} doc
-     *
-     * @return {Promise} promise
      */
     static async insertOne(databaseName, collectionName, doc) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(doc, 'doc', Object, true);
+        
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
@@ -489,10 +552,17 @@ class DatabaseService {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
-     *
-     * @return {Promise} promise
      */
     static async remove(databaseName, collectionName, query) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         let db = await this.connect(databaseName);
         
         await db.collection(collectionName).deleteMany(query, true);
@@ -504,10 +574,17 @@ class DatabaseService {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
-     *
-     * @return {Promise} promise
      */
     static async removeOne(databaseName, collectionName, query) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
         let db = await this.connect(databaseName);
     
         await db.collection(collectionName).removeOne(query, true);
@@ -518,10 +595,11 @@ class DatabaseService {
      *
      * @param {String} databaseName
      * @param {String} collectionName
-     *
-     * @return {Promise} promise
      */
     static async dropCollection(databaseName, collectionName) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        
         let db = await this.connect(databaseName);
 
         await db.dropCollection(collectionName);
@@ -531,10 +609,10 @@ class DatabaseService {
      * Drops an entire database
      *
      * @param {String} databaseName
-     *
-     * @returns {Promise}
      */
     static async dropDatabase(databaseName) {
+        checkParam(databaseName, 'databaseName', String, true);
+        
         let db = await this.connect(databaseName);
         
         await db.dropDatabase();

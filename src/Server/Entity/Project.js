@@ -186,7 +186,7 @@ class Project extends require('Common/Entity/Project') {
             }
         );
     }
-
+    
     /**
      * Gets settings
      *
@@ -198,9 +198,16 @@ class Project extends require('Common/Entity/Project') {
         checkParam(section, 'section', String);
         
         let settings = null;
-        let sync = (await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {}) || {}).sync;
 
         // Attempt remote fetch of project settings
+        let sync = (await HashBrown.Service.DatabaseService.findOne(
+            this.id,
+            'settings',
+            {
+                environment: { $exists: false }
+            }
+        ) || {}).sync;
+
         if(sync && sync.enabled && section !== 'sync') {
             settings = await HashBrown.Service.RequestService.request(
                 'get',
@@ -209,51 +216,26 @@ class Project extends require('Common/Entity/Project') {
             );
         }
 
+        // Get settings from local database
         if(!settings) {
-            settings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
+            settings = await HashBrown.Service.DatabaseService.findOne(
+                this.id,
+                'settings',
+                {
+                    environment: { $exists: false }
+                }
+            );
         }
 
         if(!settings) { return null; }
-
+       
         if(section) {
-            if(!settings[section]) { return null; }
-
-            return settings[section];
+            return settings[section] || {};
         }
-
-        // Reconstruct environment list from old structure
-        if(!settings.environments || settings.environments.constructor !== Object || Object.keys(settings.environments).length < 1) {
-            settings.environments = {};
-            
-            let allSettings = await HashBrown.Service.DatabaseService.find(this.id, 'settings', {});
-
-            for(let entry of allSettings) {
-                if(!entry.usedBy || entry.usedBy === 'project') { continue; }
-    
-                let name = entry.usedBy;
-
-                delete entry.usedBy;
-
-                settings.environments[name] = entry;
-            }
-            
-            if(Object.keys(settings.environments).length < 1) {
-                settings.environments = { live: {} };
-            }
-        
-            if(!sync || !sync.enabled) {
-                await HashBrown.Service.DatabaseService.remove(this.id, 'settings', {});
-                
-                await HashBrown.Service.DatabaseService.insertOne(this.id, 'settings', settings);
-            }
-        }
-
-        // Remove old "usedBy" field
-        delete settings.usedBy;
 
         return settings;
     }
-    
+
     /**
      * Sets settings
      *
@@ -370,15 +352,75 @@ class Project extends require('Common/Entity/Project') {
             throw new Error('Environment name must be at least 2 characters long');
         }
 
-        let environments = await this.getSettings('environments');
+        let environments = await this.getEnvironments();
 
-        if(environments[name]) {
+        if(environments.indexOf(name) > -1) {
             throw new Error(`Environment ${name} already exists`);
         }
 
-        environments[name] = {};
+        await HashBrown.Service.DatabaseService.insertOne(this.id, 'settings', { environment: name });
+    }
+    
+    /**
+     * Gets settings for an environment
+     *
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @return {Object} Settings
+     */
+    async getEnvironmentSettings(environment, section = '') {
+        checkParam(environment, 'environment', String, true);
+        checkParam(section, 'section', String);
 
-        await this.setSettings(environments, 'environments');
+        let settings = await HashBrown.Service.DatabaseService.findOne(
+            this.id,
+            'settings',
+            {
+                environment: environment
+            }
+        );
+
+        if(!settings) { return null; }
+
+        if(section) {
+            return settings[section] || {};
+        }
+
+        return settings;
+    }
+    
+    /**
+     * Sets settings for an environment
+     *
+     * @param {String} environment
+     * @param {Object} settings
+     * @param {String} section
+     */
+    async setEnvironmentSettings(environment, settings, section = '') {
+        checkParam(environment, 'environment', String, true);
+        checkParam(settings, 'settings', Object, true);
+        checkParam(section, 'section', String);
+
+        let existingSettings = await this.getEnvironmentSettings(environment);
+
+        if(!existingSettings) {
+            throw new Error(`Environment ${environment} in project ${this.getName()} not found`);
+        }
+        
+        if(section) {
+            existingSettings[section] = settings;
+            settings = existingSettings;
+        }
+
+        return await HashBrown.Service.DatabaseService.mergeOne(
+            this.id,
+            'settings',
+            {
+                environment: environment
+            },
+            settings
+        );
     }
     
     /**
@@ -389,15 +431,7 @@ class Project extends require('Common/Entity/Project') {
     async removeEnvironment(name) {
         checkParam(name, 'name', String, true);
 
-        let environments = await this.getSettings('environments');
-
-        if(!environments[name]) {
-            throw new Error(`Environment ${name} could not be found`);
-        }
-
-        delete environments[name];
-
-        await this.setSettings(environments, 'environments');
+        await HashBrown.Service.DatabaseService.remove(this.id, 'settings', { environment: name });
     }
     
     /**
@@ -406,9 +440,39 @@ class Project extends require('Common/Entity/Project') {
      * @return {Array} Environment names
      */
     async getEnvironments() {
-        let environments = await this.getSettings('environments');
+        let collections = await HashBrown.Service.DatabaseService.find(
+            this.id,
+            'settings',
+            {
+                environment: { $exists: true }
+            }
+        );
         
-        return Object.keys(environments);
+        let environments = [];
+
+        for(let collection of collections) {
+            let name = collection.environment;
+
+            if(!name || environments.indexOf(name) > -1) { continue; }
+
+            environments.push(name);
+        }
+
+        environments.sort();
+       
+        if(environments.length < 1) {
+            await HashBrown.Service.DatabaseService.insertOne(
+                this.id,
+                'settings',
+                {
+                    environment: 'live'
+                }
+            );
+
+            environments.push('live');
+        }
+
+        return environments;
     }
 }
 

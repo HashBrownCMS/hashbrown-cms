@@ -16,17 +16,6 @@ class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
     }
 
     /**
-     * Fetches dependencies
-     */
-    async fetch() {
-        let connection = await HashBrown.Entity.Resource.Media.getProvider();
-        
-        if(!connection) {
-            throw new Error('No media provider has been set for this project. Please make sure one of your connections has the "is media provider" setting switched on.');
-        }  
-    }
-
-    /**
      * Event: Change file
      */
     async onChangeFile(files) {

@@ -5,22 +5,6 @@
  */
 class Media extends require('Common/Entity/Resource/Media') {
     /**
-     * Gets the media provider
-     *
-     * @return {HashBrown.Entity.Resource.Connection} Provider
-     */
-    static async getProvider() {
-        let environments = HashBrown.Context.project.settings.environments;
-        let environment = HashBrown.Context.environment;
-
-        if(!environments || !environments[environment] || !environments[environment].mediaProvider) { return null; }
-
-        let connection = await HashBrown.Entity.Resource.Connection.get(environments[environment].mediaProvider);
-
-        return connection;
-    }
-
-    /**
      * Gets the markup for diplaying this media entity
      *
      * @return {String} HTML

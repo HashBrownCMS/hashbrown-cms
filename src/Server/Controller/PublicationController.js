@@ -18,12 +18,6 @@ class PublicationController extends HashBrown.Controller.ResourceController {
             '/api/${project}/${environment}/publications/${id}/query': {
                 handler: this.query
             },
-            '/api/${project}/${environment}/publications/processors': {
-                handler: this.processors,
-                user: {
-                    scope: 'publications'
-                }
-            },
             ...super.routes,
         };
     }        
@@ -40,23 +34,6 @@ class PublicationController extends HashBrown.Controller.ResourceController {
         let app = require(Path.join(APP_ROOT, 'package.json'));
 
         return new HttpResponse(results, 200, { 'Cache-Control': 'no-store', 'Content-Type': 'application/json' });
-    }
-    
-    /**
-     * @example GET /api/${project}/${environment}/publications/processors
-     */
-    static async processors(request, params, body, query, user) {
-        let processors = {};
-
-        for(let name in HashBrown.Entity.Processor) {
-            let processor = HashBrown.Entity.Processor[name];
-
-            if(processor === HashBrown.Entity.Processor.ProcessorBase) { continue; }
-
-            processors[processor.alias] = processor.title;
-        }
-
-        return new HttpResponse(processors);
     }
 }
 

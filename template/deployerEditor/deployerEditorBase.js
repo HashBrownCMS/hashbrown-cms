@@ -6,14 +6,11 @@ _.div({class: 'deployer-editor'},
     _.field({label: 'Type'},
         _.popup({value:  model.alias, options: state.deployerOptions, onchange: _.onChangeAlias})
     ),
-    _.field({label: 'File extension'},
-        _.text({value: model.fileExtension, onchange: _.onChangeFileExtension})
+    _.field({label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'},
+        _.text({value: model.publicUrl, onchange: _.onChangePublicUrl})
     ),
-    _.field({label: 'Content path'},
-        _.text({value: model.paths ? model.paths.content : null, onchange: _.onChangeContentPath})
-    ),
-    _.field({label: 'Media path'},
-        _.text({value: model.paths ? model.paths.media : null, onchange: _.onChangeMediaPath})
+    _.field({label: 'Path', description: 'The subdirectory to read/write files from/to'},
+        _.text({value: model.path, onchange: _.onChangePath})
     ),
     _.include(state.customTemplate)
 )
