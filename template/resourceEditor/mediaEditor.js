@@ -22,7 +22,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
             )
 
         ] : state.tab === 'settings' ? [
-            _.field({ label: 'Media deployer' },
+            _.field({ label: 'Media deployer', description: 'How to read/write media files' },
                 state.deployerEditor
             )
 

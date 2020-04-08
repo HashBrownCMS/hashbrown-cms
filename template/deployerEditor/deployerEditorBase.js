@@ -4,9 +4,9 @@ module.exports = (_, model, state) =>
 
 _.div({class: 'deployer-editor'},
     _.field({label: 'Type'},
-        _.popup({value:  model.alias, options: state.deployerOptions, onchange: _.onChangeAlias})
+        _.popup({clearable: true, value: model ? model.alias : null, options: state.deployerOptions, onchange: _.onChangeAlias})
     ),
-    model.alias ? [
+    model && model.alias ? [
         _.field({label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'},
             _.text({value: model.publicUrl, onchange: _.onChangePublicUrl})
         ),

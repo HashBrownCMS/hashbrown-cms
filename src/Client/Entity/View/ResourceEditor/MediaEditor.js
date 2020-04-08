@@ -72,7 +72,9 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      * Event: Change deployer
      */
     onChangeDeployer(newValue) {
-        if(!newValue) { return; }
+        if(!newValue || !newValue.alias) {
+            newValue = null;
+        }
 
         this.state.settings.mediaDeployer = newValue;
     }

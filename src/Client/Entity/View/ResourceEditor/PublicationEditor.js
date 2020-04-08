@@ -130,8 +130,10 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
      * Event: Change deployer
      */
     onChangeDeployer(newValue) {
-        if(!newValue) { return; }
-
+        if(!newValue || !newValue.alias) {
+            newValue = null;
+        }
+        
         this.model.deployer = newValue;
 
         this.onChange();
@@ -141,8 +143,10 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
      * Event: Change processor
      */
     onChangeProcessor(newValue) {
-        if(!newValue) { return; }
-
+        if(!newValue || !newValue.alias) {
+            newValue = null;
+        }
+        
         this.model.processor = newValue;
 
         this.onChange();
