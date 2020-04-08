@@ -85,9 +85,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
      * @return {Boolean} Can deploy
      */
     canDeploy() {
-        return
-            this.processor && this.processor.alias &&
-            this.deployer && this.deployer.alias;
+        return this.processor && this.processor.alias && this.deployer && this.deployer.alias;
     }
 
     /**
@@ -127,48 +125,51 @@ class Publication extends require('Common/Entity/Resource/Publication') {
      * Deploys a content entity
      *
      * @param {String} contentId
-     * @param {String} language
      */
-    async deployContent(contentId, language) {
+    async deployContent(contentId) {
         checkParam(contentId, 'contentId', String, true);
-        checkParam(language, 'language', String, true);
-
-        if(!this.canDeploy()) { return; }
-
-        let data = await this.getContent({ id: contentId, language: language });
-
-        if(!data) { return; }
-
-        data = data.pop();
         
-        if(!data) { return; }
+        if(!this.canDeploy()) { return; }
+        
+        let project = await HashBrown.Entity.Project.get(this.context.project);
 
-        if(typeof data !== 'string') {
-            try {
-                data = JSON.stringify(data);
-            } catch(e) {
-                data = data.toString();
-            }
+        if(!project) {
+            throw new Error(`Project ${this.context.project} not found`);
         }
 
-        data = Buffer.from(data, 'utf8').toString('base64');
+        let languages = await project.getLanguages();
 
-        await this.deployer.setFile(this.deployer.getPath(language, contentId + '.json'), data);
+        for(let language of languages) {
+            let data = await this.getContent({ id: contentId, language: language });
+            data = data.pop();
+            
+            if(!data) { continue; }
+
+            if(typeof data !== 'string') {
+                try {
+                    data = JSON.stringify(data);
+                } catch(e) {
+                    data = data.toString();
+                }
+            }
+
+            data = Buffer.from(data, 'utf8').toString('base64');
+
+            await this.deployer.setFile(this.deployer.getPath(language, contentId + '.json'), data);
+        }
     }
     
     /**
      * Removes a content entity
      *
      * @param {String} contentId
-     * @param {String} language
      */
-    async removeContent(contentId, language) {
+    async redactContent(contentId) {
         checkParam(contentId, 'contentId', String, true);
-        checkParam(language, 'language', String, true);
 
         if(!this.canDeploy()) { return; }
 
-        await this.deployer.removeFile(this.deployer.getPath(language, contentId + '.json'));
+        await this.deployer.removeFile(this.deployer.getPath('*', contentId + '.json'));
     }
 
     /**

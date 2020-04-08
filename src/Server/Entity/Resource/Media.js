@@ -235,7 +235,7 @@ class Media extends require('Common/Entity/Resource/Media') {
             resourceMap[id].filename = filename;
         }
 
-        resources = Object.values(resources);
+        resources = Object.values(resourceMap);
 
         resources.sort((a, b) => {
             a = a.getName();

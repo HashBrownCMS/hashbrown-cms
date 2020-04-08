@@ -3,13 +3,13 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'resource-editor resource-editor--json-editor'},
+    _.include(require('./inc/header')),
     state.name === 'error' ? [
         _.div({class: 'widget widget--message centered warn'},
             state.message
         )
     
     ] : [
-        _.include(require('./inc/header')),
         _.text({code: true, value: JSON.stringify(model.getObject(), null, 4), class: 'resource-editor__body', name: 'body', oninput: _.onChangeJson}),
         _.div({class: 'resource-editor__footer'},
             _.include(require('./inc/warning')),
@@ -20,6 +20,5 @@ _.div({class: 'resource-editor resource-editor--json-editor'},
                 )
             )
         )
-    
     ]
 )

@@ -35,6 +35,10 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         let parsed = {};
 
         switch(schemaId) {
+            default:
+                parsed = value;
+                break;
+            
             case 'array':
                 parsed['@type'] = 'ItemList';
                 parsed['numberOfItems'] = value.length;
@@ -58,7 +62,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'mediaReference':
-                let media = await HashBrown.Entity.Resource.Media.get(this.context.project, this.context.environment, value, { ensureWebUrl: true });
+                let media = await HashBrown.Entity.Resource.Media.get(this.context.project, this.context.environment, value);
 
                 if(media.isImage()) {
                     parsed['@type'] = 'ImageObject';
@@ -98,10 +102,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 for(let key in content) {
                     parsed[key] = content[key];
                 }
-                break;
-
-            default:
-                parsed['@type'] = schemaId;
                 break;
         }
         

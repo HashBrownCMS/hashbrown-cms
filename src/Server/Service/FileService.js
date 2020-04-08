@@ -187,31 +187,31 @@ class FileService {
     }
 
     /**
-     * Removes a file or folder
+     * Removes a file or folder (recursively)
      *
      * @param {String} path
-     *
-     * @return {Promise} Result
      */
     static async remove(path) {
         checkParam(path, 'path', String, true);
      
-        try {
-            if(FileSystem.lstatSync(path).isDirectory()) {
-                for(let filename of await Util.promisify(FileSystem.readdir)(path)) {
-                    await this.remove(Path.join(path, filename));
+        let files = await this.list(path);
+
+        for(let file of files) {
+            try {
+                if(FileSystem.lstatSync(file).isDirectory()) {
+                    await this.remove(file);
+                
+                    await Util.promisify(FileSystem.rmdir)(file);
+
+                } else {
+                    await Util.promisify(FileSystem.unlink)(file);
+
                 }
             
-                await Util.promisify(FileSystem.rmdir)(path);
-
-            } else {
-                await Util.promisify(FileSystem.unlink)(path);
+            } catch(e) {
+                // We don't really mind if a file we're trying to delete isn't there...
 
             }
-        
-        } catch(e) {
-            // We don't really mind if a file we're trying to delete isn't there...
-
         }
     }
 

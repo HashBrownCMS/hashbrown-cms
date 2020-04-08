@@ -13,8 +13,17 @@ state.tab !== 'overview' ? [
         _.div({class: 'resource-editor__footer__actions'},
             model ? [
                 _.a({href: `#/${state.category}/${state.id}/json`, class: 'widget widget--button embedded'}, 'Advanced'),
-                !model.isLocked ? [    
-                    _.button({class: 'widget widget--button', onclick: _.onClickSave}, 'Save')
+                !model.isLocked ? [
+                    state.visibleSaveOptions && Object.keys(state.visibleSaveOptions).length > 0 ? [
+                        _.div({class: 'widget-group'},
+                            _.button({class: 'widget widget--button', name: 'save', onclick: _.onClickSave}, 'Save'),
+                            _.each(state.visibleSaveOptions, (name, label) =>
+                                _.checkbox({value: model[name], class: 'large', placeholder: label, onchange: (newValue) => { _.onChangeValue(name, newValue); } })
+                            )
+                        )
+                    ] : [
+                        _.button({class: 'widget widget--button', onclick: _.onClickSave}, 'Save')
+                    ]
                 ] : null
             ] : state.tab === 'settings' ? [
                 _.button({class: 'widget widget--button', onclick: _.onClickSaveSettings}, 'Save')

@@ -26,6 +26,11 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
         if(this.state.name) { return; }
         
+        // Set visible save options
+        this.state.visibleSaveOptions = {
+            isPublished: 'Published'
+        };
+
         // Cache field states
         let fieldStates = {};
 
@@ -106,8 +111,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
             if(this.state.tab === 'meta') {
                 field.on('change', (newValue) => {  
-                    this.model[key] = newValue;
-                    this.onChange();
+                    this.onChangeValue(key, newValue);
                 });
             
             } else {
@@ -159,9 +163,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     async onClickSave() {
         this.state.title = this.model.getName();
         
-        let publishedCheckbox = this.namedElements.published;
-        this.model.isPublished = publishedCheckbox ? publishedCheckbox.model.value : false;
-
         if(this.namedElements.save) {
             this.namedElements.save.classList.toggle('loading', true);
         }

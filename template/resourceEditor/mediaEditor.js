@@ -12,6 +12,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
         
         ] : state.tab === 'overview' ? [
             _.div({class: 'resource-editor__welcome'},
+                _.h1('Media'),
                 _.p('Click any item in the panel to view it.'),
                 _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
                 _.div({class: 'widget-group'},

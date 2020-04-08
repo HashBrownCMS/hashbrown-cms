@@ -187,8 +187,8 @@ class Project extends HashBrown.Entity.EntityBase {
     async getLanguages() {
         let languages = await this.getSettings('languages');
 
-        if(languages.length < 1) {
-            languages.push('en');
+        if(!languages || !Array.isArray(languages) || languages.length < 1) {
+            return [ 'en' ];
         }
 
         return languages;

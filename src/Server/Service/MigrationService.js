@@ -11,8 +11,6 @@ class MigrationService {
         let projectIds = await HashBrown.Service.DatabaseService.listDatabases();
 
         for(let projectId of projectIds) {
-            debug.log(`Performing migration of project ${projectId}...`, this);
-
             await this.migrateSettings(projectId);
             await this.migratePublications(projectId);
         }

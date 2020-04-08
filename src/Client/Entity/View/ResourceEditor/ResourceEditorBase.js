@@ -117,7 +117,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
                 overview: 'Overview'
             };
 
-            if(HashBrown.Context.user.isAdmin) {
+            if(HashBrown.Context.user.isAdmin && this.state.hasSettings) {
                 this.state.tabs.settings = 'Settings';
             }
         
@@ -159,25 +159,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
-     * Sets a save option
-     *
-     * @param {String} key
-     * @param {*} value
-     */
-    setSaveOption(key, value) {
-        this.state.saveOptions = this.state.saveOptions || {};
-
-        if(value === false || value === null || value === undefined) {
-            delete this.state.saveOptions;
-        
-        } else {
-            this.state.saveOptions[key] = value;
-
-        }
-    }
-
-    /**
-     * Sets theis editor dirty/clean
+     * Sets this editor dirty/clean
      *
      * @param {Boolean} isDirty
      */
@@ -220,6 +202,20 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.state.lastHeartbeat = Date.now();
 
         }
+    }
+    
+    /**
+     * Event: Change a specific value
+     *
+     * @param {String} key
+     * @param {*} value
+     */
+    onChangeValue(key, value) {
+        if(!this.model || this.model.isLocked) { return; }
+        
+        this.model[key] = value;
+
+        this.onChange();
     }
 
     /**

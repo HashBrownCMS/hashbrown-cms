@@ -21,6 +21,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
      * Fetches model data
      */
     async fetch() {
+        this.state.hasSettings = true;
+        
         await super.fetch();
             
         if(this.state.tab === 'settings') {
