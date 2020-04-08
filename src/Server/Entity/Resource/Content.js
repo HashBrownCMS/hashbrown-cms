@@ -156,10 +156,6 @@ class Content extends require('Common/Entity/Resource/Content') {
      * Publishes this content
      */
     async publish() {
-        this.isPublished = true;
-
-        await this.save(null);
-
         let project = await HashBrown.Entity.Project.get(this.context.project);
 
         if(!project) {
@@ -167,7 +163,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         }
         
         let languages = await project.getLanguages();
-        let publications = await HashBrown.Entity.Resource.Publications.list(this.context.project, this.context.environment);
+        let publications = await HashBrown.Entity.Resource.Publication.list(this.context.project, this.context.environment);
         
         for(publication of publications) {
             for(let language of languages) {
@@ -180,10 +176,6 @@ class Content extends require('Common/Entity/Resource/Content') {
      * Unpublishes this content
      */
     async unpublish() {
-        this.isPublished = false;
-
-        await this.save(null);
-        
         let project = await HashBrown.Entity.Project.get(this.context.project);
 
         if(!project) {
@@ -191,7 +183,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         }
         
         let languages = await project.getLanguages();
-        let publications = await HashBrown.Entity.Resource.Publications.list(this.context.project, this.context.environment);
+        let publications = await HashBrown.Entity.Resource.Publication.list(this.context.project, this.context.environment);
         
         for(publication of publications) {
             for(let language of languages) {

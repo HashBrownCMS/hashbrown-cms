@@ -29,12 +29,12 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     adopt(params = {}) {
         params = params || {};
 
-        if(params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
+        if(params.deployer && params.deployer.alias && params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
             params.deployer.context = params.context || this.context;
             params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
         }
         
-        if(params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
+        if(params.processor && params.processor.alias && params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {
             params.processor.context = params.context || this.context;
             params.processor = HashBrown.Entity.Processor.ProcessorBase.new(params.processor);
         }

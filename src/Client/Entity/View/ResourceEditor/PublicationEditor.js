@@ -149,6 +149,13 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
     }
     
     /**
+     * Event: Click go to get url
+     */
+    onClickGoToGetUrl() {
+        window.open(this.state.getUrl);
+    }
+    
+    /**
      * Event: Click copy get url
      */
     onClickCopyGetUrl() {

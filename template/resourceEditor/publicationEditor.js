@@ -28,7 +28,8 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             _.field({label: 'GET URL'},
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label'}, state.getUrl),
-                    _.button({class: 'widget widget--button small fa fa-copy', onclick: _.onClickCopyGetUrl})
+                    _.button({title: 'Copy URL', class: 'widget widget--button small fa fa-copy', onclick: _.onClickCopyGetUrl}),
+                    _.button({title: 'Go to URL', class: 'widget widget--button small fa fa-external-link', onclick: _.onClickGoToGetUrl})
                 )
             ),
             _.field({label: 'Processor', description: 'The format to expose content in'},

@@ -9,16 +9,6 @@ const Path = require('path');
  */
 class Media extends require('Common/Entity/Resource/Media') { 
     /**
-     * Structure
-     */
-    structure() {
-        super.structure();
-
-        this.def(String, 'contentUrl');
-        this.def(String, 'thumbnailUrl');
-    }
-
-    /**
      * Gets the media deployer
      *
      * @param {String} projectId
@@ -97,7 +87,7 @@ class Media extends require('Common/Entity/Resource/Media') {
      */
     async getContentUrl(ensureWebUrl = false) {
         checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
-       
+        
         let deployer = await this.constructor.getDeployer(this.context.project, this.context.environment);
 
         if(!deployer) { return null; }
@@ -145,7 +135,7 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         return url;
     }
-    
+
     /**
      * Gets an instance of this entity type
      *
@@ -161,22 +151,35 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(environment, 'environment', String, true);
         checkParam(id, 'id', String, true);
         checkParam(options, 'options', Object, true);
-
-        let resource = await super.get(projectId, environment, id, options);
         
-        if(!resource) {
-            resource = this.new({
-                id: id,
-                context: {
-                    project: projectId,
-                    environment: environment
-                }
-            });
-        }
+        // First attempt to get the file on disk
+        let files = [];
+        let deployer = await this.getDeployer(projectId, environment);
 
-        resource.contentUrl = await resource.getContentUrl();
-        resource.thumbnailUrl = await resource.getThumbnailUrl();
-        resource.filename = Path.basename(resource.contentUrl);
+        if(deployer) {
+            files = await deployer.getFolder(deployer.getPath(id)) || [];
+        }
+        
+        // Get resource from database
+        let resource = await super.get(projectId, environment, id, options);
+
+        // Associate resource with file
+        for(let file of files) {
+            let filename = Path.basename(file);
+
+            if(filename === 'thumbnail.jpg') { continue; }
+
+            if(!resource) {
+                resource = this.new({
+                    id: id,
+                    filename: filename,
+                    context: {
+                        project: projectId,
+                        environment: environment
+                    }
+                });
+            }
+        }
 
         return resource;
     }
@@ -194,63 +197,53 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(projectId, 'projectId', String, true);
         checkParam(environment, 'environment', String, true);
         checkParam(options, 'options', Object, true);
-        
-        // Get resources from database
-        let resources = await super.list(projectId, environment, options);
-
-        // Also get resources from files
+       
+        // First attempt to get the files on disk
+        let files = [];
         let deployer = await this.getDeployer(projectId, environment);
 
         if(deployer) {
-            let files = await deployer.getFolder(deployer.getPath(), 2) || [];
-            let urls = {};
-       
-            for(let file of files) {
-                if(Path.basename(file) === 'thumbnail.jpg') { continue; }
-
-                let folder = Path.basename(Path.dirname(file));
-
-                if(urls[folder]) { continue; }
-               
-                urls[folder] = file;
-            }
-
-            // Adopt media URLs into resources
-            for(let resource of resources) {
-                let url = urls[resource.id];
-
-                delete urls[resource.id];
-
-                if(!url) { continue; }
-
-                resource.filename = Path.basename(url);
-                resource.contentUrl = url;
-            }
-       
-            // Create resources for leftover URLs
-            for(let id in urls) {
-                let url = urls[id];
-
-                let resource = new Media({
-                    id: id,
-                    filename: Path.basename(url),
-                    contentUrl: url
-                });
-
-                resources.push(resource);
-            }
+            files = await deployer.getFolder(deployer.getPath(), 2) || [];
         }
 
-        // Get thumbnail URLs
+        // Get resources from database
+        let resources = await super.list(projectId, environment, options);
+
+        // Create a map of the resources for quick access
+        let resourceMap = {};
+
         for(let resource of resources) {
-            resource.context = {
+            resourceMap[resource.id] = resource;
+        }
+
+        // Associate resources with files
+        for(let file of files) {
+            let id = Path.basename(Path.dirname(file));
+            let filename = Path.basename(file);
+
+            if(filename === 'thumbnail.jpg') { continue; }
+
+            if(!resourceMap[id]) {
+                resourceMap[id] = new Media({ id: id });
+            }
+
+            resourceMap[id].context = {
                 project: projectId,
                 environment: environment
             };
 
-            resource.thumbnailUrl = await resource.getThumbnailUrl();
+            resourceMap[id].filename = filename;
         }
 
+        resources = Object.values(resources);
+
+        resources.sort((a, b) => {
+            a = a.getName();
+            b = b.getName();
+
+            return a === b ? 0 : a < b ? -1 : 1;
+        });
+        
         return resources;
     }
     
