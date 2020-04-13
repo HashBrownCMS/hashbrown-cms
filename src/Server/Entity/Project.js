@@ -63,7 +63,8 @@ class Project extends require('Common/Entity/Project') {
             id: project.id,
             settings: await project.getSettings(),
             environments: await project.getEnvironments(),
-            users: await project.getUsers()
+            users: await project.getUsers(),
+            backups: await project.getBackups()
         };
 
         project.adopt(data);
