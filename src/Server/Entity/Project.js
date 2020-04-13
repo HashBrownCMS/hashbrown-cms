@@ -270,9 +270,11 @@ class Project extends require('Common/Entity/Project') {
     
     /**
      * Creates a backup for this project
+     *
+     * @return {String} Timestamp
      */
-    static createBackup() {
-        return HashBrown.Service.DatabaseService.dump(this.id);
+    async createBackup() {
+        return await HashBrown.Service.DatabaseService.dump(this.id);
     }
     
     /**
@@ -476,6 +478,55 @@ class Project extends require('Common/Entity/Project') {
         }
 
         return environments;
+    }
+
+    /**
+     * Performs a series of unit test
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {HashBrown.Entity.Project} project
+     * @param {Function} report
+     */
+    static async test(user, project, report) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(project, 'project', HashBrown.Entity.Project, true);
+        checkParam(report, 'report', Function, true);
+        
+        report(`Get project ${project.getName()}`);
+
+        project = await HashBrown.Entity.Project.get(project.id);
+        
+        report(`Add environment to project ${project.getName()}`);
+        
+        await project.addEnvironment('testenvironment');
+        
+        report(`Remove environment from project ${project.getName()}`);
+        
+        await project.removeEnvironment('testEnvironment');
+        
+        report(`Get all environments from project ${project.getName()}`);
+        
+        await project.getEnvironments();
+        
+        report(`Get all users from project ${project.getName()}`);
+        
+        await project.getUsers();
+        
+        report(`Get backups for project ${project.getName()}`);
+        
+        await project.getBackups();
+
+        report(`Create backup for project ${project.getName()}`); 
+        
+        let timestamp = await project.createBackup();
+
+        report(`Restore backup ${timestamp} on project ${project.getName()}`);
+        
+        await project.restoreBackup(timestamp);
+        
+        report(`Remove backup ${timestamp} from project ${project.getName()}`);
+    
+        await project.removeBackup(timestamp);
     }
 }
 

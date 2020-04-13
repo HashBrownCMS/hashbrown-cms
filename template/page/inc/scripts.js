@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
-<script src="/js/browser-check.js"></script>
+<script src="${model.rootUrl}/js/browser-check.js"></script>
 
 `

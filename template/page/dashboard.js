@@ -87,18 +87,19 @@ module.exports = (_, model) => `
         <script>
             window.HashBrown = {};
             HashBrown.Context = {
+                rootUrl: "${model.rootUrl}",
                 user: ${JSON.stringify(model.user)},
                 view: "dashboard",
                 themes: ${JSON.stringify(model.themes)}
             };
         </script>
 
-        <script src="/js/common.js"></script>
-        <script src="/js/service.js"></script>
-        <script src="/js/entity.js"></script>
-        <script src="/js/utilities.js"></script>
+        <script src="${model.rootUrl}/js/common.js"></script>
+        <script src="${model.rootUrl}/js/service.js"></script>
+        <script src="${model.rootUrl}/js/entity.js"></script>
+        <script src="${model.rootUrl}/js/utilities.js"></script>
        
-        <script src="/js/dashboard.js"></script>
+        <script src="${model.rootUrl}/js/dashboard.js"></script>
     </body>
 </html>
 

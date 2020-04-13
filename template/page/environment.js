@@ -1,15 +1,15 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <!DOCTYPE html>
 <html>
     <head>
-        ${require('./inc/head')(_, view)}
+        ${require('./inc/head')(_, model)}
     </head>
 
     <body class="page page--environment">
-        ${require('./inc/spinner')(_, view)}
+        ${require('./inc/spinner')(_, model)}
         
         <main class="page--environment__spaces">
             <div class="page--environment__space page--environment__space--menu"></div>
@@ -17,25 +17,26 @@ module.exports = (_, view) => `
             <div class="page--environment__space page--environment__space--editor"></div>
         </main>
 
-        ${require('./inc/scripts')(_, view)}
+        ${require('./inc/scripts')(_, model)}
             
         <script>
             window.HashBrown = {};
             HashBrown.Context = {
-                project: ${JSON.stringify(view.currentProject)},
-                environment: '${view.currentEnvironment}',
-                user: ${JSON.stringify(view.user)},
-                themes: ${JSON.stringify(view.themes)}
+                rootUrl: "${model.rootUrl}",
+                project: ${JSON.stringify(model.currentProject)},
+                environment: '${model.currentEnvironment}',
+                user: ${JSON.stringify(model.user)},
+                themes: ${JSON.stringify(model.themes)}
             };
         </script>
 
-        <script src="/js/common.js"></script>
-        <script src="/js/service.js"></script>
-        <script src="/js/entity.js"></script>
-        <script src="/js/utilities.js"></script>
+        <script src="${model.rootUrl}/js/common.js"></script>
+        <script src="${model.rootUrl}/js/service.js"></script>
+        <script src="${model.rootUrl}/js/entity.js"></script>
+        <script src="${model.rootUrl}/js/utilities.js"></script>
         
-        <script src="/js/environment.js"></script>
-        <script src="/js/plugins.js"></script>
+        <script src="${model.rootUrl}/js/environment.js"></script>
+        <script src="${model.rootUrl}/js/plugins.js"></script>
     </body>
 </html>
 

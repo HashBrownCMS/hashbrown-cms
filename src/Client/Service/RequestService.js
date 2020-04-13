@@ -35,6 +35,8 @@ class RequestService {
             'Content-Type': 'application/json; charset=utf-8'
         };
 
+        url = (HashBrown.Context.rootUrl || '') + url;
+        
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open(method.toUpperCase(), url);

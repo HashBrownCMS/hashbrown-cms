@@ -281,15 +281,6 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
-     * Event: Click migrate
-     */
-    onClickMigrate() {
-        let modal = HashBrown.Entity.View.Modal.MigrateResources.new({
-            category: this.category
-        });
-    }
-
-    /**
      * Sorts items based on the given sorting method
      *
      * @param {HashBrown.Entity.View.ListItem.PanelItem} a
@@ -351,7 +342,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         if(!resource.sync || (!resource.sync.hasRemote && !resource.isLocked)) {
             options['Remove'] = () => this.onClickRemove(resource.id);
         }
-
+        
         return options;
     }
 
@@ -401,6 +392,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         for(let key in baseOptions) {
+            if(options[key]) { continue; }
+            
             options[key] = baseOptions[key];
         }
             
@@ -411,9 +404,11 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         for(let key in syncOptions) {
+            if(options[key]) { continue; }
+            
             options[key] = syncOptions[key];
         }
-
+            
         let panelOptions = this.getPanelOptions();
 
         if(Object.keys(panelOptions).length > 0) {
@@ -421,6 +416,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         for(let key in panelOptions) {
+            if(options[key]) { continue; }
+
             options[key] = panelOptions[key];
         }
 
@@ -445,8 +442,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     getPanelOptions() {
         return {
-            'New': () => this.onClickNew(),
-            'Migrate': () => this.onClickMigrate()
+            'New': () => this.onClickNew()
         }
     }
 

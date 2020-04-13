@@ -17,49 +17,16 @@ class ConfigService {
      *
      * @param {String} name
      * @param {Object} config
-     *
-     * @returns {Promise}
      */
-    static set(name, config) {
-        checkParam(name, 'name', String);
-        checkParam(config, 'config', Object);
-
-        return new Promise((resolve, reject) => {
-            let path = Path.join(APP_ROOT, 'config', name + '.cfg');
-
-            FileSystem.writeFile(path, JSON.stringify(config), 'utf8', (err, data) => {
-                if(err) {
-                    reject(err);
-
-                } else {
-                    delete cache[name];
-
-                    resolve();
-
-                }
-            });
-        });
-    }
-    
-    /**
-     * Gets whether a config section exists
-     *
-     * @param {String} name
-     *
-     * @returns {Boolean} Config section exists
-     */
-    static existsSync(name) {
-        checkParam(name, 'name', String);
-       
+    static async set(name, config) {
+        checkParam(name, 'name', String, true);
+        checkParam(config, 'config', Object, true);
+            
         let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
-        try {
-            FileSystem.statSync(path);
+        await HashBrown.Service.FileService.write(path, JSON.stringify(config));
 
-            return true;
-        } catch(e) {
-            return false;
-        }
+        delete cache[name];
     }
     
     /**
@@ -67,22 +34,14 @@ class ConfigService {
      *
      * @param {String} name
      *
-     * @returns {Promise} Config section exists
+     * @return {Boolean} Config section exists
      */
     static exists(name) {
-        checkParam(name, 'name', String);
+        checkParam(name, 'name', String, true);
        
         let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
-        return new Promise((resolve, reject) => {
-            FileSystem.stat(path, (err, stats) => {
-                if(err) {
-                    return resolve(false);
-                }
-
-                resolve(true);
-            });
-        });
+        return HashBrown.Service.FileService.exists(path);
     }
         
     /**
@@ -90,45 +49,29 @@ class ConfigService {
      *
      * @param {String} name
      *
-     * @returns {Promise} Config object
+     * @returns {Object} Config object
      */
-    static get(name) {
-        checkParam(name, 'name', String);
+    static async get(name) {
+        checkParam(name, 'name', String, true);
        
-        if(cache[name]) { 
-            return Promise.resolve(cache[name]);
+        if(cache[name]) { return cache[name]; }
+
+        let path = Path.join(APP_ROOT, 'config', name + '.cfg');
+        let data = await HashBrown.Service.FileService.read(path);
+
+        try {
+            data = JSON.parse(data);
+        
+        } catch(e) {
+            data = null;
+
         }
 
-        return new Promise((resolve, reject) => {
-            let path = Path.join(APP_ROOT, 'config', name + '.cfg');
+        if(!data) { return {}; }
+    
+        cache[name] = data;
 
-            FileSystem.exists(path, (exists) => {
-                if(exists) {
-                    FileSystem.readFile(path, (err, data) => {
-                        if(err) {
-                            reject(err);
-
-                        } else {
-                            try {
-                                let result = JSON.parse(data);
-
-                                cache[name] = result;
-
-                                resolve(result);
-
-                            } catch(e) {
-                                reject(e);
-                            
-                            }
-                        }
-                    });
-            
-                } else {
-                    resolve(null);
-
-                }
-            });
-        });
+        return data;
     }
     
     /**
@@ -140,27 +83,29 @@ class ConfigService {
      * @returns {Object} Config object
      */
     static getSync(name) {
-        checkParam(name, 'name', String);
+        checkParam(name, 'name', String, true);
        
-        if(cache[name]) {
-            return cache[name];
-        }
+        if(cache[name]) { return cache[name]; }
 
         let path = Path.join(APP_ROOT, 'config', name + '.cfg');
 
-        if(!FileSystem.existsSync(path)) { return {}; }
+        if(!HashBrown.Service.FileService.exists(path)) { return {}; }
 
         let data = FileSystem.readFileSync(path);
 
-        if(!data) { return {}; }
-
         try {
-            return JSON.parse(data);
+            data = JSON.parse(data);
 
         } catch(e) {
-            return {};
+            data = null;
 
         }
+        
+        if(!data) { return {}; }
+
+        cache[name] = data;
+
+        return data;
     }
 }
 

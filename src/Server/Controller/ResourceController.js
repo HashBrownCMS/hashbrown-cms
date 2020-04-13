@@ -22,13 +22,6 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 scope: this.category
             }
         };
-        routes['/api/${project}/${environment}/' + this.category + '/migrate'] = {
-            handler: this.migrate,
-            methods: [ 'POST' ],
-            user: {
-                scope: this.category
-            }
-        };
         
         // Regular operations
         routes['/api/${project}/${environment}/' + this.category] = {
@@ -258,25 +251,6 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let allDependencies = await model.getDependencies(params.project, params.environment, ids);
 
         return new HttpResponse(allDependencies);
-    }
-    
-    /**
-     * @example POST /api/${project}/${environment}/${category}/migrate { project: XXX, environment: XXX, resources: [ XXX,XXX ] }
-     */
-    static async migrate(request, params, body, query, user) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
-        
-        if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
-        }
-        
-        for(let id of body.resources) {
-            let resource = await model.get(params.project, params.environment, params.id, query);
-
-            await resource.migrate(body.project, body.environment);
-        }
-
-        return new HttpResponse('OK');
     }
 }
 

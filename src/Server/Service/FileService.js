@@ -19,8 +19,6 @@ class FileService {
      *
      * @param {String} path
      * @param {Number} position
-     *
-     * @return {Promise} Result
      */
     static async makeDirectory(path, position = 0) {
         checkParam(path, 'path', String);
@@ -50,7 +48,7 @@ class FileService {
      *
      * @param {String} path
      *
-     * @return {Promise} Whether or not the file/folder exists
+     * @return {Boolean} Whether or not the file/folder exists
      */
     static exists(path) {
         checkParam(path, 'path', String);
@@ -63,7 +61,7 @@ class FileService {
      *
      * @param {String} path
      *
-     * @return {Promise} Array of file paths
+     * @return {Array} Array of file paths
      */
     static async list(path) {
         checkParam(path, 'path', String);
@@ -244,8 +242,6 @@ class FileService {
      *
      * @param {String} from
      * @param {String} to
-     *
-     * @return {Promise} Result
      */
     static async move(from, to) {
         checkParam(from, 'from', String);
@@ -265,8 +261,6 @@ class FileService {
      *
      * @param {String} from
      * @param {String} to
-     *
-     * @return {Promise} Result
      */
     static async copy(from, to) {
         checkParam(from, 'from', String);

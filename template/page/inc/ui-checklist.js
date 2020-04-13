@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <h1>Login</h1>
 <ul>

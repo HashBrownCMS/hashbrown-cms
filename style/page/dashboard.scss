@@ -11,11 +11,12 @@
         // Actions
         &__actions {
             display: flex;
-            padding: 0.5rem 0;
-            margin-left: auto;
+            position: absolute;
+            right: 0.5rem;
+            top: 0.5rem;
 
             .widget {
-                margin-right: 0.5rem;
+                margin-left: 0.5rem;
             }
         }
             

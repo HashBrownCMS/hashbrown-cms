@@ -98,7 +98,7 @@ global.HttpResponse = class HttpResponse {
 }
 
 async function serve(request, response) {
-    let result = new HttpResponse(`No route matched ${request.url}`, 404);
+    let result = new HttpResponse(`No route matched ${request.method} ${request.url}`, 404);
 
     for(let name in HashBrown.Controller) {
         let controller = HashBrown.Controller[name];

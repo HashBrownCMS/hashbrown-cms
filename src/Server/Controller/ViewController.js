@@ -30,8 +30,12 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 handler: this.readme,
                 user: true
             },
-            '/test': {
+            '/testing': {
                 redirect: '/test/frontend',
+                user: true
+            },
+            '/testing/${tab}': {
+                handler: this.testing,
                 user: true
             },
             '/demo': {
@@ -106,6 +110,14 @@ class ViewController extends HashBrown.Controller.ControllerBase {
 
         let templatePath = Path.join(APP_ROOT, 'template', 'page', template);
         
+        model = model || {};
+
+        model.rootUrl = HashBrown.Service.ConfigService.getSync('system').rootUrl || '';
+
+        if(model.rootUrl) {
+            model.rootUrl = '/' + model.rootUrl.split('/').filter(Boolean).join('/');
+        }
+
         let view = HashBrown.Entity.View.ViewBase.new({
             template: require(templatePath),
             model: model
@@ -200,10 +212,10 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * Test
+     * Testing
      */
-    static async test(request, params, body, query, user) {
-        return this.render('test', {
+    static async testing(request, params, body, query, user) {
+        return this.render('testing', {
             user: user,
             tab: params.tab
         });

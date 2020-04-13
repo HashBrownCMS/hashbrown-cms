@@ -14,7 +14,7 @@ _.div({class: 'modal in'},
             
             ] : [
                 _.field({label: 'Items to migrate'},
-                    _.popup({options: state.resourceOptions, multiple: true, onchange: _.onChangeResources})
+                    _.popup({value: state.resources, options: state.resourceOptions, multiple: true, onchange: _.onChangeResources})
                 ),
                 state.dependencies && Object.keys(state.dependencies).length > 0 ? [
                     _.field({label: 'Dependencies'},

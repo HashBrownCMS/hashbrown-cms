@@ -245,6 +245,40 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         return dependencies;
     }
+
+    /**
+     * Performs a series of unit test
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {HashBrown.Entity.Project} project
+     * @param {Function} report
+     */
+    static async test(user, project, report) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(project, 'project', HashBrown.Entity.Project, true);
+        checkParam(report, 'report', Function, true);
+
+        report('Create schema');
+        
+        let schema = await HashBrown.Entity.Resource.ContentSchema.create(user, project.id, 'live', { name: 'Test schema', parentId: 'contentBase' });
+        
+        report(`Get schema ${schema.getName()}`);
+        
+        schema = await HashBrown.Entity.Resource.SchemaBase.get(project.id, 'live', schema.id, { withParentFields: true });
+
+        report(`Update schema ${schema.getName()}`);
+       
+        schema.name += ' (updated)';
+        await schema.save(user);
+        
+        report('Get all schemas');
+        
+        await HashBrown.Entity.Resource.ContentSchema.list(project.id, 'live');
+
+        report(`Remove schema ${schema.getName()}`);
+        
+        await schema.remove(user);
+    }
 }
 
 module.exports = SchemaBase;

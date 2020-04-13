@@ -1,17 +1,17 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <!DOCTYPE html>
 <html>
     <head>
-        ${require('./inc/head')(_, view)}
+        ${require('./inc/head')(_, model)}
     </head>
 
     <body class="page page--login logo centered">
-        ${view.message ? `
+        ${model.message ? `
             <div class="widget widget--message fixed fixed--top warn">
-                ${view.message}
+                ${model.message}
             </div>
         ` : ''}
         
@@ -21,11 +21,18 @@ module.exports = (_, view) => `
             <input class="widget widget--button expanded" type="submit" value="Login">
         </form>
         
-        ${require('./inc/scripts')(_, view)}
+        ${require('./inc/scripts')(_, model)}
 
-        <script src="/js/common.js"></script>
-        <script src="/js/service.js"></script>
-        <script src="/js/login.js"></script>
+        <script>
+            window.HashBrown = {};
+            HashBrown.Context = {
+                rootUrl: "${model.rootUrl}"
+            };
+        </script>
+        
+        <script src="${model.rootUrl}/js/common.js"></script>
+        <script src="${model.rootUrl}/js/service.js"></script>
+        <script src="${model.rootUrl}/js/login.js"></script>
     </body>
 </html> 
 

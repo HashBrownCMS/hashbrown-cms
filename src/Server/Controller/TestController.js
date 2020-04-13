@@ -13,6 +13,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         return {
             '/api/test': {
                 handler: this.test,
+                methods: [ 'POST' ],
                 user: {
                     isAdmin: true,
                 }
@@ -24,134 +25,94 @@ class TestController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/test
      */
     static async test(request, params, body, query, user) {
-        let report = '';
+        let report = [];
 
-        // Create a test project first
-        report += 'Creating test project...\n';
+        // Create a test project
+        let project = await HashBrown.Entity.Project.create('test ' + new Date().toString());
         
-        let project = await HashBrown.Entity.Project.create(user, 'test ' + new Date().toString());
+        report.push('✔ Create test project');
 
-        // Test content
-        report += '\n[Content]\n\n';
-        
-        report += 'Create content...\n';
-        
-        let content = await HashBrown.Entity.Resource.Content.create(user, { schemaId: 'contentBase', title: 'Test content' });
+        // Find classes with static test methods
+        let testableClasses = [];
+
+        this.getTestableClasses(HashBrown, testableClasses);
+
+        // Run test methods
+        let errors = 0;
+
+        for(let testableClass of testableClasses) {
+            if(
+                testableClass === this ||
+                typeof testableClass.test !== 'function'
+            ) { continue; }
             
-        report += `Get content ${content.getName()}...\n`;
-        
-        content = await HashBrown.Entity.Resource.Content.get(project.id, 'live', content.id);
+            report.push('');
+            report.push('');
             
-        report += `Update content ${content.getName()}...\n`;
-       
-        content.title += ' (updated)';
-        await content.save(user);
+            report.push('[' + testableClass.name + ']');
+
+            report.push('');
             
-        report += 'Get all content...\n';
-        
-        await HashBrown.Entity.Resource.Content.list(project.id, 'live');
-        
-        report += `Remove content ${content.getName()}...\n`;
-        
-        await content.remove(user);
-
-        // Test forms
-        report += '\n[Forms]\n\n';
-        
-        report += 'Create form...\n';
-
-        let form = await HashBrown.Entity.Resource.Form.create(user, { title: 'Test form' });
-
-        report += `Get form ${form.getName()}\n`;
-        
-        form = await HashBrown.Entity.Resource.Form.get(project.id, 'live', form.id);
+            try {
+                await testableClass.test(user, project, (line) => {
+                    report.push('✔ ' + line);
+                });
             
-        report += `Update form ${form.getName()}...\n`;
-        
-        form.title += ' (updated)';
-        await form.save(user);
-            
-        report += `Add entry to form ${form.getName()}...\n`;
-    
-        await form.addEntry({});
-        
-        report += 'Get all forms...\n';
-        
-        await HashBrown.Entity.Resource.Form.list(project.id, 'live');
-            
-        report += `Remove form ${form.getName()}...\n`;
-        
-        await form.remove(user);
+            } catch(e) {
+                report[report.length - 1] = '✖' + report[report.length - 1].substring(1);
 
-        // Test schemas
-        report += '\n[Schemas]\n\n';
-        
-        report += 'Create schema...\n';
-        
-        let schema = await HashBrown.Entity.Resource.ContentSchema.create(project.id, 'live', { name: 'Test schema' });
-        
-        report += `Get schema ${schema.getName()}...\n`;
-        
-        schema = await HashBrown.Entity.Resource.get(project.id, 'live', schema.id, { withParentFields: true });
+                report.push('    ' + (e.stack || e.message));
+                errors++;
 
-        report += `Update schema ${schema.getName()}...\n`;
-       
-        schema.name += ' (updated)';
-        await schema.save(user);
+            }
+        }
         
-        report += 'Get all schemas...\n';
+        report.push('');
+        report.push('');
         
-        await HashBrown.Entity.Resource.ContentSchema.list(project.id, 'live');
+        try {
+            await project.remove();
+            report.push('✔ Remove test project');
 
-        report += `Remove schema ${schema.getName()}...\n`;
+        } catch(e) {
+            report.push('✖ Remove test project');
+            report.push('    ' + (e.stack || e.message));
         
-        await schema.remove(user);
+        }
         
-        report += '\n[Projects]\n\n';
+        report.push('');
+        report.push('');
+        report.push('Test completed');
 
-        report += `Get project ${project.getName()}...\n`;
+        if(errors > 0) {
+            report[report.length - 1] += ` with ${errors} error${errors > 1 ? 's' : ''}`;
+        }
 
-        project = await HashBrown.Entity.Project.get(project.id);
-        
-        report += `Add environment to project ${project.getName()}...\n`;
-        
-        await project.addEnvironment('testenvironment');
-        
-        report += `Remove environment from project ${project.getName()}...\n`;
-        
-        await project.removeEnvironment('testEnvironment');
-        
-        report += `Get all environments from project ${project.getName()}...\n`;
-        
-        await project.getEnvironments();
-        
-        report += `Get all users from project ${project.getName()}...\n`;
-        
-        await project.getUsers();
-        
-        report += `Get backups for project ${project.getName()}...\n`;
-        
-        await project.getBackups();
+        return new HttpResponse(report.join('\n'));
+    }
 
-        report += `Create backup for project ${project.getName()}...\n`; 
-        
-        let backup = await project.createBackup();
+    /**
+     * Gets testable classes in namespace
+     *
+     * @param {Object} namespace
+     * @param {Array} Classes
+     */
+    static getTestableClasses(namespace, classes) {
+        checkParam(namespace, 'namespace', Object);
 
-        report += `Restore backup ${timestamp} on project ${project.getName()}...\n`;
-        
-        await project.restoreBackup(backup);
-        
-        report += `Remove backup ${timestamp} from project ${project.getName()}...\n`;
-    
-        await project.removeBackup(timestamp);
-        
-        report += `Remove project ${project.getName()}...\n`;
-        
-        await project.remove();
-        
-        report += '\nDone!';
+        for(let subNamespaceName in namespace) {
+            let subNamespace = namespace[subNamespaceName];
 
-        return HttpResponse(report);
+            if(typeof subNamespace === 'function') {
+                if(typeof subNamespace.test === 'function') {
+                    classes.push(subNamespace);
+                }
+
+            } else if(typeof subNamespace === 'object') {
+                this.getTestableClasses(subNamespace, classes);
+
+            }
+        }
     }
 }
 

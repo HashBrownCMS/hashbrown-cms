@@ -5,7 +5,7 @@ function initServiceTest() {
     let messages = document.querySelector('.page--dashboard__backend-test__messages');
     let btnStart = document.querySelector('.page--dashboard__backend-test__run');
 
-    let url = '/api' + location.pathname.replace('/backend', '');
+    let url = '/api/test';
 
     btnStart.addEventListener('click', async () => {
         let result = '';

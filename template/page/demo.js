@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <!DOCTYPE html>
 <html>
     <head>
-        ${require('./inc/head')(_, view)}
+        ${require('./inc/head')(_, model)}
     </head>
 
     <body class="page.page--environment">
@@ -15,7 +15,7 @@ module.exports = (_, view) => `
             <div class="page--environment__space page--environment__space--editor"></div>
         </main>
         
-        ${require('./inc/scripts')(_, view)}
+        ${require('./inc/scripts')(_, model)}
             
         <script>
             window.HashBrown = {};

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (_, view) => `
+module.exports = (_, model) => `
 
 <div class="page__spinner">
     <div class="page__spinner__logo">

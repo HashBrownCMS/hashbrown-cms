@@ -404,6 +404,40 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         return dependencies;
     }
+
+    /**
+     * Performs a series of unit test
+     *
+     * @param {HashBrown.Entity.User} user
+     * @param {HashBrown.Entity.Project} project
+     * @param {Function} report
+     */
+    static async test(user, project, report) {
+        checkParam(user, 'user', HashBrown.Entity.User, true);
+        checkParam(project, 'project', HashBrown.Entity.Project, true);
+        checkParam(report, 'report', Function, true);
+        
+        report('Create content');
+        
+        let content = await HashBrown.Entity.Resource.Content.create(user, project.id, 'live', { schemaId: 'contentBase', title: 'Test content' });
+            
+        report(`Get content ${content.getName()}`);
+        
+        content = await HashBrown.Entity.Resource.Content.get(project.id, 'live', content.id);
+            
+        report(`Update content ${content.getName()}`);
+       
+        content.properties.title += ' (updated)';
+        await content.save(user);
+            
+        report('Get all content');
+        
+        await HashBrown.Entity.Resource.Content.list(project.id, 'live');
+        
+        report(`Remove content ${content.getName()}`);
+        
+        await content.remove(user);
+    }
 }
 
 module.exports = Content;
