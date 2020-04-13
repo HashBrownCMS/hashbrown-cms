@@ -11,9 +11,49 @@ class MigrationService {
         let projectIds = await HashBrown.Service.DatabaseService.listDatabases();
 
         for(let projectId of projectIds) {
+            let needsMigration = await this.check(projectId);
+
+            if(!needsMigration) { continue; }
+
+            debug.log(`Migrating project ${projectId}...`, this);
+
+            debug.log('...creating backup...', this);
+
+            await HashBrown.Service.DatabaseService.dump(projectId);
+
+            debug.log('...migrating settings...', this);
+            
             await this.migrateSettings(projectId);
+            
+            debug.log('...migrating publications...', this);
+            
             await this.migratePublications(projectId);
+            
+            debug.log('...cleaning up...', this);
+            
+            await this.cleanup(projectId);
+
+            debug.log('...done!', this);
         }
+    }
+    
+    /**
+     * Checks is a migration is needed
+     *
+     * @param {String} projectId
+     */
+    static async check(projectId) {
+        checkParam(projectId, 'projectId', String, true);
+
+        let collections = await HashBrown.Service.DatabaseService.listCollections(projectId);
+        
+        for(let collection of collections) {
+            if(!collection || !collection.name || collection.name.indexOf('.connections') < 0) { continue; }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -26,21 +66,21 @@ class MigrationService {
 
         let collections = await HashBrown.Service.DatabaseService.listCollections(projectId);
 
+        // Convert connections to publications
         for(let collection of collections) {
             if(!collection || !collection.name || collection.name.indexOf('.connections') < 0) { continue; }
 
             let connections = await HashBrown.Service.DatabaseService.find(
                 projectId,
-                collection.name,
-                {
-                    isMigrated: { $exists: false }
-                }
+                collection.name
             );
                 
             let newCollection = collection.name.replace('.connections', '.publications');
 
             let publications = {};
 
+            // Accumulate connection properties into publications
+            // NOTE: This way, we can accommodate duplicate entries, should they exist
             for(let connection of connections) {
                 if(!publications[connection.id]) {
                     publications[connection.id] = {};
@@ -92,9 +132,38 @@ class MigrationService {
                 }
             }
 
+            // Create the publications
             for(let publication of Object.values(publications)) {
+                // Find content with publishing settings referencing the connection this publication is based on
+                let contents = await HashBrown.Service.DatabaseService.find(
+                    projectId,
+                    collection.name.replace('connections', 'content'),
+                    {
+                        'settings.publishing.connectionId': publication.id
+                    }
+                );
+
+                // Add the content to the new publication's root contents
+                publication.rootContents = [];
+
+                for(let content of contents) {
+                    if(publication.rootContents.indexOf(content.id) > -1) { continue; }
+
+                    publication.rootContents.push(content.id);
+                }
+
+                if(publication.rootContents.length > 0) {
+                    publication.includeRoot = true;
+                }
+
+                // Set dates
+                if(!publication.createdOn) {
+                    publication.createdOn = new Date();
+                }
+
                 publication.updatedOn = new Date();
 
+                // Insert new publication
                 await HashBrown.Service.DatabaseService.updateOne(
                     projectId,
                     newCollection,
@@ -104,17 +173,6 @@ class MigrationService {
                     publication,
                     {
                         upsert: true
-                    }
-                );
-
-                await HashBrown.Service.DatabaseService.mergeOne(
-                    projectId,
-                    collection.name,
-                    {
-                        id: publication.id
-                    },
-                    {
-                        isMigrated: true
                     }
                 );
             }
@@ -204,6 +262,26 @@ class MigrationService {
                 },
                 settings
             );
+        }
+    }
+
+    /**
+     * Cleans up
+     *
+     * @param {String} projectId
+     */
+    static async cleanup(projectId) {
+        checkParam(projectId, 'projectId', String, true);
+
+        let collections = await HashBrown.Service.DatabaseService.listCollections(projectId);
+        
+        for(let collection of collections) {
+            if(!collection || !collection.name) { continue; }
+
+            // Remove "connections" collection
+            if(collection.name.indexOf('.connections') > -1) {
+                await HashBrown.Service.DatabaseService.dropCollection(projectId, collection.name);
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             _.field({label: 'Name'},
                 _.text({disabled: model.isLocked, value: model.name, onchange: _.onChangeName})
             ),
-            _.field({label: 'GET URL'},
+            _.field({label: 'GET URL', description: 'Where to query this publication from'},
                 _.div({class: 'widget-group'},
                     _.label({class: 'widget widget--label'}, state.getUrl),
                     _.button({title: 'Copy URL', class: 'widget widget--button small fa fa-copy', onclick: _.onClickCopyGetUrl}),
@@ -38,15 +38,15 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             _.field({label: 'Deployer', description: 'Where to deploy published content'},
                 state.deployerEditor
             ),
-            _.field({label: 'Root content', description: 'The root content item to expose'},
-                _.popup({disabled: model.isLocked, clearable: true, value: model.rootContent, options: state.contentOptions, onchange: _.onChangeRootContent})
+            _.field({label: 'Root contents', description: 'Limit the exposed content'},
+                _.popup({disabled: model.isLocked, multiple: true, clearable: true, value: model.rootContents, options: state.contentOptions, onchange: _.onChangeRootContents})
             ),
-            model.rootContent ? [
-                _.field({label: 'Include root', description: 'Include the root item in this publication'},
+            model.rootContents && model.rootContents.length > 0 ? [
+                _.field({label: 'Include root', description: 'Include the root items in this publication'},
                     _.checkbox({disabled: model.isLocked, value: model.includeRoot, onchange: _.onChangeIncludeRoot})
                 )
             ] : null,
-            _.field({label: 'Allowed schemas'},
+            _.field({label: 'Allowed schemas', description: 'Limit the the type of exposed content'},
                 _.popup({disabled: model.isLocked, multiple: true, value: model.allowedSchemas, options: state.schemaOptions, onchange: _.onChangeAllowedSchemas})
             )
         ]

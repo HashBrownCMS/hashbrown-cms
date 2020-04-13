@@ -323,7 +323,13 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/{project}/backups/${timestamp}/restore
      */
     static async restoreBackup(request, params, body, query, user) {
-        await HashBrown.Service.DatabaseService.restore(params.project, params.timestamp);
+        let project = await HashBrown.Entity.Project.get(params.project);
+
+        if(!project) {
+            return new HttpResponse('Not found', 404);
+        }
+        
+        await project.restoreBackup(params.timestamp);
 
         return new HttpResponse('OK');
     }

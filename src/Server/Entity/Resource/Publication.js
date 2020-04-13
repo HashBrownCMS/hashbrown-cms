@@ -196,10 +196,19 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         for(let item of items) {
             if(!item.isPublished) { continue; }
 
-            if(this.allowedSchemas.length > 0 && this.allowedSchemas.indexOf(item.schemaId) < 0) { continue; }
+            if(this.allowedSchemas && this.allowedSchemas.length > 0 && this.allowedSchemas.indexOf(item.schemaId) < 0) { continue; }
             
-            if(this.rootContent && (!this.includeRoot || this.rootContent !== item.id)) {
-                let isDescendant = await item.isDescendantOf(this.rootContent);
+            if(this.rootContents && this.rootContents.length > 0 && (!this.includeRoot || this.rootContents.indexOf(item.id) < 0)) {
+                let isDescendant = false;
+                
+                for(let rootContent of this.rootContents) {
+                    let isThisDescendant = await item.isDescendantOf(rootContent);
+
+                    if(!isThisDescendant) { continue; }
+
+                    isDescendant = true;
+                    break;
+                }
 
                 if(!isDescendant) { continue; }
             }

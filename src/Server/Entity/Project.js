@@ -323,6 +323,8 @@ class Project extends require('Common/Entity/Project') {
         checkParam(timestamp, 'timestamp', String, true);
 
         await HashBrown.Service.DatabaseService.restore(this.id, timestamp);
+
+        await HashBrown.Service.MigrationService.migrate();
     }
     
     /**

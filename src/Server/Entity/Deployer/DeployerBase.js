@@ -58,9 +58,58 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      * Structure
      */
     structure() {
-        this.def(String, 'publicUrl');
         this.def(String, 'path');
         this.def(Object, 'context');
+        this.def(String, 'publicUrl');
+    }
+
+    /**
+     * Gets the public URL of a filename
+     *
+     * @param {String} filename
+     *
+     * @return {String} Public URL
+     */
+    getPublicUrl(filename) {
+        checkParam(filename, 'filename', String);
+
+        if(!filename) { return ''; }
+
+        filename = filename.trim();
+
+        // If the filename contains a protocol or double slashes, return it as is
+        if(filename.indexOf('http') === 0 || filename.indexOf('//') === 0) { return filename; }
+       
+        // If the filename doesn't contain the path of this deployer, add it
+        if(filename.indexOf(this.path) < 0) {
+            filename = Path.join(this.path, filename);
+        
+        // If it does, make sure it's not a full system path
+        } else {
+            filename = Path.join(this.path, filename.split(this.path).pop());
+
+        }
+
+        // Construct relative path
+        filename = '/' + filename.split(/[\/\\]/).filter(Boolean).join('/');
+        
+        if(!this.publicUrl) { return filename; }
+
+        try {
+            let url = new URL(this.publicUrl);
+
+            if(url.pathname && url.pathname !== '/') { 
+                filename = Path.join(url.pathname, filename);
+            }
+
+            filename = url.protocol + '//' + url.host + filename;
+        
+        } catch(e) {
+            throw new Error(`Could not parse the "publicUrl" parameter: ${e.message}`);
+        
+        }
+        
+        return filename;
     }
 
     /**

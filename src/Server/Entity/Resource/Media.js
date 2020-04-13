@@ -100,11 +100,8 @@ class Media extends require('Common/Entity/Resource/Media') {
             if(Path.basename(file) === 'thumbnail.jpg') { continue; }
 
             // Ensure that this URL can be reached from a web browser
-            if(ensureWebUrl && file.indexOf('://') < 0) {
-                file = Path.join(deployer.publicUrl, deployer.path, this.id, Path.basename(file));
-
-                // If the path module removed doubles slashes for protocols, add them back
-                file = file.replace(/:\/([^\/])/, '://$1');
+            if(ensureWebUrl) {
+                file = deployer.getPublicUrl(file);
             }
 
             return file;

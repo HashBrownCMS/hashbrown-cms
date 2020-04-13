@@ -98,10 +98,10 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
     }
     
     /**
-     * Event: Change root content
+     * Event: Change root contents
      */
-    onChangeRootContent(newValue) {
-        this.model.rootContent = newValue;
+    onChangeRootContents(newValue) {
+        this.model.rootContents = newValue;
 
         this.onChange();
 

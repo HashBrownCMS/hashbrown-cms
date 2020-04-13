@@ -25,7 +25,7 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
 
         this.def(String, 'rootPath');
     }
-
+    
     /**
      * Tests this deployer
      *
