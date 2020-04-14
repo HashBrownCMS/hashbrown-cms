@@ -37,7 +37,7 @@ async function initProjects() {
  * Initialises the user views
  */
 async function initUsers() {
-    if(!HashBrown.Context.user.isAdmin) { return; }
+    if(!HashBrown.Client.context.user.isAdmin) { return; }
 
     // Add user
     let userAddButton = document.querySelector('.page--dashboard__users__add');
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Error handling
     window.onerror = (e) => { UI.error(e) };
 
-    // Init current user
-    HashBrown.Context.user = HashBrown.Entity.User.new(HashBrown.Context.user);
+    // Init context
+    HashBrown.Client.context = HashBrown.Entity.Context.new(HashBrown.Client.context);
 
     // Run init functions
     initProjects();

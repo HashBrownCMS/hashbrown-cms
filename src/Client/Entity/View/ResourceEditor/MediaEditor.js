@@ -14,7 +14,7 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
         
         this.template = require('template/resourceEditor/mediaEditor.js');    
 
-        this.state.thumbnailSource = '/media/' + HashBrown.Context.project.id + '/' + HashBrown.Context.environment + '/' + this.state.id + '/?thumbnail';
+        this.state.thumbnailSource = '/media/' + this.context.project.id + '/' + this.context.environment + '/' + this.state.id + '/?thumbnail';
     }
     
     /**
@@ -27,7 +27,7 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
             
         if(this.state.tab === 'settings') {
             this.state.settings = {
-                mediaDeployer: await HashBrown.Context.project.getEnvironmentSettings(HashBrown.Context.environment, 'mediaDeployer') || {}
+                mediaDeployer: await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaDeployer') || {}
             };
         }
     }

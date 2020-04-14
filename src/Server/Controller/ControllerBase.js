@@ -64,7 +64,7 @@ class ControllerBase {
      *
      * @param {HTTP.IncomingMessage} request
      *
-     * @return {HttpResponse} Response
+     * @return {HashBrown.Http.Response} Response
      */
     static async getResponse(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
@@ -92,7 +92,7 @@ class ControllerBase {
 
         // ETag was matched, return 304
         if(request.method === 'GET' && (eTagMatch || mTimeMatch)) {
-            return new HttpResponse('Not modified', 304);
+            return new HashBrown.Http.Response('Not modified', 304);
         }
 
         // Generate response
@@ -244,52 +244,54 @@ class ControllerBase {
         let route = this.getRoute(request);
 
         if(!route) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
        
         if(typeof route.redirect === 'string') {
-            return new HttpResponse(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
+            return new HashBrown.Http.Response(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
         }
 
         if(typeof route.handler !== 'function') {
-            return new HttpResponse(`Handler for route ${requestPath} is not a function`, 500);
+            return new HashBrown.Http.Response(`Handler for route ${requestPath} is not a function`, 500);
         }
+        
+        // Initialise context
+        let context = new HashBrown.Entity.Context();
 
         // Get request parameters
         let requestParameters = this.getRequestParameters(requestPath, route.pattern);
 
-        // Authorise/authenticate user
-        let user = null;
-
-        // ^ Authenticated user
+        // Authenticated user
         if(route.user === true) {
-            user = await this.authorize(request, requestParameters.project);
+            context.user = await this.authorize(request, requestParameters.project);
         
-        // ^ Permissions specified
+        // Permissions specified
         } else if(typeof route.user === 'object') {
-            user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
+            context.user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
         
-        // ^ Anonymous
+        // Anonymous
         } else {
-            user = await this.authenticate(request, true);
+            context.user = await this.authenticate(request, true);
 
         }
 
         // Validate project
         if(requestParameters.project) {
-            let project = await HashBrown.Entity.Project.get(requestParameters.project);
+            context.project = await HashBrown.Entity.Project.get(requestParameters.project);
 
-            if(!project) {
-                throw new HttpError(`Project "${requestParameters.project}" could not be found`, 404);
+            if(!context.project) {
+                throw new HashBrown.Http.Exception(`Project "${requestParameters.project}" could not be found`, 404);
             }
 
             // Validate environment
             if(requestParameters.environment) {
-                let environmentExists = await project.hasEnvironment(requestParameters.environment);
+                let environmentExists = await context.project.hasEnvironment(requestParameters.environment);
 
                 if(!environmentExists) {
-                    throw new HttpError(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
+                    throw new HashBrown.Http.Exception(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
                 }
+
+                context.environment = requestParameters.environment;
             }
         }
 
@@ -297,10 +299,10 @@ class ControllerBase {
         try {
             let requestBody = await this.getRequestBody(request);
             let requestQuery = this.getRequestQuery(request);
-            let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, user);
+            let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, context);
 
-            if(response instanceof HttpResponse === false) {
-                throw new HttpError('Response was not of type HttpResponse', 500);
+            if(response instanceof HashBrown.Http.Response === false) {
+                throw new HashBrown.Http.Exception('Response was not of type HashBrown.Http.Response', 500);
             }
 
             return response;
@@ -316,12 +318,12 @@ class ControllerBase {
      *
      * @param {Error} error
      *
-     * @return {HttpResponse} Response
+     * @return {HashBrown.Http.Response} Response
      */
     static error(error) {
         checkParam(error, 'error', Error, true);
         
-        return new HttpResponse(error.stack || error.message, error.code || 500, { 'Content-Type': 'text/plain' });
+        return new HashBrown.Http.Response(error.stack || error.message, error.code || 500, { 'Content-Type': 'text/plain' });
     }
 
     /**
@@ -364,7 +366,7 @@ class ControllerBase {
 
                 if(body.length > MAX_UPLOAD_SIZE) {
                     request.connection.destroy();
-                    reject(new HttpError('Body exceeded maximum capacity', 413));
+                    reject(new HashBrown.Http.Exception('Body exceeded maximum capacity', 413));
                 }
             });
 
@@ -390,7 +392,7 @@ class ControllerBase {
 
         }
 
-        throw new HttpError(`Content type ${contentType} is unsupported`, 415);
+        throw new HashBrown.Http.Exception(`Content type ${contentType} is unsupported`, 415);
     }
 
     /**
@@ -436,14 +438,14 @@ class ControllerBase {
 
         // No token was provided
         if(!token && !ignoreErrors) {
-            throw new HttpError('Please log in to continue', 401);
+            throw new HashBrown.Http.Exception('Please log in to continue', 401);
         }
    
         let user = await HashBrown.Entity.User.getByToken(token, { withPassword: true, withTokens: true });
         
         // No user was found
         if(!user && !ignoreErrors) {
-            throw new HttpError('Your session has expired, please log in again', 401);
+            throw new HashBrown.Http.Exception('Your session has expired, please log in again', 401);
         }
             
         return user;
@@ -467,17 +469,17 @@ class ControllerBase {
 
         // Admin is required, and user isn't admin
         if(isAdmin && !user.isAdmin) {
-            throw new HttpError('You need to be admin to do that', 403);
+            throw new HashBrown.Http.Exception('You need to be admin to do that', 403);
         }
         
         // A project is defined, and the user doesn't have it
         if(project && !user.hasScope(project)) {
-            throw new HttpError('You do not have permission to use this project', 403);
+            throw new HashBrown.Http.Exception('You do not have permission to use this project', 403);
         }
 
         // A scope is defined, and the user doesn't have it
         if(scope && !user.hasScope(project, scope)) {
-            throw new HttpError(`You do not have permission to use the "${scope}" scope in this project`, 403);
+            throw new HashBrown.Http.Exception(`You do not have permission to use the "${scope}" scope in this project`, 403);
         }
 
         return user;

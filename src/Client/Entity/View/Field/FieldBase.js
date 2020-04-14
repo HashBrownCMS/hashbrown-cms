@@ -113,11 +113,11 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
                 let rawValue = this.model.value;
 
                 this.model.value = {};
-                this.model.value[HashBrown.Context.language] = rawValue;
+                this.model.value[HashBrown.Client.language] = rawValue;
                 this.model.value['_multilingual'] = true;
             }
 
-            this.state.value = this.model.value[HashBrown.Context.language];
+            this.state.value = this.model.value[HashBrown.Client.language];
 
         } else {
             this.state.value = this.model.value;
@@ -221,7 +221,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
                     this.model.value = {};
                 }
 
-                this.model.value[HashBrown.Context.language] = newValue;
+                this.model.value[HashBrown.Client.language] = newValue;
                 this.model.value['_multilingual'] = true;
 
             } else {

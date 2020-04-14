@@ -21,7 +21,7 @@ class ProcessorController extends HashBrown.Controller.ControllerBase {
     /**
      * @example GET /api/processors
      */
-    static async processors(request, params, body, query, user) {
+    static async processors(request, params, body, query, context) {
         let processors = [];
 
         for(let name in HashBrown.Entity.Processor) {
@@ -32,7 +32,7 @@ class ProcessorController extends HashBrown.Controller.ControllerBase {
             processors.push(processor.alias);
         }
 
-        return new HttpResponse(processors);
+        return new HashBrown.Http.Response(processors);
     }
 }
 

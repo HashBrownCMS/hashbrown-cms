@@ -84,8 +84,8 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
                 return '(array)';
             }
             
-            if(label[HashBrown.Context.language]) {
-                return label[HashBrown.Context.language];
+            if(label[HashBrown.Client.language]) {
+                return label[HashBrown.Client.language];
             }
 
             if(Object.keys(label).length > 0) {

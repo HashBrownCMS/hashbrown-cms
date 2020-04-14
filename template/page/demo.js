@@ -19,18 +19,19 @@ module.exports = (_, model) => `
             
         <script>
             window.HashBrown = {};
-            HashBrown.Context = {
-                project: {
-                    id: 'demo',
-                    settings: {
-                        name:'Demo',
-                        languages: ['en'],
-                        sync: {}
-                    }
+            HashBrown.Client = {
+                context: {
+                    project: {
+                        id: 'demo',
+                        settings: {
+                            name:'Demo',
+                            languages: ['en'],
+                            sync: {}
+                        }
+                    },
+                    environment: 'live',
+                    user: {id:'demouser',isAdmin:true,username:'demouser',fullName:'Demo user',scopes:{}}
                 },
-                environment: 'live',
-                user: {id:'demouser',isAdmin:true,username:'demouser',fullName:'Demo user',scopes:{}},
-                isMediaPicker: location.href.indexOf('?isMediaPicker=true') > -1,
                 isDemo: true
             };
         </script>

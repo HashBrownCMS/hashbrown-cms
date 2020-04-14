@@ -36,7 +36,7 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
                 this.setErrorState(new Error('Not found'));
                 
             } else {
-                this.state.source = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${media.id}`;
+                this.state.source = `/media/${this.context.project.id}/${this.context.environment}/${media.id}`;
                 
                 let params = new URLSearchParams();
 

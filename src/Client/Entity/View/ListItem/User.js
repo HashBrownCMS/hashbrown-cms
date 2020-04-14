@@ -35,7 +35,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click edit button
      */
     onClickEdit() {
-        if(!HashBrown.Context.user.isAdmin && this.model.id !== HashBrown.Context.user.id) { return }
+        if(!this.context.user.isAdmin && this.model.id !== this.context.user.id) { return }
         
         HashBrown.Entity.View.Modal.UserEditor.new({
             modelId: this.model.id
@@ -47,7 +47,7 @@ class User extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click delete user
      */
     onClickDelete() {
-        if(this.model.id === HashBrown.Context.user.id) { return; }
+        if(this.model.id === this.context.user.id) { return; }
 
         HashBrown.Entity.View.Modal.ModalBase.new({
             model: {

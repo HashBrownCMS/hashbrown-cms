@@ -12,15 +12,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('error', (e) => { UI.error(e); });
    
     // Set context variables
-    HashBrown.Context.project = HashBrown.Entity.Project.new(HashBrown.Context.project);
-    HashBrown.Context.user = HashBrown.Entity.User.new(HashBrown.Context.user);
+    HashBrown.Client.context = new HashBrown.Entity.Context(HashBrown.Client.context);
+    HashBrown.Client.language = localStorage.getItem('language');
 
-    HashBrown.Context.language = localStorage.getItem('language');
+    let languages = HashBrown.Client.context.project.settings.languages;
 
-    let languages = HashBrown.Context.project.settings.languages;
-
-    if(languages.indexOf(HashBrown.Context.language) < 0) {
-        HashBrown.Context.language = languages[0];
+    if(languages.indexOf(HashBrown.Client.language) < 0) {
+        HashBrown.Client.language = languages[0];
     }
 
     // Init router

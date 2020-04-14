@@ -38,7 +38,7 @@ class User extends require('Common/Entity/User') {
      * @return {Boolean} Is current
      */
     get isCurrent() {
-        return this.id === HashBrown.Context.user.id;
+        return this.id === HashBrown.Client.context.user.id;
     }
 
     /**

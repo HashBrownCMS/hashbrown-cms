@@ -13,6 +13,22 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
     }
   
     get alias() { return this.constructor.alias; }
+    
+    /**
+     * Constructor
+     *
+     * @param {Object} params
+     */
+    constructor(params) {
+        params = params || {};
+        
+        checkParam(params.context, 'context', HashBrown.Entity.Context, true);
+        checkParam(params.context.project, 'context.project', HashBrown.Entity.Project, true);
+        checkParam(params.context.environment, 'context.environment', String, true);
+        checkParam(params.context.user, 'context.user', HashBrown.Entity.User, true);
+
+        super(params);
+    }
 
     /**
      * Structure
@@ -20,7 +36,7 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
     structure() {
         super.structure();
 
-        this.def(Object, 'context');
+        this.def(HashBrown.Entity.Context, 'context');
     }
     
     /**
@@ -32,22 +48,6 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
         return this.title;
     }
 
-    /**
-     * Adopts values into this entity
-     *
-     * @param {Object} params
-     */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
-        checkParam(params.context, 'params.context', Object, true);
-        checkParam(params.context.project, 'params.context.project', String, true);
-        checkParam(params.context.environment, 'params.context.environment', String, true);
-
-        super.adopt(params);
-
-        Object.seal(this.context);
-    }
-    
     /**
      * Gets a copy of every field in this object as a mutable object
      *

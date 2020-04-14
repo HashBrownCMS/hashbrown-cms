@@ -24,11 +24,11 @@ class TestController extends HashBrown.Controller.ControllerBase {
     /**
      * @example POST /api/test
      */
-    static async test(request, params, body, query, user) {
+    static async test(request, params, body, query, context) {
         let report = [];
 
         // Create a test project
-        let project = await HashBrown.Entity.Project.create('test ' + new Date().toString());
+        context.project = await HashBrown.Entity.Project.create('test ' + new Date().toString());
         
         report.push('✔ Create test project');
 
@@ -54,7 +54,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
             report.push('');
             
             try {
-                await testableClass.test(user, project, (line) => {
+                await testableClass.test(context, (line) => {
                     report.push('✔ ' + line);
                 });
             
@@ -71,7 +71,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
         report.push('');
         
         try {
-            await project.remove();
+            await context.project.remove();
             report.push('✔ Remove test project');
 
         } catch(e) {
@@ -88,7 +88,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
             report[report.length - 1] += ` with ${errors} error${errors > 1 ? 's' : ''}`;
         }
 
-        return new HttpResponse(report.join('\n'));
+        return new HashBrown.Http.Response(report.join('\n'));
     }
 
     /**

@@ -55,7 +55,6 @@ module.exports = (_, model) => `
         <script src="${model.rootUrl}/js/common.js"></script>
         <script src="${model.rootUrl}/js/service.js"></script>
         <script src="${model.rootUrl}/js/entity.js"></script>
-        <script src="${model.rootUrl}/js/utilities.js"></script>
         
         <script src="${model.rootUrl}/js/test.js"></script>
     </body>

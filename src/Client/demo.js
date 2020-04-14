@@ -361,17 +361,17 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
         
         case 'users':
             if(!id) {
-                return [HashBrown.Context.user];
+                return [HashBrown.Client.context.user];
 
             } else if(id === 'demoUser') {
-                return HashBrown.Context.user;
+                return HashBrown.Client.context.user;
 
             }
 
             throw new Error('Custom users not available in demo');
 
         case 'settings':
-            return HashBrown.Context.project.settings;
+            return HashBrown.Client.context.project.settings;
     }
 
     throw new Error('Unknown resource category "' + category + '". URL was ' + url);

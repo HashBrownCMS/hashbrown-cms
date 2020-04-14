@@ -21,7 +21,7 @@ class DeployerController extends HashBrown.Controller.ControllerBase {
     /**
      * @example GET /api/deployers
      */
-    static async deployers(request, params, body, query, user) {
+    static async deployers(request, params, body, query, context) {
         let deployers = [];
 
         for(let name in HashBrown.Entity.Deployer) {
@@ -32,7 +32,7 @@ class DeployerController extends HashBrown.Controller.ControllerBase {
             deployers.push(deployer.alias);
         }
 
-        return new HttpResponse(deployers);
+        return new HashBrown.Http.Response(deployers);
     }
 }
 

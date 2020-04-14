@@ -19,11 +19,11 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Fetches the model data
      */
     async fetch() {
-        this.state.isDashboard = !HashBrown.Context.project;
+        this.state.isDashboard = !this.context.project;
         this.state.languageOptions = [];
         
-        if(HashBrown.Context.project) {
-            this.state.languageOptions = HashBrown.Context.project.settings.languages;
+        if(this.context.project) {
+            this.state.languageOptions = this.context.project.settings.languages;
         }
     }
 
@@ -34,7 +34,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      */
     async onChangeLanguage(newLanguage) {
         localStorage.setItem('language', newLanguage);
-        HashBrown.Context.language = newLanguage;
+        this.context.language = newLanguage;
 
         HashBrown.Service.EventService.trigger('language');  
 
@@ -45,7 +45,7 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Event: Clicked user settings
      */
     onClickUserSettings() {
-        HashBrown.Entity.View.Modal.UserEditor.new({ modelId: HashBrown.Context.user.id });
+        HashBrown.Entity.View.Modal.UserEditor.new({ modelId: this.context.user.id });
     }
 
     /**

@@ -41,7 +41,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click backup button
      */
     async onClickCreateBackup() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
 
         try {
             let timestamp = await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/backups/new');
@@ -83,7 +83,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      * @param {String} timestamp
      */
     onClickRestoreBackup(timestamp) {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         
         this.state.name = 'restoring';
         this.state.backupTimestamp = timestamp;
@@ -112,7 +112,7 @@ class ProjectBackups extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click delete backup button
      */ 
     onClickDeleteBackup(timestamp) {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         
         this.state.name = 'deleting';
         this.state.backupTimestamp = timestamp;

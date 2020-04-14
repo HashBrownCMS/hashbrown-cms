@@ -20,6 +20,13 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      * Constructor
      */
     constructor(params) {
+        params = params || {};
+        
+        checkParam(params.context, 'context', HashBrown.Entity.Context, true);
+        checkParam(params.context.project, 'context.project', HashBrown.Entity.Project, true);
+        checkParam(params.context.environment, 'context.environment', String, true);
+        checkParam(params.context.user, 'context.user', HashBrown.Entity.User, true);
+        
         super(params);
     }
    
@@ -37,12 +44,7 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      *
      * @param {Object} params
      */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
-        checkParam(params.context, 'params.context', Object, true);
-        checkParam(params.context.project, 'params.context.project', String, true);
-        checkParam(params.context.environment, 'params.context.environment', String, true);
-        
+    adopt(params) {
         params = params || {};
 
         delete params.title;
@@ -50,8 +52,6 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
         delete params.alias;
         
         super.adopt(params);
-        
-        Object.seal(this.context);
     }
 
     /**
@@ -59,7 +59,7 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      */
     structure() {
         this.def(String, 'path');
-        this.def(Object, 'context');
+        this.def(HashBrown.Entity.Context, 'context');
         this.def(String, 'publicUrl');
     }
 

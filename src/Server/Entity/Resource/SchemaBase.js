@@ -11,23 +11,19 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     /**
      * Creates a new instance of this entity type
      *
-     * @param {HashBrown.Entity.User} user
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {Object} data
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(user, projectId, environment, data = {}, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async create(context, data = {}, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(data, 'data', Object, true);
         checkParam(data.parentId, 'data.parentId', String, true);
         checkParam(options, 'options', Object, true);
 
-        let parent = await this.get(projectId, environment, data.parentId, { withParentFields: true });
+        let parent = await this.get(context, data.parentId, { withParentFields: true });
 
         if(!parent) {
             throw new Error(`Parent schema ${data.parentId} could not be found`);
@@ -37,22 +33,20 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         data.customIcon = parent.icon;
         data.type = parent.type;
 
-        return await super.create(user, projectId, environment, data, options);
+        return await super.create(context, data, options);
     }
     
     /**
      * Gets a schema by id
      *
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {String} id
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Schema.SchemaBase} Schema
      */
-    static async get(projectId, environment, id, options = {}) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async get(context, id, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(id, 'id', String);
         checkParam(options, 'options', Object);
 
@@ -81,10 +75,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.isLocked = true;
                 data.updatedOn = stats.mtime;
 
-                data.context = {
-                    project: projectId,
-                    environment: environment
-                };
+                data.context = context;
 
                 resource = this.new(data);
             }
@@ -92,14 +83,14 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         // Then attempt normal fetch
         if(!resource && !options.nativeOnly) {
-            resource = await super.get(projectId, environment, id, options);
+            resource = await super.get(context, id, options);
         }
         
         if(!resource) { return null; }
 
         // Get parent fields, if specified
         if(options.withParentFields && resource.parentId) {
-            let parent = await this.get(projectId, environment, resource.parentId, options);
+            let parent = await this.get(context, resource.parentId, options);
            
             if(parent) {
                 resource = this.merge(resource, parent);
@@ -112,15 +103,13 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     /**
      * Gets a list of instances of this entity type
      *
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {Object} options
      *
      * @return {Array} Instances
      */
-    static async list(projectId, environment, options = {}) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async list(context, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(options, 'options', Object, true);
   
         let list = [];
@@ -150,10 +139,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     data.parentId = data.type + 'Base';
                 }
 
-                data.context = {
-                    project: projectId,
-                    environment: environment
-                };
+                data.context = context;
                 
                 let resource = this.new(data);
                 
@@ -165,7 +151,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         // Read normally
         if(!options.nativeOnly) {
-            let custom = await super.list(projectId, environment, options);
+            let custom = await super.list(context, options);
 
             list = list.concat(custom);
         }
@@ -179,105 +165,37 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         return list;
     }
-    
-    /**
-     * Gets a nested list of dependencies
-     *
-     * @return {Object} Dependencies
-     */
-    async getDependencies() {
-        let dependencies = {
-            schemas: {}
-        };
-
-        // NOTE: The quickest way to find all schema references is
-        // to stringify this schema and look up keywords, since they can be nested infinitely
-        let string = JSON.stringify(this);
-
-        let schemaIds = [];
-        let schemaIdRegex = /"schemaId": "([^"]+)"/;
-        let schemaIdMatch = schemaIdRegex.exec(string);
-
-        while(schemaIdMatch && schemaIdMatch[1]) {
-            if(!schemaIds.indexOf(schemaIdMatch[1]) < 0) {
-                schemaIds.push(schemaIdMatch[1]);
-            }
-
-            schemaIdMatch = schemaIdRegex.exec(string);
-        }
-        
-        let allowedSchemasRegex = /"allowedSchemas": \[([^\]]+)\]/;
-        let allowedSchemasMatch = allowedSchemasRegex.exec(string);
-
-        while(allowedSchemasMatch && allowedSchemasMatch[1]) {
-            schemaIds = schemaIds.concat(JSON.parse(allowedSchemasMatch[1]));
-
-            allowedSchemasMatch = allowedSchemasRegex.exec(string);
-        }
-        
-        // Recurse up through parents
-        let schema = this;
-
-        while(schema) {
-            schema = schema.parentId ? await this.constructor.get(this.context.project, this.context.environment, schema.parentId) : null;
-
-            if(!schema) { break; }
-
-            if(!dependencies.schemas[schema.id]) {
-                dependencies.schemas[schema.id] = schema;
-            }
-
-            let parentDependencies = await schema.getDependencies();
-
-            schemaIds = schemaIds.concat(Object.keys(parentDependencies.schemas));
-        }
-
-        // Load all schema dependencies
-        for(let id of schemaIds) {
-            if(dependencies.schemas[id]) { continue; }
-
-            let schema = await this.constructor.get(id);
-
-            if(!schema) { continue; }
-
-            dependencies.schemas[schema.id] = schema;
-        }
-
-        return dependencies;
-    }
 
     /**
      * Performs a series of unit test
      *
-     * @param {HashBrown.Entity.User} user
-     * @param {HashBrown.Entity.Project} project
+     * @param {HashBrown.Entity.Context} context
      * @param {Function} report
      */
-    static async test(user, project, report) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', HashBrown.Entity.Project, true);
+    static async test(context, report) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(report, 'report', Function, true);
 
         report('Create schema');
         
-        let schema = await HashBrown.Entity.Resource.ContentSchema.create(user, project.id, 'live', { name: 'Test schema', parentId: 'contentBase' });
+        let schema = await this.create(context, { name: 'Test schema', parentId: 'contentBase' });
         
         report(`Get schema ${schema.getName()}`);
         
-        schema = await HashBrown.Entity.Resource.SchemaBase.get(project.id, 'live', schema.id, { withParentFields: true });
+        schema = await this.get(context, schema.id, { withParentFields: true });
 
         report(`Update schema ${schema.getName()}`);
        
         schema.name += ' (updated)';
-        await schema.save(user);
+        await schema.save();
         
         report('Get all schemas');
         
-        await HashBrown.Entity.Resource.ContentSchema.list(project.id, 'live');
+        await this.list(context);
 
         report(`Remove schema ${schema.getName()}`);
         
-        await schema.remove(user);
+        await schema.remove();
     }
 }
 

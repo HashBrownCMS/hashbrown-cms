@@ -21,7 +21,7 @@ class RequestService {
     }
 
     /**
-     * An environment-independent request
+     * An environment independent request
      *
      * @param {String} method
      * @param {String} url
@@ -35,7 +35,7 @@ class RequestService {
             'Content-Type': 'application/json; charset=utf-8'
         };
 
-        url = (HashBrown.Context.rootUrl || '') + url;
+        url = (HashBrown.Client.rootUrl || '') + url;
         
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
@@ -106,12 +106,12 @@ class RequestService {
 
         let newUrl = '/api/';
 
-        if(HashBrown.Context.project) {
-            newUrl += HashBrown.Context.project.id + '/';
+        if(HashBrown.Client.context.project) {
+            newUrl += HashBrown.Client.context.project.id + '/';
         }
 
-        if(HashBrown.Context.environment) {
-            newUrl += HashBrown.Context.environment + '/';
+        if(HashBrown.Client.context.environment) {
+            newUrl += HashBrown.Client.context.environment + '/';
         }
 
         newUrl += url;

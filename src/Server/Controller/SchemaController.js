@@ -26,15 +26,15 @@ class SchemaController extends HashBrown.Controller.ResourceController {
     /**
      * @example GET /api/${project}/${environment}/schemas/icons
      */
-    static async icons(request, params, body, query, user) {
-        let schemas = await HashBrown.Entity.Resource.SchemaBase.list(params.project, params.environment);
+    static async icons(request, params, body, query, context) {
+        let schemas = await HashBrown.Entity.Resource.SchemaBase.list(context);
         let icons = {};
 
         for(let schema of schemas) {
             icons[schema.id] = schema.icon;
         }
 
-        return new HttpResponse(icons);
+        return new HashBrown.Http.Response(icons);
     }
 }
 

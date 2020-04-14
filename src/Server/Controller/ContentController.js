@@ -27,16 +27,16 @@ class ContentController extends HashBrown.Controller.ResourceController {
     /**
      * @example POST /api/${project}/${environment}/content/${id}/insert?parentId=XXX&position=XXX
      */
-    static async insert(request, params, body, query, user) {
-        let resource = await HashBrown.Entity.Resource.Content.get(params.project, params.environment, params.id);
+    static async insert(request, params, body, query, context) {
+        let resource = await HashBrown.Entity.Resource.Content.get(context, params.id);
 
         if(!resource) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
-        await resource.insert(params.project, params.environment, query.parentId, parseInt(query.position), user);
+        await resource.insert(query.parentId, parseInt(query.position));
         
-        return new HttpResponse('OK');
+        return new HashBrown.Http.Response('OK');
     }
 }
 

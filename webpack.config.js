@@ -24,10 +24,10 @@ function getJsEntries() {
         demo: './src/Client/demo.js',
         environment: './src/Client/environment.js',
 
-        common: './src/Common',
+        utilities: './src/Common/utilities',
+        
         service: './src/Client/Service',
-        entity: './src/Client/Entity',
-        utilities: './src/Client/utilities'
+        entity: './src/Client/Entity'
     }
 
     // Include plugins

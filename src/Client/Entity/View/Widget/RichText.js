@@ -109,7 +109,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      */
     toView(html) {
         return this.replaceMediaReferences(html, (id, filename) => {
-            return `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${id}`;
+            return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
     }
 

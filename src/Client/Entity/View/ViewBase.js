@@ -36,6 +36,15 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         this.def(Object, 'namedElements', {});
         this.def(Boolean, 'isUpdating', false);
     }
+    
+    /**
+     * Gets the context
+     *
+     * @return {HashBrown.Entity.Context} Context
+     */
+    get context() {
+        return HashBrown.Client.context;
+    }
 
     /**
      * Gets the placeholder element

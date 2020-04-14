@@ -68,7 +68,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             let users = await HashBrown.Entity.User.list();
 
             if(!users || users.length < 1) {
-                return new HttpResponse('Redirecting to setup...', 302, { 'Location': '/setup' });
+                return new HashBrown.Http.Response('Redirecting to setup...', 302, { 'Location': '/setup' });
             }
         }
 
@@ -80,7 +80,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      *
      * @param {Error} error
      *
-     * @return {HttpResponse} Response
+     * @return {HashBrown.Http.Response} Response
      */
     static error(error) {
         checkParam(error, 'error', Error, true);
@@ -101,7 +101,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * @param {Object} model
      * @param {Number} code
      *
-     * @return {HttpResponse} Rendered content
+     * @return {HashBrown.Http.Response} Rendered content
      */
     static render(template, model = {}, code = 200) {
         checkParam(template, 'template', String, true);
@@ -111,6 +111,11 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         let templatePath = Path.join(APP_ROOT, 'template', 'page', template);
         
         model = model || {};
+
+        if(model.context && model.context.user) {
+            model.context.user.password = {};
+            model.context.user.tokens = [];
+        }
 
         model.rootUrl = HashBrown.Service.ConfigService.getSync('system').rootUrl || '';
 
@@ -123,13 +128,13 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             model: model
         });
     
-        return new HttpResponse(view.render(), code, { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' });
+        return new HashBrown.Http.Response(view.render(), code, { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' });
     }
 
     /**
      * Browser update screen
      */
-    static async updateBrowser(request, params, body, query, user) {
+    static async updateBrowser(request, params, body, query, context) {
         return this.render(
             'error',
             {
@@ -142,28 +147,28 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Readme
      */
-    static async readme(request, params, body, query, user) {
+    static async readme(request, params, body, query, context) {
         let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
         let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
 
-        return new HttpResponse(html, 200, { 'Content-Type': 'text/html' });
+        return new HashBrown.Http.Response(html, 200, { 'Content-Type': 'text/html' });
     }
     
     /**
      * Login
      */
-    static async login(request, params, body, query, user) {
+    static async login(request, params, body, query, context) {
         return this.render('login');
     }
     
     /**
      * First time setup
      */
-    static async setup(request, params, body, query, user) {
+    static async setup(request, params, body, query, context) {
         let users = await HashBrown.Entity.User.list();
         
         if(users && users.length > 0) { 
-            throw new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
+            throw new HashBrown.Http.Exception('Cannot create first admin, users already exist. If you lost your credentials, please assign the admin using CLI.', 403);
         }
 
         if(request.method === 'POST') {
@@ -173,7 +178,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
             let token = await HashBrown.Entity.User.login(username, password);
             
-            return new HttpResponse(
+            return new HashBrown.Http.Response(
                 'Redirecting to dashboard...',
                 302,
                 {
@@ -191,7 +196,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Dashboard
      */
-    static async dashboard(request, params, body, query, user) {
+    static async dashboard(request, params, body, query, context) {
         let themes = await HashBrown.Service.AppService.getThemes();
 
         let uptime = {};
@@ -204,7 +209,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         return this.render('dashboard', {
             tab: params.tab,
             os: OS,
-            user: user,
+            context: context,
             app: require(Path.join(APP_ROOT, 'package.json')),
             uptime: uptime,
             themes: themes
@@ -214,9 +219,9 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Testing
      */
-    static async testing(request, params, body, query, user) {
+    static async testing(request, params, body, query, context) {
         return this.render('testing', {
-            user: user,
+            context: context,
             tab: params.tab
         });
     }
@@ -224,27 +229,19 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Demo
      */
-    static async demo(request, params, body, query, user) {
+    static async demo(request, params, body, query, context) {
         return this.render('demo', { title: 'Demo | HashBrown CMS' });
     }
 
     /**
      * Environment
      */
-    static async environment(request, params, body, query, user) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HttpResponse('Not found', 404);
-        }
-        
+    static async environment(request, params, body, query, context) {
         let themes = await HashBrown.Service.AppService.getThemes();
        
         return this.render('environment', {
-            title: project.getName(),
-            currentProject: project.getObject(),
-            currentEnvironment: params.environment,
-            user: user,
+            title: context.project.getName(),
+            context: context,
             themes: themes
         });
     }

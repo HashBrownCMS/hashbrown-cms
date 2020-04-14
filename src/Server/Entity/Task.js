@@ -117,16 +117,14 @@ class Task extends HashBrown.Entity.EntityBase {
     /**
      * Gets a task
      *
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {String} content
      * @param {String} type
      *
      * @return {HashBrown.Entity.Task} Task
      */
-    static async get(projectId, environment, content, type) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async get(context, content, type) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
 
@@ -136,8 +134,8 @@ class Task extends HashBrown.Entity.EntityBase {
             {
                 type: type,
                 content: content,
-                project: projectId,
-                environment: environment
+                project: context.project.id,
+                environment: context.environment
             }
         );
 
@@ -149,16 +147,14 @@ class Task extends HashBrown.Entity.EntityBase {
     /**
      * Creates a task
      *
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {String} content
      * @param {String} type
      *
      * @return {HashBrown.Entity.Task} Task
      */
-    static async create(projectId, environment, content, type) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async create(context, content, type) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
 
@@ -168,8 +164,8 @@ class Task extends HashBrown.Entity.EntityBase {
             task = this.new({
                 type: type,
                 content: content,
-                project: projectId,
-                environment: environment
+                project: context.project.id,
+                environment: context.environment
             });
 
             await task.save();
@@ -186,6 +182,8 @@ class Task extends HashBrown.Entity.EntityBase {
      * @returns {Array} Tasks
      */
     static async list(options = {}) {
+        checkParam(options, 'options', Object, true);
+        
         let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks', options);
         
         for(let i in tasks) {

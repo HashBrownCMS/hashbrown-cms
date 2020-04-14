@@ -10,49 +10,42 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     structure() {
         super.structure();
 
-        this.def(Object, 'context', {});
+        this.def(HashBrown.Entity.Context, 'context');
     }
-    
+
     /**
-     * Adopts values into this entity
+     * Constructor
      *
      * @param {Object} params
      */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
+    constructor(params) {
+        params = params || {};
+        
+        checkParam(params.context, 'context', HashBrown.Entity.Context, true);
+        checkParam(params.context.project, 'context.project', HashBrown.Entity.Project, true);
+        checkParam(params.context.environment, 'context.environment', String, true);
+        checkParam(params.context.user, 'context.user', HashBrown.Entity.User, true);
 
-        if(!this.context) {
-            checkParam(params.context, 'params.context', Object, true);
-            checkParam(params.context.project, 'params.context.project', String, true);
-            checkParam(params.context.environment, 'params.context.environment', String, true);
-        }
-
-        super.adopt(params);
-
-        if(!this.context) {
-            Object.seal(this.context);
-        }
+        super(params);
     }
-   
+    
     /**
      * Gets an instance of this entity type
      *
-     * @param {String} projectId
-     * @param {String} environment
      * @param {String} id
+     * @param {HashBrown.Entity.Context} context
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async get(projectId, environment, id, options = {}) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async get(context, id, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(id, 'id', String, true);
         checkParam(options, 'options', Object, true);
 
         let resource = await HashBrown.Service.DatabaseService.findOne(
-            projectId,
-            environment + '.' + this.category,
+            context.project.id,
+            context.environment + '.' + this.category,
             {
                 id: id
             }
@@ -60,8 +53,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         // If the resource was not found locally, attempt remote fetch
         if(!resource && !options.localOnly) {
-            let project = await HashBrown.Entity.Project.get(projectId);
-            let sync = await project.getSyncSettings();
+            let sync = await context.project.getSyncSettings();
 
             if(sync) {
                 options.token = sync.token;
@@ -81,10 +73,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!resource) { return null; }
 
-        resource.context = {
-            project: projectId, 
-            environment: environment
-        };
+        resource.context = context;
         
         return this.new(resource);
     }
@@ -92,27 +81,24 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Gets a list of instances of this entity type
      *
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {Object} options
      *
      * @return {Array} Instances
      */
-    static async list(projectId, environment, options = {}) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async list(context, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(options, 'options', Object, true);
         
         let resources = await HashBrown.Service.DatabaseService.find(
-            projectId,
-            environment + '.' + this.category,
+            context.project.id,
+            context.environment + '.' + this.category,
             options
         );
 
         // Attempt remote fetch
         if(!options.localOnly) {
-            let project = await HashBrown.Entity.Project.get(projectId);
-            let sync = await project.getSyncSettings();
+            let sync = await context.project.getSyncSettings();
 
             if(sync) {
                 let allResources = {};
@@ -146,10 +132,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         // Apply models and context
         for(let i = resources.length - 1; i >= 0; i--) {
-            resources[i].context = {
-                project: projectId, 
-                environment: environment
-            };
+            resources[i].context = context;
             
             resources[i] = this.new(resources[i]);
         
@@ -174,40 +157,33 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Creates a new instance of this entity type
      *
-     * @param {HashBrown.Entity.User} user
-     * @param {String} projectId
-     * @param {String} environment
+     * @param {HashBrown.Entity.Context} context
      * @param {Object} data
      * @param {Object} options
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Instance
      */
-    static async create(user, projectId, environment, data = {}, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
+    static async create(context, data = {}, options = {}) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(data, 'data', Object, true);
         checkParam(options, 'options', Object, true);
 
-        data.createdBy = user.id;
+        data.createdBy = context.user.id;
         data.createdOn = new Date();
-        data.updatedBy = user.id;
+        data.updatedBy = context.user.id;
         data.updatedOn = new Date();
-        data.viewedBy = user.id;
+        data.viewedBy = context.user.id;
         data.viewedOn = new Date();
 
         data.id = this.createId();
             
-        data.context = {
-            project: projectId,
-            environment: environment
-        };
+        data.context = context;
         
         let resource = this.new(data);
 
         await HashBrown.Service.DatabaseService.insertOne(
-            projectId,
-            environment + '.' + this.category,
+            context.project.id,
+            context.environment + '.' + this.category,
             resource.getObject()
         );
 
@@ -217,11 +193,9 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Saves the current state of this entity
      *
-     * @param {HashBrown.Entity.User} user
      * @param {Object} options
      */
-    async save(user, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User);
+    async save(options = {}) {
         checkParam(options, 'options', Object, true);
 
         if(this.isLocked) {
@@ -234,14 +208,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             hasRemote: false
         };
 
-        if(user) {
-            this.updatedBy = user.id;
+        if(this.context.user) {
+            this.updatedBy = this.context.user.id;
             this.updatedOn = new Date();
         }
 
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(
-            this.context.project,
+            this.context.project.id,
             this.context.environment + '.' + this.category,
             {
                 id: options.id || this.id
@@ -256,15 +230,13 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
      * Removes this entity
      *
-     * @param {HashBrown.Entity.User} user
      * @param {Object} options
      */
-    async remove(user, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
+    async remove(options = {}) {
         checkParam(options, 'options', Object, true);
 
         await HashBrown.Service.DatabaseService.removeOne(
-            this.context.project,
+            this.context.project.id,
             this.context.environment + '.' + this.category,
             {
                 id: this.id
@@ -274,14 +246,9 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     
     /**
      * Pulls a synced resource
-     *
-     * @param {HashBrown.Entity.User} user
      */
-    async pull(user) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-
-        let project = await HashBrown.Entity.Project.get(this.context.project);
-        let sync = await project.getSyncSettings();
+    async pull() {
+        let sync = await this.context.project.getSyncSettings();
 
         if(!sync) {
             throw new Error('Sync not enabled or unconfigured for this project');
@@ -299,19 +266,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         
         this.adopt(resource);
         
-        await this.save(user);
+        await this.save();
     }
     
     /**
      * Pushes a synced resource
-     *
-     * @param {HashBrown.Entity.User} user
      */
-    async push(user) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        
-        let project = await HashBrown.Entity.Project.get(this.context.project);
-        let sync = await project.getSyncSettings();
+    async push() {
+        let sync = await this.context.project.getSyncSettings();
 
         if(!sync) {
             throw new Error('Sync not enabled or unconfigured for this project');
@@ -323,21 +285,17 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             this.getObject()
         );
 
-        await this.remove(user);
+        await this.remove();
     }
     
     /**
      * Submits a heartbeat on this resource
-     *
-     * @param {HashBrown.Entity.User} user
      */
-    async heartbeat(user) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        
+    async heartbeat() {
         if(this.isLocked) { return; }
 
         await HashBrown.Service.DatabaseService.updateOne(
-            this.context.project,
+            this.context.project.id,
             this.context.environment + '.' + this.category,
             {
                 id: this.id
@@ -360,54 +318,6 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         delete object.context;
 
         return object;
-    }
-
-    /**
-     * Gets a nested list of dependencies
-     *
-     * @return {Object} Dependencies
-     */
-    async getDependencies() {
-        throw new Error('Method "getDependencies" must be overridden');
-    }
-
-    /**
-     * Gets a nested list of dependencies for multiple resources
-     *
-     * @param {String} projectId
-     * @param {String} environment
-     * @param {Array} resourceIds
-     *
-     * @return {Object} Dependencies
-     */
-    static async getDependencies(projectId, environment, resourceIds) {
-        checkParam(projectId, 'projectId', String, true);
-        checkParam(environment, 'environment', String, true);
-        checkParam(resourceIds, 'resourceIds', Array, true);
-
-        let allDependencies = {};
-
-        for(let resourceId of resourceIds) {
-            let resource = await this.get(projectId, environment, resourceId);
-
-            if(!resource) { continue; }
-
-            let dependencies = await resource.getDependencies();
-
-            for(let category in dependencies) {
-                if(!allDependencies[category]) {
-                    allDependencies[category] = {};
-                }
-
-                for(let dependencyId in dependencies[category]) {
-                    if(allDependencies[category][dependencyId]) { continue; }
-
-                    allDependencies[category][dependencyId] = dependencies[category][dependencyId];
-                }
-            }
-        }
-    
-        return allDependencies;
     }
 }
 

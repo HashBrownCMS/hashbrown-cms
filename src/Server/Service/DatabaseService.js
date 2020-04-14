@@ -171,7 +171,8 @@ class DatabaseService {
      * @param {String} timestamp
      */
     static async restore(databaseName, timestamp) {
-        checkParam(databaseName, 'databaseName', String);
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(timestamp, 'timestamp', String, true);
 
         let archivePath = Path.join(APP_ROOT, 'storage', databaseName, 'dump', timestamp + '.hba');
        
@@ -210,7 +211,7 @@ class DatabaseService {
      * @returns {Number} Timestamp
      */
     static async dump(databaseName) {
-        checkParam(databaseName, 'databaseName', String);
+        checkParam(databaseName, 'databaseName', String, true);
 
         let dumpPath = Path.join(APP_ROOT, 'storage', databaseName, 'dump');
 

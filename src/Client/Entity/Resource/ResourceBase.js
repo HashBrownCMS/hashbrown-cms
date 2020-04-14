@@ -5,6 +5,15 @@
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**
+     * Gets the context
+     *
+     * @return {HashBrown.Entity.Context} Context
+     */
+    get context() {
+        return HashBrown.Client.context;
+    }
+    
+    /**
      * Gets an instance of this entity type
      *
      * @param {String} id
@@ -149,7 +158,9 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      */
     isSyncEnabled() {
         return this.sync &&
-            HashBrown.Context.project.settings.sync.enabled &&
+            this.context.project.settings &&
+            this.context.project.settings.sync &&
+            this.context.project.settings.sync.enabled &&
             (
                 !this.isLocked ||
                 this.sync.isRemote

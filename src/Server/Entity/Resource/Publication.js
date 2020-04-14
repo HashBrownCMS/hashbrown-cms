@@ -94,14 +94,12 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     /**
      * Saves the current state of this entity
      *
-     * @param {HashBrown.Entity.User} user
      * @param {Object} options
      */
-    async save(user, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User);
+    async save(options = {}) {
         checkParam(options, 'options', Object, true);
 
-        await super.save(user, options);
+        await super.save(options);
 
         await this.clearCache();
     }
@@ -109,14 +107,12 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     /**
      * Removes this entity
      *
-     * @param {HashBrown.Entity.User} user
      * @param {Object} options
      */
-    async remove(user, options = {}) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
+    async remove(options = {}) {
         checkParam(options, 'options', Object, true);
 
-        await super.remove(user, options);
+        await super.remove(options);
 
         await this.clearCache();
     }
@@ -131,13 +127,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         
         if(!this.canDeploy()) { return; }
         
-        let project = await HashBrown.Entity.Project.get(this.context.project);
-
-        if(!project) {
-            throw new Error(`Project ${this.context.project} not found`);
-        }
-
-        let languages = await project.getLanguages();
+        let languages = await this.context.project.getLanguages();
 
         for(let language of languages) {
             let data = await this.getContent({ id: contentId, language: language });
@@ -183,14 +173,14 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         checkParam(query, 'query', Object, true);
         
         if(!this.processor) {
-            throw new HttpError('Processor not specified', 500);
+            throw new HashBrown.Http.Exception('Processor not specified', 500);
         }
 
         let cache = await this.getCache(query);
 
         if(cache) { return cache; }
         
-        let items = await HashBrown.Entity.Resource.Content.list(this.context.project, this.context.environment);
+        let items = await HashBrown.Entity.Resource.Content.list(this.context);
         let result = [];
 
         for(let item of items) {
@@ -231,7 +221,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
      * Clears all cache
      */
     async clearCache() {
-        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project, this.context.environment, 'publications', this.id);
+        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project.id, this.context.environment, 'publications', this.id);
 
         await HashBrown.Service.FileService.remove(cacheFolder);
     }
@@ -246,8 +236,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         checkParam(query, 'query', Object, true);
         checkParam(data, 'data', Array, true);
         
-        let key = Buffer.from(`${this.context.project}-${this.context.environment}-${QueryString.encode(query)}`).toString('base64');
-        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project, this.context.environment, 'publications', this.id);
+        let key = Buffer.from(`${this.context.project.id}-${this.context.environment}-${QueryString.encode(query)}`).toString('base64');
+        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project.id, this.context.environment, 'publications', this.id);
         let cacheFile = Path.join(cacheFolder, key + '.json');
 
         if(!HashBrown.Service.FileService.exists(cacheFolder)) {
@@ -269,8 +259,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     async getCache(query) {
         checkParam(query, 'query', Object, true);
         
-        let key = Buffer.from(`${this.context.project}-${this.context.environment}-${QueryString.encode(query)}`).toString('base64');
-        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project, this.context.environment, 'publications', this.id);
+        let key = Buffer.from(`${this.context.project.id}-${this.context.environment}-${QueryString.encode(query)}`).toString('base64');
+        let cacheFolder = Path.join(APP_ROOT, 'storage', this.context.project.id, this.context.environment, 'publications', this.id);
         let cacheFile = Path.join(cacheFolder, key + '.json');
 
         let stats = await HashBrown.Service.FileService.stat(cacheFile);

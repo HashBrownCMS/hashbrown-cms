@@ -106,22 +106,22 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     /**
      * @example POST /api/${project}/${environment}/${category}/${id}/heartbeat
      */
-    static async heartbeat(request, params, body, query, user) {
+    static async heartbeat(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
         
-        let resource = await model.get(params.project, params.environment, params.id);
+        let resource = await model.get(context, params.id);
 
         if(!resource) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
-        await resource.heartbeat(user);
+        await resource.heartbeat();
         
-        return new HttpResponse('OK');
+        return new HashBrown.Http.Response('OK');
     }
    
     /**
@@ -129,75 +129,83 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      *
      * @return {Object} The pulled resource
      */
-    static async pull(request, params, body, query, user) {
+    static async pull(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
         
-        let resource = await model.get(params.project, params.environment, params.id);
+        let resource = await model.get(context, params.id);
         
-        await resource.pull(user);
+        if(!resource) {
+            throw new HashBrown.Http.Exception('Not found', 404);
+        }
 
-        return new HttpResponse(resource);
+        await resource.pull();
+
+        return new HashBrown.Http.Response(resource);
     }
     
     /**
      * @example POST /api/${project}/${environment}/{category}/${id}/push
      */
-    static async push(request, params, body, query, user) {
+    static async push(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
 
-        let resource = await model.get(params.project, params.environment, params.id);
+        let resource = await model.get(context, params.id);
         
-        await resource.push(user);
+        if(!resource) {
+            throw new HashBrown.Http.Exception('Not found', 404);
+        }
+
+        await resource.push();
     
-        return new HttpResponse('OK');
+        return new HashBrown.Http.Response('OK');
     }
     
     /**
      * @example GET /api/${project}/${environment}/${category}
      */
-    static async resources(request, params, body, query, user) {
+    static async resources(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
         
-        let resources = await model.list(params.project, params.environment, query);
+        let resources = await model.list(context, query);
 
-        return new HttpResponse(resources);
+        return new HashBrown.Http.Response(resources);
     }
     
     /**
      * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}
      */
-    static async resource(request, params, body, query, user) {
+    static async resource(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
         
-        let resource = await model.get(params.project, params.environment, params.id, query);
+        let resource = await model.get(context, params.id, query);
                 
         if(!resource) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
         switch(request.method) {
             case 'GET':
-                return new HttpResponse(resource, 200, { 'Last-Modified': (resource.updatedOn || new Date()).toString() });
+                return new HashBrown.Http.Response(resource, 200, { 'Last-Modified': (resource.updatedOn || new Date()).toString() });
                 
             case 'POST':
-                if(!user.hasScope(this.category)) {
-                    return new HttpResponse('You do not have access to edit this resource', 403);
+                if(!context.user.hasScope(this.category)) {
+                    return new HashBrown.Http.Response('You do not have access to edit this resource', 403);
                 }
 
                 resource.adopt(body);
@@ -205,52 +213,36 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
                 // In case the id was changed, make sure to include the old id in the options
                 query.id = params.id;
                     
-                await resource.save(user, query);
+                await resource.save(query);
                 
-                return new HttpResponse(resource);
+                return new HashBrown.Http.Response(resource);
 
             case 'DELETE':
-                if(!user.hasScope(this.category)) {
-                    return new HttpResponse('You do not have access to remove this resource', 403);
+                if(!context.user.hasScope(this.category)) {
+                    return new HashBrown.Http.Response('You do not have access to remove this resource', 403);
                 }
                 
-                await resource.remove(user, query);
+                await resource.remove(query);
 
-                return new HttpResponse('OK');
+                return new HashBrown.Http.Response('OK');
         }
 
-        return new HttpResponse('Unexpected error', 500);
+        return new HashBrown.Http.Response('Unexpected error', 500);
     }
     
     /**
      * @example POST /api/${project}/${environment}/${category}/new
      */
-    static async new(request, params, body, query, user) {
+    static async new(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
         
         if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
         }
         
-        let resource = await model.create(user, params.project, params.environment, body, query);
+        let resource = await model.create(context, body, query);
 
-        return new HttpResponse(resource);
-    }
-
-    /**
-     * @example GET /api/${project}/${environment}/${category}/dependencies?resources=XXX,XXX
-     */
-    static async dependencies(request, params, body, query, user) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
-        
-        if(!model) {
-            return new HttpResponse(`No model found for category ${this.category}`, 404);
-        }
-       
-        let ids = (query.resources || '').split(',');
-        let allDependencies = await model.getDependencies(params.project, params.environment, ids);
-
-        return new HttpResponse(allDependencies);
+        return new HashBrown.Http.Response(resource);
     }
 }
 

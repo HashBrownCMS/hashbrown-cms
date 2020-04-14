@@ -9,22 +9,20 @@ class Form extends require('Common/Entity/Resource/Form') {
     /**
      * Performs a series of unit test
      *
-     * @param {HashBrown.Entity.User} user
-     * @param {HashBrown.Entity.Project} project
+     * @param {HashBrown.Entity.Context} context
      * @param {Function} report
      */
-    static async test(user, project, report) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', HashBrown.Entity.Project, true);
+    static async test(context, report) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(report, 'report', Function, true);
         
         report('Create form');
 
-        let form = await HashBrown.Entity.Resource.Form.create(user, project.id, 'live', { title: 'Test form' });
+        let form = await this.create(context, { title: 'Test form' });
 
         report(`Get form ${form.getName()}`);
         
-        form = await HashBrown.Entity.Resource.Form.get(project.id, 'live', form.id);
+        form = await this.get(context, form.id);
             
         report(`Update form ${form.getName()}`);
         
@@ -37,7 +35,7 @@ class Form extends require('Common/Entity/Resource/Form') {
         
         report('Get all forms');
         
-        await HashBrown.Entity.Resource.Form.list(project.id, 'live');
+        await this.list(context);
             
         report(`Remove form ${form.getName()}`);
         

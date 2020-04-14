@@ -62,57 +62,57 @@ class UserController extends HashBrown.Controller.ControllerBase {
      *
      * @return {String} Session token
      */
-    static async login(request, params, body, query, user) {
+    static async login(request, params, body, query, context) {
         let username = body.username || query.username;
         let password = body.password || query.password;
         let persist = query.persist === 'true' || query.persist === true || body.persist === 'true' || body.persist === true;
 
         let token = await HashBrown.Entity.User.login(username, password, persist);
 
-        return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
+        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
     }
     
     /** 
      * @example POST /api/user/logout
      */
-    static async logout(request, params, body, query, user) {
+    static async logout(request, params, body, query, context) {
         let token = this.getToken(request); 
         
-        await user.logout(token);
+        await context.user.logout(token);
 
-        return new HttpResponse('User logged out', 302, { 'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT', 'Location': '/' });
+        return new HashBrown.Http.Response('User logged out', 302, { 'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT', 'Location': '/' });
     }
     
     /**
      * @example GET /api/user
      */
-    static async current(request, params, body, query, user) {
-        user.tokens = [];
-        user.password = null;
+    static async current(request, params, body, query, context) {
+        context.user.tokens = [];
+        context.user.password = null;
 
-        return new HttpResponse(user);
+        return new HashBrown.Http.Response(context.user);
     }
 
     /**
      * @example GET /api/user/scopes
      */
-    static async scopes(request, params, body, query, user) {
-        return new HttpResponse(user.scopes);
+    static async scopes(request, params, body, query, context) {
+        return new HashBrown.Http.Response(context.user.scopes);
     }
     
     /**
      * @example GET /api/users
      */
-    static async users(request, params, body, query, user) {
+    static async users(request, params, body, query, context) {
         let users = await HashBrown.Entity.User.list();
     
-        return new HttpResponse(users);
+        return new HashBrown.Http.Response(users);
     }
     
     /**
      * @example GET|POST|DELETE /api/users/${id}
      */
-    static async user(request, params, body, query, user) {
+    static async user(request, params, body, query, context) {
         let subject = null;
 
         switch(request.method) {
@@ -120,30 +120,30 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 subject = await HashBrown.Entity.User.get(params.id);
 
                 if(!subject) {
-                    return new HttpError(`User by id ${id} not found`, 404);
+                    return new HashBrown.Http.Exception(`User by id ${id} not found`, 404);
                 }
                 
-                return new HttpResponse(subject);
+                return new HashBrown.Http.Response(subject);
 
             case 'POST':
                 subject = await HashBrown.Entity.User.get(params.id, { withTokens: true, withPassword: true });
 
                 if(!subject) {
-                    return new HttpError(`User by id ${id} not found`, 404);
+                    return new HashBrown.Http.Exception(`User by id ${id} not found`, 404);
                 }
                 
                 if(subject.id !== user.id && !user.isAdmin) {
-                    return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
+                    return new HashBrown.Http.Exception('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
                 // Only admins can change scopes and admin status
-                if(!user.isAdmin) {
+                if(!context.user.isAdmin) {
                     delete body.scopes;
                     delete body.isAdmin;
                 }
 
                 // Theme can only be changed by current users
-                if(subject.id !== user.id) {
+                if(subject.id !== context.user.id) {
                     delete body.theme;
                 }
        
@@ -158,25 +158,25 @@ class UserController extends HashBrown.Controller.ControllerBase {
                 // Save user
                 await subject.save(query);
 
-                return new HttpResponse('OK');
+                return new HashBrown.Http.Response('OK');
 
             case 'DELETE':
-                if(!user.isAdmin) {
-                    return new HttpError('You do not have sufficient privileges to change this user\'s information', 403);
+                if(!context.user.isAdmin) {
+                    return new HashBrown.Http.Exception('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 
                 subject = await HashBrown.Entity.User.get(params.id);
 
                 if(!subject) {
-                    return new HttpError(`User by id ${id} not found`, 404);
+                    return new HashBrown.Http.Exception(`User by id ${id} not found`, 404);
                 }
                 
                 await subject.remove();
                 
-                return new HttpResponse('OK');
+                return new HashBrown.Http.Response('OK');
         }
             
-        return new HttpResponse('Unexpected error', 500);
+        return new HashBrown.Http.Response('Unexpected error', 500);
     }
     
     /**
@@ -189,22 +189,22 @@ class UserController extends HashBrown.Controller.ControllerBase {
         let users = await HashBrown.Entity.User.list();
 
         if(users && users.length > 0) {
-            return new HttpError('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the command line.', 403);
+            return new HashBrown.Http.Exception('Cannot create first admin, users already exist. If you lost your credentials, please assign the the admin from the command line.', 403);
         }
 
         let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
         let token = await HashBrown.Entity.User.login(username, password);
        
-        return new HttpResponse(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
+        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
     }
     
     /**
      * @example /api/users/new { username: XXX, password: XXX }
      */
-    static async new(request, params, body, query, user) {
+    static async new(request, params, body, query, context) {
         let newUser = await HashBrown.Entity.User.create(body);
 
-        return new HttpResponse(newUser);
+        return new HashBrown.Http.Response(newUser);
     }
 }
 

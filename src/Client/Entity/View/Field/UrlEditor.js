@@ -19,7 +19,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Clicked regenerate
      */
     async onClickRegenerate() {
-        let editor = HashBrown.Context.currentResourceEditor;
+        let editor = HashBrown.Client.currentResourceEditor;
 
         if(!editor || !editor.model) { return; }
 
@@ -27,7 +27,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
         let url = '/';
 
         while(content) {
-            let name = content.prop('title', HashBrown.Context.language) || content.id || '';
+            let name = content.prop('title', HashBrown.Client.language) || content.id || '';
 
             name = name.toLowerCase();
             name = name.replace(/[^a-z0-9]/g, '');
@@ -39,10 +39,10 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
             content = await HashBrown.Entity.Resource.Content.get(content.parentId);
         }
        
-        let languages = HashBrown.Context.project.settings.languages;
+        let languages = this.context.project.settings.languages;
 
-        if(languages.length > 1 && HashBrown.Context.language) {
-            url = '/' + HashBrown.Context.language + url; 
+        if(languages.length > 1 && HashBrown.Client.language) {
+            url = '/' + HashBrown.Client.language + url; 
         }
 
         url = url.replace(/\/\//g, '/');

@@ -10,13 +10,13 @@ _.div({class: 'navigaton navigation--session'},
             role: 'navigation-menu',
             icon: 'flag',
             label: (value) => value ? value.toUpperCase() : '',
-            value: HashBrown.Context.language,
+            value: HashBrown.Client.language,
             options: state.languageOptions,
             onchange: _.onChangeLanguage
         })
     ),
     _.popup({
-        tooltip: 'Logged in as "' + (HashBrown.Context.user.fullName || HashBrown.Context.user.username) + '"',
+        tooltip: 'Logged in as "' + (HashBrown.Client.context.user.fullName || HashBrown.Client.context.user.username) + '"',
         color: 'secondary',
         role: 'navigation-menu',
         icon: 'user',

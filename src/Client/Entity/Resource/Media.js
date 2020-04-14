@@ -12,7 +12,7 @@ class Media extends require('Common/Entity/Resource/Media') {
     getHtml() {
         let html = '';
 
-        let fullUrl = `/media/${HashBrown.Context.project.id}/${HashBrown.Context.environment}/${this.id}`;
+        let fullUrl = `/media/${this.context.project.id}/${this.context.environment}/${this.id}`;
         let thumbnailUrl = `${fullUrl}?thumbnail`;
 
         if(this.isImage()) {

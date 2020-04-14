@@ -35,7 +35,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click remove button
      */ 
     onClickRemove() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         
         HashBrown.Entity.View.Modal.DeleteProject.new({
             model: this.model
@@ -49,7 +49,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * @param {String} environmentName
      */
     onClickRemoveEnvironment(environmentName) {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         if(this.model.environments.length < 1) { return; }
 
         let modal = HashBrown.Entity.View.Modal.ModalBase.new({
@@ -75,7 +75,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click settings button
      */
     onClickSettings() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         
         HashBrown.Entity.View.Modal.ProjectSettings.new({
             model: this.model
@@ -87,7 +87,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
      * Event: Click backups button
      */
     onClickBackups() {
-        if(!HashBrown.Context.user.isAdmin) { return; }
+        if(!this.context.user.isAdmin) { return; }
         
         HashBrown.Entity.View.Modal.ProjectBackups.new({
             model: this.model

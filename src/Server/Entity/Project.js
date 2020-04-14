@@ -483,18 +483,16 @@ class Project extends require('Common/Entity/Project') {
     /**
      * Performs a series of unit test
      *
-     * @param {HashBrown.Entity.User} user
-     * @param {HashBrown.Entity.Project} project
+     * @param {HashBrown.Entity.Context} context
      * @param {Function} report
      */
-    static async test(user, project, report) {
-        checkParam(user, 'user', HashBrown.Entity.User, true);
-        checkParam(project, 'project', HashBrown.Entity.Project, true);
+    static async test(context, report) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(report, 'report', Function, true);
         
-        report(`Get project ${project.getName()}`);
+        report(`Get project ${context.project.getName()}`);
 
-        project = await HashBrown.Entity.Project.get(project.id);
+        let project = await this.get(context.project.id);
         
         report(`Add environment to project ${project.getName()}`);
         

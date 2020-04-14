@@ -10,7 +10,7 @@ module.exports = (_, model) => `
 
     <body class="page page--dashboard">
         <header class="page--dashboard__header">
-            ${model.user.isAdmin ? `
+            ${model.context.user.isAdmin ? `
                 <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Projects</a>
                 <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
                 <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
@@ -23,20 +23,20 @@ module.exports = (_, model) => `
                     <div class="page--dashboard__projects">
                         <div class="page--dashboard__projects__list">
                         
-                            ${model.user.isAdmin ? `
+                            ${model.context.user.isAdmin ? `
                                 <button class="page--dashboard__projects__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>Add project</button>
                             ` : ''}
                         </div>
                     </div>
 
-                ` : model.user.isAdmin && model.tab === 'users' ? `
+                ` : model.context.user.isAdmin && model.tab === 'users' ? `
                     <div class="page--dashboard__users">
                         <div class="page--dashboard__users__list">
                             <button class="page--dashboard__users__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>Add user</button>
                         </div>
                     </div>
 
-                ` : model.user.isAdmin && model.tab === 'server' ? `
+                ` : model.context.user.isAdmin && model.tab === 'server' ? `
                     <div class="page--dashboard__server">
                         <div class="page--dashboard__server__info">
                             <div class="widget-group">
@@ -86,9 +86,9 @@ module.exports = (_, model) => `
 
         <script>
             window.HashBrown = {};
-            HashBrown.Context = {
+            HashBrown.Client = {
                 rootUrl: "${model.rootUrl}",
-                user: ${JSON.stringify(model.user)},
+                context: ${JSON.stringify(model.context)},
                 view: "dashboard",
                 themes: ${JSON.stringify(model.themes)}
             };
@@ -97,7 +97,6 @@ module.exports = (_, model) => `
         <script src="${model.rootUrl}/js/common.js"></script>
         <script src="${model.rootUrl}/js/service.js"></script>
         <script src="${model.rootUrl}/js/entity.js"></script>
-        <script src="${model.rootUrl}/js/utilities.js"></script>
        
         <script src="${model.rootUrl}/js/dashboard.js"></script>
     </body>

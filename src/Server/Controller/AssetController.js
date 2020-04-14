@@ -95,7 +95,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
      *
      * @param {HTTP.IncomingMessage} request
      */
-    static async handle(request, response) {
+    static async handle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
         let path = this.getFilePath(request);
@@ -106,7 +106,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         if(exists) {
             let data = HashBrown.Service.FileService.readStream(path);
 
-            return new HttpResponse(data, 200, { 'Content-Type': type });
+            return new HashBrown.Http.Response(data, 200, { 'Content-Type': type });
         }
 
         return await super.handle(request);
@@ -115,8 +115,8 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     /**
      * Serves the theme stylesheet
      */
-    static async theme(request, params, body, query, user) {
-        let theme = user && user.theme ? user.theme : 'default';
+    static async theme(request, params, body, query, context) {
+        let theme = context.user && context.user.theme ? context.user.theme : 'default';
         let path = '';
 
         // If a theme name contains a slash, it's from a plugin
@@ -137,34 +137,34 @@ class AssetController extends HashBrown.Controller.ControllerBase {
 
         let data = HashBrown.Service.FileService.readStream(path);
 
-        return new HttpResponse(data, 200, { 'Content-Type': 'text/css' });
+        return new HashBrown.Http.Response(data, 200, { 'Content-Type': 'text/css' });
     }
 
     /**
      * Serves binary media data
      */
-    static async media(request, params, body, query, user) {
+    static async media(request, params, body, query, context) {
         let media = await HashBrown.Entity.Resource.Media.get(params.project, params.environment, params.id);
 
         if(!media) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
             
         let isThumbnail = ('thumbnail' in query);
         let url = isThumbnail ? await media.getThumbnailUrl() : await media.getContentUrl();
         
         if(!url) {
-            return new HttpResponse('Media URL could not be resolved', 404);
+            return new HashBrown.Http.Response('Media URL could not be resolved', 404);
         }
 
         let data = HashBrown.Service.FileService.readStream(url);
         let type = isThumbnail ? 'image/jpeg' : media.getContentTypeHeader();
 
         if(!data) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
-        return new HttpResponse(data, 200, { 'Content-Type': type });
+        return new HashBrown.Http.Response(data, 200, { 'Content-Type': type });
     }
 }
 

@@ -43,11 +43,11 @@ class FormController extends HashBrown.Controller.ResourceController {
     /**
      * @example GET /api/${project}/${environment}/forms/${id}/entries
      */
-    static async entries(request, params, body, query, user) {
-        let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
+    static async entries(request, params, body, query, context) {
+        let form = await HashBrown.Entity.Resource.Form.get(context, params.id);
 
         if(!form) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
         let csv = '';
@@ -72,7 +72,7 @@ class FormController extends HashBrown.Controller.ResourceController {
 
         let filename = form.getName().toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv';
 
-        return new HttpResponse(csv, 200, {
+        return new HashBrown.Http.Response(csv, 200, {
             'Content-Type': 'application/octet-stream',
             'Content-Disposition': `attachment; filename="${filename}"`,
             'Cache-Control': 'no-store'
@@ -82,7 +82,7 @@ class FormController extends HashBrown.Controller.ResourceController {
     /**
      * @example POST /api/${project}/${environment}/forms/${id}/submit { ... }
      */
-    static async submit(request, params, body, query, user) {
+    static async submit(request, params, body, query, context) {
         // Prevent spam
         if(
             lastIp != request.socket.remoteAddress || // This IP is not the same as the previous one
@@ -91,15 +91,15 @@ class FormController extends HashBrown.Controller.ResourceController {
             lastSubmission = Date.now();
             lastIp = request.socket.remoteAddress;
 
-            let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
+            let form = await HashBrown.Entity.Resource.Form.get(context, params.id);
 
             if(!form) {
-                return new HttpResponse('Not found', 404);
+                return new HashBrown.Http.Response('Not found', 404);
             }
             
             form.addEntry(body);
 
-            await form.save(user);
+            await form.save();
 
             if(form.redirect) {
                 let redirectUrl = form.redirect;
@@ -108,13 +108,13 @@ class FormController extends HashBrown.Controller.ResourceController {
                     redirectUrl = request.headers.referer + redirectUrl;
                 }
                 
-                return new HttpResponse('Redirecting...', 302, { 'Location': redirectUrl });
+                return new HashBrown.Http.Response('Redirecting...', 302, { 'Location': redirectUrl });
             }
 
-            return new HttpResponse('OK');
+            return new HashBrown.Http.Response('OK');
         
         } else {
-            return new HttpResponse('Spam prevention triggered. Please try again later.', 400);
+            return new HashBrown.Http.Response('Spam prevention triggered. Please try again later.', 400);
         
         }
     }
@@ -122,16 +122,16 @@ class FormController extends HashBrown.Controller.ResourceController {
     /**
      * @example POST /api/${project}/${environment}/forms/${id}/clear
      */
-    static async clear(request, params, body, query, user) {
-        let form = await HashBrown.Entity.Resource.Form.get(params.project, params.environment, params.id);
+    static async clear(request, params, body, query, context) {
+        let form = await HashBrown.Entity.Resource.Form.get(context, params.id);
 
         if(!form) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
         
-        await form.clear(params.project, params.environment);
+        await form.clear();
 
-        return new HttpResponse('OK');
+        return new HashBrown.Http.Response('OK');
     }
 }
 

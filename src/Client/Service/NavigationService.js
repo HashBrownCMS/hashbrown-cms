@@ -35,7 +35,7 @@ class NavigationService {
 
         if(!category) { return location.hash = '/content/'; }
 
-        let hasScope = HashBrown.Context.user.hasScope(HashBrown.Context.project.id, category);
+        let hasScope = HashBrown.Client.context.user.hasScope(HashBrown.Client.context.project.id, category);
         
         if(!hasScope) { return location.hash = '/content/'; }
    
@@ -57,7 +57,7 @@ class NavigationService {
      * @param {HashChangeEvent} e
      */
     static updateEditorSpace(e) {
-        if(HashBrown.Context.currentResourceEditor && HashBrown.Context.currentResourceEditor.isDirty) {
+        if(HashBrown.Client.currentResourceEditor && HashBrown.Client.currentResourceEditor.isDirty) {
             e.preventDefault();
 
             UI.highlight(false);
@@ -66,7 +66,7 @@ class NavigationService {
                 'Discard unsaved changes?',
                 'You have unsaved changes. Do you want to discard them?',
                 () => {
-                    HashBrown.Context.currentResourceEditor = null;
+                    HashBrown.Client.currentResourceEditor = null;
                     this.poke();
                 },
                 () => {
@@ -78,7 +78,7 @@ class NavigationService {
             return;
         }
 
-        HashBrown.Context.currentResourceEditor = null;
+        HashBrown.Client.currentResourceEditor = null;
         
         let category = this.getRoute(0);
         let resourceId = this.getRoute(1);
@@ -88,10 +88,10 @@ class NavigationService {
 
         space.innerHTML = '';
 
-        HashBrown.Context.currentResourceEditor = null;
+        HashBrown.Client.currentResourceEditor = null;
 
         if(isJson) {
-            HashBrown.Context.currentResourceEditor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
+            HashBrown.Client.currentResourceEditor = HashBrown.Entity.View.ResourceEditor.JsonEditor.new();
 
         } else {
             for(let name in HashBrown.Entity.View.ResourceEditor) {
@@ -100,18 +100,18 @@ class NavigationService {
                 if(type === HashBrown.Entity.View.ResourceEditor.JsonEditor) { continue; }
                 if(type.category !== category) { continue; }
 
-                HashBrown.Context.currentResourceEditor = type.new();
+                HashBrown.Client.currentResourceEditor = type.new();
                 break;
             }
         }
 
-        if(!HashBrown.Context.currentResourceEditor) {
+        if(!HashBrown.Client.currentResourceEditor) {
             space.innerHTML = `No resource editor for category "${category}" was found`;
             return;
         }
 
         space.appendChild(
-            HashBrown.Context.currentResourceEditor.element
+            HashBrown.Client.currentResourceEditor.element
         );
     }
 

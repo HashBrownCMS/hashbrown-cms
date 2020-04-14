@@ -16,15 +16,15 @@ class MediaController extends HashBrown.Controller.ResourceController {
      * @example POST /api/${project}/${environment}/media/${id} { folder: XXX, filename: XXX, full: XXX, thumbnail: XXX }
      * @example DELETE /api/${project}/${environment}/media/${id}
      */
-    static async resource(request, params, body, query, user) {
+    static async resource(request, params, body, query, context) {
         if(request.method !== 'POST') {
-            return await super.resource(request, params, body, query, user);
+            return await super.resource(request, params, body, query, context);
         }
         
-        let media = await HashBrown.Entity.Resource.Media.get(params.project, params.environment, params.id);
+        let media = await HashBrown.Entity.Resource.Media.get(context, params.id);
 
         if(!media) {
-            return new HttpResponse('Not found', 404);
+            return new HashBrown.Http.Response('Not found', 404);
         }
 
         media.adopt(body);
@@ -35,29 +35,23 @@ class MediaController extends HashBrown.Controller.ResourceController {
             thumbnail: body.thumbnail
         };
 
-        await media.save(user, options);
+        await media.save(options);
 
-        return new HttpResponse('OK', 200);
+        return new HashBrown.Http.Response('OK', 200);
     }
     
     /**
      * @example POST /api/${project}/${environment}/media/new { folder: XXX, filename: XXX, full: XXX }
      */
-    static async new(request, params, body, query, user) {
+    static async new(request, params, body, query, context) {
         let options = {
             filename: body.filename,
             full: body.full
         };
 
-        let media = await HashBrown.Entity.Resource.Media.create(
-            user,
-            params.project,
-            params.environment,
-            body,
-            options
-        );
+        let media = await HashBrown.Entity.Resource.Media.create(context, body, options);
 
-        return new HttpResponse(media);
+        return new HashBrown.Http.Response(media);
     }
 }
 

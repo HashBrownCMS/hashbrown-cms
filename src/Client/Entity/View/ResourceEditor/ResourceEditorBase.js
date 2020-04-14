@@ -55,7 +55,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.model &&
             this.model.viewedBy &&
             this.model.viewedOn &&
-            this.model.viewedBy !== HashBrown.Context.user.id &&
+            this.model.viewedBy !== this.context.user.id &&
             new Date() - this.model.viewedOn < HEARTBEAT_INTERVAL + HEARTBEAT_TIMEOUT
         ) {
             let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
@@ -117,7 +117,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
                 overview: 'Overview'
             };
 
-            if(HashBrown.Context.user.isAdmin && this.state.hasSettings) {
+            if(this.context.user.isAdmin && this.state.hasSettings) {
                 this.state.tabs.settings = 'Settings';
             }
         
@@ -240,7 +240,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.namedElements.save.classList.toggle('loading', true);
         }
 
-        await HashBrown.Context.project.setEnvironmentSettings(HashBrown.Context.environment, this.state.settings);
+        await this.context.project.setEnvironmentSettings(this.context.environment, this.state.settings);
 
         UI.notifySmall(`${this.state.title} settings saved successfully`, null, 3);
 

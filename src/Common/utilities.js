@@ -1,15 +1,85 @@
 'use strict';
 
+// Establish the base namespace
 let base;
 
 if(typeof window !== 'undefined') {
     base = window;
+    
+    base.IS_CLIENT = true;
+    base.IS_SERVER = false;
+
 } else if(typeof global !== 'undefined') {
     base = global;
+
+    base.IS_CLIENT = false;
+    base.IS_SERVER = true;
 }
 
 if(!base) {
     throw new Error('Base not found');
+}
+
+/**
+ * Gets a cookie by name
+ *
+ * @param {String} name
+ *
+ * @returns {String} value
+ */
+base.getCookie = function getCookie(name) {
+    if(!IS_CLIENT) { return ''; }
+
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+
+    if(parts.length === 2) {
+        return parts.pop().split(";").shift();
+    }
+
+    return '';
+}
+
+/**
+ * Copies string to the clipboard
+ *
+ * @param {String} string
+ */
+base.copyToClipboard = function copyToClipboard(string) {
+    if(!IS_CLIENT) { return; }
+
+    let text = document.createElement('TEXTAREA');
+
+    text.innerHTML = string;
+
+    document.body.appendChild(text);
+
+    text.select();
+
+    try {
+        let success = document.execCommand('copy');
+
+        if(!success) {
+            UI.error('Your browser does not yet support copying to clipboard');
+        }
+    } catch(e) {
+        UI.error(e.toString());
+    }
+
+    document.body.removeChild(text);
+}
+
+/**
+ * Checks for updates
+ */
+base.updateCheck = async function updateCheck() {
+    if(!IS_CLIENT) { return; }
+
+    let update = await HashBrown.Service.RequestService.customRequest('get', '/api/server/update/check');
+    
+    if(update && update.isBehind) {
+        UI.notifySmall('Update available', 'HashBrown can be updated to ' + update.remoteVersion + '. Please check the <a href="/readme">readme</a> for instructions.'); 
+    }
 }
 
 /**

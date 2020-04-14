@@ -78,7 +78,7 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
 
         for(let panel of Object.values(HashBrown.Entity.View.Panel)) {
             if(panel === HashBrown.Entity.View.Panel.PanelBase) { continue; }
-            if(!HashBrown.Context.user.hasScope(HashBrown.Context.project.id, panel.category)) { continue; }
+            if(!this.context.user.hasScope(this.context.project.id, panel.category)) { continue; }
         
             this.state.panels.push(panel);
 

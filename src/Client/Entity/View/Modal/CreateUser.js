@@ -35,7 +35,7 @@ class CreateUser extends HashBrown.Entity.View.Modal.ModalBase {
         let body = [
             `Hello ${this.model.fullName || this.model.username}!`,
             ``,
-            `You have been invited by ${HashBrown.Context.user.fullName || HashBrown.Context.user.username} to join a HashBrown CMS instance.`,
+            `You have been invited by ${this.context.user.fullName || this.context.user.username} to join a HashBrown CMS instance.`,
             `Please visit this URL to login:`,
             url,
             ``,
