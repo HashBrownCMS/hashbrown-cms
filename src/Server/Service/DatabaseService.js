@@ -208,7 +208,7 @@ class DatabaseService {
      *
      * @param {String} databaseName
      *
-     * @returns {Number} Timestamp
+     * @returns {String} Timestamp
      */
     static async dump(databaseName) {
         checkParam(databaseName, 'databaseName', String, true);
@@ -240,7 +240,7 @@ class DatabaseService {
         
         await HashBrown.Service.FileService.write(collections, archivePath);
 
-        return timestamp;
+        return timestamp.toString();
     }
 
     /**

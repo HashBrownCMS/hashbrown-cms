@@ -36,7 +36,6 @@ module.exports = (_, model) => `
             };
         </script>
 
-        <script src="/js/common.js"></script>
         <script src="/js/service.js"></script>
         <script src="/js/entity.js"></script>
         <script src="/js/utilities.js"></script>

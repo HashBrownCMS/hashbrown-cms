@@ -9,6 +9,6 @@ namespace('Entity.Resource')
 .add(require('./Form'))
 .add(require('./Media'))
 .add(require('./SchemaBase'))
-.add(require('Common/Entity/Resource/ContentSchema'))
-.add(require('Common/Entity/Resource/FieldSchema'))
+.add(require('./ContentSchema'))
+.add(require('./FieldSchema'))
 .add(require('./Publication'));

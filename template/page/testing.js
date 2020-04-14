@@ -10,12 +10,12 @@ module.exports = (_, model) => `
         <header class="page--dashboard__header">
             <a class="page--dashboard__header__tab ${model.tab === 'frontend' ? 'active': ''}" href="frontend">Frontend</a>
 
-            ${model.user.isAdmin ? ` 
+            ${model.context.user.isAdmin ? ` 
                 <a class="page--dashboard__header__tab ${model.tab === 'backend' ? 'active': ''}" href="backend">Backend</a>
             `: ''}
 
             <div class="page--dashboard__header__actions">
-                ${model.user.isAdmin && model.tab === 'backend' ? `
+                ${model.context.user.isAdmin && model.tab === 'backend' ? `
                     <button class="page--dashboard__backend-test__run widget widget--button">Run tests</button>
                 ` : ''}
 
@@ -33,7 +33,7 @@ module.exports = (_, model) => `
                     </div>
                 ` : ''}
 
-                ${model.user.isAdmin && model.tab === 'backend' ? `
+                ${model.context.user.isAdmin && model.tab === 'backend' ? `
                     <div class="page--dashboard__backend-test">
                         <pre class="page--dashboard__backend-test__messages"></pre>
                     </div>
@@ -45,14 +45,13 @@ module.exports = (_, model) => `
         
         <script>
             window.HashBrown = {};
-            HashBrown.Context = {
+            HashBrown.Client = {
                 rootUrl: "${model.rootUrl}",
-                user: ${JSON.stringify(model.user)},
+                context: ${JSON.stringify(model.context)},
                 themes: ${JSON.stringify(model.themes)}
             };
         </script>
         
-        <script src="${model.rootUrl}/js/common.js"></script>
         <script src="${model.rootUrl}/js/service.js"></script>
         <script src="${model.rootUrl}/js/entity.js"></script>
         

@@ -94,7 +94,6 @@ module.exports = (_, model) => `
             };
         </script>
 
-        <script src="${model.rootUrl}/js/common.js"></script>
         <script src="${model.rootUrl}/js/service.js"></script>
         <script src="${model.rootUrl}/js/entity.js"></script>
        

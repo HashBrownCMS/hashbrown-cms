@@ -27,7 +27,7 @@ class Form extends require('Common/Entity/Resource/Form') {
         report(`Update form ${form.getName()}`);
         
         form.name += ' (updated)';
-        await form.save(user);
+        await form.save();
             
         report(`Add entry to form ${form.getName()}`);
     
@@ -39,7 +39,7 @@ class Form extends require('Common/Entity/Resource/Form') {
             
         report(`Remove form ${form.getName()}`);
         
-        await form.remove(user);
+        await form.remove();
     }
 }
 

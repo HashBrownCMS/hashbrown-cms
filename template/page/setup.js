@@ -26,7 +26,7 @@ module.exports = (_, model) => `
         
         <script>
             window.HashBrown = {};
-            HashBrown.Context = {
+            HashBrown.Client = {
                 rootUrl: "${model.rootUrl}"
             };
         </script>

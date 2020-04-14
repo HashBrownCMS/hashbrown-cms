@@ -31,15 +31,15 @@ _.div({class: 'modal in'},
                 ),
 
                 // Only show theme picker to the current user
-                HashBrown.Context.user.id === model.id ? [
+                HashBrown.Client.context.user.id === model.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Theme'),
-                        _.popup({options: HashBrown.Context.themes, value: model.theme || 'default', onchange: _.onChangeTheme})
+                        _.popup({options: HashBrown.Client.themes, value: model.theme || 'default', onchange: _.onChangeTheme})
                     )
                 ] : null,
 
                 // Only show "is admin" switch to other admins
-                HashBrown.Context.user.isAdmin && model.id !== HashBrown.Context.user.id ? [
+                HashBrown.Client.context.user.isAdmin && model.id !== HashBrown.Client.context.user.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Administrator'),
                         _.checkbox({value: model.isAdmin, onchange: _.onChangeAdmin})
@@ -47,7 +47,7 @@ _.div({class: 'modal in'},
                 ] : null,
 
                 // Only show scope editors to admins for users who are not admins
-                HashBrown.Context.user.isAdmin && !model.isAdmin ? [
+                HashBrown.Client.context.user.isAdmin && !model.isAdmin ? [
                     _.div({class: 'widget widget--separator'}, 'Projects'),
                     _.each(state.projects, (i, project) => 
                         _.div({class: 'widget-group'},

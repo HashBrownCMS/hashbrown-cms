@@ -62,8 +62,7 @@ class Content extends require('Common/Entity/Resource/Content') {
      * @param {HashBrown.Entity.Context} context
      * @param {Object} options
      */
-    async remove(context, options = {}) {
-        checkParam(context, 'context', HashBrown.Entity.Context, true);
+    async remove(options = {}) {
         checkParam(options, 'options', Object, true);
         
         let children = await this.getChildren();
@@ -259,8 +258,8 @@ class Content extends require('Common/Entity/Resource/Content') {
         checkParam(excludeIds, 'excludeIds', Array);
         
         let result = await HashBrown.Service.DatabaseService.find(
-            projectId,
-            environment + '.content',
+            context.project.id,
+            context.environment + '.content',
             {
                 parentId: ''
             },

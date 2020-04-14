@@ -7,7 +7,7 @@ _.div({class: 'list-item--user'},
         _.popup({
             icon: 'ellipsis-v',
             role: 'item-menu',
-            options: HashBrown.Context.user.id === model.id ? {
+            options: HashBrown.Client.context.user.id === model.id ? {
                 'Edit': _.onClickEdit
             } : {
                 'Edit': _.onClickEdit,
@@ -15,7 +15,7 @@ _.div({class: 'list-item--user'},
             }
         }),
         _.h3({class: 'list-item--user__name'},
-            model.getName() + (model.id == HashBrown.Context.user.id ? ' (you)' : '')
+            model.getName() + (model.id == HashBrown.Client.context.user.id ? ' (you)' : '')
         ),
         _.div({class: 'list-item--user__type'},
             _.if(model.isAdmin,

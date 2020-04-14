@@ -132,7 +132,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
                     return new HashBrown.Http.Exception(`User by id ${id} not found`, 404);
                 }
                 
-                if(subject.id !== user.id && !user.isAdmin) {
+                if(subject.id !== context.user.id && !context.user.isAdmin) {
                     return new HashBrown.Http.Exception('You do not have sufficient privileges to change this user\'s information', 403);
                 }
 

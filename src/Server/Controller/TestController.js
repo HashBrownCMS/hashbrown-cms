@@ -29,6 +29,7 @@ class TestController extends HashBrown.Controller.ControllerBase {
 
         // Create a test project
         context.project = await HashBrown.Entity.Project.create('test ' + new Date().toString());
+        context.environment = 'live';
         
         report.push('✔ Create test project');
 

@@ -126,7 +126,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST /api/projects/${project}
      */
     static async project(request, params, body, query, context) {
-        if(!user.hasScope(params.project)) {
+        if(!context.user.hasScope(params.project)) {
             return new HashBrown.Http.Response(`You do not have access to project ${params.project}`, 403);
         }
         
@@ -162,7 +162,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
         for(let i = projects.length - 1; i >= 0; i--) {
             let id = projects[i];
            
-            if(!user.hasScope(id)) { 
+            if(!context.user.hasScope(id)) { 
                 projects.splice(i, 1);
             }
         }

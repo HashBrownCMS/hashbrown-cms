@@ -31,7 +31,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 user: true
             },
             '/testing': {
-                redirect: '/test/frontend',
+                redirect: '/testing/frontend',
                 user: true
             },
             '/testing/${tab}': {

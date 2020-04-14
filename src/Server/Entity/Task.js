@@ -158,7 +158,7 @@ class Task extends HashBrown.Entity.EntityBase {
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
 
-        let task = await this.get(projectId, environment, content, type);
+        let task = await this.get(context, content, type);
 
         if(!task) {
             task = this.new({
