@@ -156,6 +156,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         mergedSchema.name = childSchema.name;
         mergedSchema.parentId = childSchema.parentId;
         mergedSchema.icon = childSchema.icon || mergedSchema.icon;
+        mergedSchema.isLocked = childSchema.isLocked || false;
 
         // Merge config
         if(!mergedSchema.config) { mergedSchema.config = {}; }

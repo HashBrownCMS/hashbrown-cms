@@ -28,15 +28,13 @@ class TestController extends HashBrown.Controller.ControllerBase {
         let report = [];
 
         // Create a test project
-        context.project = await HashBrown.Entity.Project.create('test ' + new Date().toString());
+        context.project = await HashBrown.Entity.Project.create('Test Project ' + Date.now());
         context.environment = 'live';
         
-        report.push('✔ Create test project');
+        report.push(`✔ Create test project "${context.project.getName()}"`);
 
         // Find classes with static test methods
-        let testableClasses = [];
-
-        this.getTestableClasses(HashBrown, testableClasses);
+        let testableClasses = this.getTestableClasses(HashBrown);
 
         // Run test methods
         let errors = 0;
@@ -96,10 +94,13 @@ class TestController extends HashBrown.Controller.ControllerBase {
      * Gets testable classes in namespace
      *
      * @param {Object} namespace
-     * @param {Array} Classes
+     *
+     * @return {Array} Classes
      */
-    static getTestableClasses(namespace, classes) {
+    static getTestableClasses(namespace) {
         checkParam(namespace, 'namespace', Object);
+
+        let classes = [];
 
         for(let subNamespaceName in namespace) {
             let subNamespace = namespace[subNamespaceName];
@@ -110,10 +111,19 @@ class TestController extends HashBrown.Controller.ControllerBase {
                 }
 
             } else if(typeof subNamespace === 'object') {
-                this.getTestableClasses(subNamespace, classes);
+                classes = classes.concat(this.getTestableClasses(subNamespace));
 
             }
         }
+
+        classes.sort((a, b) => {
+            a = a.name;
+            b = b.name;
+
+            return a === b ? 0 : a < b ? -1 : 1;
+        });
+
+        return classes;
     }
 }
 

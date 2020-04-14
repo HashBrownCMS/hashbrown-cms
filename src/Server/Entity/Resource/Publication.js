@@ -271,6 +271,38 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
         return HashBrown.Service.FileService.readStream(cacheFile, 'utf8');
     }
+    
+    /**
+     * Performs a series of unit test
+     *
+     * @param {HashBrown.Entity.Context} context
+     * @param {Function} report
+     */
+    static async test(context, report) {
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
+        checkParam(report, 'report', Function, true);
+
+        report('Create publication');
+        
+        let publication = await this.create(context, { name: 'Test publication' });
+        
+        report(`Get publication ${publication.getName()}`);
+        
+        publication = await this.get(context, publication.id);
+
+        report(`Update publication ${publication.getName()}`);
+       
+        publication.name += ' (updated)';
+        await publication.save();
+        
+        report('Get all publications');
+        
+        await this.list(context);
+
+        report(`Remove publication ${publication.getName()}`);
+        
+        await publication.remove();
+    }
 }
 
 module.exports = Publication;
