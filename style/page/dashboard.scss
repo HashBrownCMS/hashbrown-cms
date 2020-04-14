@@ -103,6 +103,17 @@
             }
         }
     }
+    
+    // Backend test
+    &__backend-test {
+        &__messages {
+            color: var(--color-decor-text);
+            background-color: var(--color-decor-600);
+            border-radius: var(--border-radius-small);
+            padding: var(--padding-medium);
+            margin: 0 0 var(--padding-large) 0;
+        }
+    }
 
     // List views
     &__projects,

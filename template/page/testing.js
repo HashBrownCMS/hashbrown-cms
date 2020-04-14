@@ -35,7 +35,7 @@ module.exports = (_, model) => `
 
                 ${model.context.user.isAdmin && model.tab === 'backend' ? `
                     <div class="page--dashboard__backend-test">
-                        <pre class="page--dashboard__backend-test__messages"></pre>
+                        <pre class="page--dashboard__backend-test__messages">Press the "run tests" button to start.</pre>
                     </div>
                 ` : ''}
             </div>

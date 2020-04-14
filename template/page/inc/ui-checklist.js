@@ -133,12 +133,6 @@ module.exports = (_, model) => `
             <li>The order is maintained upon reload</li>
         </ul>
     </li>
-    <li>Can change publishing settings
-        <ul>
-            <li>Apply settings to children</li>
-            <li>Connections appear as options</li>
-        </ul>
-    </li>
 </ul>
 <h3>Editor</h3>
 <ul>
@@ -156,10 +150,9 @@ module.exports = (_, model) => `
             <li>Can publish</li>
             <li>Can preview</li>
             <li>Can unpublish</li>
-            <li>All publishing operations are performed through the associated Connections</li>
+            <li>All publishing operations are performed through the associated publications</li>
         </ul>
     </li>
-    <li>Publishing operations are hidden when no Connection is set in the Content's publishing settings</li>
     <li>Fields from parent Schemas are visible in the editor</li>
 </ul>
 <h3>Field types</h3>
@@ -319,25 +312,22 @@ module.exports = (_, model) => `
     <li>If "check for duplicates" is checked, no duplicates are allowed</li>
     <li>If a regex pattern is defined, it is checked properly</li>
 </ul>
-<h2>Connections</h2>
+<h2>Publications</h2>
 <h3>Publishing</h3>
 <ul>
-    <li>Can publish Content with every Connection type</li>
-    <li>Can unpublish Content with every Connection type</li>
-    <li>Can preview Content with every Connection type</li>
-    <li>Can see and edit Media with every Connection type</li>
+    <li>Can publish content with every deployer type</li>
+    <li>Can unpublish content with every deloyer type</li>
 </ul>
 <h3>Navbar</h3>
 <ul>
-    <li>Can create new Connection</li>
-    <li>Can copy Connection id</li>
-    <li>Can remove Connection</li>
-    <li>Can push Connection to remote</li>
-    <li>Can pull Connection from remote</li>
+    <li>Can create new publication</li>
+    <li>Can copy publication id</li>
+    <li>Can remove publication</li>
+    <li>Can push publication to remote</li>
+    <li>Can pull publication from remote</li>
 </ul>
 <h3>Editor</h3>
 <ul>
-    <li>Can set as Media provider</li>
     <li>Can edit title</li>
     <li>Can edit URL</li>
     <li>Can change type
