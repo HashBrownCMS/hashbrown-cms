@@ -53,6 +53,23 @@ class MigrationService {
             return true;
         }
 
+        let settings = await HashBrown.Service.DatabaseService.find(
+            projectId,
+            'settings',
+            {
+                $or: [
+                    { usedBy: { $exists: true } },
+                    { providers: { $exists: true } },
+                    { mediaProvider: { $exists: true } },
+                    { info: { $exists: true } },
+                ]
+            }
+        );
+
+        if(settings && settings.length > 0) {
+            return true;
+        }
+
         return false;
     }
 
@@ -199,10 +216,7 @@ class MigrationService {
                 ]
             },
             {
-                _id: 1,
-                usedBy: 1,
-                providers: 1,
-                info: 1
+                _id: 1
             }
         );
 
@@ -232,17 +246,17 @@ class MigrationService {
                     }
                 );
 
-                if(!connection) { continue; }
-          
-                settings.mediaDeployer = connection.deployer;
+                if(connection) {
+                    settings.mediaDeployer = connection.deployer;
 
-                if(settings.mediaDeployer && settings.mediaDeployer.paths) {
-                    settings.mediaDeployer.path = settings.mediaDeployer.paths.media;
-                
-                    delete settings.mediaDeployer.paths;
-                }
+                    if(settings.mediaDeployer && settings.mediaDeployer.paths) {
+                        settings.mediaDeployer.path = settings.mediaDeployer.paths.media;
                     
-                delete settings.mediaDeployer.name;
+                        delete settings.mediaDeployer.paths;
+                    }
+                        
+                    delete settings.mediaDeployer.name;
+                }
             }
 
             delete settings.providers;
@@ -254,7 +268,7 @@ class MigrationService {
 
             delete settings.info;
 
-            await HashBrown.Service.DatabaseService.mergeOne(
+            await HashBrown.Service.DatabaseService.replaceOne(
                 projectId,
                 'settings',
                 {

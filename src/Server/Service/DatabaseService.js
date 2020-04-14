@@ -354,9 +354,16 @@ class DatabaseService {
         checkParam(query, 'query', Object, true);
         checkParam(projection, 'projection', Object, true);
 
-        // Don't include _id in projection unless specified
-        if(!projection._id) {
+        // If _id was specified as the only projection parameter, return all fields
+        if(projection._id) {
+            if(Object.keys(projection).length === 1) {
+                projection = {};
+            }
+
+        // If _id was not specified, exclude it in the projection
+        } else {
             projection._id = 0;
+        
         }
 
         // Wrap query _id in ObjectID model
@@ -392,9 +399,16 @@ class DatabaseService {
         checkParam(projection, 'projection', Object, true);
         checkParam(sort, 'sort', Object);
 
-        // Don't include _id in projection unless specified
-        if(!projection._id) { 
+        // If _id was specified as the only projection parameter, return all fields
+        if(projection._id) {
+            if(Object.keys(projection).length === 1) {
+                projection = {};
+            }
+
+        // If _id was not specified, exclude it in the projection
+        } else {
             projection._id = 0;
+        
         }
         
         // Wrap query _id in ObjectID model
@@ -496,6 +510,35 @@ class DatabaseService {
         let db = await this.connect(databaseName);
 
         await db.collection(collectionName).updateOne(query, { $set: doc }, options || {});
+    }
+    
+    /**
+     * Replaces a single Mongo document
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     * @param {Object} query
+     * @param {Object} doc
+     * @param {Object} options
+     */
+    static async replaceOne(databaseName, collectionName, query, doc, options = {}) {
+        checkParam(databaseName, 'databaseName', String, true);
+        checkParam(collectionName, 'collectionName', String, true);
+        checkParam(query, 'query', Object, true);
+        checkParam(doc, 'doc', Object, true);
+        checkParam(options, 'options', Object, true);
+        
+        // Wrap query _id in ObjectID model
+        if(query._id) {
+            query._id = new MongoDB.ObjectID(query._id);
+        }
+        
+        // Make sure the MongoId isn't included
+        delete doc['_id'];
+
+        let db = await this.connect(databaseName);
+
+        await db.collection(collectionName).replaceOne(query, doc, options || {});
     }
     
     /**
