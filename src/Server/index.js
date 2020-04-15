@@ -26,7 +26,16 @@ require('Server/Controller');
 // Service shortcuts
 global.debug = HashBrown.Service.DebugService;
 
+// State object for storing relevant current values
+let state = {};
+
+/**
+ * Serves any request
+ */
 async function serve(request, response) {
+    state.request = request;
+    state.response = response;
+
     let result = new HashBrown.Http.Response(`No route matched ${request.method} ${request.url}`, 404);
 
     for(let name in HashBrown.Controller) {
@@ -43,20 +52,39 @@ async function serve(request, response) {
     result.end(response);
 }
 
+/**
+ * Handles uncaught exceptions
+ */
+async function exception(error) {
+    debug.error(error, 'HashBrown', true);
+
+    if(state.response) {
+        let result = new HashBrown.Http.Response(error.stack || error.message || 'Unexpected error', error.code || 500);
+    
+        result.end(state.response);
+    }
+}
+
+/**
+ * Starts the application
+ */
 async function main() {
     // Check CLI input
     await HashBrown.Controller.InputController.handle();
 
     // Register system cleanup event
-    for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'exit' ]) {
+    for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'exit' ]) {
         process.on(signal, (e) => {
             if(e instanceof Error) {
-                debug.error(e);
+                debug.error(e, 'HashBrown', true);
             }
 
             HashBrown.Service.EventService.trigger('stop');
         });
     }
+
+    // Handle uncaught exceptions
+    process.on('uncaughtException', exception);
 
     // Perform migration tasks
     await HashBrown.Service.MigrationService.migrate();

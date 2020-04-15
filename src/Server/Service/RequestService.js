@@ -107,7 +107,7 @@ class RequestService {
                 let options = {
                     port: url.port,
                     host: url.hostname,
-                    path: url.pathname,
+                    path: url.pathname + url.search,
                     method: method,
                     headers: headers
                 };
@@ -158,12 +158,10 @@ class RequestService {
                            
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
-                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + method + ' ' + url.protocol + '//' + Path.join(url.host, url.path));
-                               
-                                error.url = url;
-                                error.statusCode = res.statusCode;
-
-                                return reject(error);
+                                return reject(new HashBrown.Http.Exception(
+                                    res.statusMessage + '\nat ' + method + ' ' + url.toString(),
+                                    res.statusCode
+                                ));
                             }
                             
                             resolve(result, res);

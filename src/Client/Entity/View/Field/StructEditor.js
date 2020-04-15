@@ -54,7 +54,9 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             } else {
                 let view = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
                     definition,
-                    this.state.value ? this.state.value[key] : null
+                    this.state.value ? this.state.value[key] : null,
+                    {},
+                    this.model.isDisabled
                 );
           
                 view.on('change', (newValue) => {

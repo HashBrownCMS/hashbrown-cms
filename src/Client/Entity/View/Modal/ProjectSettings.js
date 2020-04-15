@@ -67,7 +67,7 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
             let url = this.model.settings.sync.url;
    
             if(username && password && url) {
-                let token = await HashBrown.Service.RequestService.request( 'post', this.model.settings.sync.project + '/sync/login', { username: username, password: password, url: url });
+                let token = await HashBrown.Service.RequestService.request('post', `projects/${this.model.id}/sync/token`, { username: username, password: password, url: url });
 
                 this.model.settings.sync.token = token;
                 
@@ -77,13 +77,14 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
         } catch(e) {
             UI.error(e);
 
-        }
+        } finally {
+            let inputGroup = this.element.querySelector('.modal--project-settings__sync-token__input');
+            let loginGroup = this.element.querySelector('.modal--project-settings__sync-token__login');
         
-        let inputGroup = this.element.querySelector('.modal--project-settings__sync-token__input');
-        let loginGroup = this.element.querySelector('.modal--project-settings__sync-token__login');
-    
-        inputGroup.removeAttribute('style');
-        loginGroup.style.display = 'none';
+            inputGroup.removeAttribute('style');
+            loginGroup.style.display = 'none';
+        
+        }
     }
 
     /**

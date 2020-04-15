@@ -59,15 +59,10 @@ class Project extends require('Common/Entity/Project') {
             id: id
         });
 
-        let data = {
-            id: project.id,
-            settings: await project.getSettings(),
-            environments: await project.getEnvironments(),
-            users: await project.getUsers(),
-            backups: await project.getBackups()
-        };
-
-        project.adopt(data);
+        project.settings = await project.getSettings();
+        project.environments = await project.getEnvironments();
+        project.users = await project.getUsers();
+        project.backups = await project.getBackups();
 
         return project;
     }
@@ -167,27 +162,63 @@ class Project extends require('Common/Entity/Project') {
     async getSyncToken(username, password, url) {
         checkParam(username, 'username', String, true);
         checkParam(password, 'password', String, true);
-        checkParam(url, 'url', String);
+        checkParam(url, 'url', String, true);
 
-        let settings = await this.getSyncSettings(true);
-
-        if(url) { settings.url = url; }
-
-        if(!settings.url || !settings.project) {
-            throw new Error('Invalid sync settings');
-        }
-
-        return await HashBrown.Service.RequestService.request(
-            'get',
-            settings.url + '/api/user/login',
+        let token = await HashBrown.Service.RequestService.request(
+            'post',
+            url + '/api/user/login',
             {
                 persist: true,
                 username: username,
                 password: password
             }
         );
+
+        return token;
     }
-    
+   
+    /**
+     * Gets sync settings
+     *
+     * @param {Boolean} skipValidation
+     *
+     * @return {Object} Settings
+     */
+    async getSyncSettings(skipValidation = false) {
+        checkParam(skipValidation, 'skipValidation', Boolean);
+
+        let sync = (await HashBrown.Service.DatabaseService.findOne(
+            this.id,
+            'settings',
+            {
+                environment: { $exists: false }
+            }
+        ) || {}).sync;
+
+        if(skipValidation) { return sync; }
+
+        if(!sync || !sync.enabled) { return null; }
+
+        if(
+            !sync.project ||
+            !sync.url ||
+            !sync.token ||
+            sync.project === this.id
+        ) {
+            throw new Error('Invalid sync settings');
+        }
+
+        try {
+            new URL(sync.url);
+        
+        } catch(e) {
+            throw new Error('Invalid sync URL');
+
+        }
+
+        return sync;
+    }
+
     /**
      * Gets settings
      *
@@ -198,34 +229,42 @@ class Project extends require('Common/Entity/Project') {
     async getSettings(section = '') {
         checkParam(section, 'section', String);
         
-        let settings = null;
+        let sync = await this.getSyncSettings();
+        
+        if(section === 'sync') { return sync; }
 
-        // Attempt remote fetch of project settings
-        let sync = (await HashBrown.Service.DatabaseService.findOne(
+        // Get settings from local database
+        let settings = await HashBrown.Service.DatabaseService.findOne(
             this.id,
             'settings',
             {
                 environment: { $exists: false }
             }
-        ) || {}).sync;
-
-        if(sync && sync.enabled && section !== 'sync') {
-            settings = await HashBrown.Service.RequestService.request(
+        );
+        
+        // Attempt remote fetch of project settings
+        if(sync) {
+            let remoteSettings = await HashBrown.Service.RequestService.request(
                 'get',
-                sync.url + '/api/projects/' + this.id + '/settings',
+                sync.url + '/api/projects/' + sync.project + '/settings',
                 { token: sync.token }
             );
-        }
 
-        // Get settings from local database
-        if(!settings) {
-            settings = await HashBrown.Service.DatabaseService.findOne(
-                this.id,
-                'settings',
-                {
-                    environment: { $exists: false }
+            if(remoteSettings) {
+                if(remoteSettings.name) {
+                    settings.name += ' (' + remoteSettings.name + ')';
                 }
-            );
+
+                delete remoteSettings.name;
+                delete remoteSettings.sync;
+
+                // Merge remote settings with local ones, respecting overrides
+                for(let key in remoteSettings) {
+                    if(settings[key] && Object.keys(settings[key]).length > 0) { continue; }
+                    
+                    settings[key] = remoteSettings[key];
+                }
+            }
         }
 
         if(!settings) { return null; }
@@ -246,7 +285,7 @@ class Project extends require('Common/Entity/Project') {
     async setSettings(settings, section = '') {
         checkParam(settings, 'settings', Object, true);
         checkParam(section, 'section', String);
-
+        
         if(section) {
             let oldSettings = await HashBrown.Service.DatabaseService.findOne(this.id, 'settings', {});
 
@@ -352,6 +391,12 @@ class Project extends require('Common/Entity/Project') {
      */
     async addEnvironment(name) {
         checkParam(name, 'name', String, true);
+        
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            throw new Error('Cannot add environments to synced projects');
+        }
 
         if(name.length < 2) {
             throw new Error('Environment name must be at least 2 characters long');
@@ -377,6 +422,16 @@ class Project extends require('Common/Entity/Project') {
     async getEnvironmentSettings(environment, section = '') {
         checkParam(environment, 'environment', String, true);
         checkParam(section, 'section', String);
+        
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            return await HashBrown.Service.RequestService.request(
+                'get',
+                sync.url + '/api/projects/' + sync.project + '/environments/' + environment,
+                { token: sync.token }
+            );
+        }
 
         let settings = await HashBrown.Service.DatabaseService.findOne(
             this.id,
@@ -407,6 +462,12 @@ class Project extends require('Common/Entity/Project') {
         checkParam(settings, 'settings', Object, true);
         checkParam(section, 'section', String);
 
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            throw new Error('Cannot set environment settings on synced projects');
+        }
+        
         let existingSettings = await this.getEnvironmentSettings(environment);
 
         if(!existingSettings) {
@@ -436,6 +497,12 @@ class Project extends require('Common/Entity/Project') {
     async removeEnvironment(name) {
         checkParam(name, 'name', String, true);
 
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            throw new Error('Cannot remove environments on synced projects');
+        }
+        
         await HashBrown.Service.DatabaseService.remove(this.id, 'settings', { environment: name });
     }
     
@@ -445,6 +512,16 @@ class Project extends require('Common/Entity/Project') {
      * @return {Array} Environment names
      */
     async getEnvironments() {
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            return await HashBrown.Service.RequestService.request(
+                'get',
+                sync.url + '/api/projects/' + sync.project + '/environments',
+                { token: sync.token }
+            );
+        }
+
         let collections = await HashBrown.Service.DatabaseService.find(
             this.id,
             'settings',

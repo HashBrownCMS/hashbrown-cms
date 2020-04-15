@@ -100,15 +100,15 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         for(let key in schemaFields) {
             let field = await HashBrown.Entity.View.Field.FieldBase.createFromFieldDefinition(
                 schemaFields[key],
-                contentFields[key]
+                contentFields[key],
+                {},
+                this.model.isLocked
             );
-
+            
             if(fieldStates[key]) {
                 field.state.isCollapsed = fieldStates[key].isCollapsed === true;
             }
             
-            field.model.isDisabled = this.model.isLocked;
-
             if(this.state.tab === 'meta') {
                 field.on('change', (newValue) => {  
                     this.onChangeValue(key, newValue);

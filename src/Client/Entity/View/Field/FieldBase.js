@@ -12,10 +12,11 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * @param {Object} definition
      * @param {*} value
      * @param {Object} state
+     * @param {Boolean} isDisabled
      *
      * @return {HashBrown.Entity.View.Field.FieldBase} Field
      */
-    static async createFromFieldDefinition(definition, value = null, state = {}) {
+    static async createFromFieldDefinition(definition, value = null, state = {}, isDisabled = false) {
         checkParam(definition, 'definition', Object, true);
 
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(definition.schemaId, { withParentFields: true });
@@ -28,7 +29,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         let model = {
             config: config,
             description: definition.description,
-            isDisabled: definition.disabled,
+            isDisabled: definition.disabled || state.isDisabled || isDisabled,
             isMultilingual: definition.multilingual,
             label: definition.label,
             schema: schema,
@@ -48,16 +49,18 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      *
      * @param {HashBrown.Entity.Resource.FieldSchema} schema
      * @param {*} value
+     * @param {Boolean} isDisabled
      *
      * @return {HashBrown.Entity.View.Field.FieldBase} Field
      */
-    static createFromSchema(schema, value) {
+    static createFromSchema(schema, value, isDisabled = false) {
         checkParam(schema, 'schema', HashBrown.Entity.Resource.SchemaBase, true);
 
         let model = {
             schema: schema,
             config: schema.config,
-            value: value
+            value: value,
+            isDisabled: isDisabled
         };
         
         let type = HashBrown.Entity.View.Field[schema.editorId] || HashBrown.Entity.View.Field.FieldBase;
@@ -72,17 +75,18 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      *
      * @param {String} schemaId
      * @param {*} value
+     * @param {Boolean} isDisabled
      *
      * @return {HashBrown.Entity.View.Field.FieldBase} Field
      */
-    static async createFromSchemaId(schemaId, value) {
+    static async createFromSchemaId(schemaId, value, isDisabled = false) {
         checkParam(schemaId, 'schemaId', String, true);
         
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId, { withParentFields: true });
     
         if(!schema) { return null; }
         
-        return this.createFromSchema(schema, value);
+        return this.createFromSchema(schema, value, isDisabled);
     }
 
     /**

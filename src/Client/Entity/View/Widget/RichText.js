@@ -22,10 +22,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Fetches the model
      */
     async fetch() {
-        let provider = await HashBrown.Entity.Resource.Media.getProvider();
+        let deployer = await HashBrown.Entity.Resource.Media.getDeployer();
 
-        if(provider) {
-            this.state.mediaPath = '/' + provider.deployer.paths.media.split('/').filter(Boolean).join('/');
+        if(deployer) {
+            this.state.mediaPath = '/' + deployer.path.split('/').filter(Boolean).join('/');
         } else {
             this.state.mediaPath = '/media';
         }

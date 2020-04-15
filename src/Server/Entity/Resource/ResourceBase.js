@@ -60,7 +60,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
                 resource = await HashBrown.Service.RequestService.request(
                     'get',
-                    sync.url + '/api/' + sync.project + '/' + this.category + '/' + id,
+                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.category + '/' + id,
                     options
                 );
 
@@ -90,13 +90,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(options, 'options', Object, true);
         
+        // Get local resources
         let resources = await HashBrown.Service.DatabaseService.find(
             context.project.id,
             context.environment + '.' + this.category,
             options
         );
 
-        // Attempt remote fetch
+        // Attempt remote fetch and merge with local
         if(!options.localOnly) {
             let sync = await context.project.getSyncSettings();
 
@@ -113,7 +114,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
                 let remoteResources = await HashBrown.Service.RequestService.request(
                     'get',
-                    sync.url + '/api/' + sync.project + '/' + this.category,
+                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.category,
                     options
                 );
 
@@ -126,7 +127,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
                     allResources[resource.id] = resource;
                 }
 
-                resources = Object.values(resources);
+                resources = Object.values(allResources);
             }
         }
 

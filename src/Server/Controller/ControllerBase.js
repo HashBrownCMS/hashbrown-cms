@@ -345,6 +345,9 @@ class ControllerBase {
             });
         }
 
+        // Exlude "token" from the query, as it's only used for authentication
+        delete requestQuery.token;
+
         return requestQuery;
     }
 
@@ -405,18 +408,18 @@ class ControllerBase {
     static getToken(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
 
+        let requestSearchParams = this.getUrl(request).searchParams;
+
+        if(requestSearchParams && requestSearchParams.get('token')) {
+            return requestSearchParams.get('token');
+        }
+
         for(let kvp of (request.headers.cookie || '').split(';')) {
             kvp = kvp.split('=');
 
             if(kvp[0] !== 'token') { continue; }
 
             return kvp[1];
-        }
-
-        let requestSearchParams = this.getUrl(request).searchParams;
-
-        if(requestSearchParams) {
-            return requestSearchParams.get('token');
         }
 
         return null;

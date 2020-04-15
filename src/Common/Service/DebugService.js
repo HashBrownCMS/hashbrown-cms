@@ -171,8 +171,8 @@ class DebugService {
         this.onLog(sender, error.message || error.trace);
    
         if(suppress) {
-            if(error.trace) {
-                console.log(error.trace);
+            if(error.stack) {
+                console.log(error.stack);
             } else {
                 console.trace();
             }

@@ -5,6 +5,20 @@
  */
 class Media extends require('Common/Entity/Resource/Media') {
     /**
+     * Gets the media deployer
+     *
+     * @return {Object} Deployer
+     */
+    static async getDeployer() {
+        let context = HashBrown.Client.context;
+        let deployer = await context.project.getEnvironmentSettings(context.environment, 'mediaDeployer');
+        
+        if(!deployer || !deployer.alias) { return null; }
+
+        return deployer;
+    }
+    
+    /**
      * Gets the markup for diplaying this media entity
      *
      * @return {String} HTML

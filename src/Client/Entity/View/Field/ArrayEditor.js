@@ -89,9 +89,10 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                         
                 let view = await HashBrown.Entity.View.Field.FieldBase.createFromSchemaId(
                     item.schemaId,
-                    item.value
+                    item.value,
+                    this.model.isDisabled
                 );
-
+            
                 if(!view) { continue; }
 
                 view.state.isCollapsible = true;
