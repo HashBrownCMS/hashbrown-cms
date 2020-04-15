@@ -169,9 +169,10 @@ class MigrationService {
                     publication.rootContents.push(content.id);
                 }
 
-                if(publication.rootContents.length > 0) {
-                    publication.includeRoot = true;
-                }
+                // If no content is associated with this publication, don't migrate it
+                if(publication.rootContents.length < 1) { continue; }
+                
+                publication.includeRoot = true;
 
                 // Set dates
                 if(!publication.createdOn) {
