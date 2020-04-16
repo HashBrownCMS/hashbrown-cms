@@ -6,6 +6,12 @@ const MAX_CACHE_TIME = 1000 * 60 * 5; // 5 minutes
  * The base class for resources
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
+    /**
+     * Enables/disables memory caching
+     * This should only be used with extremely frequently accessed resources
+     *
+     * @return {Boolean} Use caching
+     */
     static get useCaching() { return false; }
 
     /**
