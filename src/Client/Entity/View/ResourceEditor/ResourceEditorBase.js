@@ -286,7 +286,11 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
                 this.namedElements.save.classList.toggle('loading', false);
             }
 
-            this.render();
+            if(this.state.id && this.state.id !== this.model.id) {
+                location.hash = '/' + this.category + '/' + this.model.id;
+            } else {
+                this.render();
+            }
         }
     }
     
