@@ -118,12 +118,14 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Gets a URL safe name for this schema
+     * Gets all children of this schema
+     *
+     * @return {Array} Children
      */
-    getUrlSafeName() {
-        return this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    async getChildren() {
+        return await this.constructor.list(this.context, { parentId: this.id, customOnly: true });
     }
-   
+
     /**
      * Merges two sets of schema data
      *

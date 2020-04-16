@@ -43,6 +43,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         checkParam(id, 'id', String, true);
         checkParam(options, 'options', Object, true);
 
+        // Get the resource from database
         let resource = await HashBrown.Service.DatabaseService.findOne(
             context.project.id,
             context.environment + '.' + this.category,
@@ -50,7 +51,12 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
                 id: id
             }
         );
-        
+      
+        // Make sure it's not locked
+        if(resource) {
+            resource.isLocked = false;
+        }
+
         // If the resource was not found locally, attempt remote fetch
         if(!resource && !options.localOnly) {
             let sync = await context.project.getSyncSettings();
@@ -75,7 +81,16 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         resource.context = context;
         
-        return this.new(resource);
+        resource = this.new(resource);
+        
+        // Ensure modification date
+        if(!resource.updatedOn && !resource.isLocked) {
+            resource.updatedOn = resource.createdOn || new Date();
+
+            await resource.save();
+        }
+
+        return resource;
     }
     
     /**
@@ -96,6 +111,11 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             context.environment + '.' + this.category,
             options
         );
+
+        // Make sure they're not locked
+        for(let resource of resources) {
+            resource.isLocked = false;
+        }
 
         // Attempt remote fetch and merge with local
         if(!options.localOnly) {
@@ -131,14 +151,25 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
             }
         }
 
-        // Apply models and context
+        // Post process
         for(let i = resources.length - 1; i >= 0; i--) {
+            // Include context
             resources[i].context = context;
             
+            // Apply model
             resources[i] = this.new(resources[i]);
         
+            // Exclude null resources
             if(!resources[i]) {
                 resources.splice(i, 1);
+                continue;
+            }
+
+            // Ensure modification date
+            if(!resources[i].updatedOn && !resources[i].isLocked) {
+                resources[i].updatedOn = resources[i].createdOn || new Date();
+
+                await resources[i].save();
             }
         }
 
@@ -199,8 +230,18 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     async save(options = {}) {
         checkParam(options, 'options', Object, true);
 
+        // Check if this resource is locked
         if(this.isLocked) {
             throw new Error(`The resource ${this.id} (${this.getName()}) is locked`);
+        }
+
+        // If the id has been changed, check for duplicate ids
+        if(options.id && options.id !== this.id) {
+            let existingResource = await this.constructor.get(this.context, this.id);
+
+            if(existingResource) {
+                throw new HashBrown.Http.Exception(`A resource with the id "${this.id}" already exists`, 403);
+            }
         }
 
         // Unset sync flags
@@ -302,7 +343,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
                 id: this.id
             },
             {
-                viewedBy: user.id,
+                viewedBy: this.context.user.id,
                 viewedOn: new Date()
             }
         );

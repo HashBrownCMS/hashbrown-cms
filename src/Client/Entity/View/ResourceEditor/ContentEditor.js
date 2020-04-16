@@ -158,38 +158,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     }
 
     /**
-     * Event: Click save
-     */
-    async onClickSave() {
-        this.state.title = this.model.getName();
-        
-        if(this.namedElements.save) {
-            this.namedElements.save.classList.toggle('loading', true);
-        }
-
-        try {
-            await this.model.save();
-        
-            if(this.model.isPublished) {
-                UI.notifySmall(`"${this.state.title}" published successfully`, null, 3);
-            
-            } else {
-                UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-
-            }
-
-            this.setDirty(false);
-        
-        } catch(e) {
-            UI.error(e);
-        }
-        
-        if(this.namedElements.save) {
-            this.namedElements.save.classList.toggle('loading', false);
-        }
-    }
-
-    /**
      * Event: Language changed
      */
     onChangeLanguage() {

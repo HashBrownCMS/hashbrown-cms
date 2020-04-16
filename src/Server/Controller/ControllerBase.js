@@ -12,54 +12,6 @@ const MAX_UPLOAD_SIZE = 20e6;
  */
 class ControllerBase {
     /**
-     * Gets the last modified time from a request
-     *
-     * @param {HTTP.IncomingMessage} request
-     *
-     * @return {Date} Time
-     */
-    static async getLastModified(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
-        
-        if(!this.lastModified) { 
-            this.lastModified = {};
-        }
-        
-        let key = this.getUrl(request).pathname;
-
-        // Mutation: Reset last modifed dates on any other request methods than GET
-        if(request.method !== 'GET') {
-            this.resetLastModified(key);
-        }
-
-        // Mutation: Set a new last modified date if needed
-        if(!this.lastModified[key]) {
-            this.lastModified[key] = new Date();
-        }
-
-        return this.lastModified[key];
-    }
-
-    /**
-     * Resets last modified dates related to a key
-     *
-     * @param {String} key
-     */
-    static resetLastModified(key) {
-        checkParam(key, 'key', String);
-        
-        if(!key || !this.lastModified) { return; }
-
-        for(let k in this.lastModified) {
-            if(k.indexOf(key) < 0 && key.indexOf(k) < 0) {
-                continue;
-            }
-
-            delete this.lastModified[k];
-        }
-    }
-
-    /**
      * Gets a response based on a request
      *
      * @param {HTTP.IncomingMessage} request
@@ -81,31 +33,24 @@ class ControllerBase {
         // Check if this controller can handle the request
         if(!this.canHandle(request)) { return null; }
    
-        // Get cache info
-        let requestMTime = request.headers['If-Modified-Since'] || request.headers['if-modified-since'];
-        let responseMTime = await this.getLastModified(request);
-        let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
-        let responseETag = responseMTime ? '"' + (this.getUrl(request).pathname.match(/[^\/]+/g) || []).join('-') + '--' + responseMTime.getTime() + '"' : null;
-
-        let mTimeMatch = requestMTime && responseMTime && new Date(requestMTime) >= new Date(responseMTime);
-        let eTagMatch = requestETag && responseETag && requestETag === responseETag;
-
-        // ETag was matched, return 304
-        if(request.method === 'GET' && (eTagMatch || mTimeMatch)) {
-            return new HashBrown.Http.Response('Not modified', 304);
-        }
-
         // Generate response
         try {
             let response = await this.handle(request);
 
-            // Include ETag and cache response, if allowed to store
+            // Check for cache matches
             if(request.method === 'GET' && response.headers['Cache-Control'] !== 'no-store') {
-                response.headers['ETag'] = responseETag;
-            }
+                let requestMTime = request.headers['If-Modified-Since'] || request.headers['if-modified-since'];
+                let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
+                let responseMTime = response.headers['Last-Modified'];
+                let responseETag = response.headers['ETag'];
 
-            if(!response.headers['Last-Modified'] && responseMTime) {
-                response.headers['Last-Modified'] = responseMTime.toString();
+                // Compare modified date and ETag, set response code to 304 if needed
+                let mTimeMatch = requestMTime && responseMTime && new Date(requestMTime) >= new Date(responseMTime);
+                let eTagMatch = requestETag && responseETag && requestETag === responseETag;
+                
+                if(mTimeMatch || eTagMatch) {
+                    response.code = 304;
+                }
             }
 
             return response;
@@ -170,66 +115,35 @@ class ControllerBase {
 
             if(patternParts.length !== requestParts.length) { continue; }
 
-            let regexMatches = 0;
-            let exactMatches = 0;
+            let matches = 0;
+            let parameters = {};
 
             for(let i in requestParts) {
-                let requestPart = requestParts[i];
-                let patternPart = patternParts[i];
+                let requestPart = requestParts[i] || '';
+                let patternPart = patternParts[i] || '';
 
-                if(requestPart === patternPart) {
-                    exactMatches++;
+                let exactMatch = requestPart === patternPart;
+                let parameterMatch = patternPart.match(/\${([^}]+)}/)
+                
+                if(exactMatch || parameterMatch) {
+                    matches++;
                 }
-
-                if(patternPart.match(/\${[^}]+}/)) {
-                    regexMatches++;
+               
+                if(parameterMatch) {
+                    parameters[parameterMatch[1]] = requestPart;
                 }
             }
-
-            let matches = regexMatches + exactMatches;
 
             if(matches !== patternParts.length) { continue; }
 
             route = routes[pattern];
             route.pattern = pattern;
+            route.parameters = parameters;
 
             break;
         }
 
         return route;
-    }
-
-    /**
-     * Parses a request path and route pattern into a parameters object
-     *
-     * @param {String} path
-     * @param {String} pattern
-     *
-     * @return {Object} Parameters
-     */
-    static getRequestParameters(path, pattern) {
-        checkParam(path, 'path', String);
-        checkParam(pattern, 'pattern', String);
-
-        if(!path || !pattern) { return {}; }
-
-        let pathParts = path.split('/');
-        let patternParts = pattern.split('/');
-            
-        let params = {};
-                
-        for(let i in pathParts) {
-            let match = (patternParts[i] || '').match(/\${([^}]+)}/);
-
-            if(!match || !match[1]) { continue; }
-            
-            let key = match[1];
-            let value = pathParts[i];
-
-            params[key] = value;
-        }
-
-        return params;
     }
 
     /**
@@ -239,12 +153,11 @@ class ControllerBase {
      */
     static async handle(request) {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
-       
-        let requestPath = this.getUrl(request).pathname;
-        let route = this.getRoute(request);
 
+        let route = this.getRoute(request);
+        
         if(!route) {
-            return new HashBrown.Http.Response('Not found', 404);
+            throw new HashBrown.Http.Exception('Not found', 404);
         }
        
         if(typeof route.redirect === 'string') {
@@ -252,65 +165,32 @@ class ControllerBase {
         }
 
         if(typeof route.handler !== 'function') {
-            return new HashBrown.Http.Response(`Handler for route ${requestPath} is not a function`, 500);
+            throw new HashBrown.Http.Exception(`Handler for route ${route.pattern} is not a function`, 500);
         }
-        
-        // Initialise context
-        let context = new HashBrown.Entity.Context();
 
-        // Get request parameters
-        let requestParameters = this.getRequestParameters(requestPath, route.pattern);
+        let user = null;
 
         // Authenticated user
-        if(route.user === true) {
-            context.user = await this.authorize(request, requestParameters.project);
+        if(route.user) {
+            user = await this.authorize(request, route.parameters.project, route.user.scope, route.user.isAdmin);
         
-        // Permissions specified
-        } else if(typeof route.user === 'object') {
-            context.user = await this.authorize(request, requestParameters.project, route.user.scope, route.user.isAdmin);
-        
-        // Anonymous
+        // Potentially anonymous user
         } else {
-            context.user = await this.authenticate(request, true);
+            user = await this.authenticate(request, true);
 
-        }
-
-        // Validate project
-        if(requestParameters.project) {
-            context.project = await HashBrown.Entity.Project.get(requestParameters.project);
-
-            if(!context.project) {
-                throw new HashBrown.Http.Exception(`Project "${requestParameters.project}" could not be found`, 404);
-            }
-
-            // Validate environment
-            if(requestParameters.environment) {
-                let environmentExists = await context.project.hasEnvironment(requestParameters.environment);
-
-                if(!environmentExists) {
-                    throw new HashBrown.Http.Exception(`Environment "${requestParameters.environment}" was not found for project "${requestParameters.project}"`, 404);
-                }
-
-                context.environment = requestParameters.environment;
-            }
         }
 
         // Read request and produce response
-        try {
-            let requestBody = await this.getRequestBody(request);
-            let requestQuery = this.getRequestQuery(request);
-            let response = await route.handler.call(this, request, requestParameters, requestBody, requestQuery, context);
+        let context = await this.getContext(request, route.parameters, user);
+        let requestBody = await this.getRequestBody(request);
+        let requestQuery = this.getRequestQuery(request);
+        let response = await route.handler.call(this, request, route.parameters, requestBody, requestQuery, context);
 
-            if(response instanceof HashBrown.Http.Response === false) {
-                throw new HashBrown.Http.Exception('Response was not of type HashBrown.Http.Response', 500);
-            }
-
-            return response;
-
-        } catch(e) {
-            return this.error(e);
-
+        if(response instanceof HashBrown.Http.Response === false) {
+            throw new HashBrown.Http.Exception('Response was not of type HashBrown.Http.Response', 500);
         }
+
+        return response;
     }
 
     /**
@@ -323,7 +203,50 @@ class ControllerBase {
     static error(error) {
         checkParam(error, 'error', Error, true);
         
-        return new HashBrown.Http.Response(error.stack || error.message, error.code || 500, { 'Content-Type': 'text/plain' });
+        debug.error(error, this, true);
+
+        return new HashBrown.Http.Response(error.message || 'Unexpected error', error.code || 500, error.headers || {});
+    }
+
+    /**
+     * Gets the context of a request
+     *
+     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Entity.User} user
+     * @param {Object} parameters
+     *
+     * @return {HashBrown.Entity.Context} Context
+     */
+    static async getContext(request, parameters, user) {
+        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(parameters, 'parameters', Object, true);
+        checkParam(user, 'user', HashBrown.Entity.User);
+       
+        let context = new HashBrown.Entity.Context();
+
+        context.user = user;
+
+        // Validate project
+        if(parameters.project) {
+            context.project = await HashBrown.Entity.Project.get(parameters.project);
+
+            if(!context.project) {
+                throw new HashBrown.Http.Exception(`Project "${parameters.project}" could not be found`, 404);
+            }
+
+            // Validate environment
+            if(parameters.environment) {
+                let environmentExists = await context.project.hasEnvironment(parameters.environment);
+
+                if(!environmentExists) {
+                    throw new HashBrown.Http.Exception(`Environment "${parameters.environment}" was not found for project "${requestParameters.project}"`, 404);
+                }
+
+                context.environment = parameters.environment;
+            }
+        }
+
+        return context;
     }
 
     /**

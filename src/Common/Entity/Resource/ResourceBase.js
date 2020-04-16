@@ -64,6 +64,13 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     getName() {
         throw new Error('The "getName" method must be overridden');
     }
+    
+    /**
+     * Gets a URL safe name for this entity
+     */
+    getUrlSafeName() {
+        return this.getName().replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    }
 
     /**
      * Gets a model by category

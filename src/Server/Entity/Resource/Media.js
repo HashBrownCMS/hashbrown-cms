@@ -199,11 +199,10 @@ class Media extends require('Common/Entity/Resource/Media') {
             if(filename === 'thumbnail.jpg') { continue; }
 
             if(!resourceMap[id]) {
-                resourceMap[id] = new Media({ id: id });
+                resourceMap[id] = new Media({ id: id, context: context });
             }
 
             resourceMap[id].context = context;
-
             resourceMap[id].filename = filename;
         }
 

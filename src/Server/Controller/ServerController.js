@@ -24,7 +24,15 @@ class ServerController extends HashBrown.Controller.ControllerBase {
      * Checks for new updates
      */
     static async updateCheck(request, params, body, query, context) {
-        let gitTags = await HashBrown.Service.AppService.exec('git ls-remote --tags');
+        let gitTags = '';
+        
+        try {
+            gitTags = await HashBrown.Service.AppService.exec('git ls-remote --tags');
+
+        } catch(e) {
+            return new HashBrown.Http.Response('Could not fetch remote version information: ' + (e.message || 'Unknown error'), 500);
+        
+        }
 
         gitTags = (gitTags || '').match(/v([0-9.]+)/g);
 

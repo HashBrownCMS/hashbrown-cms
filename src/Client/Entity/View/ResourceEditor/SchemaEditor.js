@@ -309,21 +309,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
         this.render();
     }
-
-    /**
-     * Event: Click save
-     */
-    async onClickSave() {
-        await this.model.save();
-
-        UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-        
-        this.setDirty(false);
-
-        if(this.state.id !== this.model.id) {
-            location.hash = `/schemas/${this.model.id}`;
-        }
-    }
 }
 
 module.exports = SchemaEditor;

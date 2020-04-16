@@ -1,6 +1,7 @@
 'use strict';
 
 const HTTP = require('http');
+const Crypto = require('crypto');
 
 /**
  * A controller for resource endpoints
@@ -67,25 +68,6 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         };
 
         return routes;
-    }
-    
-    /**
-     * Resets last modified dates related to a key
-     *
-     * @param {String} key
-     */
-    static resetLastModified(key) {
-        checkParam(key, 'key', String);
-   
-        if(!key) { return; }
-
-        // Ignore heartbeat requests
-        if(key.indexOf('/heartbeat') > -1) { return; }
-
-        // Modify key to widen search for similar keys
-        key = key.split('/' + this.category + '/').shift() + '/' + this.category;
-
-        super.resetLastModified(key);
     }
     
     /**
@@ -179,8 +161,15 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         }
         
         let resources = await model.list(context, query);
+        let eTag = '|';
 
-        return new HashBrown.Http.Response(resources);
+        for(let resource of resources) {
+            eTag += resource.id + ':' + (resource.updatedOn || '*') + '|';
+        }
+
+        eTag = '"' + Crypto.createHash('md5').update(eTag).digest('hex') + '"';
+
+        return new HashBrown.Http.Response(resources, 200, { 'ETag': eTag });
     }
     
     /**
@@ -201,7 +190,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'GET':
-                return new HashBrown.Http.Response(resource, 200, { 'Last-Modified': (resource.updatedOn || new Date()).toString() });
+                return new HashBrown.Http.Response(resource, 200, { 'Last-Modified': resource.updatedOn });
                 
             case 'POST':
                 if(!context.user.hasScope(this.category)) {

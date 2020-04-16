@@ -127,6 +127,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             let pluginPaths = await HashBrown.Service.FileService.list(pluginPath);
 
             for(let schemaPath of corePaths.concat(pluginPaths)) {
+                let stats = await HashBrown.Service.FileService.stat(schemaPath);
                 let data = await HashBrown.Service.FileService.read(schemaPath);
 
                 data = JSON.parse(data);
@@ -134,6 +135,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 data.id = Path.basename(schemaPath, '.json');
                 data.type = data.type || options.type || Path.basename(Path.dirname(schemaPath));
                 data.isLocked = true;
+                data.updatedOn = stats.mtime;
 
                 if(!data.parentId && data.id !== data.type + 'Base') {
                     data.parentId = data.type + 'Base';
@@ -164,6 +166,22 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         }
 
         return list;
+    }
+    
+    /**
+     * Saves the current state of this entity
+     *
+     * @param {Object} options
+     */
+    async save(options = {}) {
+        checkParam(options, 'options', Object, true);
+
+        await super.save(options);
+
+        // Save children to modify their update date (this will work recursively)
+        for(let child of await this.getChildren()) {
+            await child.save();
+        }
     }
 }
 

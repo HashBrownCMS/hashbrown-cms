@@ -4,14 +4,11 @@
  * A throwable HTTP exception
  */
 class Exception extends Error {
-    constructor(message, code, stack) {
+    constructor(message, code, headers) {
         super(message);
 
         this.code = code || 500;
-
-        if(stack) {
-            this.stack = stack;
-        }
+        this.headers = headers || {};
     }
 }
 

@@ -48,34 +48,6 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * Gets the last modified time from a request
-     *
-     * @param {HTTP.IncomingMessage} request
-     *
-     * @return {Date} Time
-     */
-    static async getLastModified(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
-
-        // Check for media request
-        let parts = this.getUrl(request).pathname.split('/').filter(Boolean);
-
-        if(parts[0] === 'media' && parts[1] && parts[2] && parts[3]) {
-            let media = await HashBrown.Entity.Resource.Media.get(parts[1], parts[2], parts[3]);
-
-            if(media) { return media.updatedOn; }
-        }
-
-        // Check for file on disk
-        let path = this.getFilePath(request);
-        let stats = await HashBrown.Service.FileService.stat(path);
-
-        if(!stats) { return new Date(); }
-
-        return stats.mtime;
-    }
-
-    /**
      * Gets the file path from a request
      *
      * @param {HTTP.IncomingMessage} request
@@ -99,14 +71,14 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         checkParam(request, 'request', HTTP.IncomingMessage, true);
        
         let path = this.getFilePath(request);
-        let exists = HashBrown.Service.FileService.exists(path);
+        let stats = await HashBrown.Service.FileService.stat(path);
         let type = getMIMEType(path);
 
         // If file exists in the /public directory, serve it statically
-        if(exists) {
+        if(stats) {
             let data = HashBrown.Service.FileService.readStream(path);
 
-            return new HashBrown.Http.Response(data, 200, { 'Content-Type': type });
+            return new HashBrown.Http.Response(data, 200, { 'Content-Type': type, 'Last-Modified': stats.mtime });
         }
 
         return await super.handle(request);

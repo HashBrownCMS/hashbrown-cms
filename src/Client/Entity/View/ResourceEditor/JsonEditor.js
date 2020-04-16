@@ -118,22 +118,23 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      */
     async onClickSave() {
         this.state.warning = null;
-        this.namedElements.save.removeAttribute('disabled');
        
         try {
             let value = this.namedElements.body.model.value;
+
             this.debug(this.model);
 
-            await super.onClickSave();
-            
         } catch(e) {
             this.state.warning = e.message;
-            this.namedElements.save.setAttribute('disabled', true);
 
             debug.error(e, this, true);
+            
+            this.renderPartial('warning');
+
+            return;
         }
-        
-        this.renderPartial('warning');
+            
+        await super.onClickSave();    
     }
 }
 

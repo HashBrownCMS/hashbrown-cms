@@ -157,7 +157,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             body.scrollTop = scrollTop;
         }
 
-        this.element.classList.toggle('locked', this.model.isLocked);
+        this.element.classList.toggle('locked', this.model && this.model.isLocked);
     }
 
     /**
@@ -193,7 +193,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         ) { return; }
 
         try {
-            await this.model.heartbeat();
+            await this.model.heartbeat({ id: this.state.id });
 
         } catch(e) {
             if(e && e.message) {
@@ -242,15 +242,21 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.namedElements.save.classList.toggle('loading', true);
         }
 
-        await this.context.project.setEnvironmentSettings(this.context.environment, this.state.settings);
+        try {
+            await this.context.project.setEnvironmentSettings(this.context.environment, this.state.settings);
 
-        UI.notifySmall(`${this.state.title} settings saved successfully`, null, 3);
+            UI.notifySmall(`${this.state.title} settings saved successfully`, null, 3);
+        
+        } catch(e) {
+            UI.error(e);
 
-        if(this.namedElements.save) {
-            this.namedElements.save.classList.toggle('loading', false);
+        } finally {
+            if(this.namedElements.save) {
+                this.namedElements.save.classList.toggle('loading', false);
+            }
+
+            this.render();
         }
-
-        this.render();
     }
 
     /**
@@ -265,17 +271,23 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             this.namedElements.save.classList.toggle('loading', true);
         }
 
-        await this.model.save(this.state.saveOptions);
+        try {
+            await this.model.save(this.state.saveOptions);
 
-        UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
-
-        this.setDirty(false);
+            UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
         
-        if(this.namedElements.save) {
-            this.namedElements.save.classList.toggle('loading', false);
-        }
+            this.setDirty(false);
 
-        this.render();
+        } catch(e) {
+            UI.error(e);
+
+        } finally {
+            if(this.namedElements.save) {
+                this.namedElements.save.classList.toggle('loading', false);
+            }
+
+            this.render();
+        }
     }
     
     /**

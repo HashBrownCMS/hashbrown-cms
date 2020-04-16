@@ -146,9 +146,14 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     
     /**
      * Submits a heartbeat on this resource
+     *
+     * @param {Object} options
      */
-    async heartbeat() {
-        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/heartbeat');      
+    async heartbeat(options = {}) {
+        await HashBrown.Service.RequestService.request(
+            'post',
+            (options.category || this.category) + '/' + (options.id || this.id) + '/heartbeat'
+        );
     }
 
     /**
