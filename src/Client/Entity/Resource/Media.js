@@ -4,6 +4,8 @@
  * The media class
  */
 class Media extends require('Common/Entity/Resource/Media') {
+    static get useCaching() { return true; }
+    
     /**
      * Gets the media deployer
      *

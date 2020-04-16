@@ -1,9 +1,13 @@
 'use strict';
 
+const MAX_CACHE_TIME = 1000 * 60 * 5; // 5 minutes
+
 /**
  * The base class for resources
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
+    static get useCaching() { return false; }
+
     /**
      * Gets the context
      *
@@ -12,7 +16,68 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     get context() {
         return HashBrown.Client.context;
     }
+
+    /**
+     * Sets a cache object
+     *
+     * @param {String} key
+     * @param {Object} options
+     * @param {Object} data
+     */
+    static setCache(id, options, data) {
+        checkParam(id, 'id', String, true);
+        checkParam(options, 'options', Object);
+        checkParam(data, 'data', Object);
+
+        if(!this.useCaching) { return; }
+        
+        if(!this.cache) {
+            this.cache = {};
+        }
+
+        let key = id + (options ? '_' + new URLSearchParams(options).toString() : '');
+
+        if(!data) {
+            delete this.cache[id];
+        }
+
+        if(data instanceof HashBrown.Entity.EntityBase) {
+            data = data.getObject();
+        }
+
+        this.cache[key] = {
+            expires: Date.now() + MAX_CACHE_TIME,
+            data: data
+        };
+    }
     
+    /**
+     * Gets a cache object
+     *
+     * @param {String} key
+     * @param {Object} options
+     *
+     * @return {Object} Data
+     */
+    static getCache(id, options) {
+        checkParam(id, 'id', String, true);
+        checkParam(options, 'options', Object);
+        
+        if(!this.useCaching) { return null; }
+
+        if(!this.cache) { return null; }
+
+        let key = id + (options ? '_' + new URLSearchParams(options).toString() : '');
+
+        if(!this.cache[key] || !this.cache[key].data || this.cache[key].expires <= Date.now()) {
+            delete this.cache[key];
+
+            return null;
+        }
+
+        return this.cache[key].data;
+    }
+
     /**
      * Gets an instance of this entity type
      *
@@ -27,18 +92,22 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         if(!id) { return null; }
 
-        let resource = null;
+        let resource = this.getCache(id, options);
 
-        try {
-            resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
-        } catch(e) {
-            return null;
+        if(!resource) {
+            try {
+                resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
+            } catch(e) {
+                resource = null;
+            }
         }
             
         if(!resource) { return null; }
 
         resource = this.new(resource);
         
+        this.setCache(id, options, resource);
+
         return resource;
     }
     
@@ -68,6 +137,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
                 resources.splice(i, 1);
                 continue;
             }
+
+            this.setCache(resources[i].id, {}, resources[i]); 
         }
 
         return resources;
@@ -91,6 +162,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         HashBrown.Service.EventService.trigger('resource', resource.id);  
 
+        this.setCache(resource.id, {}, resource);
+
         return resource;
     }
     
@@ -106,6 +179,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data, options);
         
         HashBrown.Service.EventService.trigger('resource', this.id);
+
+        this.constructor.setCache(id, {}, data);
     }
     
     /**
@@ -122,6 +197,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         } 
 
         HashBrown.Service.EventService.trigger('resource', this.id);  
+
+        this.constructor.setCache(id, {}, null);
     }
     
     /**
@@ -133,6 +210,8 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         this.adopt(data);
     
         HashBrown.Service.EventService.trigger('resource', this.id);
+
+        this.constructor.setCache(this.id, {}, data);
     }
     
     /**
