@@ -5,6 +5,7 @@ const OS = require('os');
 const Path = require('path');
 const HTTP = require('http');
 const HTTPS = require('https');
+const Crypto = require('crypto');
 
 /**
  * The controller for assets
@@ -30,12 +31,12 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     /**
      * Checks whether this controller can handle a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Boolean} Can handle request
      */
     static canHandle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
         
         let requestPath = this.getUrl(request).pathname;
 
@@ -50,12 +51,12 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     /**
      * Gets the file path from a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {String} Path
      */
     static getFilePath(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         let requestPath = this.getUrl(request).pathname;
 
@@ -65,10 +66,10 @@ class AssetController extends HashBrown.Controller.ControllerBase {
     /**
      * Handles a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      */
     static async handle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
        
         let path = this.getFilePath(request);
         let stats = await HashBrown.Service.FileService.stat(path);
@@ -77,8 +78,11 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         // If file exists in the /public directory, serve it statically
         if(stats) {
             let data = HashBrown.Service.FileService.readStream(path);
+            
+            let eTag = path + stats.mtime;
+            eTag = '"' + Crypto.createHash('md5').update(eTag).digest('hex') + '"';
 
-            return new HashBrown.Http.Response(data, 200, { 'Content-Type': type, 'Last-Modified': stats.mtime });
+            return new HashBrown.Http.Response(data, 200, { 'Content-Type': type, 'ETag': eTag });
         }
 
         return await super.handle(request);

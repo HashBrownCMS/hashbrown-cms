@@ -158,10 +158,21 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             list = list.concat(custom);
         }
 
-        // Remove all schemas without a "type" value
+        // Post process
         for(let i = list.length - 1; i >= 0 ; i--) {
+            // Remove all schema without a "type" value
             if(!list[i].type) {
                 list.splice(i, 1);
+                continue;
+            }
+
+            // Get parent fields, if specified
+            if(options.withParentFields && list[i].parentId) {
+                let parent = await this.get(context, list[i].parentId, options);
+               
+                if(parent) {
+                    list[i] = this.merge(list[i], parent);
+                }
             }
         }
 

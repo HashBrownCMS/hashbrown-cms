@@ -59,10 +59,10 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     /**
      * Handles a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      */
     static async handle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
        
         if(this.getUrl(request).pathname.indexOf('/setup') !== 0) {
             let users = await HashBrown.Entity.User.list();

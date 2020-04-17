@@ -73,16 +73,39 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     /**
      * Checks whether this controller can handle a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Boolean} Can handle request
      */
     static canHandle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         if(this === HashBrown.Controller.ResourceController) { return false; }
 
         return super.canHandle(request);
+    }
+i
+    /**
+     * Gets the ETag for a list of resources
+     *
+     * @param {Array} resources
+     * @param {Object} params
+     * @param {Object} query
+     *
+     * @return {String} ETag
+     */
+    static getETag(resources, params, query) {
+        checkParam(resources, 'resources', Array, true);
+        checkParam(params, 'params', Object, true);
+        checkParam(query, 'query', Object, true);
+
+        let eTag = '|' + (new URLSearchParams(params).toString() || '*') + '|' + (new URLSearchParams(query).toString() || '*') + '|';
+
+        for(let resource of resources) {
+            eTag += resource.id + ':' + (resource.updatedOn || '*') + '|';
+        }
+
+        return '"' + Crypto.createHash('md5').update(eTag).digest('hex') + '"';
     }
 
     /**
@@ -161,15 +184,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         }
         
         let resources = await model.list(context, query);
-        let eTag = '|';
 
-        for(let resource of resources) {
-            eTag += resource.id + ':' + (resource.updatedOn || '*') + '|';
-        }
-
-        eTag = '"' + Crypto.createHash('md5').update(eTag).digest('hex') + '"';
-
-        return new HashBrown.Http.Response(resources, 200, { 'ETag': eTag });
+        return new HashBrown.Http.Response(resources, 200, { 'ETag': this.getETag(resources, params, query) });
     }
     
     /**
@@ -190,7 +206,7 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
 
         switch(request.method) {
             case 'GET':
-                return new HashBrown.Http.Response(resource, 200, { 'Last-Modified': resource.updatedOn });
+                return new HashBrown.Http.Response(resource, 200, { 'ETag': this.getETag([ resource ], params, query) });
                 
             case 'POST':
                 if(!context.user.hasScope(this.category)) {

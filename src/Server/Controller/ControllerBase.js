@@ -14,12 +14,12 @@ class ControllerBase {
     /**
      * Gets a response based on a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {HashBrown.Http.Response} Response
      */
     static async getResponse(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
        
         // Ignore paths with suspicious components
         if(
@@ -32,25 +32,14 @@ class ControllerBase {
                
         // Check if this controller can handle the request
         if(!this.canHandle(request)) { return null; }
-   
+                
         // Generate response
         try {
             let response = await this.handle(request);
 
             // Check for cache matches
-            if(request.method === 'GET' && response.headers['Cache-Control'] !== 'no-store') {
-                let requestMTime = request.headers['If-Modified-Since'] || request.headers['if-modified-since'];
-                let requestETag = request.headers['If-None-Match'] || request.headers['if-none-match'];
-                let responseMTime = response.headers['Last-Modified'];
-                let responseETag = response.headers['ETag'];
-
-                // Compare modified date and ETag, set response code to 304 if needed
-                let mTimeMatch = requestMTime && responseMTime && new Date(requestMTime) >= new Date(responseMTime);
-                let eTagMatch = requestETag && responseETag && requestETag === responseETag;
-                
-                if(mTimeMatch || eTagMatch) {
-                    response.code = 304;
-                }
+            if(this.isCached(request, response)) {
+                return new HashBrown.Http.Response('Not modified', 304);
             }
 
             return response;
@@ -60,16 +49,62 @@ class ControllerBase {
         
         }
     }
+    
+    /**
+     * Gets whether a response is cached client-side
+     *
+     * @param {HashBrown.Http.Request} request
+     * @param {HashBrown.Http.Response} response
+     *
+     * @return {Boolean} Is cached
+     */
+    static isCached(request, response) {
+        checkParam(request, 'request', HashBrown.Http.Request, true);
+        checkParam(response, 'response', HashBrown.Http.Response, true);
+        
+        if(request.method !== 'GET') { return false; }
+        
+        return request.getETag() && response.getETag() && request.getETag() === response.getETag();
+    }
+
+    /**
+     * Caches a response
+     *
+     * @param {HashBrown.Http.Request} request
+     * @param {HashBrown.Http.Response} response
+     */
+    static setCache(request, response) {
+        checkParam(request, 'request', HashBrown.Http.Request, true);
+        checkParam(response, 'response', HashBrown.Http.Response, true);
+
+        if(!this.cache) {
+            this.cache = {};
+        }
+
+        let eTag = response.getHeader('ETag') || response.getHeader('etag');
+        
+        if(!eTag) { return; }
+
+        // Methods that are not GET will clear the entire cache
+        if(request.method !== 'GET') {
+            this.cache = {};
+        
+        // Cache responses that allow it
+        } else if(response.getHeader('Cache-Control') !== 'no-store') {
+            this.cache[eTag] = true;
+
+        }
+    }
 
     /**
      * Checks whether this controller can handle a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Boolean} Can handle request
      */
     static canHandle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         if(this === HashBrown.Controller.ControllerBase) { return false; }
 
@@ -79,12 +114,12 @@ class ControllerBase {
     /**
      * Gets a WHATWG URL object from a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {URL} URL
      */
     static getUrl(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         // NOTE: We can assume protocol here, because we aren't actually using it
         return new URL(request.url, 'https://' + request.headers.host);
@@ -93,12 +128,12 @@ class ControllerBase {
     /**
      * Gets a route definition
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Object} Route definition
      */
     static getRoute(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         let requestPath = this.getUrl(request).pathname;
         let requestParts = requestPath.match(/[^\/]+/g) || [];
@@ -149,10 +184,10 @@ class ControllerBase {
     /**
      * Handles a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      */
     static async handle(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         let route = this.getRoute(request);
         
@@ -211,14 +246,14 @@ class ControllerBase {
     /**
      * Gets the context of a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      * @param {HashBrown.Entity.User} user
      * @param {Object} parameters
      *
      * @return {HashBrown.Entity.Context} Context
      */
     static async getContext(request, parameters, user) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
         checkParam(parameters, 'parameters', Object, true);
         checkParam(user, 'user', HashBrown.Entity.User);
        
@@ -252,12 +287,12 @@ class ControllerBase {
     /**
      * Gets the query of a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Object} Query
      */
     static getRequestQuery(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
         
         let requestSearchParams = this.getUrl(request).searchParams;
         let requestQuery = {};
@@ -277,12 +312,12 @@ class ControllerBase {
     /**
      * Gets the body of a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {Object|Buffer} Body
      */
     static async getRequestBody(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         let body = '';
 
@@ -324,12 +359,12 @@ class ControllerBase {
     /**
      * Reads the token from a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      *
      * @return {String} Value
      */
     static getToken(request) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
 
         let requestSearchParams = this.getUrl(request).searchParams;
 
@@ -351,13 +386,13 @@ class ControllerBase {
     /**
      * Authenticates a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      * @param {Boolean} ignoreErrors
      *
      * @returns {HashBrown.Entity.User} User object
      */
     static async authenticate(request, ignoreErrors = false) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
         checkParam(ignoreErrors, 'ignoreErrors', Boolean, true);
 
         let token = this.getToken(request); 
@@ -380,13 +415,13 @@ class ControllerBase {
     /**
      * Authorises a request
      *
-     * @param {HTTP.IncomingMessage} request
+     * @param {HashBrown.Http.Request} request
      * @param {String} project
      * @param {String} scope
      * @param {Boolean} isAdmin
      */
     static async authorize(request, project = '', scope = '', isAdmin = false) {
-        checkParam(request, 'request', HTTP.IncomingMessage, true);
+        checkParam(request, 'request', HashBrown.Http.Request, true);
         checkParam(project, 'project', String);
         checkParam(scope, 'scope', String);
         checkParam(isAdmin, 'isAdmin', Boolean);

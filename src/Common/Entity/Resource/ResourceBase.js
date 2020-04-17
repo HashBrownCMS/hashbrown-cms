@@ -66,13 +66,6 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
     }
     
     /**
-     * Gets a URL safe name for this entity
-     */
-    getUrlSafeName() {
-        return this.getName().replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    }
-
-    /**
      * Gets a model by category
      *
      * @param {String} category

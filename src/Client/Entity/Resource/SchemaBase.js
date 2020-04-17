@@ -6,8 +6,6 @@
  * @memberof HashBrown.Client.Entity.Resource
  */
 class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
-    static get useCaching() { return true; }
-    
     /**
      * Gets a list of instances of this entity type
      *

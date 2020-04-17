@@ -31,12 +31,19 @@ let state = {};
 
 /**
  * Serves any request
+ *
+ * @param {HashBrown.Http.Request} request
+ * @param {HashBrown.Http.Response} response
  */
 async function serve(request, response) {
+    checkParam(request, 'request', HashBrown.Http.Request, true);
+    checkParam(response, 'response', HashBrown.Http.Response, true);
+
     state.request = request;
     state.response = response;
 
-    let result = new HashBrown.Http.Response(`No route matched ${request.method} ${request.url}`, 404);
+    response.code = 404;
+    response.data = `No route matched ${request.method} ${request.url}`;
 
     for(let name in HashBrown.Controller) {
         let controller = HashBrown.Controller[name];
@@ -45,11 +52,11 @@ async function serve(request, response) {
 
         if(!thisResponse) { continue; }
 
-        result = thisResponse;
+        response.adopt(thisResponse.data, thisResponse.statusCode, thisResponse.getHeaders());
         break;
     }
 
-    result.end(response);
+    response.send();
 }
 
 /**
@@ -95,7 +102,13 @@ async function main() {
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
     
-    HTTP.createServer(serve).listen(port);
+    HTTP.createServer(
+        {
+            IncomingMessage: HashBrown.Http.Request,
+            ServerResponse: HashBrown.Http.Response
+        },
+        serve
+    ).listen(port);
         
     debug.log('HTTP server restarted on port ' + port, 'HashBrown');
 

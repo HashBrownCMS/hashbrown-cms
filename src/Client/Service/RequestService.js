@@ -1,5 +1,7 @@
 'use strict';
 
+const MAX_CACHE_TIME = 1000 * 60 * 5; // 5 minutes
+
 /**
  * A helper class for making HTTP/S requests
  *
@@ -30,16 +32,30 @@ class RequestService {
      *
      * @returns {Object} Response
      */
-    static customRequest(method, url, data, headers) {
+    static async customRequest(method, url, data, headers) {
+        method = method.toUpperCase();
+        url = (HashBrown.Client.rootUrl || '') + url;
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };
+       
+        // Initialise request cache
+        this.cache = this.cache || {};
 
-        url = (HashBrown.Client.rootUrl || '') + url;
+        // Any non-GET request clears the cache
+        if(method !== 'GET') {
+            this.cache = {};
+
+        // Look up a request in the cache
+        } else if(this.cache[url] && this.cache[url].expires > Date.now()) {
+            return await Promise.race([ this.cache[url].promise ]);
         
-        return new Promise((resolve, reject) => {
+        } 
+        
+        // Create a new request
+        let promise = new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
-            xhr.open(method.toUpperCase(), url);
+            xhr.open(method, url);
 
             for(let k in headers) {
                 xhr.setRequestHeader(k, headers[k]);
@@ -92,6 +108,15 @@ class RequestService {
                 }
             }
         });
+        
+        if(method === 'GET') {
+            this.cache[url] = {
+                promise: promise,
+                expires: Date.now() + MAX_CACHE_TIME
+            };
+        }
+
+        return await promise;
     }
 
     /**
