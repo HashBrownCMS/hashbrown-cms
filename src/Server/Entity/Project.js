@@ -423,23 +423,26 @@ class Project extends require('Common/Entity/Project') {
         checkParam(environment, 'environment', String, true);
         checkParam(section, 'section', String);
         
+        let settings = null;
         let sync = await this.getSyncSettings();
 
         if(sync) {
-            return await HashBrown.Service.RequestService.request(
+            settings = await HashBrown.Service.RequestService.request(
                 'get',
                 sync.url + '/api/projects/' + sync.project + '/environments/' + environment,
                 { token: sync.token }
             );
         }
 
-        let settings = await HashBrown.Service.DatabaseService.findOne(
-            this.id,
-            'settings',
-            {
-                environment: environment
-            }
-        );
+        if(!settings) {
+            settings = await HashBrown.Service.DatabaseService.findOne(
+                this.id,
+                'settings',
+                {
+                    environment: environment
+                }
+            );
+        }
 
         if(!settings) { return null; }
 
