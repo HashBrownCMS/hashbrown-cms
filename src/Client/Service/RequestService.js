@@ -39,84 +39,90 @@ class RequestService {
             'Content-Type': 'application/json; charset=utf-8'
         };
        
+        let promise = null;
+
         // Initialise request cache
         this.cache = this.cache || {};
 
         // Any non-GET request clears the cache
         if(method !== 'GET') {
             this.cache = {};
-
-        // Look up a request in the cache
-        } else if(this.cache[url]) {
-            return await Promise.race([ this.cache[url] ]);
-        } 
-        
-        // Create a new request
-        let promise = new Promise((resolve, reject) => {
-            var xhr = new XMLHttpRequest();
-            xhr.open(method, url);
-
-            for(let k in headers) {
-                xhr.setRequestHeader(k, headers[k]);
-            }
-
-            if(data) {
-                if(typeof data === 'object' && data instanceof FormData === false) {
-                    data = JSON.stringify(data);
-                }
-               
-                xhr.send(data);
-
-            } else {
-                xhr.send();
-            
-            }
-
-            xhr.onreadystatechange = () => {
-                const DONE = 4;
-                const OK = 200;
-                const NOT_MODIFIED = 304;
-                const UNAUTHORIZED = 403;
-
-                if(xhr.readyState === DONE) {
-                    if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
-                        let response = xhr.responseText;
-
-                        if(response && response != 'OK') {
-                            try {
-                                response = JSON.parse(response);
-                            
-                            } catch(e) {
-                                // If the response isn't JSON, then so be it
-
-                            }
-                        }
-
-                        if(response === '') { response = null; }
-
-                        resolve(response);
-
-                    } else {
-                        let error = new Error(xhr.responseText);
-
-                        error.code = xhr.status;
-
-                        reject(error);
-                    
-                    }
-                }
-            }
-        });
-        
-        if(method === 'GET') {
-            this.cache[url] = promise;
-
-            setTimeout(() => {
-                delete this.cache[url];
-            }, MAX_CACHE_TIME);
         }
 
-        return await promise;
+        // Look up a request in the cache
+        if(this.cache[url]) {
+            promise = await Promise.race([ this.cache[url] ]);
+        
+        // Create a new request
+        } else { 
+            promise = new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open(method, url);
+
+                for(let k in headers) {
+                    xhr.setRequestHeader(k, headers[k]);
+                }
+
+                if(data) {
+                    if(typeof data === 'object' && data instanceof FormData === false) {
+                        data = JSON.stringify(data);
+                    }
+                   
+                    xhr.send(data);
+
+                } else {
+                    xhr.send();
+                
+                }
+
+                xhr.onreadystatechange = () => {
+                    const DONE = 4;
+                    const OK = 200;
+                    const NOT_MODIFIED = 304;
+                    const UNAUTHORIZED = 403;
+
+                    if(xhr.readyState === DONE) {
+                        if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                            let response = xhr.responseText;
+
+                            if(response === '') { response = null; }
+
+                            resolve(response);
+
+                        } else {
+                            let error = new Error(xhr.responseText);
+
+                            error.code = xhr.status;
+
+                            reject(error);
+                        
+                        }
+                    }
+                }
+            });
+            
+            if(method === 'GET') {
+                this.cache[url] = promise;
+
+                setTimeout(() => {
+                    delete this.cache[url];
+                }, MAX_CACHE_TIME);
+            }
+        }
+
+        let response = await promise;
+
+        if(response) {
+            try {
+                response = JSON.parse(response);
+
+            } catch(e) {
+                // If the response isn't JSON, then so be it
+
+            }
+        }
+
+        return response;
     }
 
     /**

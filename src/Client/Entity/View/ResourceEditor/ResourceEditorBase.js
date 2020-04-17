@@ -100,6 +100,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         } else {
             this.model = null;
+
         }
 
         if(this.model) {

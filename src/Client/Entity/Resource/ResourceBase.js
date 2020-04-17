@@ -34,7 +34,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         } catch(e) {
             resource = null;
         }
-            
+        
         if(!resource) { return null; }
 
         resource = this.new(resource);
