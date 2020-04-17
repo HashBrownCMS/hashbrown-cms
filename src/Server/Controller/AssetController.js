@@ -120,7 +120,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
      * Serves binary media data
      */
     static async media(request, params, body, query, context) {
-        let media = await HashBrown.Entity.Resource.Media.get(params.project, params.environment, params.id);
+        let media = await HashBrown.Entity.Resource.Media.get(context, params.id);
 
         if(!media) {
             return new HashBrown.Http.Response('Not found', 404);
