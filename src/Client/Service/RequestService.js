@@ -48,11 +48,7 @@ class RequestService {
 
         // Look up a request in the cache
         } else if(this.cache[url]) {
-            if(this.cache[url].expires > Date.now()) {
-                return await Promise.race([ this.cache[url].promise ]);
-            }
-        
-            delete this.cache[url];
+            return await Promise.race([ this.cache[url] ]);
         } 
         
         // Create a new request
@@ -113,10 +109,11 @@ class RequestService {
         });
         
         if(method === 'GET') {
-            this.cache[url] = {
-                promise: promise,
-                expires: Date.now() + MAX_CACHE_TIME
-            };
+            this.cache[url] = promise;
+
+            setTimeout(() => {
+                delete this.cache[url];
+            }, MAX_CACHE_TIME);
         }
 
         return await promise;
