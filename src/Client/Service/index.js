@@ -7,7 +7,6 @@ namespace('Service')
 .add(require('./DebugService'))
 .add(require('../../Common/Service/LanguageService'))
 .add(require('../../Common/Service/MarkdownService'))
-.add(require('./NavigationService'))
 .add(require('./RequestService'))
 .add(require('./UIService'))
 .add(require('../../Common/Service/EventService'));

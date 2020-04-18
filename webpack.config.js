@@ -26,6 +26,7 @@ function getJsEntries() {
 
         utilities: './src/Common/utilities',
         
+        controller: './src/Client/Controller',
         service: './src/Client/Service',
         entity: './src/Client/Entity'
     }

@@ -1,19 +1,11 @@
 'use strict';
 
-// Keep an instance of this view in memory for easy access
-let instance;
-
 /**
  * A list of resources
  *
  * @memberof HashBrown.Client.Entity.View.Navigation
  */
 class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
-    /**
-     * Gets the instance in memory
-     */
-    static getInstance() { return instance; }
-
     /**
      * Constructor
      */
@@ -22,11 +14,8 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
 
         this.template = require('template/navigation/resourceBrowser');
 
-        HashBrown.Service.EventService.on('route', 'resourceBrowser', () => { this.onChangeRoute(); });
         HashBrown.Service.EventService.on('resource', 'resourceBrowser', (id) => { this.onChangeResource(id); });
         HashBrown.Service.EventService.on('language', 'resourceBrowser', (id) => { this.onChangeLanguage(); });
-    
-        instance = this;
     }
     
     /**
@@ -50,45 +39,29 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
     }
 
     /**
-     * Event: Route changed
+     * Sets the panel
+     *
+     * @param {HashBrown.Entity.View.Panel.PanelBase} panel
      */
-    onChangeRoute() {
-        let category = HashBrown.Service.NavigationService.getRoute(0);
+    setPanel(panel) {
+        checkParam(panel, 'panel', HashBrown.Entity.View.Panel.PanelBase, true);
 
-        if(!category) { return; }
-
-        if(!this.state.panel || this.state.panel.category !== category) {
-            this.update();
-
-        } else {
-            this.state.panel.update();
-
-        }
+        this.state.panel = panel;
+        
+        this.render();
     }
 
     /**
      * Fetches the view data
      */
     async fetch() {
-        let category = HashBrown.Service.NavigationService.getRoute(0);
-
         this.state.panels = [];
-
-        if(!category) { return; }
 
         for(let panel of Object.values(HashBrown.Entity.View.Panel)) {
             if(panel === HashBrown.Entity.View.Panel.PanelBase) { continue; }
             if(!this.context.user.hasScope(this.context.project.id, panel.category)) { continue; }
         
             this.state.panels.push(panel);
-
-            if(panel.category === category) {
-                this.state.panel = new panel();
-            }
-        }
-
-        if(!this.state.panel) {
-            throw new Error(`No panel matching "${category}" could be found`);
         }
     }
 }

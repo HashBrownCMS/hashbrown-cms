@@ -110,7 +110,7 @@ class Media extends require('Common/Entity/Resource/Media') {
      * @param {Object} options
      */
     async save(options = {}) {
-        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
+        let id = options.id || this.id;
         let data = this.getObject();
 
         // Parts of the options object are long base64 strings,

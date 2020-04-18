@@ -59,9 +59,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
         
         // Highlight selected item
-        let itemId = HashBrown.Service.NavigationService.getRoute(1);
-
-        this.highlightItem(itemId);
+        this.highlightItem();
     }
 
     /**
@@ -313,11 +311,11 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
-     * Highlights an item by id
-     *
-     * @param {String} hightlightId
+     * Highlights the current item
      */
-    highlightItem(highlightId) {
+    highlightItem() {
+        let highlightId = this.state.selectedItem;
+
         for(let id in this.state.itemMap) {
             let item = this.state.itemMap[id];
            

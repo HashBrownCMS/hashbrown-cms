@@ -216,6 +216,33 @@ class Project extends require('Common/Entity/Project') {
 
         }
 
+        // Test connection, disable if failed
+        try {
+            await HashBrown.Service.RequestService.request(
+                'get',
+                sync.url + '/api/user',
+                { token: sync.token }
+            );
+
+        } catch(e) {
+            debug.log(`Sync test failed (${e.message}), disabling...`, this);
+    
+            sync.enabled = false;
+        
+            await HashBrown.Service.DatabaseService.updateOne(
+                this.id,
+                'settings',
+                {
+                    environment: { $exists: false }
+                },
+                {
+                    sync: sync
+                }
+            );
+
+            return null;
+        }   
+
         return sync;
     }
 

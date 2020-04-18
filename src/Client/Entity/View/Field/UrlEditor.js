@@ -19,7 +19,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Clicked regenerate
      */
     async onClickRegenerate() {
-        let editor = HashBrown.Client.currentResourceEditor;
+        let editor = HashBrown.Client.editor;
 
         if(!editor || !editor.model) { return; }
 

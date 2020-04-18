@@ -10,7 +10,7 @@ const MAX_UPLOAD_SIZE = 20e6;
  *
  * @memberof HashBrown.Server.Controller
  */
-class ControllerBase {
+class ControllerBase extends require('Common/Controller/ControllerBase') {
     /**
      * Gets a response based on a request
      *
@@ -68,35 +68,6 @@ class ControllerBase {
     }
 
     /**
-     * Caches a response
-     *
-     * @param {HashBrown.Http.Request} request
-     * @param {HashBrown.Http.Response} response
-     */
-    static setCache(request, response) {
-        checkParam(request, 'request', HashBrown.Http.Request, true);
-        checkParam(response, 'response', HashBrown.Http.Response, true);
-
-        if(!this.cache) {
-            this.cache = {};
-        }
-
-        let eTag = response.getHeader('ETag') || response.getHeader('etag');
-        
-        if(!eTag) { return; }
-
-        // Methods that are not GET will clear the entire cache
-        if(request.method !== 'GET') {
-            this.cache = {};
-        
-        // Cache responses that allow it
-        } else if(response.getHeader('Cache-Control') !== 'no-store') {
-            this.cache[eTag] = true;
-
-        }
-    }
-
-    /**
      * Checks whether this controller can handle a request
      *
      * @param {HashBrown.Http.Request} request
@@ -108,7 +79,9 @@ class ControllerBase {
 
         if(this === HashBrown.Controller.ControllerBase) { return false; }
 
-        return !!this.getRoute(request);
+        let path = this.getUrl(request).pathname;
+
+        return !!this.getRoute(path);
     }
 
     /**
@@ -126,62 +99,6 @@ class ControllerBase {
     }
 
     /**
-     * Gets a route definition
-     *
-     * @param {HashBrown.Http.Request} request
-     *
-     * @return {Object} Route definition
-     */
-    static getRoute(request) {
-        checkParam(request, 'request', HashBrown.Http.Request, true);
-
-        let requestPath = this.getUrl(request).pathname;
-        let requestParts = requestPath.match(/[^\/]+/g) || [];
-       
-        let route = null;
-        let routes = this.routes;
-
-        for(let pattern in routes) {
-            let methods = routes[pattern].methods || [ 'GET' ];
-
-            if(methods.indexOf(request.method) < 0) { continue; }
-
-            let patternParts = pattern.match(/[^\/]+/g) || [];
-
-            if(patternParts.length !== requestParts.length) { continue; }
-
-            let matches = 0;
-            let parameters = {};
-
-            for(let i in requestParts) {
-                let requestPart = requestParts[i] || '';
-                let patternPart = patternParts[i] || '';
-
-                let exactMatch = requestPart === patternPart;
-                let parameterMatch = patternPart.match(/\${([^}]+)}/)
-                
-                if(exactMatch || parameterMatch) {
-                    matches++;
-                }
-               
-                if(parameterMatch) {
-                    parameters[parameterMatch[1]] = requestPart;
-                }
-            }
-
-            if(matches !== patternParts.length) { continue; }
-
-            route = routes[pattern];
-            route.pattern = pattern;
-            route.parameters = parameters;
-
-            break;
-        }
-
-        return route;
-    }
-
-    /**
      * Handles a request
      *
      * @param {HashBrown.Http.Request} request
@@ -189,16 +106,23 @@ class ControllerBase {
     static async handle(request) {
         checkParam(request, 'request', HashBrown.Http.Request, true);
 
-        let route = this.getRoute(request);
+        let path = this.getUrl(request).pathname;
+        let route = this.getRoute(path);
         
         if(!route) {
             throw new HashBrown.Http.Exception('Not found', 404);
         }
-       
+        
+        let methods = route.methods || [ 'GET' ];
+
         if(typeof route.redirect === 'string') {
             return new HashBrown.Http.Response(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
         }
 
+        if(methods.indexOf(request.method) < 0) {
+            throw new HashBrown.Http.Exception(`Route ${route.pattern} does not support the method ${request.method}`, 405);
+        }
+       
         if(typeof route.handler !== 'function') {
             throw new HashBrown.Http.Exception(`Handler for route ${route.pattern} is not a function`, 500);
         }

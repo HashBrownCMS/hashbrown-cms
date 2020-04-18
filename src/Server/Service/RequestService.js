@@ -159,7 +159,7 @@ class RequestService {
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
                                 return reject(new HashBrown.Http.Exception(
-                                    res.statusMessage + '\nat ' + method + ' ' + url.toString(),
+                                    res.statusMessage + ' (' + method + ' ' + url.toString() + ')',
                                     res.statusCode
                                 ));
                             }

@@ -4,8 +4,11 @@
  * The advanced resource editor
  */
 class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get category() { return HashBrown.Service.NavigationService.getRoute(0); }
-
+    static get itemType() { return HashBrown.Entity.Resource.ResourceBase; }
+    get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
+    
+    get category() { return this.state.category; }
+    
     /**
      * Constructor
      */

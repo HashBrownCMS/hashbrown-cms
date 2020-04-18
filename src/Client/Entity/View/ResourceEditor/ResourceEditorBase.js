@@ -61,7 +61,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
 
             modal.on('no', () => {
-                location.hash = '/' + this.category + '/';
+                location.hash = '/' + this.model.category + '/';
             });
         }
     }
@@ -72,16 +72,12 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     async init() {
         this.setDirty(false);
 
-        this.state.category = HashBrown.Service.NavigationService.getRoute(0);
-        this.state.id = HashBrown.Service.NavigationService.getRoute(1);
-
         if(!this.state.id || this.state.id === 'settings' || this.state.id === 'overview') {
             this.state.tab = this.state.id || 'overview';
             this.state.id = null;
             this.state.name = 'welcome';
         
         } else {
-            this.state.tab = HashBrown.Service.NavigationService.getRoute(2);
             this.state.name = undefined;
        
         }
@@ -106,7 +102,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.model) {
             this.state.title = this.model.getName();
         
-        } else {
+        } else if(this.category) {
             this.state.title = this.category[0].toUpperCase() + this.category.substring(1);
 
         }
@@ -288,7 +284,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             }
 
             if(this.state.id && this.state.id !== this.model.id) {
-                location.hash = '/' + this.category + '/' + this.model.id;
+                location.hash = '/' + this.model.category + '/' + this.model.id;
             } else {
                 this.render();
             }

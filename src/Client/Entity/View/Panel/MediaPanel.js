@@ -36,7 +36,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         });
         
         modal.on('success', () => {
-            HashBrown.Service.NavigationService.poke();
+            HashBrown.Service.EventService.trigger('resource');
         });
     }
 

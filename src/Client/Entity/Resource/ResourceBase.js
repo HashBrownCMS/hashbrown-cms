@@ -100,7 +100,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @param {Object} options
      */
     async save(options = {}) {
-        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
+        let id = options.id || this.id;
         let data = this.getObject();
 
         await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data, options);
@@ -112,9 +112,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Removes this entity
      */
     async remove() {
-        let id = HashBrown.Service.NavigationService.getRoute(1) || this.id;
-        
-        await HashBrown.Service.RequestService.request('delete', this.category + '/' + id);
+        await HashBrown.Service.RequestService.request('delete', this.category + '/' + this.id);
         
         // Cancel any editor instances displaying the deleted content
         if(location.hash == '#/' + this.category + '/' + id) {

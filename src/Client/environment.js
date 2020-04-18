@@ -21,13 +21,99 @@ document.addEventListener('DOMContentLoaded', async () => {
         HashBrown.Client.language = languages[0];
     }
 
-    // Init router
-    HashBrown.Service.NavigationService.startListening();
+    /**
+     * Populates spaces
+     *
+     * @param {String} space
+     * @param {HashBrown.Entity.View.ViewBase} view
+     */
+    function setSpaceView(space, view) {
+        checkParam(space, 'space', String, true);
+        checkParam(view, 'view', HashBrown.Entity.View.ViewBase);
 
-    // Init escape key handler
-    document.addEventListener('keydown', (e) => {
-        if(e.which === 27) { HashBrown.Service.EventService.trigger('escape'); }
-    });
+        let container = document.querySelector(`.page--environment__space--${space}`);
+        container.innerHTML = '';
+        
+        HashBrown.Client[space] = view;
+
+        if(!view || !view.element) { return; }
+
+        container.appendChild(view.element);
+    }
+
+    /**
+     * Handles events as requests
+     *
+     * @param {HashChangeEvent} request
+     */
+    async function handle(request) {
+        checkParam(request, 'request', HashChangeEvent, true);
+
+        if(HashBrown.Client.skipRouter) {
+            delete HashBrown.Client.skipRouter;
+            return;
+        }
+
+        // Await confirmation
+        if(HashBrown.Client.editor && HashBrown.Client.editor.isDirty) {
+            request.preventDefault();
+
+            return await new Promise((resolve) => {
+                UI.highlight(false);
+
+                UI.confirm(
+                    'Discard unsaved changes?',
+                    'You have unsaved changes. Do you want to discard them?',
+                    () => {
+                        HashBrown.Client.editor.isDirty = false;
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                    },
+                    () => {
+                        HashBrown.Client.skipRouter = true;
+                        location = request.oldURL;
+                    }
+                );
+            });
+        }
+        
+        let response = null;
+        
+        for(let name in HashBrown.Controller) {
+            let controller = HashBrown.Controller[name];
+
+            let thisResponse = await controller.getResponse(request);
+
+            if(!thisResponse) { continue; }
+
+            response = thisResponse;
+            break;
+        }
+
+        if(!response) { return; }
+
+        if(!Array.isArray(response)) {
+            response = [ response ];
+        }
+
+        for(let view of response) {
+            // Swap out the editor
+            if(view instanceof HashBrown.Entity.View.ResourceEditor.ResourceEditorBase) {
+                setSpaceView('editor', view);
+            
+            // Swap out the panel
+            } else if(view instanceof HashBrown.Entity.View.Panel.PanelBase) {
+                HashBrown.Client.nav.setPanel(view);
+
+            }
+        }
+    }
+
+    window.addEventListener('hashchange', handle);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    // Init pervasive views
+    setSpaceView('nav', HashBrown.Entity.View.Navigation.ResourceBrowser.new());
+    setSpaceView('menu', HashBrown.Entity.View.Navigation.Session.new());
 
     // Check for updates
     updateCheck();

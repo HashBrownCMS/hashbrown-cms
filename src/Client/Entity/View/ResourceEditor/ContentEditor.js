@@ -42,7 +42,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         this.state.schema = await HashBrown.Entity.Resource.ContentSchema.get(this.model.schemaId, { withParentFields: true });
 
         // Establish tabs
-        this.state.tab = HashBrown.Service.NavigationService.getRoute(2) || this.state.schema.defaultTabId || 'meta';
+        this.state.tab = this.state.tab || this.state.schema.defaultTabId || 'meta';
         this.state.tabs = this.state.schema.tabs || {};
         this.state.tabs['meta'] = 'Meta';
 

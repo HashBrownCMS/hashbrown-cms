@@ -34,9 +34,11 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
             this.state.schemaOptions = {};
 
             let allowedSchemas = this.model.config.allowedSchemas || [];
-
-            let thisContentId = HashBrown.Service.NavigationService.getRoute(1);
-            let thisContent = await HashBrown.Entity.Resource.Content.get(thisContentId);
+        
+            if(!HashBrown.Client.editor) { return; }
+            if(!HashBrown.Client.editor.model) { return; }
+            
+            let thisContent = HashBrown.Client.editor.model;
             
             if(allowedSchemas === 'fromParent' && thisContent.parentId) {
                 let parentContent = await HashBrown.Entity.Resource.Content.get(thisContent.parentId);

@@ -34,7 +34,8 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      */
     async onChangeLanguage(newLanguage) {
         localStorage.setItem('language', newLanguage);
-        this.context.language = newLanguage;
+        
+        HashBrown.Client.language = newLanguage;
 
         HashBrown.Service.EventService.trigger('language');  
 
