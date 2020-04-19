@@ -181,12 +181,12 @@ class Content extends require('Common/Entity/Resource/Content') {
     /**
      * Checks whether a content node is a descendant of another one
      *
-     * @param {String} ancestorId
+     * @param {HashBrown.Entity.Resource.Content} ancestor
      *
      * @return {Boolean} Is descendant
      */
-    async isDescendantOf(ancestorId) {
-        checkParam(ancestorId, 'ancestorId', String, true);
+    async isDescendantOf(ancestor) {
+        checkParam(ancestor, 'ancestor', HashBrown.Entity.Resource.Content, true);
         
         let allContent = await this.constructor.list(this.context) || [];
         
@@ -201,7 +201,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         let parentId = map[this.id].parentId;
 
         while(parentId && map[parentId]) {
-            if(parentId === ancestorId) { return true; }
+            if(parentId === ancestor.id) { return true; }
 
             parentId = map[parentId].parentId;
         }
@@ -219,37 +219,38 @@ class Content extends require('Common/Entity/Resource/Content') {
     async getChildren(excludeIds = []) {
         checkParam(excludeIds, 'excludeIds', Array);
         
-        let result = await HashBrown.Service.DatabaseService.find(
-            this.context.project.id,
-            this.context.environment + '.content',
-            {
-                parentId: this.id
-            },
-            {},
-            {
-                sort: 1
-            }
-        );
-        
+        let allContent = await this.constructor.list(this.context);
         let children = [];
 
-        for(let child of result) {
-            if(excludeIds && excludeIds.indexOf(child.id) > -1) { continue; }
+        for(let content of allContent) {
+            if(content.parentId !== this.id) { continue; }
+            if(excludeIds && excludeIds.indexOf(content.id) > -1) { continue; }
 
-            child.context = this.context;
-
-            child = this.constructor.new(child);
-
-            children.push(child);
+            content.context = this.context;
+            children.push(content);
         }
 
         return children;
     }
     
     /**
+     * Gets whether this content is allowed at the root
+     *
+     * @return {Boolean} Is allowed at root
+     */
+    async isAllowedAtRoot() {
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, this.schemaId);
+
+        if(!schema) { return false; }
+
+        return schema.isAllowedAtRoot === true;
+    }
+
+    /**
      * Gets orphans (root items)
      *
      * @param {HashBrown.Entity.Context} context
+     * @param {Array} excludeIds
      *
      * @return {Array} Orphans
      */
@@ -257,28 +258,15 @@ class Content extends require('Common/Entity/Resource/Content') {
         checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(excludeIds, 'excludeIds', Array);
         
-        let result = await HashBrown.Service.DatabaseService.find(
-            context.project.id,
-            context.environment + '.content',
-            {
-                parentId: ''
-            },
-            {},
-            {
-                sort: 1
-            }
-        );
-        
+        let allContent = await this.constructor.list(context);
         let orphans = [];
 
-        for(let orphan of result) {
-            if(excludeIds && excludeIds.indexOf(orphan.id) > -1) { continue; }
+        for(let content of allContent) {
+            if(content.parentId) { continue; }
+            if(excludeIds && excludeIds.indexOf(content.id) > -1) { continue; }
 
-            orphan.context = context;
-
-            orphan = this.new(orphan);
-
-            orphans.push(orphan);
+            content.context = context;
+            orphans.push(content);
         }
 
         return orphans;
@@ -287,23 +275,18 @@ class Content extends require('Common/Entity/Resource/Content') {
     /**
      * Inserts content before/after another node
      *
-     * @param {String} parentId
+     * @param {HashBrown.Entity.Resource.Content} parent
      * @param {Number} position
      */
-    async insert(parentId, position) {
-        checkParam(parentId, 'parentId', String);
+    async insert(parent, position) {
+        checkParam(parent, 'parent', HashBrown.Entity.Resource.Content);
         checkParam(position, 'position', Number, true);
         
         // Get siblings
-        let parent = null;
         let siblings = [];
        
-        if(parentId) {
-            parent = await this.constructor.get(this.context, parentId);
-        
-            if(parent) {
-                siblings = await parent.getChildren();
-            }
+        if(parent) {
+            siblings = await parent.getChildren();
         
         } else {
             siblings = await this.constructor.getOrphans(this.context);
@@ -314,13 +297,19 @@ class Content extends require('Common/Entity/Resource/Content') {
         if(parent) {
             if(parent.id === this.id) { throw new Error('Content cannot be a parent of itself'); }
 
-            let isAllowed = await parent.isSchemaAllowedAsChild(this.schemaId);
+            let isAllowed = await this.isAllowedAsChildOf(parent);
 
             if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
 
-            let isDescendant = await parent.isDescendantOf(this.id); 
+            let isDescendant = await parent.isDescendantOf(this); 
             
             if(isDescendant) { throw new Error('Content cannot be a child of its own descendants'); }
+
+        // Check if allowed at root
+        } else {
+            let isAllowed = await this.isAllowedAtRoot();
+
+            if(!isAllowed) { throw new Error('This type of content is not allowed here'); }
         }
 
         // Assign the new position
@@ -329,33 +318,45 @@ class Content extends require('Common/Entity/Resource/Content') {
         if(position < 0) { position = 0; }
       
         for(let i = 0; i < siblings.length; i++) {
-            if(siblings[i].id === contentId) { continue; }
+            if(siblings[i].id === this.id) { continue; }
 
             if(i === position) {
-                result.push(content);
+                result.push(this);
             }
 
             result.push(siblings[i]);
         }
 
-        if(result.indexOf(content) < 0) {
-            result.push(content);
+        if(result.indexOf(this) < 0) {
+            result.push(this);
         }
 
         // Update all nodes with their new sort index
         for(let i = 0; i < result.length; i++) {
-            await HashBrown.Service.DatabaseService.updateOne(
-                this.context.project.id,
-                this.context.environment + '.content',
-                {
-                    id: result[i].id
-                },
-                {
-                    sort: i,
-                    parentId: parentId
-                }
-            );
+            if(result[i].isLocked) { continue; }
+
+            result[i].sort = i;
+            result[i].parentId = parent ? parent.id : null;
+
+            await result[i].save();
         }
+    }
+
+    /**
+     * Checks if a schema type is allowed as a child of this content
+     *
+     * @param {HashBrown.Entity.Resource.Content} content
+     *
+     * @returns {Boolean} Is the schema allowed as a child
+     */
+    async isAllowedAsChildOf(parent) {
+        checkParam(parent, 'parent', HashBrown.Entity.Resource.Content, true);
+
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, parent.schemaId);
+
+        if(!schema) { return false; }
+
+        return schema.allowedChildSchemas.indexOf(this.schemaId) > -1;
     }
 
     /**

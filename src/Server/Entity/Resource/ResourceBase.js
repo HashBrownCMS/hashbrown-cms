@@ -323,7 +323,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.RequestService.request(
             'post',
-            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id + '?token=' + sync.token,
+            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id + '?token=' + sync.token + '&create=true',
             this.getObject()
         );
 

@@ -46,9 +46,17 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
     setPanel(panel) {
         checkParam(panel, 'panel', HashBrown.Entity.View.Panel.PanelBase, true);
 
-        this.state.panel = panel;
-        
-        this.render();
+        // If it's the same panel, just update it
+        if(this.state.panel && panel.constructor === this.state.panel.constructor) {
+            this.state.panel.state.id = panel.state.id;
+            this.state.panel.render();
+
+        // If it's a new panel, replace it
+        } else {
+            this.state.panel = panel;
+            this.render();
+
+        }
     }
 
     /**

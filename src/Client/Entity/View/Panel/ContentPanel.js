@@ -60,7 +60,7 @@ class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
      */
     async onDropItem(itemId, parentId, position) {
         try {
-            await HashBrown.Service.RequestService.request('post', `content/insert?contentId=${itemId}&parentId=${parentId || ''}&position=${position}`);
+            await HashBrown.Service.RequestService.request('post', `content/${itemId}/insert?parentId=${parentId || ''}&position=${position}`);
 
             this.update();
 

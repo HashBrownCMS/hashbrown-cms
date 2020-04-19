@@ -34,7 +34,9 @@ class ContentController extends HashBrown.Controller.ResourceController {
             return new HashBrown.Http.Response('Not found', 404);
         }
 
-        await resource.insert(query.parentId, parseInt(query.position));
+        let parent = await HashBrown.Entity.Resource.Content.get(context, query.parentId);
+
+        await resource.insert(parent, parseInt(query.position));
         
         return new HashBrown.Http.Response('OK');
     }

@@ -108,7 +108,9 @@
         align-items: center;
         cursor: pointer;
         justify-content: center;
+    }
 
+    &__action {
         &:focus, &:hover {
             outline: none;
             background-color: var(--color-decor-700);

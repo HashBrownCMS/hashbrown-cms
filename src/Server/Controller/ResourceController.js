@@ -189,7 +189,7 @@ i
     }
     
     /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}
+     * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}?create=true|false
      */
     static async resource(request, params, body, query, context) {
         let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
@@ -200,7 +200,7 @@ i
         
         let resource = await model.get(context, params.id, query);
                 
-        if(!resource) {
+        if(!resource && !query.create) {
             return new HashBrown.Http.Response('Not found', 404);
         }
 
@@ -213,12 +213,16 @@ i
                     return new HashBrown.Http.Response('You do not have access to edit this resource', 403);
                 }
 
-                resource.adopt(body);
+                if(!resource) {
+                    resource = await model.create(context, body, query);
 
-                // In case the id was changed, make sure to include the old id in the options
-                query.id = params.id;
+                } else {
+                    resource.adopt(body);
                     
-                await resource.save(query);
+                    query.id = params.id; // Include the original id, in case it was changed
+                    
+                    await resource.save(query);
+                }
                 
                 return new HashBrown.Http.Response(resource);
 

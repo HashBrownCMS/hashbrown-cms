@@ -13,7 +13,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
 
     /**
      * @example GET /api/${project}/${environment}/media/${id}
-     * @example POST /api/${project}/${environment}/media/${id} { folder: XXX, filename: XXX, full: XXX, thumbnail: XXX }
+     * @example POST /api/${project}/${environment}/media/${id}?create=true|false { folder: XXX, filename: XXX, full: XXX, thumbnail: XXX }
      * @example DELETE /api/${project}/${environment}/media/${id}
      */
     static async resource(request, params, body, query, context) {
@@ -23,11 +23,9 @@ class MediaController extends HashBrown.Controller.ResourceController {
         
         let media = await HashBrown.Entity.Resource.Media.get(context, params.id);
 
-        if(!media) {
+        if(!media && !query.create) {
             return new HashBrown.Http.Response('Not found', 404);
         }
-
-        media.adopt(body);
 
         let options = {
             full: body.full,
@@ -35,7 +33,14 @@ class MediaController extends HashBrown.Controller.ResourceController {
             thumbnail: body.thumbnail
         };
 
-        await media.save(options);
+        if(!media) {
+            media = await HashBrown.Entity.Resource.Media.create(body, options);
+
+        } else {
+            media.adopt(body);
+            await media.save(options);
+        
+        }
 
         return new HashBrown.Http.Response('OK', 200);
     }

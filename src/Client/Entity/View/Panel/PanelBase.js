@@ -26,40 +26,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     
         this.state.sortingOptions = this.getSortingOptions();
         this.state.sortingMethod = Object.values(this.state.sortingOptions || {})[0];
-        this.state.itemStates = {};
-    }
-
-    /**
-     * Update
-     *
-     * @param {Boolean} useCache
-     */
-    async update(useCache = true) {
-        let scrollTop = 0;
-        
-        // Cache scroll position and item states
-        if(useCache) { 
-            if(this.namedElements.items) {
-                scrollTop = this.namedElements.items.scrollTop;
-            }
-
-            for(let id in this.state.itemMap || {}) {
-                this.state.itemStates[id] = this.state.itemMap[id].state;
-            }
-        }
-
-        // Fetch models
-        await super.update();        
-
-        // Restore scroll position
-        if(useCache) {
-            if(this.namedElements.items) {
-                this.namedElements.items.scrollTop = scrollTop;
-            }
-        }
-        
-        // Highlight selected item
-        this.highlightItem();
+        this.state.itemMap = {};
     }
 
     /**
@@ -67,29 +34,38 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      */
     async fetch() {
         let resources = this.itemType ? await this.itemType.list() : [];
+        
+        this.state.scrollTop = this.namedElements.items ? this.namedElements.items.scrollTop : 0;
 
-        this.state.itemMap = {};
+        // Generate items and place them in the map cache
+        let itemMap = {};
 
-        let queue = [];
-
-        // Generate items and place them in the queue and map cache
         for(let resource of resources) {
             let model = await this.getItem(resource);
             let item = HashBrown.Entity.View.ListItem.PanelItem.new({
                 model: model,
-                state: this.state.itemStates[model.id] || {}
+                state: this.state.itemMap[model.id] ? this.state.itemMap[model.id].state : {}
             });
 
-            if(this.state.searchQuery && item.model.name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) < 0) { continue; }
+            // Check if item name matches the search filter
+            if(this.state.searchQuery && resource.getName().toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) < 0) { continue; }
 
             item.on('drop', (itemId, parentId, position) => {
                 this.onDropItem(itemId, parentId, position);
             });
 
-            this.state.itemMap[item.model.id] = item;
-            
-            queue.push(item);
+            itemMap[item.model.id] = item;
         }
+
+        this.state.itemMap = itemMap;
+    }
+
+    /**
+     * Pre render
+     */
+    prerender() {
+        // Process items
+        let queue = Object.values(this.state.itemMap);
 
         // Apply the item hierarchy
         for(let item of queue) {
@@ -107,7 +83,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             }
         }
   
-        // Add items to the root view and sort them
+        // Add items to the root
         this.state.rootItems = [];
         
         for(let item of queue) {
@@ -119,10 +95,25 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
                 this.state.rootItems.push(item);
             }
 
+            // Sort children
             item.model.children.sort((a, b) => this.sortItems(a, b));
         }
 
+        // Sort root items
         this.state.rootItems.sort((a, b) => this.sortItems(a, b));
+    }
+
+    /**
+     * Post render
+     */
+    postrender() {
+        // Restore scroll position
+        if(this.namedElements.items) {
+            this.namedElements.items.scrollTop = this.state.scrollTop;
+        }
+
+        // Highlight selected item
+        this.highlightItem();
     }
 
     /**
@@ -314,12 +305,10 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Highlights the current item
      */
     highlightItem() {
-        let highlightId = this.state.selectedItem;
-
         for(let id in this.state.itemMap) {
             let item = this.state.itemMap[id];
            
-            item.setHighlight(id === highlightId);
+            item.setHighlight(id === this.state.id);
         }
     }
 
@@ -457,6 +446,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         return {
             id: resource.id,
             category: this.category,
+            isRemote: resource.sync && resource.sync.isRemote === true,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),
             changed: resource.updatedOn,
