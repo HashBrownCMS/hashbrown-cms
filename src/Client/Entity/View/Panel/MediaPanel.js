@@ -6,8 +6,6 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
-    static get category() { return 'media'; }
-   
     /**
      * Event: Click new
      */

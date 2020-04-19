@@ -6,8 +6,6 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
-    static get category() { return 'content'; };
-    
     /**
      * Fetches the models
      */

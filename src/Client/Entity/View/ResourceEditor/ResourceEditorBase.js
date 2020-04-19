@@ -9,10 +9,12 @@ const HEARTBEAT_TIMEOUT  = 1000 * 5; // An extra 5 seconds waiting time when che
  * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
-    static get category() { return null; }
-    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
-
-    get category() { return this.constructor.category; }
+    /**
+     * Gets the type of item this resource editor works with
+     *
+     * @return {HashBrown.Entity.Resource.ResourceBase} Item type
+     */
+    static get itemType() { return HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase); }
     get itemType() { return this.constructor.itemType; }
 
     /**
@@ -61,7 +63,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
 
             modal.on('no', () => {
-                location.hash = '/' + this.model.category + '/';
+                location.hash = '/' + this.model.module + '/';
             });
         }
     }
@@ -71,6 +73,10 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      */
     async init() {
         this.setDirty(false);
+
+        if(!this.state.module) {
+            this.state.module = this.module;
+        }
 
         if(!this.state.id || this.state.id === 'settings' || this.state.id === 'overview') {
             this.state.tab = this.state.id || 'overview';
@@ -102,8 +108,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.model) {
             this.state.title = this.model.getName();
         
-        } else if(this.category) {
-            this.state.title = this.category[0].toUpperCase() + this.category.substring(1);
+        } else if(this.module) {
+            this.state.title = HashBrown.Service.ModuleService.getName(this.module);
 
         }
 
@@ -284,7 +290,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             }
 
             if(this.state.id && this.state.id !== this.model.id) {
-                location.hash = '/' + this.model.category + '/' + this.model.id;
+                location.hash = '/' + this.model.module + '/' + this.model.id;
             } else {
                 this.render();
             }
@@ -297,7 +303,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     async onClickNew() {
         let resource = await this.itemType.create();
         
-        location.hash = `/${this.category}/${resource.id}`;
+        location.hash = `/${this.module}/${resource.id}`;
     }
 }
 

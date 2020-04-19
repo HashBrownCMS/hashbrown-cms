@@ -4,8 +4,6 @@
  * The editor for publication resources
  */
 class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get category() { return 'publications'; }
-    
     /**
      * Constructor
      */

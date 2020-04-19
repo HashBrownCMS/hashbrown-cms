@@ -2,8 +2,8 @@
 
 module.exports = (_, model, state) => [
 
-_.field({label: 'Category'},
-    _.popup({disabled: model.isLocked, value: model.config.resource, options: state.categoryOptions, onchange: _.onChangeResourceCategory})
+_.field({label: 'Module'},
+    _.popup({disabled: model.isLocked, value: model.config.resource, options: state.moduleOptions, onchange: _.onChangeResourceModule})
 ),
 _.if(state.keyOptions && state.keyOptions.length > 0,
     _.field({label: 'Keys'},

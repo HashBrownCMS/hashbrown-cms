@@ -8,8 +8,6 @@ const Path = require('path');
  * @memberof HashBrown.Server.Controller
  */
 class PublicationController extends HashBrown.Controller.ResourceController {
-    static get category() { return 'publications'; }
-    
     /**
      * Routes
      */

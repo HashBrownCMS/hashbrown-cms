@@ -4,8 +4,6 @@
  * The editor for schema resources
  */
 class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get category() { return 'schemas'; }
-    
     /**
      * Constructor
      */

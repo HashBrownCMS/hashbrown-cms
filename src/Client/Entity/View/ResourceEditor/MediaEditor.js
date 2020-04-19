@@ -4,8 +4,6 @@
  * The editor for media resources
  */
 class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get category() { return 'media'; }
-    
     /**
      * Constructor
      */

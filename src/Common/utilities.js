@@ -83,6 +83,27 @@ base.updateCheck = async function updateCheck() {
 }
 
 /**
+ * Handles module creation
+ *
+ * @param {String} alias
+ * @param {String} name
+ * @param {String} icon
+ *
+ * @return {Function} Chain
+ */
+base.register = function register(alias, name, icon) {
+    HashBrown.Service.ModuleService.register(alias, name, icon);
+
+    let add = (module) => {
+        HashBrown.Service.ModuleService.addClass(module, alias);
+
+        return { add: add };
+    };
+
+    return { add: add };
+}
+
+/**
  * Handles namespace creation
  *
  * @param {String} query

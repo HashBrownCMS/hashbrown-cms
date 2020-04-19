@@ -16,7 +16,7 @@ class PluginService {
         let folders = await HashBrown.Service.FileService.list(path);
 
         for(let plugin of folders) {
-            let indexPath = Path.join(path, plugin, 'src', 'Server', 'index.js');
+            let indexPath = Path.join(plugin, 'src', 'Server', 'index.js');
             
             if(!HashBrown.Service.FileService.exists(indexPath)) { continue; }
 

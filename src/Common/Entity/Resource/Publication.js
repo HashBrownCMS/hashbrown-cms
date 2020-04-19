@@ -6,9 +6,6 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Publication extends HashBrown.Entity.Resource.ResourceBase {
-    static get icon() { return 'newspaper-o'; }
-    static get category() { return 'publications'; }
-    
     /**
      * Structure
      */

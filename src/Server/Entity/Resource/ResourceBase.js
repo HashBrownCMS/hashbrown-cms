@@ -46,7 +46,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         // Get the resource from database
         let resource = await HashBrown.Service.DatabaseService.findOne(
             context.project.id,
-            context.environment + '.' + this.category,
+            context.environment + '.' + this.module,
             {
                 id: id
             }
@@ -66,7 +66,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
                 resource = await HashBrown.Service.RequestService.request(
                     'get',
-                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.category + '/' + id,
+                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.module + '/' + id,
                     options
                 );
 
@@ -108,7 +108,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         // Get local resources
         let resources = await HashBrown.Service.DatabaseService.find(
             context.project.id,
-            context.environment + '.' + this.category,
+            context.environment + '.' + this.module,
             options
         );
 
@@ -134,7 +134,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
                 let remoteResources = await HashBrown.Service.RequestService.request(
                     'get',
-                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.category,
+                    sync.url + '/api/' + sync.project + '/' + context.environment + '/' + this.module,
                     options
                 );
 
@@ -215,7 +215,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.DatabaseService.insertOne(
             context.project.id,
-            context.environment + '.' + this.category,
+            context.environment + '.' + this.module,
             resource.getObject()
         );
 
@@ -258,7 +258,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         // Insert into database
         await HashBrown.Service.DatabaseService.updateOne(
             this.context.project.id,
-            this.context.environment + '.' + this.category,
+            this.context.environment + '.' + this.module,
             {
                 id: options.id || this.id
             },
@@ -279,7 +279,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.DatabaseService.removeOne(
             this.context.project.id,
-            this.context.environment + '.' + this.category,
+            this.context.environment + '.' + this.module,
             {
                 id: this.id
             }
@@ -298,12 +298,12 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         let resource = await HashBrown.Service.RequestService.request(
             'get',
-            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id,
+            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.module + '/' + this.id,
             { token: sync.token }
         );
         
         if(!resource) {
-            throw new Error(`Could not find remote resource ${this.category}/${this.id}`);
+            throw new Error(`Could not find remote resource ${this.module}/${this.id}`);
         }
         
         this.adopt(resource);
@@ -323,7 +323,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.RequestService.request(
             'post',
-            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.category + '/' + this.id + '?token=' + sync.token + '&create=true',
+            sync.url + '/api/' + sync.project + '/' + this.context.environment + '/' + this.module + '/' + this.id + '?token=' + sync.token + '&create=true',
             this.getObject()
         );
 
@@ -338,7 +338,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         await HashBrown.Service.DatabaseService.updateOne(
             this.context.project.id,
-            this.context.environment + '.' + this.category,
+            this.context.environment + '.' + this.module,
             {
                 id: this.id
             },

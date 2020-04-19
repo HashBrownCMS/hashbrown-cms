@@ -30,7 +30,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         let resource = null;
 
         try {
-            resource = await HashBrown.Service.RequestService.request('get', this.category + '/' + id, null, options);
+            resource = await HashBrown.Service.RequestService.request('get', this.module + '/' + id, null, options);
         } catch(e) {
             resource = null;
         }
@@ -50,10 +50,10 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * @return {Array} Instances
      */
     static async list(options = {}) {
-        let resources = await HashBrown.Service.RequestService.request('get', this.category, null, options);
+        let resources = await HashBrown.Service.RequestService.request('get', this.module, null, options);
         
         if(!resources) {
-            throw new Error('Resource list ' + this.category + ' not found');
+            throw new Error('Resource list ' + this.module + ' not found');
         }
    
         for(let i = resources.length - 1; i >= 0; i--) {
@@ -85,7 +85,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         checkParam(data, 'data', Object, true);
         checkParam(options, 'options', Object, true);
         
-        let resource = await HashBrown.Service.RequestService.request('post', this.category + '/new', data, options);
+        let resource = await HashBrown.Service.RequestService.request('post', this.module + '/new', data, options);
 
         resource = this.new(resource);
 
@@ -103,7 +103,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         let id = options.id || this.id;
         let data = this.getObject();
 
-        await HashBrown.Service.RequestService.request('post', this.category + '/' + id, data, options);
+        await HashBrown.Service.RequestService.request('post', this.module + '/' + id, data, options);
         
         HashBrown.Service.EventService.trigger('resource', this.id);
     }
@@ -112,11 +112,11 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Removes this entity
      */
     async remove() {
-        await HashBrown.Service.RequestService.request('delete', this.category + '/' + this.id);
+        await HashBrown.Service.RequestService.request('delete', this.module + '/' + this.id);
         
         // Cancel any editor instances displaying the deleted content
-        if(location.hash == '#/' + this.category + '/' + id) {
-            location.hash = '/' + this.category + '/';
+        if(location.hash == '#/' + this.module + '/' + id) {
+            location.hash = '/' + this.module + '/';
         } 
 
         HashBrown.Service.EventService.trigger('resource', this.id);  
@@ -126,7 +126,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Pulls a synced resource
      */
     async pull() {
-        let data = await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/pull');
+        let data = await HashBrown.Service.RequestService.request('post', this.module + '/' + this.id + '/pull');
 
         this.adopt(data);
     
@@ -137,7 +137,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
      * Pushes a synced resource
      */
     async push() {
-        await HashBrown.Service.RequestService.request('post', this.category + '/' + this.id + '/push');
+        await HashBrown.Service.RequestService.request('post', this.module + '/' + this.id + '/push');
 
         HashBrown.Service.EventService.trigger('resource', this.id);
     }
@@ -150,7 +150,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     async heartbeat(options = {}) {
         await HashBrown.Service.RequestService.request(
             'post',
-            (options.category || this.category) + '/' + (options.id || this.id) + '/heartbeat'
+            (options.module || this.module) + '/' + (options.id || this.id) + '/heartbeat'
         );
     }
 

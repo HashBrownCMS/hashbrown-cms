@@ -6,8 +6,6 @@
  * @memberof HashBrown.Server.Controller
  */
 class ContentController extends HashBrown.Controller.ResourceController {
-    static get category() { return 'content'; }
-
     /**
      * Initialises this controller
      */

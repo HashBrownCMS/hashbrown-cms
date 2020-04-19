@@ -9,8 +9,6 @@ const Path = require('path');
  * @memberof HashBrown.Server.Controller
  */
 class MediaController extends HashBrown.Controller.ResourceController {
-    static get category() { return 'media'; }
-
     /**
      * @example GET /api/${project}/${environment}/media/${id}
      * @example POST /api/${project}/${environment}/media/${id}?create=true|false { folder: XXX, filename: XXX, full: XXX, thumbnail: XXX }

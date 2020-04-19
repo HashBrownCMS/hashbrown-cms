@@ -6,15 +6,11 @@
  * @memberof HashBrown.Client.Entity.View.Panel
  */
 class PanelBase extends HashBrown.Entity.View.ViewBase {
-    static get category() { return this.name.replace('Panel', '').toLowerCase(); }
-    static get itemType() { return HashBrown.Entity.Resource.ResourceBase.getModel(this.category); }
-    static get icon() { return this.itemType ? this.itemType.icon : 'question'; }
-    static get title() { return this.name.replace('Panel', ''); }
+    static get itemType() { return HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase); }
+    static get title() { return HashBrown.Service.ModuleService.getName(this.module); }
 
     get title() { return this.constructor.title; }
-    get icon() { return this.constructor.icon; }
     get itemType() { return this.constructor.itemType; }
-    get category() { return this.constructor.category; }
 
     /**
      * Constructor
@@ -205,7 +201,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
         let resource = await this.itemType.create();
         
-        location.hash = `/${this.category}/${resource.id}`;
+        location.hash = `/${this.module}/${resource.id}`;
     }
 
     /**
@@ -445,7 +441,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         
         return {
             id: resource.id,
-            category: this.category,
+            module: this.module,
             isRemote: resource.sync && resource.sync.isRemote === true,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),

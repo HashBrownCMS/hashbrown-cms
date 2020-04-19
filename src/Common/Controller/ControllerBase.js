@@ -7,6 +7,21 @@
  */
 class ControllerBase {
     /**
+     * Gets the alias of the module this entity belongs to
+     *
+     * @return {String} Alias
+     */
+    static get module() {
+        let alias = HashBrown.Service.ModuleService.getAlias(this);
+
+        if(!alias) {
+            throw new Error(`The controller ${this.name} does not belong to any module`);
+        }
+
+        return alias;
+    }
+    
+    /**
      * Gets a list of routes
      *
      * @return {Object} Routes

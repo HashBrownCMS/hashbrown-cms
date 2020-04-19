@@ -12,8 +12,6 @@ let lastIp = '';
  * @memberof HashBrown.Server.Controller
  */
 class FormController extends HashBrown.Controller.ResourceController {
-    static get category() { return 'forms'; }
-    
     /**
      * Routes
      */

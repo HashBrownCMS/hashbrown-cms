@@ -4,8 +4,6 @@
  * The editor for form resources
  */
 class FormEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    static get category() { return 'forms'; }
-    
     /**
      * Constructor
      */

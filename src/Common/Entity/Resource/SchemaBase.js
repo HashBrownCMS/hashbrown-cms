@@ -6,12 +6,9 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
-    static get icon() { return 'cogs'; }
     set icon(name) { this.customIcon = name; }
     get icon() { return this.customIcon || super.icon; }
 
-    static get category() { return 'schemas'; }
-    
     static get type() { return null; }
     get type() { return this.constructor.type; }
    

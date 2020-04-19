@@ -6,9 +6,7 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Content extends HashBrown.Entity.Resource.ResourceBase {
-    static get icon() { return 'file'; }
     get icon() { return this.schema ? this.schema.icon : super.icon; }
-    static get category() { return 'content'; }
 
     /**
      * Gets the human readable name

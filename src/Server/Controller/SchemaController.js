@@ -6,8 +6,6 @@
  * @memberof HashBrown.Server.Controller
  */
 class SchemaController extends HashBrown.Controller.ResourceController {
-    static get category() { return 'schemas'; }
-
     /**
      * Routes
      */

@@ -14,7 +14,7 @@ _.div({class: 'resource-editor resource-editor--json-editor'},
         _.div({class: 'resource-editor__footer'},
             _.include(require('./inc/warning')),
             _.div({class: 'resource-editor__footer__actions'},
-                _.a({href: `#/${state.category}/${state.id}`, class: 'widget widget--button embedded'}, 'Basic'),
+                _.a({href: `#/${state.module}/${state.id}`, class: 'widget widget--button embedded'}, 'Basic'),
                 _.if(!model.isLocked,
                     _.button({class: 'widget widget--button', name: 'save', onclick: _.onClickSave}, 'Save')
                 )

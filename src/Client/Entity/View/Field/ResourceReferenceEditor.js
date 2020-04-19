@@ -23,23 +23,22 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
         await super.fetch();
 
         if(this.state.name === 'config') {
-            this.state.categoryOptions = HashBrown.Entity.Resource.ResourceBase.getAllCategories();
+            this.state.moduleOptions = HashBrown.Service.ModuleService.getAliases();
             this.state.keyOptions = [];
 
             if(this.model.config.resource) {
-                for(let type of Object.values(HashBrown.Entity.Resource)) {
-                    if(type.category === this.model.config.resource) {
-                        for(let key of Object.keys(new type())) {
-                            this.state.keyOptions.push(key);
-                        }
-                        break;
+                let model = HashBrown.Service.ModuleService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
+
+                if(model) {
+                    for(let key of Object.keys(new model())) {
+                        this.state.keyOptions.push(key);
                     }
                 }
             }
 
         } else {
             if(this.model.config.resource && this.state.value) {
-                let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.model.config.resource);
+                let model = HashBrown.Service.ModuleService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
 
                 this.state.resource = model ? await model.get(this.state.value) : null;
             }
@@ -77,9 +76,9 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
-     * Event: Change resource category
+     * Event: Change resource module
      */
-    onChangeResourceCategory(newValue) {
+    onChangeResourceModule(newValue) {
         this.model.config.resource = newValue;
         this.model.config.resourceKeys = [];
 

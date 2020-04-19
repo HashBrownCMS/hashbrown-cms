@@ -9,6 +9,31 @@ let crypto = require('crypto');
  */
 class EntityBase {
     /**
+     * Gets the alias of the module this entity belongs to
+     *
+     * @return {String} Alias
+     */
+    static get module() {
+        let alias = HashBrown.Service.ModuleService.getAlias(this);
+
+        if(!alias) {
+            throw new Error(`The entity ${this.name} does not belong to any module`);
+        }
+
+        return alias;
+    }
+
+    get module() { return this.constructor.module; }
+
+    /**
+     * Gets the icon of the module this entity belongs to
+     *
+     * @return {String} Icon
+     */
+    static get icon() { return HashBrown.Service.ModuleService.getIcon(this.module); }
+    get icon() { return this.constructor.icon; }
+
+    /**
      * Constructs an entity
      *
      * @param {Object} params

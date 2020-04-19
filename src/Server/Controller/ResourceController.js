@@ -9,61 +9,49 @@ const Crypto = require('crypto');
  * @memberof HashBrown.Server.Controller
  */
 class ResourceController extends HashBrown.Controller.ControllerBase {
-    static get category() {
-        throw new Error('The "category" getter method must be overridden');
-    }
-
     static get routes() {
         let routes = {};
         
-        // Migration
-        routes['/api/${project}/${environment}/' + this.category + '/dependencies'] = {
-            handler: this.dependencies,
-            user: {
-                scope: this.category
-            }
-        };
-        
         // Regular operations
-        routes['/api/${project}/${environment}/' + this.category] = {
+        routes['/api/${project}/${environment}/' + this.module] = {
             handler: this.resources,
             user: true
         };
-        routes['/api/${project}/${environment}/' + this.category + '/new'] = {
+        routes['/api/${project}/${environment}/' + this.module + '/new'] = {
             handler: this.new,
             methods: [ 'POST' ],
             user: {
-                scope: this.category
+                scope: this.module
             }
         };
-        routes['/api/${project}/${environment}/' + this.category + '/${id}'] = {
+        routes['/api/${project}/${environment}/' + this.module + '/${id}'] = {
             handler: this.resource,
             methods: [ 'GET', 'POST', 'DELETE' ],
             user: true
         };
         
         // Sync
-        routes['/api/${project}/${environment}/' + this.category + '/${id}/pull'] = {
+        routes['/api/${project}/${environment}/' + this.module + '/${id}/pull'] = {
             handler: this.pull,
             methods: [ 'POST' ],
             user: {
-                scope: this.category
+                scope: this.module
             }
         };
-        routes['/api/${project}/${environment}/' + this.category + '/${id}/push'] = {
+        routes['/api/${project}/${environment}/' + this.module + '/${id}/push'] = {
             handler: this.push,
             methods: [ 'POST' ],
             user: {
-                scope: this.category
+                scope: this.module
             }
         };
 
         // Heartbeat
-        routes['/api/${project}/${environment}/' + this.category + '/${id}/heartbeat'] = {
+        routes['/api/${project}/${environment}/' + this.module + '/${id}/heartbeat'] = {
             handler: this.heartbeat,
             methods: [ 'POST' ],
             user: {
-                scope: this.category
+                scope: this.module
             }
         };
 
@@ -109,13 +97,13 @@ i
     }
 
     /**
-     * @example POST /api/${project}/${environment}/${category}/${id}/heartbeat
+     * @example POST /api/${project}/${environment}/${module}/${id}/heartbeat
      */
     static async heartbeat(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
         
         let resource = await model.get(context, params.id);
@@ -130,15 +118,15 @@ i
     }
    
     /**
-     * @example POST /api/${project}/${environment}/${category}/{$id}/pull
+     * @example POST /api/${project}/${environment}/${module}/{$id}/pull
      *
      * @return {Object} The pulled resource
      */
     static async pull(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
         
         let resource = await model.get(context, params.id);
@@ -153,13 +141,13 @@ i
     }
     
     /**
-     * @example POST /api/${project}/${environment}/{category}/${id}/push
+     * @example POST /api/${project}/${environment}/{module}/${id}/push
      */
     static async push(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
 
         let resource = await model.get(context, params.id);
@@ -174,13 +162,13 @@ i
     }
     
     /**
-     * @example GET /api/${project}/${environment}/${category}
+     * @example GET /api/${project}/${environment}/${module}
      */
     static async resources(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
         
         let resources = await model.list(context, query);
@@ -189,13 +177,13 @@ i
     }
     
     /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/${category}/${id}?create=true|false
+     * @example GET|POST|DELETE /api/${project}/${environment}/${module}/${id}?create=true|false
      */
     static async resource(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
         
         let resource = await model.get(context, params.id, query);
@@ -209,7 +197,7 @@ i
                 return new HashBrown.Http.Response(resource, 200, { 'ETag': this.getETag([ resource ], params, query) });
                 
             case 'POST':
-                if(!context.user.hasScope(this.category)) {
+                if(!context.user.hasScope(this.module)) {
                     return new HashBrown.Http.Response('You do not have access to edit this resource', 403);
                 }
 
@@ -227,7 +215,7 @@ i
                 return new HashBrown.Http.Response(resource);
 
             case 'DELETE':
-                if(!context.user.hasScope(this.category)) {
+                if(!context.user.hasScope(this.module)) {
                     return new HashBrown.Http.Response('You do not have access to remove this resource', 403);
                 }
                 
@@ -240,13 +228,13 @@ i
     }
     
     /**
-     * @example POST /api/${project}/${environment}/${category}/new
+     * @example POST /api/${project}/${environment}/${module}/new
      */
     static async new(request, params, body, query, context) {
-        let model = HashBrown.Entity.Resource.ResourceBase.getModel(this.category);
+        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for category ${this.category}`, 404);
+            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
         }
         
         let resource = await model.create(context, body, query);

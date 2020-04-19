@@ -14,13 +14,13 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
             '/': {
                 redirect: '/content'
             },
-            '/${category}/${id}/${tab}': {
+            '/${module}/${id}/${tab}': {
                 handler: this.resource
             },
-            '/${category}/${id}': {
+            '/${module}/${id}': {
                 handler: this.resource
             },
-            '/${category}': {
+            '/${module}': {
                 handler: this.resources
             }
         };
@@ -31,8 +31,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resource(request, params) {
         return [
-            this.getPanel(params.category, params.id),
-            this.getEditor(params.category, params.id, params.tab)
+            this.getPanel(params.module, params.id),
+            this.getEditor(params.module, params.id, params.tab)
         ];
     }
 
@@ -41,77 +41,71 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resources(request, params) {
         return [
-            this.getPanel(params.category),
-            this.getEditor(params.category, 'overview')
+            this.getPanel(params.module),
+            this.getEditor(params.module, 'overview')
         ];
     }
 
     /**
-     * Gets the editor for a category
+     * Gets the editor for a module
      *
-     * @param {String} category
+     * @param {String} module
      * @param {String} id
      * @param {String} tab
      *
      * @return {HashBrown.Entity.View.ResourceEditor.ResourceEditorBase} Editor
      */
-    static getEditor(category, id = '', tab = '') {
-        checkParam(category, 'category', String, true);
+    static getEditor(module, id = '', tab = '') {
+        checkParam(module, 'module', String, true);
         checkParam(id, 'id', String);
         checkParam(tab, 'tab', String);
        
         if(tab === 'json') {
             return HashBrown.Entity.View.ResourceEditor.JsonEditor.new({
                 state: {
-                    category: category,
+                    module: module,
                     id: id
                 }
             });
         }
 
-        for(let name in HashBrown.Entity.View.ResourceEditor) {
-            let type = HashBrown.Entity.View.ResourceEditor[name];
+        let type = HashBrown.Service.ModuleService.getClass(module, HashBrown.Entity.View.ResourceEditor.ResourceEditorBase);
 
-            if(type.category !== category) { continue; }
-
-            return type.new({
-                state: {
-                    category: category,
-                    id: id,
-                    tab: tab
-                }
-            });
+        if(!type) {
+            throw new Error(`No resource editor for module "${module}" was found`);
         }
 
-        throw new Error(`No resource editor for category "${category}" was found`);
+        return type.new({
+            state: {
+                id: id,
+                tab: tab
+            }
+        });
     }
 
     /**
-     * Gets the panel for a category
+     * Gets the panel for a module
      *
-     * @param {String} category
+     * @param {String} module
      * @param {String} id
      *
      * @return {HashBrown.Entity.View.Panel.PanelBase} Panel
      */
-    static getPanel(category, id = '') {
-        checkParam(category, 'category', String, true);
+    static getPanel(module, id = '') {
+        checkParam(module, 'module', String, true);
         checkParam(id, 'id', String);
         
-        for(let name in HashBrown.Entity.View.Panel) {
-            let type = HashBrown.Entity.View.Panel[name];
-
-            if(type.category !== category) { continue; }
-
-            return type.new({
-                state: {
-                    category: category,
-                    id: id
-                }
-            });
+        let type = HashBrown.Service.ModuleService.getClass(module, HashBrown.Entity.View.Panel.PanelBase);
+        
+        if(!type) {
+            throw new Error(`No panel for module "${module}" was found`);
         }
 
-        throw new Error(`No panel for category "${category}" was found`);
+        return type.new({
+            state: {
+                id: id
+            }
+        });
     }
 }
 

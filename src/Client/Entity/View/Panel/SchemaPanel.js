@@ -6,8 +6,6 @@
  * @memberof HashBrown.Entity.View.Panel
  */
 class SchemaPanel extends HashBrown.Entity.View.Panel.PanelBase {
-    static get category() { return 'schemas'; }
-   
     /**
      * Event: Click new
      */

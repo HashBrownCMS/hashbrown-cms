@@ -7,37 +7,6 @@
  */
 class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
-     * Gets the representative icon of this resource type
-     */
-    static get icon() { return 'question'; }
-    get icon() { return this.constructor.icon; }
-
-    /**
-     * Gets the category (API group) of this resource type
-     */
-    static get category() { return null; }
-    get category() { return this.constructor.category; }
-
-    /**
-     * Gets a list of all categories
-     *
-     * @return {Array} Category names
-     */
-    static getAllCategories() {
-        let categories = [];
-
-        for(let i in HashBrown.Entity.Resource) {
-            let category = HashBrown.Entity.Resource[i].category;
-
-            if(categories.indexOf(category) > -1) { continue; }
-
-            categories.push(category);
-        }
-
-        return categories;
-    }
-
-    /**
      * Structure
      */
     structure() {
@@ -63,36 +32,6 @@ class ResourceBase extends HashBrown.Entity.EntityBase {
      */
     getName() {
         throw new Error('The "getName" method must be overridden');
-    }
-    
-    /**
-     * Gets a model by category
-     *
-     * @param {String} category
-     * @param {Object} data
-     *
-     * @return {HashBrown.Entity.Resource.ResourceBase} Resource
-     */
-    static getModel(category, data = null) {
-        checkParam(category, 'category', String, true);
-        checkParam(data, 'data', Object);
-
-        for(let name in HashBrown.Entity.Resource) {
-            let model = HashBrown.Entity.Resource[name];
-            let parentModel = Object.getPrototypeOf(model);
-            let grandParentModel = Object.getPrototypeOf(parentModel);
-            
-            if(parentModel !== this && grandParentModel !== this) { continue; }
-            if(model.category !== category) { continue; }
-
-            if(data) {
-                return model.new(data);
-            } 
-            
-            return model;
-        }
-
-        return null;
     }
     
     /**
