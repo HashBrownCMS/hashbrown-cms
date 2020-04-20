@@ -1,30 +1,58 @@
 'use strict';
 
-// Initialise schemas
-let schemas = {
-    'array': require('schema/field/array.json'),
-    'boolean': require('schema/field/boolean.json'),
-    'contentReference': require('schema/field/contentReference.json'),
-    'contentSchemaReference': require('schema/field/contentSchemaReference.json'),
-    'date': require('schema/field/date.json'),
-    'dropdown': require('schema/field/dropdown.json'),
-    'fieldBase': require('schema/field/fieldBase.json'),
-    'language': require('schema/field/language.json'),
-    'mediaReference': require('schema/field/mediaReference.json'),
-    'number': require('schema/field/number.json'),
-    'resourceReference': require('schema/field/resourceReference.json'),
-    'richText': require('schema/field/richText.json'),
-    'string': require('schema/field/string.json'),
-    'struct': require('schema/field/struct.json'),
-    'tags': require('schema/field/tags.json'),
-    'url': require('schema/field/url.json'),
+// Initialise libraries
+let libraries = {
+    schemas: {
+        'array': require('schema/field/array.json'),
+        'boolean': require('schema/field/boolean.json'),
+        'contentReference': require('schema/field/contentReference.json'),
+        'contentSchemaReference': require('schema/field/contentSchemaReference.json'),
+        'date': require('schema/field/date.json'),
+        'dropdown': require('schema/field/dropdown.json'),
+        'fieldBase': require('schema/field/fieldBase.json'),
+        'language': require('schema/field/language.json'),
+        'mediaReference': require('schema/field/mediaReference.json'),
+        'number': require('schema/field/number.json'),
+        'resourceReference': require('schema/field/resourceReference.json'),
+        'richText': require('schema/field/richText.json'),
+        'string': require('schema/field/string.json'),
+        'struct': require('schema/field/struct.json'),
+        'tags': require('schema/field/tags.json'),
+        'url': require('schema/field/url.json'),
 
-    'contentBase': require('schema/content/contentBase.json'),
-    'page': require('schema/content/page.json')
+        'contentBase': require('schema/content/contentBase.json'),
+        'page': require('schema/content/page.json'),
+        'demopage': {
+            parentId: 'page',
+            name: 'Demo page',
+            icon: 'file',
+            config: {
+                'image': {
+                    tabId: 'content',
+                    label: 'Image',
+                    schemaId: 'mediaReference'
+                }
+            }
+        }
+    },
+    content: {
+        'democontent': {
+            schemaId: 'demopage',
+            properties: {
+                title: 'Demo Content',
+                image: 'demoimage'
+            }
+        }
+    },
+    media: {
+        'demoimage': {
+            filename: 'Demo Image'
+        }
+    }
 };
 
-for(let id in schemas) {
-    let schema = schemas[id];
+for(let id in libraries.schemas) {
+    let schema = libraries.schemas[id];
 
     schema.id = id;
     schema.isLocked = true;
@@ -84,21 +112,19 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
                 if(id) {
                     let item = null;
 
-                    if(library === 'schemas') {
-                        if(id === 'icons') {
-                            let schemas = await HashBrown.Entity.Resource.SchemaBase.list();
-                            let icons = {};
+                    if(library === 'schemas' && id === 'icons') {
+                        let schemas = await HashBrown.Entity.Resource.SchemaBase.list();
+                        let icons = {};
 
-                            for(let schema of schemas) {
-                                icons[schema.id] = schema.icon || 'cogs';
-                            }
-
-                            return icons;
+                        for(let schema of schemas) {
+                            icons[schema.id] = schema.icon || 'cogs';
                         }
 
-                        if(schemas[id]) {
-                            item = JSON.parse(JSON.stringify(schemas[id]));
-                        }
+                        return icons;
+                    }
+
+                    if(libraries[library] && libraries[library][id]) {
+                        item = JSON.parse(JSON.stringify(libraries[library][id]));
                     }
                     
                     if(!item) {
@@ -118,11 +144,14 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
 
                 let items = [];
 
-                if(library === 'schemas') {
-                    for(let item of Object.values(schemas)) {
-                        if(query.get('type') && item.type !== query.get('type')) { continue; }
+                if(libraries[library]) {
+                    for(let id in libraries[library]) {
+                        let item = libraries[library][id];
+
+                        if(library === 'schemas' && query.get('type') && item.type !== query.get('type')) { continue; }
 
                         item = JSON.parse(JSON.stringify(item));
+                        item.id = id;
 
                         items.push(item);
                     }
@@ -132,6 +161,8 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
                     if(key.indexOf(library) !== 0) { continue; }
 
                     let item = JSON.parse(localStorage.getItem(key));
+
+                    if(library === 'schemas' && query.get('type') && item.type !== query.get('type')) { continue; }
 
                     items.push(item);
                 }

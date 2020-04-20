@@ -106,7 +106,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         // Update publish task
         let publishTask = await HashBrown.Entity.Task.get(this.context, this.id, 'publish');
 
-        if(!this.isPublished && this.publishOn) {
+        if(this.publishOn) {
             if(!publishTask) {
                 publishTask = await HashBrown.Entity.Task.create(this.context, this.id, 'publish');
             }
@@ -123,7 +123,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         // Update unpublish task
         let unpublishTask = await HashBrown.Entity.Task.get(this.context, this.id, 'unpublish');
 
-        if(this.isPublished && this.unpublishOn) {
+        if(this.unpublishOn) {
             if(!unpublishTask) {
                 unpublishTask = await HashBrown.Entity.Task.create(this.context, this.id, 'unpublish');
             }

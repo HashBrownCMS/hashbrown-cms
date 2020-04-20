@@ -12,6 +12,7 @@ class Task extends HashBrown.Entity.EntityBase {
         this.def(String, 'content');
         this.def(String, 'project');
         this.def(String, 'environment');
+        this.def(String, 'user');
     }
 
     /**
@@ -20,7 +21,13 @@ class Task extends HashBrown.Entity.EntityBase {
      * @return {HashBrown.Entity.Resource.Content} Content
      */
     async getContent() {
-        return await HashBrown.Entity.Resource.Content.get(this.content);
+        let context = new HashBrown.Entity.Context({
+            project: await HashBrown.Entity.Project.get(this.project),
+            environment: this.environment,
+            user: await HashBrown.Entity.User.get(this.user)
+        });
+
+        return await HashBrown.Entity.Resource.Content.get(context, this.content);
     }
 
     /**
@@ -29,7 +36,7 @@ class Task extends HashBrown.Entity.EntityBase {
     async run() {
         if(!this.isOverdue()) { return; }
 
-        debug.log(`Running ${this.type} task for "${this.content}"...`, this);
+        debug.log(`Running ${this.type} task for ${this.content}...`, this);
                 
         try {
             let content = await this.getContent();
@@ -40,14 +47,16 @@ class Task extends HashBrown.Entity.EntityBase {
 
             switch(this.type) {
                 case 'publish':
-                    await content.publish(this.project, this.environment);
+                    await content.publish();
                     content.isPublished = true;
+                    content.publishOn = null;
                     await content.save();
                     break;
 
                 case 'unpublish':
-                    await content.unpublish(this.project, this.environment);
+                    await content.unpublish();
                     content.isPublished = false;
+                    content.unpublishOn = null;
                     await content.save();
                     break;
             }
@@ -80,28 +89,17 @@ class Task extends HashBrown.Entity.EntityBase {
      * Saves this task
      */
     async save() {
-        // If the date is invalid, remove instead
-        if(
-            !this.date ||
-            isNaN(new Date(this.date).getTime()) ||
-            new Date(this.date) < new Date()
-        ) {
-            await this.remove();
-       
-        // Update in database
-        } else {
-            await HashBrown.Service.DatabaseService.updateOne(
-                'schedule',
-                'tasks',
-                {
-                    type: this.type,
-                    content: this.content,
-                    project: this.project,
-                    environment: this.environment
-                },
-                this.getObject()
-            );
-        }
+        await HashBrown.Service.DatabaseService.updateOne(
+            'schedule',
+            'tasks',
+            {
+                type: this.type,
+                content: this.content,
+                project: this.project,
+                environment: this.environment
+            },
+            this.getObject()
+        );
     }
 
     /**
@@ -162,18 +160,19 @@ class Task extends HashBrown.Entity.EntityBase {
         checkParam(content, 'content', String, true);
         checkParam(type, 'type', String, true);
 
-        let task = await this.get(context, content, type);
+        let task = this.new({
+            type: type,
+            content: content,
+            project: context.project.id,
+            environment: context.environment,
+            user: context.user.id
+        });
 
-        if(!task) {
-            task = this.new({
-                type: type,
-                content: content,
-                project: context.project.id,
-                environment: context.environment
-            });
-
-            await task.save();
-        }
+        await HashBrown.Service.DatabaseService.insertOne(
+            'schedule',
+            'tasks',
+            task.getObject()
+        );
 
         return task;
     }

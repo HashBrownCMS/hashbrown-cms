@@ -4,6 +4,10 @@
  * The advanced resource editor
  */
 class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
+    static get itemType() { return null; }
+    static get library() { return null; }
+    
+    get itemType() { return HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase); }
     get library() { return this.state.library; }
     
     /**

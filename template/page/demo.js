@@ -24,15 +24,22 @@ module.exports = (_, model) => `
                     project: {
                         id: 'demo',
                         settings: {
-                            name:'Demo',
-                            languages: ['en'],
+                            name: 'Demo',
+                            languages: [ 'en' ],
                             sync: {}
                         }
                     },
                     environment: 'live',
-                    user: {id:'demouser',username:'demouser',fullName:'Demo user',scopes:{demo: [ 'content', 'schemas' ]}}
+                    user: {
+                        id:'demouser',
+                        username:'demouser',
+                        fullName:'Demo User',
+                        scopes: {
+                            demo: [ 'content', 'media', 'schemas' ]
+                        }
+                    }
                 },
-                themes: ${JSON.stringify(model.themes)}
+                themes: [ 'default' ]
             };
         </script>
 

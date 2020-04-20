@@ -230,9 +230,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Demo
      */
     static async demo(request, params, body, query, context) {
-        let themes = await HashBrown.Service.AppService.getThemes();
-        
-        return this.render('demo', { title: 'Demo | HashBrown CMS', themes: themes });
+        return this.render('demo', { title: 'Demo | HashBrown CMS' });
     }
 
     /**
