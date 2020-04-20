@@ -19,18 +19,22 @@ class Confirm extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Clicked yes
      */
     async onClickYes() {
-        this.trigger('yes');
+        await this.trigger('yes');
 
-        this.close();
+        if(this.state.name !== 'error') {
+            this.close();
+        }
     }
     
     /**
      * Event: Clicked no
      */
     async onClickNo() {
-        this.trigger('no');
+        await this.trigger('no');
 
-        this.close();
+        if(this.state.name !== 'error') {
+            this.close();
+        }
     }
 }
 

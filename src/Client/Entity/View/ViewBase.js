@@ -91,14 +91,14 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
      * @param {String} type
      * @param {Array} params
      */
-    trigger(type, ...params) {
+    async trigger(type, ...params) {
         checkParam(type, 'type', String, true);
 
         if(!this.events || !this.events[type]) { return; }
 
         try {
             for(let handler of this.events[type]) {
-                handler.call(this, ...params);
+                await handler.call(this, ...params);
             }
 
         } catch(e) {

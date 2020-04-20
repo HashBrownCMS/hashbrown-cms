@@ -9,11 +9,19 @@ _.div({class: 'modal modal--confirm in'},
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
-            model.message
+            state.name === 'error' ? [
+                state.message
+            ] : [
+                model.message
+            ]
         ),
         _.div({class: 'modal__footer'},
-            _.button({class: 'widget widget--button', onclick: _.onClickNo}, 'No'),
-            _.button({class: 'widget widget--button', onclick: _.onClickYes}, 'Yes')
+            state.name === 'error' ? [
+                _.button({class: 'widget widget--button', onclick: _.onClickOK}, 'OK')
+            ] : [
+                _.button({class: 'widget widget--button', onclick: _.onClickNo}, 'No'),
+                _.button({class: 'widget widget--button', onclick: _.onClickYes}, 'Yes')
+            ]
         )
     )
 )

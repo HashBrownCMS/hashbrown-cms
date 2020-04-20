@@ -26,6 +26,8 @@ let libraries = {
             parentId: 'page',
             name: 'Demo page',
             icon: 'file',
+            isAllowedAtRoot: true,
+            allowedChildSchemas: [ 'demopage' ],
             config: {
                 'image': {
                     tabId: 'content',
@@ -37,16 +39,19 @@ let libraries = {
     },
     content: {
         'democontent': {
+            isLocked: true,
             schemaId: 'demopage',
             properties: {
                 title: 'Demo Content',
-                image: 'demoimage'
+                image: 'demoimage.jpg'
             }
         }
     },
     media: {
-        'demoimage': {
-            filename: 'Demo Image'
+        'demoimage.jpg': {
+            isLocked: true,
+            filename: 'demoimage.jpg',
+            caption: 'Demo Image'
         }
     }
 };
@@ -139,6 +144,8 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
                         }
                     }
 
+                    item.id = id;
+
                     return item;
                 }
 
@@ -170,6 +177,10 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
                 return items;
 
             case 'POST':
+                if(library === 'media') {
+                    throw new Error('Media items cannot be changed in the demo');
+                }
+
                 if(id === 'new') {
                     let model = HashBrown.Service.LibraryService.getClass(library, HashBrown.Entity.Resource.ResourceBase);
                     
@@ -188,6 +199,10 @@ HashBrown.Service.RequestService.customRequest = async (method, url, data, heade
                 return data;
                 
             case 'DELETE':
+                if(library === 'media') {
+                    throw new Error('Media items cannot be changed in the demo');
+                }
+                
                 localStorage.removeItem(`${library}/${id}`);
                 return 'OK';
         }

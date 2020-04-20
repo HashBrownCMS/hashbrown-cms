@@ -214,7 +214,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     onClickRemove(id) {
         if(!this.itemType) { return; }
 
-        UI.confirm(
+        let modal = UI.confirm(
             'Remove item',
             'Are you sure you want to remove this item?',
             async () => {
@@ -222,9 +222,19 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
                     this.state.itemMap[id].element.classList.toggle('loading', true);
                 }
 
-                let resource = await this.itemType.get(id);
+                try {
+                    let resource = await this.itemType.get(id);
 
-                await resource.remove();
+                    await resource.remove();
+                
+                } catch(e) {
+                    modal.setErrorState(e);
+
+                }
+                
+                if(this.state.itemMap[id]) {
+                    this.state.itemMap[id].element.classList.toggle('loading', false);
+                }
             }
         );
     }

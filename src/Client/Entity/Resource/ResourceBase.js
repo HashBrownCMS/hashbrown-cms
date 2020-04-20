@@ -115,7 +115,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         await HashBrown.Service.RequestService.request('delete', this.library + '/' + this.id);
         
         // Cancel any editor instances displaying the deleted content
-        if(location.hash == '#/' + this.library + '/' + id) {
+        if(location.hash == '#/' + this.library + '/' + this.id) {
             location.hash = '/' + this.library + '/';
         } 
 
