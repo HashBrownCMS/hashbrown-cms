@@ -88,7 +88,11 @@ class User extends HashBrown.Entity.EntityBase {
             this.scopes[projectId] = [];
         }
 
-        if(!scope || scope === 'content' || scope === 'media') { return true; }
+        if(!scope) { return true; }
+
+        if(this.scopes[projectId].length < 1) {
+            this.scopes[projectId] = [ 'content', 'media' ];
+        }
 
         return this.scopes[projectId].indexOf(scope) > -1;
     }

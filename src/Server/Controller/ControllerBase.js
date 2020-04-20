@@ -63,7 +63,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
         checkParam(response, 'response', HashBrown.Http.Response, true);
         
         if(request.method !== 'GET') { return false; }
-        
+       
         return request.getETag() && response.getETag() && request.getETag() === response.getETag();
     }
 

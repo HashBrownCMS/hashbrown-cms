@@ -1,26 +1,7 @@
 'use strict';
 
-const MEDIA = {};
-const FORMS = {};
-
-const CONTENT = {
-    '3217ea5955478c0b': {
-        id: '3217ea5955478c0b',
-        createdOn: Date.now(),
-        updatedOn: Date.now(),
-        createdBy: 'demoUser',
-        updatedBy: 'demoUser',
-        schemaId: 'webPage',
-        sort: 10000,
-        properties: {
-            url: '/my-example-page/',
-            title: 'My Example Page'
-        }
-    }
-};
-
-const SCHEMAS = {
-    // Field
+// Initialise schemas
+let schemas = {
     'array': require('schema/field/array.json'),
     'boolean': require('schema/field/boolean.json'),
     'contentReference': require('schema/field/contentReference.json'),
@@ -37,353 +18,149 @@ const SCHEMAS = {
     'struct': require('schema/field/struct.json'),
     'tags': require('schema/field/tags.json'),
     'url': require('schema/field/url.json'),
-    'module': {
-        id: 'module',
-        name: 'Module',
-        type: 'field',
-        parentId: 'struct',
-        config: {
-            struct: {
-                string: {
-                    schemaId: 'string',
-                    label: 'String',
-                    description: 'A simple text string'
-                },
-                boolean: {
-                    schemaId: 'boolean',
-                    label: 'Boolean',
-                    description: 'A true/false value'
-                }
-            }
-        }
-    },
 
-    // Content
     'contentBase': require('schema/content/contentBase.json'),
-    'page': require('schema/content/page.json'),
-    'webPage': {
-        id: 'webPage',
-        icon: 'file',
-        type: 'content',
-        defaultTabId: 'content',
-        allowedChildSchemas: [ 'webPage' ],
-        allowedAtRoot: true,
-        name: 'Web Page',
-        parentId: 'page',
-        fields: {
-            properties: {
-                array: {
-                    tabId: 'content',
-                    label: 'Array',
-                    schemaId: 'array',
-                    description: 'A list of values',
-                    config: {
-                        minItems: 0,
-                        maxItems: 4,
-                        allowedSchemas: [ 'module', 'string', 'richText' ]
-                    }
-                },
-                boolean: {
-                    tabId: 'content',
-                    schemaId: 'boolean',
-                    label: 'Boolean',
-                    description: 'A true/false value'
-                },
-                contentReference: {
-                    tabId: 'content',
-                    schemaId: 'contentReference',
-                    label: 'Content Reference',
-                    description: 'A reference to another Content node',
-                    config: {
-                        allowedSchemas: [ 'webPage' ]
-                    }
-                },
-                contentSchemaReference: {
-                    tabId: 'content',
-                    schemaId: 'contentSchemaReference',
-                    label: 'Content Schema Reference',
-                    description: 'A reference to a Content Schema',
-                    config: {
-                        allowedSchemas: [ 'webPage' ]
-                    }
-                },
-                date: {
-                    tabId: 'content',
-                    schemaId: 'date',
-                    label: 'Date',
-                    description: 'A date picker'
-                },
-                dropdown: {
-                    tabId: 'content',
-                    schemaId: 'dropdown',
-                    label: 'Dropdown',
-                    description: 'A dropdown list of options',
-                    config: {
-                        options: [
-                            {
-                                label: 'Option #1',
-                                value: 'option1'
-                            },
-                            {
-                                label: 'Option #2',
-                                value: 'option2'
-                            },
-                            {
-                                label: 'Option #3',
-                                value: 'option3'
-                            }
-                        ]
-                    }
-                },
-                language: {
-                    tabId: 'content',
-                    schemaId: 'language',
-                    label: 'Language',
-                    description: 'A dropdown list of available languages'
-                },
-                mediaReference: {
-                    tabId: 'content',
-                    schemaId: 'mediaReference',
-                    label: 'Media Reference',
-                    description: 'A reference to a Media node'
-                },
-                number: {
-                    tabId: 'content',
-                    schemaId: 'number',
-                    label: 'Number',
-                    description: 'A number picker, which can optionally be a slider',
-                    config: {
-                        step: 0.5,
-                        min: 0,
-                        max: 10,
-                        isSlider: true
-                    }
-                },
-                richText: {
-                    tabId: 'content',
-                    schemaId: 'richText',
-                    label: 'Rich Text',
-                    description: 'A formatted text field'
-                },
-                string: {
-                    tabId: 'content',
-                    schemaId: 'string',
-                    label: 'String',
-                    description: 'A simple text string'
-                },
-                struct: {
-                    tabId: 'content',
-                    schemaId: 'module',
-                    label: 'Struct',
-                    description: 'A combination of fields'
-                },
-                tags: {
-                    tabId: 'content',
-                    schemaId: 'tags',
-                    label: 'Tags',
-                    description: 'A comma-separated list of tags'
-                }
-            }
-        }
-    }
+    'page': require('schema/content/page.json')
 };
 
-HashBrown.Service.RequestService.upload = async () => {
-    throw new Error('Uploads not available in demo mode');
-};
+for(let id in schemas) {
+    let schema = schemas[id];
 
+    schema.id = id;
+    schema.isLocked = true;
+    
+    schema.type = schema.parentId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
+}
+    
+// Override API calls
 HashBrown.Service.RequestService.customRequest = async (method, url, data, headers) => {
     if(url === '/api/server/update/check') { return; }
     if(url.indexOf('heartbeat') > -1) { return; }
 
-    let query = url.split('?')[1];
-    let path = url.split('?')[0].split('/');
-    let category = path[4];
-    let id = path[5];
+    method = method.toUpperCase();
 
-    switch(category) {
-        case 'content':
-            if(!id) {
-                return Object.values(CONTENT);
+    let query = new URLSearchParams(url.split('?')[1]);
+    let path = url.split('?')[0].split('/').filter(Boolean);
 
-            } else {
-                if(id === 'new') {
-                    let schemaId = HashBrown.Service.NavigationService.getQuery('schemaId', query);
-                    let content = HashBrown.Entity.Resource.Content.create(schemaId);
+    // Users
+    if(path[1] === 'users') {
+        let id = path[2];
 
-                    content.parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
-
-                    CONTENT[content.id] = content.getObject();
-
-                    return content;
+        switch(method) {
+            case 'GET': 
+                if(id) {
+                    return HashBrown.Client.context.user.getObject();
                 }
-                
-                if(id === 'insert') {
-                    let contentId = HashBrown.Service.NavigationService.getQuery('contentId', query);
-                    let parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
-                    let position = parseInt(HashBrown.Service.NavigationService.getQuery('position', query));
-                
-                    let siblings = Object.values(CONTENT).filter((x) => { return x.parentId === parentId; });
-                    let content = CONTENT[contentId];
 
-                    if(parentId) {
-                        if(parentId === contentId) { throw new Error('Content cannot be a parent of itself'); }
-                    }
+                return [ HashBrown.Client.context.user.getObject() ];
 
-                    // Assign the new position
-                    let result = [];
+            case 'POST':
+                throw new Error('User settings cannot be changed in the demo');
+        }
+    
+    // Projects
+    } else if(path[1] === 'projects') {
+        let id = path[2];
 
-                    if(position < 0) { position = 0; }
+        switch(method) {
+            case 'GET': 
+                if(id) {
+                    return HashBrown.Client.context.project.getObject();
+                }
 
-                    for(let i = 0; i < siblings.length; i++) {
-                        if(siblings[i].id === contentId) { continue; }
+                return [ HashBrown.Client.context.project.getObject() ];
 
-                        if(i === position) {
-                            result.push(content);
+            case 'POST':
+                throw new Error('Project settings cannot be changed in the demo');
+        }
+    
+    // Resources
+    } else if(path.length > 3) {
+        let library = path[3];
+        let id = path[4];
+        
+        switch(method) {
+            case 'GET':
+                if(id) {
+                    let item = null;
+
+                    if(library === 'schemas') {
+                        if(id === 'icons') {
+                            let schemas = await HashBrown.Entity.Resource.SchemaBase.list();
+                            let icons = {};
+
+                            for(let schema of schemas) {
+                                icons[schema.id] = schema.icon || 'cogs';
+                            }
+
+                            return icons;
                         }
 
-                        result.push(siblings[i]);
+                        if(schemas[id]) {
+                            item = JSON.parse(JSON.stringify(schemas[id]));
+                        }
                     }
-
-                    if(result.indexOf(content) < 0) {
-                        result.push(content);
-                    }
-
-                    // Update all nodes with their new sort index
-                    for(let i = 0; i < result.length; i++) {
-                        let node = result[i];
-
-                        node.sort = i;
-                        node.parentId = parentId;
-                    }
-                
-                    return;
-                }
-               
-                if(method === 'post') {
-                    CONTENT[id] = data;
-                    return data;
-                }
-
-                if(CONTENT[id]) {
-                    return CONTENT[id];
-                
-                } else {
-                    throw new Error('Content "' + id + '" not found');
-
-                }
-            }
-        
-        case 'forms':
-            if(!id) {
-                return Object.values(FORMS);
-
-            } else {
-                if(id === 'new') {
-                    let form = HashBrown.Entity.Resource.Form.create();
                     
-                    FORMS[form.id] = form.getObject();
+                    if(!item) {
+                        item = JSON.parse(localStorage.getItem(`${library}/${id}`));
+                    }
 
-                    return form;
-                }
-                
-                if(method === 'post') {
-                    FORMS[id] = data;
-                    return data;
-                }
+                    if(library === 'schemas' && query.get('withParentFields') && item && item.parentId) {
+                        let parent = await HashBrown.Entity.Resource.SchemaBase.get(item.parentId, { withParentFields: true });
 
-                if(FORMS[id]) {
-                    return FORMS[id];
-                
-                } else {
-                    throw new Error('Form "' + id + '" not found');
+                        if(parent) {
+                            item = HashBrown.Entity.Resource.SchemaBase.merge(HashBrown.Entity.Resource.SchemaBase.new(item), parent);
+                        }
+                    }
 
+                    return item;
                 }
 
-            }
+                let items = [];
 
-        case 'media':
-            if(!id) {
-                return Object.values(MEDIA);
+                if(library === 'schemas') {
+                    for(let item of Object.values(schemas)) {
+                        if(query.get('type') && item.type !== query.get('type')) { continue; }
 
-            } else {
+                        item = JSON.parse(JSON.stringify(item));
+
+                        items.push(item);
+                    }
+                }
+
+                for(let key of Object.keys(localStorage)) {
+                    if(key.indexOf(library) !== 0) { continue; }
+
+                    let item = JSON.parse(localStorage.getItem(key));
+
+                    items.push(item);
+                }
+
+                return items;
+
+            case 'POST':
                 if(id === 'new') {
-                    let media = HashBrown.Entity.Resource.Media.create();
+                    let model = HashBrown.Service.LibraryService.getClass(library, HashBrown.Entity.Resource.ResourceBase);
                     
-                    MEDIA[media.id] = media.getObject();
+                    id = model.createId();
+                    data.id = id;
 
-                    return media;
+                    if(library === 'schemas') {
+                        let schema = await HashBrown.Entity.Resource.SchemaBase.get(data.parentId);
+
+                        data.type = schema.type;
+                        data.customIcon = schema.customIcon;
+                    }
                 }
+
+                localStorage.setItem(`${library}/${id}`, JSON.stringify(data));
+                return data;
                 
-                if(method === 'post') {
-                    MEDIA[id] = data;
-                    return data;
-                }
-
-                if(MEDIA[id]) {
-                    return MEDIA[id];
-                
-                } else {
-                    throw new Error('Media "' + id + '" not found');
-
-                }
-
-            }
-        
-        case 'schemas':
-            if(!id) {
-                return Object.values(SCHEMAS);
-    
-            } else {
-                if(id === 'new') {
-                    let parentId = HashBrown.Service.NavigationService.getQuery('parentId', query);
-                    let parentSchema = await HashBrown.Entity.Resource.SchemaBase.get(parentId);
-                    let schema = await HashBrown.Entity.Resource.SchemaBase.create({ parentId: parentId });
-
-                    SCHEMAS[schema.id] = schema;
-
-                    return schema;
-                }
-
-                if(method === 'post') {
-                    SCHEMAS[id] = data;
-                    return data;
-                }
-
-                if(SCHEMAS[id]) {
-                    return SCHEMAS[id];
-
-                } else {
-                    throw new Error('Schema "' + id + '" could not be found');
-                
-                }
-            }
-        
-        case 'users':
-            if(!id) {
-                return [HashBrown.Client.context.user];
-
-            } else if(id === 'demoUser') {
-                return HashBrown.Client.context.user;
-
-            }
-
-            throw new Error('Custom users not available in demo');
-
-        case 'settings':
-            return HashBrown.Client.context.project.settings;
+            case 'DELETE':
+                localStorage.removeItem(`${library}/${id}`);
+                return 'OK';
+        }
     }
 
-    throw new Error('Unknown resource category "' + category + '". URL was ' + url);
+    throw new Error(`The API endpoint ${url} cannot be used in this demo`);
 };
-
-for(let id in SCHEMAS) {
-    let schema = SCHEMAS[id];
-
-    schema.id = id;
-    schema.isLocked = schema.parentId === 'fieldBase' || schema.parentId === 'contentBase' || schema.id === 'fieldBase' || schema.id === 'contentBase';
-    
-    if(!schema.type) {
-        schema.type = schema.parentId === 'fieldBase' || schema.id === 'fieldBase' ? 'field' : 'content';
-    }
-}

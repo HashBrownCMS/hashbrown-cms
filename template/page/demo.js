@@ -30,9 +30,9 @@ module.exports = (_, model) => `
                         }
                     },
                     environment: 'live',
-                    user: {id:'demouser',isAdmin:true,username:'demouser',fullName:'Demo user',scopes:{}}
+                    user: {id:'demouser',username:'demouser',fullName:'Demo user',scopes:{demo: [ 'content', 'schemas' ]}}
                 },
-                isDemo: true
+                themes: ${JSON.stringify(model.themes)}
             };
         </script>
 
@@ -41,6 +41,7 @@ module.exports = (_, model) => `
         <script src="/js/utilities.js"></script>
         
         <script src="/js/environment.js"></script>
+        <script src="/js/controller.js"></script>
         <script src="/js/demo.js"></script>
     </body>
 </html>

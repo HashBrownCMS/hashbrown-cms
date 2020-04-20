@@ -25,7 +25,7 @@ class Request extends HTTP.IncomingMessage {
      * @return {String} ETag
      */
     getETag() {
-        return this.getHeader('If-None-Match') || this.getHeader('id-none-match');
+        return this.getHeader('If-None-Match') || this.getHeader('if-none-match');
     }
 }
 
