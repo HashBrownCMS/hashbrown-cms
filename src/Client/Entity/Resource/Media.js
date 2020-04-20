@@ -119,7 +119,7 @@ class Media extends require('Common/Entity/Resource/Media') {
             data[key] = options[key];
         }
 
-        await HashBrown.Service.RequestService.request('post', this.module + '/' + id, data);
+        await HashBrown.Service.RequestService.request('post', this.library + '/' + id, data);
         
         HashBrown.Service.EventService.trigger('resource', this.id);
     }

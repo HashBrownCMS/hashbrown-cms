@@ -13,45 +13,45 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
         let routes = {};
         
         // Regular operations
-        routes['/api/${project}/${environment}/' + this.module] = {
+        routes['/api/${project}/${environment}/' + this.library] = {
             handler: this.resources,
             user: true
         };
-        routes['/api/${project}/${environment}/' + this.module + '/new'] = {
+        routes['/api/${project}/${environment}/' + this.library + '/new'] = {
             handler: this.new,
             methods: [ 'POST' ],
             user: {
-                scope: this.module
+                scope: this.library
             }
         };
-        routes['/api/${project}/${environment}/' + this.module + '/${id}'] = {
+        routes['/api/${project}/${environment}/' + this.library + '/${id}'] = {
             handler: this.resource,
             methods: [ 'GET', 'POST', 'DELETE' ],
             user: true
         };
         
         // Sync
-        routes['/api/${project}/${environment}/' + this.module + '/${id}/pull'] = {
+        routes['/api/${project}/${environment}/' + this.library + '/${id}/pull'] = {
             handler: this.pull,
             methods: [ 'POST' ],
             user: {
-                scope: this.module
+                scope: this.library
             }
         };
-        routes['/api/${project}/${environment}/' + this.module + '/${id}/push'] = {
+        routes['/api/${project}/${environment}/' + this.library + '/${id}/push'] = {
             handler: this.push,
             methods: [ 'POST' ],
             user: {
-                scope: this.module
+                scope: this.library
             }
         };
 
         // Heartbeat
-        routes['/api/${project}/${environment}/' + this.module + '/${id}/heartbeat'] = {
+        routes['/api/${project}/${environment}/' + this.library + '/${id}/heartbeat'] = {
             handler: this.heartbeat,
             methods: [ 'POST' ],
             user: {
-                scope: this.module
+                scope: this.library
             }
         };
 
@@ -97,13 +97,13 @@ i
     }
 
     /**
-     * @example POST /api/${project}/${environment}/${module}/${id}/heartbeat
+     * @example POST /api/${project}/${environment}/${library}/${id}/heartbeat
      */
     static async heartbeat(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
         
         let resource = await model.get(context, params.id);
@@ -118,15 +118,15 @@ i
     }
    
     /**
-     * @example POST /api/${project}/${environment}/${module}/{$id}/pull
+     * @example POST /api/${project}/${environment}/${library}/{$id}/pull
      *
      * @return {Object} The pulled resource
      */
     static async pull(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
         
         let resource = await model.get(context, params.id);
@@ -141,13 +141,13 @@ i
     }
     
     /**
-     * @example POST /api/${project}/${environment}/{module}/${id}/push
+     * @example POST /api/${project}/${environment}/{library}/${id}/push
      */
     static async push(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
 
         let resource = await model.get(context, params.id);
@@ -162,13 +162,13 @@ i
     }
     
     /**
-     * @example GET /api/${project}/${environment}/${module}
+     * @example GET /api/${project}/${environment}/${library}
      */
     static async resources(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
         
         let resources = await model.list(context, query);
@@ -177,13 +177,13 @@ i
     }
     
     /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/${module}/${id}?create=true|false
+     * @example GET|POST|DELETE /api/${project}/${environment}/${library}/${id}?create=true|false
      */
     static async resource(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
         
         let resource = await model.get(context, params.id, query);
@@ -197,7 +197,7 @@ i
                 return new HashBrown.Http.Response(resource, 200, { 'ETag': this.getETag([ resource ], params, query) });
                 
             case 'POST':
-                if(!context.user.hasScope(this.module)) {
+                if(!context.user.hasScope(this.library)) {
                     return new HashBrown.Http.Response('You do not have access to edit this resource', 403);
                 }
 
@@ -215,7 +215,7 @@ i
                 return new HashBrown.Http.Response(resource);
 
             case 'DELETE':
-                if(!context.user.hasScope(this.module)) {
+                if(!context.user.hasScope(this.library)) {
                     return new HashBrown.Http.Response('You do not have access to remove this resource', 403);
                 }
                 
@@ -228,13 +228,13 @@ i
     }
     
     /**
-     * @example POST /api/${project}/${environment}/${module}/new
+     * @example POST /api/${project}/${environment}/${library}/new
      */
     static async new(request, params, body, query, context) {
-        let model = HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase);
+        let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
         
         if(!model) {
-            return new HashBrown.Http.Response(`No model found for module ${this.module}`, 404);
+            return new HashBrown.Http.Response(`No model found for library ${this.library}`, 404);
         }
         
         let resource = await model.create(context, body, query);

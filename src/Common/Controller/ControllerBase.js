@@ -7,15 +7,15 @@
  */
 class ControllerBase {
     /**
-     * Gets the alias of the module this entity belongs to
+     * Gets the alias of the library this entity belongs to
      *
      * @return {String} Alias
      */
-    static get module() {
-        let alias = HashBrown.Service.ModuleService.getAlias(this);
+    static get library() {
+        let alias = HashBrown.Service.LibraryService.getAlias(this);
 
         if(!alias) {
-            throw new Error(`The controller ${this.name} does not belong to any module`);
+            throw new Error(`The controller ${this.name} does not belong to any library`);
         }
 
         return alias;

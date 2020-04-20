@@ -23,11 +23,11 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
         await super.fetch();
 
         if(this.state.name === 'config') {
-            this.state.moduleOptions = HashBrown.Service.ModuleService.getAliases();
+            this.state.libraryOptions = HashBrown.Service.LibraryService.getAliases();
             this.state.keyOptions = [];
 
             if(this.model.config.resource) {
-                let model = HashBrown.Service.ModuleService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
+                let model = HashBrown.Service.LibraryService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
 
                 if(model) {
                     for(let key of Object.keys(new model())) {
@@ -38,7 +38,7 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         } else {
             if(this.model.config.resource && this.state.value) {
-                let model = HashBrown.Service.ModuleService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
+                let model = HashBrown.Service.LibraryService.getClass(this.model.config.resource, HashBrown.Entity.Resource);
 
                 this.state.resource = model ? await model.get(this.state.value) : null;
             }
@@ -76,9 +76,9 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
-     * Event: Change resource module
+     * Event: Change resource library
      */
-    onChangeResourceModule(newValue) {
+    onChangeResourceLibrary(newValue) {
         this.model.config.resource = newValue;
         this.model.config.resourceKeys = [];
 

@@ -41,10 +41,14 @@ class Task extends HashBrown.Entity.EntityBase {
             switch(this.type) {
                 case 'publish':
                     await content.publish(this.project, this.environment);
+                    content.isPublished = true;
+                    await content.save();
                     break;
 
                 case 'unpublish':
                     await content.unpublish(this.project, this.environment);
+                    content.isPublished = false;
+                    await content.save();
                     break;
             }
 

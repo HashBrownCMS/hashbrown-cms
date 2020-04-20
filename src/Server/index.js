@@ -23,24 +23,24 @@ require('Server/Service');
 require('Server/Entity');
 require('Server/Controller');
 
-// Register built-in modules
-register('content', 'Content', 'file')
+// Register built-in libraries
+library('content', 'Content', 'file')
     .add(HashBrown.Entity.Resource.Content)
     .add(HashBrown.Controller.ContentController);
 
-register('forms', 'Forms', 'wpforms')
+library('forms', 'Forms', 'wpforms')
     .add(HashBrown.Entity.Resource.Form)
     .add(HashBrown.Controller.FormController);
 
-register('media', 'Media', 'file-image-o')
+library('media', 'Media', 'file-image-o')
     .add(HashBrown.Entity.Resource.Media)
     .add(HashBrown.Controller.MediaController);
 
-register('publications', 'Publications', 'newspaper-o')
+library('publications', 'Publications', 'newspaper-o')
     .add(HashBrown.Entity.Resource.Publication)
     .add(HashBrown.Controller.PublicationController);
 
-register('schemas', 'Schemas', 'cogs')
+library('schemas', 'Schemas', 'cogs')
     .add(HashBrown.Entity.Resource.SchemaBase)
     .add(HashBrown.Entity.Resource.ContentSchema)
     .add(HashBrown.Entity.Resource.FieldSchema)

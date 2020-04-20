@@ -95,28 +95,28 @@ async function handle(request) {
  * Initialises the client
  */
 async function init() {
-    // Register built-in modules
-    register('content', 'Content', 'file')
+    // Register built-in libraries
+    library('content', 'Content', 'file')
         .add(HashBrown.Entity.Resource.Content)
         .add(HashBrown.Entity.View.ResourceEditor.ContentEditor)
         .add(HashBrown.Entity.View.Panel.ContentPanel);
 
-    register('forms', 'Forms', 'wpforms')
+    library('forms', 'Forms', 'wpforms')
         .add(HashBrown.Entity.Resource.Form)
         .add(HashBrown.Entity.View.ResourceEditor.FormEditor)
         .add(HashBrown.Entity.View.Panel.FormPanel);
     
-    register('media', 'Media', 'file-image-o')
+    library('media', 'Media', 'file-image-o')
         .add(HashBrown.Entity.Resource.Media)
         .add(HashBrown.Entity.View.ResourceEditor.MediaEditor)
         .add(HashBrown.Entity.View.Panel.MediaPanel);
     
-    register('publications', 'Publications', 'newspaper-o')
+    library('publications', 'Publications', 'newspaper-o')
         .add(HashBrown.Entity.Resource.Publication)
         .add(HashBrown.Entity.View.ResourceEditor.PublicationEditor)
         .add(HashBrown.Entity.View.Panel.PublicationPanel);
     
-    register('schemas', 'Schemas', 'cogs')
+    library('schemas', 'Schemas', 'cogs')
         .add(HashBrown.Entity.Resource.SchemaBase)
         .add(HashBrown.Entity.Resource.ContentSchema)
         .add(HashBrown.Entity.Resource.FieldSchema)

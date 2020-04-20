@@ -1,13 +1,13 @@
 'use strict';
 
 /**
- * A class for managing which other classes belong to which modules
+ * A class for managing which other classes belong to which libraries
  *
  * @memberof HashBrown.Common.Service
  */
-class ModuleService {
+class LibraryService {
     /**
-     * Registers a module
+     * Registers a library
      *
      * @param {String} alias
      * @param {String} name
@@ -18,15 +18,15 @@ class ModuleService {
         checkParam(name, 'name', String, true);
         checkParam(icon, 'icon', String, true);
 
-        if(!this.modules) {
-            this.modules = {};
+        if(!this.libraries) {
+            this.libraries = {};
         }
 
-        if(this.modules[alias]) {
-            throw new Error(`A module by alias "${alias}" has already been registered`);
+        if(this.libraries[alias]) {
+            throw new Error(`A library by alias "${alias}" has already been registered`);
         }
 
-        this.modules[alias] = {
+        this.libraries[alias] = {
             alias: alias,
             name: name,
             icon: icon,
@@ -35,7 +35,7 @@ class ModuleService {
     }
 
     /**
-     * Adds a class to a module
+     * Adds a class to a library
      *
      * @param {Function} constructor
      * @param {String} alias
@@ -44,19 +44,19 @@ class ModuleService {
         checkParam(constructor, 'constructor', Function, true);
         checkParam(alias, 'alias', String, true);
 
-        if(!this.modules || !this.modules[alias]) {
-            throw new Error(`No module registered with alias "${alias}"`);
+        if(!this.libraries || !this.libraries[alias]) {
+            throw new Error(`No library registered with alias "${alias}"`);
         }
 
-        if(this.modules[alias].classes.indexOf(constructor) > -1) {
-            throw new Error(`Class ${constructor.name} has already been added to module "${alias}"`);
+        if(this.libraries[alias].classes.indexOf(constructor) > -1) {
+            throw new Error(`Class ${constructor.name} has already been added to library "${alias}"`);
         }
 
-        this.modules[alias].classes.push(constructor);
+        this.libraries[alias].classes.push(constructor);
     }
 
     /**
-     * Gets a list of classes from a module
+     * Gets a list of classes from a library
      *
      * @param {String} alias
      *
@@ -65,11 +65,11 @@ class ModuleService {
     static getClasses(alias) {
         checkParam(alias, 'alias', String, true);
 
-        if(!this.modules || !this.modules[alias]) {
-            throw new Error(`No module registered with alias "${alias}"`);
+        if(!this.libraries || !this.libraries[alias]) {
+            throw new Error(`No library registered with alias "${alias}"`);
         }
 
-        return this.modules[alias].classes;
+        return this.libraries[alias].classes;
     }
     
     /**
@@ -96,7 +96,7 @@ class ModuleService {
     }
     
     /**
-     * Gets the name of a module
+     * Gets the name of a library
      *
      * @param {String} alias
      *
@@ -105,13 +105,13 @@ class ModuleService {
     static getName(alias) {
         checkParam(alias, 'alias', String);
 
-        if(!alias || !this.modules[alias]) { return ''; }
+        if(!alias || !this.libraries[alias]) { return ''; }
 
-        return this.modules[alias].name;
+        return this.libraries[alias].name;
     }
     
     /**
-     * Gets the icon of a module
+     * Gets the icon of a library
      *
      * @param {String} alias
      *
@@ -120,13 +120,13 @@ class ModuleService {
     static getIcon(alias) {
         checkParam(alias, 'alias', String);
 
-        if(!alias || !this.modules[alias]) { return ''; }
+        if(!alias || !this.libraries[alias]) { return ''; }
 
-        return this.modules[alias].icon;
+        return this.libraries[alias].icon;
     }
     
     /**
-     * Gets the module alias of a class
+     * Gets the library alias of a class
      *
      * @param {Function} constructor
      *
@@ -135,10 +135,10 @@ class ModuleService {
     static getAlias(constructor) {
         checkParam(constructor, 'constructor', Function, true);
 
-        if(!this.modules) { return ''; }
+        if(!this.libraries) { return ''; }
 
-        for(let alias in this.modules) {
-            if(this.modules[alias].classes.indexOf(constructor) < 0) { continue; }
+        for(let alias in this.libraries) {
+            if(this.libraries[alias].classes.indexOf(constructor) < 0) { continue; }
 
             return alias;
         }
@@ -147,15 +147,15 @@ class ModuleService {
     }
 
     /**
-     * Gets a list of all module aliases
+     * Gets a list of all library aliases
      *
      * @return {Array} Aliases
      */
     static getAliases() {
-        if(!this.modules) { return []; }
+        if(!this.libraries) { return []; }
 
-        return Object.keys(this.modules);
+        return Object.keys(this.libraries);
     }
 }
 
-module.exports = ModuleService;
+module.exports = LibraryService;

@@ -4,7 +4,7 @@
  * The advanced resource editor
  */
 class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
-    get module() { return this.state.module; }
+    get library() { return this.state.library; }
     
     /**
      * Constructor

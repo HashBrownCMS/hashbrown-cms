@@ -14,7 +14,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {HashBrown.Entity.Resource.ResourceBase} Item type
      */
-    static get itemType() { return HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase); }
+    static get itemType() { return HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase); }
     get itemType() { return this.constructor.itemType; }
 
     /**
@@ -63,7 +63,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             let modal = UI.confirm('Resource busy', `"${this.state.title}" is currently being edited by someone else. Do you still want to proceed?`);
 
             modal.on('no', () => {
-                location.hash = '/' + this.model.module + '/';
+                location.hash = '/' + this.model.library + '/';
             });
         }
     }
@@ -74,8 +74,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     async init() {
         this.setDirty(false);
 
-        if(!this.state.module) {
-            this.state.module = this.module;
+        if(!this.state.library) {
+            this.state.library = this.library;
         }
 
         if(!this.state.id || this.state.id === 'settings' || this.state.id === 'overview') {
@@ -108,8 +108,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.model) {
             this.state.title = this.model.getName();
         
-        } else if(this.module) {
-            this.state.title = HashBrown.Service.ModuleService.getName(this.module);
+        } else if(this.library) {
+            this.state.title = HashBrown.Service.LibraryService.getName(this.library);
 
         }
 
@@ -290,7 +290,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             }
 
             if(this.state.id && this.state.id !== this.model.id) {
-                location.hash = '/' + this.model.module + '/' + this.model.id;
+                location.hash = '/' + this.model.library + '/' + this.model.id;
             } else {
                 this.render();
             }
@@ -303,7 +303,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     async onClickNew() {
         let resource = await this.itemType.create();
         
-        location.hash = `/${this.module}/${resource.id}`;
+        location.hash = `/${this.library}/${resource.id}`;
     }
 }
 

@@ -39,6 +39,20 @@
     &__context {
         flex-grow: 1;
         width: 100%;
+
+        &-button {
+            color: inherit;
+            background-color: transparent;
+            line-height: var(--size-widget-small);
+            cursor: pointer;
+            border: 0;
+            padding: 0;
+            
+            &:hover, &:focus {
+                background-color: var(--color-decor-700);
+                outline: none;
+            }
+        }
     }
 
     &[data-drag-over] &__context {

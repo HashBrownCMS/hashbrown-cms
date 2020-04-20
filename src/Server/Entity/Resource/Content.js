@@ -243,7 +243,7 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         if(!schema) { return false; }
 
-        return schema.isAllowedAtRoot === true;
+        return schema.isAllowedAtRoot !== false;
     }
 
     /**
@@ -258,7 +258,7 @@ class Content extends require('Common/Entity/Resource/Content') {
         checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(excludeIds, 'excludeIds', Array);
         
-        let allContent = await this.constructor.list(context);
+        let allContent = await this.list(context);
         let orphans = [];
 
         for(let content of allContent) {

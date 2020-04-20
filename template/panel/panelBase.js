@@ -14,6 +14,9 @@ _.div({class: 'panel'},
         ),
         _.div({class: 'panel__items', name: 'items'},
             state.rootItems,
-            _.div({class: 'panel__context', oncontextmenu: _.onClickContext, ondrop: _.onDropItemOntoPanel, ondragover: _.onDragOverPanel})
+            state.hasPanelContext ? [
+                _.button({class: 'panel__context-button fa fa-ellipsis-h', onclick: _.onClickContext}),
+                _.div({class: 'panel__context', oncontextmenu: _.onClickContext, ondrop: _.onDropItemOntoPanel, ondragover: _.onDragOverPanel})
+            ] : null
         )
 )

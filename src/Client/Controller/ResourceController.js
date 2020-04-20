@@ -14,13 +14,13 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
             '/': {
                 redirect: '/content'
             },
-            '/${module}/${id}/${tab}': {
+            '/${library}/${id}/${tab}': {
                 handler: this.resource
             },
-            '/${module}/${id}': {
+            '/${library}/${id}': {
                 handler: this.resource
             },
-            '/${module}': {
+            '/${library}': {
                 handler: this.resources
             }
         };
@@ -31,8 +31,8 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resource(request, params) {
         return [
-            this.getPanel(params.module, params.id),
-            this.getEditor(params.module, params.id, params.tab)
+            this.getPanel(params.library, params.id),
+            this.getEditor(params.library, params.id, params.tab)
         ];
     }
 
@@ -41,38 +41,38 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
      */
     static async resources(request, params) {
         return [
-            this.getPanel(params.module),
-            this.getEditor(params.module, 'overview')
+            this.getPanel(params.library),
+            this.getEditor(params.library, 'overview')
         ];
     }
 
     /**
-     * Gets the editor for a module
+     * Gets the editor for a library
      *
-     * @param {String} module
+     * @param {String} library
      * @param {String} id
      * @param {String} tab
      *
      * @return {HashBrown.Entity.View.ResourceEditor.ResourceEditorBase} Editor
      */
-    static getEditor(module, id = '', tab = '') {
-        checkParam(module, 'module', String, true);
+    static getEditor(library, id = '', tab = '') {
+        checkParam(library, 'library', String, true);
         checkParam(id, 'id', String);
         checkParam(tab, 'tab', String);
        
         if(tab === 'json') {
             return HashBrown.Entity.View.ResourceEditor.JsonEditor.new({
                 state: {
-                    module: module,
+                    library: library,
                     id: id
                 }
             });
         }
 
-        let type = HashBrown.Service.ModuleService.getClass(module, HashBrown.Entity.View.ResourceEditor.ResourceEditorBase);
+        let type = HashBrown.Service.LibraryService.getClass(library, HashBrown.Entity.View.ResourceEditor.ResourceEditorBase);
 
         if(!type) {
-            throw new Error(`No resource editor for module "${module}" was found`);
+            throw new Error(`No resource editor for library "${library}" was found`);
         }
 
         return type.new({
@@ -84,21 +84,21 @@ class ResourceController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * Gets the panel for a module
+     * Gets the panel for a library
      *
-     * @param {String} module
+     * @param {String} library
      * @param {String} id
      *
      * @return {HashBrown.Entity.View.Panel.PanelBase} Panel
      */
-    static getPanel(module, id = '') {
-        checkParam(module, 'module', String, true);
+    static getPanel(library, id = '') {
+        checkParam(library, 'library', String, true);
         checkParam(id, 'id', String);
         
-        let type = HashBrown.Service.ModuleService.getClass(module, HashBrown.Entity.View.Panel.PanelBase);
+        let type = HashBrown.Service.LibraryService.getClass(library, HashBrown.Entity.View.Panel.PanelBase);
         
         if(!type) {
-            throw new Error(`No panel for module "${module}" was found`);
+            throw new Error(`No panel for library "${library}" was found`);
         }
 
         return type.new({

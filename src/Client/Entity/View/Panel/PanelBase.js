@@ -6,8 +6,8 @@
  * @memberof HashBrown.Client.Entity.View.Panel
  */
 class PanelBase extends HashBrown.Entity.View.ViewBase {
-    static get itemType() { return HashBrown.Service.ModuleService.getClass(this.module, HashBrown.Entity.Resource.ResourceBase); }
-    static get title() { return HashBrown.Service.ModuleService.getName(this.module); }
+    static get itemType() { return HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase); }
+    static get title() { return HashBrown.Service.LibraryService.getName(this.library); }
 
     get title() { return this.constructor.title; }
     get itemType() { return this.constructor.itemType; }
@@ -54,6 +54,8 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         }
 
         this.state.itemMap = itemMap;
+
+        this.state.hasPanelContext = Object.keys(this.getPanelOptions()).length > 0;
     }
 
     /**
@@ -103,13 +105,15 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Post render
      */
     postrender() {
-        // Restore scroll position
-        if(this.namedElements.items) {
-            this.namedElements.items.scrollTop = this.state.scrollTop;
-        }
-
         // Highlight selected item
         this.highlightItem();
+        
+        // Restore scroll position
+        if(this.namedElements.items) {
+            requestAnimationFrame(() => {
+                this.namedElements.items.scrollTop = this.state.scrollTop;
+            });
+        }
     }
 
     /**
@@ -201,7 +205,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
 
         let resource = await this.itemType.create();
         
-        location.hash = `/${this.module}/${resource.id}`;
+        location.hash = `/${this.library}/${resource.id}`;
     }
 
     /**
@@ -441,7 +445,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         
         return {
             id: resource.id,
-            module: this.module,
+            library: this.library,
             isRemote: resource.sync && resource.sync.isRemote === true,
             isLocked: resource.isLocked || false,
             options: this.getItemOptions(resource),

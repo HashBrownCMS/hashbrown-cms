@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (_, model) => 
+module.exports = (_, model, state) => 
  
 _.div({class: 'modal'},
     _.div({class: 'modal__dialog'},

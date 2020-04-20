@@ -2,13 +2,13 @@
 
 module.exports = (_, model, state) => [
 
-_.field({label: 'Module'},
-    _.popup({disabled: model.isLocked, value: model.config.resource, options: state.moduleOptions, onchange: _.onChangeResourceModule})
+_.field({label: 'Library'},
+    _.popup({disabled: model.isLocked, value: model.config.resource, options: state.libraryOptions, onchange: _.onChangeResourceLibrary})
 ),
-_.if(state.keyOptions && state.keyOptions.length > 0,
+state.keyOptions && state.keyOptions.length > 0 ? [
     _.field({label: 'Keys'},
         _.popup({disabled: model.isLocked, mutliple: true, value: model.config.resourceKeys, options: state.keyOptions, onchange: _.onChangeResourceKeys})
     )
-)
+] : null
 
 ]
