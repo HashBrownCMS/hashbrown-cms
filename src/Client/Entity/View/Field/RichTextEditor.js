@@ -39,7 +39,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
             if(!this.model.config.wysiwygToolbar) {
                 this.model.config.wysiwygToolbar = {};
             }
-            
+
             let toolbarOptions = {};
 
             let categories = {
@@ -57,13 +57,13 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 for(let key in options) {
                     let label = options[key];
-                    
+
                     toolbarOptions[label] = key;
                 }
             }
-                
+
             this.state.wysiwygToolbarOptions = toolbarOptions;
-           
+
             let toolbarValue = [];
 
             for(let label in toolbarOptions) {
@@ -73,9 +73,9 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 toolbarValue.push(key);
             }
-            
+
             this.state.wysiwygToolbarValue = toolbarValue;
-           
+
 
         } else {
             // Sanity check of value
@@ -91,14 +91,17 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
             if(lastTab === 'markdown' && !this.model.config.isMarkdownDisabled) {
                 this.state.name = 'markdown';
                 this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
-            
+
             } else if(lastTab === 'html' && !this.model.config.isHtmlDisabled) {
                 this.state.name = 'html';
 
+            } else if(this.model.config.isVisualDisabled && !this.model.config.isMarkdownDisabled) {
+                this.state.name = 'markdown';
+                this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
             }
         }
     }
-    
+
     /**
      * Gets the value label
      *
@@ -109,7 +112,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
         tmp.innerHTML = this.state.value || '';
         return tmp.textContent || tmp.innerText || super.getValueLabel();
     }
-    
+
     /**
      * Event: Click visual tab
      */
@@ -117,10 +120,10 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
         this.state.name = 'visual';
         localStorage.setItem('rich-text-editor--tab', 'visual');
-        
+
         this.render();
     }
-   
+
     /**
      * Event: Click markdown tab
      */
@@ -131,7 +134,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.render();
     }
-    
+
     /**
      * Event: Click HTML tab
      */
@@ -142,7 +145,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.render();
     }
-   
+
     /**
      * Event: Click insert media
      */
@@ -151,7 +154,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         mediaBrowser.on('pick', async (id) => {
             let media = await HashBrown.Entity.Resource.Media.get(id);
-            
+
             if(!media) { return; }
 
             let html = media.getHtml();
@@ -159,7 +162,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
             if(input instanceof HashBrown.Entity.View.Widget.RichText) {
                 input.insertHtml(html);
-            
+
             } else if(input instanceof HashBrown.Entity.View.Widget.Text) {
                 if(this.state.name === 'markdown') {
                     html = HashBrown.Service.MarkdownService.toMarkdown(html);
@@ -180,7 +183,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
         if(this.state.name !== 'config') {
             newValue = HashBrown.Service.MarkdownService.toHtml(newValue);
         }
-        
+
         super.onChange(newValue);
     }
 
