@@ -83,7 +83,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
             for(let key in this.state.schema.config) {
                 let definition = this.state.schema.config[key];
-              
+             
+                // Fallback to default tab, if no valid tab id was provided
                 if(!definition.tabId || definition.tabId === 'meta') {
                     definition.tabId = 'content';
                 }
