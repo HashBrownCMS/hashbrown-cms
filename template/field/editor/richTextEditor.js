@@ -31,9 +31,12 @@ _.div({class: 'field--rich-text-editor__content'},
         )
     ] : null,
     _.div({class: 'field--rich-text-editor__body'},
-        state.name !== 'markdown' && state.name !== 'html' && !model.config.isVisualDisabled ? [
+        state.name === 'visual' ? [
             _.richtext({disabled: model.isDisabled, name: 'input', value: state.value, toolbar: model.config.wysiwygToolbar, onchange: _.onChange})
 
+        ] : state.name == 'markdown' ? [
+            _.richtext({disabled: model.isDisabled, name: 'input', markdown: true, value: state.value, toolbar: model.config.wysiwygToolbar, onchange: _.onChange})
+            
         ] : [
             _.text({disabled: model.isDisabled, name: 'input', code: true, value: state.value, onchange: _.onChange})
 

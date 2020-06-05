@@ -28,6 +28,8 @@
         overflow: auto;
         padding: var(--padding-medium);
         border-radius: var(--border-radius-small);
+        border-width: 0;
+        resize: none;
 
         &:focus {
             outline: none;

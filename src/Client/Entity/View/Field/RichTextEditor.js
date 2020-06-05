@@ -83,22 +83,21 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
                 this.state.value = this.state.value || '';
             }
 
-            // Make sure the string is HTML
+            // Make sure the string is HTML to begin with
             this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
 
-            let lastTab = localStorage.getItem('rich-text-editor--tab');
+            // Determine the initial active tab
+            let tab = localStorage.getItem('rich-text-editor--tab') || 'visual';
 
-            if(lastTab === 'markdown' && !this.model.config.isMarkdownDisabled) {
-                this.state.name = 'markdown';
-                this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
-
-            } else if(lastTab === 'html' && !this.model.config.isHtmlDisabled) {
-                this.state.name = 'html';
-
-            } else if(this.model.config.isVisualDisabled && !this.model.config.isMarkdownDisabled) {
-                this.state.name = 'markdown';
-                this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
+            if(tab === 'html' && this.model.config.isHtmlDisabled) {
+                tab = 'markdown';
             }
+            
+            if(tab === 'markdown' && this.model.config.isMarkdownDisabled) {
+                tab = 'visual';
+            }
+
+            this.state.name = tab;
         }
     }
 

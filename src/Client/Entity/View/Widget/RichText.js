@@ -108,9 +108,17 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * @return {String} HTML
      */
     toView(html) {
-        return this.replaceMediaReferences(html, (id, filename) => {
+        if(!html) { return ''; }
+
+        html = this.replaceMediaReferences(html, (id, filename) => {
             return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
+
+        if(this.model.markdown) {
+            return HashBrown.Service.MarkdownService.toMarkdown(html);
+        }
+
+        return html;
     }
 
     /**
@@ -123,6 +131,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     toValue(html) {
         if(!html) { return ''; }
         
+        if(this.model.markdown) {
+            html = HashBrown.Service.MarkdownService.toHtml(html);
+        }
+        
         // Replace empty divs with pararaphs
         html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
 
@@ -130,6 +142,22 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         return this.replaceMediaReferences(html, (id, filename) => {
             return `${this.state.mediaPath}/${id}/${filename}`;
         });
+    }
+
+    /**
+     * Converts HTML to plain text
+     *
+     * @param {String} html
+     *
+     * @return {String{ Plain text
+     */
+    toPlainText(html) {
+        if(!html) { return ''; }
+
+        let temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        return temp.textContent || temp.innerText || '';
     }
 
     /**
@@ -176,36 +204,279 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
-     * Event: Change font color
+     * Clears the selection
      */
-    onChangeFontColor(color) {
-        document.execCommand('foreColor', false, color);
+    clearSelection() {
+        window.getSelection().removeAllRanges();
     }
 
     /**
-     * Event: Change heading
+     * Gets all ranges of the selection
+     *
+     * @return {Array} Ranges
      */
-    onChangeHeading(newValue) {
-        document.execCommand('formatBlock', false, newValue);
-        this.namedElements.editor.focus();
-        this.onChange();
+    getSelectionRanges() {
+        let selection = window.getSelection();
+        let totalRange = selection.getRangeAt(0);
+        let container = totalRange.commonAncestorContainer;
+        let ranges = [];
+
+        // This is a single node selection
+        if(container.childNodes.length < 1) {
+            ranges.push(totalRange);
+
+        // This is a multiple node selection
+        } else {
+            let walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+            let nodes = [];
+
+            while(walker.nextNode()) {
+                let node = walker.currentNode;
+                
+                if(selection.containsNode(node)) {
+                    nodes.push(node);
+                }
+            }
+
+            for(let i = 0; i < nodes.length; i++) {
+                let node = nodes[i];
+                let range = document.createRange();
+
+                // First range, use start offset and fill to end
+                if(i < 1) {
+                    range.setStart(node, totalRange.startOffset);
+                    range.setEnd(node, node.length);
+
+                // Ranges in the middle, fill both start and end
+                } else if(i < nodes.length - 1) {
+                    range.setStart(node, 0);
+                    range.setEnd(node, node.length);
+
+                // Last range, fill to start and use end offset
+                } else {
+                    range.setStart(node, 0);
+                    range.setEnd(node, totalRange.endOffset);
+                
+                }
+
+                ranges.push(range);
+            }
+        }
+
+        return ranges;
     }
 
     /**
-     * Event: On change style
+     * Sets the style of the selection element
+     *
+     * @param {Function} callback
      */
-    onChangeStyle(newValue) {
-        document.execCommand(newValue);
+    modifySelection(callback) {
+        let ranges = this.getSelectionRanges();
+
+        for(let range of ranges) {
+            let node = range.startContainer;
+            let element = range.commonAncestorContainer;
+
+            while(element instanceof Text) {
+                element = element.parentElement;
+            }
+
+            if(element === this.namedElements.editor) {
+                element = null;
+            }
+
+            callback(range, node, element);
+        }
+        
         this.onChange();
+    }
+    
+    /**
+     * Changes the tag of an element
+     *
+     * @param {HTMLElement} element
+     * @param {String} tagName
+     *
+     * @return {HTMLElement} New element
+     */
+    setElementTag(element, tagName) {
+        let oldTag = element.tagName.toLowerCase();
+        let newTag = tagName.toLowerCase();
+            
+        if(oldTag === newTag) { return element; }
+        
+        let newElement = document.createElement(newTag);
+
+        while(element.firstChild) {
+            newElement.appendChild(element.firstChild);
+        }
+
+        for(let i = element.attributes.length - 1; i >= 0; --i) {
+            newElement.attributes.setNamedItem(element.attributes[i].cloneNode());
+        }
+
+        element.parentNode.replaceChild(newElement, element);
+
+        return newElement;
+    }
+
+    /**
+     * Event: Change style
+     *
+     * @param {String} property
+     * @param {String} value
+     */
+    onChangeStyle(property, value) {
+        this.modifySelection((range, node, element) => {
+            if(!element) {
+                element = document.createElement('span');
+
+                range.surroundContents(element);
+            }
+
+            element.style[property] = value;
+        });
+    }
+
+    /**
+     * Event: Toggle style
+     */
+    onToggleStyle(property, value) {
+        this.modifySelection((range, node, element) => {
+            if(!element || element.tagName.toLowerCase() !== 'span') {
+                element = document.createElement('span');
+
+                range.surroundContents(element);
+            }
+            
+            if(element.style[property] !== value) {
+                element.style[property] = value;
+            } else {
+                element.style[property] = null;
+            }
+        });
+    }
+
+    /**
+     * Event: Toggle list
+     */
+    onToggleList(newTagName) {
+        let parentElement = null;
+        let items = [];
+        
+        this.modifySelection((range, node, element) => {
+            parentElement = element.parentElement;
+            
+            items.push(element);
+        });
+
+        if(items.length < 1) { return; }
+
+        let oldTagName = parentElement.tagName.toLowerCase();
+            
+        // Clear list
+        if(oldTagName === newTagName) {
+            while(parentElement.firstChild) {
+                let item = parentElement.firstChild;
+
+                parentElement.parentElement.insertBefore(item, parentElement);
+
+                this.setElementTag(item, 'p');
+            }
+
+            parentElement.parentElement.removeChild(parentElement);
+        
+        // Change list
+        } else if(oldTagName === 'ul' || oldTagName === 'ol') {
+            parentElement = this.setElementTag(parentElement, newTagName);
+        
+            for(let item of items) {
+                parentElement.appendChild(item);
+
+                this.setElementTag(item, 'li');
+            }
+        
+        // Create list
+        } else {
+            let newParentElement = document.createElement(newTagName);
+
+            parentElement.insertBefore(newParentElement, items[0]);
+
+            for(let item of items) {
+                newParentElement.appendChild(item);
+
+                this.setElementTag(item, 'li');
+            }
+        }
+    }
+
+    /**
+     * Event: Change element
+     */
+    onChangeElement(tagName) {
+        this.modifySelection((range, node, element) => {
+            if(!element) {
+                element = document.createElement(tagName);
+
+                range.surroundContents(element);
+            
+            } else {
+                this.setElementTag(element, tagName);
+            
+            }
+        });
+    }
+    
+    /**
+     * Event: Toggle container element
+     */
+    onToggleContainerElement(tagName, isActive) {
+        let children = [];
+
+        this.modifySelection((range, node, element) => {
+            if(element) {
+                children.push(element);
+            } else {
+                children.push(node);
+            }
+        });
+
+        if(children.length < 1) { return; }
+
+        let container = children[0].parentElement;
+
+        // Create container
+        if(container.tagName.toLowerCase() !== tagName && isActive) {
+            container = document.createElement(tagName);
+            children[0].parentElement.insertBefore(container, children[0]);
+
+            for(let child of children) {
+                container.appendChild(child);
+            }
+        
+        // Remove container
+        } else if(container.tagName.toLowerCase() === tagName && !isActive) {
+            while(container.firstChild) {
+                container.parentElement.insertBefore(container.firstChild, container);
+            }
+        
+            container.parentElement.removeChild(container);
+        }
     }
 
     /**
      * Event: On remove format
      */
     onRemoveFormat() {
-        document.execCommand('removeFormat');
-        document.execCommand('unlink');
-        this.onChange();
+        let selection = window.getSelection();
+        let range = selection.getRangeAt(0);
+        let node = document.createTextNode(selection.toString());
+
+        range.deleteContents();
+        range.insertNode(node);
+
+        node.parentElement.normalize();
     }
 
     /**
