@@ -83,9 +83,6 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
                 this.state.value = this.state.value || '';
             }
 
-            // Make sure the string is HTML to begin with
-            this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
-
             // Determine the initial active tab
             let tab = localStorage.getItem('rich-text-editor--tab') || 'visual';
 
@@ -116,7 +113,6 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Click visual tab
      */
     onClickVisualTab() {
-        this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
         this.state.name = 'visual';
         localStorage.setItem('rich-text-editor--tab', 'visual');
 
@@ -127,7 +123,6 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Click markdown tab
      */
     onClickMarkdownTab() {
-        this.state.value = HashBrown.Service.MarkdownService.toMarkdown(this.state.value);
         this.state.name = 'markdown';
         localStorage.setItem('rich-text-editor--tab', 'markdown');
 
@@ -138,7 +133,6 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      * Event: Click HTML tab
      */
     onClickHtmlTab() {
-        this.state.value = HashBrown.Service.MarkdownService.toHtml(this.state.value);
         this.state.name = 'html';
         localStorage.setItem('rich-text-editor--tab', 'html');
 
@@ -157,33 +151,9 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
             if(!media) { return; }
 
             let html = media.getHtml();
-            let input = this.namedElements.input;
-
-            if(input instanceof HashBrown.Entity.View.Widget.RichText) {
-                input.insertHtml(html);
-
-            } else if(input instanceof HashBrown.Entity.View.Widget.Text) {
-                if(this.state.name === 'markdown') {
-                    html = HashBrown.Service.MarkdownService.toMarkdown(html);
-                }
-
-                input.insertHtml(html);
-
-            }
+            
+            this.namedElements.input.insertHtml(html);
         });
-    }
-
-    /**
-     * Event: Value changed
-     *
-     * @param {String} newValue
-     */
-    onChange(newValue) {
-        if(this.state.name !== 'config') {
-            newValue = HashBrown.Service.MarkdownService.toHtml(newValue);
-        }
-
-        super.onChange(newValue);
     }
 
     /**

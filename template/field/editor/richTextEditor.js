@@ -6,7 +6,6 @@ _.div({class: 'field--rich-text-editor__content'},
     !model.isDisabled ? [
         _.div({class: 'field--rich-text-editor__header'},
             _.div({class: 'field--rich-text-editor__header__tabs'},
-
                 !model.config.isVisualDisabled ? [
                     _.button({class: `field--rich-text-editor__header__tab ${state.name === 'visual' ? 'active' : ''}`, onclick: _.onClickVisualTab}, 'Visual')
 

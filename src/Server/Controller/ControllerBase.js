@@ -299,9 +299,12 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
         for(let kvp of (request.headers.cookie || '').split(';')) {
             kvp = kvp.split('=');
 
-            if(kvp[0] !== 'token') { continue; }
+            let key = (kvp[0] || '').trim();
+            let value = (kvp[1] || '').trim();
 
-            return kvp[1];
+            if(key !== 'token') { continue; }
+
+            return value;
         }
 
         return null;

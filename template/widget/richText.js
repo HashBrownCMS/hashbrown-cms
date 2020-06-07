@@ -9,50 +9,50 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
 
             _.div({class: 'widget-group__separator line'}),
             
-            _.if(model.toolbar.bold !== false,
-                _.button({class: 'widget widget--button default small fa fa-bold', title: 'Bold', onclick: () => _.onToggleStyle('fontWeight', 'bold')})
-            ),
-            _.if(model.toolbar.italic !== false,
-                _.button({class: 'widget widget--button default small fa fa-italic', title: 'Italic', onclick: () => _.onToggleStyle('fontStyle', 'italic')})
-            ),
-            _.if(model.toolbar.underline !== false,
+            model.toolbar.bold !== false ? [
+                _.button({class: 'widget widget--button default small fa fa-bold', title: 'Bold', onclick: () => _.onToggleElement('strong')})
+            ] : null,
+            model.toolbar.italic !== false && !model.markdown ? [
+                _.button({class: 'widget widget--button default small fa fa-italic', title: 'Italic', onclick: () => _.onToggleElement('em')})
+            ] : null,
+            model.toolbar.underline !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-underline', title: 'Underline', onclick: () =>  _.onToggleStyle('textDecoration', 'underline')})
-            ),
-            _.if(model.toolbar.color !== false,
+            ] : null,
+            model.toolbar.color !== false && !model.markdown ? [
                 _.div({class: 'widget widget--button default small fa fa-paint-brush', title: 'Font colour'},
                     _.input({class: 'widget--button__input', type: 'color', onchange: (e) => _.onChangeStyle('color', e.target.value)})
                 )
-            ),
+            ] : null,
             
             _.div({class: 'widget-group__separator line'}),
             
-            _.if(model.toolbar.orderedList !== false,
+            model.toolbar.orderedList !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-list-ol', title: 'Ordered list', onclick: () => _.onToggleList('ol')})
-            ),
-            _.if(model.toolbar.unorderedList !== false,
+            ] : null,
+            model.toolbar.unorderedList !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-list-ul', title: 'Unordered list', onclick: () => _.onToggleList('ul')})
-            ),
+            ] : null,
 
             _.div({class: 'widget-group__separator line'}),
             
-            _.if(model.toolbar.indent !== false,
+            model.toolbar.indent !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-indent', title: 'Indent', onclick: () => _.onToggleContainerElement('blockquote', true)})
-            ),
-            _.if(model.toolbar.outdent !== false,
+            ] : null,
+            model.toolbar.outdent !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-outdent', title: 'Outdent', onclick: () => _.onToggleContainerElement('blockquote', false)})
-            ),
-            _.if(model.toolbar.alignLeft !== false,
+            ] : null,
+            model.toolbar.alignLeft !== false && !model.markdown ? [
                 _.button({class: 'widget widget--button default small fa fa-align-left', title: 'Left', onclick: () => _.onChangeStyle('textAlign', 'left')})
-            ),
-            _.if(model.toolbar.center !== false,
+            ] : null,
+            model.toolbar.center !== false && !model.markdown ? [
                 _.button({class: 'widget widget--button default small fa fa-align-center', title: 'Center', onclick: () => _.onChangeStyle('textAlign', 'center')})
-            ),
-            _.if(model.toolbar.justify !== false,
+            ] : null,
+            model.toolbar.justify !== false && !model.markdown ? [
                 _.button({class: 'widget widget--button default small fa fa-align-justify', title: 'Justify', onclick: () => _.onChangeStyle('textAlign', 'justify')})
-            ),
-            _.if(model.toolbar.alignRight !== false,
+            ] : null,
+            model.toolbar.alignRight !== false && !model.markdown ? [
                 _.button({class: 'widget widget--button default small fa fa-align-right', title: 'Right', onclick: () => _.onChangeStyle('textAlign', 'right')})
-            ),
+            ] : null,
 
             _.div({class: 'widget-group__separator line'}),
             

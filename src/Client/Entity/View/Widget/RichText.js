@@ -16,6 +16,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         this.model.toolbar = this.model.toolbar || {};
         this.state.paragraphOptions = this.getParagraphOptions();
+
+        this.model.value = HashBrown.Service.MarkdownService.toHtml(this.model.value);
+
     }
 
     /**
@@ -35,16 +38,32 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Post render
      */
     postrender() {
-        this.namedElements.editor.innerHTML = this.toView(this.model.value);
+        if(this.isMarkdown) {
+            this.namedElements.editor.value = this.toView(this.model.value);
+        } else {
+            this.namedElements.editor.innerHTML = this.toView(this.model.value);
+        }
     }
 
     /**
      * Event: Value changed
      */
     onChange() {
-        let newValue = this.toValue(this.namedElements.editor.innerHTML);
+        let newValue = this.toValue(this.isMarkdown ? 
+            this.namedElements.editor.value :
+            this.namedElements.editor.innerHTML
+        );
 
         super.onChange(newValue);
+    }
+
+    /**
+     * Gets whether we're in markdown mode
+     *
+     * @return {Boolean} Is markdown
+     */
+    get isMarkdown() {
+        return this.model.markdown === true;
     }
 
     /**
@@ -55,7 +74,11 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     insertHtml(html) {
         if(!html) { return; }
 
-        this.namedElements.editor.innerHTML += this.toView(html);
+        if(this.isMarkdown) {
+            this.namedElements.editor.value += this.toView(html);
+        } else {
+            this.namedElements.editor.innerHTML += this.toView(html);
+        }
 
         this.onChange();
     }
@@ -68,7 +91,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         
         if(!paragraphPicker) { return; }
 
-        let selection = window.getSelection();
+        let selection = this.getSelection();
 
         if(!selection) { return; }
 
@@ -113,9 +136,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         html = this.replaceMediaReferences(html, (id, filename) => {
             return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
-
-        if(this.model.markdown) {
-            return HashBrown.Service.MarkdownService.toMarkdown(html);
+        
+        if(this.isMarkdown) {
+            html = HashBrown.Service.MarkdownService.toMarkdown(html);
         }
 
         return html;
@@ -131,7 +154,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     toValue(html) {
         if(!html) { return ''; }
         
-        if(this.model.markdown) {
+        if(this.isMarkdown) {
             html = HashBrown.Service.MarkdownService.toHtml(html);
         }
         
@@ -207,7 +230,29 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Clears the selection
      */
     clearSelection() {
-        window.getSelection().removeAllRanges();
+        this.getSelection().removeAllRanges();
+    }
+
+    /**
+     * Gets the selection
+     *
+     * @return {Selection} Selection
+     */
+    getSelection() {
+        let selection = window.getSelection();
+
+        if(this.isMarkdown) {
+            let range = document.createRange();
+            let editor = this.namedElements.editor;
+
+            range.setStart(editor, editor.selectionStart);
+            range.setEnd(editor, editor.selectionEnd);
+            
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        return selection;
     }
 
     /**
@@ -216,7 +261,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * @return {Array} Ranges
      */
     getSelectionRanges() {
-        let selection = window.getSelection();
+        let selection = this.getSelection();
         let totalRange = selection.getRangeAt(0);
         let container = totalRange.commonAncestorContainer;
         let ranges = [];
@@ -288,10 +333,23 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
             callback(range, node, element);
         }
-        
-        this.onChange();
     }
     
+    /**
+     * Removes an element while keeping its children
+     *
+     * @param {HTMLElement} element
+     */
+    removeParentElement(element) {
+        if(!element) { return; }
+
+        while(element.firstChild) {
+            element.parentElement.insertBefore(element.firstChild, element);
+        }
+
+        element.parentElement.removeChild(element);
+    }
+
     /**
      * Changes the tag of an element
      *
@@ -337,6 +395,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
             element.style[property] = value;
         });
+        
+        this.onChange();
     }
 
     /**
@@ -356,6 +416,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 element.style[property] = null;
             }
         });
+        
+        this.onChange();
     }
 
     /**
@@ -409,6 +471,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 this.setElementTag(item, 'li');
             }
         }
+        
+        this.onChange();
     }
 
     /**
@@ -426,6 +490,32 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             
             }
         });
+        
+        this.onChange();
+    }
+    
+    /**
+     * Event: Toggle element
+     */
+    onToggleElement(tagName, isActive) {
+        let children = [];
+
+        this.modifySelection((range, node, element) => {
+            if(isActive === undefined) {
+                isActive = element && element.tagName.toLowerCase() === tagName;
+            }
+
+            if(isActive) {
+                this.removeParentElement(element);
+                
+            } else {
+                element = document.createElement(tagName);
+                    
+                range.surroundContents(element);
+            }
+        });
+        
+        this.onChange();
     }
     
     /**
@@ -446,6 +536,11 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         let container = children[0].parentElement;
 
+        // Determine toggle state
+        if(isActive === undefined) {
+            isActive = container.tagName.toLowerCase() !== tagName;
+        }
+
         // Create container
         if(container.tagName.toLowerCase() !== tagName && isActive) {
             container = document.createElement(tagName);
@@ -463,13 +558,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         
             container.parentElement.removeChild(container);
         }
+        
+        this.onChange();
     }
 
     /**
      * Event: On remove format
      */
     onRemoveFormat() {
-        let selection = window.getSelection();
+        let selection = this.getSelection();
         let range = selection.getRangeAt(0);
         let node = document.createTextNode(selection.toString());
 
@@ -477,13 +574,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         range.insertNode(node);
 
         node.parentElement.normalize();
+        
+        this.onChange();
     }
 
     /**
      * Event: Create link
      */
     onCreateLink() {
-        let selection = window.getSelection();
+        let selection = this.getSelection();
         let anchorOffset = selection.anchorOffset;
         let focusOffset = selection.focusOffset;
         let anchorNode = selection.anchorNode;
@@ -504,7 +603,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         modal.on('ok', (url, newTab) => {
             if(!url) { return; }
 
-            selection = window.getSelection();
+            selection = this.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
 
