@@ -39,9 +39,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      */
     postrender() {
         if(this.isMarkdown) {
-            this.namedElements.editor.value = this.toView(this.model.value);
+            this.namedElements.editor.value = this.toView(this.model.value, 'markdown');
+            this.namedElements.preview.innerHTML = this.toView(this.model.value, 'html');
         } else {
-            this.namedElements.editor.innerHTML = this.toView(this.model.value);
+            this.namedElements.editor.innerHTML = this.toView(this.model.value, 'html');
         }
     }
 
@@ -53,6 +54,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             this.namedElements.editor.value :
             this.namedElements.editor.innerHTML
         );
+
+        if(this.isMarkdown) {
+            this.namedElements.preview.innerHTML = this.toView(newValue, 'html');
+        }
 
         super.onChange(newValue);
     }
@@ -75,9 +80,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(!html) { return; }
 
         if(this.isMarkdown) {
-            this.namedElements.editor.value += this.toView(html);
+            this.namedElements.editor.value += this.toView(html, 'markdown');
         } else {
-            this.namedElements.editor.innerHTML += this.toView(html);
+            this.namedElements.editor.innerHTML += this.toView(html, 'html');
         }
 
         this.onChange();
@@ -127,17 +132,18 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Converts HTML to view format, replacing media references
      *
      * @param {String} html
+     * @param {String} mode
      *
      * @return {String} HTML
      */
-    toView(html) {
+    toView(html, mode) {
         if(!html) { return ''; }
 
         html = this.replaceMediaReferences(html, (id, filename) => {
             return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
         
-        if(this.isMarkdown) {
+        if(mode === 'markdown') {
             html = HashBrown.Service.MarkdownService.toMarkdown(html);
         }
 
@@ -242,11 +248,21 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         let selection = window.getSelection();
 
         if(this.isMarkdown) {
-            let range = document.createRange();
+            let range = new Range();
             let editor = this.namedElements.editor;
+            let preview = this.namedElements.preview;
 
-            range.setStart(editor, editor.selectionStart);
-            range.setEnd(editor, editor.selectionEnd);
+            let text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            let before = editor.value.substring(0, editor.selectionStart);
+            let after = editor.value.substring(editor.selectionEnd);
+
+            text = before + `<selection>` + text + '</selection>' + after;
+
+            preview.innerHTML = this.toValue(text);
+
+            let element = preview.querySelector('selection');
+
+            range.selectNode(element);
             
             selection.removeAllRanges();
             selection.addRange(range);
@@ -576,6 +592,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         node.parentElement.normalize();
         
         this.onChange();
+    }
+
+    /**
+     * Event: Toggle preview
+     */
+    onTogglePreview() {
+        this.state.isPreviewActive = !this.state.isPreviewActive;
+
+        this.render();
     }
 
     /**

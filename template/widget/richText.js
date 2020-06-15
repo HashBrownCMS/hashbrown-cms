@@ -12,10 +12,10 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
             model.toolbar.bold !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-bold', title: 'Bold', onclick: () => _.onToggleElement('strong')})
             ] : null,
-            model.toolbar.italic !== false && !model.markdown ? [
+            model.toolbar.italic !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-italic', title: 'Italic', onclick: () => _.onToggleElement('em')})
             ] : null,
-            model.toolbar.underline !== false ? [
+            model.toolbar.underline !== false && !model.markdown ? [
                 _.button({class: 'widget widget--button default small fa fa-underline', title: 'Underline', onclick: () =>  _.onToggleStyle('textDecoration', 'underline')})
             ] : null,
             model.toolbar.color !== false && !model.markdown ? [
@@ -60,12 +60,21 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
             
             _.div({class: 'widget-group__separator line'}),
             
-            _.button({class: 'widget widget--button default small fa fa-remove', title: 'Remove formatting', onclick: _.onRemoveFormat})
+            _.button({class: 'widget widget--button default small fa fa-remove', title: 'Remove formatting', onclick: _.onRemoveFormat}),
+            
+            model.markdown ? [
+                _.div({class: 'widget-group__separator line'}),
+                
+                _.button({class: `widget widget--button default small fa fa-eye${state.isPreviewActive ? '-slash' : ''}`, title: 'Toggle preview', onclick: _.onTogglePreview})
+            ] : null,
         )
     ] : null,
-    model.markdown ? [
-        _.textarea({name: 'editor', disabled: model.disabled, class: 'widget--rich-text__editor', oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
-    ] : [
-        _.div({name: 'editor', disabled: model.disabled, class: 'widget--rich-text__editor', contenteditable: !model.disabled, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
-    ]
+    _.div({class: 'widget--rich-text__view'},
+        model.markdown ? [
+            _.textarea({name: 'editor', disabled: model.disabled, class: `widget--rich-text__editor ${state.isPreviewActive ? 'has-preview' : ''}`, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}),
+            _.div({name: 'preview', class: `widget--rich-text__preview ${state.isPreviewActive ? '' : 'is-hidden'}`}) 
+        ] : [
+            _.div({name: 'editor', disabled: model.disabled, class: 'widget--rich-text__editor', contenteditable: !model.disabled, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
+        ]
+    )
 )
