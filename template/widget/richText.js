@@ -71,10 +71,10 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
     ] : null,
     _.div({class: 'widget--rich-text__view'},
         model.markdown ? [
-            _.textarea({name: 'editor', disabled: model.disabled, class: `widget--rich-text__editor ${state.isPreviewActive ? 'has-preview' : ''}`, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}),
+            _.textarea({name: 'editor', disabled: model.disabled, class: `widget--rich-text__editor ${state.isPreviewActive ? 'has-preview' : ''}`, oninput: _.onChangeInput, onclick: _.onSilentChange, onkeyup: _.onSilentChange}),
             _.div({name: 'preview', class: `widget--rich-text__preview ${state.isPreviewActive ? '' : 'is-hidden'}`}) 
         ] : [
-            _.div({name: 'editor', disabled: model.disabled, class: 'widget--rich-text__editor', contenteditable: !model.disabled, oninput: _.onChange, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
+            _.div({name: 'editor', disabled: model.disabled, class: 'widget--rich-text__editor', contenteditable: !model.disabled, oninput: _.onChangeInput, onclick: _.onSilentChange, onkeyup: _.onSilentChange}) 
         ]
     )
 )

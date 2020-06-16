@@ -47,17 +47,35 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
-     * Event: Value changed
+     * Event: Value changed via the input
      */
-    onChange() {
-        let newValue = this.toValue(this.isMarkdown ? 
-            this.namedElements.editor.value :
-            this.namedElements.editor.innerHTML
+    onChangeInput() {
+        let newValue = this.toValue(this.isMarkdown ?
+            HashBrown.Service.MarkdownService.toHtml(this.namedElements.editor.value) :
+            this.namedElements.editor.inenrHTML
         );
 
         if(this.isMarkdown) {
             this.namedElements.preview.innerHTML = this.toView(newValue, 'html');
         }
+
+        super.onChange(newValue);
+    }
+
+    /**
+     * Event: Value changed programmatically
+     */
+    onChange() {
+        let newValue = this.toValue(this.isMarkdown ? 
+            this.namedElements.preview.innerHTML :
+            this.namedElements.editor.innerHTML
+        );
+
+        if(this.isMarkdown) {
+            this.namedElements.editor.value = HashBrown.Service.MarkdownService.toMarkdown(this.namedElements.preview.innerHTML);
+        }
+
+        this.clearSelection();
 
         super.onChange(newValue);
     }
@@ -160,11 +178,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     toValue(html) {
         if(!html) { return ''; }
         
-        if(this.isMarkdown) {
-            html = HashBrown.Service.MarkdownService.toHtml(html);
-        }
-        
-        // Replace empty divs with pararaphs
+        // Replace divs with pararaphs
         html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
 
         // Replace media references
@@ -252,18 +266,46 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             let editor = this.namedElements.editor;
             let preview = this.namedElements.preview;
 
+            let marker = `|selection-${Date.now()}|`;
             let text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
             let before = editor.value.substring(0, editor.selectionStart);
             let after = editor.value.substring(editor.selectionEnd);
+            let html = HashBrown.Service.MarkdownService.toHtml(before + marker + text + marker + after);
 
-            text = before + `<selection>` + text + '</selection>' + after;
+            preview.innerHTML = html;
 
-            preview.innerHTML = this.toValue(text);
+            let walker = document.createTreeWalker(preview, NodeFilter.SHOW_TEXT, null, false);
+            let startOffset = -1;
+            let startContainer = null;
+            let endOffset = -1;
+            let endContainer = null;
 
-            let element = preview.querySelector('selection');
+            while(walker.nextNode()) {
+                while(walker.currentNode.textContent.indexOf(marker) > -1) {
+                    let offset = walker.currentNode.textContent.indexOf(marker);
+                    let container = walker.currentNode;
 
-            range.selectNode(element);
+                    container.textContent = container.textContent.substring(0, offset) + container.textContent.substring(offset + marker.length);
+
+                    if(startOffset < 0) {
+                        startOffset = offset;
+                        startContainer = container;
+
+                    } else {
+                        endOffset = offset;
+                        endContainer = container;
+
+                    }
+                }
+            }
             
+            if(startOffset < 0 || endOffset < 0) {
+                throw new Error('Invalid selection');
+            }
+
+            range.setStart(startContainer, startOffset);
+            range.setEnd(endContainer, endOffset);
+
             selection.removeAllRanges();
             selection.addRange(range);
         }
@@ -343,7 +385,10 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 element = element.parentElement;
             }
 
-            if(element === this.namedElements.editor) {
+            if(
+                element === this.namedElements.editor ||
+                element === this.namedElements.preview
+            ) {
                 element = null;
             }
 
@@ -444,12 +489,16 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         let items = [];
         
         this.modifySelection((range, node, element) => {
-            parentElement = element.parentElement;
-            
-            items.push(element);
+            parentElement = element ? element.parentElement : node.parentElement;
+           
+            items.push(element || node);
         });
 
         if(items.length < 1) { return; }
+
+        console.log(items);
+
+        return;
 
         let oldTagName = parentElement.tagName.toLowerCase();
             
