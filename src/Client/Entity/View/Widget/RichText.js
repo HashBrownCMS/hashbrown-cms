@@ -486,30 +486,44 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      */
     onToggleList(newTagName) {
         let parentElement = null;
-        let items = [];
+        let items = {};
         
         this.modifySelection((range, node, element) => {
-            parentElement = element ? element.parentElement : node.parentElement;
+            if(
+                !element ||
+                (
+                    element.tagName.toLowerCase() !== 'p' &&
+                    element.tagName.toLowerCase() !== 'li'
+                )
+            ) { return; }
            
-            items.push(element || node);
+            parentElement = element.parentElement;
+
+            items[element.textContent] = element;
         });
+
+        items = Object.values(items);
 
         if(items.length < 1) { return; }
 
-        console.log(items);
+        let oldTagName = parentElement ? parentElement.tagName.toLowerCase() : '';
+           
+        console.log(parentElement, items);
 
-        return;
-
-        let oldTagName = parentElement.tagName.toLowerCase();
-            
         // Clear list
         if(oldTagName === newTagName) {
             while(parentElement.firstChild) {
                 let item = parentElement.firstChild;
+                
+                if(item instanceof HTMLElement === false) {
+                    parentElement.removeChild(item);
 
-                parentElement.parentElement.insertBefore(item, parentElement);
+                } else {
+                    parentElement.parentElement.insertBefore(item, parentElement);
 
-                this.setElementTag(item, 'p');
+                    this.setElementTag(item, 'p');
+
+                }
             }
 
             parentElement.parentElement.removeChild(parentElement);
@@ -519,9 +533,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             parentElement = this.setElementTag(parentElement, newTagName);
         
             for(let item of items) {
-                parentElement.appendChild(item);
+                if(item instanceof HTMLElement === false) {
+                    parentElement.removeChild(item);
 
-                this.setElementTag(item, 'li');
+                } else {
+                    parentElement.appendChild(item);
+
+                    this.setElementTag(item, 'li');
+                
+                }
             }
         
         // Create list
@@ -531,9 +551,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             parentElement.insertBefore(newParentElement, items[0]);
 
             for(let item of items) {
-                newParentElement.appendChild(item);
+                if(item instanceof HTMLElement === false) {
+                    parentElement.removeChild(item);
 
-                this.setElementTag(item, 'li');
+                } else {
+                    newParentElement.appendChild(item);
+
+                    this.setElementTag(item, 'li');
+
+                }
             }
         }
         
