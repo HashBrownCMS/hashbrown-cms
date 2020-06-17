@@ -1,5 +1,13 @@
 'use strict';
 
+const ProseMirror = {
+    EditorView: require('prosemirror-view').EditorView,
+    EditorState: require('prosemirror-state').EditorState,
+    DOMParser: require('prosemirror-model').DOMParser,
+    Schema: require('prosemirror-model').Schema,
+    VisualSchema: require('prosemirror-schema-basic').schema
+}
+
 /**
  * A rich text widget
  *
@@ -38,12 +46,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Post render
      */
     postrender() {
-        if(this.isMarkdown) {
-            this.namedElements.editor.value = this.toView(this.model.value, 'markdown');
-            this.namedElements.preview.innerHTML = this.toView(this.model.value, 'html');
-        } else {
-            this.namedElements.editor.innerHTML = this.toView(this.model.value, 'html');
-        }
+        this.namedElements.output.innerHTML = this.toView(this.model.value);
+
+        let schema = ProseMirror.VisualSchema;
+
+        this.state.editor = new ProseMirror.EditorView(this.namedElements.editor, {
+            state: ProseMirror.EditorState.create({
+                doc: ProseMirror.DOMParser.fromSchema(schema).parse(this.namedElements.output)
+            })
+        });
     }
 
     /**

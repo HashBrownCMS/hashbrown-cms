@@ -24,7 +24,7 @@
         display: flex;
     }
 
-    &__editor, &__preview {
+    &__editor, &__output {
         min-height: var(--height-rich-text-editor);
         flex-grow: 1;
         background-color: var(--color-default);
@@ -36,6 +36,7 @@
         resize: none;
         flex-grow: 1;
         width: 100%;
+        white-space: pre-wrap;
 
         &.is-hidden {
             display: none;
@@ -54,19 +55,9 @@
         }
     }
 
-    &__editor {
-        &.has-preview {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            width: 50%;
+    &__output {
+        &.hidden {
+            display: none;
         }
-    }
-
-    &__preview {
-        user-select: none;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-left: 1px solid var(--color-default-200);
-        width: 50%;
     }
 }
