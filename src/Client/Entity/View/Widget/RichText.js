@@ -5,7 +5,13 @@ const ProseMirror = {
     EditorState: require('prosemirror-state').EditorState,
     DOMParser: require('prosemirror-model').DOMParser,
     Schema: require('prosemirror-model').Schema,
-    VisualSchema: require('prosemirror-schema-basic').schema
+    Transform: require('prosemirror-transform').Transform,
+    VisualSchema: require('prosemirror-schema-basic').schema,
+    ListSchema: require('prosemirror-schema-list').schema,
+    MarkdownSchema: require('prosemirror-markdown').schema,
+    MarkdownSerializer: require('prosemirror-markdown').defaultMarkdownSerializer,
+    MarkdownParser: require('prosemirror-markdown').defaultMarkdownParser,
+    Commands: require('prosemirror-commands')
 }
 
 /**
@@ -30,6 +36,15 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(ProseMirror.EditorView, 'editor');
+    }
+
+    /**
      * Fetches the model
      */
     async fetch() {
@@ -50,7 +65,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         let schema = ProseMirror.VisualSchema;
 
-        this.state.editor = new ProseMirror.EditorView(this.namedElements.editor, {
+        this.editor = new ProseMirror.EditorView(this.namedElements.editor, {
             state: ProseMirror.EditorState.create({
                 doc: ProseMirror.DOMParser.fromSchema(schema).parse(this.namedElements.output)
             })
@@ -258,416 +273,82 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
-     * Clears the selection
+     * Event: Change paragraph
+     *
+     * @param {String} tagName
      */
-    clearSelection() {
-        this.getSelection().removeAllRanges();
+    onChangeParagraph(tagName) {
+        let node = null;
+        let attrs = {};
+            
+        if(tagName !== 'p') {
+            attrs.level = parseInt(tagName.substring(1));
+        }
+
+        if(tagName === 'p') {
+            if(this.isMarkdown) {
+                node = ProseMirror.MarkdownSchema.nodes.paragraph;
+            } else {
+                node = ProseMirror.VisualSchema.nodes.paragraph;
+            }
+        } else {
+            if(this.isMarkdown) {
+                node = ProseMirror.MarkdownSchema.nodes.heading;
+            } else {
+                node = ProseMirror.VisualSchema.nodes.heading;
+            }
+        }
+            
+        let cmd = ProseMirror.Commands.setBlockType(node, attrs);
+            
+        cmd(this.editor.state, this.editor.dispatch);
     }
 
     /**
-     * Gets the selection
-     *
-     * @return {Selection} Selection
+     * Event: Click bold
      */
-    getSelection() {
-        let selection = window.getSelection();
+    onClickBold() {
+        let cmd = null;
 
         if(this.isMarkdown) {
-            let range = new Range();
-            let editor = this.namedElements.editor;
-            let preview = this.namedElements.preview;
-
-            let marker = `|selection-${Date.now()}|`;
-            let text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-            let before = editor.value.substring(0, editor.selectionStart);
-            let after = editor.value.substring(editor.selectionEnd);
-            let html = HashBrown.Service.MarkdownService.toHtml(before + marker + text + marker + after);
-
-            preview.innerHTML = html;
-
-            let walker = document.createTreeWalker(preview, NodeFilter.SHOW_TEXT, null, false);
-            let startOffset = -1;
-            let startContainer = null;
-            let endOffset = -1;
-            let endContainer = null;
-
-            while(walker.nextNode()) {
-                while(walker.currentNode.textContent.indexOf(marker) > -1) {
-                    let offset = walker.currentNode.textContent.indexOf(marker);
-                    let container = walker.currentNode;
-
-                    container.textContent = container.textContent.substring(0, offset) + container.textContent.substring(offset + marker.length);
-
-                    if(startOffset < 0) {
-                        startOffset = offset;
-                        startContainer = container;
-
-                    } else {
-                        endOffset = offset;
-                        endContainer = container;
-
-                    }
-                }
-            }
+            cmd = ProseMirror.Commands.toggleMark(ProseMirror.MarkdownSchema.marks.strong);
             
-            if(startOffset < 0 || endOffset < 0) {
-                throw new Error('Invalid selection');
-            }
-
-            range.setStart(startContainer, startOffset);
-            range.setEnd(endContainer, endOffset);
-
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-
-        return selection;
-    }
-
-    /**
-     * Gets all ranges of the selection
-     *
-     * @return {Array} Ranges
-     */
-    getSelectionRanges() {
-        let selection = this.getSelection();
-        let totalRange = selection.getRangeAt(0);
-        let container = totalRange.commonAncestorContainer;
-        let ranges = [];
-
-        // This is a single node selection
-        if(container.childNodes.length < 1) {
-            ranges.push(totalRange);
-
-        // This is a multiple node selection
         } else {
-            let walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
-            let nodes = [];
+            cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.strong);
 
-            while(walker.nextNode()) {
-                let node = walker.currentNode;
-                
-                if(selection.containsNode(node)) {
-                    nodes.push(node);
-                }
-            }
-
-            for(let i = 0; i < nodes.length; i++) {
-                let node = nodes[i];
-                let range = document.createRange();
-
-                // First range, use start offset and fill to end
-                if(i < 1) {
-                    range.setStart(node, totalRange.startOffset);
-                    range.setEnd(node, node.length);
-
-                // Ranges in the middle, fill both start and end
-                } else if(i < nodes.length - 1) {
-                    range.setStart(node, 0);
-                    range.setEnd(node, node.length);
-
-                // Last range, fill to start and use end offset
-                } else {
-                    range.setStart(node, 0);
-                    range.setEnd(node, totalRange.endOffset);
-                
-                }
-
-                ranges.push(range);
-            }
         }
-
-        return ranges;
-    }
-
-    /**
-     * Sets the style of the selection element
-     *
-     * @param {Function} callback
-     */
-    modifySelection(callback) {
-        let ranges = this.getSelectionRanges();
-
-        for(let range of ranges) {
-            let node = range.startContainer;
-            let element = range.commonAncestorContainer;
-
-            while(element instanceof Text) {
-                element = element.parentElement;
-            }
-
-            if(
-                element === this.namedElements.editor ||
-                element === this.namedElements.preview
-            ) {
-                element = null;
-            }
-
-            callback(range, node, element);
-        }
+            
+        cmd(this.editor.state, this.editor.dispatch);
     }
     
     /**
-     * Removes an element while keeping its children
-     *
-     * @param {HTMLElement} element
+     * Event: Click italic
      */
-    removeParentElement(element) {
-        if(!element) { return; }
+    onClickItalic() {
+        let cmd = null;
 
-        while(element.firstChild) {
-            element.parentElement.insertBefore(element.firstChild, element);
-        }
-
-        element.parentElement.removeChild(element);
-    }
-
-    /**
-     * Changes the tag of an element
-     *
-     * @param {HTMLElement} element
-     * @param {String} tagName
-     *
-     * @return {HTMLElement} New element
-     */
-    setElementTag(element, tagName) {
-        let oldTag = element.tagName.toLowerCase();
-        let newTag = tagName.toLowerCase();
+        if(this.isMarkdown) {
+            cmd = ProseMirror.Commands.toggleMark(ProseMirror.MarkdownSchema.marks.em);
             
-        if(oldTag === newTag) { return element; }
-        
-        let newElement = document.createElement(newTag);
-
-        while(element.firstChild) {
-            newElement.appendChild(element.firstChild);
-        }
-
-        for(let i = element.attributes.length - 1; i >= 0; --i) {
-            newElement.attributes.setNamedItem(element.attributes[i].cloneNode());
-        }
-
-        element.parentNode.replaceChild(newElement, element);
-
-        return newElement;
-    }
-
-    /**
-     * Event: Change style
-     *
-     * @param {String} property
-     * @param {String} value
-     */
-    onChangeStyle(property, value) {
-        this.modifySelection((range, node, element) => {
-            if(!element) {
-                element = document.createElement('span');
-
-                range.surroundContents(element);
-            }
-
-            element.style[property] = value;
-        });
-        
-        this.onChange();
-    }
-
-    /**
-     * Event: Toggle style
-     */
-    onToggleStyle(property, value) {
-        this.modifySelection((range, node, element) => {
-            if(!element || element.tagName.toLowerCase() !== 'span') {
-                element = document.createElement('span');
-
-                range.surroundContents(element);
-            }
-            
-            if(element.style[property] !== value) {
-                element.style[property] = value;
-            } else {
-                element.style[property] = null;
-            }
-        });
-        
-        this.onChange();
-    }
-
-    /**
-     * Event: Toggle list
-     */
-    onToggleList(newTagName) {
-        let parentElement = null;
-        let items = {};
-        
-        this.modifySelection((range, node, element) => {
-            if(
-                !element ||
-                (
-                    element.tagName.toLowerCase() !== 'p' &&
-                    element.tagName.toLowerCase() !== 'li'
-                )
-            ) { return; }
-           
-            parentElement = element.parentElement;
-
-            items[element.textContent] = element;
-        });
-
-        items = Object.values(items);
-
-        if(items.length < 1) { return; }
-
-        let oldTagName = parentElement ? parentElement.tagName.toLowerCase() : '';
-           
-        console.log(parentElement, items);
-
-        // Clear list
-        if(oldTagName === newTagName) {
-            while(parentElement.firstChild) {
-                let item = parentElement.firstChild;
-                
-                if(item instanceof HTMLElement === false) {
-                    parentElement.removeChild(item);
-
-                } else {
-                    parentElement.parentElement.insertBefore(item, parentElement);
-
-                    this.setElementTag(item, 'p');
-
-                }
-            }
-
-            parentElement.parentElement.removeChild(parentElement);
-        
-        // Change list
-        } else if(oldTagName === 'ul' || oldTagName === 'ol') {
-            parentElement = this.setElementTag(parentElement, newTagName);
-        
-            for(let item of items) {
-                if(item instanceof HTMLElement === false) {
-                    parentElement.removeChild(item);
-
-                } else {
-                    parentElement.appendChild(item);
-
-                    this.setElementTag(item, 'li');
-                
-                }
-            }
-        
-        // Create list
         } else {
-            let newParentElement = document.createElement(newTagName);
+            cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.em);
 
-            parentElement.insertBefore(newParentElement, items[0]);
-
-            for(let item of items) {
-                if(item instanceof HTMLElement === false) {
-                    parentElement.removeChild(item);
-
-                } else {
-                    newParentElement.appendChild(item);
-
-                    this.setElementTag(item, 'li');
-
-                }
-            }
         }
-        
-        this.onChange();
-    }
-
-    /**
-     * Event: Change element
-     */
-    onChangeElement(tagName) {
-        this.modifySelection((range, node, element) => {
-            if(!element) {
-                element = document.createElement(tagName);
-
-                range.surroundContents(element);
             
-            } else {
-                this.setElementTag(element, tagName);
-            
-            }
-        });
-        
-        this.onChange();
-    }
-    
-    /**
-     * Event: Toggle element
-     */
-    onToggleElement(tagName, isActive) {
-        let children = [];
-
-        this.modifySelection((range, node, element) => {
-            if(isActive === undefined) {
-                isActive = element && element.tagName.toLowerCase() === tagName;
-            }
-
-            if(isActive) {
-                this.removeParentElement(element);
-                
-            } else {
-                element = document.createElement(tagName);
-                    
-                range.surroundContents(element);
-            }
-        });
-        
-        this.onChange();
-    }
-    
-    /**
-     * Event: Toggle container element
-     */
-    onToggleContainerElement(tagName, isActive) {
-        let children = [];
-
-        this.modifySelection((range, node, element) => {
-            if(element) {
-                children.push(element);
-            } else {
-                children.push(node);
-            }
-        });
-
-        if(children.length < 1) { return; }
-
-        let container = children[0].parentElement;
-
-        // Determine toggle state
-        if(isActive === undefined) {
-            isActive = container.tagName.toLowerCase() !== tagName;
-        }
-
-        // Create container
-        if(container.tagName.toLowerCase() !== tagName && isActive) {
-            container = document.createElement(tagName);
-            children[0].parentElement.insertBefore(container, children[0]);
-
-            for(let child of children) {
-                container.appendChild(child);
-            }
-        
-        // Remove container
-        } else if(container.tagName.toLowerCase() === tagName && !isActive) {
-            while(container.firstChild) {
-                container.parentElement.insertBefore(container.firstChild, container);
-            }
-        
-            container.parentElement.removeChild(container);
-        }
-        
-        this.onChange();
+        cmd(this.editor.state, this.editor.dispatch);
     }
 
     /**
-     * Event: On remove format
+     * Event: Click ordered list
      */
-    onRemoveFormat() {
+    onClickOrderedList() {
+        
+    }
+
+    /**
+     * Event: Click remove format
+     */
+    onClickRemoveFormat() {
         let selection = this.getSelection();
         let range = selection.getRangeAt(0);
         let node = document.createTextNode(selection.toString());
@@ -681,18 +362,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
-     * Event: Toggle preview
-     */
-    onTogglePreview() {
-        this.state.isPreviewActive = !this.state.isPreviewActive;
-
-        this.render();
-    }
-
-    /**
      * Event: Create link
      */
-    onCreateLink() {
+    onClickLink() {
         let selection = this.getSelection();
         let anchorOffset = selection.anchorOffset;
         let focusOffset = selection.focusOffset;
