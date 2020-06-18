@@ -4,6 +4,7 @@ const ProseMirror = {
     EditorView: require('prosemirror-view').EditorView,
     EditorState: require('prosemirror-state').EditorState,
     DOMParser: require('prosemirror-model').DOMParser,
+    DOMSerializer: require('prosemirror-model').DOMSerializer,
     Schema: require('prosemirror-model').Schema,
     Transform: require('prosemirror-transform'),
     VisualSchema: require('prosemirror-schema-basic').schema,
@@ -79,7 +80,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Event: Value changed
      */
     onChange() {
-        let newValue = this.toValue(this.namedElements.output);
+        let newValue = this.toValue(this.getHtml());
 
         super.onChange(newValue);
     }
@@ -107,11 +108,33 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
+     * Gets the HTML value
+     *
+     * @return {String} HTML
+     */
+    getHtml() {
+        let html = '';
+       
+        if(this.isMarkdown) {
+
+        } else {
+            let serializer = ProseMirror.DOMSerializer.fromSchema(ProseMirror.VisualSchema);
+            let fragment = serializer.serializeFragment(this.editor.state.doc.content);
+
+            for(let child of fragment.children) {
+                html += child.outerHTML;
+            }
+        }
+
+        return html;
+    }
+
+    /**
      * Updates the paragraph picker and selection tag
      */
     updateParagraphTag () {
         let paragraphPicker = this.namedElements.paragraph;
-        
+       
         if(!paragraphPicker) { return; }
 
         let selection = this.editor.state.selection;
