@@ -1,20 +1,5 @@
 'use strict';
 
-const ProseMirror = {
-    EditorView: require('prosemirror-view').EditorView,
-    EditorState: require('prosemirror-state').EditorState,
-    DOMParser: require('prosemirror-model').DOMParser,
-    DOMSerializer: require('prosemirror-model').DOMSerializer,
-    Schema: require('prosemirror-model').Schema,
-    Transform: require('prosemirror-transform'),
-    VisualSchema: require('prosemirror-schema-basic').schema,
-    ListSchema: require('prosemirror-schema-list').schema,
-    MarkdownSchema: require('prosemirror-markdown').schema,
-    MarkdownSerializer: require('prosemirror-markdown').defaultMarkdownSerializer,
-    MarkdownParser: require('prosemirror-markdown').defaultMarkdownParser,
-    Commands: require('prosemirror-commands')
-}
-
 /**
  * A rich text widget
  *
@@ -29,17 +14,8 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         this.template = require('template/widget/richText'); 
 
-        this.model.toolbar = this.model.toolbar || {};
+        this.model.toolbar = this.getToolbarOptions();
         this.state.paragraphOptions = this.getParagraphOptions();
-    }
-
-    /**
-     * Structure
-     */
-    structure() {
-        super.structure();
-
-        this.def(ProseMirror.EditorView, 'editor');
     }
 
     /**
@@ -62,19 +38,14 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(this.model.disabled) {
             return this.namedElements.editor.innerHTML = this.toView(this.model.value);
         }
-        
-        let view = document.createElement('div');
-        view.innerHTML = this.toView(this.model.value);
-
-        let schema =  this.isMarkdown? ProseMirror.MarkdownSchema : ProseMirror.VisualSchema;
-        let doc = ProseMirror.DOMParser.fromSchema(schema).parse(view);
-
-        this.editor = new ProseMirror.EditorView(this.namedElements.editor, {
-            state: ProseMirror.EditorState.create({ doc: doc }),
-            handleKeyPress: () => { this.updateParagraphTag(); },
-            handleClick: () => { this.updateParagraphTag(); }
-        });
+      
+        this.initEditor();
     }
+
+    /**
+     * Initialises the editor
+     */
+    initEditor() {}
 
     /**
      * Event: Value changed
@@ -86,26 +57,11 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
-     * Gets whether we're in markdown mode
-     *
-     * @return {Boolean} Is markdown
-     */
-    get isMarkdown() {
-        return this.model.markdown === true;
-    }
-
-    /**
      * Insert HTML
      *
      * @param {String} html
      */
-    insertHtml(html) {
-        if(!html) { return; }
-
-        this.namedElements.output.innerHTML += this.toView(html);
-
-        this.onChange();
-    }
+    insertHtml(html) {}
 
     /**
      * Gets the HTML value
@@ -113,41 +69,13 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * @return {String} HTML
      */
     getHtml() {
-        let html = '';
-       
-        if(this.isMarkdown) {
-
-        } else {
-            let serializer = ProseMirror.DOMSerializer.fromSchema(ProseMirror.VisualSchema);
-            let fragment = serializer.serializeFragment(this.editor.state.doc.content);
-
-            for(let child of fragment.children) {
-                html += child.outerHTML;
-            }
-        }
-
-        return html;
+        return this.namedElements.editor.innerHTML;
     }
 
     /**
      * Updates the paragraph picker and selection tag
      */
-    updateParagraphTag () {
-        let paragraphPicker = this.namedElements.paragraph;
-       
-        if(!paragraphPicker) { return; }
-
-        let selection = this.editor.state.selection;
-        let range = selection.$from.blockRange(selection.$to);
-
-        let tagName = 'p';
-
-        if(range.$from.sameParent(range.$to) && range.$from.parent.type.name === 'heading') {
-            tagName = `h${range.$from.parent.attrs.level}`;
-        }
-
-        paragraphPicker.setValue(tagName);
-    }
+    updateParagraphTag () {}
 
     /**
      * Converts HTML to view format, replacing media references
@@ -227,199 +155,47 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      *
      * @param {String} tagName
      */
-    onChangeParagraph(tagName) {
-        let node = null;
-        let attrs = {};
-            
-        if(tagName !== 'p') {
-            attrs.level = parseInt(tagName.substring(1));
-        }
-
-        if(tagName === 'p') {
-            if(this.isMarkdown) {
-                node = ProseMirror.MarkdownSchema.nodes.paragraph;
-            } else {
-                node = ProseMirror.VisualSchema.nodes.paragraph;
-            }
-        } else {
-            if(this.isMarkdown) {
-                node = ProseMirror.MarkdownSchema.nodes.heading;
-            } else {
-                node = ProseMirror.VisualSchema.nodes.heading;
-            }
-        }
-            
-        let cmd = ProseMirror.Commands.setBlockType(node, attrs);
-            
-        cmd(this.editor.state, this.editor.dispatch);
-    }
+    onChangeParagraph(tagName) {}
 
     /**
      * Event: Click bold
      */
-    onClickBold() {
-        let cmd = null;
+    onClickBold() {} 
 
-        if(this.isMarkdown) {
-            cmd = ProseMirror.Commands.toggleMark(ProseMirror.MarkdownSchema.marks.strong);
-            console.log(ProseMirror.MarkdownSchema.marks.strong);
-            
-        } else {
-            cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.strong);
-
-        }
-            
-        cmd(this.editor.state, this.editor.dispatch);
-    }
-    
     /**
      * Event: Click italic
      */
-    onClickItalic() {
-        let cmd = null;
-
-        if(this.isMarkdown) {
-            cmd = ProseMirror.Commands.toggleMark(ProseMirror.MarkdownSchema.marks.em);
-            
-        } else {
-            cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.em);
-
-        }
-            
-        cmd(this.editor.state, this.editor.dispatch);
-    }
+    onClickItalic() {}
 
     /**
      * Event: Click quotation
      */
-    onClickQuotation() {
-        let cmd = null;
-        let selection = this.editor.state.selection;
-        let range = selection.$from.blockRange(selection.$to);
-
-        if(range.parent.type.name === 'blockquote') {
-            cmd = ProseMirror.Commands.lift;
-
-        } else if(this.isMarkdown) {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.MarkdownSchema.nodes.blockquote);
-                
-        } else {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.blockquote);
-
-        }
-            
-        cmd(this.editor.state, this.editor.dispatch);
-    }
+    onClickQuotation() {}
     
     /**
      * Event: Click code
      */
-    onClickCode() {
-        let cmd = null;
-        let selection = this.editor.state.selection;
-        let range = selection.$from.blockRange(selection.$to);
-
-        if(range.parent.type.name === 'code_block') {
-            cmd = ProseMirror.Commands.lift;
-        
-        } else if(this.isMarkdown) {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.MarkdownSchema.nodes.code_block);
-            
-        } else {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.code_block);
-
-        }
-            
-        cmd(this.editor.state, this.editor.dispatch);
-    }
+    onClickCode() {}
 
     /**
      * Event: Click ordered list
      */
-    onClickOrderedList() {
-        
-    }
+    onClickOrderedList() {}
     
     /**
      * Event: Click unordered list
      */
-    onClickUnorderedList() {
-        
-    }
+    onClickUnorderedList() {}
 
     /**
      * Event: Click remove format
      */
-    onClickRemoveFormat() {
-        let selection = this.editor.state.selection;
-        let markTypes = Object.values(ProseMirror.MarkdownSchema.marks).concat(Object.values(ProseMirror.VisualSchema.marks));
-
-        for(let markType of markTypes) {
-            let tr = this.editor.state.tr;
-            let hasMark = false;
-
-            for(let i = 0; !hasMark && i < selection.ranges.length; i++) {
-                let {$from, $to} = selection.ranges[i];
-
-                hasMark = this.editor.state.doc.rangeHasMark($from.pos, $to.pos, markType);
-            }
-
-            for(let i = 0; i < selection.ranges.length; i++) {
-                let {$from, $to} = selection.ranges[i];
-
-                tr.removeMark($from.pos, $to.pos, markType);
-            }
-            
-            this.editor.dispatch(tr.scrollIntoView());
-        }
-    }
+    onClickRemoveFormat() {}
 
     /**
      * Event: Create link
      */
-    onClickLink() {
-        let selection = this.getSelection();
-        let anchorOffset = selection.anchorOffset;
-        let focusOffset = selection.focusOffset;
-        let anchorNode = selection.anchorNode;
-        let range = selection.getRangeAt(0);
-        let text = selection.toString();
-
-        if(Math.abs(anchorOffset - focusOffset) < 1) {
-            return UI.notify('Create link', 'Please select some text first');
-        }
-
-        let modal = HashBrown.Entity.View.Modal.CreateLink.new({
-            model: {
-                url: anchorNode.parentElement.getAttribute('href'),
-                newTab: false
-            }
-        });
-
-        modal.on('ok', (url, newTab) => {
-            if(!url) { return; }
-
-            selection = this.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            document.execCommand('createLink', false, url);
-
-            setTimeout(() => {
-                let a = selection.anchorNode.parentElement.querySelector('a');
-
-                if(!a) { return; }
-
-                if(newTab) {
-                    a.setAttribute('target', '_blank');
-                } else {
-                    a.removeAttribute('target');
-                }
-
-                this.onChange();
-            }, 10);
-        });
-    }
+    onClickLink() {}
 
     /**
      * Gets toolbar elements
@@ -486,6 +262,16 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         return elements;
     }
 
+    /**
+     * Gets the toolbar options
+     *
+     * @return {Object} Options
+     */
+    getToolbarOptions() {
+        if(!this.model.toolbar) { return {}; }
+    
+        return JSON.parse(JSON.stringify(this.model.toolbar));
+    }
 
     /**
      * Gets all paragraph options

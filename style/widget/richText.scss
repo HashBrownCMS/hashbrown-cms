@@ -1,3 +1,5 @@
+@import '../../node_modules/codemirror/lib/codemirror';
+
 .widget--rich-text {
     background-color: var(--color-default-200);
     width: 100%;
@@ -11,6 +13,10 @@
         .widget--popup {
             max-width: 14rem;
             
+            &__value:not(:hover) {
+                border-color: var(--color-default-300);
+            }
+
             &__option {
                 &::after {
                     font-size: 1rem;
@@ -30,13 +36,20 @@
         background-color: var(--color-default);
         color: var(--color-default-text);
         overflow: auto;
-        padding: var(--padding-medium);
         border-radius: var(--border-radius-small);
-        border-width: 0;
         resize: none;
+        border: 1px solid var(--color-default-300);
         flex-grow: 1;
         width: 100%;
         white-space: pre-wrap;
+
+        .ProseMirror {
+            padding: 0 1rem;
+        }
+
+        .CodeMirror {
+            height: 100%;
+        }
 
         &:focus {
             outline: none;

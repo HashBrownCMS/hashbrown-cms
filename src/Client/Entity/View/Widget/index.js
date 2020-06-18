@@ -14,5 +14,8 @@ namespace('Entity.View.Widget')
 .add(require('./Number'))
 .add(require('./Popup'))
 .add(require('./RichText'))
+.add(require('./VisualRichText'))
+.add(require('./MarkdownRichText'))
+.add(require('./HtmlRichText'))
 .add(require('./Search'))
 .add(require('./Text'));
