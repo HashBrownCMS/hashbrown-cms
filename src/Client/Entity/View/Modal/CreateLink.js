@@ -23,6 +23,13 @@ class CreateLink extends HashBrown.Entity.View.Modal.ModalBase {
             this.namedElements.input.element.focus();
         }, 500);
     }
+    
+    /**
+     * Event: Change text
+     */
+    onChangeText(newValue) {
+        this.model.text = newValue;
+    }
 
     /**
      * Event: Change URL
@@ -42,7 +49,7 @@ class CreateLink extends HashBrown.Entity.View.Modal.ModalBase {
      * Event: Click OK
      */
     onClickOK() {
-        this.trigger('ok', this.model.url, this.model.newTab);
+        this.trigger('ok', this.model.text, this.model.url, this.model.newTab);
 
         this.close();
     }

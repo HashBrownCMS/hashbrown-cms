@@ -51,7 +51,11 @@ class HtmlRichText extends HashBrown.Entity.View.Widget.RichText  {
      *
      * @param {String} html
      */
-    insertHtml(html) {}
+    insertHtml(html) {
+        html = this.toView(html);
+
+        this.editor.replaceSelection(html);
+    }
     
     /**
      * Gets the HTML value

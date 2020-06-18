@@ -37,6 +37,7 @@ class MarkdownRichText extends HashBrown.Entity.View.Widget.RichText  {
         this.editor = new CodeMirror.Editor(this.namedElements.editor, {
             value: this.toView(this.model.value),
             indentUnit: 4,
+            lineWrapping: true,
             mode: 'markdown'
         });
 
@@ -54,7 +55,13 @@ class MarkdownRichText extends HashBrown.Entity.View.Widget.RichText  {
      *
      * @param {String} html
      */
-    insertHtml(html) {}
+    insertHtml(html) {
+        html = this.toView(html);
+
+        let markdown = HashBrown.Service.MarkdownService.toMarkdown(html);
+
+        this.editor.replaceSelection(markdown);
+    }
     
     /**
      * Converts HTML to view format, replacing media references
@@ -254,74 +261,67 @@ class MarkdownRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Event: Click remove format
      */
     onClickRemoveFormat() {
-        let from = this.editor.getCursor('from').line;
-        let to = this.editor.getCursor('to').line;
-        let pattern = /\* |[0-9]+\. |> |    |\*\*|_|^=+|^-+/;
+        let patterns = {
+            '^\\*[ ]*': '',
+            '^[0-9]+\. ': '',
+            '^>[ ]': '',
+            '^    ': '',
+            '\\*\\*(.+)\\*\\*': (m, s) => { return s; },
+            '_([^_]+)_': (m, s) => { return s; },
+            '\\[(.+)\\]\\(.+\\)': (m, s) => { return s; },
+            '^=+': '',
+            '^-+': ''
+        };
+        
+        let separator = 'separator-' + Date.now();
+        let from = this.editor.getCursor('from');
+        let to = this.editor.getCursor('to');
+        let lines = this.editor.getSelection(separator).split(separator);
 
-        for(let i = from; i <= to; i++) {
-            let line = this.editor.getLine(i);
-            let tokens = this.editor.getLineTokens(i);
-           
-            for(let i = tokens.length - 1; i >= 0; i--) {
-                if(!tokens[i].string.match(pattern)) { continue; }
+        for(let i in lines) {
+            let line = lines[i];
 
-                tokens.splice(i, 1);
+            for(let pattern in patterns) {
+                let replace = patterns[pattern];
+                let regex = new RegExp(pattern, 'g');
+              
+                line = line.replace(regex, replace);
             }
-            
-            let result = '';
 
-            for(let token of tokens) {
-                result += token.string;
-            }
-
-            this.editor.replaceRange(result, { line: i, ch: 0 }, { line: i, ch: line.length }); 
+            lines[i] = line;
         }
+            
+        this.editor.replaceRange(lines.join('\n'), from, to);
     }
     
     /**
      * Event: Create link
      */
     onClickLink() {
-        let selection = this.getSelection();
-        let anchorOffset = selection.anchorOffset;
-        let focusOffset = selection.focusOffset;
-        let anchorNode = selection.anchorNode;
-        let range = selection.getRangeAt(0);
-        let text = selection.toString();
-
-        if(Math.abs(anchorOffset - focusOffset) < 1) {
+        let selection = this.editor.getSelection();
+        
+        if(!selection) {
             return UI.notify('Create link', 'Please select some text first');
         }
 
+        let from = this.editor.getCursor('from');
+        let to = this.editor.getCursor('to');
+        let match = selection.match(/\[(.*)\]\((.*)\)/);
+
         let modal = HashBrown.Entity.View.Modal.CreateLink.new({
             model: {
-                url: anchorNode.parentElement.getAttribute('href'),
-                newTab: false
+                text: match ? match[1] : selection,
+                url: match ? match[2] : '',
+                useNewTab: false
             }
         });
 
-        modal.on('ok', (url, newTab) => {
-            if(!url) { return; }
+        modal.on('ok', (text, url, newTab) => {
+            if(!text || !url) { return; }
 
-            selection = this.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            document.execCommand('createLink', false, url);
-
-            setTimeout(() => {
-                let a = selection.anchorNode.parentElement.querySelector('a');
-
-                if(!a) { return; }
-
-                if(newTab) {
-                    a.setAttribute('target', '_blank');
-                } else {
-                    a.removeAttribute('target');
-                }
-
-                this.onChange();
-            }, 10);
+            this.editor.replaceRange(`[${text}](${url})`, from, to); 
+            
+            this.onChange();
         });
     }
 }
