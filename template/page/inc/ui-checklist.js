@@ -202,7 +202,7 @@ module.exports = (_, model) => `
     <li>Rich Text
         <ul>
             <li>Value is stored in HTML form</li>
-            <li>Changing between HTML/Markdown and WYSIWYG doesn't trigger a change</li>
+            <li>Changing between tabs doesn't trigger a change</li>
             <li>Can insert Media from the MediaBrowser</li>
         </ul>
     </li>

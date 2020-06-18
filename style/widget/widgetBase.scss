@@ -65,14 +65,10 @@
             pointer-events: none;
             position: relative;
             line-height: 2rem;
-
-            &:not(.line) {
-                min-width: 2rem !important;
-                padding: 0 0.5rem;
-            }
+            margin: 0 0.5rem;
 
             &.line {
-                background-color: var(--color-default-200);
+                background-color: var(--color-default-300);
                 width: 1px;
                 height: 2rem;
             }

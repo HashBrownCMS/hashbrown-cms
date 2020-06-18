@@ -14,8 +14,8 @@ _.field({label: 'Disable markdown'},
 _.field({label: 'Disable HTML'},
     _.checkbox({tooltip: 'Hides the HTML tab if enabled', name: 'isHtmlDisabled', value: model.config.isHtmlDisabled || false, onchange: _.onChangeConfig})
 ),
-_.field({label: 'WYSIWYG'},
-    _.popup({multiple: true, options: state.wysiwygToolbarOptions, value: state.wysiwygToolbarValue, onchange: _.onChangeConfigWysiwyg})
+_.field({label: 'Toolbar'},
+    _.popup({multiple: true, options: state.toolbarOptions, value: state.toolbarValue, onchange: _.onChangeConfigToolbar})
 )
 
 ]

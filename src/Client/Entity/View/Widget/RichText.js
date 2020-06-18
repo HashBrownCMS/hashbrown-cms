@@ -5,7 +5,7 @@ const ProseMirror = {
     EditorState: require('prosemirror-state').EditorState,
     DOMParser: require('prosemirror-model').DOMParser,
     Schema: require('prosemirror-model').Schema,
-    Transform: require('prosemirror-transform').Transform,
+    Transform: require('prosemirror-transform'),
     VisualSchema: require('prosemirror-schema-basic').schema,
     ListSchema: require('prosemirror-schema-list').schema,
     MarkdownSchema: require('prosemirror-markdown').schema,
@@ -30,9 +30,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         this.model.toolbar = this.model.toolbar || {};
         this.state.paragraphOptions = this.getParagraphOptions();
-
-        this.model.value = HashBrown.Service.MarkdownService.toHtml(this.model.value);
-
     }
 
     /**
@@ -61,47 +58,28 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Post render
      */
     postrender() {
-        this.namedElements.output.innerHTML = this.toView(this.model.value);
+        if(this.model.disabled) {
+            return this.namedElements.editor.innerHTML = this.toView(this.model.value);
+        }
+        
+        let view = document.createElement('div');
+        view.innerHTML = this.toView(this.model.value);
 
-        let schema = ProseMirror.VisualSchema;
+        let schema =  this.isMarkdown? ProseMirror.MarkdownSchema : ProseMirror.VisualSchema;
+        let doc = ProseMirror.DOMParser.fromSchema(schema).parse(view);
 
         this.editor = new ProseMirror.EditorView(this.namedElements.editor, {
-            state: ProseMirror.EditorState.create({
-                doc: ProseMirror.DOMParser.fromSchema(schema).parse(this.namedElements.output)
-            })
+            state: ProseMirror.EditorState.create({ doc: doc }),
+            handleKeyPress: () => { this.updateParagraphTag(); },
+            handleClick: () => { this.updateParagraphTag(); }
         });
     }
 
     /**
-     * Event: Value changed via the input
-     */
-    onChangeInput() {
-        let newValue = this.toValue(this.isMarkdown ?
-            HashBrown.Service.MarkdownService.toHtml(this.namedElements.editor.value) :
-            this.namedElements.editor.inenrHTML
-        );
-
-        if(this.isMarkdown) {
-            this.namedElements.preview.innerHTML = this.toView(newValue, 'html');
-        }
-
-        super.onChange(newValue);
-    }
-
-    /**
-     * Event: Value changed programmatically
+     * Event: Value changed
      */
     onChange() {
-        let newValue = this.toValue(this.isMarkdown ? 
-            this.namedElements.preview.innerHTML :
-            this.namedElements.editor.innerHTML
-        );
-
-        if(this.isMarkdown) {
-            this.namedElements.editor.value = HashBrown.Service.MarkdownService.toMarkdown(this.namedElements.preview.innerHTML);
-        }
-
-        this.clearSelection();
+        let newValue = this.toValue(this.namedElements.output);
 
         super.onChange(newValue);
     }
@@ -123,11 +101,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     insertHtml(html) {
         if(!html) { return; }
 
-        if(this.isMarkdown) {
-            this.namedElements.editor.value += this.toView(html, 'markdown');
-        } else {
-            this.namedElements.editor.innerHTML += this.toView(html, 'html');
-        }
+        this.namedElements.output.innerHTML += this.toView(html);
 
         this.onChange();
     }
@@ -135,63 +109,36 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     /**
      * Updates the paragraph picker and selection tag
      */
-    updateElementTag () {
+    updateParagraphTag () {
         let paragraphPicker = this.namedElements.paragraph;
         
         if(!paragraphPicker) { return; }
 
-        let selection = this.getSelection();
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
 
-        if(!selection) { return; }
+        let tagName = 'p';
 
-        let textNode = selection.anchorNode;
-
-        if(!textNode) { return; }
-        
-        let parentElement = textNode.parentElement;
-       
-        if(!parentElement) { return; }
-        
-        let parentElementTagName = parentElement.tagName.toLowerCase();
-
-        // If a media objects is involved, use it as reference
-        if(textNode.children) {
-            for(let i = 0; i < textNode.children.length; i++) {
-                if(textNode.children[i].hasAttribute('src')) {
-                    parentElementTagName = textNode.children[i].parentElement.tagName.toLowerCase();
-                    break;
-                }
-            }
+        if(range.$from.sameParent(range.$to) && range.$from.parent.type.name === 'heading') {
+            tagName = `h${range.$from.parent.attrs.level}`;
         }
 
-        // If the parent tag is not a heading or a paragraph, default to paragraph
-        if(!paragraphPicker.hasOption(parentElementTagName)) {
-            parentElementTagName = 'p';
-        }
-
-        paragraphPicker.setValue(parentElementTagName);
+        paragraphPicker.setValue(tagName);
     }
 
     /**
      * Converts HTML to view format, replacing media references
      *
      * @param {String} html
-     * @param {String} mode
      *
      * @return {String} HTML
      */
-    toView(html, mode) {
+    toView(html) {
         if(!html) { return ''; }
 
-        html = this.replaceMediaReferences(html, (id, filename) => {
+        return this.replaceMediaReferences(html, (id, filename) => {
             return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
-        
-        if(mode === 'markdown') {
-            html = HashBrown.Service.MarkdownService.toMarkdown(html);
-        }
-
-        return html;
     }
 
     /**
@@ -204,29 +151,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     toValue(html) {
         if(!html) { return ''; }
         
-        // Replace divs with pararaphs
-        html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
-
-        // Replace media references
         return this.replaceMediaReferences(html, (id, filename) => {
             return `${this.state.mediaPath}/${id}/${filename}`;
         });
-    }
-
-    /**
-     * Converts HTML to plain text
-     *
-     * @param {String} html
-     *
-     * @return {String{ Plain text
-     */
-    toPlainText(html) {
-        if(!html) { return ''; }
-
-        let temp = document.createElement('div');
-        temp.innerHTML = html;
-
-        return temp.textContent || temp.innerText || '';
     }
 
     /**
@@ -312,6 +239,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
 
         if(this.isMarkdown) {
             cmd = ProseMirror.Commands.toggleMark(ProseMirror.MarkdownSchema.marks.strong);
+            console.log(ProseMirror.MarkdownSchema.marks.strong);
             
         } else {
             cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.strong);
@@ -339,9 +267,60 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
     }
 
     /**
+     * Event: Click quotation
+     */
+    onClickQuotation() {
+        let cmd = null;
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
+
+        if(range.parent.type.name === 'blockquote') {
+            cmd = ProseMirror.Commands.lift;
+
+        } else if(this.isMarkdown) {
+            cmd = ProseMirror.Commands.wrapIn(ProseMirror.MarkdownSchema.nodes.blockquote);
+                
+        } else {
+            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.blockquote);
+
+        }
+            
+        cmd(this.editor.state, this.editor.dispatch);
+    }
+    
+    /**
+     * Event: Click code
+     */
+    onClickCode() {
+        let cmd = null;
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
+
+        if(range.parent.type.name === 'code_block') {
+            cmd = ProseMirror.Commands.lift;
+        
+        } else if(this.isMarkdown) {
+            cmd = ProseMirror.Commands.wrapIn(ProseMirror.MarkdownSchema.nodes.code_block);
+            
+        } else {
+            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.code_block);
+
+        }
+            
+        cmd(this.editor.state, this.editor.dispatch);
+    }
+
+    /**
      * Event: Click ordered list
      */
     onClickOrderedList() {
+        
+    }
+    
+    /**
+     * Event: Click unordered list
+     */
+    onClickUnorderedList() {
         
     }
 
@@ -349,16 +328,27 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Event: Click remove format
      */
     onClickRemoveFormat() {
-        let selection = this.getSelection();
-        let range = selection.getRangeAt(0);
-        let node = document.createTextNode(selection.toString());
+        let selection = this.editor.state.selection;
+        let markTypes = Object.values(ProseMirror.MarkdownSchema.marks).concat(Object.values(ProseMirror.VisualSchema.marks));
 
-        range.deleteContents();
-        range.insertNode(node);
+        for(let markType of markTypes) {
+            let tr = this.editor.state.tr;
+            let hasMark = false;
 
-        node.parentElement.normalize();
-        
-        this.onChange();
+            for(let i = 0; !hasMark && i < selection.ranges.length; i++) {
+                let {$from, $to} = selection.ranges[i];
+
+                hasMark = this.editor.state.doc.rangeHasMark($from.pos, $to.pos, markType);
+            }
+
+            for(let i = 0; i < selection.ranges.length; i++) {
+                let {$from, $to} = selection.ranges[i];
+
+                tr.removeMark($from.pos, $to.pos, markType);
+            }
+            
+            this.editor.dispatch(tr.scrollIntoView());
+        }
     }
 
     /**
@@ -431,6 +421,13 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                     h6: 'Header 6'
                 };
                 break;
+            
+            case 'blocks':
+                elements = {
+                    quotation: 'Quotation',
+                    code: 'Code'
+                };
+                break;
 
             case 'style':
                 elements = {
@@ -460,7 +457,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 break;
             
             default:
-                throw new Error('WYSIWYG toolbar element category "' + category + '" not recognised');
+                throw new Error('Toolbar element category "' + category + '" not recognised');
         }
 
         return elements;

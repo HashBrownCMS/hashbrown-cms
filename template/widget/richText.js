@@ -6,9 +6,9 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
     !model.disabled ? [
         _.div({class: 'widget--rich-text__toolbar'},
             _.popup({name: 'paragraph', value: 'p', options: state.paragraphOptions, onchange: _.onChangeParagraph}),
-
-            _.div({class: 'widget-group__separator line'}),
             
+            _.div({class: 'widget-group__separator'}),
+
             model.toolbar.bold !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-bold', title: 'Bold', onclick: _.onClickBold})
             ] : null,
@@ -16,6 +16,15 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
                 _.button({class: 'widget widget--button default small fa fa-italic', title: 'Italic', onclick: _.onClickItalic})
             ] : null,
             
+            _.div({class: 'widget-group__separator line'}),
+           
+            model.toolbar.quotation !== false ? [
+                _.button({class: 'widget widget--button default small fa fa-quote-left', title: 'Quotation', onclick: _.onClickQuotation})
+            ] : null,
+            model.toolbar.code !== false ? [
+                _.button({class: 'widget widget--button default small fa fa-code', title: 'Code', onclick: _.onClickCode})
+            ] : null,
+
             _.div({class: 'widget-group__separator line'}),
             
             model.toolbar.orderedList !== false ? [
@@ -57,8 +66,13 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
     ] : null,
     _.div({class: 'widget--rich-text__view'},
         !model.disabled ? [
-            _.div({name: 'editor', class: 'widget--rich-text__editor'})
-        ] : null,
-        _.div({name: 'output', class: `widget--rich-text__output ${!model.disabled ? 'hidden' : ''}`}) 
+            model.markdown ? [
+                _.textarea({name: 'editor', class: 'widget--rich-text__editor'})
+            ] : [
+                _.div({name: 'editor', class: 'widget--rich-text__editor'})
+            ]
+        ] : [
+            _.div({name: 'editor', class: 'widget--rich-text__editor'}) 
+        ]
     )
 )

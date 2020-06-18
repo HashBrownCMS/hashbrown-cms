@@ -14,6 +14,16 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/richTextEditor');
         this.configTemplate = require('template/field/config/richTextEditor');
+        
+        if(this.model.config.wysiwygToolbar) {
+            this.model.config.toolbar = this.model.config.wysiwygToolbar;
+            delete this.model.config.wysiwygToolbar;
+        }
+
+        if(!this.model.config.toolbar) {
+            this.model.config.toolbar = {};
+        }
+
     }
 
     /**
@@ -36,10 +46,6 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      */
     async fetch() {
         if(this.state.name === 'config') {
-            if(!this.model.config.wysiwygToolbar) {
-                this.model.config.wysiwygToolbar = {};
-            }
-
             let toolbarOptions = {};
 
             let categories = {
@@ -62,19 +68,19 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
                 }
             }
 
-            this.state.wysiwygToolbarOptions = toolbarOptions;
+            this.state.toolbarOptions = toolbarOptions;
 
             let toolbarValue = [];
 
             for(let label in toolbarOptions) {
                 let key = toolbarOptions[label];
 
-                if(this.model.config.wysiwygToolbar && this.model.config.wysiwygToolbar[key] === false) { continue; }
+                if(this.model.config.toolbar && this.model.config.toolbar[key] === false) { continue; }
 
                 toolbarValue.push(key);
             }
 
-            this.state.wysiwygToolbarValue = toolbarValue;
+            this.state.toolbarValue = toolbarValue;
 
 
         } else {
@@ -157,13 +163,13 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
-     * Event: Change config WYSIWYG
+     * Event: Change config toolbar
      *
      * @param {Array} enabled
      */
-    onChangeConfigWysiwyg(enabled) {
-        if(!this.model.config.wysiwygToolbar) {
-            this.model.config.wysiwygToolbar = {};
+    onChangeConfigToolbar(enabled) {
+        if(!this.model.config.toolbar) {
+            this.model.config.toolbar = {};
         }
 
         let keys = [];
@@ -184,9 +190,9 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         for(let key of keys) {
             if(enabled.indexOf(key) > -1) {
-                delete this.model.config.wysiwygToolbar[key];
+                delete this.model.config.toolbar[key];
             } else {
-                this.model.config.wysiwygToolbar[key] = false;
+                this.model.config.toolbar[key] = false;
             }
         }
 

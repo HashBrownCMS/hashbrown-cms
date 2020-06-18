@@ -24,7 +24,7 @@
         display: flex;
     }
 
-    &__editor, &__output {
+    &__editor {
         min-height: var(--height-rich-text-editor);
         flex-grow: 1;
         background-color: var(--color-default);
@@ -38,10 +38,6 @@
         width: 100%;
         white-space: pre-wrap;
 
-        &.is-hidden {
-            display: none;
-        }
-
         &:focus {
             outline: none;
         }
@@ -53,11 +49,19 @@
         *[src] {
             max-width: 100%;
         }
+
+        blockquote {
+            position: relative;
+            padding: 1rem;
+            border: 1px solid var(--color-default-300);
+            background-color: var(--color-default-200);
+
+            *:first-child { margin-top: 0; }
+            *:last-child { margin-bottom: 0; }
+        }
     }
 
     &__output {
-        &.hidden {
-            display: none;
-        }
+        display: none;
     }
 }
