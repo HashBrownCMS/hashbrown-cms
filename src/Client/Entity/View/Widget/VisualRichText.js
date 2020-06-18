@@ -6,10 +6,10 @@ const ProseMirror = {
     DOMParser: require('prosemirror-model').DOMParser,
     DOMSerializer: require('prosemirror-model').DOMSerializer,
     Schema: require('prosemirror-model').Schema,
-    VisualSchema: require('prosemirror-schema-basic').schema,
-    ListSchema: require('prosemirror-schema-list').schema,
+    BasicSchema: require('prosemirror-schema-basic').schema,
+    ListSchema: require('prosemirror-schema-list'),
     Commands: require('prosemirror-commands'),
-    Keymap: require('prosemirror-keymap')
+    Keymap: require('prosemirror-keymap').keymap
 }
 
 /**
@@ -24,6 +24,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
     structure() {
         super.structure();
 
+        this.def(ProseMirror.Schema, 'schema');
         this.def(ProseMirror.EditorView, 'editor');
     }
 
@@ -34,16 +35,25 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
         let view = document.createElement('div');
         view.innerHTML = this.toView(this.model.value);
 
-        let doc = ProseMirror.DOMParser.fromSchema(ProseMirror.VisualSchema).parse(view);
-    
+        this.schema = new ProseMirror.Schema({
+            nodes: ProseMirror.ListSchema.addListNodes(ProseMirror.BasicSchema.spec.nodes, 'paragraph block*', 'block'),
+            marks: ProseMirror.BasicSchema.spec.marks
+        });
+
+        let doc = ProseMirror.DOMParser.fromSchema(this.schema).parse(view);
+        let keymap = ProseMirror.Keymap(ProseMirror.Commands.baseKeymap);
+        let listKeymap = ProseMirror.Keymap({
+            'Enter': ProseMirror.ListSchema.splitListItem(this.schema.nodes.list_item)
+        });
+
         this.editor = new ProseMirror.EditorView(this.namedElements.editor, {
-            state: ProseMirror.EditorState.create({ doc: doc }),
+            state: ProseMirror.EditorState.create({
+                doc: doc,
+                plugins: [ keymap, listKeymap ]
+            }),
             handleKeyPress: () => { this.updateParagraphTag(); },
             handleClick: () => { this.updateParagraphTag(); },
             handleTextInput: () => { this.onChange(); },
-            plugins: [
-                ProseMirror.Keymap.keymap(ProseMirror.Commands.baseKeymap) 
-            ]
         });
     }
     
@@ -62,7 +72,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
     getHtml() {
         let html = '';
        
-        let serializer = ProseMirror.DOMSerializer.fromSchema(ProseMirror.VisualSchema);
+        let serializer = ProseMirror.DOMSerializer.fromSchema(this.schema);
         let fragment = serializer.serializeFragment(this.editor.state.doc.content);
 
         for(let child of fragment.children) {
@@ -106,9 +116,9 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
         }
 
         if(tagName === 'p') {
-            node = ProseMirror.VisualSchema.nodes.paragraph;
+            node = this.schema.nodes.paragraph;
         } else {
-            node = ProseMirror.VisualSchema.nodes.heading;
+            node = this.schema.nodes.heading;
         }
             
         let cmd = ProseMirror.Commands.setBlockType(node, attrs);
@@ -122,7 +132,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Event: Click bold
      */
     onClickBold() {
-        let cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.strong);
+        let cmd = ProseMirror.Commands.toggleMark(this.schema.marks.strong);
             
         cmd(this.editor.state, this.editor.dispatch);
 
@@ -133,7 +143,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Event: Click italic
      */
     onClickItalic() {
-        let cmd = ProseMirror.Commands.toggleMark(ProseMirror.VisualSchema.marks.em);
+        let cmd = ProseMirror.Commands.toggleMark(this.schema.marks.em);
 
         cmd(this.editor.state, this.editor.dispatch);
 
@@ -152,7 +162,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
             cmd = ProseMirror.Commands.lift;
 
         } else {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.blockquote);
+            cmd = ProseMirror.Commands.wrapIn(this.schema.nodes.blockquote);
 
         }
             
@@ -173,7 +183,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
             cmd = ProseMirror.Commands.lift;
         
         } else {
-            cmd = ProseMirror.Commands.wrapIn(ProseMirror.VisualSchema.nodes.code_block);
+            cmd = ProseMirror.Commands.wrapIn(this.schema.nodes.code_block);
 
         }
             
@@ -186,7 +196,22 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Event: Click ordered list
      */
     onClickOrderedList() {
-        // TODO: Implement 
+        let cmd = null;
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
+       
+        if(range.parent.type.name === 'ordered_list') {
+            cmd = ProseMirror.Commands.lift;
+
+        } else if(range.parent.type.name === 'list_item') {
+            cmd = ProseMirror.ListSchema.liftListItem(this.schema.nodes.list_item);
+
+        } else {
+            cmd = ProseMirror.ListSchema.wrapInList(this.schema.nodes.ordered_list);
+
+        }
+        
+        cmd(this.editor.state, this.editor.dispatch);
 
         this.onChange();
     }
@@ -195,7 +220,22 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Event: Click unordered list
      */
     onClickUnorderedList() {
-        // TODO: Implement 
+        let cmd = null;
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
+       
+        if(range.parent.type.name === 'bullet_list') {
+            cmd = ProseMirror.Commands.lift;
+
+        } else if(range.parent.type.name === 'list_item') {
+            cmd = ProseMirror.ListSchema.liftListItem(this.schema.nodes.list_item);
+
+        } else {
+            cmd = ProseMirror.ListSchema.wrapInList(this.schema.nodes.bullet_list);
+
+        }
+        
+        cmd(this.editor.state, this.editor.dispatch);
 
         this.onChange();
     }
@@ -205,7 +245,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      */
     onClickRemoveFormat() {
         let selection = this.editor.state.selection;
-        let markTypes = Object.values(ProseMirror.VisualSchema.marks);
+        let markTypes = Object.values(this.schema.marks);
 
         for(let markType of markTypes) {
             let tr = this.editor.state.tr;

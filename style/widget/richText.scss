@@ -44,7 +44,12 @@
         white-space: pre-wrap;
 
         .ProseMirror {
-            padding: 0 1rem;
+            padding: 1rem;
+            outline: none !important;
+
+            *:first-child {
+                margin-top: 0;
+            }
         }
 
         .CodeMirror {
