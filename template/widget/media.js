@@ -9,7 +9,8 @@ _.div({class: `widget widget--media ${model.class || ''}`},
         
         ] : [
             _.div({class: 'widget--media__preview readonly' + (model.full ? ' full' : ''), title: state.title},
-                _[state.tagName]({src: state.source, controls: !model.disabled && state.tagName === 'video', class: `widget--media__preview__source ${state.tagName === 'div' ? 'fa fa-file' : ''}`})
+                _[state.tagName]({src: state.source, controls: !model.disabled && state.tagName === 'video', class: `widget--media__preview__source ${state.tagName === 'div' ? 'fa fa-file' : ''}`}),
+                _.label({class: 'widget--media__preview__name', title: state.title}, state.title),
             )
 
         ]

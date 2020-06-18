@@ -246,8 +246,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             
             case 'positioning':
                 elements = {
-                    indent: 'Indent',
-                    outdent: 'Outdent',
                     alignLeft: 'Align left',
                     center: 'Center', 
                     justify: 'Justify',

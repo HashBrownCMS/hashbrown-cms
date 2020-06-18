@@ -56,11 +56,9 @@ class MarkdownRichText extends HashBrown.Entity.View.Widget.RichText  {
      * @param {String} html
      */
     insertHtml(html) {
-        html = this.toView(html);
-
         let markdown = HashBrown.Service.MarkdownService.toMarkdown(html);
 
-        this.editor.replaceSelection(markdown);
+        this.editor.replaceSelection(markdown || html);
     }
     
     /**

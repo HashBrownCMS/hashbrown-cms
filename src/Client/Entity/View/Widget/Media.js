@@ -44,21 +44,18 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
                     params.set('t', Date.now());
                 }
 
-                if(!this.model.full || this.model.thumbnail) {
+                if(media.isImage() && (!this.model.full || this.model.thumbnail)) {
                     params.set('thumbnail', true);
                 }
 
                 this.state.source += '?' + params.toString();
                 
-                if(this.model.thumbnail) {
+                if(media.isImage()) {
                     this.state.tagName = 'img';
-
-                } else {
-                    if(media.isImage()) {
-                        this.state.tagName = 'img';
-                    } else if(media.isVideo()) {
-                        this.state.tagName = 'video';
-                    }
+                } else if(media.isVideo()) {
+                    this.state.tagName = 'video';
+                } else if(media.isAudio()) {
+                    this.state.tagName = 'audio';
                 }
 
                 this.state.title = media.filename;
