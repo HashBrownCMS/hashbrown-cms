@@ -205,7 +205,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      */
     onClickRemoveFormat() {
         let selection = this.editor.state.selection;
-        let markTypes = Object.values(ProseMirror.MarkdownSchema.marks).concat(Object.values(ProseMirror.VisualSchema.marks));
+        let markTypes = Object.values(ProseMirror.VisualSchema.marks);
 
         for(let markType of markTypes) {
             let tr = this.editor.state.tr;
