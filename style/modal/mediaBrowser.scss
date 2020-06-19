@@ -52,6 +52,10 @@
         &:hover {
             .widget--media__preview {
                 background-color: var(--color-action-500);
+
+                &__name {
+                    color: var(--color-action-text);
+                }
             }
         }
         

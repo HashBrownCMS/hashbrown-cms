@@ -35,10 +35,12 @@
             width: 100%;
             padding: 0 0.5rem;
             text-align: center;
-            line-height: 2rem;
+            line-height: 3rem;
             white-space: nowrap;
             text-overflow: ellipsis;
-            z-index: 10;
+            overflow: hidden;
+            z-index: 200;
+            pointer-events: none;
         }
 
         &:last-child {
@@ -63,12 +65,25 @@
         }
 
         &__source {
-            max-width: 100%;
-            max-height: 100%;
             display: block;
             font-size: 2rem;
             z-index: 100;
-            border-radius: var(--border-radius-small);
+            position: relative;
+
+            &::before {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        &.readonly &__source {
+            object-fit: contain;
+            object-position: center;
+            width: calc(100% - 2rem);
+            height: calc(100% - 4rem);
+            margin-top: -2rem;
         }
     }
 
