@@ -13,10 +13,12 @@ _.div({class: 'modal in'},
                 state.message,
 
             ] : [
-                _.div({class: 'widget-group'},
-                    _.div({class: 'widget widget--label'}, 'Text'),
-                    _.text({name: 'input', value: model.text, onchange: _.onChangeText})
-                ),
+                model.useText !== false ? [
+                    _.div({class: 'widget-group'},
+                        _.div({class: 'widget widget--label'}, 'Text'),
+                        _.text({name: 'input', value: model.text, onchange: _.onChangeText})
+                    )
+                ] : null,
                 _.div({class: 'widget-group'},
                     _.div({class: 'widget widget--label'}, 'URL'),
                     _.text({name: 'input', value: model.url, onchange: _.onChangeUrl}),

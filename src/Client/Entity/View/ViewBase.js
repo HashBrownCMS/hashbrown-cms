@@ -250,6 +250,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                     // Render HTML
                     case 'html':
                         return (html) => {
+                            if(!html) { return ''; }
+
                             let wrapper = document.createElement('div');
 
                             wrapper.innerHTML = html;

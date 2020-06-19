@@ -127,25 +127,23 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * @return {String} Text
      */
     getSelectionText() {
-        let node = this.editor.state.doc.cut(this.editor.state.selection.from, this.editor.state.selection.to);
-        let text = '';
+        let text = this.editor.state.doc.cut(this.editor.state.selection.from, this.editor.state.selection.to);
 
-        function recurse(n) {
-            if(n.text) {
-                text += n.text;
+        while(text && text.content) {
+            if(text.text) {
+                text = text.text;
             
-            } else if(n.content) {
-                recurse(n.content);
+            } else if(Array.isArray(text.content)) {
+                text = text.content[0];
             
-            } else if(Array.isArray(n)) {
-                for(let i in n) {
-                    recurse(n[i]);
-                }
+            } else if(text.content.content) {
+                text = text.content;
+
+            } else {
+                break;
 
             }
         }
-        
-        recurse(node);
 
         return text;
     }
@@ -322,39 +320,48 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
     onClickLink() {
         let text = this.getSelectionText();
         
+        let selection = this.editor.state.selection;
+        let range = selection.$from.blockRange(selection.$to);
+       
+        console.log(selection.$head.marks());
+        
         if(!text) {
             return UI.notify('Create link', 'Please select some text first');
         }
 
-        let selection = this.editor.state.selection;
+        return;
 
-        if(this.editor.state.doc.rangeHasMark(selection.from, selection.to, this.schema.marks.link)) {
-            let cmd = ProseMirror.Commands.toggleMark(this.schema.marks.link);
+        let modal = HashBrown.Entity.View.Modal.CreateLink.new({
+            model: {
+                text: text,
+                url: anchorNode.parentElement.getAttribute('href'),
+                newTab: false
+            }
+        });
 
-            cmd(this.editor.state, this.editor.dispatch);
-        
-        } else {
-            let modal = HashBrown.Entity.View.Modal.CreateLink.new({
-                model: {
-                    useText: false,
-                    newTab: false
+        modal.on('ok', (url, newTab) => {
+            if(!url) { return; }
+
+            selection = this.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            document.execCommand('createLink', false, url);
+
+            setTimeout(() => {
+                let a = selection.anchorNode.parentElement.querySelector('a');
+
+                if(!a) { return; }
+
+                if(newTab) {
+                    a.setAttribute('target', '_blank');
+                } else {
+                    a.removeAttribute('target');
                 }
-            });
 
-            modal.on('ok', (text, url, newTab) => {
-                if(!url) { return; }
-            
-                let attrs = {
-                    href: url,
-                    target: newTab ? '_blank' : undefined
-                };
-
-                let cmd = ProseMirror.Commands.toggleMark(this.schema.marks.link, attrs);
-           
-                cmd(this.editor.state, this.editor.dispatch);
-            });
-        
-        }
+                this.onChange();
+            }, 10);
+        });
     }
 }
 
