@@ -78,7 +78,7 @@
             }
         }
 
-        &.readonly &__source {
+        &.readonly:not(.full) &__source {
             object-fit: contain;
             object-position: center;
             width: calc(100% - 2rem);
