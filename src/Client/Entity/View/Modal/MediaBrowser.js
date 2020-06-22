@@ -3,7 +3,7 @@
 /**
  * A browser modal for Media objects
  *
- * @memberof HashBrown.Entity.Client.View.Modal
+ * @memberof HashBrown.Client.Entity.Client.View.Modal
  */
 class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
     /**

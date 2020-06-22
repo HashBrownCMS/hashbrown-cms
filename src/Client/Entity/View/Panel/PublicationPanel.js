@@ -3,7 +3,7 @@
 /**
  * A panel for publication resources
  *
- * @memberof HashBrown.Entity.View.Panel
+ * @memberof HashBrown.Client.Entity.View.Panel
  */
 class PublicationPanel extends HashBrown.Entity.View.Panel.PanelBase {
 }

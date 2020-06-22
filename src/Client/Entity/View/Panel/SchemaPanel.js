@@ -3,7 +3,7 @@
 /**
  * A panel for schema resources
  *
- * @memberof HashBrown.Entity.View.Panel
+ * @memberof HashBrown.Client.Entity.View.Panel
  */
 class SchemaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     /**

@@ -3,7 +3,7 @@
 /**
  * A search field with clear and submit buttons
  *
- * @memberof HashBrown.Entity.View.Widget
+ * @memberof HashBrown.Client.Entity.View.Widget
  */
 class Search extends HashBrown.Entity.View.Widget.WidgetBase {
     /**

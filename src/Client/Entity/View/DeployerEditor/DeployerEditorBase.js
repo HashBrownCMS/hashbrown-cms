@@ -3,7 +3,7 @@
 /**
  * The base view for deployer editors
  *
- * @memberof HashBrown.Entity.View.ProcessorEditor
+ * @memberof HashBrown.Client.Entity.View.ProcessorEditor
  */
 class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
     static get alias() { return ''; }

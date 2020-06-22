@@ -3,7 +3,7 @@
 /**
  * The base class for field views
  *
- * @memberof HashBrown.Entity.View.Field
+ * @memberof HashBrown.Client.Entity.View.Field
  */
 class FieldBase extends HashBrown.Entity.View.ViewBase {
     /**

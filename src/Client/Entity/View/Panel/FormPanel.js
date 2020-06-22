@@ -3,7 +3,7 @@
 /**
  * A panel for form resources
  *
- * @memberof HashBrown.Entity.View.Panel
+ * @memberof HashBrown.Client.Entity.View.Panel
  */
 class FormPanel extends HashBrown.Entity.View.Panel.PanelBase {
 

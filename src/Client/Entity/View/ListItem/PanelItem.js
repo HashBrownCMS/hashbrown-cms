@@ -3,7 +3,7 @@
 /**
  * A list item in a panel
  *
- * @memberof HashBrown.Entity.View.ListItem
+ * @memberof HashBrown.Client.Entity.View.ListItem
  */
 class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
     /**

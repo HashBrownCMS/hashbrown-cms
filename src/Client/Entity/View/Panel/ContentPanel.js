@@ -3,7 +3,7 @@
 /**
  * A panel for content resources
  *
- * @memberof HashBrown.Entity.View.Panel
+ * @memberof HashBrown.Client.Entity.View.Panel
  */
 class ContentPanel extends HashBrown.Entity.View.Panel.PanelBase {
     /**

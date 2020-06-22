@@ -3,7 +3,7 @@
 /**
  * A panel for media resources
  *
- * @memberof HashBrown.Entity.View.Panel
+ * @memberof HashBrown.Client.Entity.View.Panel
  */
 class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     /**
