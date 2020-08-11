@@ -105,6 +105,7 @@
 
         &__warning {
             position: relative;
+            z-index: 20;
 
             &:empty {
                 display: none;

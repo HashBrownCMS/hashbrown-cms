@@ -10,7 +10,7 @@ _.div({class: 'resource-editor resource-editor--json-editor'},
         )
     
     ] : [
-        _.text({code: true, value: JSON.stringify(model.getObject(), null, 4), class: 'resource-editor__body', name: 'body', oninput: _.onChangeJson}),
+        _.div({name: 'body', class: 'resource-editor__body resource-editor--json-editor__body'}),
         _.div({class: 'resource-editor__footer'},
             _.include(require('./inc/warning')),
             _.div({class: 'resource-editor__footer__actions'},

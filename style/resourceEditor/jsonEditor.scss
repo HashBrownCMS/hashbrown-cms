@@ -1,0 +1,10 @@
+.resource-editor--json-editor {
+    &__body {
+        padding: 0;
+
+        .CodeMirror {
+            margin-bottom: 0;
+            height: 100%;
+        }
+    }
+}

@@ -1,5 +1,10 @@
 'use strict';
 
+const CodeMirror = {
+    Editor: require('codemirror'),
+    JavaScriptMode: require('codemirror/mode/javascript/javascript')
+};
+
 /**
  * The advanced resource editor
  */
@@ -11,12 +16,42 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     get library() { return this.state.library; }
     
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(CodeMirror.Editor, 'editor');
+    }
+    
+    /**
      * Constructor
      */
     constructor(params) {
         super(params);
         
         this.template = require('template/resourceEditor/jsonEditor.js');
+    }
+
+    /**
+     * Post render
+     */
+    postrender() {
+        if(this.model.disabled) {
+            return this.namedElements.body.innerHTML = this.toView(this.model.value);
+        }
+        
+        this.editor = new CodeMirror.Editor(this.namedElements.body, {
+            value: JSON.stringify(this.model.getObject(), null, 4),
+            indentUnit: 4,
+            lineNumbers: true,
+            lineWrapping: true,
+            mode: 'javascript'
+        });
+
+        this.editor.on('change', () => {
+            this.onChangeJson();
+        });
     }
     
     /**
@@ -97,7 +132,9 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
     /**
      * Event: Change JSON
      */
-    onChangeJson(newValue) {
+    onChangeJson() {
+        let newValue = this.editor.getValue();
+
         this.state.warning = null;
         this.namedElements.save.removeAttribute('disabled');
         
@@ -124,9 +161,12 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
         this.state.warning = null;
        
         try {
-            let value = this.namedElements.body.model.value;
+            let value = this.editor.getValue();
+            this.debug(value);
 
-            this.debug(this.model);
+            this.model = this.itemType.new(JSON.parse(value));
+        
+            await super.onClickSave();    
 
         } catch(e) {
             this.state.warning = e.message;
@@ -134,11 +174,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             debug.error(e, this, true);
             
             this.renderPartial('warning');
-
-            return;
         }
-            
-        await super.onClickSave();    
     }
 }
 
