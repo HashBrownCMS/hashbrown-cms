@@ -3,6 +3,7 @@
 const ProseMirror = {
     BasicSchema: require('prosemirror-schema-basic').schema,
     Commands: require('prosemirror-commands'),
+    InputRules: require('prosemirror-inputrules'),
     DOMParser: require('prosemirror-model').DOMParser,
     DOMSerializer: require('prosemirror-model').DOMSerializer,
     EditorState: require('prosemirror-state').EditorState,
@@ -32,31 +33,96 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
      * Initialises the editor
      */
     initEditor() {
-        let nodes = ProseMirror.BasicSchema.spec.nodes;
-        nodes = ProseMirror.ListSchema.addListNodes(nodes, 'paragraph block*', 'block');
+        this.schema = this.buildSchema();
+        this.editor = this.buildEditorView();
+    }
 
-        let marks = ProseMirror.BasicSchema.spec.marks;
-
-        this.schema = new ProseMirror.Schema({ nodes: nodes, marks: marks });
-        
-        let plugins = [
-            ProseMirror.Keymap(ProseMirror.Commands.baseKeymap),
-            ProseMirror.Keymap({
-                'Enter': ProseMirror.ListSchema.splitListItem(this.schema.nodes.list_item)
-            })
-        ]
-
-        this.editor = new ProseMirror.EditorView(this.namedElements.editor, {
+    /**
+     * Builds the editor view
+     *
+     * @return {ProseMirror.EditorView} Editor view
+     */
+    buildEditorView() {
+        return new ProseMirror.EditorView(this.namedElements.editor, {
             state: ProseMirror.EditorState.create({
                 doc: this.createEditorStateDocument(),
-                plugins: plugins
+                plugins: this.buildPlugins()
             }),
             handleKeyPress: () => { this.updateParagraphTag(); },
             handleClick: () => { this.updateParagraphTag(); },
             dispatchTransaction: (tr) => { this.onDispatchTransaction(tr); },
         });
     }
-   
+
+    /**
+     * Builds the schema
+     *
+     * @return {ProseMirror.Schema} Schema
+     */
+    buildSchema() {
+        let nodes = ProseMirror.BasicSchema.spec.nodes;
+        nodes = ProseMirror.ListSchema.addListNodes(nodes, 'paragraph block*', 'block');
+
+        let marks = ProseMirror.BasicSchema.spec.marks;
+
+        return new ProseMirror.Schema({ nodes: nodes, marks: marks });
+    }
+
+    /**
+     * Builds the plugins
+     *
+     * @return {Array} Plugins
+     */
+    buildPlugins() {
+        let rules = ProseMirror.InputRules.smartQuotes.concat(ProseMirror.InputRules.ellipsis, ProseMirror.InputRules.emDash);
+
+        if(this.schema.nodes.blockquote) {
+            rules.push(ProseMirror.InputRules.wrappingInputRule(
+                /^\s*>\s$/,
+                this.schema.nodes.blockquote
+            ));
+        }
+        
+        if(this.schema.nodes.ordered_list) {
+            rules.push(ProseMirror.InputRules.wrappingInputRule(
+                /^\s*>\s$/,
+                this.schema.nodes.ordered_list,
+                (match) => { return { order: +match[1] }; },
+                (match, node) => { return node.childCount + node.attrs.order == +match[1]; }
+            ));
+        }
+      
+        if(this.schema.nodes.bullet_list) {
+            rules.push(ProseMirror.InputRules.wrappingInputRule(
+                /^\s*([-+*])\s$/,
+                this.schema.nodes.bullet_list
+            ));
+        }
+        
+        if(this.schema.nodes.code_block) {
+            rules.push(ProseMirror.InputRules.wrappingInputRule(
+                /^\s*>\s$/,
+                this.schema.nodes.code_block
+            ));
+        }
+
+        if(this.schema.nodes.heading) {
+            rules.push(ProseMirror.InputRules.wrappingInputRule(
+                new RegExp("^(#{1,6})\\s$"),
+                this.schema.nodes.heading,
+                (match) => { return { level: match[1].length }; }
+            ));
+        }
+        
+        return [
+            ProseMirror.Keymap(ProseMirror.Commands.baseKeymap),
+            ProseMirror.Keymap({
+                'Enter': ProseMirror.ListSchema.splitListItem(this.schema.nodes.list_item)
+            }),
+            ProseMirror.InputRules.inputRules({rules: rules})
+        ];
+    }
+
     /**
      * Initialises and returns a new editor state
      * 

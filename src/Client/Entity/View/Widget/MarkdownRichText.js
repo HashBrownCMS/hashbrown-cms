@@ -21,16 +21,6 @@ class MarkdownRichText extends HashBrown.Entity.View.Widget.RichText  {
     }
 
     /**
-     * Pre render
-     */
-    prerender() {
-        this.model.toolbar.alignLeft = false;
-        this.model.toolbar.center = false;
-        this.model.toolbar.justify = false;
-        this.model.toolbar.alignRight = false;
-    }
-
-    /**
      * Initialises the editor
      */
     initEditor() {

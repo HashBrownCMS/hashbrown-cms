@@ -244,15 +244,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                 };
                 break;
             
-            case 'positioning':
-                elements = {
-                    alignLeft: 'Align left',
-                    center: 'Center', 
-                    justify: 'Justify',
-                    alignRight: 'Align right'
-                };
-                break;
-            
             default:
                 throw new Error('Toolbar element category "' + category + '" not recognised');
         }

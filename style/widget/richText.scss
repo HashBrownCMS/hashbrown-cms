@@ -31,8 +31,7 @@
     }
 
     &__editor {
-        min-height: var(--height-rich-text-editor);
-        flex-grow: 1;
+        max-height: var(--height-rich-text-editor);
         background-color: var(--color-default);
         color: var(--color-default-text);
         overflow: auto;

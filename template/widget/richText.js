@@ -38,23 +38,6 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
                 _.button({class: 'widget widget--button default small fa fa-list-ul', title: 'Unordered list', onclick: _.onClickUnorderedList})
             ] : null,
 
-            model.toolbar.alignLeft !== false || model.toolbar.center !== false || model.toolbar.justify !== false || model.toolbar.alignRight !== false ? [
-                _.div({class: 'widget-group__separator line'})
-            ] : null,
-            
-            model.toolbar.alignLeft !== false ? [
-                _.button({class: 'widget widget--button default small fa fa-align-left', title: 'Left', onclick: _.onClickAlignLeft})
-            ] : null,
-            model.toolbar.center !== false ? [
-                _.button({class: 'widget widget--button default small fa fa-align-center', title: 'Center', onclick: _.onClickAlignCenter})
-            ] : null,
-            model.toolbar.justify !== false ? [
-                _.button({class: 'widget widget--button default small fa fa-align-justify', title: 'Justify', onclick: _.onClickAlignJustify})
-            ] : null,
-            model.toolbar.alignRight !== false ? [
-                _.button({class: 'widget widget--button default small fa fa-align-right', title: 'Right', onclick: () => _.onClickAlignRight})
-            ] : null,
-
             _.div({class: 'widget-group__separator line'}),
             
             _.button({class: 'widget widget--button default small fa fa-link', title: 'Create link', onclick: _.onClickLink}),
