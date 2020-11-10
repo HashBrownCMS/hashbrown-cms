@@ -6,7 +6,7 @@
     &__body {
         display: flex;
         padding: 0;
-        
+
         @include tablet {
             display: block;
         }
@@ -56,15 +56,16 @@
         height: 20rem;
         position: relative;
         border: 1px solid transparent;
+        display: flex;
 
         &:hover {
             border-color: var(--color-action-500);
         }
-        
+
         @include tablet {
             max-width: calc(100% / 2);
         }
-        
+
         @include phone {
             max-width: 100%;
         }
@@ -93,7 +94,7 @@
             color: var(--color-default-text);
             border-radius: var(--border-radius-small);
         }
-        
+
         &:hover &__name {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
