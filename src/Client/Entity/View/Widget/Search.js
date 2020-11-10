@@ -16,9 +16,11 @@ class Search extends HashBrown.Entity.View.Widget.WidgetBase {
     }
 
     /**
-     * Event: Click search
+     * Event: Submit
      */
-    onClickSearch() {
+    onSubmit(e) {
+        e.preventDefault();
+
         if(typeof this.model.onsearch === 'function') {
             this.model.onsearch(this.namedElements.input.value);
         }
