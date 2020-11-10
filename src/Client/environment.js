@@ -150,6 +150,14 @@ async function init() {
     updateCheck();
 }
 
+/**
+ * Handles key events
+ */
+function keydown(e) {
+    HashBrown.Service.EventService.trigger(e.key.toLowerCase());
+}
+
 // Register listerners
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('hashchange', handle);
+window.addEventListener('keydown', keydown);

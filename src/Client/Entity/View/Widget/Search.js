@@ -16,6 +16,22 @@ class Search extends HashBrown.Entity.View.Widget.WidgetBase {
     }
 
     /**
+     * Event: Focus
+     */
+    onFocus() {
+        HashBrown.Service.EventService.on('escape', 'search', () => {
+            this.onClickClear();
+        });
+    }
+    
+    /**
+     * Event: Blur
+     */
+    onBlur() {
+        HashBrown.Service.EventService.off('escape', 'search');
+    }
+
+    /**
      * Event: Submit
      */
     onSubmit(e) {
