@@ -2,7 +2,8 @@
     max-width: 100%;
     display: flex;
     flex-direction: column;
-    
+    height: 100%;
+
     &.small {
         width: 10rem;
     }
@@ -10,7 +11,7 @@
     &.small &__preview {
         height: 10rem;
     }
-   
+
     &__placeholder {
         @include spinner;
     }
@@ -35,7 +36,7 @@
 
         &:not(.readonly) {
             cursor: pointer;
-            
+
             &:hover {
                 border-color: var(--color-action-500);
                 background-color: var(--color-action-500);
@@ -51,6 +52,9 @@
             font-size: 2rem;
             position: relative;
             z-index: 100;
+            object-fit: contain;
+            max-height: 100%;
+            max-width: 100%;
         }
     }
 
