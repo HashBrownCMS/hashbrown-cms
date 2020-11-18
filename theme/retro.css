@@ -6,18 +6,19 @@
     --font-size-phone: 12px;
 
     /* Colour */
-    --color-action-300: #0263b9;
-    --color-action-500: #0075dc;
+    --color-action-300: #b70a2f;
+    --color-action-500: #e70d3b;
+    --color-action-600: #f66483;
     --color-action-text: #ffffff;
-    
-    --color-decor-200: black;
-    --color-decor-300: #1a1a1a;
-    --color-decor-400: #252525;
-    --color-decor-500: #383639;
-    --color-decor-600: #424242;
-    --color-decor-700: #535353;
-    --color-decor-800: #6b696c;
-    --color-decor-text: #f2f0f3;
+
+    --color-decor-200: black; 
+    --color-decor-300: #0f151a;
+    --color-decor-400: #131d23;
+    --color-decor-500: #21303b;
+    --color-decor-600: #283b48;
+    --color-decor-700: #2c404f;
+    --color-decor-800: #375062;
+    --color-decor-text: #ffffff;
 
     --color-warn-500: #FFB300;
     --color-warn-300: #FFB300;
