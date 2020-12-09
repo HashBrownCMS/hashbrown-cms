@@ -4,7 +4,7 @@ module.exports = (_, model, state) =>
 
 _.div({class: 'list-item--project'},
     _.div({class: 'list-item--project__body'},
-        _.if(HashBrown.Client.context.user.isAdmin,
+        HashBrown.Client.context.user.isAdmin ? [
             _.popup({
                 icon: 'ellipsis-v',
                 role: 'item-menu',
@@ -15,7 +15,7 @@ _.div({class: 'list-item--project'},
                     'Delete': _.onClickRemove
                 }
             })
-        ),
+        ] : null,
         _.div({class: 'list-item--project__info'},
             _.h3({class: 'list-item--project__info__name'}, model.getName()),
             _.p(model.users.length + ' user' + (model.users.length != 1 ? 's' : '')),
@@ -27,7 +27,7 @@ _.div({class: 'list-item--project'},
                     _.a({title: `Enter "${environment}" environment`, href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                         environment
                     ),
-                    _.if(HashBrown.Client.context.user.isAdmin && model.environments.length > 1,
+                    HashBrown.Client.context.user.isAdmin && model.environments.length > 1 ? [
                         _.popup({
                             icon: 'ellipsis-v',
                             role: 'item-menu',
@@ -37,15 +37,15 @@ _.div({class: 'list-item--project'},
                                 'Delete': () => _.onClickRemoveEnvironment(environment)
                             }
                         })
-                    )
+                    ] : null
                 )
             ),
-            _.if(HashBrown.Client.context.user.isAdmin,
-                _.button({onclick: _.onClickAddEnvironment, title: 'Add environment', class: 'widget widget--button dashed embedded expanded'},
+            HashBrown.Client.context.user.isAdmin ? [
+                _.button({onclick: _.onClickAddEnvironment, disabled: model.settings.sync.enabled === true, title: 'Add environment', class: 'widget widget--button dashed embedded expanded'},
                     _.span({class: 'fa fa-plus'}),
                     'Add environment'
                 )
-            )
+            ] : null
         )
     )
 )

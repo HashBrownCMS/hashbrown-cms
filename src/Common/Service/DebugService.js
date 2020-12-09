@@ -161,25 +161,18 @@ class DebugService {
      *
      * @param {String|Error} error
      * @param {Object} sender
-     * @param {Boolean} suppress
      */
-    static error(error, sender, suppress = false) {
+    static error(error, sender) {
         if(error instanceof Error !== true) {
             error = new Error(error);
         }
 
         this.onLog(sender, error.message || error.trace);
    
-        if(suppress) {
-            if(error.stack) {
-                console.log(error.stack);
-            } else {
-                console.trace();
-            }
-        
+        if(error.stack) {
+            console.log(error.stack);
         } else {
-            throw error;
-
+            console.trace();
         }
     }
 
