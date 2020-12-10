@@ -69,6 +69,7 @@
             font-size: 2rem;
             z-index: 100;
             position: relative;
+            max-width: 100%;
 
             &::before {
                 position: absolute;

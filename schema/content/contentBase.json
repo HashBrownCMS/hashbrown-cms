@@ -1,7 +1,7 @@
 {
-    "customIcon": "cogs",
+    "customIcon": "cubes",
     "allowedAtRoot": false,
-    "name": "Content Base",
+    "name": "Content",
     "tabs": {
         "content": "Content"
     },
