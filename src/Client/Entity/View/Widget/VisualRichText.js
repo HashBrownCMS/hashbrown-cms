@@ -146,7 +146,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
         let state = this.editor.state
         state.doc = this.createEditorStateDocument();
         
-        ths.editor.updateState(state);
+        this.editor.updateState(state);
     }
     
     /**
