@@ -31,7 +31,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                 _.button({disabled: model.isLocked, class: `widget widget--button small fa fa-${model.icon || ''}`, onclick: _.onClickChangeIcon})
             ),
             _.field({label: 'Parent'},
-                _.popup({disabled: model.isLocked, value: model.parentId, options: state.parentSchemaOptions, onchange: _.onChangeParentSchemaId})
+                _.popup({disabled: model.isLocked, value: model.parentId, autocomplete: true, options: state.parentSchemaOptions, onchange: _.onChangeParentId})
             ),
             model instanceof HashBrown.Entity.Resource.ContentSchema ? [
                 _.field({label: 'Allowed at root'},

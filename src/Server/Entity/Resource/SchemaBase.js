@@ -85,7 +85,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         if(!resource && !options.nativeOnly) {
             resource = await super.get(context, id, options);
         }
-        
+       
         if(!resource) { return null; }
 
         // Get parent fields, if specified

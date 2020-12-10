@@ -37,6 +37,8 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
      * Post render
      */
     postrender() {
+        if(!this.model) { return; }
+
         if(this.model.disabled) {
             return this.namedElements.body.innerHTML = this.toView(this.model.value);
         }

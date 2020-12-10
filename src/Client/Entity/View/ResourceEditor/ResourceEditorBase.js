@@ -100,6 +100,11 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         if(this.state.id) {
             this.model = await this.itemType.get(this.state.id);
 
+            if(!this.model) {
+                this.setErrorState(new Error(`Resource ${this.library}/${this.state.id} not found`));
+                return;
+            }
+
         } else {
             this.model = null;
 
@@ -276,6 +281,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         try {
             await this.model.save(this.state.saveOptions);
+
+            HashBrown.Service.EventService.trigger('resource', this.model.id);
 
             UI.notifySmall(`"${this.state.title}" saved successfully`, null, 3);
         

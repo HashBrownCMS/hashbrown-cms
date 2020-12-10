@@ -19,6 +19,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     async init() {
         this.element = this.getPlaceholder(this.scope(), this.model || {}, this.state || {});
 
+        this.element.view = this;
+
         await this.update();
 
         this.trigger('ready');
@@ -477,7 +479,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         }
 
         this.element = element;
-
+        this.element.view = this;
+            
         this.postrender();
         
         return this.element;

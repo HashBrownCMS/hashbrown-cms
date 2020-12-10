@@ -43,7 +43,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
     static error(error) {
         checkParam(error, 'error', Error, true);
         
-        debug.error(error, this, true);
+        debug.error(error, this);
 
         return UI.error(error);
     }

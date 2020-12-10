@@ -99,7 +99,10 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
 
         // Adopt old value names
         if(params.parentSchemaId) {
-            params.parentId = params.parentSchemaId;
+            if(!params.parentId) {
+                params.parentId = params.parentSchemaId;
+            }
+
             delete params.parentSchemaId;
         }
 
