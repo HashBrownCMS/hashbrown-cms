@@ -121,12 +121,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             delete model.context.config.database;
         }
 
-        model.rootUrl = HashBrown.Service.ConfigService.getSync('system').rootUrl || '';
-
-        if(model.rootUrl) {
-            model.rootUrl = '/' + model.rootUrl.split('/').filter(Boolean).join('/');
-        }
-
         let view = HashBrown.Entity.View.ViewBase.new({
             template: require(templatePath),
             model: model
