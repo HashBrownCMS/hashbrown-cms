@@ -1,6 +1,8 @@
+# Plugins
+
 How to extend HashBrown with further functionality
 
-## Folder structure
+A plugin's folder structure is like this:
 
 ```
 /plugins

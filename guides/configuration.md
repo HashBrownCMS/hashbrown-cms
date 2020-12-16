@@ -1,3 +1,5 @@
+# Configuration
+
 How to configure HashBrown for your needs
 
 ## System

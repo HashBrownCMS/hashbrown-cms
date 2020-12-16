@@ -1,4 +1,5 @@
 # HashBrown CMS
+
 A free and open-source headless CMS built with Node.js and MongoDB
 
 ![HashBrown CMS](http://hashbrowncms.org/img/screenshot.jpg)
