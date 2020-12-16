@@ -280,6 +280,8 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         }
 
         try {
+            this.state.saveOptions.id = this.state.id;
+
             await this.model.save(this.state.saveOptions);
 
             HashBrown.Service.EventService.trigger('resource', this.model.id);

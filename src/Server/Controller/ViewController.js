@@ -117,6 +117,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             model.context.user.tokens = [];
         }
 
+        // Filter out sensitive config information
         if(model.context && model.context.config) {
             delete model.context.config.database;
         }

@@ -26,12 +26,10 @@ module.exports = (_, model) => `
         
         <script>
             window.HashBrown = {};
-            HashBrown.Client = {
-                rootUrl: "${model.rootUrl}"
-            };
+            HashBrown.Client = {};
         </script>
         
-        <script src="${model.rootUrl}/js/setup.js"></script>
+        <script src="${model.context.config.system.rootUrl}/js/setup.js"></script>
     </body>
 </html>
 

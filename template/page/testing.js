@@ -46,16 +46,15 @@ module.exports = (_, model) => `
         <script>
             window.HashBrown = {};
             HashBrown.Client = {
-                rootUrl: "${model.rootUrl}",
                 context: ${JSON.stringify(model.context)},
                 themes: ${JSON.stringify(model.themes)}
             };
         </script>
         
-        <script src="${model.rootUrl}/js/service.js"></script>
-        <script src="${model.rootUrl}/js/entity.js"></script>
+        <script src="${model.context.config.system.rootUrl}/js/service.js"></script>
+        <script src="${model.context.config.system.rootUrl}/js/entity.js"></script>
         
-        <script src="${model.rootUrl}/js/test.js"></script>
+        <script src="${model.context.config.system.rootUrl}/js/test.js"></script>
     </body>
 </html> 
 

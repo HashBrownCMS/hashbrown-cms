@@ -90,9 +90,13 @@ class ConfigService {
 
         if(!data) { return {}; }
     
-        // Validate root URL
-        if(name === 'system' && data.rootUrl) {
-            data.rootUrl = '/' + data.rootUrl.split('/').filter(Boolean).join('/');
+        if(name === 'system') {
+            // Validate root URL
+            if(data.rootUrl) {
+                data.rootUrl = '/' + data.rootUrl.split('/').filter(Boolean).join('/');
+            } else {
+                data.rootUrl = '';
+            }
         }
         
         cache[name] = data;

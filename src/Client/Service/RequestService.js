@@ -34,7 +34,7 @@ class RequestService {
      */
     static async customRequest(method, url, data, headers) {
         method = method.toUpperCase();
-        url = (HashBrown.Client.rootUrl || '') + url;
+        url = (HashBrown.Client.context.config.system.rootUrl || '') + url;
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };
