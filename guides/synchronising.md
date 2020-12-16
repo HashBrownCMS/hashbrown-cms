@@ -4,7 +4,7 @@ How to synchronise two HashBrown projects
 
 If you want a project to inherit schemas, settings and content from another one, you've come to the right place.
 
-1. Create a new project by going the the dashboard and clicking "Add project", if you haven't already
+1. Create a new project by going to the dashboard (the root page) and clicking "Add project", if you haven't already
 2. Click the ellipsis (⋮) in the top right corner
 3. Click "Settings"
 4. Enter the URL of the HashBrown instance the parent project lives on in the "API URL" field
