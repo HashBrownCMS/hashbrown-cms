@@ -11,6 +11,7 @@ class Context extends HashBrown.Entity.EntityBase {
         this.def(HashBrown.Entity.User, 'user');
         this.def(HashBrown.Entity.Project, 'project');
         this.def(String, 'environment');
+        this.def(Object, 'config', {});
     }
 
     /**

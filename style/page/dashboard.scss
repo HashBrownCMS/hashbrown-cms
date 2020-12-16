@@ -124,6 +124,20 @@
             grid-gap: 1rem;
             grid-auto-rows: 1fr;
     
+            &.-single {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .list-item--project {
+                    min-width: 30rem;
+                
+                    @include phone {
+                        min-width: 100%;
+                    }
+                }
+            }
+
             @include tablet {
                 grid-template-columns: repeat(2, 1fr);
             }

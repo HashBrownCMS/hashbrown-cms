@@ -117,6 +117,10 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             model.context.user.tokens = [];
         }
 
+        if(model.context && model.context.config) {
+            delete model.context.config.database;
+        }
+
         model.rootUrl = HashBrown.Service.ConfigService.getSync('system').rootUrl || '';
 
         if(model.rootUrl) {

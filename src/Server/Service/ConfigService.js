@@ -43,7 +43,7 @@ class ConfigService {
 
         return HashBrown.Service.FileService.exists(path);
     }
-        
+    
     /**
      * Gets a particular config section
      *
@@ -51,9 +51,30 @@ class ConfigService {
      *
      * @returns {Object} Config object
      */
-    static async get(name) {
-        checkParam(name, 'name', String, true);
+    static async get(name = '') {
+        checkParam(name, 'name', String);
        
+        if(!name) {
+            let all = {};
+            let configPath = Path.join(APP_ROOT, 'config');
+            let files = await HashBrown.Service.FileService.list(configPath);
+
+            for(let file of files) {
+                if(Path.extname(file) !== '.cfg') { continue; }
+
+                let configName = Path.basename(file, '.cfg');
+
+                if(!configName) { continue; }
+
+                all[configName] = await this.get(configName);
+            }
+
+            if(!all.system) { all.system = {}; }
+            if(!all.database) { all.database = {}; }
+
+            return all;
+        }
+
         if(cache[name]) { return cache[name]; }
 
         let path = Path.join(APP_ROOT, 'config', name + '.cfg');

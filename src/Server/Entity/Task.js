@@ -24,7 +24,8 @@ class Task extends HashBrown.Entity.EntityBase {
         let context = new HashBrown.Entity.Context({
             project: await HashBrown.Entity.Project.get(this.project),
             environment: this.environment,
-            user: await HashBrown.Entity.User.get(this.user)
+            user: await HashBrown.Entity.User.get(this.user),
+            config: await HashBrown.Service.ConfigService.get()
         });
 
         return await HashBrown.Entity.Resource.Content.get(context, this.content);

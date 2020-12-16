@@ -11,7 +11,7 @@ module.exports = (_, model) => `
     <body class="page page--dashboard">
         <header class="page--dashboard__header">
             ${model.context.user.isAdmin ? `
-                <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Projects</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Project${!model.context.config.system.isSingleProject ? 's' : ''}</a>
                 <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
                 <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
             `: ''}
@@ -21,9 +21,9 @@ module.exports = (_, model) => `
             <div class="page--dashboard__body__container">
                 ${model.tab === 'projects' ? `
                     <div class="page--dashboard__projects">
-                        <div class="page--dashboard__projects__list">
+                        <div class="page--dashboard__projects__list ${model.context.config.system.isSingleProject ? '-single' : ''}">
                         
-                            ${model.context.user.isAdmin ? `
+                            ${model.context.user.isAdmin && !model.context.config.system.isSingleProject ? `
                                 <button class="page--dashboard__projects__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>Add project</button>
                             ` : ''}
                         </div>

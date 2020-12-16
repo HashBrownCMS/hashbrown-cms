@@ -184,6 +184,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
         let context = new HashBrown.Entity.Context();
 
         context.user = user;
+        context.config = await HashBrown.Service.ConfigService.get();
 
         // Validate project
         if(parameters.project) {

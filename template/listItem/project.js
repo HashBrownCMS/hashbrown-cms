@@ -25,7 +25,7 @@ _.div({class: 'list-item--project'},
             _.each(model.environments, (i, environment) =>
                 _.div({class: 'list-item--project__environment'},
                     _.a({title: `Enter "${environment}" environment`, href: '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
-                        environment
+                        HashBrown.Client.context.config.system.isSingleEnvironment ? 'cms' : environment
                     ),
                     HashBrown.Client.context.user.isAdmin && model.environments.length > 1 ? [
                         _.popup({
@@ -40,7 +40,7 @@ _.div({class: 'list-item--project'},
                     ] : null
                 )
             ),
-            HashBrown.Client.context.user.isAdmin ? [
+            HashBrown.Client.context.user.isAdmin && !HashBrown.Client.context.config.system.isSingleEnvironment ? [
                 _.button({onclick: _.onClickAddEnvironment, disabled: model.settings.sync.enabled === true, title: 'Add environment', class: 'widget widget--button dashed embedded expanded'},
                     _.span({class: 'fa fa-plus'}),
                     'Add environment'

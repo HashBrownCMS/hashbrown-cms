@@ -12,7 +12,20 @@ class Project extends require('Common/Entity/Project') {
      * @return {Array} Project ids
      */
     static async listIds() {
-        return await HashBrown.Service.DatabaseService.listDatabases();
+        let ids = await HashBrown.Service.DatabaseService.listDatabases();
+        let config = await HashBrown.Service.ConfigService.get('system');
+
+        if(config.isSingleProject) {
+            let id = ids.shift();
+
+            if(!id) {
+                id = this.createId();
+            }
+
+            return [ id ];
+        }
+
+        return ids;
     }
 
     /**
@@ -285,10 +298,10 @@ class Project extends require('Common/Entity/Project') {
                 delete remoteSettings.name;
                 delete remoteSettings.sync;
 
-                // Merge remote settings with local ones, respecting overrides
+                // Merge remote settings with local ones, respecting local overrides
                 for(let key in remoteSettings) {
                     if(settings[key] && Object.keys(settings[key]).length > 0) { continue; }
-                    
+
                     settings[key] = remoteSettings[key];
                 }
             }
@@ -542,6 +555,10 @@ class Project extends require('Common/Entity/Project') {
      * @return {Array} Environment names
      */
     async getEnvironments() {
+        let config = await HashBrown.Service.ConfigService.get('system');
+
+        if(config.isSingleEnvironment) { return [ 'live' ]; }
+
         let sync = await this.getSyncSettings();
 
         if(sync) {

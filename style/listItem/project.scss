@@ -27,7 +27,10 @@
 
     &__environment {
         position: relative;
-        margin-bottom: 1rem;
+
+        &:not(:last-child) {
+            margin-bottom: 1rem;
+        }
     }
 
     .widget--popup[role="item-menu"] {
