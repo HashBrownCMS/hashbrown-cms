@@ -35,7 +35,7 @@ class UserController extends HashBrown.Controller.ApiController {
     }    
     
     /**
-     * @example POST /api/user/login
+     * @example POST /api/user/login { username, password }
      *
      * @apiGroup User
      *
