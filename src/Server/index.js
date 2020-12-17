@@ -62,6 +62,13 @@ async function serve(request, response) {
     checkParam(request, 'request', HashBrown.Http.Request, true);
     checkParam(response, 'response', HashBrown.Http.Response, true);
 
+    // Filter out custom root URL if set
+    let system = await HashBrown.Service.ConfigService.get('system');
+
+    if(system.rootUrl) {
+        request.url = request.url.replace(system.rootUrl, '');
+    }
+
     state.request = request;
     state.response = response;
 

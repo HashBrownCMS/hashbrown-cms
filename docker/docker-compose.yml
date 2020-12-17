@@ -20,7 +20,6 @@ services:
             - NODE_PORT=${NODE_PORT:-8080}
         volumes:
             - "../:/opt/hashbrown-cms"
-            - "./remote:/remote"
 
     mongodb:
         image: mongo

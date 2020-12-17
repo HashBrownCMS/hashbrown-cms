@@ -63,12 +63,20 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      */
     static async handle(request) {
         checkParam(request, 'request', HashBrown.Http.Request, true);
-       
+      
         if(this.getUrl(request).pathname.indexOf('/setup') !== 0) {
             let users = await HashBrown.Entity.User.list();
+            let context = await this.getContext(request);
+            let url = Path.join(context.config.system.rootUrl, 'setup');
 
             if(!users || users.length < 1) {
-                return new HashBrown.Http.Response('Redirecting to setup...', 302, { 'Location': '/setup' });
+                return new HashBrown.Http.Response(
+                    `Redirecting to ${url}...`,
+                    302,
+                    {
+                        'Location': url
+                    }
+                );
             }
         }
 
@@ -79,18 +87,20 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Handles an error
      *
      * @param {Error} error
+     * @param {HashBrown.Entity.Context} context
      *
      * @return {HashBrown.Http.Response} Response
      */
-    static error(error) {
+    static error(error, context) {
         checkParam(error, 'error', Error, true);
+        checkParam(context, 'context', HashBrown.Entity.Context, true);
         
         switch(error.code) {
             default:
-                return this.render('error', { message: error.message }, error.code || 500);
+                return this.render('error', { message: error.message, context: context }, error.code || 500);
             
             case 401:
-                return this.render('login', { message: error.message });
+                return this.render('login', { message: error.message, context: context });
         }
     }
 
@@ -137,7 +147,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         return this.render(
             'error',
             {
-                message: 'Your browser is out-of-date. Please upgrade to a more recent version.'
+                message: 'Your browser is out-of-date. Please upgrade to a more recent version.',
+                context: context
             },
             400
         );
@@ -157,7 +168,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      * Login
      */
     static async login(request, params, body, query, context) {
-        return this.render('login');
+        return this.render('login', { context: context });
     }
     
     /**
@@ -176,18 +187,19 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             
             let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
             let token = await HashBrown.Entity.User.login(username, password);
-            
+            let url = Path.join(context.config.system.rootUrl, 'dashboard');
+
             return new HashBrown.Http.Response(
-                'Redirecting to dashboard...',
+                `Redirecting to ${url}...`,
                 302,
                 {
-                    'Location': '/dashboard',
+                    'Location': url,
                     'Set-Cookie': `token=${token}; path=/;`
                 }
             );
 
         } else {
-            return this.render('setup');
+            return this.render('setup', { context: context });
         
         }
     }
@@ -223,13 +235,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             context: context,
             tab: params.tab
         });
-    }
-
-    /**
-     * Demo
-     */
-    static async demo(request, params, body, query, context) {
-        return this.render('demo', { title: 'Demo | HashBrown CMS' });
     }
 
     /**

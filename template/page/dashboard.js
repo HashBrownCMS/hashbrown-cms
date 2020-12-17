@@ -11,9 +11,9 @@ module.exports = (_, model) => `
     <body class="page page--dashboard">
         <header class="page--dashboard__header">
             ${model.context.user.isAdmin ? `
-                <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="/dashboard/projects">Project${!model.context.config.system.isSingleProject ? 's' : ''}</a>
-                <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="/dashboard/users">Users</a>
-                <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="/dashboard/server">Server</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'projects' ? 'active' : ''}" href="${model.context.config.system.rootUrl}/dashboard/projects">Project${!model.context.config.system.isSingleProject ? 's' : ''}</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'users' ? 'active' : ''}" href="${model.context.config.system.rootUrl}/dashboard/users">Users</a>
+                <a class="page--dashboard__header__tab ${model.tab === 'server' ? 'active' : ''}" href="${model.context.config.system.rootUrl}/dashboard/server">Server</a>
             `: ''}
         </header>
 

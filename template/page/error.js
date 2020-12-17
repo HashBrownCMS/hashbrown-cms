@@ -15,7 +15,7 @@ module.exports = (_, model) => `
             ${model.message || 'An unspecified error occurred'}
         </div>
 
-        <a class="widget widget--button" href="/">Go to dashboard</a>
+        <a class="widget widget--button" href="${model.context.config.system.rootUrl || '/'}">Go to dashboard</a>
     </body>
 </html> 
 

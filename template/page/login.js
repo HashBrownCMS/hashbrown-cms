@@ -25,7 +25,10 @@ module.exports = (_, model) => `
 
         <script>
             window.HashBrown = {};
-            HashBrown.Client = {};
+            HashBrown.Client = {
+                context: ${JSON.stringify(model.context)},
+                view: "login",
+            };
         </script>
         
         <script src="${model.context.config.system.rootUrl}/js/service.js"></script>

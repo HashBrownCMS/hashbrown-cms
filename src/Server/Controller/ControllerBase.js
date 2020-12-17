@@ -2,6 +2,7 @@
 
 const HTTP = require('http');
 const QueryString = require('querystring');
+const Path = require('path');
 
 const MAX_UPLOAD_SIZE = 20e6;
 
@@ -45,7 +46,11 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
             return response;
 
         } catch(e) {
-            return this.error(e);
+            let context = await this.getContext(request);
+            let path = this.getUrl(request).pathname;
+            let route = this.getRoute(path);
+
+            return this.error(e, context, route.parameters);
         
         }
     }
@@ -108,25 +113,6 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
 
         let path = this.getUrl(request).pathname;
         let route = this.getRoute(path);
-        
-        if(!route) {
-            throw new HashBrown.Http.Exception('Not found', 404);
-        }
-        
-        let methods = route.methods || [ 'GET' ];
-
-        if(typeof route.redirect === 'string') {
-            return new HashBrown.Http.Response(`You are being redirected to ${route.redirect}...`, 302, { 'Location': route.redirect });
-        }
-
-        if(methods.indexOf(request.method) < 0) {
-            throw new HashBrown.Http.Exception(`Route ${route.pattern} does not support the method ${request.method}`, 405);
-        }
-       
-        if(typeof route.handler !== 'function') {
-            throw new HashBrown.Http.Exception(`Handler for route ${route.pattern} is not a function`, 500);
-        }
-
         let user = null;
 
         // Authenticated user
@@ -139,8 +125,30 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
 
         }
 
-        // Read request and produce response
+        // Initialise context
         let context = await this.getContext(request, route.parameters, user);
+        
+        if(!route) {
+            throw new HashBrown.Http.Exception('Not found', 404);
+        }
+        
+        let methods = route.methods || [ 'GET' ];
+
+        if(typeof route.redirect === 'string') {
+            let url = Path.join(context.config.system.rootUrl, route.redirect);
+
+            return new HashBrown.Http.Response(`You are being redirected to ${url}...`, 302, { 'Location': url });
+        }
+
+        if(methods.indexOf(request.method) < 0) {
+            throw new HashBrown.Http.Exception(`Route ${route.pattern} does not support the method ${request.method}`, 405);
+        }
+       
+        if(typeof route.handler !== 'function') {
+            throw new HashBrown.Http.Exception(`Handler for route ${route.pattern} is not a function`, 500);
+        }
+
+        // Read request and produce response
         let requestBody = await this.getRequestBody(request);
         let requestQuery = this.getRequestQuery(request);
         let response = await route.handler.call(this, request, route.parameters, requestBody, requestQuery, context);
@@ -156,10 +164,11 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
      * Handles an error
      *
      * @param {Error} error
+     * @param {HashBrown.Entity.Context} context
      *
      * @return {HashBrown.Http.Response} Response
      */
-    static error(error) {
+    static error(error, context) {
         checkParam(error, 'error', Error, true);
         
         debug.error(error, this, true);
@@ -176,7 +185,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
      *
      * @return {HashBrown.Entity.Context} Context
      */
-    static async getContext(request, parameters, user) {
+    static async getContext(request, parameters = {}, user = null) {
         checkParam(request, 'request', HashBrown.Http.Request, true);
         checkParam(parameters, 'parameters', Object, true);
         checkParam(user, 'user', HashBrown.Entity.User);
