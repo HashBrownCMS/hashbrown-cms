@@ -484,7 +484,9 @@ class Project extends require('Common/Entity/Project') {
             );
         }
 
-        if(!settings) { return null; }
+        if(!settings) {
+            settings = {};
+        }
 
         if(section) {
             return settings[section] || {};
