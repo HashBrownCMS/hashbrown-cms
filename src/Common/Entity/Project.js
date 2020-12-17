@@ -33,7 +33,12 @@ class Project extends HashBrown.Entity.EntityBase {
 
         if(!params.settings) { params.settings = {}; }
         if(!params.settings.sync) { params.settings.sync = {}; }
-        if(!params.settings.languages || params.settings.languages.length < 1) { params.settings.languages = [ 'en' ]; }
+
+        if(params.settings.languages) {
+            params.settings.locales = params.settings.languages;
+        }
+
+        if(!params.settings.locales || params.settings.locales.length < 1) { params.settings.locales = [ 'en' ]; }
 
         if(params.settings.info && params.settings.info.name) {
             params.settings.name = params.settings.info.name;
@@ -180,18 +185,18 @@ class Project extends HashBrown.Entity.EntityBase {
     }
 
     /**
-     * Gets all languages
+     * Gets all locales
      *
-     * @return {Array} Language names
+     * @return {Array} Locale names
      */
-    async getLanguages() {
-        let languages = await this.getSettings('languages');
+    async getLocales() {
+        let locales = await this.getSettings('locales');
 
-        if(!languages || !Array.isArray(languages) || languages.length < 1) {
+        if(!locales || !Array.isArray(locales) || locales.length < 1) {
             return [ 'en' ];
         }
 
-        return languages;
+        return locales;
     }
     
     /**

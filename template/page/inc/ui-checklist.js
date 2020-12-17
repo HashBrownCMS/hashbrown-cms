@@ -26,15 +26,15 @@ module.exports = (_, model) => `
 <ul>
     <li>Name is correct</li>
     <li>Amount of users is correct</li>
-    <li>Amount of languages is correct</li>
+    <li>Amount of locales is correct</li>
 </ul>
 <h4>Info</h4>
 <ul>
     <li>Can change the project name</li>
 </ul>
-<h4>Languages</h4>
+<h4>Locales</h4>
 <ul>
-    <li>Can change languages</li>
+    <li>Can change locales</li>
 </ul>
 <h4>Backups</h4>
 <ul>
@@ -106,8 +106,8 @@ module.exports = (_, model) => `
             <li>Context sensitive information is displayed in the modal</li>
         </ul>
     </li>
-    <li>Langage selector appears, if some than one language is selected</li>
-    <li>Can change language
+    <li>Locale selector appears, if some than one locale is selected</li>
+    <li>Can change locale
         <ul>
             <li>Navbar items are updated</li>
             <li>Content currently being edited is being updated</li>
@@ -178,10 +178,10 @@ module.exports = (_, model) => `
             <li>Can pick options</li>
         </ul>
     </li>
-    <li>Language
+    <li>Locale
         <ul>
-            <li>Languages are displaying</li>
-            <li>Can pick a language</li>
+            <li>Locales are displaying</li>
+            <li>Can pick a locale</li>
         </ul>
     </li>
     <li>Media reference

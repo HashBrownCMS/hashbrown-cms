@@ -128,32 +128,32 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      * Shorthand to get property value
      *
      * @param {String} key
-     * @param {String} language
+     * @param {String} locale
      *
      * @returns {Object} value
      */
-    prop(key, language) {
-        return this.getPropertyValue(key, language);
+    prop(key, locale) {
+        return this.getPropertyValue(key, locale);
     }
 
     /**
      * Gets a property value
      *
      * @param {String} key
-     * @param {String} language
+     * @param {String} locale
      *
      * @returns {*} value
      */
-    getPropertyValue(key, language) {
+    getPropertyValue(key, locale) {
         checkParam(key, 'key', String, true);
-        checkParam(language, 'language', String);
+        checkParam(locale, 'locale', String);
         
         if(!this.properties) {
             this.properties = {};
         }
 
-        if(language && typeof this.properties[key] === 'object') {
-            return this.properties[key][language];
+        if(locale && typeof this.properties[key] === 'object') {
+            return this.properties[key][locale];
         
         } else {
             return this.properties[key];
@@ -166,15 +166,15 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
      *
      * @param {String} key
      * @param {String|Number|Object} value
-     * @param {String} language
+     * @param {String} locale
      */
-    setPropertyValue(key, value, language) {
+    setPropertyValue(key, value, locale) {
         if(!this.properties) {
             this.properties = {};
         }
 
-        if(language && typeof this.properties[key] === 'object') {
-            this.properties[key][language] = value;
+        if(locale && typeof this.properties[key] === 'object') {
+            this.properties[key][locale] = value;
         
         } else {
             this.properties[key] = value;
@@ -183,13 +183,13 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
     }
 
     /**
-     * Returns all properties in a given language
+     * Returns all properties in a given locale
      *
-     * @param {String} language
+     * @param {String} locale
      *
      * @returns {Object} properties
      */
-    getLocalizedProperties(language) {
+    getLocalizedProperties(locale) {
         // Create references
         // NOTE: We're cloning the "properties" value to avoid destroying the structure
         let localizedProperties = {};
@@ -203,13 +203,13 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
 
                 // If the value is an object type, examine it further
                 if(value && typeof value === 'object') {
-                    // If multilingual flag is set, assign value directly
-                    if(value._multilingual) {
-                        if(typeof value[language] === 'undefined') {
-                            value[language] = null;
+                    // If localized flag is set, assign value directly
+                    if(value._localized) {
+                        if(typeof value[locale] === 'undefined') {
+                            value[locale] = null;
                         }
 
-                        target[key] = value[language];
+                        target[key] = value[locale];
 
                     // If not, recurse into the object
                     } else {

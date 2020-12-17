@@ -15,13 +15,13 @@ class ResourceBrowser extends HashBrown.Entity.View.Navigation.NavigationBase {
         this.template = require('template/navigation/resourceBrowser');
 
         HashBrown.Service.EventService.on('resource', 'resourceBrowser', (id) => { this.onChangeResource(id); });
-        HashBrown.Service.EventService.on('language', 'resourceBrowser', (id) => { this.onChangeLanguage(); });
+        HashBrown.Service.EventService.on('locale', 'resourceBrowser', (id) => { this.onChangeLocale(); });
     }
     
     /**
-     * Event: Language
+     * Event: Locale changed
      */
-    async onChangeLanguage() {
+    async onChangeLocale() {
         if(!this.state.panel) { return; }
 
         await this.state.panel.update();

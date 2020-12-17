@@ -1,18 +1,18 @@
 'use strict';
 
 /**
- * A language picker
+ * A locale picker
  *
  * @memberof {HashBrown.Client.Entity.View.Field}
  */
-class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
+class LocaleEditor extends HashBrown.Entity.View.Field.FieldBase {
     /**
      * Constructor
      */
     constructor(params) {
         super(params);
 
-        this.editorTemplate = require('template/field/editor/languageEditor');
+        this.editorTemplate = require('template/field/editor/localeEditor');
     }
 
     /**
@@ -21,7 +21,7 @@ class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
     async fetch() {
         await super.fetch();
 
-        this.state.languageOptions = this.context.project.settings.languages;
+        this.state.localeOptions = this.context.project.settings.locales;
     }
     
     /**
@@ -34,4 +34,4 @@ class LanguageEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 }
 
-module.exports = LanguageEditor;
+module.exports = LocaleEditor;

@@ -10,19 +10,19 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * Compiles content as JSON
      *
      * @param {Content} content
-     * @param {String} language
+     * @param {String} locale
      *
      * @returns {Promise} Result
      */
-    async process(content, language) {
+    async process(content, locale) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
-        checkParam(language, 'language', String);
+        checkParam(locale, 'locale', String);
 
-        let properties = content.getLocalizedProperties(language);
+        let properties = content.getLocalizedProperties(locale);
         let meta = content.getMeta();
 
         if(!properties) {
-            throw new Error(`No properties for content "${content.getName()}" with language "${language}"`);
+            throw new Error(`No properties for content "${content.getName()}" with locale "${locale}"`);
         }
 
         let createdBy = await content.getCreatedBy();
@@ -45,7 +45,7 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         meta.createdBy = createdBy.getName();
         meta.updatedBy = updatedBy.getName();
-        meta.language = language;
+        meta.locale = locale;
 
         // Combine all data into one
         let data = {};

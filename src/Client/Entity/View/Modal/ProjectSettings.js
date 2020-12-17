@@ -23,10 +23,10 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
     }
 
     /**
-     * Event: Change languages
+     * Event: Change locales
      */
-    onChangeLanguages(languages) {
-        this.model.settings.languages = languages;
+    onChangeLocales(locales) {
+        this.model.settings.locales = locales;
     }
 
     /**

@@ -10,7 +10,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     constructor(params) {
         super(params);
         
-        HashBrown.Service.EventService.on('language', 'resourceEditor', (id) => { this.onChangeLanguage(); });
+        HashBrown.Service.EventService.on('locale', 'resourceEditor', (id) => { this.onChangeLocale(); });
         HashBrown.Service.EventService.on('settings', 'resourceEditor', (id) => { this.onChangeContentSettings(id); });
 
         this.template = require('template/resourceEditor/contentEditor.js');
@@ -157,9 +157,9 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     }
 
     /**
-     * Event: Language changed
+     * Event: Locale changed
      */
-    onChangeLanguage() {
+    onChangeLocale() {
         this.update(); 
     }
     

@@ -21,7 +21,6 @@ function getJsEntries() {
     // Include main codebase files
     let entry = {
         dashboard: './src/Client/dashboard.js',
-        demo: './src/Client/demo.js',
         environment: './src/Client/environment.js',
 
         utilities: './src/Common/utilities',

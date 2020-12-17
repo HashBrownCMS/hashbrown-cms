@@ -132,12 +132,12 @@ async function init() {
    
     // Set context variables
     HashBrown.Client.context = new HashBrown.Entity.Context(HashBrown.Client.context);
-    HashBrown.Client.language = localStorage.getItem('language');
+    HashBrown.Client.locale = localStorage.getItem('locale');
 
-    let languages = HashBrown.Client.context.project.settings.languages;
+    let locales = HashBrown.Client.context.project.settings.locales;
 
-    if(languages.indexOf(HashBrown.Client.language) < 0) {
-        HashBrown.Client.language = languages[0];
+    if(locales.indexOf(HashBrown.Client.locale) < 0) {
+        HashBrown.Client.locale = locales[0];
     }
 
     window.dispatchEvent(new HashChangeEvent('hashchange'));

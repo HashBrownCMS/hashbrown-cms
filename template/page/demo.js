@@ -25,7 +25,7 @@ module.exports = (_, model) => `
                         id: 'demo',
                         settings: {
                             name: 'Demo',
-                            languages: [ 'en' ],
+                            locales: [ 'en' ],
                             sync: {}
                         }
                     },

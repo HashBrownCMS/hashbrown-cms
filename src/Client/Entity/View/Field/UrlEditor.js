@@ -27,7 +27,7 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
         let url = '/';
 
         while(content) {
-            let name = content.prop('title', HashBrown.Client.language) || content.id || '';
+            let name = content.prop('title', HashBrown.Client.locale) || content.id || '';
 
             name = name.toLowerCase();
             name = name.replace(/[^a-z0-9]/g, '');
@@ -39,10 +39,10 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
             content = await HashBrown.Entity.Resource.Content.get(content.parentId);
         }
        
-        let languages = this.context.project.settings.languages;
+        let locales = this.context.project.settings.locales;
 
-        if(languages.length > 1 && HashBrown.Client.language) {
-            url = '/' + HashBrown.Client.language + url; 
+        if(locales.length > 1 && HashBrown.Client.locale) {
+            url = '/' + HashBrown.Client.locale + url; 
         }
 
         url = url.replace(/\/\//g, '/');

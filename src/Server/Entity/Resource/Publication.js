@@ -127,10 +127,10 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         
         if(!this.canDeploy()) { return; }
         
-        let languages = await this.context.project.getLanguages();
+        let locales = await this.context.project.getLocales();
 
-        for(let language of languages) {
-            let data = await this.getContent({ id: contentId, language: language });
+        for(let locale of locales) {
+            let data = await this.getContent({ id: contentId, locale: locale });
             data = data.pop();
             
             if(!data) { continue; }
@@ -145,7 +145,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
             data = Buffer.from(data, 'utf8').toString('base64');
 
-            await this.deployer.setFile(this.deployer.getPath(language, contentId + '.json'), data);
+            await this.deployer.setFile(this.deployer.getPath(locale, contentId + '.json'), data);
         }
     }
     
@@ -203,7 +203,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
                 if(!isDescendant) { continue; }
             }
            
-            let output = await this.processor.process(item, query.language || 'en');
+            let output = await this.processor.process(item, query.locale || 'en');
 
             let isMatch = this.isQueryMatch(query, output);
 

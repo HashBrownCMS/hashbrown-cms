@@ -3,16 +3,16 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'navigaton navigation--session'},
-    _.if(state.languageOptions.length > 1,
+    _.if(Object.keys(state.localeOptions).length > 1,
         _.popup({
-            tooltip: 'Language',
+            tooltip: 'Locale',
             color: 'secondary',
             role: 'navigation-menu',
             icon: 'flag',
-            label: (value) => value ? value.toUpperCase() : '',
-            value: HashBrown.Client.language,
-            options: state.languageOptions,
-            onchange: _.onChangeLanguage
+            label: (value) => value,
+            value: HashBrown.Client.locale,
+            options: state.localeOptions,
+            onchange: _.onChangeLocale
         })
     ),
     _.popup({

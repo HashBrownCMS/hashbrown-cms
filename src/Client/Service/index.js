@@ -5,7 +5,7 @@
  */
 namespace('Service')
 .add(require('./DebugService'))
-.add(require('../../Common/Service/LanguageService'))
+.add(require('../../Common/Service/LocaleService'))
 .add(require('../../Common/Service/MarkdownService'))
 .add(require('../../Common/Service/LibraryService'))
 .add(require('./RequestService'))

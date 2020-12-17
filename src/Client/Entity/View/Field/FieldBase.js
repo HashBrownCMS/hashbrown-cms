@@ -30,7 +30,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             config: config,
             description: definition.description,
             isDisabled: definition.disabled || state.isDisabled || isDisabled,
-            isMultilingual: definition.multilingual,
+            isLocalized: definition.multilingual || definition.isMultilingual || definition.localized || definition.isLocalized || false,
             label: definition.label,
             schema: schema,
             value: value
@@ -111,17 +111,17 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * Update
      */
     async update() {
-        // Multilingual sanity check
-        if(this.model.isMultilingual) {
+        // Localised sanity check
+        if(this.model.isLocalized) {
             if(!this.model.value || this.model.value.constructor !== Object) {
                 let rawValue = this.model.value;
 
                 this.model.value = {};
-                this.model.value[HashBrown.Client.language] = rawValue;
-                this.model.value['_multilingual'] = true;
+                this.model.value[HashBrown.Client.locale] = rawValue;
+                this.model.value['_localized'] = true;
             }
 
-            this.state.value = this.model.value[HashBrown.Client.language];
+            this.state.value = this.model.value[HashBrown.Client.locale];
 
         } else {
             this.state.value = this.model.value;
@@ -220,13 +220,13 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             this.trigger('change', this.model.config);
 
         } else {
-            if(this.model.isMultilingual) {
+            if(this.model.isLocalized) {
                 if(!this.model.value || this.model.value.constructor !== Object) {
                     this.model.value = {};
                 }
 
-                this.model.value[HashBrown.Client.language] = newValue;
-                this.model.value['_multilingual'] = true;
+                this.model.value[HashBrown.Client.locale] = newValue;
+                this.model.value['_localized'] = true;
 
             } else {
                 this.model.value = newValue;

@@ -12,16 +12,16 @@ class Content extends require('Common/Entity/Resource/Content') {
      * @return {String} 
      */
     getName() {
-        let name = this.getPropertyValue('title', HashBrown.Client.language);
+        let name = this.getPropertyValue('title', HashBrown.Client.locale);
 
         if(!name) {
             name = 'Untitled';
 
-            for(let language in this.properties.title) {
-                let languageTitle = this.properties.title[language];
+            for(let locale in this.properties.title) {
+                let localeTitle = this.properties.title[locale];
 
-                if(languageTitle) {
-                    name += ' - (' + language + ': ' + languageTitle + ')';
+                if(localeTitle) {
+                    name += ' - (' + locale + ': ' + localeTitle + ')';
                     break;
                 }
             }

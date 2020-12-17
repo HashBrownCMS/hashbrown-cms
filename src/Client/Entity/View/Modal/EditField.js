@@ -103,10 +103,10 @@ class EditField extends HashBrown.Entity.View.Modal.ModalBase {
     }
     
     /**
-     * Event: Change is multilingual
+     * Event: Change is localised
      */
-    onChangeIsMultilingual(newValue) {
-        this.model.definition.multilingual = newValue;
+    onChangeIsLocalized(newValue) {
+        this.model.definition.isLocalized = newValue;
 
         this.trigger('change', this.model.definition);
     }

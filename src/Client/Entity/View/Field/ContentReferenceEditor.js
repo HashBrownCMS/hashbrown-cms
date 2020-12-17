@@ -36,7 +36,7 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
             for(let content of allContent) {
                 if(this.model.config.allowedSchemas && this.model.config.allowedSchemas.indexOf(content.schemaId) < 0) { continue; }
 
-                this.state.contentOptions[content.prop('title', HashBrown.Client.language) || content.id] = content.id;
+                this.state.contentOptions[content.prop('title', HashBrown.Client.locale) || content.id] = content.id;
             }
         }
     }   

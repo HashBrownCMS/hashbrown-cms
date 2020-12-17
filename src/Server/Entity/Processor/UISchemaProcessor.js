@@ -11,11 +11,11 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      *
      * @param {*} value
      * @param {String} schemaId
-     * @param {String} language
+     * @param {String} locale
      *
      * @return {*} Value
      */
-    async check(value, schemaId, language) {
+    async check(value, schemaId, locale) {
         if(value === null || value === undefined || value === '') { return null; }
 
         if(Array.isArray(value)) {
@@ -106,7 +106,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             case 'contentReference':
                 let content = await HashBrown.Entity.Resource.Content.get(this.context, value);
                 
-                content = await this.process(content, language, [ 'url', 'description', 'image' ]);
+                content = await this.process(content, locale, [ 'url', 'description', 'image' ]);
         
                 for(let key in content) {
                     parsed[key] = content[key];
@@ -121,22 +121,22 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * Compiles content as uischema.org JSON
      *
      * @param {Content} content
-     * @param {String} language
+     * @param {String} locale
      * @param {Array} filter
      *
      * @returns {Promise} Result
      */
-    async process(content, language = 'en', filter = []) {
+    async process(content, locale = 'en', filter = []) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
-        checkParam(language, 'language', String, true);
+        checkParam(locale, 'locale', String, true);
         checkParam(filter, 'filter', Array, true);
 
         let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId);
-        let properties = content.getLocalizedProperties(language);
+        let properties = content.getLocalizedProperties(locale);
         let meta = content.getMeta();
 
         if(!properties) {
-            throw new Error(`No properties for content "${content.getName()}" with language "${language}"`);
+            throw new Error(`No properties for content "${content.getName()}" with locale "${locale}"`);
         }
 
         let createdBy = await content.getCreatedBy();
@@ -174,7 +174,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             email: updatedBy.email
         };
 
-        data.inLanguage = language;
+        data.inLanguage = locale;
 
         data.dateCreated = content.createdOn;
         data.dateModified = content.updatedOn;
@@ -183,7 +183,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         for(let key in schema.config) {
             if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
 
-            data[key] = await this.check(properties[key], schema.config[key].schemaId, language);
+            data[key] = await this.check(properties[key], schema.config[key].schemaId, locale);
         }
         
         return data;

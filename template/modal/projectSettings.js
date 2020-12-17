@@ -14,15 +14,15 @@ _.div({class: 'modal'},
                 _.input({class: 'widget widget--text', type: 'text', value: model.getName(), onchange: (e) => _.onChangeName(e.target.value)})
             ),
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'Languages'),
+                _.label({class: 'widget widget--label small'}, 'Locales'),
                 _.popup({
-                    value: model.settings.languages,
+                    value: model.settings.locales,
                     autocomplete: true,
                     clearable: true,
                     multiple: true,
                     min: 1,
-                    options: HashBrown.Service.LanguageService.getLanguageOptions(),
-                    onchange: _.onChangeLanguages
+                    options: HashBrown.Service.LocaleService.getLocaleOptions(true),
+                    onchange: _.onChangeLocales
                 })
             ),
             _.div({class: 'widget widget--separator'}, 'Sync'),

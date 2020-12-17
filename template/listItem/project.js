@@ -19,7 +19,7 @@ _.div({class: 'list-item--project'},
         _.div({class: 'list-item--project__info'},
             _.h3({class: 'list-item--project__info__name'}, model.getName()),
             _.p(model.users.length + ' user' + (model.users.length != 1 ? 's' : '')),
-            _.p(model.settings.languages.length + ' language' + (model.settings.languages.length != 1 ? 's' : '') + ' (' + model.settings.languages.join(', ') + ')')
+            _.p(model.settings.locales.length + ' locale' + (model.settings.locales.length != 1 ? 's' : '') + ' (' + model.settings.locales.join(', ') + ')')
         ),
         _.div({class: 'list-item--project__environments'},
             _.each(model.environments, (i, environment) =>

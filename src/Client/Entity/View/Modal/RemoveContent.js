@@ -22,7 +22,7 @@ class RemoveContent extends HashBrown.Entity.View.Modal.ModalBase {
         if(!this.model.contentId) { throw new Error('Missing content id'); }
 
         this.state.content = await HashBrown.Entity.Resource.Content.get(this.model.contentId);
-        this.state.title = this.state.content.prop('title', HashBrown.Client.language) || this.state.content.id;
+        this.state.title = this.state.content.prop('title', HashBrown.Client.locale) || this.state.content.id;
     }
 
     /**

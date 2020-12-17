@@ -19,25 +19,29 @@ class Session extends HashBrown.Entity.View.Navigation.NavigationBase {
      * Fetches the model data
      */
     async fetch() {
+        let allLocaleOptions = HashBrown.Service.LocaleService.getLocaleOptions(true);
+
         this.state.isDashboard = !this.context.project;
-        this.state.languageOptions = [];
+        this.state.localeOptions = {};
         
         if(this.context.project) {
-            this.state.languageOptions = this.context.project.settings.languages;
+            for(let locale of this.context.project.settings.locales) {
+                this.state.localeOptions[HashBrown.Service.LocaleService.getLocaleName(locale)] = locale;
+            }
         }
     }
 
     /**
-     * Event: Changed language
+     * Event: Changed locale
      *
-     * @param {String} newLanguage
+     * @param {String} newLocale
      */
-    async onChangeLanguage(newLanguage) {
-        localStorage.setItem('language', newLanguage);
+    async onChangeLocale(newLocale) {
+        localStorage.setItem('locale', newLocale);
         
-        HashBrown.Client.language = newLanguage;
+        HashBrown.Client.locale = newLocale;
 
-        HashBrown.Service.EventService.trigger('language');  
+        HashBrown.Service.EventService.trigger('locale');
 
         this.update();
     }
