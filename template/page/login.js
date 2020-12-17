@@ -8,7 +8,7 @@ module.exports = (_, model) => `
         ${require('./inc/head')(_, model)}
     </head>
 
-    <body class="page page--login logo centered">
+    <body class="page page--login centered">
         ${model.message ? `
             <div class="widget widget--message fixed fixed--top warn">
                 ${model.message}
