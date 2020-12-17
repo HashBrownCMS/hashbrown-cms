@@ -85,15 +85,6 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
     }
     
     /**
-     * Event: Change public URL
-     */
-    onChangePublicUrl(newValue) {
-        this.model.publicUrl = newValue;
-
-        this.trigger('change', this.model);
-    }
-    
-    /**
      * Event: Change path
      */
     onChangePath(newValue) {

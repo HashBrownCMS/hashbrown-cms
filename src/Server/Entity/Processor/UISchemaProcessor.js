@@ -99,6 +99,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
                 parsed['copyrightYear'] = media.copyrightYear;
 
+                parsed['name'] = media.filename;
                 parsed['contentUrl'] = await media.getContentUrl(true);
                 parsed['thumbnailUrl'] = await media.getThumbnailUrl(true);
                 break;

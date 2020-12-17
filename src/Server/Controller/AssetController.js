@@ -126,7 +126,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
             return new HashBrown.Http.Response('Not found', 404);
         }
             
-        let isThumbnail = ('thumbnail' in query);
+        let isThumbnail = ('thumbnail' in query) && !media.isSvg();
         let url = isThumbnail ? await media.getThumbnailUrl() : await media.getContentUrl();
         
         if(!url) {

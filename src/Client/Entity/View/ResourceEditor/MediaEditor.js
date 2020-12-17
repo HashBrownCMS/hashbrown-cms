@@ -25,7 +25,8 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
             
         if(this.state.tab === 'settings') {
             this.state.settings = {
-                mediaDeployer: await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaDeployer') || {}
+                mediaDeployer: await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaDeployer') || {},
+                mediaPublicUrl: await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaPublicUrl') || ''
             };
         }
     }
@@ -75,6 +76,13 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
         }
 
         this.state.settings.mediaDeployer = newValue;
+    }
+    
+    /**
+     * Event: Change public URL
+     */
+    onChangePublicUrl(newValue) {
+        this.state.settings.mediaPublicUrl = newValue;
     }
 
     /**

@@ -28,6 +28,47 @@ class Media extends require('Common/Entity/Resource/Media') {
     }
     
     /**
+     * Gets the public URL of a filename
+     *
+     * @param {String} filename
+     *
+     * @return {String} Public URL
+     */
+    async getPublicUrl(filename) {
+        checkParam(filename, 'filename', String);
+        
+        if(!filename) { return ''; }
+
+        filename = filename.trim();
+
+        // If the filename contains a protocol or double slashes, return it as is
+        if(filename.indexOf('http') === 0 || filename.indexOf('//') === 0) { return filename; }
+       
+        // Construct relative path
+        filename = '/' + filename.split(/[\/\\]/).filter(Boolean).join('/');
+        
+        let rootUrl = await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaPublicUrl');
+
+        if(!rootUrl) { return filename; }
+
+        try {
+            let url = new URL(rootUrl);
+
+            if(url.pathname && url.pathname !== '/') { 
+                filename = Path.join(url.pathname, filename);
+            }
+
+            filename = url.protocol + '//' + url.host + filename;
+        
+        } catch(e) {
+            throw new Error(`Could not parse the "mediaPublicUrl": ${e.message}`);
+        
+        }
+        
+        return filename;
+    }
+
+    /**
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.Context} context
@@ -73,6 +114,10 @@ class Media extends require('Common/Entity/Resource/Media') {
     async getContentUrl(ensureWebUrl = false) {
         checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
         
+        if(ensureWebUrl) {
+            return await this.getPublicUrl(this.id + '/' + this.filename);
+        }
+
         let deployer = await this.constructor.getDeployer(this.context);
 
         if(!deployer) { return null; }
@@ -83,11 +128,6 @@ class Media extends require('Common/Entity/Resource/Media') {
         
         for(let file of files) {
             if(Path.basename(file) === 'thumbnail.jpg') { continue; }
-
-            // Ensure that this URL can be reached from a web browser
-            if(ensureWebUrl) {
-                file = deployer.getPublicUrl(file);
-            }
 
             return file;
         }
