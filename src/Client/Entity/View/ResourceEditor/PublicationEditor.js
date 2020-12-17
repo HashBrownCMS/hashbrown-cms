@@ -18,7 +18,7 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
      */
     prerender() {
         if(this.model) {
-            this.state.getUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + '/api/' + this.context.project.id + '/' + this.context.environment + '/publications/' + this.model.id + '/query';
+            this.state.getUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + HashBrown.Client.context.config.system.rootUrl + '/api/' + this.context.project.id + '/' + this.context.environment + '/publications/' + this.model.id + '/query';
 
             // Processor
             this.state.processorEditor = HashBrown.Entity.View.ProcessorEditor.ProcessorEditorBase.new({ model: this.model.processor || {} });
