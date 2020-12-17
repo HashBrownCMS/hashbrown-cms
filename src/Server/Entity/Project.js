@@ -489,7 +489,7 @@ class Project extends require('Common/Entity/Project') {
         }
 
         if(section) {
-            return settings[section] || {};
+            return settings[section] || null;
         }
 
         return settings;

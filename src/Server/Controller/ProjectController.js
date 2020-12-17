@@ -290,10 +290,6 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 
         let settings = await project.getEnvironmentSettings(params.environment, params.section);
         
-        if(!settings) {
-            return new HashBrown.Http.Response('Environment not found', 404);
-        }
-
         switch(request.method) {
             case 'GET':
                 return new HashBrown.Http.Response(settings);
