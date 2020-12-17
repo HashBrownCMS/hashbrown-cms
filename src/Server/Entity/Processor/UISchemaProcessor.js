@@ -172,6 +172,9 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         // Combine all data into one
         let data = {};
+        
+        data['@type'] = schema.id;
+        data['@parentId'] = content.parentId;
 
         // TODO: Include images here?
         data.creator = {
