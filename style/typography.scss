@@ -1,21 +1,3 @@
-@font-face {
-    font-family: 'NunitoSans';
-    font-weight: 400;
-    src: url('/fonts/NunitoSans/NunitoSans-Regular.ttf');
-}
-
-@font-face {
-    font-family: 'NunitoSans';
-    font-weight: 700;
-    src: url('/fonts/NunitoSans/NunitoSans-Bold.ttf');
-}
-
-@font-face {
-    font-family: 'NunitoSans';
-    font-weight: 100;
-    src: url('/fonts/NunitoSans/NunitoSans-ExtraLight.ttf');
-}
-
 html {
     font-size: var(--font-size-desktop);
     font-family: 'NunitoSans', sans-serif;
