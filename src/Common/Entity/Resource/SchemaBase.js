@@ -257,7 +257,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
                 for(let key in definition) {
                     if(key[0] === '@') { continue; }
 
-                    struct[key] = this.getFieldFromUISchema(definition[key], i18n[key]);
+                    struct[key] = this.getFieldFromUISchema(key, definition[key], i18n[key]);
                 }
 
                 return {
