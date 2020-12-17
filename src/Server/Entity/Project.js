@@ -18,6 +18,8 @@ class Project extends require('Common/Entity/Project') {
         if(config.isSingleProject) {
             if(ids.length < 1) {
                 let project = await this.create('My project');
+
+                return [ project.id ];
             }
 
             return ids.slice(0, 1);
