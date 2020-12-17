@@ -129,7 +129,7 @@
                 align-items: center;
                 justify-content: center;
 
-                .list-item--project {
+                .list-item--project, .placeholder {
                     min-width: 30rem;
                 
                     @include phone {
