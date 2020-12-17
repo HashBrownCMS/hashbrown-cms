@@ -69,6 +69,7 @@
         flex-shrink: 0;
         line-height: var(--size-widget-small);
         margin-right: var(--padding-medium);
+        overflow: hidden;
 
         &__label {
             overflow: hidden;
