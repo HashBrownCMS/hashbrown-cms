@@ -24,7 +24,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         checkParam(params.context, 'context', HashBrown.Entity.Context, true);
         checkParam(params.context.project, 'context.project', HashBrown.Entity.Project, true);
         checkParam(params.context.environment, 'context.environment', String, true);
-        checkParam(params.context.user, 'context.user', HashBrown.Entity.User, true);
+        checkParam(params.context.user, 'context.user', HashBrown.Entity.User);
 
         super(params);
     }

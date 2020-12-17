@@ -11,11 +11,12 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      *
      * @param {*} value
      * @param {String} schemaId
+     * @param {Object} config
      * @param {String} locale
      *
      * @return {*} Value
      */
-    async check(value, schemaId, locale) {
+    async check(value, schemaId, config, locale) {
         if(value === null || value === undefined || value === '') { return null; }
 
         if(Array.isArray(value)) {
@@ -28,7 +29,22 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         if(!schema) { return value; }
 
-        if(schema.config && schema.config.struct) {
+        // Ensure config
+        if(!config) {
+            config = {};
+        }
+
+        // Merge schema config
+        if(schema.config) {
+            for(let k in schema.config) {
+                if(config[k]) { continue; }
+
+                config[key] = schema.config[k];
+            }
+        }
+
+        // This schema is a struct
+        if(config.struct) {
             schemaId = 'struct';
         }
 
@@ -48,7 +64,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                     parsed['itemListElement'].push({
                         '@type': 'ItemListElement',
                         'position': i,
-                        'item': await this.check(value[i].value, value[i].schemaId)
+                        'item': await this.check(value[i].value, value[i].schemaId, null, locale)
                     });
                 }
                 break;
@@ -57,14 +73,9 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 parsed['@type'] = 'StructuredValue';
 
                 for(let k in value) {
-                    if(
-                        !value[k] ||
-                        !schema.config.struct || 
-                        !schema.config.struct[k] ||
-                        !schema.config.struct[k].schemaId
-                    ) { continue; }
+                    if(!value[k] || !config.struct || !config.struct[k] || !config.struct[k].schemaId) { continue; }
 
-                    parsed[k] = await this.check(value[k], schema.config.struct[k].schemaId);
+                    parsed[k] = await this.check(value[k], config.struct[k].schemaId, config.struct[k].config, locale);
                 }
                 break;
 
@@ -114,7 +125,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 }
                 break;
         }
-        
+       
         return parsed;
     }
 
@@ -184,7 +195,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         for(let key in schema.config) {
             if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
 
-            data[key] = await this.check(properties[key], schema.config[key].schemaId, locale);
+            data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
         }
         
         return data;
