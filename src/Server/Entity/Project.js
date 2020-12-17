@@ -16,13 +16,11 @@ class Project extends require('Common/Entity/Project') {
         let config = await HashBrown.Service.ConfigService.get('system');
 
         if(config.isSingleProject) {
-            let id = ids.shift();
-
-            if(!id) {
-                id = this.createId();
+            if(ids.length < 1) {
+                let project = await this.create('My project');
             }
 
-            return [ id ];
+            return ids.slice(0, 1);
         }
 
         return ids;
