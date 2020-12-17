@@ -39,7 +39,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             for(let k in schema.config) {
                 if(config[k]) { continue; }
 
-                config[key] = schema.config[k];
+                config[k] = schema.config[k];
             }
         }
 
