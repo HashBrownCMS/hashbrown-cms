@@ -279,7 +279,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
                 try {
                     return JSON.parse(body);
                 } catch(e) {
-                    return {};
+                    throw new HashBrown.Http.Exception(`Submitted content is not valid JSON: ${body}`, 406);
                 }
 
             case 'application/x-www-form-urlencoded':
