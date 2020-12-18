@@ -1,6 +1,7 @@
 .field {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
 
     &:not(:last-child) {
         margin-bottom: var(--padding-medium);
@@ -44,7 +45,7 @@
         min-width: calc(var(--size-widget-small) + var(--padding-small));
 
         &:empty {
-            border-right: none;
+            display: none;
         }
     
         @include tablet {
@@ -65,10 +66,10 @@
     }
 
     &__key {
-        flex-basis: var(--width-field-key);
+        flex-basis: 100%;
         flex-shrink: 0;
         line-height: var(--size-widget-small);
-        margin-right: var(--padding-medium);
+        margin-bottom: var(--padding-small);
         overflow: hidden;
 
         &__label {
