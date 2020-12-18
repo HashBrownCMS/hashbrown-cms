@@ -17,6 +17,15 @@ class StringEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
     
     /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return true;
+    }
+    
+    /**
      * Gets the value label
      *
      * @return {String}

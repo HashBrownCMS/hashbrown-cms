@@ -16,6 +16,15 @@ class BooleanEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
     
     /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return true;
+    }
+
+    /**
      * Gets tools for this field
      *
      * @return {Array} Tools

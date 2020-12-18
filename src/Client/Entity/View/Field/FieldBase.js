@@ -142,6 +142,15 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return false;
+    }
+
+    /**
      * Gets tools for this field
      *
      * @return {Object} Tools
@@ -158,6 +167,9 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * Pre render
      */
     prerender() {
+        // Get whether this is a small field
+        this.state.isSmall = this.isSmall();
+
         // Update tools
         this.state.tools = this.getTools();
 

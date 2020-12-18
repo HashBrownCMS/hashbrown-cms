@@ -15,6 +15,15 @@ class NumberEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.editorTemplate = require('template/field/editor/numberEditor');
         this.configTemplate = require('template/field/config/numberEditor');
     }
+    
+    /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return true;
+    }
 }
 
 module.exports = NumberEditor;

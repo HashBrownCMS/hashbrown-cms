@@ -85,6 +85,12 @@
         }
     }
 
+    .small &__key {
+        flex-basis: 8rem;
+        margin-right: var(--padding-large);
+        margin-bottom: 0;
+    }
+
     &__value {
         flex-grow: 1;
        

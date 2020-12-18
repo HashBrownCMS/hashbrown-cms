@@ -94,6 +94,15 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     
         this.onChange();
     }
+    
+    /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return true;
+    }
 }
 
 module.exports = ResourceReferenceEditor;

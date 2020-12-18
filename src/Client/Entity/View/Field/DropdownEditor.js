@@ -40,6 +40,15 @@ class DropdownEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.model.config.options = options;
         }
     }
+    
+    /**
+     * Gets whether this field is small
+     *
+     * @return {Boolean} Is small
+     */
+    isSmall() {
+        return true;
+    }
 }
 
 module.exports = DropdownEditor;
