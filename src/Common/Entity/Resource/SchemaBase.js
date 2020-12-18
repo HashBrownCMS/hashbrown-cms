@@ -362,12 +362,23 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
                 };
 
             case 'Enumeration':
+                let options = {};
+
+                if(Array.isArray(definition['@options'])) {
+                    for(let i = 0; i < definition['@options'].length; i++) {
+                        let key = definition['@options'][i];
+                        let label = i18n['@options'] && i18n['@options'][i] ? i18n['@options'][i] : key;
+
+                        options[label] = key;
+                    }
+                }
+
                 return {
                     label: i18n['@name'] || key,
                     isLocalized: isLocalized,
                     schemaId: 'dropdown',
                     config: {
-                        options: i18n['@options'] || {}
+                        options: options
                     }
                 };
 

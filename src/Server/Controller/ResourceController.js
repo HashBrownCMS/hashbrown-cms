@@ -87,7 +87,7 @@ i
         checkParam(params, 'params', Object, true);
         checkParam(query, 'query', Object, true);
 
-        let eTag = '|' + (new URLSearchParams(params).toString() || '*') + '|' + (new URLSearchParams(query).toString() || '*') + '|';
+        let eTag = '|' + APP_STARTED + '|' + (new URLSearchParams(params).toString() || '*') + '|' + (new URLSearchParams(query).toString() || '*') + '|';
 
         for(let resource of resources) {
             eTag += resource.id + ':' + (resource.updatedOn || '*') + '|';
