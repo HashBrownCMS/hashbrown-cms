@@ -558,9 +558,6 @@ class Project extends require('Common/Entity/Project') {
      */
     async getEnvironments() {
         let config = await HashBrown.Service.ConfigService.get('system');
-
-        if(config.isSingleEnvironment) { return [ 'live' ]; }
-
         let sync = await this.getSyncSettings();
 
         if(sync) {
@@ -601,6 +598,10 @@ class Project extends require('Common/Entity/Project') {
             );
 
             environments.push('live');
+        }
+        
+        if(config.isSingleEnvironment) {
+            environments.slice(0, 1);
         }
 
         return environments;
