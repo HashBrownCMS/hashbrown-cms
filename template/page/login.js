@@ -18,6 +18,15 @@ module.exports = (_, model) => `
         <form class="page--login__login">
             <input class="widget widget--text large" name="username" type="text" placeholder="Username">
             <input class="widget widget--text large" name="password" type="password" placeholder="Password">
+            <div class="page--login__login__persist">
+                <div class="widget-group">
+                    <div class="widget widget--label decor">Stay logged in</div>
+                    <label class="widget widget--checkbox">
+                        <input class="widget--checkbox__input" type="checkbox" name="persist">
+                        <div class="widget--checkbox__indicator"></div>
+                    </label>
+                </div>
+            </div>
             <input class="widget widget--button expanded" type="submit" value="Login">
         </form>
         

@@ -5,6 +5,7 @@ async function onSubmit(e) {
 
     let username = form.username.value;
     let password = form.password.value;
+    let persist = form.persist.checked;
 
     if(!username || !password) {
         return;
@@ -12,7 +13,8 @@ async function onSubmit(e) {
 
     let data = {
         username: username,
-        password: password
+        password: password,
+        persist: persist
     };
         
     try {

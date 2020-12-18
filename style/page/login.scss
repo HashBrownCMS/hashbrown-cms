@@ -27,5 +27,11 @@
         .widget {
             margin-bottom: 1rem;
         }
+
+        &__persist {
+            text-align: left;
+            display: flex;
+            justify-content: flex-end;
+        }
     }
 }
