@@ -125,6 +125,8 @@ class FileService {
         }
         
         // Stream data from disk
+        if(!FileSystem.existsSync(path)) { return null; }
+        
         return FileSystem.createReadStream(path);
     }
 
