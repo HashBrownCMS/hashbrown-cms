@@ -110,6 +110,10 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
      */
     static async handle(request) {
         checkParam(request, 'request', HashBrown.Http.Request, true);
+        
+        // Read request
+        let requestBody = await this.getRequestBody(request);
+        let requestQuery = this.getRequestQuery(request);
 
         let path = this.getUrl(request).pathname;
         let route = this.getRoute(path);
@@ -148,9 +152,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
             throw new HashBrown.Http.Exception(`Handler for route ${route.pattern} is not a function`, 500);
         }
 
-        // Read request and produce response
-        let requestBody = await this.getRequestBody(request);
-        let requestQuery = this.getRequestQuery(request);
+        // Produce response
         let response = await route.handler.call(this, request, route.parameters, requestBody, requestQuery, context);
 
         if(response instanceof HashBrown.Http.Response === false) {
