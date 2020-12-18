@@ -601,7 +601,7 @@ class Project extends require('Common/Entity/Project') {
         }
         
         if(config.isSingleEnvironment) {
-            environments.slice(0, 1);
+            return environments.slice(0, 1);
         }
 
         return environments;
