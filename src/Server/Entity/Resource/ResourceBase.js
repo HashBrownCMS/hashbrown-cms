@@ -209,7 +209,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
         data.viewedBy = context.user.id;
         data.viewedOn = new Date();
 
-        data.id = this.createId();
+        data.id = data.id || this.createId();
             
         data.context = context;
         
