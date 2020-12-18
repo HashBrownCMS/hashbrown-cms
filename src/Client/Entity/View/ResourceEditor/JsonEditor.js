@@ -97,7 +97,7 @@ class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase
             let v = obj[k];
 
             switch(k) {
-                case 'schemaId': case 'parentId':
+                case 'schemaId':
                     if(!v || typeof v !== 'string') { break; }
                     if(this.getSchema(v)) { break; }
 
