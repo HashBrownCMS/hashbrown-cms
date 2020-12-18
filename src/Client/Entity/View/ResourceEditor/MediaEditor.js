@@ -12,7 +12,7 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
         
         this.template = require('template/resourceEditor/mediaEditor.js');    
 
-        this.state.thumbnailSource = '/media/' + this.context.project.id + '/' + this.context.environment + '/' + this.state.id + '/?thumbnail';
+        this.state.thumbnailSource = HashBrown.Client.context.config.system.rootUrl + '/media/' + this.context.project.id + '/' + this.context.environment + '/' + this.state.id + '/?thumbnail';
     }
     
     /**
