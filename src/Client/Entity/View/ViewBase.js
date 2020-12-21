@@ -262,9 +262,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                     // Render an icon string
                     case 'icon':
-
                         return (string) => {
-                            if(!string) { return null; }
+                            if(!string || typeof string !== 'string') { return string; }
 
                             let elements = [];
                             let iconMatch = string.match(/\[icon:([^\]]+)\]/);
