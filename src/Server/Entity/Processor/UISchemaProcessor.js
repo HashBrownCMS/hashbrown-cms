@@ -48,8 +48,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             schemaId = 'struct';
         }
 
-        let parsed = {};
-
         switch(schemaId) {
             default:
                 parsed = value;
@@ -175,6 +173,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         
         data['@type'] = schema.id;
         data['@parentId'] = content.parentId;
+        data['identifier'] = content.id;
 
         // TODO: Include images here?
         data.creator = {
