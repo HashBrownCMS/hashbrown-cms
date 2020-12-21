@@ -37,10 +37,10 @@ _.div({class: `field ${state.className || ''} ${state.isSmall ? 'small' : ''} ${
             state.name === 'config' ? [
                 _.include(state.configTemplate)
 
-            ] : [
+            ] : !state.isCollapsed ? [
                 _.include(state.editorTemplate)
 
-            ]
+            ] : null
         )
     ]
 )
