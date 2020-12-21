@@ -14,15 +14,6 @@ class BooleanEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/booleanEditor');
     }
-    
-    /**
-     * Gets whether this field is small
-     *
-     * @return {Boolean} Is small
-     */
-    isSmall() {
-        return true;
-    }
 
     /**
      * Gets tools for this field

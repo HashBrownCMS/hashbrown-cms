@@ -56,15 +56,6 @@ class ContentSchemaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase
             }
         }
     }   
-    
-    /**
-     * Gets whether this field is small
-     *
-     * @return {Boolean} Is small
-     */
-    isSmall() {
-        return true;
-    }
 }
 
 module.exports = ContentSchemaReferenceEditor;

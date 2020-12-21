@@ -61,15 +61,6 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
     getTools() {
         return [];
     }
-    
-    /**
-     * Gets whether this field is small
-     *
-     * @return {Boolean} Is small
-     */
-    isSmall() {
-        return true;
-    }
 }
 
 module.exports = UrlEditor;
