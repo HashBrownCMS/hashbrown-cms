@@ -34,7 +34,9 @@ _.div({class: `field ${state.className || ''} ${state.isSmall ? 'small' : ''} ${
                 _.include(state.configTemplate)
 
             ] : [
-                _.div({class: 'field__value__label'}, state.label),
+                state.isCollapsible && !state.isCollapsed ? [
+                    _.div({class: 'field__value__label'}, state.label)
+                ] : null,
                 _.include(state.editorTemplate)
 
             ]
