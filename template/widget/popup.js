@@ -12,7 +12,7 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} $
                 model.icon ? [
                     _.span({class: `fa fa-${model.icon}`})
                 ] : null,
-                typeof _.icon(model.label === 'function' ? model.label(model.value) : model.label)
+                _.icon(typeof model.label === 'function' ? model.label(model.value) : model.label)
             )
 
         ] : [
