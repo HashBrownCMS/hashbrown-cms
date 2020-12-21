@@ -70,7 +70,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'struct':
-                parsed['@type'] = 'StructuredValue';
+                parsed['@type'] = schema.id || 'StructuredValue';
 
                 for(let k in value) {
                     if(!value[k] || !config.struct || !config.struct[k] || !config.struct[k].schemaId) { continue; }
@@ -118,7 +118,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             case 'contentReference':
                 let content = await HashBrown.Entity.Resource.Content.get(this.context, value);
                 
-                content = await this.process(content, locale, [ 'url', 'description', 'image' ]);
+                content = await this.process(content, locale);
         
                 for(let key in content) {
                     parsed[key] = content[key];
