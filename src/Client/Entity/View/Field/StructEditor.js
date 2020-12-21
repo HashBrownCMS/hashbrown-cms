@@ -16,7 +16,6 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.configTemplate = require('template/field/config/structEditor');
 
         this.state.isCollapsible = true;
-        this.state.isCollapsed = this.state.name !== 'config';
     }
 
     /**
@@ -68,7 +67,9 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
             
                 this.state.fields[key] = view;
             }
-        }        
+        }
+
+        this.state.isCollapsed = this.state.name !== 'config' && Object.keys(this.state.fields).length > 4;
     }
    
     /**

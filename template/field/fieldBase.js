@@ -30,17 +30,16 @@ _.div({class: `field ${state.className || ''} ${state.isSmall ? 'small' : ''} ${
         ] : null,
         
         _.div({class: 'field__value'},
-            state.isCollapsible ? [
+            state.isCollapsed ? [
                 _.div({class: 'field__value__label'}, state.label)
-            ] : null,
-            
-            state.name === 'config' ? [
+
+            ] : state.name === 'config' ? [
                 _.include(state.configTemplate)
 
-            ] : !state.isCollapsed ? [
+            ] : [
                 _.include(state.editorTemplate)
 
-            ] : null
+            ]
         )
     ]
 )
