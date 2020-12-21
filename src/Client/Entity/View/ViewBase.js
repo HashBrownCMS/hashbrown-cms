@@ -264,6 +264,8 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                     case 'icon':
 
                         return (string) => {
+                            if(!string) { return null; }
+
                             let elements = [];
                             let iconMatch = string.match(/\[icon:([^\]]+)\]/);
 
