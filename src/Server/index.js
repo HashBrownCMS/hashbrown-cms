@@ -24,7 +24,7 @@ require('Server/Entity');
 require('Server/Controller');
 
 // Register built-in libraries
-library('content', 'Content', 'file')
+library('content', 'Content', 'cubes')
     .add(HashBrown.Entity.Resource.Content)
     .add(HashBrown.Controller.ContentController);
 

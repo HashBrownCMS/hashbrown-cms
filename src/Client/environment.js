@@ -96,7 +96,7 @@ async function handle(request) {
  */
 async function init() {
     // Register built-in libraries
-    library('content', 'Content', 'file')
+    library('content', 'Content', 'cubes')
         .add(HashBrown.Entity.Resource.Content)
         .add(HashBrown.Entity.View.ResourceEditor.ContentEditor)
         .add(HashBrown.Entity.View.Panel.ContentPanel);

@@ -35,6 +35,10 @@
         position: relative;
         display: flex;
         flex-direction: column;
+
+        &.field-size {
+            max-width: var(--max-width-field-value);
+        }
     }
 
     // Close button

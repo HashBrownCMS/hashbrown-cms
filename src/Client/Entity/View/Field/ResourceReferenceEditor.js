@@ -44,6 +44,7 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
             }
 
             this.state.label = this.getValueLabel();
+            this.state.icon = this.getValueIcon();
         }
     }
 

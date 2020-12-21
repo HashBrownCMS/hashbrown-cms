@@ -161,8 +161,9 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         // Update tools
         this.state.tools = this.getTools();
 
-        // Update value label
+        // Update value label and icon
         this.state.label = this.getValueLabel();
+        this.state.icon = this.getValueIcon();
 
         // Expose include templates
         this.state.editorTemplate = this.editorTemplate;
@@ -181,6 +182,17 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
                 _.div({class: 'field__key__description'}, model.description)
             )
         );
+    }
+
+    /**
+     * Gets the value icon
+     *
+     * @return {String}
+     */
+    getValueIcon() {
+        if(!this.model || !this.model.schema) { return ''; }
+
+        return this.model.schema.icon;
     }
 
     /**

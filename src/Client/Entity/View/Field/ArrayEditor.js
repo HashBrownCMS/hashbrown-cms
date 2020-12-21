@@ -106,6 +106,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 this.state.fields.push({
                     view: view,
+                    icon: view.getValueIcon(),
                     label: view.getValueLabel()
                 }); 
             }

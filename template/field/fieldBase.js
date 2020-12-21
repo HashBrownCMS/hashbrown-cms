@@ -31,7 +31,12 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
         
         _.div({class: 'field__value'},
             state.isCollapsed ? [
-                _.div({class: 'field__value__label'}, state.label)
+                _.div({class: 'field__value__label'}, 
+                    state.icon ? [
+                        _.span({class: `field__value__label__icon fa fa-${state.icon}`})
+                    ] : null,
+                    state.label
+                )
 
             ] : state.name === 'config' ? [
                 _.include(state.configTemplate)

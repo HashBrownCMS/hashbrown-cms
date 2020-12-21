@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'modal in'},
-    _.div({class: 'modal__dialog'},
+    _.div({class: 'modal__dialog field-size'},
         _.div({class: 'modal__header'},
             _.h4({class: 'modal__title'}, `Edit field "${model.definition.label || model.key}"`),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
@@ -31,8 +31,8 @@ _.div({class: 'modal in'},
                 _.field({label: 'Description'},
                     _.text({value: model.definition.description, onchange: _.onChangeDescription})
                 ),
-                _.field({label: 'Multilingual'},
-                    _.checkbox({value: model.definition.multilingual, onchange: _.onChangeIsMultilingual})
+                _.field({label: 'Localised'},
+                    _.checkbox({value: model.definition.localized, onchange: _.onChangeIsLocalized})
                 ),
                 state.extraFields
             )

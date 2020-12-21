@@ -106,6 +106,10 @@
 
         &__label {
             line-height: var(--size-widget-small);
+        
+            &__icon {
+                margin-right: var(--padding-small);
+            }
         }
     }
 }
