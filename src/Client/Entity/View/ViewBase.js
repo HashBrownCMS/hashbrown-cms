@@ -260,6 +260,27 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             return Array.from(wrapper.childNodes);
                         };
 
+                    // Render an icon string
+                    case 'icon':
+
+                        return (string) => {
+                            let elements = [];
+                            let iconMatch = string.match(/\[icon:([^\]]+)\]/);
+
+                            if(iconMatch) {
+                                string = string.replace(iconMatch[0], '');
+
+                                let iconElement = document.createElement('span');
+                                iconElement.className = `fa fa-${iconMatch[1]}`;
+
+                                elements.push(iconElement);
+                            }
+
+                            elements.push(string);
+
+                            return elements;
+                        };
+
                     // Render an included template
                     case 'include':
                         return (template, model) => {

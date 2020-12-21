@@ -286,6 +286,11 @@
         position: relative;
         z-index: 20;
 
+        .fa {
+            width: 1.5rem;
+            text-align: center;
+        }
+
         &.selected {
             &::after {
                 font-family: 'FontAwesome';
