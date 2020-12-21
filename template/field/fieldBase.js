@@ -30,7 +30,7 @@ _.div({class: `field ${state.className || ''} ${state.isSmall ? 'small' : ''} ${
         ] : null,
         
         _.div({class: 'field__value'},
-            state.isCollapsible && !state.isCollapsed ? [
+            state.isCollapsible ? [
                 _.div({class: 'field__value__label'}, state.label)
             ] : null,
             
