@@ -93,14 +93,9 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
 
         await HashBrown.Service.FileService.makeDirectory(dirPath);
 
-        debug.log('Writing file "' + path + '"...', this);
-
         let fileData = Buffer.from(base64, 'base64');
 
         await HashBrown.Service.FileService.write(fileData, path);
-
-        debug.log('...done writing file.', this);
-
     }
    
     /**

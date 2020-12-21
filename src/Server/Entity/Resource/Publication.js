@@ -128,10 +128,10 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         if(!this.canDeploy()) { return; }
         
         let locales = await this.context.project.getLocales();
+        let content = await HashBrown.Entity.Resource.Content.get(this.context, contentId);
 
         for(let locale of locales) {
-            let data = await this.getContent({ id: contentId, locale: locale });
-            data = data.pop();
+            let data = await this.processor.process(content, locale || 'en');
             
             if(!data) { continue; }
 
