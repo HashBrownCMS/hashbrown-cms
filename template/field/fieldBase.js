@@ -30,13 +30,11 @@ _.div({class: `field ${state.className || ''} ${state.isSmall ? 'small' : ''} ${
         ] : null,
         
         _.div({class: 'field__value'},
-            state.isCollapsed ? [
-                _.div({class: 'field__value__label'}, state.label)
-            
-            ] : state.name === 'config' ? [
+            state.name === 'config' ? [
                 _.include(state.configTemplate)
 
             ] : [
+                _.div({class: 'field__value__label'}, state.label),
                 _.include(state.editorTemplate)
 
             ]
