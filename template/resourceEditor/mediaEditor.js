@@ -25,7 +25,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
             _.field({ label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'}, 
                 _.text({ value: state.settings.mediaPublicUrl, onchange: _.onChangePublicUrl })
             ),
-            _.field({ label: 'Media deployer', description: 'How to read/write media files' },
+            _.field({ label: 'Deployer', description: 'How to read/write media files', labelTag: 'h2' },
                 state.deployerEditor
             )
 

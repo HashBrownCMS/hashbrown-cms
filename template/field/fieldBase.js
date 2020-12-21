@@ -9,7 +9,7 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
     ] : [
         !state.hideKey && (model.label || model.description) ? [
             _.div({class: 'field__key'},
-                _.div({class: 'field__key__label'}, model.label),
+                _[model.labelTag || 'div']({class: 'field__key__label'}, model.label),
                 _.div({class: 'field__key__description'}, model.description)
             )
         

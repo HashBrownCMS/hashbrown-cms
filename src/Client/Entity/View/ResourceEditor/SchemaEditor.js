@@ -106,15 +106,6 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
     }
 
     /**
-     * Event: Change id
-     */
-    onChangeId(id) {
-        this.model.id = id;
-    
-        this.onChange();
-    }
-    
-    /**
      * Event: Change name
      */
     onChangeName(name) {

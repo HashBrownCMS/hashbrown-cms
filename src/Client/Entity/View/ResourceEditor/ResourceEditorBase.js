@@ -215,6 +215,15 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
     
     /**
+     * Event: Change id
+     */
+    onChangeId(id) {
+        this.model.id = id;
+    
+        this.onChange();
+    }
+    
+    /**
      * Event: Change a specific value
      *
      * @param {String} key
