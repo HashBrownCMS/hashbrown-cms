@@ -41,16 +41,18 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             _.field({label: 'Deployer', description: 'Where to deploy published content', labelTag: 'h2'},
                 state.deployerEditor
             ),
-            _.field({label: 'Root contents', description: 'Limit the exposed content'},
-                _.popup({autocomplete: true, disabled: model.isLocked, multiple: true, clearable: true, value: model.rootContents, options: state.contentOptions, onchange: _.onChangeRootContents})
-            ),
-            model.rootContents && model.rootContents.length > 0 ? [
-                _.field({label: 'Include root', description: 'Include the root items in this publication'},
-                    _.checkbox({disabled: model.isLocked, value: model.includeRoot, onchange: _.onChangeIncludeRoot})
+            _.field({label: 'Limits', labelTag: 'h2'},
+                _.field({label: 'Root contents', description: 'Limit the exposed content'},
+                    _.popup({autocomplete: true, disabled: model.isLocked, multiple: true, clearable: true, value: model.rootContents, options: state.contentOptions, onchange: _.onChangeRootContents})
+                ),
+                model.rootContents && model.rootContents.length > 0 ? [
+                    _.field({label: 'Include root', description: 'Include the root items in this publication'},
+                        _.checkbox({disabled: model.isLocked, value: model.includeRoot, onchange: _.onChangeIncludeRoot})
+                    )
+                ] : null,
+                _.field({label: 'Allowed schemas', description: 'Limit the the type of exposed content'},
+                    _.popup({autocomplete: true, disabled: model.isLocked, multiple: true, value: model.allowedSchemas, options: state.schemaOptions, onchange: _.onChangeAllowedSchemas})
                 )
-            ] : null,
-            _.field({label: 'Allowed schemas', description: 'Limit the the type of exposed content'},
-                _.popup({autocomplete: true, disabled: model.isLocked, multiple: true, value: model.allowedSchemas, options: state.schemaOptions, onchange: _.onChangeAllowedSchemas})
             )
         ]
     ),
