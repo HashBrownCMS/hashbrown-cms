@@ -176,8 +176,18 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         data['@type'] = schema.id;
         data['@parentId'] = content.parentId;
         data['identifier'] = content.id;
+        
+        if(!content.name && content.title) {
+            data.name = content.title;
+            delete content.title;
+        }
 
-        // TODO: Include images here?
+        for(let key in schema.config) {
+            if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
+
+            data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
+        }
+
         data.creator = {
             '@type': 'Person',
             name: createdBy.getName(),
@@ -195,12 +205,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         data.dateCreated = content.createdOn;
         data.dateModified = content.updatedOn;
         data.datePublished = content.createdOn;
-
-        for(let key in schema.config) {
-            if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
-
-            data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
-        }
         
         return data;
     }
