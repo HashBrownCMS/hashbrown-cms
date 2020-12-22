@@ -75,7 +75,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     if(parentDirName === 'content') {
                         data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
                     } else if(parentDirName === 'field') {
-                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data);
                     }
                 }
 
@@ -148,7 +148,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     if(parentDirName === 'content') {
                         data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
                     } else if(parentDirName === 'field') {
-                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data);
                     }
                 }
                 
