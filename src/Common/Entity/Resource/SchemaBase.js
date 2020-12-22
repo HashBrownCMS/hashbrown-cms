@@ -205,7 +205,10 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
      */
     static getFieldFromUISchema(key, definition, i18n) {
         // First a sanity check
-        if(!definition) { return null; }
+        if(
+            !key || key[0] === '@' ||
+            !definition || (typeof definition !== 'object' && typeof definition !== 'string')
+        ) { return null; }
 
         if(!i18n) {
             i18n = {};
@@ -225,10 +228,6 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         } else if(definition.constructor === Object && !definition['@type']) {
             definition['@type'] = 'StructuredValue';
         
-        }
-
-        if(!definition['@type']) {
-            throw new Error(`No @type field for definition ${JSON.stringify(definition)}`);
         }
 
         let isLocalized = definition['@config'] && definition['@config']['isLocalized'] === true;
@@ -255,9 +254,11 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
                 let struct = {};
 
                 for(let key in definition) {
-                    if(key[0] === '@') { continue; }
+                    let def = this.getFieldFromUISchema(key, definition[key], i18n[key]);
 
-                    struct[key] = this.getFieldFromUISchema(key, definition[key], i18n[key]);
+                    if(!def) { continue; }
+
+                    struct[key] = def;
                 }
 
                 return {

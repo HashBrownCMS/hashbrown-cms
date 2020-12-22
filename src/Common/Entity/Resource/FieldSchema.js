@@ -67,9 +67,11 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
             };
             
             for(let key in params) {
-                if(key[0] === '@') { continue; }
+                let definition = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
 
-                config.struct[key] = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
+                if(!definition) { continue; }
+
+                config.struct[key] = definition; 
             }
 
             params.config = config;

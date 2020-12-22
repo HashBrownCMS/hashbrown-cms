@@ -76,12 +76,11 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
             let config = {};
             
             for(let key in params) {
-                if(
-                    key[0] === '@' ||
-                    typeof this[key] !== 'undefined'
-                ) { continue; }
+                let definition = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
 
-                config[key] = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
+                if(!definition) { continue; }
+
+                config[key] = definition;
             }
 
             params.config = config;
