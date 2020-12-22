@@ -145,7 +145,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId);
         let properties = content.getLocalizedProperties(locale);
-        let meta = content.getMeta();
 
         if(!properties) {
             throw new Error(`No properties for content "${content.getName()}" with locale "${locale}"`);
@@ -169,7 +168,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             });
         }
 
-
         // Combine all data into one
         let data = {};
         
@@ -177,15 +175,15 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         data['@parentId'] = content.parentId;
         data['identifier'] = content.id;
         
-        if(!content.name && content.title) {
-            data.name = content.title;
-            delete content.title;
-        }
-
         for(let key in schema.config) {
             if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
 
             data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
+        }
+        
+        if(!data.name && data.title) {
+            data.name = data.title;
+            delete data.title;
         }
 
         data.creator = {
