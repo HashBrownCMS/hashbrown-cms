@@ -35,6 +35,45 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
     
     /**
+     * Converts fields from uischema.org format
+     *
+     * @param {Object} input
+     *
+     * @return {Object} Definition
+     */
+    static convertFromUISchema(input) {
+        checkParam(input, 'input', Object, true);
+
+        let i18n = input['@i18n'] && input['@i18n']['en'] ? input['@i18n']['en'] : {};
+        let output = {
+            id: input['@type'],
+            name: i18n['@name'],
+            parentId: input['@parent'] || 'struct'
+        };
+
+        for(let key in input['@config'] || {}) {
+            output[key] = input['@config'][key];
+        }
+
+        let config = {
+            label: input['@label'],
+            struct: {}
+        };
+        
+        for(let key in input) {
+            let definition = this.getFieldFromUISchema(key, input[key], i18n[key]);
+
+            if(!definition) { continue; }
+
+            config.struct[key] = definition; 
+        }
+
+        output.config = config;
+
+        return output;
+    }
+
+    /**
      * Adopts values into this entity
      *
      * @param {Object} params
@@ -42,39 +81,11 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     adopt(params = {}) {
         checkParam(params, 'params', Object);
 
-        params = params || {};
+        params = JSON.parse(JSON.stringify(params || {}));
     
         // Backwards compatible editor names
         if(params.editorId && params.editorId.indexOf('Editor') < 0) {
             params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
-        }
-        
-        // Adopt uischema.org fields
-        if(params['@type']) {
-            let i18n = params['@i18n'] && params['@i18n']['en'] ? params['@i18n']['en'] : {};
-
-            params.id = params['@type'];
-            params.name = i18n['@name'];
-            params.parentId = params['@parent'] || 'struct';
-
-            for(let key in params['@config'] || {}) {
-                params[key] = params['@config'][key];
-            }
-
-            let config = {
-                label: params['@label'],
-                struct: {}
-            };
-            
-            for(let key in params) {
-                let definition = this.constructor.getFieldFromUISchema(key, params[key], i18n[key]);
-
-                if(!definition) { continue; }
-
-                config.struct[key] = definition; 
-            }
-
-            params.config = config;
         }
 
         super.adopt(params);

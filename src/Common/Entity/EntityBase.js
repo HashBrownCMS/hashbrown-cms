@@ -47,6 +47,15 @@ class EntityBase {
     }
 
     /**
+     * Gets a list of custom properties
+     *
+     * @return {Array} Custom properties
+     */
+    getPropertyNames() {
+        return Object.keys(this.getObject()); 
+    }
+
+    /**
      * Adopts values into this entity
      *
      * @param {Object} params
