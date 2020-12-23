@@ -279,7 +279,9 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     isLocalized: isLocalized,
                     schemaId: 'array',
                     config: {
-                        allowedSchemas: definition['@options']
+                        allowedSchemas: definition['@options'],
+                        minItems: definition['@min'] || 0,
+                        maxItems: definition['@mmax'] || 0
                     }
                 };
 

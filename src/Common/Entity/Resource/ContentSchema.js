@@ -33,42 +33,6 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
     
         return new this(params);
     }
-   
-    /**
-     * Converts fields from uischema.org format
-     *
-     * @param {Object} input
-     *
-     * @return {Object} Definition
-     */
-    static convertFromUISchema(input) {
-        checkParam(input, 'input', Object, true);
-
-        let i18n = input['@i18n'] && input['@i18n']['en'] ? input['@i18n']['en'] : {};
-        let output = {
-            id: input['@type'],
-            name: i18n['@name'],
-            parentId: input['@parent'] || 'contentBase'
-        };
-        
-        for(let key in input['@config'] || {}) {
-            output[key] = input['@config'][key];
-        }
-
-        let config = {};
-
-        for(let key in input) {
-            let definition = this.getFieldFromUISchema(key, input[key], i18n[key]);
-
-            if(!definition) { continue; }
-
-            config[key] = definition;
-        }
-
-        output.config = config;
-        
-        return output;
-    }
 
     /**
      * Adopts values into this entity
