@@ -30,14 +30,6 @@
         padding: var(--padding-large);
     }
 
-    @include tablet {
-        display: block;
-        
-        & & {
-            margin-left: var(--padding-large);
-        }
-    }
-
     &__tools {
         margin-right: var(--padding-small);
         padding-right: var(--padding-small);
@@ -47,21 +39,11 @@
         &:empty {
             display: none;
         }
-    
-        @include tablet {
-            border: 0;
-            display: flex;
-            margin-bottom: var(--padding-small);
-        }
     }
 
     &__tool {
         &:not(:last-child) {
             margin: 0 0 var(--padding-small) 0;
-        
-            @include tablet {
-                margin: 0 var(--padding-small) 0 0;
-            }
         }
     }
 
