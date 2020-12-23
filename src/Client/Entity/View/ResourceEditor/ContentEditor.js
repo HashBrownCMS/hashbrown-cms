@@ -125,6 +125,19 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     }
 
     /**
+     * Event: Clicked republish all content
+     */
+    async onClickRepublishAllContent() {
+        this.namedElements.republish.classList.toggle('loading', true);
+        
+        await HashBrown.Service.RequestService.request('post', 'content/republish');
+
+        UI.notifySmall(`All content republished successfully`, null, 3);
+        
+        this.namedElements.republish.classList.toggle('loading', false);
+    }
+
+    /**
      * Event: Clicked start tour
      */
     async onClickStartTour() {

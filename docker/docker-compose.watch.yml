@@ -2,6 +2,7 @@ version: "3.4"
 
 services:
     node:
+        command: "node --trace-warnings /opt/hashbrown-cms/hashbrown.js"
         environment:
             - WATCH=true
             - DEBUG_VERBOSITY=5 
