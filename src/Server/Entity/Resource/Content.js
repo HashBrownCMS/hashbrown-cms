@@ -411,7 +411,7 @@ class Content extends require('Common/Entity/Resource/Content') {
                 ) {
                     for(let i = 0; i < property.length; i++) {
                         let item = property[i];
-                        let itemSchema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, item.schemaId);
+                        let itemSchema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, item.schemaId, { withParentFields: true });
 
                         if(!itemSchema || !itemSchema.config || !itemSchema.config.struct) { continue; }
 
