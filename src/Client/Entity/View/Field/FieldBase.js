@@ -118,7 +118,6 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
 
                 this.model.value = {};
                 this.model.value[HashBrown.Client.locale] = rawValue;
-                this.model.value['_localized'] = true;
             }
 
             this.state.value = this.model.value[HashBrown.Client.locale];
@@ -238,7 +237,6 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
                 }
 
                 this.model.value[HashBrown.Client.locale] = newValue;
-                this.model.value['_localized'] = true;
 
             } else {
                 this.model.value = newValue;

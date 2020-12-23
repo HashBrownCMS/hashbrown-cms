@@ -18,7 +18,7 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(locale, 'locale', String);
 
-        let properties = content.getLocalizedProperties(locale);
+        let properties = await content.getLocalizedProperties(locale);
         let meta = content.getMeta();
 
         if(!properties) {

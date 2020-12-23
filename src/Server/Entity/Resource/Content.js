@@ -358,6 +358,73 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         return schema.allowedChildSchemas.indexOf(this.schemaId) > -1;
     }
+    
+    /**
+     * Returns all properties in a given locale
+     *
+     * @param {String} locale
+     *
+     * @returns {Object} properties
+     */
+    async getLocalizedProperties(locale) {
+        let localized = JSON.parse(JSON.stringify(this.properties));
+
+        if(!locale) { return properties; }
+    
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, this.schemaId, { withParentFields: true });
+
+        let recurse = async (properties, config) => {
+            if(
+                !config ||
+                config.constructor !== Object ||
+                !properties ||
+                properties.constructor !== Object
+            ) { return; }
+
+            for(let key in properties) {
+                let definition = config[key];
+                let property = properties[key];
+
+                // Flatten localised property value
+                if(
+                    property &&
+                    property.constructor === Object &&
+                    definition &&
+                    (definition.isLocalized || definition.isMultilingual)
+                ) {
+                    properties[key] = properties[key][locale];
+                
+                // Recurse into structs
+                } else if(
+                    property &&
+                    property.constructor === Object &&
+                    definition && 
+                    definition.config && 
+                    definition.config.struct
+                ) {
+                    await recurse(property, definition.config.struct);
+                
+                // Recurse into arrays
+                } else if(
+                    property &&
+                    property.constructor === Array
+                ) {
+                    for(let i = 0; i < property.length; i++) {
+                        let item = property[i];
+                        let itemSchema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, item.schemaId);
+
+                        if(!itemSchema || !itemSchema.config || !itemSchema.config.struct) { continue; }
+
+                        await recurse(item.value, itemSchema.config.struct);
+                    }
+                }
+            }
+        };
+
+        await recurse(localized, schema.config);
+
+        return localized;
+    }
 
     /**
      * Performs a series of unit test

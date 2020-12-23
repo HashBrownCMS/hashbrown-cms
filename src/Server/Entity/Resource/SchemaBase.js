@@ -106,6 +106,8 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             }
         }
      
+        resource.context = context;
+
         return resource;
     }
     

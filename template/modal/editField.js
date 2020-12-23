@@ -32,7 +32,7 @@ _.div({class: 'modal in'},
                     _.text({value: model.definition.description, onchange: _.onChangeDescription})
                 ),
                 _.field({label: 'Localised'},
-                    _.checkbox({value: model.definition.localized, onchange: _.onChangeIsLocalized})
+                    _.checkbox({value: model.definition.isLocalized, onchange: _.onChangeIsLocalized})
                 ),
                 state.extraFields
             )

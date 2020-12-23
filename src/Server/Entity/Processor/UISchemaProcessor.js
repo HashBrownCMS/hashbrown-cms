@@ -70,7 +70,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'struct':
-                parsed['@type'] = schema.id || 'StructuredValue';
+                parsed['@type'] = schema.id && schema.id !== 'struct' ? schema.id : 'StructuredValue';
 
                 for(let k in value) {
                     if(!config.struct || !config.struct[k] || !config.struct[k].schemaId) { continue; }
@@ -144,7 +144,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         checkParam(filter, 'filter', Array, true);
 
         let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId);
-        let properties = content.getLocalizedProperties(locale);
+        let properties = await content.getLocalizedProperties(locale);
 
         if(!properties) {
             throw new Error(`No properties for content "${content.getName()}" with locale "${locale}"`);

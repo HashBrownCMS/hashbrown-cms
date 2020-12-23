@@ -89,9 +89,6 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     }
 
     /**
-     *
-
-    /**
      * Saves the current state of this entity
      *
      * @param {Object} options

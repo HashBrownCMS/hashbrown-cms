@@ -181,61 +181,6 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         
         }
     }
-
-    /**
-     * Returns all properties in a given locale
-     *
-     * @param {String} locale
-     *
-     * @returns {Object} properties
-     */
-    getLocalizedProperties(locale) {
-        // Create references
-        // NOTE: We're cloning the "properties" value to avoid destroying the structure
-        let localizedProperties = {};
-        let allProperties = JSON.parse(JSON.stringify(this.properties));
-
-        // Flatten properties recursively
-        function flattenRecursively(source, target) {
-            // Loop through all keys
-            for(let key in source) {
-                let value = source[key];
-
-                // If the value is an object type, examine it further
-                if(value && typeof value === 'object') {
-                    // If localized flag is set, assign value directly
-                    if(value._localized) {
-                        if(typeof value[locale] === 'undefined') {
-                            value[locale] = null;
-                        }
-
-                        target[key] = value[locale];
-
-                    // If not, recurse into the object
-                    } else {
-                        // Prepare target data type for either Object or Array
-                        if(Array.isArray(value)) {
-                            target[key] = [];
-                        } else {
-                            target[key] = {};
-                        }
-
-                        flattenRecursively(value, target[key]);
-
-                    }
-                
-                // If not, just return the localised value
-                } else {
-                    target[key] = value;
-
-                }
-            }
-        }
-
-        flattenRecursively(allProperties, localizedProperties);
-
-        return localizedProperties;
-    }
 }
 
 module.exports = Content;
