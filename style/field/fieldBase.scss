@@ -94,7 +94,8 @@
 
     &__value {
         flex-grow: 1;
-       
+        position: relative;
+
         > .widget, >.widget-group {
             max-width: var(--max-width-field-value);
 
@@ -106,7 +107,12 @@
 
         &__label {
             line-height: var(--size-widget-small);
-        
+            position: absolute;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+
             &__icon {
                 margin-right: var(--padding-small);
             }
