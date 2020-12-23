@@ -73,7 +73,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 parsed['@type'] = schema.id || 'StructuredValue';
 
                 for(let k in value) {
-                    if(!value[k] || !config.struct || !config.struct[k] || !config.struct[k].schemaId) { continue; }
+                    if(!config.struct || !config.struct[k] || !config.struct[k].schemaId) { continue; }
 
                     parsed[k] = await this.check(value[k], config.struct[k].schemaId, config.struct[k].config, locale);
                 }
