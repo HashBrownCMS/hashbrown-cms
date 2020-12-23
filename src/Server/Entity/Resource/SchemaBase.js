@@ -281,7 +281,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     config: {
                         allowedSchemas: definition['@options'],
                         minItems: definition['@min'] || 0,
-                        maxItems: definition['@mmax'] || 0
+                        maxItems: definition['@max'] || 0
                     }
                 };
 
