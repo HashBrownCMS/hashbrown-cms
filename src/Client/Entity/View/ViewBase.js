@@ -266,18 +266,19 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             if(!string || typeof string !== 'string') { return string; }
 
                             let elements = [];
-                            let iconMatch = string.match(/\[icon:([^\]]+)\]/);
+                            let parts = string.split(/<icon:[^>]+>/);
+                            let iconMatches = [...string.matchAll(/<icon:([^>]+)>/g)];
 
-                            if(iconMatch) {
-                                string = string.replace(iconMatch[0], '');
-
+                            for(let iconMatch of iconMatches) {
+                                elements.push(parts.shift());
+                                
                                 let iconElement = document.createElement('span');
                                 iconElement.className = `fa fa-${iconMatch[1]}`;
 
                                 elements.push(iconElement);
                             }
 
-                            elements.push(string);
+                            elements.push(parts.shift());
 
                             return elements;
                         };

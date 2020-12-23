@@ -62,7 +62,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
             this.state.schemaOptions = {};
 
             for(let schema of await HashBrown.Entity.Resource.FieldSchema.list() || []) {
-                this.state.schemaOptions[(schema.icon ? `[icon:${schema.icon}] `: '') + schema.name] = schema.id;
+                this.state.schemaOptions[(schema.icon ? `<icon:${schema.icon}> `: '') + schema.name] = schema.id;
             }
 
         } else {
@@ -73,7 +73,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
                 let schema = await HashBrown.Entity.Resource.FieldSchema.get(schemaId);
 
                 if(schema) {
-                    this.state.schemaOptions[(schema.icon ? `[icon:${schema.icon}] `: '') + schema.name] = schema.id;
+                    this.state.schemaOptions[(schema.icon ? `<icon:${schema.icon}> `: '') + schema.name] = schema.id;
                 }
             }
 
