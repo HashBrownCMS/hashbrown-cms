@@ -31,8 +31,6 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
     async fetch() {
         let resources = this.itemType ? await this.itemType.list() : [];
         
-        this.state.scrollTop = this.namedElements.items ? this.namedElements.items.scrollTop : 0;
-
         // Generate items and place them in the map cache
         let itemMap = {};
 
@@ -62,6 +60,9 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
      * Pre render
      */
     prerender() {
+        // Cache scroll position
+        this.state.scrollTop = this.namedElements.items ? this.namedElements.items.scrollTop : 0;
+
         // Process items
         let queue = Object.values(this.state.itemMap);
 
