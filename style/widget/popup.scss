@@ -291,18 +291,8 @@
             text-align: center;
         }
 
-        &.selected {
-            &::after {
-                font-family: 'FontAwesome';
-                content: '\f00c';
-                display: block;
-                line-height: var(--size-widget-small);
-                width: var(--size-widget-small);
-                text-align: center;
-                right: 0;
-                top: 0;
-                position: absolute;
-            }
+        &.selected:not(:hover) {
+            background-color: var(--color-default-200);
         }
 
         &:hover {

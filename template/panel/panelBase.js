@@ -7,9 +7,9 @@ _.div({class: 'panel'},
         state.message
     :
         _.div({class: 'panel__tools'},
-            _.search({class: 'widget-group panel__tools__search', value: state.searchQuery, onclear: _.onClickClearSearch, onsearch: _.onClickSearch}),
+            _.search({tooltip: 'Search', class: 'widget-group panel__tools__search', value: state.searchQuery, onclear: _.onClickClearSearch, onsearch: _.onClickSearch}),
             _.if(state.sortingOptions && Object.values(state.sortingOptions).length > 1,
-                _.popup({class: 'panel__tools__sort', options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
+                _.popup({tooltip: 'Change sorting method', class: 'panel__tools__sort', options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
             )
         ),
         _.div({class: 'panel__items', name: 'items'},
