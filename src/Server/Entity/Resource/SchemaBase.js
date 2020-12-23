@@ -229,6 +229,35 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     }
 
     /**
+     * Translates a type name frmom uischema.org format
+     *
+     * @param {String} name
+     *
+     * @return {String} Name
+     */
+    static translateTypeFromUISchema(name) {
+        return {
+            'ItemList': 'array',
+            'Number': 'number',
+            'StructuredValue': 'struct',
+            'Boolean': 'boolean',
+            'CreativeWork': 'contentReference',
+            'AudioObject': 'mediaReference',
+            'MediaObject': 'mediaReference',
+            'VideoObject': 'mediaReference',
+            'ImageObject': 'mediaReference',
+            'DataDownload': 'mediaReference',
+            'Text': 'string',
+            'URL': 'url',
+            'MultiLineText': 'string',
+            'RichText': 'richText',
+            'Enumeration': 'dropdown',
+            'Date': 'date',
+            'DateTime': 'date'
+        }[name] || name;
+    }
+
+    /**
      * Transforms a uischema.org definition to the HashBrown standard
      *
      * @param {String} key
@@ -274,12 +303,18 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         switch(definition['@type']) {
             case 'ItemList':
+                let allowedSchemas = [];
+
+                for(let schemaId of definition['@options'] || []) {
+                    allowedSchemas.push(this.translateTypeFromUISchema(schemaId));
+                }
+
                 return {
                     label: i18n['@name'] || key,
                     isLocalized: isLocalized,
                     schemaId: 'array',
                     config: {
-                        allowedSchemas: definition['@options'],
+                        allowedSchemas: allowedSchemas,
                         minItems: definition['@min'] || 0,
                         maxItems: definition['@max'] || 0
                     }
