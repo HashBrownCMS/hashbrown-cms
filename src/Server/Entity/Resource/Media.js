@@ -52,13 +52,21 @@ class Media extends require('Common/Entity/Resource/Media') {
         if(!rootUrl) { return filename; }
 
         try {
-            let url = new URL(rootUrl);
+            // The root URL contains protocol information
+            if(rootUrl.indexOf('://') > -1) {
+                let url = new URL(rootUrl);
 
-            if(url.pathname && url.pathname !== '/') { 
-                filename = Path.join(url.pathname, filename);
+                if(url.pathname && url.pathname !== '/') { 
+                    filename = Path.join(url.pathname, filename);
+                }
+
+                filename = url.protocol + '//' + url.host + filename;
+
+            // The root URL is relative to the frontend
+            } else {
+                filename = Path.join(rootUrl, filename);
+
             }
-
-            filename = url.protocol + '//' + url.host + filename;
         
         } catch(e) {
             throw new Error(`Could not parse the "mediaPublicUrl": ${e.message}`);
