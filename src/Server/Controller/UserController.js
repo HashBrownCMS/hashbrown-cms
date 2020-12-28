@@ -69,7 +69,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
 
         let token = await HashBrown.Entity.User.login(username, password, persist);
 
-        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
+        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=${context.config.system.rootUrl || '/'};` });
     }
     
     /** 
@@ -80,7 +80,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
         
         await context.user.logout(token);
 
-        return new HashBrown.Http.Response('User logged out', 302, { 'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT', 'Location': '/' });
+        return new HashBrown.Http.Response('User logged out', 302, { 'Set-Cookie': `token=; path=${context.config.system.rootUrl || '/'}; expires=Thu, 01 Jan 1970 00:00:00 GMT`, 'Location': '/' });
     }
     
     /**
@@ -195,7 +195,7 @@ class UserController extends HashBrown.Controller.ControllerBase {
         let user = await HashBrown.Entity.User.create({ username: username, password: password, isAdmin: true });
         let token = await HashBrown.Entity.User.login(username, password);
        
-        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=/;` });
+        return new HashBrown.Http.Response(token, 200, { 'Set-Cookie': `token=${token}; path=${context.config.system.rootUrl || '/'};` });
     }
     
     /**
