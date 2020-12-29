@@ -13,6 +13,8 @@ class MigrationService {
         // Migrate users
         if(databases.indexOf('users') > -1) {
             debug.log('Migrating users...', this);
+            
+            await HashBrown.Service.DatabaseService.dump('users');
 
             let users = await HashBrown.Service.DatabaseService.find('users', 'users');
 
@@ -32,6 +34,8 @@ class MigrationService {
         // Migrate schedule
         if(databases.indexOf('schedule') > -1) {
             debug.log('Migrating schedule...', this);
+            
+            await HashBrown.Service.DatabaseService.dump('schedule');
 
             let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks');
 
