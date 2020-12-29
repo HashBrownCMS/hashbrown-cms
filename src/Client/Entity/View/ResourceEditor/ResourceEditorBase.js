@@ -165,7 +165,9 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             body.scrollTop = scrollTop;
         }
 
-        this.element.classList.toggle('locked', this.model && this.model.isLocked);
+        if(this.element) {
+            this.element.classList.toggle('locked', this.model && this.model.isLocked);
+        }
     }
 
     /**

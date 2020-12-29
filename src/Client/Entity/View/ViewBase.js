@@ -534,7 +534,10 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         }
 
         this.element = element;
-        this.element.view = this;
+
+        if(this.element) {
+            this.element.view = this;
+        }
             
         this.postrender();
         
