@@ -83,6 +83,8 @@ function compileCss() {
     });
 
     cmd.on('close', (code) => {
+        if(code == 0) { return; }
+
         console.log('SASS compilation exited with status code', code);
     });
 }
