@@ -6,7 +6,7 @@
   "main": "hashbrown.js",
   "scripts": {
     "build:frontend": "webpack --progress",
-    "watch:frontend": "webpack --watch --watch-poll --progress",
+    "watch:frontend": "webpack --watch --progress",
     "start": "npm run build:frontend && node hashbrown.js",
     "watch:nodemon": "nodemon hashbrown.js",
     "start:docker": "npm run build:frontend && cd ./docker && sudo docker-compose up --build -d",
@@ -30,9 +30,9 @@
     "prosemirror-schema-basic": "^1.1.2",
     "prosemirror-state": "^1.3.3",
     "prosemirror-view": "^1.14.13",
-    "sass": "1.25.0",
-    "turndown": "^6.0.0",
-    "webpack": "^4.28.1",
-    "webpack-cli": "^3.3.0"
+    "sass": "^1.30.0",
+    "turndown": "^7.0.0",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.0"
   }
 }

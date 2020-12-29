@@ -3,7 +3,7 @@
 // Libs
 const Path = require('path');
 const Webpack = require('webpack');
-const Sass = require('sass/sass.dart.js');
+const ChildProcess = require('child_process');
 const FileSystem = require('fs');
 
 // Parameters
@@ -54,27 +54,43 @@ function getJsEntries() {
 
 /**
  * Runs the SASS compilation
+ * NOTE: We're using NPX because of how dependency heavy it is to do via WebPack
  */
 function compileCss() {
     // Build SASS commands
-    let sassArgs = [];
+    let sassArgs = [
+        'sass',
+        '--source-map',
+        '--embed-sources',
+    ];
 
     if(IS_WATCHING) { 
         sassArgs.push('--watch');
         sassArgs.push('--poll');
     }
 
-    sassArgs.push('--source-map');
-    sassArgs.push('--embed-sources'),
-
-    // Include main codebase styling
     sassArgs.push('./style/index.scss:./public/css/style.css');
 
     // Start SASS compilation
-    Sass.run_(sassArgs);
+    let cmd = ChildProcess.spawn('npx', sassArgs);
+
+    cmd.stdout.on('data', (data) => {
+        console.log('\n' + data.toString('utf8'));
+    });
+    
+    cmd.stderr.on('data', (data) => {
+        console.log(data.toString('utf8'));
+    });
+
+    cmd.on('close', (code) => {
+        console.log('SASS compilation exited with status code', code);
+    });
 }
 
-// Define settings
+// Compile CSS
+compileCss();
+
+// Export settings
 module.exports = {
     mode: 'none',
     devtool: 'source-map',
@@ -91,9 +107,6 @@ module.exports = {
     // Automatically accept these extensions
     resolve: {
         modules: [Path.resolve(__dirname), Path.resolve(__dirname, 'src'), 'node_modules'],
-        extensions: ['.js', '.json', '.schema']
+        extensions: ['.js', '.json']
     }
 };
-
-// Compile CSS
-compileCss();

@@ -1,7 +1,5 @@
 'use strict';
 
-let crypto = require('crypto');
-
 /**
  * The base class for everything
  *
@@ -85,20 +83,6 @@ class EntityBase {
      */
     structure() {
 
-    }
-
-    /**
-     * Generates a new random id
-     *
-     * @param {Number} length
-     *
-     * @returns {String} id
-     */
-    static createId(length) {
-        if(!length) { length = 8; }
-        if(length < 4) { length = 4; }
-
-        return crypto.randomBytes(length).toString('hex');
     }
 
     /**

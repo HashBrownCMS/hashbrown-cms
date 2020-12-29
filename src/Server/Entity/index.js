@@ -4,7 +4,7 @@
  * @namespace HashBrown.Server.Entity
  */
 namespace('Entity')
-.add(require('Common/Entity/EntityBase'))
+.add(require('./EntityBase'))
 .add(require('Common/Entity/Context'))
 .add(require('./Project'))
 .add(require('./Task'))
