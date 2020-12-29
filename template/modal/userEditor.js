@@ -5,7 +5,7 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal in'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Settings for ${model.getName()}`),
+            _.h4({class: 'modal__title'}, 'Settings'),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
@@ -37,6 +37,14 @@ _.div({class: 'modal in'},
                         _.popup({options: HashBrown.Client.themes, value: model.theme || 'default', onchange: _.onChangeTheme})
                     )
                 ] : null,
+                
+                // Only show locale picker to the current user
+                HashBrown.Client.context.user.id === model.id ? [
+                    _.div({class: 'widget-group'},
+                        _.label({class: 'widget widget--label small'}, 'Locale'),
+                        _.popup({autocomplete: true, options: HashBrown.Service.LocaleService.getLocaleOptions(true), value: model.locale || 'en', onchange: _.onChangeLocale})
+                    )
+                ] : null,
 
                 // Only show "is admin" switch to other admins
                 HashBrown.Client.context.user.isAdmin && model.id !== HashBrown.Client.context.user.id ? [
@@ -57,12 +65,12 @@ _.div({class: 'modal in'},
                                 value: model.getScopes(project.id),
                                 multiple: true,
                                 clearable: true,
-                                placeholder: '(no scopes)',
-                                options: [
-                                    'connections',
-                                    'forms',
-                                    'schemas'
-                                ],
+                                placeholder: `(${_.t('no scopes')})`,
+                                options: {
+                                    'Publications': 'publications',
+                                    'Forms': 'forms',
+                                    'Schemas': 'schemas'
+                                },
                                 onchange: (scopes) => _.onChangeResourceScope(project.id, scopes)
                             })
                         )

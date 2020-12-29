@@ -15,17 +15,16 @@ _.div({class: 'list-item--user'},
             }
         }),
         _.h3({class: 'list-item--user__name'},
-            model.getName() + (model.id == HashBrown.Client.context.user.id ? ' (you)' : '')
+            model.getName() + (model.id == HashBrown.Client.context.user.id ? ' *' : '')
         ),
         _.div({class: 'list-item--user__type'},
-            _.if(model.isAdmin,
+            model.isAdmin ? [
                 _.span({class: 'list-item--user__type__icon fa fa-black-tie'}),
                 'Admin'
-            ),
-            _.if(!model.isAdmin,
+            ] : [
                 _.span({class: 'list-item--user__type__icon fa fa-user'}),
                 'Editor'
-            )
+            ]
         )
     )
 )

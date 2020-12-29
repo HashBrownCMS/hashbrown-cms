@@ -49,7 +49,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                 _.field({label: 'Caption'},
                     _.text({disabled: model.isLocked, value: model.caption, onchange: _.onChangeCaption})
                 ),
-                _.field({label: 'Author'},
+                _.field({label: 'Author', labelTag: 'h2'},
                     _.field({label: 'Name'},
                         _.text({disabled: model.isLocked, value: model.author.name, onchange: _.onChangeAuthorName})
                     ),
@@ -57,7 +57,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                         _.text({disabled: model.isLocked, value: model.author.url, onchange: _.onChangeAuthorUrl})
                     )
                 ),
-                _.field({label: 'Copyright'},
+                _.field({label: 'Copyright', labelTag: 'h2'},
                     _.field({label: 'Name'},
                         _.text({disabled: model.isLocked, value: model.copyrightHolder.name, onchange: _.onChangeCopyrightHolderName})
                     ),

@@ -14,6 +14,15 @@ class ViewBase extends HashBrown.Entity.EntityBase {
     }
 
     /**
+     * Gets the context
+     *
+     * @return {HashBrown.Entity.Context} Context
+     */
+    get context() {
+        return null;
+    }
+
+    /**
      * Scope
      *
      * @return {Object} Scope

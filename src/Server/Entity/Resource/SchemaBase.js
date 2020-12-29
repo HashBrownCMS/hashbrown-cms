@@ -73,9 +73,9 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 // Convert from uischema.org
                 if(data['@type']) {
                     if(parentDirName === 'content') {
-                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data, context.user.locale);
                     } else if(parentDirName === 'field') {
-                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data, context.user.locale);
                     }
                 }
 
@@ -148,9 +148,9 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 // Convert from uischema.org
                 if(data['@type']) {
                     if(parentDirName === 'content') {
-                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data, context.user.locale || 'en');
                     } else if(parentDirName === 'field') {
-                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data);
+                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data, context.user.locale || 'en');
                     }
                 }
                 

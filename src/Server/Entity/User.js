@@ -1,6 +1,7 @@
 'use strict';
 
 const Crypto = require('crypto');
+const Path = require('path');
 
 /**
  * A model for Users
@@ -164,6 +165,12 @@ class User extends require('Common/Entity/User') {
             
             if(!options.withPassword) {
                 user.password = null;
+            }
+
+            let localePath = Path.join(APP_ROOT, 'i18n', user.locale + '.json');
+
+            if(HashBrown.Service.FileService.exists(localePath)) {
+                user.localeConfig = require(localePath);
             }
 
             return user;

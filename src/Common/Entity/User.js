@@ -19,8 +19,23 @@ class User extends HashBrown.Entity.EntityBase {
         this.def(String, 'fullName');
         this.def(String, 'email');
         this.def(String, 'theme');
+        this.def(String, 'locale');
+        this.def(Object, 'localeConfig');
         
         this.def(Object, 'scopes', {});
+    }
+
+    /**
+     * Translates a string
+     *
+     * @param {String} string
+     *
+     * @return {String} Translated
+     */
+    translate(string) {
+        if(!string || typeof string !== 'string' || !this.locale || !this.localeConfig || !this.localeConfig[string]) { return string; }
+
+        return this.localeConfig[string];
     }
 
     /**

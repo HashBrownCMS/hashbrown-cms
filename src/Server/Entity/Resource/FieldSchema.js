@@ -45,10 +45,24 @@ class FieldSchema extends require('Common/Entity/Resource/FieldSchema') {
      *
      * @return {Object} Definition
      */
-    static convertFromUISchema(input) {
+    static convertFromUISchema(input, locale) {
         checkParam(input, 'input', Object, true);
+        checkParam(locale, 'locale', String);
+        
+        if(!locale) { locale = 'en'; }
+        
+        let i18n = {};
 
-        let i18n = input['@i18n'] && input['@i18n']['en'] ? input['@i18n']['en'] : {};
+        if(input['@i18n'] && input['@i18n'].constructor === Object) {
+            if(input['@i18n'][locale] && input['@i18n'][locale].constructor === Object) {
+                i18n = input['@i18n'][locale];
+            
+            } else if(Object.values(input['@i18n']).length > 0) {
+                i18n = Object.values(input['@i18n'])[0];
+
+            }
+        }
+        
         let output = {
             id: input['@type'],
             name: i18n['@name'],

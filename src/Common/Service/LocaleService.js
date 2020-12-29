@@ -14,6 +14,8 @@ class LocaleService {
      * @return {String} Name
      */
     static getLocaleName(locale) {
+        checkParam(locale, 'locale', String, true);
+
         let all = this.getLocaleOptions(true);
 
         for(let name in all) {

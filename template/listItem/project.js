@@ -18,20 +18,24 @@ _.div({class: 'list-item--project'},
         ] : null,
         _.div({class: 'list-item--project__info'},
             _.h3({class: 'list-item--project__info__name'}, model.getName()),
-            _.p(model.users.length + ' user' + (model.users.length != 1 ? 's' : '')),
-            _.p(model.settings.locales.length + ' locale' + (model.settings.locales.length != 1 ? 's' : '') + ' (' + model.settings.locales.join(', ') + ')')
+            _.p(
+                _.span({class: 'list-item--project__info__icon fa fa-user'}),
+                model.users.length,
+                _.span({class: 'list-item--project__info__icon fa fa-flag'}),
+                model.settings.locales.length
+            )
         ),
         _.div({class: 'list-item--project__environments'},
             _.each(model.environments, (i, environment) =>
                 _.div({class: 'list-item--project__environment'},
-                    _.a({title: `Enter "${environment}" environment`, href: HashBrown.Client.context.config.system.rootUrl + '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
+                    _.a({title: 'Enter' + ' ' + environment, href: HashBrown.Client.context.config.system.rootUrl + '/' + model.id + '/' + environment, class: 'widget widget--button expanded'}, 
                         HashBrown.Client.context.config.system.isSingleEnvironment ? 'cms' : environment
                     ),
                     HashBrown.Client.context.user.isAdmin && model.environments.length > 1 ? [
                         _.popup({
                             icon: 'ellipsis-v',
                             role: 'item-menu',
-                            tooltip: `Options for "${environment}" environment`,
+                            tooltip: 'Settings for' + ' ' + environment,
                             color: 'primary',
                             options: {
                                 'Delete': () => _.onClickRemoveEnvironment(environment)

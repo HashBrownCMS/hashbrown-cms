@@ -72,6 +72,13 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
     }
     
     /**
+     * Event: Change locale
+     */
+    onChangeLocale(locale) {
+        this.model.locale = locale;
+    }
+    
+    /**
      * Event: Change email
      */
     onChangeEmail(email) {
@@ -110,11 +117,7 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
             this.close();
 
             if(this.model.isCurrent) {
-                let link = document.getElementById('theme');
-
-                if(link) {
-                    link.setAttribute('href', '/css/theme.css?t=' + Date.now());
-                }
+                location.reload();
             }
 
             this.trigger('change', this.model);

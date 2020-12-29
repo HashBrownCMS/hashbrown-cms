@@ -255,6 +255,10 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             let wrapper = document.createElement('div');
 
+                            if(this.context && this.context.user) {
+                                html = this.context.user.translate(html);
+                            }
+
                             wrapper.innerHTML = html;
 
                             return Array.from(wrapper.childNodes);
@@ -270,7 +274,13 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                             let iconMatches = [...string.matchAll(/<icon:([^>]+)>/g)];
 
                             for(let iconMatch of iconMatches) {
-                                elements.push(parts.shift());
+                                let text = parts.shift();
+
+                                if(this.context && this.context.user) {
+                                    text = this.context.user.translate(text);
+                                }
+                                
+                                elements.push(text);
                                 
                                 let iconElement = document.createElement('span');
                                 iconElement.className = `fa fa-${iconMatch[1]}`;
@@ -278,7 +288,13 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                                 elements.push(iconElement);
                             }
 
-                            elements.push(parts.shift());
+                            let lastText = parts.shift(); 
+
+                            if(this.context && this.context.user) {
+                                lastText = this.context.user.translate(lastText);
+                            }
+                                
+                            elements.push(lastText);
 
                             return elements;
                         };
@@ -316,6 +332,14 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                                     editorTemplate: (_, model, state) => { return content; },
                                 }
                             );
+                        };
+
+                    // Translate a string
+                    case 't':
+                        return (string) => {
+                            if(!this.context || !this.context.user) { return string; }
+                            
+                            return this.context.user.translate(string);
                         };
 
                     // Any unrecognised key will be interpreted as an element constructor
@@ -375,6 +399,9 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             } else if(typeof content === 'function') {
                 content = content();
 
+            } else if(typeof content === 'string' && this.context && this.context.user) {
+                content = this.context.user.translate(content);
+            
             }
 
             element.append(content);
@@ -398,6 +425,11 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         // The first parameter could be a collection of attributes
         if(params && params[0] && params[0].constructor === Object) {
             attributes = params.shift();
+        }
+
+        // Translate any property named "title"
+        if(this.context && this.context.user && attributes.title) {
+            attributes.title = this.context.user.translate(attributes.title);
         }
 
         // The remaining parameters are content

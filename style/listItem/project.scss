@@ -23,6 +23,14 @@
         &__name {
             margin: 0;
         }
+
+        &__icon {
+            margin-right: 0.5rem;
+
+            &:not(:first-child) {
+                margin-left: 1rem;
+            }
+        }
     }   
 
     &__environment {

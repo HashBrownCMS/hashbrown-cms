@@ -93,13 +93,7 @@ async function serve(request, response) {
  * Handles uncaught exceptions
  */
 async function exception(error) {
-    debug.error(error, 'HashBrown', true);
-
-    if(state.response) {
-        let result = new HashBrown.Http.Response(error.stack || error.message || 'Unexpected error', error.code || 500);
-    
-        result.end(state.response);
-    }
+    debug.error(error, 'HashBrown');
 }
 
 /**

@@ -5,7 +5,7 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, `Settings for ${model.getName()}`),
+            _.h4({class: 'modal__title'}, 'Settings'),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
@@ -40,7 +40,7 @@ _.div({class: 'modal'},
                     class: 'widget widget--text',
                     type: 'text',
                     value: model.settings.sync.url || '',
-                    placeholder: 'e.g. "https://myserver.com/api/"',
+                    placeholder: 'https://myserver.com',
                     onchange: (e) => _.onChangeSyncUrl(e.target.value)
                 })
             ),
