@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
         
 _.div({class: `list-item--panel-item ${model.type || ''} ${state.isActive ? 'active' : ''}`, 'data-sort': model.sort, id: model.id},
-    _.div({class: 'list-item--panel-item__inner', name:'inner', draggable: model.isDraggable, ondragstart: _.onDragStart, ondragend: _.onDragEnd,  ondragover: _.onDragOver, ondragleave: _.onDragLeave, ondrop: _.onDrop},
+    _.div({class: 'list-item--panel-item__inner', name: 'inner', draggable: model.isDraggable, ondragstart: _.onDragStart, ondragend: _.onDragEnd,  ondragover: _.onDragOver, ondragleave: _.onDragLeave, ondrop: _.onDrop},
         _[model.isDisabled ? 'div' : 'a']({href: model.isDisabled ? null : `#/${model.library}/${model.id}`, class: 'list-item--panel-item__name', oncontextmenu: _.onClickContext},
             _.if(model.icon && !model.image,
                 _.span({class: `list-item--panel-item__icon fa fa-${model.icon}`})

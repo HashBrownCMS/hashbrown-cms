@@ -91,7 +91,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         }
 
         // Then attempt normal fetch
-        if(!resource && !options.nativeOnly) {
+        if(!resource) {
             resource = await super.get(context, id, options);
         }
        
@@ -148,9 +148,9 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 // Convert from uischema.org
                 if(data['@type']) {
                     if(parentDirName === 'content') {
-                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data, context.user.locale || 'en');
+                        data = HashBrown.Entity.Resource.ContentSchema.convertFromUISchema(data, context.user.locale);
                     } else if(parentDirName === 'field') {
-                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data, context.user.locale || 'en');
+                        data = HashBrown.Entity.Resource.FieldSchema.convertFromUISchema(data, context.user.locale);
                     }
                 }
                 
@@ -165,9 +165,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
                 data.context = context;
                 
-                let resource = null;
-
-                resource = this.new(data);
+                let resource = this.new(data);
                 
                 if(!resource) { continue; }
 
@@ -175,12 +173,15 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             }
         }
 
-        // Read normally
-        if(!options.nativeOnly) {
-            let custom = await super.list(context, options);
+        // Read custom schemas (and make sure they're unique)
+        let allSchemas = {};
+        let custom = await super.list(context, options);
 
-            list = list.concat(custom);
+        for(let schema of list.concat(custom)) {
+            allSchemas[schema.id] = schema;
         }
+
+        list = Object.values(allSchemas);
 
         // Post process
         for(let i = list.length - 1; i >= 0 ; i--) {
