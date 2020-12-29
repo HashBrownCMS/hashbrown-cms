@@ -101,7 +101,7 @@
 
     &__frame {
         border: 1px solid var(--color-action-500);   
-        border-radius: 0.2rem;
+        border-radius: var(--border-radius-small);
         box-shadow: 0 0 0 0 var(--color-action-500);
         animation: highlight-pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
     }
@@ -109,7 +109,7 @@
     &__label {
         transform-origin: 0% 0%;
         animation: highlight-popup 0.5s once cubic-bezier(.75, -0.5, 0, 1.75);
-        border-radius: 0.2rem;
+        border-radius: var(--border-radius-small);
         border: 1px solid var(--color-action-500);
         background-color: var(--color-default);
         color: var(--color-default-text);

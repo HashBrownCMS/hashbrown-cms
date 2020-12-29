@@ -24,11 +24,11 @@
         &__tab {
             text-decoration: none;
             padding: 0 2rem;
-            border-top-left-radius: 0.2rem;
-            border-top-right-radius: 0.2rem;
+            border-top-left-radius: var(--border-radius-small);
+            border-top-right-radius: var(--border-radius-small);
             display: inline-block;
-            height: 3rem;
-            line-height: 3rem;
+            height: var(--size-widget-medium);
+            line-height: var(--size-widget-medium);
             text-transform: uppercase;
             font-weight: bold;
             border: 0;

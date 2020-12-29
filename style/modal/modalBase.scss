@@ -66,6 +66,8 @@
         padding: 1rem;
         position: relative;
         display: flex;
+        border-top-left-radius: var(--border-radius-small);
+        border-top-right-radius: var(--border-radius-small);
     }
     
     // Title
@@ -104,6 +106,8 @@
         color: var(--color-decor-text);
         display: flex;
         justify-content: flex-end;
+        border-bottom-left-radius: var(--border-radius-small);
+        border-bottom-right-radius: var(--border-radius-small);
 
         .widget {
             margin-left: 0.5rem;

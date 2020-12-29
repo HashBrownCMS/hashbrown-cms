@@ -6,6 +6,7 @@
     box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
+    border-radius: var(--border-radius-small);
     
     &.loading {
         @include spinner;
