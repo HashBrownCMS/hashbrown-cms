@@ -262,9 +262,11 @@ class DatabaseService {
     /**
      * Lists all databases
      *
+     * @param {Boolean} includeSystem
+     *
      * @returns {Array} Database names
      */
-    static async listDatabases() {
+    static async listDatabases(includeSystem = false) {
         if(!this.client) {
             await this.init();
         }
@@ -282,11 +284,7 @@ class DatabaseService {
 
             if(
                 !database.empty &&
-                database.name !== 'admin' &&
-                database.name !== 'local' &&
-                database.name !== 'config' &&
-                database.name !== prefix + 'users' &&
-                database.name !== prefix + 'schedule' &&
+                (database.name !== prefix + 'system' && !includeSystem) &&
                 database.name.indexOf(prefix) === 0
             ) {
                 let name = database.name.replace(prefix, '');

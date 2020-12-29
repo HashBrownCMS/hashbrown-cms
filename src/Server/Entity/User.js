@@ -151,7 +151,7 @@ class User extends require('Common/Entity/User') {
 
         if(!token) { return null; }
 
-        let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
+        let users = await HashBrown.Service.DatabaseService.find('system', 'users', {});
 
         for(let user of users) {
             user = this.new(user);
@@ -182,7 +182,7 @@ class User extends require('Common/Entity/User') {
     static async list(options = {}) {
         checkParam(options, 'options', Object, true);
 
-        let users = await HashBrown.Service.DatabaseService.find('users', 'users', {});
+        let users = await HashBrown.Service.DatabaseService.find('system', 'users', {});
 
         for(let i in users) {
             users[i] = this.new(users[i]);
@@ -224,7 +224,7 @@ class User extends require('Common/Entity/User') {
         checkParam(id, 'id', String, true);
         checkParam(options, 'options', Object, true);
 
-        let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { id: id });
+        let user = await HashBrown.Service.DatabaseService.findOne('system', 'users', { id: id });
 
         if(!user) { return null; }
 
@@ -251,7 +251,7 @@ class User extends require('Common/Entity/User') {
         checkParam(username, 'username', String, true);
         checkParam(options, 'options', Object, true);
 
-        let user = await HashBrown.Service.DatabaseService.findOne('users', 'users', { username: username });
+        let user = await HashBrown.Service.DatabaseService.findOne('system', 'users', { username: username });
 
         if(!user) { return null; }
 
@@ -293,7 +293,7 @@ class User extends require('Common/Entity/User') {
         user.id = this.createId();
         user.setPassword(options.password);
 
-        await HashBrown.Service.DatabaseService.insertOne('users', 'users', user.getObject());
+        await HashBrown.Service.DatabaseService.insertOne('system', 'users', user.getObject());
 
         user.tokens = [];
         user.password = null;
@@ -317,14 +317,14 @@ class User extends require('Common/Entity/User') {
             throw new Error('Username must be minimum 2 characters long'); 
         }
 
-        await HashBrown.Service.DatabaseService.updateOne('users', 'users', { id: this.id }, this.getObject());
+        await HashBrown.Service.DatabaseService.updateOne('system', 'users', { id: this.id }, this.getObject());
     }
     
     /**
      * Removes this user
      */
     async remove() {
-        await HashBrown.Service.DatabaseService.removeOne('users', 'users', { id: this.id });
+        await HashBrown.Service.DatabaseService.removeOne('system', 'users', { id: this.id });
     }
     
     /**

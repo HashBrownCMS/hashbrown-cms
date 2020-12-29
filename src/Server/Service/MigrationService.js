@@ -8,32 +8,71 @@ class MigrationService {
      * The main migration task
      */
     static async migrate() {
-        let projectIds = await HashBrown.Service.DatabaseService.listDatabases();
+        let databases = await HashBrown.Service.DatabaseService.listDatabases();
 
-        for(let projectId of projectIds) {
+        // Migrate users
+        if(databases.indexOf('users') > -1) {
+            debug.log('Migrating users...', this);
+
+            let users = await HashBrown.Service.DatabaseService.find('users', 'users');
+
+            for(let user of users) {
+                debug.log(`* ${user.id}`, this);
+                
+                await HashBrown.Service.DatabaseService.updateOne('system', 'users', { id: user.id }, user, { upsert: true });
+            }
+
+            await HashBrown.Service.DatabaseService.dropDatabase('users');
+            
+            debug.log('* Done!', this);
+
+            databases = await HashBrown.Service.DatabaseService.listDatabases();
+        }
+
+        // Migrate schedule
+        if(databases.indexOf('schedule') > -1) {
+            debug.log('Migrating schedule...', this);
+
+            let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks');
+
+            for(let task of tasks) {
+                debug.log(`* ${task.id}`, this);
+                
+                await HashBrown.Service.DatabaseService.updateOne('system', 'tasks', { id: task.id }, task, { upsert: true });
+            }
+
+            await HashBrown.Service.DatabaseService.dropDatabase('schedule');
+            
+            debug.log('* Done!', this);
+
+            databases = await HashBrown.Service.DatabaseService.listDatabases();
+        }
+
+        // Check each project
+        for(let projectId of databases) {
             let needsMigration = await this.check(projectId);
 
             if(!needsMigration) { continue; }
 
             debug.log(`Migrating project ${projectId}...`, this);
 
-            debug.log('...creating backup...', this);
+            debug.log('* Creating backup...', this);
 
             await HashBrown.Service.DatabaseService.dump(projectId);
 
-            debug.log('...migrating settings...', this);
+            debug.log('* Migrating settings...', this);
             
             await this.migrateSettings(projectId);
             
-            debug.log('...migrating publications...', this);
+            debug.log('* Migrating publications...', this);
             
             await this.migratePublications(projectId);
             
-            debug.log('...cleaning up...', this);
+            debug.log('* Cleaning up...', this);
             
             await this.cleanup(projectId);
 
-            debug.log('...done!', this);
+            debug.log('* Done!', this);
         }
     }
     

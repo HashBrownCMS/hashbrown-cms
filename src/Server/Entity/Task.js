@@ -75,7 +75,7 @@ class Task extends HashBrown.Entity.EntityBase {
      */
     async remove() {
         await HashBrown.Service.DatabaseService.remove(
-            'schedule',
+            'system',
             'tasks',
             {
                 type: this.type,
@@ -91,7 +91,7 @@ class Task extends HashBrown.Entity.EntityBase {
      */
     async save() {
         await HashBrown.Service.DatabaseService.updateOne(
-            'schedule',
+            'system',
             'tasks',
             {
                 type: this.type,
@@ -132,7 +132,7 @@ class Task extends HashBrown.Entity.EntityBase {
         checkParam(type, 'type', String, true);
 
         let task = await HashBrown.Service.DatabaseService.findOne(
-            'schedule',
+            'system',
             'tasks',
             {
                 type: type,
@@ -170,7 +170,7 @@ class Task extends HashBrown.Entity.EntityBase {
         });
 
         await HashBrown.Service.DatabaseService.insertOne(
-            'schedule',
+            'system',
             'tasks',
             task.getObject()
         );
@@ -188,7 +188,7 @@ class Task extends HashBrown.Entity.EntityBase {
     static async list(options = {}) {
         checkParam(options, 'options', Object, true);
         
-        let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks', options);
+        let tasks = await HashBrown.Service.DatabaseService.find('system', 'tasks', options);
         
         for(let i in tasks) {
             tasks[i] = this.new(tasks[i]);

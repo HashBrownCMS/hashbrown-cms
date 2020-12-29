@@ -134,7 +134,7 @@ class Project extends require('Common/Entity/Project') {
         ];
 
         let users = await HashBrown.Service.DatabaseService.find(
-            'users',
+            'system',
             'users',
             query,
             {
