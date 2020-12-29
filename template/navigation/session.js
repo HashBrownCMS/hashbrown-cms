@@ -16,7 +16,7 @@ _.div({class: 'navigaton navigation--session'},
         })
     ),
     _.popup({
-        tooltip: 'Logged in as "' + (HashBrown.Client.context.user.fullName || HashBrown.Client.context.user.username) + '"',
+        tooltip: HashBrown.Client.context.user.fullName || HashBrown.Client.context.user.username,
         color: 'secondary',
         role: 'navigation-menu',
         icon: 'user',

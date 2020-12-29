@@ -315,7 +315,7 @@ class User extends require('Common/Entity/User') {
      */
     async save(options = {}) {
         this.cleanUpTokens();
-           
+          
         if(options.password) {
             this.setPassword(options.password);
         }

@@ -42,7 +42,7 @@ _.div({class: 'modal in'},
                 HashBrown.Client.context.user.id === model.id ? [
                     _.div({class: 'widget-group'},
                         _.label({class: 'widget widget--label small'}, 'Locale'),
-                        _.popup({autocomplete: true, options: HashBrown.Service.LocaleService.getLocaleOptions(true), value: model.locale || 'en', onchange: _.onChangeLocale})
+                        _.popup({autocomplete: true, options: HashBrown.Service.LocaleService.getUILocaleOptions(true), value: model.locale || 'en', onchange: _.onChangeLocale})
                     )
                 ] : null,
 

@@ -26,6 +26,20 @@ class User extends HashBrown.Entity.EntityBase {
     }
 
     /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
+        let object = super.getObject();
+
+        // Empty the locale config, we don't want to save that to the database
+        object.localeConfig = {};
+
+        return object;
+    }
+
+    /**
      * Translates a string
      *
      * @param {String} string
