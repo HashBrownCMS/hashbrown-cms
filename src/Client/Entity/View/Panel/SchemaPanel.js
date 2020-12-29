@@ -53,10 +53,6 @@ class SchemaPanel extends HashBrown.Entity.View.Panel.PanelBase {
         
         let item = await super.getItem(resource);
 
-        if(resource.id === 'Topic') {
-            console.log(resource.id, resource.name, resource.getName());
-        }
-
         item.name = resource.getName();
         item.parentId = resource.parentId;
     
