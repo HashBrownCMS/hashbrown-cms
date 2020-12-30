@@ -243,9 +243,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
                     unorderedList: 'Unordered'
                 };
                 break;
-            
-            default:
-                throw new Error('Toolbar element category "' + category + '" not recognised');
         }
 
         return elements;

@@ -1,6 +1,6 @@
 {
     "parentId": "fieldBase",
-    "editorId": "LanguageEditor",
-    "customIcon": "globe",
-    "name": "Language"
+    "editorId": "LocaleEditor",
+    "customIcon": "flag",
+    "name": "Locale"
 }

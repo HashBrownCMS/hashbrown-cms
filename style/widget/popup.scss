@@ -291,14 +291,32 @@
             text-align: center;
         }
 
-        &.selected:not(:hover) {
-            background-color: var(--color-default-200);
+        &::after {
+            font-family: 'FontAwesome';
+            position: absolute;
+            display: block;
+            line-height: var(--size-widget-small);
+            width: var(--size-widget-small);
+            text-align: center;
+            top: 0;
+            right: 0;
+        }
+
+        &.selected {
+            &::after {
+                content: '\f00c';
+            }
         }
 
         &:hover {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
         }
+    }
+        
+    &.multiple &__option:not(.selected)::after {
+        content: '\f10c';
+        color: var(--color-default-300);
     }
     
     &__option + &__separator {

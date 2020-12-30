@@ -43,8 +43,45 @@ class ContentController extends HashBrown.Controller.ResourceController {
                 await publication.deployContent(content.id);
             }
         }
+        
+        // Clear publication cache
+        for(let publication of publications) {
+            await publication.clearCache();
+        }
 
         return new HashBrown.Http.Response('OK');
+    }
+    
+    /**
+     * @example POST /api/${project}/${environment}/content/{$id}/pull
+     *
+     * @return {Object} The pulled resource
+     */
+    static async pull(request, params, body, query, context) {
+        // Clear publication cache
+        let publications = await HashBrown.Entity.Resource.Publication.list(context);
+
+        for(let publication of publications) {
+            await publication.clearCache();
+        }
+
+        return await super.pull(request, params, body, query, context);
+    }
+    
+    /**
+     * @example GET|POST|DELETE /api/${project}/${environment}/content/${id}?create=true|false
+     */
+    static async resource(request, params, body, query, context) {
+        // Clear publication cache
+        if(request.method === 'POST' || request.method === 'DELETE') {
+            let publications = await HashBrown.Entity.Resource.Publication.list(context);
+
+            for(let publication of publications) {
+                await publication.clearCache();
+            }
+        }
+
+        return await super.resource(request, params, body, query, context);
     }
     
     /**

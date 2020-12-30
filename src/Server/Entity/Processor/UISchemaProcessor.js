@@ -80,6 +80,8 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'mediaReference':
+                if(typeof value !== 'string') { return null; }
+
                 let media = await HashBrown.Entity.Resource.Media.get(this.context, value);
 
                 if(!media) { return null; }
@@ -116,6 +118,8 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'contentReference':
+                if(typeof value !== 'string') { return null; }
+
                 let content = await HashBrown.Entity.Resource.Content.get(this.context, value);
                 
                 content = await this.process(content, locale);

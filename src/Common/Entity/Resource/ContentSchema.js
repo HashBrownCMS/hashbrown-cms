@@ -35,36 +35,6 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
 
     /**
-     * Adopts values into this entity
-     *
-     * @param {Object} params
-     */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
-
-        params = JSON.parse(JSON.stringify(params || {}));
-        params.config = params.config || {};
-
-        // Adopt from old structure using "fields -> properties"
-        if(params.fields) {
-            let properties = params.fields.properties || {};
-            delete params.fields.properties;
-
-            for(let k in params.fields) {
-                params.config[k] = params.fields[k];
-            }
-            
-            for(let k in properties) {
-                params.config[k] = properties[k];
-            }
-            
-            delete params.fields;
-        }
-        
-        super.adopt(params);
-    }
-
-    /**
      * Checks whether a tab is the default one
      *
      * @param {String} tabId

@@ -181,26 +181,11 @@ class DatabaseService {
 
         await this.dropDatabase(databaseName);
 
-        let collectionNames = Object.keys(collections);
-       
-        let insertCollection = async (index) => {
-            if(index >= collectionNames.length) { return; }
-        
-            let collectionName = collectionNames[index];
-            let documents = collections[collectionName];
-
-            let insertDocument = async (index) => {
-                if(index >= documents.length) { return; }
-            
-                await this.insertOne(databaseName, collectionName, documents[index])
-                await insertDocument(index + 1);
-            };
-
-            await insertDocument(0);
-            await insertCollection(index + 1);    
-        };
-
-        await insertCollection(0);
+        for(let collectionName of Object.keys(collections)) {
+            for(let doc of collections[collectionName]) {
+                await this.insertOne(databaseName, collectionName, doc)
+            }
+        }
     }
    
     /**
@@ -221,23 +206,12 @@ class DatabaseService {
         let timestamp = Date.now();
         let archivePath = Path.join(dumpPath, timestamp + '.hba'); 
 
-        let collectionNames = await this.listCollections(databaseName);
-    
-        let getDocuments = async (index) => {
-            if(index >= collectionNames.length) { return; }
-
-            let collectionName = collectionNames[index].name;
-            let documents = await this.find(databaseName, collectionName, {});
-            
-            collections[collectionName] = documents;
-            
-            await getDocuments(index + 1);
-        };
-
         let collections = {};
-
-        await getDocuments(0); 
         
+        for(let collection of await this.listCollections(databaseName)) {
+            collections[collection.name] = await this.find(databaseName, collection.name, {});
+        }
+    
         await HashBrown.Service.FileService.write(collections, archivePath);
 
         return timestamp.toString();

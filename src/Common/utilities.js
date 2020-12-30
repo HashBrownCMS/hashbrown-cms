@@ -83,6 +83,47 @@ base.updateCheck = async function updateCheck() {
 }
 
 /**
+ * Compares 2 semantic version strings
+ *
+ * @param {String} a
+ * @param {String} b
+ *
+ * @return {Number} -1 for behind, 1 for ahead, 0 for same
+ */
+base.semver = function semver(a, b) {
+    checkParam(a, 'a', String, true);
+    checkParam(b, 'b', String, true);
+
+    let aParts = a.replace(/[^0-9.]/g, '').split('.').filter(Boolean);
+    let bParts = b.replace(/[^0-9.]/g, '').split('.').filter(Boolean);
+        
+    if(aParts.length !== 3 || bParts.length !== 3) {
+        throw new Error(`Could not compare versions ${a} and ${b}`);
+    }
+   
+    // A is behind
+    if(
+        (aParts[0] < bParts[0]) ||
+        (aParts[0] <= bParts[0] && aParts[1] < bParts[1]) ||
+        (aParts[1] <= bParts[1] && aParts[2] < bParts[2])
+    ) {
+        return -1;
+    }
+    
+    // A is ahead
+    if(
+        (bParts[0] < aParts[0]) ||
+        (bParts[0] <= aParts[0] && bParts[1] < aParts[1]) ||
+        (bParts[1] <= aParts[1] && bParts[2] < aParts[2])
+    ) {
+        return 1;
+    }
+
+    // A and B are the same
+    return 0;
+}
+
+/**
  * Handles library creation
  *
  * @param {String} alias

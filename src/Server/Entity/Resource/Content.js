@@ -136,13 +136,6 @@ class Content extends require('Common/Entity/Resource/Content') {
             await unpublishTask.remove();
 
         }
-
-        // Clear publication cache
-        let publications = await HashBrown.Entity.Resource.Publication.list(this.context);
-
-        for(let publication of publications) {
-            await publication.clearCache();
-        }
     }
 
     /**

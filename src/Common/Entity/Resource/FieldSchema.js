@@ -35,24 +35,6 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
     }
 
     /**
-     * Adopts values into this entity
-     *
-     * @param {Object} params
-     */
-    adopt(params = {}) {
-        checkParam(params, 'params', Object);
-
-        params = JSON.parse(JSON.stringify(params || {}));
-    
-        // Backwards compatible editor names
-        if(params.editorId && params.editorId.indexOf('Editor') < 0) {
-            params.editorId = params.editorId[0].toUpperCase() + params.editorId.substring(1) + 'Editor';
-        }
-
-        super.adopt(params);
-    }
-
-    /**
      * Appends properties to this config
      *
      * @param {Object} config

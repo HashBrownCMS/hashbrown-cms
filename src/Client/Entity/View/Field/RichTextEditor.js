@@ -51,8 +51,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
             let categories = {
                 paragraphs: 'Paragraphs',
                 style: 'Style',
-                lists: 'Lists',
-                positioning: 'Positioning'
+                lists: 'Lists'
             };
 
             for(let key in categories) {

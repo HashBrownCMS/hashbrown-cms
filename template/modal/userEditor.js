@@ -65,7 +65,7 @@ _.div({class: 'modal in'},
                                 value: model.getScopes(project.id),
                                 multiple: true,
                                 clearable: true,
-                                placeholder: `(${_.t('no scopes')})`,
+                                placeholder: '(no scopes)',
                                 options: {
                                     'Publications': 'publications',
                                     'Forms': 'forms',

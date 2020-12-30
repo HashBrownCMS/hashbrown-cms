@@ -10,9 +10,6 @@ _.field({label: 'Max. items'},
 ),
 _.field({label: 'Allowed schemas'},
     _.popup({disabled: model.isLocked, autocomplete: true, name: 'allowedSchemas', value: model.config.allowedSchemas, options: state.schemaOptions, multiple: true, onchange: _.onChangeConfig})
-),
-_.field({label: 'Display as grid'},
-    _.checkbox({disabled: model.isLocked, name: 'isGrid', value: model.config.isGrid, onchange: _.onChangeConfig})
 )
 
 ]

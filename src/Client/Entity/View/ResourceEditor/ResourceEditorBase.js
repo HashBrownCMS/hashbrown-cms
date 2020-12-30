@@ -155,19 +155,21 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         super.render();
         
         // Restore scroll position
-        body = this.namedElements.body;
+        requestAnimationFrame(() => {
+            body = this.namedElements.body;
 
-        if(body instanceof HashBrown.Entity.View.ViewBase) {
-            body = body.element;
-        }
-        
-        if(body) {
-            body.scrollTop = scrollTop;
-        }
+            if(body instanceof HashBrown.Entity.View.ViewBase) {
+                body = body.element;
+            }
+            
+            if(body) {
+                body.scrollTop = scrollTop;
+            }
 
-        if(this.element) {
-            this.element.classList.toggle('locked', this.model && this.model.isLocked);
-        }
+            if(this.element) {
+                this.element.classList.toggle('locked', this.model && this.model.isLocked);
+            }
+        });
     }
 
     /**
