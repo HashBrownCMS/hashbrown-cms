@@ -76,20 +76,6 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     isAdmin: true
                 }
             },
-            '/api/projects/${project}/backups/${timestamp}': {
-                handler: this.backup,
-                methods: [ 'GET', 'DELETE' ],
-                user: {
-                    isAdmin: true
-                }
-            },
-            '/api/projects/${project}/backups/${timestamp}/restore': {
-                handler: this.restoreBackup,
-                methods: [ 'POST' ],
-                user: {
-                    isAdmin: true
-                }
-            },
             '/api/projects/${project}/backups/upload': {
                 handler: this.uploadBackup,
                 methods: [ 'POST' ],
@@ -99,6 +85,20 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             },
             '/api/projects/${project}/backups/new': {
                 handler: this.newBackup,
+                methods: [ 'POST' ],
+                user: {
+                    isAdmin: true
+                }
+            },
+            '/api/projects/${project}/backups/${timestamp}': {
+                handler: this.backup,
+                methods: [ 'GET', 'DELETE' ],
+                user: {
+                    isAdmin: true
+                }
+            },
+            '/api/projects/${project}/backups/${timestamp}/restore': {
+                handler: this.restoreBackup,
                 methods: [ 'POST' ],
                 user: {
                     isAdmin: true

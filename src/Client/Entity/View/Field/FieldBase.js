@@ -30,7 +30,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             config: config,
             description: definition.description,
             isDisabled: definition.disabled || state.isDisabled || isDisabled,
-            isLocalized: definition.multilingual || definition.isMultilingual || definition.localized || definition.isLocalized || false,
+            isLocalized: definition.isLocalized || false,
             label: definition.label,
             schema: schema,
             value: value

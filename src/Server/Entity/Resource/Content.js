@@ -383,7 +383,7 @@ class Content extends require('Common/Entity/Resource/Content') {
                     property &&
                     property.constructor === Object &&
                     definition &&
-                    (definition.isLocalized || definition.isMultilingual)
+                    definition.isLocalized
                 ) {
                     properties[key] = properties[key][locale];
                 
