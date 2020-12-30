@@ -33,7 +33,7 @@ class RequestService {
      * @returns {Object} Response
      */
     static async customRequest(method, url, data, headers) {
-        let rootUrl = HashBrown.Client.content.config.system.rootUrl;
+        let rootUrl = HashBrown.Client.context.config.system.rootUrl;
 
         method = method.toUpperCase();
 
@@ -141,7 +141,7 @@ class RequestService {
         checkParam(url, 'url', String, true);
         checkParam(query, 'query', Object);
 
-        let rootUrl = HashBrown.Client.content.config.system.rootUrl || '';
+        let rootUrl = HashBrown.Client.context.config.system.rootUrl || '';
         let newUrl = rootUrl + '/api/';
 
         if(HashBrown.Client.context.project) {
