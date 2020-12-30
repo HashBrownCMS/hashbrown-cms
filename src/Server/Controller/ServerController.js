@@ -41,12 +41,12 @@ class ServerController extends HashBrown.Controller.ControllerBase {
         }
 
         let localVersion = require(APP_ROOT + '/package.json').version || '';
-        let remoteVersion = gitTags.pop();
+        let remoteVersion = gitTags.pop().replace('v', '');
 
         let check = {
             isBehind: semver(localVersion, remoteVersion) < 0,
-            remoteVersion: remoteVersion.join('.'),
-            localVersion: localVersion.join('.')
+            remoteVersion: remoteVersion,
+            localVersion: localVersion
         };
 
         return new HashBrown.Http.Response(check);
