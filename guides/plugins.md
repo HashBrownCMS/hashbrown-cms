@@ -2,7 +2,13 @@
 
 How to extend HashBrown with further functionality
 
-In addition to creating your own, HashBrown also has a couple of [official plugins](https://github.com/HashBrownCMS)
+## Installing
+
+HashBrown has a couple of [official plugins](https://github.com/HashBrownCMS)
+
+To add a plugin to your instance, just clone it to your `/plugins` folder, execute `npm run build:frontend` and restart HashBrown.
+
+# Developing
 
 A plugin's folder structure is like this:
 
