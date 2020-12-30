@@ -1,5 +1,5 @@
 .list-item--project {
-    padding: 1rem;
+    padding: var(--padding-medium);
     position: relative;
     color: var(--color-default-text);
     background-color: var(--color-default);
@@ -26,10 +26,10 @@
         }
 
         &__icon {
-            margin-right: 0.5rem;
+            margin-right: var(--padding-small);
 
             &:not(:first-child) {
-                margin-left: 1rem;
+                margin-left: var(--padding-medium);
             }
         }
     }   
@@ -38,13 +38,13 @@
         position: relative;
 
         &:not(:last-child) {
-            margin-bottom: 1rem;
+            margin-bottom: var(--padding-medium);
         }
     }
 
     .widget--popup[role="item-menu"] {
         position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
+        top: var(--padding-small);
+        right: var(--padding-small);
     }
 }

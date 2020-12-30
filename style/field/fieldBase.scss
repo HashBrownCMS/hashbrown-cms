@@ -15,7 +15,7 @@
         min-height: var(--size-widget-small);
 
         &::before, &::after {
-            margin-top: -0.5rem;
+            margin-top: -var(--padding-small);
         }
     }
 

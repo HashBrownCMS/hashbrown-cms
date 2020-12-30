@@ -1,27 +1,28 @@
 .list-item--user {
     color: var(--color-default-text);
     background-color: var(--color-default);
-    padding: 1rem;
+    padding: var(--padding-medium);
     position: relative;
     transform-origin: center;
     transition: transform 0.25s ease;
     box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius-small);
     
     &__name {
         margin: 0;
     }
 
     &__type {
-        margin-top: 0.5rem;
+        margin-top: var(--padding-small);
 
         &__icon {
-            margin-right: 0.5rem;
+            margin-right: var(--padding-small);
         }   
     }
 
     .widget--popup[role="item-menu"] {
         position: absolute;
-        right: 0.5rem;
-        top: 0.5rem;
+        right: var(--padding-small);
+        top: var(--padding-small)
     }
 }
