@@ -269,49 +269,6 @@ module.exports = (_, model) => `
 <ul>
     <li>Can view SVG, image and video files</li>
 </ul>
-<h2>Forms</h2>
-<h3>Navbar</h3>
-<ul>
-    <li>Can copy Form id</li>
-    <li>Can remove Form</li>
-    <li>Can pull from remote</li>
-    <li>Can push to remote</li>
-</ul>
-<h3>Editor</h3>
-<ul>
-    <li>Can see amount of entries</li>
-    <li>Can clear entires</li>
-    <li>Can download entries as CSV</li>
-    <li>Can see timestamps on all entries</li>
-    <li>Can copy the generated POST URL</li>
-    <li>Can change the title</li>
-    <li>Can set the allowed origin</li>
-    <li>Can set redirect URL</li>
-    <li>Can toggle whether the redirect URL is appended</li>
-    <li>Can define inputs
-        <ul>
-            <li>Can set input name</li>
-            <li>Can set input type</li>
-            <li>Can toggle "required" attribute</li>
-            <li>Can toggle "check for duplicates"</li>
-            <li>Can define regex pattern</li>
-            <li>Test form updates as fields are updated</li>
-        </ul>
-    </li>
-</ul>
-<h3>Submissions</h3>
-<ul>
-    <li>Submissions are only accepted from the allowed origin</li>
-    <li>Submissions are timestamped</li>
-    <li>Submissions enter the database correctly</li>
-    <li>If a redirect is specified, it is carried out successfully upon submission
-        <ul>
-            <li>If the redirect is appended, it is done so as well</li>
-        </ul>
-    </li>
-    <li>If "check for duplicates" is checked, no duplicates are allowed</li>
-    <li>If a regex pattern is defined, it is checked properly</li>
-</ul>
 <h2>Publications</h2>
 <h3>Publishing</h3>
 <ul>

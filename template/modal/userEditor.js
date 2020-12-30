@@ -68,7 +68,6 @@ _.div({class: 'modal in'},
                                 placeholder: '(no scopes)',
                                 options: {
                                     'Publications': 'publications',
-                                    'Forms': 'forms',
                                     'Schemas': 'schemas'
                                 },
                                 onchange: (scopes) => _.onChangeResourceScope(project.id, scopes)
