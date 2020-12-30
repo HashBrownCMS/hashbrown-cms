@@ -340,9 +340,9 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             return new HashBrown.Http.Response('Not found', 404);
         }
         
-        await project.createBackup();
+        let timestamp = await project.createBackup();
 
-        return new HashBrown.Http.Response('OK');
+        return new HashBrown.Http.Response(timestamp);
     }
 
 
