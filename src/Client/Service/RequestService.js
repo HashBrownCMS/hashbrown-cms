@@ -33,8 +33,14 @@ class RequestService {
      * @returns {Object} Response
      */
     static async customRequest(method, url, data, headers) {
+        let rootUrl = HashBrown.Client.content.config.system.rootUrl;
+
         method = method.toUpperCase();
-        url = (HashBrown.Client.context.config.system.rootUrl || '') + url;
+
+        if(rootUrl && url.indexOf(rootUrl) !== 0) {
+            url = rootUrl + url;
+        }
+        
         headers = headers || {
             'Content-Type': 'application/json; charset=utf-8'
         };
@@ -135,7 +141,8 @@ class RequestService {
         checkParam(url, 'url', String, true);
         checkParam(query, 'query', Object);
 
-        let newUrl = '/api/';
+        let rootUrl = HashBrown.Client.content.config.system.rootUrl || '';
+        let newUrl = rootUrl + '/api/';
 
         if(HashBrown.Client.context.project) {
             newUrl += HashBrown.Client.context.project.id + '/';
