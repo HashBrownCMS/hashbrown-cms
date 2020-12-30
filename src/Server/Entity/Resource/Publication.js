@@ -128,7 +128,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         let content = await HashBrown.Entity.Resource.Content.get(this.context, contentId);
 
         for(let locale of locales) {
-            let data = await this.processor.process(content, locale || 'en');
+            let data = await this.processor.process(content, locale);
             
             if(!data) { continue; }
 
@@ -173,6 +173,14 @@ class Publication extends require('Common/Entity/Resource/Publication') {
             throw new HashBrown.Http.Exception('Processor not specified', 500);
         }
 
+        let locale = query.locale;
+
+        if(!locale) {
+            let locales = await this.context.project.getLocales()
+
+            locale = locales[0] || 'en';
+        }
+
         let cache = await this.getCache(query);
 
         if(cache) { return cache; }
@@ -200,7 +208,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
                 if(!isDescendant) { continue; }
             }
            
-            let output = await this.processor.process(item, query.locale || 'en');
+            let output = await this.processor.process(item, locale);
 
             let isMatch = this.isQueryMatch(query, output);
 

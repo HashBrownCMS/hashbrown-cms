@@ -66,13 +66,15 @@ class ProjectSettings extends HashBrown.Entity.View.Modal.ModalBase {
             let password = this.element.querySelector('input[name="password"]').value;
             let url = this.model.settings.sync.url;
    
-            if(username && password && url) {
-                let token = await HashBrown.Service.RequestService.request('post', `projects/${this.model.id}/sync/token`, { username: username, password: password, url: url });
+            if(!username) { throw new Error('Username is required'); }
+            if(!password) { throw new Error('Password is required'); }
+            if(!url) { throw new Error('URL is required'); }
 
-                this.model.settings.sync.token = token;
-                
-                this.element.querySelector('input[name="token"]').value = token;
-            }
+            let token = await HashBrown.Service.RequestService.request('post', `projects/${this.model.id}/sync/token`, { username: username, password: password, url: url });
+
+            this.model.settings.sync.token = token;
+            
+            this.element.querySelector('input[name="token"]').value = token;
 
         } catch(e) {
             UI.error(e);

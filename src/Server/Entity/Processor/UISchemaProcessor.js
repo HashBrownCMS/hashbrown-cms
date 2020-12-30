@@ -138,14 +138,12 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      *
      * @param {Content} content
      * @param {String} locale
-     * @param {Array} filter
      *
      * @returns {Promise} Result
      */
-    async process(content, locale = 'en', filter = []) {
+    async process(content, locale = 'en') {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(locale, 'locale', String, true);
-        checkParam(filter, 'filter', Array, true);
 
         let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId);
         let properties = await content.getLocalizedProperties(locale);
@@ -180,12 +178,10 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         data['identifier'] = content.id;
         
         for(let key in schema.config) {
-            if(filter.length > 0 && filter.indexOf(key) < 0) { continue; }
-
             data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
         }
         
-        if(!data.name && data.title) {
+        if(!data.name && data.title !== undefined) {
             data.name = data.title;
             delete data.title;
         }
@@ -206,7 +202,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         data.dateCreated = content.createdOn;
         data.dateModified = content.updatedOn;
-        data.datePublished = content.createdOn;
+        data.datePublished = content.updatedOn;
         
         return data;
     }

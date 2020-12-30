@@ -8,7 +8,7 @@ _.div({class: 'list-item--project'},
             _.popup({
                 icon: 'ellipsis-v',
                 role: 'item-menu',
-                tooltip: `Options for ${model.getName()}`,
+                tooltip: 'Options',
                 options: {
                     'Settings': _.onClickSettings,
                     'Backups': _.onClickBackups,
@@ -19,10 +19,11 @@ _.div({class: 'list-item--project'},
         _.div({class: 'list-item--project__info'},
             _.h3({class: 'list-item--project__info__name'}, model.getName()),
             _.p(
-                _.span({class: 'list-item--project__info__icon fa fa-user'}),
+                _.span({class: 'list-item--project__info__icon fa fa-user', title: 'Users'}),
                 model.users.length,
-                _.span({class: 'list-item--project__info__icon fa fa-flag'}),
-                model.settings.locales.length
+                _.span({class: 'list-item--project__info__icon fa fa-flag', title: 'Locales'}),
+                model.settings.locales.length,
+                model.settings && model.settings.sync && model.settings.sync.enabled ? _.span({class: 'list-item--project__info__icon fa fa-external-link', title: 'Synced'}) : null
             )
         ),
         _.div({class: 'list-item--project__environments'},

@@ -136,7 +136,7 @@ async function init() {
 
     let locales = HashBrown.Client.context.project.settings.locales;
 
-    if(locales.indexOf(HashBrown.Client.locale) < 0) {
+    if(!HashBrown.Client.locale || locales.indexOf(HashBrown.Client.locale) < 0) {
         HashBrown.Client.locale = locales[0];
     }
 

@@ -291,10 +291,6 @@ class Project extends require('Common/Entity/Project') {
             );
 
             if(remoteSettings) {
-                if(remoteSettings.name) {
-                    settings.name += ' (' + remoteSettings.name + ')';
-                }
-
                 delete remoteSettings.name;
                 delete remoteSettings.sync;
 
