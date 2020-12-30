@@ -31,7 +31,7 @@ class CreateUser extends HashBrown.Entity.View.Modal.ModalBase {
      */
     onClickEmail() {
         let subject = 'Invitation to HashBrown CMS';
-        let url = `${location.protocol}//${location.host}`;
+        let url = `${location.protocol}//${location.host}${this.context.config.system.rootUrl}`;
         let body = [
             `Hello ${this.model.fullName || this.model.username}!`,
             ``,
