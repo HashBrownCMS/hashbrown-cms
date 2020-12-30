@@ -1,7 +1,5 @@
 .field {
     position: relative;
-    display: flex;
-    flex-wrap: wrap;
 
     &:not(:last-child) {
         margin-bottom: var(--padding-medium);
@@ -35,6 +33,7 @@
         padding-right: var(--padding-small);
         border-right: 1px solid var(--color-default-200); 
         min-width: calc(var(--size-widget-small) + var(--padding-small));
+        flex-shrink: 0;
 
         &:empty {
             display: none;
@@ -48,8 +47,6 @@
     }
 
     &__key {
-        flex-basis: 100%;
-        flex-shrink: 0;
         line-height: var(--size-widget-small);
         margin-bottom: var(--padding-small);
         overflow: hidden;
@@ -72,6 +69,10 @@
         flex-basis: 8rem;
         margin-right: var(--padding-large);
         margin-bottom: 0;
+    }
+
+    &__content {
+        display: flex;
     }
 
     &__value {

@@ -484,6 +484,21 @@ class Project extends require('Common/Entity/Project') {
             settings = {};
         }
 
+        // Instantiate media deployer
+        if(settings.mediaDeployer && settings.mediaDeployer.alias) {
+            let deployer = settings.mediaDeployer;
+
+            deployer.context = new HashBrown.Entity.Context({
+                project: this,
+                environment: environment
+            });
+            
+            deployer = HashBrown.Entity.Deployer.DeployerBase.new(deployer);
+            deployer.ensureRootPath('media');
+
+            settings.mediaDeployer = deployer;
+        }
+
         if(section) {
             return settings[section] || null;
         }

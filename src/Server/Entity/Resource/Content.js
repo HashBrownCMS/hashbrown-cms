@@ -351,7 +351,7 @@ class Content extends require('Common/Entity/Resource/Content') {
 
         return schema.allowedChildSchemas.indexOf(this.schemaId) > -1;
     }
-    
+   
     /**
      * Returns all properties in a given locale
      *

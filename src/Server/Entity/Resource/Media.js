@@ -18,13 +18,7 @@ class Media extends require('Common/Entity/Resource/Media') {
     static async getDeployer(context) {
         checkParam(context, 'context', HashBrown.Entity.Context, true);
         
-        let deployer = await context.project.getEnvironmentSettings(context.environment, 'mediaDeployer');
-
-        if(!deployer || !deployer.alias) { return null; }
-
-        deployer.context = context;
-
-        return HashBrown.Entity.Deployer.DeployerBase.new(deployer);
+        return await context.project.getEnvironmentSettings(context.environment, 'mediaDeployer');
     }
     
     /**
@@ -102,7 +96,7 @@ class Media extends require('Common/Entity/Resource/Media') {
 
         await deployer.removeFolder(deployer.getPath(resource.id));
         await deployer.setFile(deployer.getPath(resource.id, options.filename), options.full);
-        
+
         let thumbnail = await this.generateThumbnail(context, options.filename, Buffer.from(options.full, 'base64'));
        
         if(thumbnail) {
@@ -140,7 +134,7 @@ class Media extends require('Common/Entity/Resource/Media') {
             return file;
         }
 
-        return null;
+        return '';
     }
 
     /**
@@ -151,19 +145,19 @@ class Media extends require('Common/Entity/Resource/Media') {
     async getThumbnailUrl(ensureWebUrl = false) {
         checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
 
-        let url = await this.getContentUrl(ensureWebUrl);
-
-        if(!url) { return null }
-
-        // SVGs don't use thumbnails
-        if(!this.isSvg()) {
-            url = Path.join(Path.dirname(url), 'thumbnail.jpg');
+        if(this.isSvg()) {
+            return this.getContentUrl(ensureWebUrl);
         }
 
-        // If the path module removed doubles slashes for protocols, add them back
-        url = url.replace(/:\/([^\/])/, '://$1');
+        if(ensureWebUrl) {
+            return await this.getPublicUrl(this.id + '/thumbnail.jpg');
+        }
 
-        return url;
+        let deployer = await this.constructor.getDeployer(this.context);
+
+        if(!deployer) { return ''; }
+                
+        return deployer.getPath(this.id, 'thumbnail.jpg');
     }
 
     /**
@@ -341,7 +335,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         // If not an image, or SVG, we won't be generating anything
         if(type.indexOf('image') < 0 || type.indexOf('svg') > -1) { return null; }
 
-        let tempFolder = Path.join(APP_ROOT, 'storage', context.project.id, context.environment, 'media');
+        let tempFolder = Path.join(APP_ROOT, 'storage', context.project.id, context.environment, 'tmp');
         let tempFile = Path.join(tempFolder, 'thumbnail' + Path.extname(filename));
         
         // Write the temporary file of the full source

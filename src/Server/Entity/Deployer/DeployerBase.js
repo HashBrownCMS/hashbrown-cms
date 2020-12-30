@@ -40,6 +40,13 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
     }
 
     /**
+     * Ensures that a root path is in place
+     *
+     * @param {String} appendix
+     */
+    ensureRootPath(appendix) {}
+
+    /**
      * Adopts values into this entity
      *
      * @param {Object} params

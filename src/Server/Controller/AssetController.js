@@ -125,12 +125,12 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         if(!media) {
             return new HashBrown.Http.Response('Not found', 404);
         }
-            
+           
         let isThumbnail = ('thumbnail' in query) && !media.isSvg();
         let url = isThumbnail ? await media.getThumbnailUrl() : await media.getContentUrl();
-        
+
         if(!url) {
-            return new HashBrown.Http.Response('Media URL could not be resolved', 404);
+            return new HashBrown.Http.Response(`Media ${isThumbnail ? 'thumbnail' : 'content'} URL could not be resolved`, 404);
         }
 
         let data = HashBrown.Service.FileService.readStream(url);

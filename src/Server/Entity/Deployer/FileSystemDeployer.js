@@ -25,7 +25,18 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
 
         this.def(String, 'rootPath');
     }
-    
+     
+    /**
+     * Ensures that a root path is in place
+     *
+     * @param {String} appendix
+     */
+    ensureRootPath(appendix) {
+        if(this.rootPath) { return; }
+
+        this.rootPath = Path.join(APP_ROOT, 'storage', this.context.project.id, this.context.environment, appendix);
+    }
+        
     /**
      * Tests this deployer
      *
@@ -76,7 +87,7 @@ class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
      */
     async renameFile(oldPath, name) {
         let newPath = Path.join(Path.dirname(oldPath), name);
-        
+       
         await HashBrown.Service.FileService.move(oldPath, newPath);
     }
     

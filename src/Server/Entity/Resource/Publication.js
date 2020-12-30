@@ -32,6 +32,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         if(params.deployer && params.deployer.alias && params.deployer instanceof HashBrown.Entity.Deployer.DeployerBase === false) {
             params.deployer.context = params.context || this.context;
             params.deployer = HashBrown.Entity.Deployer.DeployerBase.new(params.deployer);
+
+            params.deployer.ensureRootPath('content');
         }
         
         if(params.processor && params.processor.alias && params.processor instanceof HashBrown.Entity.Processor.ProcessorBase === false) {

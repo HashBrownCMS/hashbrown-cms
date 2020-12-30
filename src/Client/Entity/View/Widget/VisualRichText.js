@@ -403,7 +403,7 @@ class VisualRichText extends HashBrown.Entity.View.Widget.RichText  {
             let modal = HashBrown.Entity.View.Modal.CreateLink.new({
                 model: {
                     useText: false,
-                    newTab: false
+                    useNewTab: false
                 }
             });
 

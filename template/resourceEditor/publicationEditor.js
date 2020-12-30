@@ -36,10 +36,10 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
                     _.button({title: 'Go to URL', class: 'widget widget--button small fa fa-external-link', onclick: _.onClickGoToGetUrl})
                 )
             ),
-            _.field({label: 'Processor', description: 'The format to expose content in', labelTag: 'h2'},
+            _.field({label: 'Processing', description: 'The format to expose content in', labelTag: 'h2'},
                 state.processorEditor,
             ),
-            _.field({label: 'Deployer', description: 'Where to deploy published content', labelTag: 'h2'},
+            _.field({label: 'File handling', description: 'Where to deploy published content', labelTag: 'h2'},
                 state.deployerEditor
             ),
             _.field({label: 'Limits', labelTag: 'h2'},

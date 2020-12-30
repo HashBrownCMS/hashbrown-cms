@@ -15,36 +15,38 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
         
         ] : null,
 
-        !state.hideTools ? [
-            _.div({class: 'field__tools'},
-                state.isCollapsible ? [
-                    _.button({class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
+        _.div({class: 'field__content'}, 
+            !state.hideTools ? [
+                _.div({class: 'field__tools'},
+                    state.isCollapsible ? [
+                        _.button({class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
 
-                ] : null,
-
-                _.each(state.tools || model.tools, (name, tool) =>
-                    _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
-                )
-            )
-
-        ] : null,
-        
-        _.div({class: 'field__value'},
-            state.isCollapsed ? [
-                _.div({class: 'field__value__label'}, 
-                    state.icon ? [
-                        _.span({class: `field__value__label__icon fa fa-${state.icon}`})
                     ] : null,
-                    state.label
+
+                    _.each(state.tools || model.tools, (name, tool) =>
+                        _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
+                    )
                 )
 
-            ] : state.name === 'config' ? [
-                _.include(state.configTemplate)
+            ] : null,
+            
+            _.div({class: 'field__value'},
+                state.isCollapsed ? [
+                    _.div({class: 'field__value__label'}, 
+                        state.icon ? [
+                            _.span({class: `field__value__label__icon fa fa-${state.icon}`})
+                        ] : null,
+                        state.label
+                    )
 
-            ] : [
-                _.include(state.editorTemplate)
+                ] : state.name === 'config' ? [
+                    _.include(state.configTemplate)
 
-            ]
+                ] : [
+                    _.include(state.editorTemplate)
+
+                ]
+            )
         )
     ]
 )

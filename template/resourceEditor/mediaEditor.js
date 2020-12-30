@@ -23,10 +23,10 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
             )
 
         ] : state.tab === 'settings' ? [
-            _.field({ label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'}, 
+            _.field({label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'}, 
                 _.text({ value: state.settings.mediaPublicUrl, onchange: _.onChangePublicUrl })
             ),
-            _.field({ label: 'Deployer', description: 'How to read/write media files', labelTag: 'h2' },
+            _.field({label: 'File handling', description: 'How to read/write media files', labelTag: 'h2'},
                 state.deployerEditor
             )
 
