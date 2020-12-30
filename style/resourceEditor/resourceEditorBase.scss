@@ -17,6 +17,14 @@
         padding: 4rem;
         margin-right: auto;
         max-width: 40rem;
+
+        &__actions {
+            margin-top: var(-padding-large);
+
+            .widget {
+                margin-bottom: var(--padding-medium);
+            }
+        }
     }
 
     &__header {

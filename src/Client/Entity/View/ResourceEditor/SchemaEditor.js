@@ -172,7 +172,7 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             
         await UI.highlight('.navigation--resource-browser__tab[href="#/schemas/"]', 'This the schemas section, where you will define how content is structured.', 'right', 'next');
 
-        await UI.highlight('.panel', 'Here you will find all of your schemas. They are divided into 2 major categories, "field base" and "content base". Content schemas define which fields are available to content authors, and field schemas define how they are presented.', 'right', 'next');
+        await UI.highlight('.panel', 'Here you will find all of your schemas. They are divided into 2 major categories, "field" and "content". Content schemas define which fields are available to content authors, and field schemas define how they are presented.', 'right', 'next');
         
         await UI.highlight('.resource-editor', 'This is the schema editor, where you can edit schemas.', 'left', 'next');
     }

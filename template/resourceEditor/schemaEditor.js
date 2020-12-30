@@ -15,8 +15,9 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                 _.h1('Schemas'),
                 _.p('Click any item in the panel to edit it.'),
                 _.p('Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
-                _.div({class: 'widget-group'},
-                    _.button({class: 'widget widget--button', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
+                _.h2('Actions'),
+                _.div({class: 'resource-editor__welcome__actions'},
+                    _.button({class: 'widget widget--button condensed', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
                 )
             )
     

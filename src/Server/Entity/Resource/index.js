@@ -6,7 +6,6 @@
 namespace('Entity.Resource')
 .add(require('./ResourceBase'))
 .add(require('./Content'))
-.add(require('./Form'))
 .add(require('./Media'))
 .add(require('./SchemaBase'))
 .add(require('./ContentSchema'))

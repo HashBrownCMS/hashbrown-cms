@@ -12,7 +12,7 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * @param {Content} content
      * @param {String} locale
      *
-     * @returns {Promise} Result
+     * @returns {Object} Result
      */
     async process(content, locale) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
@@ -28,7 +28,7 @@ class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         let createdBy = await content.getCreatedBy();
         let updatedBy = await content.getUpdatedBy();
 
-        // We'll have to a allow unknown authors, as they could disappear between backups
+        // We'll have to allow unknown authors, as they could disappear between backups
         if(!createdBy) {
             createdBy = HashBrown.Entity.User.new({
                 fullName: 'Unknown',

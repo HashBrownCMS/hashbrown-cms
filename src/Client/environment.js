@@ -101,11 +101,6 @@ async function init() {
         .add(HashBrown.Entity.View.ResourceEditor.ContentEditor)
         .add(HashBrown.Entity.View.Panel.ContentPanel);
 
-    library('forms', 'Forms', 'wpforms')
-        .add(HashBrown.Entity.Resource.Form)
-        .add(HashBrown.Entity.View.ResourceEditor.FormEditor)
-        .add(HashBrown.Entity.View.Panel.FormPanel);
-    
     library('media', 'Media', 'file-image-o')
         .add(HashBrown.Entity.Resource.Media)
         .add(HashBrown.Entity.View.ResourceEditor.MediaEditor)

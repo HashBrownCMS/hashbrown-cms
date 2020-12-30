@@ -14,6 +14,10 @@ class ProcessorBase extends HashBrown.Entity.EntityBase {
   
     get alias() { return this.constructor.alias; }
     
+    static get fileExtension() { return '.json'; }
+   
+    get fileExtension() { return this.constructor.fileExtension; }
+
     /**
      * Constructor
      *

@@ -129,7 +129,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
         for(let locale of locales) {
             let data = await this.processor.process(content, locale);
-            
+            let extension = this.processor.fileExtension || '.json';
+
             if(!data) { continue; }
 
             if(typeof data !== 'string') {
@@ -142,7 +143,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
             data = Buffer.from(data, 'utf8').toString('base64');
 
-            await this.deployer.setFile(this.deployer.getPath(locale, contentId + '.json'), data);
+            await this.deployer.setFile(this.deployer.getPath(locale, contentId + extension), data);
         }
     }
     
@@ -155,8 +156,10 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         checkParam(contentId, 'contentId', String, true);
 
         if(!this.canDeploy()) { return; }
+            
+        let extension = this.processor.fileExtension || '.json';
 
-        await this.deployer.removeFile(this.deployer.getPath('*', contentId + '.json'));
+        await this.deployer.removeFile(this.deployer.getPath('*', contentId + extension));
     }
 
     /**

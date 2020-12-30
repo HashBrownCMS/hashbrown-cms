@@ -28,10 +28,6 @@ library('content', 'Content', 'cubes')
     .add(HashBrown.Entity.Resource.Content)
     .add(HashBrown.Controller.ContentController);
 
-library('forms', 'Forms', 'wpforms')
-    .add(HashBrown.Entity.Resource.Form)
-    .add(HashBrown.Controller.FormController);
-
 library('media', 'Media', 'file-image-o')
     .add(HashBrown.Entity.Resource.Media)
     .add(HashBrown.Controller.MediaController);
