@@ -356,7 +356,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             case 'GET':
                 let data = await HashBrown.Service.FileService.read(path);
 
-                return new HashBrown.Http.Response(backup, 200, {
+                return new HashBrown.Http.Response(data, 200, {
                     'Content-Type': 'application/octet-stream',
                     'Content-Disposition': `attachment; filename="${params.timestamp}.hba"`
                 });
