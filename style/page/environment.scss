@@ -23,6 +23,56 @@
                     flex-grow: 1;
                 }
             }
+
+            @include phone {
+                position: absolute;
+                z-index: 1000;
+                top: 0;
+                left: 0;
+                transition: transform 0.5s ease;
+                transform: translateX(-100%);
+
+                &__toggle:checked ~ & {
+                    transform: none;
+                    box-shadow: var(--box-shadow);
+                }
+                
+                &__toggle:checked ~ &__switch {
+                    color: var(--color-default);
+                    transform: rotate(180deg);
+
+                    &::after {
+                        content: '\f00d';
+                    }
+                }
+            }
+
+            &__toggle {
+                display: none;
+            }
+
+            &__switch {
+                position: absolute;
+                display: none;
+                left: var(--padding-small);
+                bottom: var(--padding-small);
+                width: var(--size-widget-large);
+                line-height: var(--size-widget-large);
+                cursor: pointer;
+                text-align: center;
+                z-index: 1100;
+                color: var(--color-default-text);
+                transition: color 0.5s ease, transform 0.5s ease;
+
+                &::after {
+                    font-family: 'FontAwesome';
+                    content: '\f0c9';
+                }
+
+                @include phone {
+                    display: block;
+                }
+            }
         }
 
         &--editor {

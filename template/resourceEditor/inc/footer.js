@@ -12,7 +12,7 @@ state.tab !== 'overview' ? [
         ),
         _.div({class: 'resource-editor__footer__actions'},
             model ? [
-                _.a({href: `#/${state.library}/${state.id}/json`, class: 'widget widget--button embedded'}, 'Advanced'),
+                _.a({href: `#/${state.library}/${state.id}/json`, class: 'widget widget--button embedded hidden-phone'}, 'Advanced'),
                 !model.isLocked ? [
                     state.visibleSaveOptions && Object.keys(state.visibleSaveOptions).length > 0 ? [
                         _.div({class: 'widget-group'},

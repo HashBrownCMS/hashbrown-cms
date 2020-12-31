@@ -497,6 +497,10 @@ class Project extends require('Common/Entity/Project') {
             deployer.ensureRootPath('media');
 
             settings.mediaDeployer = deployer;
+        
+        } else {
+            settings.mediaDeployer = null;
+
         }
 
         if(section) {

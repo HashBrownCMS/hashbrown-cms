@@ -25,6 +25,11 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
 
         this.state.saveOptions = this.state.saveOptions || {};
         this.state.settings = this.state.settings || {};
+
+        // Make sure the resource browser is collapsed on mobile
+        if(this.state.name !== 'welcome') {
+            document.getElementById('page--environment__space--nav__toggle').checked = false;
+        }
     }
 
     /**

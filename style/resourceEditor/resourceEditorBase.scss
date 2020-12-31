@@ -92,6 +92,7 @@
         padding: 1rem;
         flex-grow: 1;
         overflow: auto;
+        max-width: 100%;
 
         &.centered {
             display: flex;
@@ -106,8 +107,8 @@
 
     &__footer {
         border-top: 1px solid var(--color-default-200);
-        padding: 1rem;
-        min-height: var(--size-widget-large);
+        padding: var(--padding-medium);
+        min-height: calc(var(--size-widget-large) + var(--padding-medium));
         display: flex;
         flex-shrink: 0;
 

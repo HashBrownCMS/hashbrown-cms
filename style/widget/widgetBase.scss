@@ -103,6 +103,12 @@
     // Hidden
     &.hidden {
         display: none;
+
+        &-phone {
+            @include phone {
+                display: none;
+            }
+        }
     }
 
     // Colour themes

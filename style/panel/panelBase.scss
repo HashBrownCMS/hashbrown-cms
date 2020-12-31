@@ -4,16 +4,6 @@
     flex-direction: column;
     width: calc(var(--width-panels) - var(--size-widget-large) - var(--padding-medium));
 
-    @include phone {
-        body:not(.welcome) & {
-            display: none;            
-        }
-
-        body.welcome & {
-            width: 100%;
-        }
-    }
-
     &.loading {
         @include spinner; 
     }
