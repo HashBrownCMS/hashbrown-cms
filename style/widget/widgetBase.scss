@@ -100,17 +100,6 @@
         pointer-events: none;
     }
 
-    // Hidden
-    &.hidden {
-        display: none;
-
-        &-phone {
-            @include phone {
-                display: none;
-            }
-        }
-    }
-
     // Colour themes
     &.warn {
         background-color: var(--color-warn-500);

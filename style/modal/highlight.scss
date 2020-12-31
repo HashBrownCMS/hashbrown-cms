@@ -119,7 +119,7 @@
         position: absolute;
         min-height: 2rem;
         min-width: 20rem;
-        box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+        box-shadow: var(--box-shadow);
 
         &:after {
             position: absolute;

@@ -37,13 +37,8 @@
                     box-shadow: var(--box-shadow);
                 }
                 
-                &__toggle:checked ~ &__switch {
-                    color: var(--color-default);
-                    transform: rotate(180deg);
-
-                    &::after {
-                        content: '\f00d';
-                    }
+                &__toggle:checked ~ &__switch::after {
+                    content: '\f00d';
                 }
             }
 
@@ -54,15 +49,16 @@
             &__switch {
                 position: absolute;
                 display: none;
-                left: var(--padding-small);
-                bottom: var(--padding-small);
-                width: var(--size-widget-large);
-                line-height: var(--size-widget-large);
+                left: var(--padding-medium);
+                bottom: var(--padding-medium);
+                width: var(--size-widget-medium);
+                line-height: var(--size-widget-medium);
                 cursor: pointer;
                 text-align: center;
                 z-index: 1100;
-                color: var(--color-default-text);
-                transition: color 0.5s ease, transform 0.5s ease;
+                color: var(--color-action-text);
+                border-radius: var(--border-radius-small);
+                background-color: var(--color-action-500);
 
                 &::after {
                     font-family: 'FontAwesome';

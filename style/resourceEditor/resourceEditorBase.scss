@@ -18,6 +18,12 @@
         margin-right: auto;
         max-width: 40rem;
 
+        &__heading {
+            &__icon {
+                margin-left: var(--padding-medium);
+            }
+        }
+
         &__actions {
             margin-top: var(-padding-large);
 
