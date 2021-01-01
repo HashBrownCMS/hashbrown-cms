@@ -14,15 +14,6 @@ class DateEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/dateEditor');
     }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = DateEditor;

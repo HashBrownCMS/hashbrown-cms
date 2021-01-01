@@ -126,6 +126,13 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
             this.state.value = this.model.value;
 
         }
+        
+        // Update tools
+        this.state.tools = await this.getTools();
+
+        // Update value label and icon
+        this.state.label = await this.getValueLabel();
+        this.state.icon = await this.getValueIcon();
 
         await super.update();
     }
@@ -145,7 +152,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {Object} Tools
      */
-    getTools() {
+    async getTools() {
         if(this.model.tools) {
             return this.model.tools;
         }
@@ -157,13 +164,6 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * Pre render
      */
     prerender() {
-        // Update tools
-        this.state.tools = this.getTools();
-
-        // Update value label and icon
-        this.state.label = this.getValueLabel();
-        this.state.icon = this.getValueIcon();
-
         // Expose include templates
         this.state.editorTemplate = this.editorTemplate;
         this.state.configTemplate = this.configTemplate;
@@ -184,11 +184,20 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     }
 
     /**
+     * Checks if this field is in the config state
+     *
+     * @return {Boolean} Is config
+     */
+    isConfig() {
+        return this.state.name === 'config';
+    }
+
+    /**
      * Gets the value icon
      *
      * @return {String}
      */
-    getValueIcon() {
+    async getValueIcon() {
         if(!this.model || !this.model.schema) { return ''; }
 
         return this.model.schema.icon;
@@ -199,7 +208,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      *
      * @return {String}
      */
-    getValueLabel() {
+    async getValueLabel() {
         if(!this.model || !this.model.schema) { return '...'; }
 
         return this.model.schema.name;
@@ -227,7 +236,7 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      * Event: Change value
      */
     onChange(newValue) {
-        if(this.state.name === 'config') {
+        if(this.isConfig()) {
             this.trigger('change', this.model.config);
 
         } else {

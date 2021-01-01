@@ -75,6 +75,22 @@
         }
     }
 
+    // Grid
+    &-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: var(--padding-medium);
+        grid-auto-rows: 1fr;
+        
+        @include tablet {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include phone {
+            grid-template-columns: 1fr;
+        }
+    }
+
     // Notifier
     &__notifier {
         position: absolute;

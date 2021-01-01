@@ -21,8 +21,8 @@ class StringEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {String}
      */
-    getValueLabel() {
-        if(!this.state.value) { return super.getValueLabel(); }
+    async getValueLabel() {
+        if(!this.state.value) { return await super.getValueLabel(); }
 
         return this.state.value;
     }

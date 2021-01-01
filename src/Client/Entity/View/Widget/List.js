@@ -184,14 +184,17 @@ class List extends HashBrown.Entity.View.Widget.WidgetBase {
 
         if(this.model.value.constructor === Object) {
             this.model.value[`new${this.model.placeholder || 'item'}`] = `New ${this.model.placeholder || 'item'}`;
-
+            
         } else if(this.model.value.constructor === Array) {
             this.model.value.push(null);
-       
         }
 
         this.render();
         this.onChange();
+       
+        if(typeof this.model.onadd === 'function') {
+            this.model.onadd();
+        }
     }
 }
 

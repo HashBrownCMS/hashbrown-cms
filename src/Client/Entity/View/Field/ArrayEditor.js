@@ -21,7 +21,7 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {Array} Tools
      */
-    getTools() {
+    async getTools() {
         if(this.state.name === 'config') { return []; }
 
         if(this.state.name === 'sorting') {
@@ -106,14 +106,14 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
 
                 this.state.fields.push({
                     view: view,
-                    icon: view.getValueIcon(),
-                    label: view.getValueLabel()
+                    icon: await view.getValueIcon(),
+                    label: await view.getValueLabel()
                 }); 
             }
             
             // Set state limitations
             this.state.canRemoveItems = !this.model.config.minItems || this.state.value.length > this.model.config.minItems;
-            this.state.canAddItems = !this.model.config.maxItems || this.state.value.length < this.model.config.maxItems;
+            this.state.canAddItems = Object.keys(this.state.schemaOptions).length > 0 && (!this.model.config.maxItems || this.state.value.length < this.model.config.maxItems);
         }
     }
 
@@ -200,6 +200,13 @@ class ArrayEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.onChange(this.state.value);
 
         this.update();
+    }
+
+    /**
+     * Event: Click add item (implied)
+     */
+    onClickAddImpliedItem() {
+        this.onClickAddItem(Object.values(this.state.schemaOptions)[0]);
     }
     
     /**

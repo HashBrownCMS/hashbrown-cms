@@ -23,15 +23,6 @@ class LocaleEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.state.localeOptions = this.context.project.settings.locales;
     }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = LocaleEditor;

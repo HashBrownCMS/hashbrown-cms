@@ -14,15 +14,6 @@ class BooleanEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/booleanEditor');
     }
-
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = BooleanEditor;

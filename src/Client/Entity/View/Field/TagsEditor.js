@@ -33,15 +33,6 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         super.onChange(newValue);
     }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = TagsEditor;

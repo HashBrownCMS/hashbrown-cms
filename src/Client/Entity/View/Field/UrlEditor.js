@@ -52,15 +52,6 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.onChange(this.state.value);
     }
-    
-    /**
-     * Gets tools for this field
-     *
-     * @return {Array} Tools
-     */
-    getTools() {
-        return [];
-    }
 }
 
 module.exports = UrlEditor;

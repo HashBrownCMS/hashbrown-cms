@@ -57,7 +57,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                         _.popup({value: state.tab, options: state.tabOptions, onchange: _.onSwitchTab})
                     ),
                     _.div({class: 'widget widget--separator'}),
-                    _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField})
+                    _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField, onadd: _.onClickAddField})
                 )
 
             ] : model instanceof HashBrown.Entity.Resource.FieldSchema ? [

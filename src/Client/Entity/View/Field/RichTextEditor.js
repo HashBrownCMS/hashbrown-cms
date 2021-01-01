@@ -31,7 +31,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {Object} Tools
      */
-    getTools() {
+    async getTools() {
         return {
             fullscreen: {
                 icon: this.state.isFullscreen ? 'compress' : 'expand',
@@ -108,10 +108,10 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {String}
      */
-    getValueLabel() {
+    async getValueLabel() {
         var tmp = document.createElement('div');
         tmp.innerHTML = this.state.value || '';
-        return tmp.textContent || tmp.innerText || super.getValueLabel();
+        return tmp.textContent || tmp.innerText || await super.getValueLabel();
     }
 
     /**

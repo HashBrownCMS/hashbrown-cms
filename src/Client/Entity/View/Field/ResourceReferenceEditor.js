@@ -43,8 +43,8 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
                 this.state.resource = model ? await model.get(this.state.value) : null;
             }
 
-            this.state.label = this.getValueLabel();
-            this.state.icon = this.getValueIcon();
+            this.state.label = await this.getValueLabel();
+            this.state.icon = await this.getValueIcon();
         }
     }
 
@@ -53,7 +53,7 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {String} Label
      */
-    getValueLabel() {
+    async getValueLabel() {
         let label = '';
 
         if(this.state.resource) {
@@ -73,7 +73,7 @@ class ResourceReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
             return '(' + singularResourceName + ' not found)';
         }
        
-        return super.getValueLabel();
+        return await super.getValueLabel();
     }
 
     /**

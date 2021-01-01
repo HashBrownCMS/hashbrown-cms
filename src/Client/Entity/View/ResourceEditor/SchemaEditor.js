@@ -127,7 +127,14 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
             this.render();
         });
     }
-    
+   
+    /**
+     * Event: Click add field
+     */
+    onClickAddField() {
+        this.onClickEditField('newfield');
+    }
+
     /**
      * Event: Click edit field
      *

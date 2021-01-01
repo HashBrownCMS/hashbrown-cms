@@ -76,8 +76,8 @@ class StructEditor extends HashBrown.Entity.View.Field.FieldBase {
      *
      * @return {String} Value label
      */
-    getValueLabel() {
-        if(!this.model.config || !this.state.value || !this.state.value[this.model.config.label]) { return super.getValueLabel(); }
+    async getValueLabel() {
+        if(!this.model.config || !this.state.value || !this.state.value[this.model.config.label]) { return await super.getValueLabel(); }
     
         let label = this.state.value[this.model.config.label];
 

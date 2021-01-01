@@ -16,12 +16,20 @@ class MediaReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
     
     /**
-     * Gets tools for this field
+     * Gets the value label
      *
-     * @return {Array} Tools
+     * @return {String}
      */
-    getTools() {
-        return [];
+    async getValueLabel() {
+        if(this.state.value) {
+            let resource = await HashBrown.Entity.Resource.Media.get(this.state.value);
+
+            if(resource) {
+                return resource.getName();
+            }
+        }
+
+        return await super.getValueLabel();
     }
 }
 

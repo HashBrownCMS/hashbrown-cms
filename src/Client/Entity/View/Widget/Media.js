@@ -25,11 +25,16 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
             tagName: 'div'
         };
 
+        // Media selected
         if(this.model.value) {
             let media = this.model.value;
 
             if(typeof media === 'string') {
                 media = await HashBrown.Entity.Resource.Media.get(media);
+            }
+            
+            if(typeof this.model.onload == 'function') {
+                this.model.onload(media);
             }
 
             if(!media) {
@@ -60,6 +65,13 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
 
                 this.state.title = media.filename;
             }
+        
+        // No media selected
+        } else {
+            if(typeof this.model.onload == 'function') {
+                this.model.onload(null);
+            }
+            
         }
     }
     
@@ -77,6 +89,8 @@ class Media extends HashBrown.Entity.View.Widget.WidgetBase {
      */
     onClickClear() {
         this.model.value = null;
+
+        this.onChange();
 
         this.update();
     }
