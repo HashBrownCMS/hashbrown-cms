@@ -14,6 +14,19 @@ class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/urlEditor');
     }
+    
+    /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        if(this.state.value) {
+            return this.state.value;
+        }
+
+        return await super.getValueLabel();
+    }
 
     /**
      * Event: Clicked regenerate

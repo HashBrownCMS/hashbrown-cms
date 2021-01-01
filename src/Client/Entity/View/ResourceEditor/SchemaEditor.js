@@ -78,7 +78,9 @@ class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBa
 
                 if(definition.tabId !== this.state.tab) { continue; }
 
-                this.state.properties[key] = definition.label;
+                this.state.properties[key] = {
+                    label: definition.label
+                };
             }
         
         } else if(this.model instanceof HashBrown.Entity.Resource.FieldSchema) {

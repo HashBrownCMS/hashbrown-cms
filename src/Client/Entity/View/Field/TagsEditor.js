@@ -21,8 +21,7 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
     async fetch() {
         await super.fetch();
 
-        this.state.value = (this.state.value || '').split(',')
-        this.state.value = this.state.value.filter((x) => !!x);
+        this.state.value = (this.state.value || '').split(',').filter(Boolean);
     }
 
     /**
@@ -32,6 +31,23 @@ class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
         newValue = newValue.join(',');
 
         super.onChange(newValue);
+    }
+    
+    /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        if(this.state.value && this.state.value.length > 0) {
+            if(Array.isArray(this.state.value)) {
+                return this.state.value.join(', ');
+            }
+
+            return this.state.value;
+        }
+
+        return await super.getValueLabel();
     }
 }
 

@@ -15,6 +15,25 @@ class DropdownEditor extends HashBrown.Entity.View.Field.FieldBase {
         this.editorTemplate = require('template/field/editor/dropdownEditor');
         this.configTemplate = require('template/field/config/dropdownEditor');
     }
+    
+    /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        if(this.state.value) {
+            for(let label in this.model.config.options) {
+                if(this.model.config.options[label] !== this.state.value) { continue; }
+
+                return label;
+            }
+
+            return this.state.value;
+        }
+
+        return await super.getValueLabel();
+    }
 
     /**
      * Fetches the view data

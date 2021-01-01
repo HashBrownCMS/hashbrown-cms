@@ -23,9 +23,11 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
 
                     ] : null,
 
-                    _.each(state.tools || model.tools, (name, tool) =>
-                        _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
-                    )
+                    !state.isCollapsed ? [
+                        _.each(state.tools || model.tools, (name, tool) =>
+                            _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
+                        )
+                    ] : null
                 )
 
             ] : null,

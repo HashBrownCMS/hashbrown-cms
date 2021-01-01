@@ -34,6 +34,10 @@
             display: block;
             flex-grow: 1;
 
+            &__icon {
+                margin-right: var(--padding-small);
+            }
+
             &:last-child {
                 border-top-right-radius: var(--border-radius-small);
                 border-bottom-right-radius: var(--border-radius-small);

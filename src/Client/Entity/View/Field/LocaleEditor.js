@@ -14,6 +14,20 @@ class LocaleEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/localeEditor');
     }
+    
+    /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        if(this.state.value) {
+            return this.state.value;
+        }
+
+        return await super.getValueLabel();
+    }
+    
 
     /**
      * Fetches view data

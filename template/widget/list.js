@@ -11,20 +11,25 @@ _.ul({class: `widget widget--list ${model.disabled ? 'disabled' : ''}`},
 
             model.readonly ? [
                 model.onclick && !model.disabled ? [
-                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)}, value ? value.label || value : '')
+                    _.button({class: 'widget--list__item__edit', onclick: () => model.onclick(key, value)},
+                        value ? value.label || value : ''
+                    )
                 
                 ] : [
-                    _.label({class: 'widget--list__item__label'}, value ? value.label || value : '')
+                    _.label({class: 'widget--list__item__label'},
+                        value && value.icon ? _.span({class: `widget--list__item__label__icon fa fa-${value.icon}`}) : null,
+                        value ? value.label || value : ''
+                    )
                 
                 ]
             
             ] : [
                 model.keys ? [
-                    _.text({disabled: model.disabled, value: key, onchange: (newKey) => _.onChangeItemKey(key, newKey)})
+                    _.text({disabled: model.disabled, tooltip: 'Name', value: key, onchange: (newKey) => _.onChangeItemKey(key, newKey)})
                 
                 ] : null,
                 
-                _.text({disabled: model.disabled, value: value ? value.label || value : '', onchange: (newValue) => _.onChangeItemValue(key, newValue)}),
+                _.text({disabled: model.disabled, tooltip: 'Value', value: value ? value.label || value : '', onchange: (newValue) => _.onChangeItemValue(key, newValue)}),
             ],
 
             !model.disabled && !model.sortonly ? [

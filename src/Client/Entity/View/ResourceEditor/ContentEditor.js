@@ -73,7 +73,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                     schemaId: 'contentSchemaReference',
                     tabId: 'meta',
                     config: {
-                        allowedSchemas: 'fromParent'
+                        allowedSchemas: await this.getAllowedSchemas()
                     }
                 }
             };
@@ -103,6 +103,8 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                 {},
                 this.model.isLocked
             );
+
+            if(!field) { continue; }
             
             if(fieldStates[key]) {
                 field.state.isCollapsed = fieldStates[key].isCollapsed === true;
@@ -122,6 +124,38 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
 
             this.state.fields[key] = field;
         }
+    }
+
+    /**
+     * Gets a list of allowed alternative schemas
+     *
+     * @return {Array} Schema ids
+     */
+    async getAllowedSchemas() {
+        if(!this.model.parentId) {
+            let allSchemas = await HashBrown.Entity.Resource.ContentSchema.list() || [];
+            let rootSchemas = [];
+
+            for(let schema of allSchemas) {
+                if(!schema.allowedAtRoot) { continue; }
+
+                rootSchemas.push(schema.id);
+            }
+
+            return rootSchemas;
+        }
+
+        let parentContent = await HashBrown.Entity.Resource.Content.get(this.model.parentId);
+
+        if(parentContent) {
+            let parentContentSchema = await HashBrown.Entity.Resource.ContentSchema.get(parentContent.schemaId);
+   
+            if(parentContentSchema) {
+                return parentContentSchema.allowedChildSchemas || [];
+            }
+        }
+
+        return [];
     }
 
     /**

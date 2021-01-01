@@ -17,6 +17,23 @@ class ContentReferenceEditor extends HashBrown.Entity.View.Field.FieldBase {
     }
 
     /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        if(this.state.value) {
+            let resource = await HashBrown.Entity.Resource.Content.get(this.state.value);
+
+            if(resource) {
+                return resource.getName();
+            }
+        }
+
+        return await super.getValueLabel();
+    }
+    
+    /**
      * Fetches view data
      */
     async fetch() {

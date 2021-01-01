@@ -14,6 +14,15 @@ class BooleanEditor extends HashBrown.Entity.View.Field.FieldBase {
 
         this.editorTemplate = require('template/field/editor/booleanEditor');
     }
+    
+    /**
+     * Gets the value label
+     *
+     * @return {String}
+     */
+    async getValueLabel() {
+        return this.state.value === true;
+    }
 }
 
 module.exports = BooleanEditor;

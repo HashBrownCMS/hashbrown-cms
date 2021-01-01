@@ -18,8 +18,15 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      */
     static async createFromFieldDefinition(definition, value = null, state = {}, isDisabled = false) {
         checkParam(definition, 'definition', Object, true);
+        checkParam(definition.schemaId, 'definition.schemaId', String, true);
 
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(definition.schemaId, { withParentFields: true });
+
+        if(!schema) {
+            debug.error(new Error(`Schema "${definition.schemaId}" could not be found`), this);
+            return null;
+        }
+
         let config = definition.config || {};
 
         if(schema.parentId !== 'fieldBase') {
