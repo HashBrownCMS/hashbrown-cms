@@ -39,6 +39,10 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         // Get schema and settings
         this.state.schema = await HashBrown.Entity.Resource.ContentSchema.get(this.model.schemaId, { withParentFields: true });
 
+        if(!this.state.schema) {
+            throw new Error(`Schema "${this.model.schemaId}" not found`);
+        }
+
         // Establish tabs
         this.state.tab = this.state.tab || this.state.schema.defaultTabId || 'meta';
         this.state.tabs = this.state.schema.tabs || {};

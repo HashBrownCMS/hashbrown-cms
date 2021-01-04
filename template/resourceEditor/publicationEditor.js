@@ -26,7 +26,7 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
             )
     
         ] : [
-            _.field({label: 'Id'},
+            _.field({label: 'Id', description: 'Only edit this field if you know what you\'re doing'},
                 _.text({disabled: model.isLocked, value: model.id, onchange: _.onChangeId})
             ),
             _.field({label: 'Name'},
