@@ -35,7 +35,7 @@ class RichTextEditor extends HashBrown.Entity.View.Field.FieldBase {
         return {
             fullscreen: {
                 icon: this.state.isFullscreen ? 'compress' : 'expand',
-                tooltip: 'Toggle full screen',
+                tooltip: this.state.isFullscreen ? 'Unmaximise this field' : 'Maximise this field',
                 handler: () => this.onClickFullscreen()
             }
         };

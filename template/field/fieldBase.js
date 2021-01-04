@@ -18,7 +18,7 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
         _.div({class: 'field__content'}, 
             !state.hideTools ? [
                 _.div({class: 'field__tools'},
-                    state.isCollapsible ? [
+                    state.isCollapsible && !state.isFullscreen ? [
                         _.button({class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
 
                     ] : null,

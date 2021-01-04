@@ -74,6 +74,10 @@
     &__content {
         display: flex;
     }
+    
+    &.fullscreen &__content {
+        height: 100%;
+    }
 
     &__value {
         flex-grow: 1;

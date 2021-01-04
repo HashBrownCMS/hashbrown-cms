@@ -235,8 +235,8 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
      */
     onClickFullscreen() {
         this.state.isFullscreen = !this.state.isFullscreen;
-
-        this.render();
+        
+        this.update();
     }
     
     /**
