@@ -77,6 +77,10 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
      */
     postrender() {
         this.updatePositionStyle();
+
+        if(this.namedElements.input) {
+            this.namedElements.input.focus();
+        }
     }
 
     /**
@@ -204,12 +208,6 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
         this.state.searchQuery = '';
         
         this.render();
-
-        let input = this.element.querySelector('input');
-
-        if(input && isOpen) {
-            input.focus();
-        }
 
         if(isOpen) {
             this.trigger('opened');

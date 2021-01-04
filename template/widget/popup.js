@@ -30,14 +30,14 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} $
     ] : null,
 
     state.isOpen && !model.disabled ? [
-        _.div({class: 'widget--popup__menu'},
+        _.div({class: 'widget--popup__menu', name: 'menu' },
             model.autocomplete ? [
                 _.div({class: 'widget--popup__search'},
-                    _.input({type: 'text', class: 'widget--popup__search__input', value: state.searchQuery, oninput: (e) => _.onSearch(e.target.value)}),
+                    _.input({type: 'text', name: 'input', class: 'widget--popup__search__input', value: state.searchQuery, oninput: (e) => _.onSearch(e.target.value)}),
                     _.button({class: 'widget--popup__search__clear fa fa-remove', title: 'Clear search', onclick: _.onClickClearSearch})
                 )
             ] : null,
-            _.div({class: 'widget--popup__options'},
+            _.div({class: 'widget--popup__options', name: 'options'},
                 _.each(model.options, (label, value) =>
                     value === null || value === undefined || value === '---' ? 
                         _.div({class: 'widget--popup__separator'}, label)

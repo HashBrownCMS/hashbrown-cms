@@ -256,6 +256,7 @@
     &__options {
         background-color: transparent;
         overflow: auto;
+        overscroll-behavior: contain;
         max-height: 20rem;
         padding: 0.25rem 0;
     }

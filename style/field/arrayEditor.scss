@@ -31,6 +31,8 @@
     }
 
     &__add {
+        height: var(--size-widget-medium) !important;
+
         > .widget--popup__label {
             @extend .widget--button, .default, .expanded;
         }
