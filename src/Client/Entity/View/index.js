@@ -4,7 +4,7 @@
  * @namespace HashBrown.Client.Entity.View
  */
 namespace('Entity.View')
-.add(require('./ViewBase'));
+    .add(require('./ViewBase'));
 
 require('./Field');
 require('./DeployerEditor');

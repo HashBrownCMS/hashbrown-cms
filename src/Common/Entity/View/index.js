@@ -4,4 +4,4 @@
  * @namespace HashBrown.Common.Entity.View
  */
 namespace('Entity.View')
-.add(require('./ViewBase'));
+    .add(require('./ViewBase'));
