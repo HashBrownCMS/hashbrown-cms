@@ -7,7 +7,7 @@
  */
 class ContentController extends HashBrown.Controller.ResourceController {
     /**
-     * Initialises this controller
+     * Gets the routes
      */
     static get routes() {
         return {

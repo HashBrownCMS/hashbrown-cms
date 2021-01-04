@@ -22,8 +22,10 @@ class AssetController extends HashBrown.Controller.ControllerBase {
                 handler: this.theme
             },
             '/media/${project}/${environment}/${id}': {
-                handler: this.media,
-                user: true
+                handler: this.media
+            },
+            '/media/${project}/${environment}/${id}/${filename}': {
+                handler: this.media
             }
         };
     }
@@ -127,7 +129,7 @@ class AssetController extends HashBrown.Controller.ControllerBase {
         }
            
         let isThumbnail = ('thumbnail' in query) && !media.isSvg();
-        let url = isThumbnail ? await media.getThumbnailUrl() : await media.getContentUrl();
+        let url = params.filename ? await media.getFileUrl(params.filename) : isThumbnail ? await media.getThumbnailUrl() : await media.getContentUrl();
 
         if(!url) {
             return new HashBrown.Http.Response(`Media ${isThumbnail ? 'thumbnail' : 'content'} URL could not be resolved`, 404);

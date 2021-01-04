@@ -28,7 +28,7 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         super(params);
     }
-    
+   
     /**
      * Gets an instance of this entity type
      *

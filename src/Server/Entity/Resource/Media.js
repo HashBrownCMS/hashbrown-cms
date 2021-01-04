@@ -31,8 +31,6 @@ class Media extends require('Common/Entity/Resource/Media') {
     async getPublicUrl(filename) {
         checkParam(filename, 'filename', String);
         
-        if(!filename) { return ''; }
-
         filename = filename.trim();
 
         // If the filename contains a protocol or double slashes, return it as is
@@ -135,6 +133,31 @@ class Media extends require('Common/Entity/Resource/Media') {
         }
 
         return '';
+    }
+
+    /**
+     * Gets a URL of a file inside this media folder
+     *
+     * @param {String} filename
+     * @param {Boolean} ensureWebUrl
+     *
+     * @return {String} Custom URL
+     */
+    async getFileUrl(filename, ensureWebUrl = false) {
+        checkParam(filename, 'filename', String);
+        checkParam(ensureWebUrl, 'ensureWebUrl', Boolean);
+
+        if(!filename) { return ''; }
+
+        if(ensureWebUrl) {
+            return await this.getPublicUrl(this.id + '/' + filename);
+        }
+        
+        let deployer = await this.constructor.getDeployer(this.context);
+
+        if(!deployer) { return ''; }
+                
+        return deployer.getPath(this.id, filename);
     }
 
     /**

@@ -86,6 +86,15 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     }
 
     /**
+     * Event: Click generate public URL
+     */
+    onClickGeneratePublicUrl() {
+        this.state.settings.mediaPublicUrl = `${location.origin}${this.context.config.system.rootUrl}/media/${this.context.project.id}/${this.context.environment}`;
+
+        this.render();
+    }
+
+    /**
      * Event: Click new
      */
     onClickNew() {

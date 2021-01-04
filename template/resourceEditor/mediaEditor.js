@@ -27,7 +27,10 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
 
         ] : state.tab === 'settings' ? [
             _.field({label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'}, 
-                _.text({ value: state.settings.mediaPublicUrl, onchange: _.onChangePublicUrl })
+                _.div({class: 'widget-group'},
+                    _.text({name: 'publicUrl', value: state.settings.mediaPublicUrl, onchange: _.onChangePublicUrl }),
+                    _.button({class: 'widget widget--button small fa fa-refresh', title: 'Generate public URL', onclick: _.onClickGeneratePublicUrl})
+                )
             ),
             _.field({label: 'File handling', description: 'How to read/write media files', labelTag: 'h2'},
                 state.deployerEditor

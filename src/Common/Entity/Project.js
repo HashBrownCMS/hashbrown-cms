@@ -49,7 +49,7 @@ class Project extends HashBrown.Entity.EntityBase {
     }
 
     /**
-     * Defines the structure of this project
+     * Structure
      */
     structure() {
         this.def(String, 'id');

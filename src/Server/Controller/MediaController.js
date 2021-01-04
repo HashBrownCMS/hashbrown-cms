@@ -56,6 +56,11 @@ class MediaController extends HashBrown.Controller.ResourceController {
 
         return new HashBrown.Http.Response(media);
     }
+
+    /**
+     * @example GET /api/${project}/${environment}/media/settings
+     */
+
 }
 
 module.exports = MediaController;
