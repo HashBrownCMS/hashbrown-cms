@@ -56,7 +56,7 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
             model: {
                 folders: folders,
                 canAdd: true,
-                heading: `Move ${media.name} to...`
+                heading: 'Move to...'
             }
         });
 
