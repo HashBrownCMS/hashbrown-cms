@@ -13,26 +13,38 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * @param {String} schemaId
      * @param {Object} config
      * @param {String} locale
+     * @param {Array} excludeTypes
      *
      * @return {*} Value
      */
-    async check(value, schemaId, config, locale) {
+    async check(value, schemaId, config, locale, excludeTypes) {
         if(value === null || value === undefined || value === '') { return null; }
 
+        // Ensure config
+        if(!config) { config = {}; }
+
+        // Ensure schema id
         if(Array.isArray(value)) {
             schemaId = 'array';
+        
+        } else if(config.struct) {
+            schemaId = 'struct';
+        
         }
         
         if(!schemaId) { return value; }
 
+        if(excludeTypes && excludeTypes.indexOf(schemaId) > -1) {
+            if(schemaId === 'array') { return []; }
+            if(schemaId === 'struct') { return {}; }
+
+            return null;
+        }
+
+        // Load schema
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, schemaId, { withParentFields: true });
 
         if(!schema) { return value; }
-
-        // Ensure config
-        if(!config) {
-            config = {};
-        }
 
         // Merge schema config
         if(schema.config) {
@@ -43,11 +55,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
             }
         }
 
-        // This schema is a struct
-        if(config.struct) {
-            schemaId = 'struct';
-        }
-
+        // Parse value
         let parsed = {};
 
         switch(schemaId) {
@@ -60,7 +68,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 parsed['numberOfItems'] = value.length;
                 parsed['itemListElement'] = [];
 
-                for(let i in value) {
+                for(let i  = 0; i < value.length; i++) {
                     parsed['itemListElement'].push({
                         '@type': 'ItemListElement',
                         'position': i,
@@ -121,8 +129,9 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 if(typeof value !== 'string') { return null; }
 
                 let content = await HashBrown.Entity.Resource.Content.get(this.context, value);
-                
-                content = await this.process(content, locale);
+               
+                // NOTE: We're excluding arrays, structs and content references to prevent infinite recursion
+                content = await this.process(content, locale, ['array', 'struct', 'contentReference']);
         
                 for(let key in content) {
                     parsed[key] = content[key];
@@ -138,14 +147,16 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      *
      * @param {Content} content
      * @param {String} locale
+     * @param {Array} excludeTypes
      *
      * @returns {Promise} Result
      */
-    async process(content, locale = 'en') {
+    async process(content, locale = 'en', excludeTypes = []) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(locale, 'locale', String, true);
+        checkParam(excludeTypes, 'excludeTypes', Array, true);
 
-        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId);
+        let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId, { withParentFields: true });
         let properties = await content.getLocalizedProperties(locale);
 
         if(!properties) {
@@ -172,15 +183,21 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
 
         // Combine all data into one
         let data = {};
-        
+       
         data['@type'] = schema.id;
         data['@parentId'] = content.parentId;
         data['identifier'] = content.id;
         
         for(let key in schema.config) {
-            data[key] = await this.check(properties[key], schema.config[key].schemaId, schema.config[key].config, locale);
+            data[key] = await this.check(
+                properties[key],
+                schema.config[key].schemaId,
+                schema.config[key].config,
+                locale,
+                excludeTypes
+            );
         }
-        
+       
         if(!data.name && data.title !== undefined) {
             data.name = data.title;
             delete data.title;

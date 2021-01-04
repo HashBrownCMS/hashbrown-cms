@@ -13,6 +13,9 @@ _.field({label: 'Username'},
 ),
 _.field({label: 'Password'},
     _.text({value: model.password, type: 'password', onchange: _.onChangePassword})
+),
+_.field({label: 'Path', description: 'The path to write files to'},
+    _.text({value: model.path, onchange: _.onChangePath})
 )
 
 ]

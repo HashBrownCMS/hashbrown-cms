@@ -83,15 +83,6 @@ class DeployerEditorBase extends HashBrown.Entity.View.ViewBase {
         this.trigger('change', this.model);
         this.trigger('changealias');
     }
-    
-    /**
-     * Event: Change path
-     */
-    onChangePath(newValue) {
-        this.model.path = newValue;
-
-        this.trigger('change', this.model);
-    }
 }
 
 module.exports = DeployerEditorBase;

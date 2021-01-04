@@ -123,8 +123,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
      */
     async deployContent(contentId) {
         checkParam(contentId, 'contentId', String, true);
-        
-        if(!this.canDeploy()) { return; }
+       
+        if(!this.canDeploy()) { console.log('FAIL'); return; }
         
         let locales = await this.context.project.getLocales();
         let content = await HashBrown.Entity.Resource.Content.get(this.context, contentId);
@@ -132,9 +132,9 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         for(let locale of locales) {
             let data = await this.processor.process(content, locale);
             let extension = this.processor.fileExtension || '.json';
-
+            
             if(!data) { continue; }
-
+            
             if(typeof data !== 'string') {
                 try {
                     data = JSON.stringify(data);

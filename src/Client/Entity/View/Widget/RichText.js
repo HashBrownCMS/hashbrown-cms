@@ -22,13 +22,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
      * Fetches the model
      */
     async fetch() {
-        let deployer = await HashBrown.Entity.Resource.Media.getDeployer();
-
-        if(deployer) {
-            this.state.mediaPath = '/' + deployer.path.split('/').filter(Boolean).join('/');
-        } else {
-            this.state.mediaPath = '/media';
-        }
+        this.state.mediaPath = await this.context.project.getEnvironmentSettings(this.context.environment, 'mediaPublicUrl') || '/media';
     }
 
     /**
@@ -38,8 +32,9 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(this.model.disabled) {
             return this.namedElements.editor.innerHTML = this.toView(this.model.value);
         }
-      
-        this.initEditor();
+    
+        // CodeMirror won't behave unless we wait a bit before initialising the editor
+        setTimeout(() => { this.initEditor(); }, 100);
     }
 
     /**
@@ -88,7 +83,7 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
         if(!html) { return ''; }
 
         return this.replaceMediaReferences(html, (id, filename) => {
-            return `/media/${this.context.project.id}/${this.context.environment}/${id}`;
+            return `${this.context.config.system.rootUrl}/media/${this.context.project.id}/${this.context.environment}/${id}`;
         });
     }
 
@@ -127,11 +122,6 @@ class RichText extends HashBrown.Entity.View.Widget.WidgetBase  {
             let id = null;
             let filename = element.getAttribute('title') || element.getAttribute('alt');
             let source = element.getAttribute('src');
-
-            if(source.indexOf('http') === 0 || source.indexOf('//') === 0) {
-                return elementHtml;
-            }
-
             let sourceParts = element.getAttribute('src').split('/');
 
             for(let part of sourceParts) {

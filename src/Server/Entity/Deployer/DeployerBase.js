@@ -65,7 +65,6 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
      * Structure
      */
     structure() {
-        this.def(String, 'path');
         this.def(HashBrown.Entity.Context, 'context');
     }
 
@@ -165,7 +164,7 @@ class DeployerBase extends HashBrown.Entity.EntityBase {
     getPath(...parts) {
         let path = (parts || []).join('/');
         
-        path = Path.join(this.getRootPath(), this.path, path);
+        path = Path.join(this.getRootPath(), path);
     
         // If the path module removed doubles slashes for protocols, add them back
         path = (path || '').replace(/:\/([^\/])/, '://$1');

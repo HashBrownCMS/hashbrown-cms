@@ -52,6 +52,15 @@ class GitDeployerEditor extends HashBrown.Entity.View.DeployerEditor.DeployerEdi
 
         this.trigger('change', this.model);
     }
+    
+    /**
+     * Event: Change path
+     */
+    onChangePath(newValue) {
+        this.model.path = newValue;
+
+        this.trigger('change', this.model);
+    }
 }
 
 module.exports = GitDeployerEditor;

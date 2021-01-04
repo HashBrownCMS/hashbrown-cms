@@ -26,6 +26,7 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
         this.def(String, 'password');
         this.def(String, 'repo');
         this.def(String, 'branch');
+        this.def(String, 'path');
     }
 
     /**
@@ -112,6 +113,24 @@ class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
         let dirName = Buffer.from(this.repo + (this.branch || 'master')).toString('base64');
 
         return Path.join(APP_ROOT, 'storage', 'git', dirName);
+    }
+    
+    /**
+     * Gets a deployment path
+     *
+     * @param {Array} parts
+     *
+     * @returns {String} Path
+     */
+    getPath(...parts) {
+        let path = (parts || []).join('/');
+        
+        path = Path.join(this.getRootPath(), this.path, path);
+    
+        // If the path module removed doubles slashes for protocols, add them back
+        path = (path || '').replace(/:\/([^\/])/, '://$1');
+
+        return path;
     }
 
     /**

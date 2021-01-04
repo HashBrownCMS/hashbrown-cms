@@ -34,6 +34,7 @@ _.div({class: `editor widget--rich-text ${model.disabled ? 'disabled' : ''}`},
             model.toolbar.orderedList !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-list-ol', title: 'Ordered list', onclick: _.onClickOrderedList})
             ] : null,
+
             model.toolbar.unorderedList !== false ? [
                 _.button({class: 'widget widget--button default small fa fa-list-ul', title: 'Unordered list', onclick: _.onClickUnorderedList})
             ] : null,
