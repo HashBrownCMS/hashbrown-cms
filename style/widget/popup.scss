@@ -2,7 +2,7 @@
     position: relative;
     color: var(--color-default-text);
     background-color: transparent;
-    min-height: var(--size-widget-small);
+    height: var(--size-widget-small);
     min-width: var(--size-widget-small);
     border-radius: var(--border-radius-small);
 
@@ -285,6 +285,8 @@
         cursor: pointer;
         position: relative;
         z-index: 20;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         .fa {
             width: 1.5rem;
