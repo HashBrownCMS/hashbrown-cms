@@ -30,9 +30,7 @@ _.div({class: 'list-item--project'},
         _.div({class: 'list-item--project__environments'},
             _.each(model.environments, (i, environment) =>
                 _.div({class: 'list-item--project__environment'},
-                    _.a({href: `${HashBrown.Client.context.config.system.rootUrl}/${model.id}/${environment}/#/content/`, class: 'widget widget--button expanded'}, 
-                        HashBrown.Client.context.config.system.isSingleEnvironment ? 'cms' : environment
-                    ),
+                    _.a({href: `${HashBrown.Client.context.config.system.rootUrl}/${model.id}/${environment}/#/content/`, class: 'widget widget--button expanded'}, environment),
                     HashBrown.Client.context.user.isAdmin && model.environments.length > 1 ? [
                         _.popup({
                             icon: 'ellipsis-v',

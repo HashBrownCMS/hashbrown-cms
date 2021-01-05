@@ -2,9 +2,12 @@
     position: relative;
 
     &:not(:last-child) {
-        margin-bottom: var(--padding-medium);
-        border-bottom: 1px solid var(--color-default-200);
         padding-bottom: var(--padding-medium);
+        
+        &.separator {
+            margin-bottom: var(--padding-medium);
+            border-bottom: 1px solid var(--color-default-200);
+        }
     }
 
     &.loading {

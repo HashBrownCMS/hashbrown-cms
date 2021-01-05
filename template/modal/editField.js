@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'modal in'},
-    _.div({class: 'modal__dialog field-size'},
+    _.div({class: 'modal__dialog fields'},
         _.div({class: 'modal__header'},
             _.h4({localized: true, class: 'modal__title'}, 'Edit field'),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})

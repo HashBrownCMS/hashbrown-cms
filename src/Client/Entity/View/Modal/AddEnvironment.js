@@ -37,7 +37,14 @@ class AddEnvironment extends HashBrown.Entity.View.Modal.ModalBase {
 
         }
     }
-        
+
+    /**
+     * Event: Changed copy from environment
+     */
+    onChangeCopyFromEnvironment(environment) {
+        this.state.copyFrom = environment;
+    }
+
     /**
      * Event: Input name
      */

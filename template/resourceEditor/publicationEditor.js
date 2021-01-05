@@ -39,13 +39,13 @@ _.div({class: 'resource-editor resource-editor--publication-editor'},
                     _.button({title: 'Go to URL', class: 'widget widget--button small fa fa-external-link', onclick: _.onClickGoToGetUrl})
                 )
             ),
-            _.field({localized: true, label: 'Processing', description: 'The format to expose content in', labelTag: 'h2'},
+            _.field({localized: true, label: 'Processing', description: 'The format to expose content in', size: 2},
                 state.processorEditor,
             ),
-            _.field({localized: true, label: 'File handling', description: 'Where to deploy published content', labelTag: 'h2'},
+            _.field({localized: true, label: 'File handling', description: 'Where to deploy published content', size: 2},
                 state.deployerEditor
             ),
-            _.field({localized: true, label: 'Limits', labelTag: 'h2'},
+            _.field({localized: true, label: 'Limits', size: 2},
                 _.field({localized: true, label: 'Root contents', description: 'Limit the exposed content'},
                     _.popup({autocomplete: true, disabled: model.isLocked, multiple: true, clearable: true, value: model.rootContents, options: state.contentOptions, onchange: _.onChangeRootContents})
                 ),

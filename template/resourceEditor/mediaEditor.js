@@ -32,7 +32,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                     _.button({class: 'widget widget--button small fa fa-refresh', title: 'Generate public URL', onclick: _.onClickGeneratePublicUrl})
                 )
             ),
-            _.field({localized: true, label: 'File handling', description: 'How to read/write media files', labelTag: 'h2'},
+            _.field({localized: true, label: 'File handling', description: 'How to read/write media files', size: 2},
                 state.deployerEditor
             )
 
@@ -56,7 +56,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                 _.field({localized: true, label: 'Caption'},
                     _.text({disabled: model.isLocked, value: model.caption, onchange: _.onChangeCaption})
                 ),
-                _.field({localized: true, label: 'Author', labelTag: 'h2'},
+                _.field({localized: true, label: 'Author', size: 2},
                     _.field({localized: true, label: 'Name'},
                         _.text({disabled: model.isLocked, value: model.author.name, onchange: _.onChangeAuthorName})
                     ),
@@ -64,7 +64,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                         _.text({disabled: model.isLocked, value: model.author.url, onchange: _.onChangeAuthorUrl})
                     )
                 ),
-                _.field({localized: true, label: 'Copyright', labelTag: 'h2'},
+                _.field({localized: true, label: 'Copyright', size: 2},
                     _.field({localized: true, label: 'Name'},
                         _.text({disabled: model.isLocked, value: model.copyrightHolder.name, onchange: _.onChangeCopyrightHolderName})
                     ),

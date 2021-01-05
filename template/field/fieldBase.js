@@ -2,14 +2,14 @@
 
 module.exports = (_, model, state) =>
 
-_.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen' : ''}`},
+_.div({class: `field ${state.className || ''} ${model.separator !== false ? 'separator' : ''} ${state.isFullscreen ? 'fullscreen' : ''}`},
     state.name === 'error' ? [
         state.message
     
     ] : [
         !state.hideKey && (model.label || model.description) ? [
             _.div({class: 'field__key'},
-                _[model.labelTag || 'div']({localized: model.localized, class: 'field__key__label'},
+                _[model.size ? `h${model.size}` : 'div']({localized: model.localized, class: 'field__key__label'},
                     model.label,
                     model.isLocalized ? _.span({localized: true, class: 'field__key__label__icon fa fa-flag', title: 'This field is localised'}) : null,
                 ),
