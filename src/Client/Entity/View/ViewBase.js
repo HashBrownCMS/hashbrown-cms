@@ -255,48 +255,9 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                             let wrapper = document.createElement('div');
 
-                            if(this.context && this.context.user) {
-                                html = this.context.user.translate(html);
-                            }
-
                             wrapper.innerHTML = html;
 
                             return Array.from(wrapper.childNodes);
-                        };
-
-                    // Render an icon string
-                    case 'icon':
-                        return (string) => {
-                            if(!string || typeof string !== 'string') { return string; }
-
-                            let elements = [];
-                            let parts = string.split(/<icon:[^>]+>/);
-                            let iconMatches = [...string.matchAll(/<icon:([^>]+)>/g)];
-
-                            for(let iconMatch of iconMatches) {
-                                let text = parts.shift();
-
-                                if(this.context && this.context.user) {
-                                    text = this.context.user.translate(text);
-                                }
-                                
-                                elements.push(text);
-                                
-                                let iconElement = document.createElement('span');
-                                iconElement.className = `fa fa-${iconMatch[1]}`;
-
-                                elements.push(iconElement);
-                            }
-
-                            let lastText = parts.shift(); 
-
-                            if(this.context && this.context.user) {
-                                lastText = this.context.user.translate(lastText);
-                            }
-                                
-                            elements.push(lastText);
-
-                            return elements;
                         };
 
                     // Render an included template
@@ -339,7 +300,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                         return (string) => {
                             if(!this.context || !this.context.user) { return string; }
                             
-                            return this.context.user.translate(string);
+                            return this.context.translate(string);
                         };
 
                     // Any unrecognised key will be interpreted as an element constructor
@@ -384,23 +345,52 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
     appendToElement(element, content) {
         if(!content) { return; }
 
+        // Render an icon string
+        if(typeof content === 'string') {
+            let iconMatches = [...content.matchAll(/<icon:([^>]+)>/g)];
+
+            if(iconMatches.length > 0) {
+                let elements = [];
+                let parts = content.split(/<icon:[^>]+>/);
+
+                for(let iconMatch of iconMatches) {
+                    let text = parts.shift();
+
+                    elements.push(text);
+                    
+                    let iconElement = document.createElement('span');
+                    iconElement.className = `fa fa-${iconMatch[1]}`;
+
+                    elements.push(iconElement);
+                }
+
+                let lastText = parts.shift(); 
+
+                elements.push(lastText);
+
+                content = elements;
+            }
+        }
+
+        // Recurse into arrays
         if(content.constructor === Array) {
             for(let item of content) {
                 this.appendToElement(element, item);
             }
 
+        // Append content
         } else {
+            // View
             if(content && content.element instanceof Node) {
                 content = content.element;
-            
-            } else if(content && content[0] && content[0] instanceof Node) {
-                content = content[0];
-            
+           
+            // Function
             } else if(typeof content === 'function') {
                 content = content();
 
-            } else if(typeof content === 'string' && this.context && this.context.user) {
-                content = this.context.user.translate(content);
+            // String
+            } else if(typeof content === 'string' && this.context && element.hasAttribute('localized')) {
+                content = this.context.translate(content);
             
             }
 
@@ -428,12 +418,17 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
         }
 
         // Translate any property named "title"
-        if(this.context && this.context.user && attributes.title) {
-            attributes.title = this.context.user.translate(attributes.title);
+        if(this.context && this.context.user && attributes.title && attributes.localized !== false) {
+            attributes.title = this.context.translate(attributes.title);
         }
 
         // The remaining parameters are content
         content = params;
+
+        // Ensure localisation
+        if(attributes.localized === undefined) {
+            attributes.localized = true;
+        }
 
         // Adopt all attributes
         for(let key in attributes) {

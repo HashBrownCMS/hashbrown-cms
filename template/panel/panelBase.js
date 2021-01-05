@@ -8,9 +8,9 @@ _.div({class: 'panel'},
     :
         _.div({class: 'panel__tools'},
             _.search({tooltip: 'Search', class: 'widget-group panel__tools__search', value: state.searchQuery, onclear: _.onClickClearSearch, onsearch: _.onClickSearch}),
-            _.if(state.sortingOptions && Object.values(state.sortingOptions).length > 1,
-                _.popup({tooltip: 'Sorting', class: 'panel__tools__sort', options: state.sortingOptions, value: state.sortingMethod, onchange: _.onChangeSortingMethod})
-            )
+            state.sortingOptions && Object.values(state.sortingOptions).length > 1 ? [
+                _.popup({tooltip: 'Sorting', class: 'panel__tools__sort', options: state.sortingOptions, color: 'secondary', value: state.sortingMethod, icon: 'sort', role: 'sorting', onchange: _.onChangeSortingMethod})
+            ] : null
         ),
         _.div({class: 'panel__items', name: 'items'},
             state.rootItems,

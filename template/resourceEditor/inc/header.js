@@ -3,7 +3,7 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'resource-editor__header'},
-    _.div({class: 'resource-editor__header__title'},
+    _.div({class: 'resource-editor__header__title', localized: !!state.name},
         _.span({class: `resource-editor__header__title__icon fa fa-${state.icon}`}),
         state.title
     ),

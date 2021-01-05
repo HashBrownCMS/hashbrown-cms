@@ -20,36 +20,8 @@ class User extends HashBrown.Entity.EntityBase {
         this.def(String, 'email');
         this.def(String, 'theme');
         this.def(String, 'locale');
-        this.def(Object, 'localeConfig');
         
         this.def(Object, 'scopes', {});
-    }
-
-    /**
-     * Gets a copy of every field in this object as a mutable object
-     *
-     * @returns {Object} object
-     */
-    getObject() {
-        let object = super.getObject();
-
-        // Empty the locale config, we don't want to save that to the database
-        object.localeConfig = {};
-
-        return object;
-    }
-
-    /**
-     * Translates a string
-     *
-     * @param {String} string
-     *
-     * @return {String} Translated
-     */
-    translate(string) {
-        if(!string || typeof string !== 'string' || !this.locale || !this.localeConfig || !this.localeConfig[string]) { return string; }
-
-        return this.localeConfig[string];
     }
 
     /**

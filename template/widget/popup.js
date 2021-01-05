@@ -12,13 +12,13 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} $
                 model.icon ? [
                     _.span({class: `fa fa-${model.icon}`})
                 ] : null,
-                _.icon(typeof model.label === 'function' ? model.label(model.value) : model.label)
+                typeof model.label === 'function' ? model.label(model.value) : model.label
             )
 
         ] : [
             _.div({class: 'widget--popup__inner'},
                 _.button({disabled: model.disabled, class: 'widget--popup__value', onclick: _.onClickToggle},
-                    _.icon(state.value),
+                    state.value,
                     _.span({class: 'widget--popup__value__icon fa fa-chevron-down'})
                 ),
                 model.clearable ? [
@@ -43,7 +43,7 @@ _.div({title: model.tooltip, class: `widget widget--popup ${model.color || ''} $
                         _.div({class: 'widget--popup__separator'}, label)
                     :
                         _.button({class: `widget--popup__option ${model.value === value || (Array.isArray(model.value) && model.value.indexOf(value) > -1) ? 'selected' : ''}`, onclick: (e) => _.onClickOption(value)},
-                            _.icon(Array.isArray(model.options) ? value : label)
+                            Array.isArray(model.options) ? value : label
                         )
                 )
             )

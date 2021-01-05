@@ -48,7 +48,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             t: (string) => {
                 if(!this.context || !this.context.user) { return string; }
 
-                return this.context.user.translate(string);
+                return this.context.translate(string);
             }
         };
     }

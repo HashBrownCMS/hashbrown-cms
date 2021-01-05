@@ -14,7 +14,7 @@ _.div({class: 'list-item--user'},
                 'Delete': _.onClickDelete,
             }
         }),
-        _.h3({class: 'list-item--user__name'},
+        _.h3({class: 'list-item--user__name', localized: false},
             model.getName() + (model.id == HashBrown.Client.context.user.id ? ' *' : '')
         ),
         _.div({class: 'list-item--user__type'},

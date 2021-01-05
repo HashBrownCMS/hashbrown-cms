@@ -104,7 +104,19 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
 
         return item;
     }
-   
+    
+    /**
+     * Gets available sorting options
+     *
+     * @return {Object} Options
+     */
+    getSortingOptions() {
+        return {
+            'Name': 'name:asc',
+            'Changed': 'changed:desc',
+            'Created': 'created:desc'
+        }
+    }
 
     /**
      * Gets the basic options for a resource

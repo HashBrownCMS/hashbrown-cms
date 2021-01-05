@@ -12,6 +12,7 @@ class Context extends HashBrown.Entity.EntityBase {
         this.def(HashBrown.Entity.Project, 'project');
         this.def(String, 'environment');
         this.def(Object, 'config', {});
+        this.def(Object, 'i18n', {});
     }
 
     /**
@@ -31,6 +32,19 @@ class Context extends HashBrown.Entity.EntityBase {
         }
 
         super.adopt(params);
+    }
+
+    /**
+     * Translates a string
+     *
+     * @param {String} string
+     *
+     * @return {String} Translated
+     */
+    translate(string) {
+        if(!string || typeof string !== 'string' || !this.i18n || !this.i18n[string]) { return string; }
+
+        return this.i18n[string];
     }
 }
 
