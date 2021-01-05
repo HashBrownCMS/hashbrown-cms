@@ -1,7 +1,7 @@
 .navigation--session {
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    top: var(--padding-medium);
+    right: var(--padding-medium);
     display: flex;
     z-index: 200;
 

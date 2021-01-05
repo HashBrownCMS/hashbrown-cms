@@ -3,8 +3,8 @@
     &__header {
         background-color: var(--color-decor-500);
         color: var(--color-decor-text);
-        padding: 1rem 0 0 0;
-        height: 4rem;
+        padding: 7rem 0 0 0;
+        height: 10rem;
         display: flex;
         justify-content: center;
 
@@ -47,6 +47,34 @@
                 pointer-events: none;
                 color: var(--color-default-text);
                 background-color: var(--color-default-100);
+            }
+        }
+
+        // Logo
+        &__logo {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            display: flex;
+            padding: var(--padding-medium);
+            transform: translateX(-50%);
+            align-items: center;
+
+            svg {
+                display: block;
+                fill: var(--color-decor-700);
+                width: var(--size-widget-medium);
+                height: var(--size-widget-medium);
+            }
+
+            &:hover svg {
+                fill: var(--color-action-500);
+            }
+
+            h1 {
+                color: var(--color-default);
+                margin-left: var(--padding-medium);
+                white-space: nowrap;
             }
         }
     }
