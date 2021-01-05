@@ -55,6 +55,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             font-weight: bold;
+
+            &__icon {
+                margin-left: var(--padding-small);
+                color: var(--color-default-300);
+            }
         }
 
         &__description {

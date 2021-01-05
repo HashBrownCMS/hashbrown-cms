@@ -9,8 +9,11 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
     ] : [
         !state.hideKey && (model.label || model.description) ? [
             _.div({class: 'field__key'},
-                _[model.labelTag || 'div']({class: 'field__key__label'}, model.label),
-                _.div({class: 'field__key__description'}, model.description)
+                _[model.labelTag || 'div']({localized: model.localized, class: 'field__key__label'},
+                    model.label,
+                    model.isLocalized ? _.span({localized: true, class: 'field__key__label__icon fa fa-flag', title: 'This field is localised'}) : null,
+                ),
+                _.div({localized: model.localized, class: 'field__key__description'}, model.description)
             )
         
         ] : null,
@@ -19,13 +22,13 @@ _.div({class: `field ${state.className || ''} ${state.isFullscreen ? 'fullscreen
             !state.hideTools ? [
                 _.div({class: 'field__tools'},
                     state.isCollapsible && !state.isFullscreen ? [
-                        _.button({class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
+                        _.button({localized: true, class: `widget widget--button default small field__tool fa fa-${state.isCollapsed ? 'caret-right' : 'caret-down'}`, title: state.isCollapsed ? 'Expand this field' : 'Collapse this field', onclick: _.onToggleCollapsed})
 
                     ] : null,
 
                     !state.isCollapsed ? [
                         _.each(state.tools || model.tools, (name, tool) =>
-                            _.button({class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
+                            _.button({localized: true, class: `widget widget--button default small field__tool fa fa-${tool.icon || ''}`, name: name, title: tool.tooltip, onclick: tool.handler})
                         )
                     ] : null
                 )

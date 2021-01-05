@@ -129,6 +129,7 @@ class PanelItem extends HashBrown.Entity.View.ListItem.ListItemBase {
                 target: this.element,
                 options: this.model.options,
                 role: 'context-menu',
+                localized: true,
                 offset: {
                     x: pageX,
                     y: pageY

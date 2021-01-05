@@ -5,16 +5,16 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, 'Settings'),
+            _.h4({localized: true, class: 'modal__title'}, 'Settings'),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
         _.div({class: 'modal__body'},
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'Name'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'Name'),
                 _.input({class: 'widget widget--text', type: 'text', value: model.getName(), onchange: (e) => _.onChangeName(e.target.value)})
             ),
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'Locales'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'Locales'),
                 _.popup({
                     value: model.settings.locales,
                     autocomplete: true,
@@ -25,16 +25,16 @@ _.div({class: 'modal'},
                     onchange: _.onChangeLocales
                 })
             ),
-            _.div({class: 'widget widget--separator'}, 'Sync'),
+            _.div({localized: true, class: 'widget widget--separator'}, 'Sync'),
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'Enabled'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'Enabled'),
                 _.checkbox({
                     value: model.settings.sync.enabled === true,
                     onchange: _.onToggleSync
                 })
             ),
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'API URL'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'API URL'),
                 _.input({
                     name: 'url',
                     class: 'widget widget--text',
@@ -45,7 +45,7 @@ _.div({class: 'modal'},
                 })
             ),
             _.div({class: 'widget-group'},
-                _.label({class: 'widget widget--label small'}, 'Project id'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'Project id'),
                 _.input({
                     class: 'widget widget--text',
                     name: 'name',
@@ -55,7 +55,7 @@ _.div({class: 'modal'},
                 })
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__input'},
-                _.label({class: 'widget widget--label small'}, 'Token'),
+                _.label({localized: true, class: 'widget widget--label small'}, 'Token'),
                 _.input({
                     value: model.settings.sync.token,
                     type: 'text',
@@ -67,13 +67,13 @@ _.div({class: 'modal'},
                 _.button({title: 'Get new token', class: 'widget widget--button default small fa fa-refresh', onclick: _.onClickGetSyncToken})
             ),
             _.div({class: 'widget-group modal--project-settings__sync-token__login', style: 'display: none'},
-                _.input({class: 'widget widget--text', name: 'username', type: 'text', placeholder: 'Username'}),
-                _.input({class: 'widget widget--text', name: 'password', type: 'password', placeholder: 'Password'}),
+                _.input({localized: true, class: 'widget widget--text', name: 'username', type: 'text', placeholder: 'Username'}),
+                _.input({localized: true, class: 'widget widget--text', name: 'password', type: 'password', placeholder: 'Password'}),
                 _.button({class: 'widget widget--button default small fa fa-check', onclick: _.onClickRemoteLogin}) 
             )
         ),
         _.div({class: 'modal__footer'},
-            _.button({class: 'widget widget--button', onclick: _.onClickSave}, 'Save')
+            _.button({localized: true, class: 'widget widget--button', onclick: _.onClickSave}, 'Save')
         )
     )
 )

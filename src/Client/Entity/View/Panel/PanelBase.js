@@ -172,6 +172,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
                 target: this.element,
                 options: options,
                 role: 'context-menu',
+                localized: true,
                 offset: {
                     x: pageX,
                     y: pageY

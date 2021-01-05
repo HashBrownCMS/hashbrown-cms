@@ -3,9 +3,9 @@
 module.exports = (_, model, state) =>
 
 _.div({class: 'navigaton navigation--session'},
-    _.if(Object.keys(state.localeOptions).length > 1,
+    Object.keys(state.localeOptions).length > 1 ? [
         _.popup({
-            tooltip: 'Locale',
+            tooltip: _.t('Locale'),
             color: 'secondary',
             role: 'navigation-menu',
             icon: 'flag',
@@ -14,11 +14,12 @@ _.div({class: 'navigaton navigation--session'},
             options: state.localeOptions,
             onchange: _.onChangeLocale
         })
-    ),
+    ] : null,
     _.popup({
         tooltip: HashBrown.Client.context.user.fullName || HashBrown.Client.context.user.username,
         color: 'secondary',
         role: 'navigation-menu',
+        localized: true, 
         icon: 'user',
         options: {
             'User settings': _.onClickUserSettings,

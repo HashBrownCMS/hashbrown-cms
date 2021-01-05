@@ -33,14 +33,14 @@ _.ul({class: `widget widget--list ${model.disabled ? 'disabled' : ''}`},
             ],
 
             !model.disabled && !model.sortonly ? [
-                _.button({class: 'widget widget--button default small fa fa-remove', title: `Remove ${model.placeholder || 'item'}`, onclick: () =>  _.onClickRemoveItem(key)})
+                _.button({localized: true, class: 'widget widget--button default small fa fa-remove', title: `Remove ${model.placeholder || 'item'}`, onclick: () =>  _.onClickRemoveItem(key)})
             
             ] : null
         )
     ),
 
     !model.disabled && !model.sortonly ? [
-        _.button({class: 'widget--list__add widget widget--button default expanded low', title: `Add ${model.placeholder || 'item'}`, onclick: _.onClickAddItem},
+        _.button({localized: true, class: 'widget--list__add widget widget--button default expanded low', title: `Add ${model.placeholder || 'item'}`, onclick: _.onClickAddItem},
             _.span({class: 'fa fa-plus'}),
             `Add ${model.placeholder || 'item'}`
         )

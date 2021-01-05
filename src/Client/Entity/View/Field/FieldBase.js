@@ -184,8 +184,8 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
     getPlaceholder(_, model, state) {
         return _.div({class: 'field field--resource-reference-editor loading'},
             _.div({class: 'field__key'},
-                _.div({class: 'field__key__label'}, model.label),
-                _.div({class: 'field__key__description'}, model.description)
+                _.div({class: 'field__key__label', localized: false}, model.label),
+                _.div({class: 'field__key__description', localized: false}, model.description)
             )
         );
     }

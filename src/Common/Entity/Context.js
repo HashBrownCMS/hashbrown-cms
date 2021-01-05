@@ -42,7 +42,9 @@ class Context extends HashBrown.Entity.EntityBase {
      * @return {String} Translated
      */
     translate(string) {
-        if(!string || typeof string !== 'string' || !this.i18n || !this.i18n[string]) { return string; }
+        if(!string || typeof string !== 'string' || !this.i18n || !this.i18n[string]) {
+            return string;
+        }
 
         return this.i18n[string];
     }

@@ -5,15 +5,14 @@ module.exports = (_, model, state) =>
 _.div({class: 'modal modal--upload-media in'},
     _.div({class: 'modal__dialog'},
         _.div({class: 'modal__header'},
-            _.h4({class: 'modal__title'}, 'Upload media'),
+            _.h4({localized: true, class: 'modal__title'}, 'Upload media'),
             _.button({class: 'modal__close fa fa-close', onclick: _.onClickClose})
         ),
-        _.div({class: 'modal__body'},
-            _.if(state.name === 'error', 
+        _.div({localized: true, class: 'modal__body'},
+            state.name === 'error' ? [
                 state.message,
-            ),
 
-            _.if(state.name === undefined,
+            ] : [
                 _.partial('preview',  (_, model, state) =>
                     _.div({name: 'preview', class: 'modal--upload-media__previews', name: 'previews'},
                         _.each(state.previews, (i, file) =>
@@ -41,12 +40,12 @@ _.div({class: 'modal modal--upload-media in'},
                     onchange: _.onChangeFile,
                     onsubmit: _.onSubmit
                 })
-            )
+            ]
         ),
-        _.if(state.name === 'error', 
+        state.name === 'error' ? [
             _.div({class: 'modal__footer'},
-                _.button({class: 'widget widget--button', onclick: _.onClickReset}, 'OK')
+                _.button({localized: true, class: 'widget widget--button', onclick: _.onClickReset}, 'OK')
             )
-        )
+        ] : null
     )
 )

@@ -356,7 +356,9 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                 for(let iconMatch of iconMatches) {
                     let text = parts.shift();
 
-                    elements.push(text);
+                    if(text) {
+                        elements.push(text.trim());
+                    }
                     
                     let iconElement = document.createElement('span');
                     iconElement.className = `fa fa-${iconMatch[1]}`;
@@ -366,9 +368,11 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
 
                 let lastText = parts.shift(); 
 
-                elements.push(lastText);
+                if(lastText) {
+                    elements.push(lastText.trim());
+                }
 
-                content = elements;
+                content = elements.filter(Boolean);
             }
         }
 
@@ -393,7 +397,7 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
                 content = this.context.translate(content);
             
             }
-
+            
             element.append(content);
         }
     }
@@ -417,18 +421,19 @@ class ViewBase extends require('Common/Entity/View/ViewBase') {
             attributes = params.shift();
         }
 
-        // Translate any property named "title"
-        if(this.context && this.context.user && attributes.title && attributes.localized !== false) {
-            attributes.title = this.context.translate(attributes.title);
+        // Translate visual properties
+        if(attributes.localized) {
+            if(attributes.title) {
+                attributes.title = this.context.translate(attributes.title);
+            }
+            
+            if(attributes.placeholder) {
+                attributes.placeholder = this.context.translate(attributes.placeholder);
+            }
         }
 
         // The remaining parameters are content
         content = params;
-
-        // Ensure localisation
-        if(attributes.localized === undefined) {
-            attributes.localized = true;
-        }
 
         // Adopt all attributes
         for(let key in attributes) {
