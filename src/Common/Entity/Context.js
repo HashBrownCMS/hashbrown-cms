@@ -13,6 +13,7 @@ class Context extends HashBrown.Entity.EntityBase {
         this.def(String, 'environment');
         this.def(Object, 'config', {});
         this.def(Object, 'i18n', {});
+        this.def(Array, 'locales', [ 'en ']);
     }
 
     /**

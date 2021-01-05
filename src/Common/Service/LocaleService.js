@@ -28,26 +28,6 @@ class LocaleService {
     }
 
     /**
-     * Gets the UI locale options
-     *
-     * @param {Boolean} includeNames
-     *
-     * @returns {Object} List of locale names
-     */
-    static getUILocaleOptions(includeNames = false) {
-        let locales = {
-            'Danish': 'da',
-            'English': 'en'
-        };
-        
-        if(includeNames) {
-            return locales;
-        }
-
-        return Object.values(locales);
-    }
-
-    /**
      * Gets all locales
      *
      * @param {Boolean} includeNames

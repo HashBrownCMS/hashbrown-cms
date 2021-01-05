@@ -197,13 +197,13 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
         context.user = user;
         context.config = await HashBrown.Service.ConfigService.get();
        
-        // Establish user locale
-        if(user) {
-            let localePath = Path.join(APP_ROOT, 'i18n', user.locale + '.json');
+        // Get locale information
+        context.locales = await HashBrown.Service.LocaleService.getSystemLocales();
 
-            if(HashBrown.Service.FileService.exists(localePath)) {
-                context.i18n = require(localePath);
-            }
+        if(user && user.locale !== 'en' && context.locales.indexOf(user.locale) > -1) {
+            let localePath = Path.join(APP_ROOT, 'i18n', user.locale + '.json');
+            
+            context.i18n = require(localePath);
         }
 
         // Validate project

@@ -94,10 +94,14 @@ class ViewController extends HashBrown.Controller.ControllerBase {
     static error(error, context) {
         checkParam(error, 'error', Error, true);
         checkParam(context, 'context', HashBrown.Entity.Context, true);
-        
+       
+        if(isNaN(error.code)) {
+            error.code = 500;
+        }
+
         switch(error.code) {
             default:
-                return this.render('error', { message: error.message, context: context }, error.code || 500);
+                return this.render('error', { message: error.message, context: context }, error.code);
             
             case 401:
                 return this.render('login', { message: error.message, context: context });

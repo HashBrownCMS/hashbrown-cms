@@ -30,6 +30,13 @@ class UserEditor extends HashBrown.Entity.View.Modal.ModalBase {
     async fetch() {
         this.model = await HashBrown.Entity.User.get(this.modelId);
         this.state.projects = await HashBrown.Entity.Project.list();
+        this.state.localeOptions = {};
+
+        for(let locale of this.context.locales) {
+            let name = HashBrown.Service.LocaleService.getLocaleName(locale);
+
+            this.state.localeOptions[name] = locale;
+        }
     }
    
     /**

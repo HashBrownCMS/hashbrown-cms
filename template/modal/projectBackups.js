@@ -66,7 +66,7 @@ _.div({class: 'modal in'},
             
             ] : [
                 _.button({localized: true, class: 'widget widget--button', title: 'Upload backup', onclick: _.onClickUploadBackup}, 'Upload'),
-                _.button({localized: true, class: 'widget widget--button', title: 'Create a new backup', onclick: _.onClickCreateBackup}, 'Create')
+                _.button({localized: true, class: 'widget widget--button', title: 'Create a new backup', onclick: _.onClickCreateBackup}, 'New')
             
             ]
         )
