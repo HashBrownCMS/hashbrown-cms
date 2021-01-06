@@ -88,7 +88,7 @@ class Project extends require('Common/Entity/Project') {
      *
      * @return {HashBrown.Entity.Project} Project
      */
-    static async create(name, id) {
+    static async create(name, id = '') {
         checkParam(name, 'name', String, true);
         checkParam(id, 'id', String);
 

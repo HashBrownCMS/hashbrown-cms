@@ -6,11 +6,6 @@ module.exports = (_, model) => `
 <ul>
     <li>Logging in</li>
     <li>Upon first time setup, a user can create an admin account</li>
-    <li>Upon invited, the user can create their account
-        <ul>
-            <li>If invite is expired, a message appears</li>
-        </ul>
-    </li>
 </ul>
 <h1>Dashboard</h1>
 <ul>

@@ -71,6 +71,10 @@
             border-color: var(--color-action-500);
         }
 
+        & > .fa:not(&__icon) {
+            margin-right: var(--padding-small);
+        }
+
         &__icon {
             float: right;
             display: inline-block;
