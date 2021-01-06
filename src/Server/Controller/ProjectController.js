@@ -141,7 +141,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 return new HashBrown.Http.Response(project);
 
             case 'DELETE':
-                if(!user.isAdmin) {
+                if(!context.user || !context.user.isAdmin) {
                     return new HashBrown.Http.Response('Only admins can remove projects', 403);
                 }
 
@@ -188,10 +188,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
-     * @example POST /api/projects/new?name=XXX { name: XXX }
+     * @example POST /api/projects/new?name=XXX&id=XXX { name: XXX, id: XXX }
      */
     static async new(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.create(query.name || body.name);
+        let project = await HashBrown.Entity.Project.create(query.name || body.name, query.id || body.id);
 
         return new HashBrown.Http.Response(project);
     }

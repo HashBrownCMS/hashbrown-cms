@@ -84,13 +84,24 @@ class Project extends require('Common/Entity/Project') {
      * Creates a new project
      *
      * @param {String} name
+     * @param {String} id
      *
      * @return {HashBrown.Entity.Project} Project
      */
-    static async create(name) {
+    static async create(name, id) {
         checkParam(name, 'name', String, true);
+        checkParam(id, 'id', String);
 
-        let id = this.createId();
+        if(!id) {
+            id = this.createId();
+        }
+
+        let exists = await HashBrown.Service.DatabaseService.databaseExists(id);
+
+        if(exists) {
+            throw new Error(`Project with id "${id}" already exists`);
+        }
+
         let settings = { name: name };
 
         await HashBrown.Service.DatabaseService.insertOne(

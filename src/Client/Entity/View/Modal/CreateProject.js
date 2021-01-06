@@ -32,8 +32,8 @@ class CreateProject extends HashBrown.Entity.View.Modal.ModalBase {
             if(!this.state.projectName || this.state.projectName.length < 2) {
                 throw new Error('The project name is too short');
             }
-
-            await HashBrown.Service.RequestService.request('post', 'projects/new', { name: this.state.projectName });
+            
+            await HashBrown.Service.RequestService.request('post', 'projects/new', { name: this.state.projectName, id: this.state.projectId });
 
             this.trigger('change');
 
@@ -50,6 +50,13 @@ class CreateProject extends HashBrown.Entity.View.Modal.ModalBase {
      */
     onInputName(name) {
         this.state.projectName = name;
+    }
+    
+    /**
+     * Event: Input id
+     */
+    onInputId(id) {
+        this.state.projectId = id;
     }
 }
 
