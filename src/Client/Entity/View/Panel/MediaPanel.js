@@ -169,9 +169,10 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
                 hasSortingPriority: true,
                 parentId: parentFolderPath,
                 children: []
-            }
+            },
+            state: this.getSavedItemState(path)
         });
-        
+       
         item.on('drop', (itemId, parentId, position) => {
             this.onDropItem(itemId, parentId, position);
         });

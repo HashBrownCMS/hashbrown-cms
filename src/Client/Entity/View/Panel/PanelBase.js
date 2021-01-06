@@ -23,12 +23,18 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
         this.state.sortingOptions = this.getSortingOptions();
         this.state.sortingMethod = Object.values(this.state.sortingOptions || {})[0];
         this.state.itemMap = {};
+        this.state.itemStates = {};
     }
 
     /**
      * Fetches the models
      */
     async fetch() {
+        // Save item states
+        for(let id in this.state.itemMap) {
+            this.state.itemStates[id] = this.state.itemMap[id].state;
+        }
+
         let resources = this.itemType ? await this.itemType.list() : [];
         
         // Generate items and place them in the map cache
@@ -38,7 +44,7 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
             let model = await this.getItem(resource);
             let item = HashBrown.Entity.View.ListItem.PanelItem.new({
                 model: model,
-                state: this.state.itemMap[model.id] ? this.state.itemMap[model.id].state : {}
+                state: this.getSavedItemState(model.id)
             });
 
             // Check if item name matches the search filter
@@ -322,6 +328,17 @@ class PanelBase extends HashBrown.Entity.View.ViewBase {
            
             item.setHighlight(id === this.state.id);
         }
+    }
+
+    /**
+     * Gets a saved item state
+     *
+     * @param {String} id
+     *
+     * @return {Object} State
+     */
+    getSavedItemState(id) {
+        return this.state.itemStates[id] || {};
     }
 
     /**
