@@ -436,8 +436,9 @@ class Project extends require('Common/Entity/Project') {
      *
      * @param {String} name
      */
-    async addEnvironment(name) {
+    async addEnvironment(name, options = {}) {
         checkParam(name, 'name', String, true);
+        checkParam(options, 'options', Object, true);
         
         let sync = await this.getSyncSettings();
 
@@ -456,8 +457,51 @@ class Project extends require('Common/Entity/Project') {
         }
 
         await HashBrown.Service.DatabaseService.insertOne(this.id, 'settings', { environment: name });
+        
+        if(options.from) {
+            await this.migrateEnvironment(options.from, name);
+        }
     }
     
+    /**
+     * Migrates resources from one environment to another
+     *
+     * @param {String} from
+     * @param {String} to
+     */
+    async migrateEnvironment(from, to) {
+        checkParam(from, 'from', String, true);
+        checkParam(to, 'to', String, true);
+
+        let environments = await this.getEnvironments();
+
+        if(environments.indexOf(from) < 0) {
+            throw new Error(`Environment ${from} could not be found`);
+        }
+        
+        if(environments.indexOf(to) < 0) {
+            throw new Error(`Environment ${to} could not be found`);
+        }
+
+        let sync = await this.getSyncSettings();
+
+        if(sync) {
+            throw new Error('Cannot migrate environments on synced projects');
+        }
+
+        let settings = await this.getEnvironmentSettings(from);
+
+        await this.setEnvironmentSettings(to, settings);
+
+        for(let library of HashBrown.Service.LibraryService.getAliases()) {
+            let resources = await HashBrown.Service.DatabaseService.find(this.id, `${from}.${library}`);
+
+            for(let resource of resources) {
+                HashBrown.Service.DatabaseService.updateOne(this.id, `${to}.${library}`, { id: resource.id }, resource, { upsert: true });
+            }
+        }
+    }
+
     /**
      * Gets settings for an environment
      *
@@ -549,6 +593,8 @@ class Project extends require('Common/Entity/Project') {
             existingSettings[section] = settings;
             settings = existingSettings;
         }
+
+        settings.environment = environment;
 
         return await HashBrown.Service.DatabaseService.mergeOne(
             this.id,

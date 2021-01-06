@@ -262,7 +262,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
-     * @example POST /api/projects/${project}/environments/new?name=XXX { name: XXX }
+     * @example POST /api/projects/${project}/environments/new?name=XXX&from=XXX { name: XXX, from: XXX }
      */
     static async newEnvironment(request, params, body, query, context) {
         let environment = query.name || body.name;
@@ -273,7 +273,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             return new HashBrown.Http.Response('Not found', 404);
         }
 
-        await project.addEnvironment(environment);
+        await project.addEnvironment(environment, { from: query.from || body.from });
 
         return new HashBrown.Http.Response('OK');
     }

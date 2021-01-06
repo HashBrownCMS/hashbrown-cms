@@ -26,7 +26,10 @@ class AddEnvironment extends HashBrown.Entity.View.Modal.ModalBase {
                 throw new Error('The environment name is too short');
             }
 
-            await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/environments/new', { 'name': this.state.environmentName })
+            await HashBrown.Service.RequestService.request('post', 'projects/' + this.model.id + '/environments/new', {
+                name: this.state.environmentName,
+                from: this.state.copyFrom
+            });
 
             this.trigger('change');
 
