@@ -82,6 +82,22 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         })
         .on('change', () => { this.update(); });
     }
+
+    /**
+     * Event: Click migrate button
+     */
+    onClickMigrateEnvironment(environment) {
+        if(this.model.environments.length < 2) {
+            UI.error(new Error('At least 2 environments are needed for migration'));
+        }
+        
+        HashBrown.Entity.View.Modal.MigrateEnvironments.new({
+            model: this.model,
+            state: {
+                from: environment
+            }
+        });
+    }
     
     /**
      * Event: Click backups button

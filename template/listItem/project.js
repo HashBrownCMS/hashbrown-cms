@@ -39,6 +39,7 @@ _.div({class: 'list-item--project'},
                             localized: true,
                             color: 'primary',
                             options: {
+                                'Migrate': () => _.onClickMigrateEnvironment(environment),
                                 'Delete': () => _.onClickRemoveEnvironment(environment)
                             }
                         })

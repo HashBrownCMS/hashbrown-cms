@@ -615,6 +615,10 @@ class DatabaseService {
     static async dropCollection(databaseName, collectionName) {
         checkParam(databaseName, 'databaseName', String, true);
         checkParam(collectionName, 'collectionName', String, true);
+
+        let exists = await this.collectionExists(databaseName, collectionName);
+
+        if(!exists) { return; }
         
         let db = await this.connect(databaseName);
 

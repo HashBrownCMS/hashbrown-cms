@@ -473,6 +473,8 @@ class Project extends require('Common/Entity/Project') {
         checkParam(from, 'from', String, true);
         checkParam(to, 'to', String, true);
 
+        if(from === to) { return; }
+
         let environments = await this.getEnvironments();
 
         if(environments.indexOf(from) < 0) {
@@ -488,10 +490,6 @@ class Project extends require('Common/Entity/Project') {
         if(sync) {
             throw new Error('Cannot migrate environments on synced projects');
         }
-
-        let settings = await this.getEnvironmentSettings(from);
-
-        await this.setEnvironmentSettings(to, settings);
 
         for(let library of HashBrown.Service.LibraryService.getAliases()) {
             let resources = await HashBrown.Service.DatabaseService.find(this.id, `${from}.${library}`);
@@ -621,6 +619,10 @@ class Project extends require('Common/Entity/Project') {
         }
         
         await HashBrown.Service.DatabaseService.remove(this.id, 'settings', { environment: name });
+        
+        for(let library of HashBrown.Service.LibraryService.getAliases()) {
+            await HashBrown.Service.DatabaseService.dropCollection(this.id, `${name}.${library}`);
+        }
     }
     
     /**

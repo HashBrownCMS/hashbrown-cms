@@ -33,6 +33,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 methods: [ 'GET', 'DELETE' ],
                 user: true
             },
+            
+            // Migrate
+            '/api/projects/${project}/migrate': {
+                handler: this.migrateEnvironment,
+                methods: [ 'POST' ],
+                user: {
+                    isAdmin: true
+                }
+            },
            
             // Settings
             '/api/projects/${project}/settings': {
@@ -130,22 +139,16 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             return new HashBrown.Http.Response(`You do not have access to project ${params.project}`, 403);
         }
         
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);
-        }
-
         switch(request.method) {
             case 'GET':
-                return new HashBrown.Http.Response(project);
+                return new HashBrown.Http.Response(context.project);
 
             case 'DELETE':
                 if(!context.user || !context.user.isAdmin) {
                     return new HashBrown.Http.Response('Only admins can remove projects', 403);
                 }
 
-                await project.remove();
+                await context.project.remove();
                 
                 return new HashBrown.Http.Response('OK');
         }
@@ -204,13 +207,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
         let password = query.password || body.password;
         let url = query.url || body.url;
 
-        let project = await HashBrown.Entity.Project.get(params.project);
-        
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);    
-        }
-
-        let token = await project.getSyncToken(username, password, url);
+        let token = await context.project.getSyncToken(username, password, url);
 
         return new HashBrown.Http.Response(token, 200, { 'Cache-Control': 'no-store' });
     }
@@ -219,24 +216,18 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST /api/projects/${project}/settings[/${section}] { ... }
      */
     static async settings(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-        
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);    
-        }
-
         switch(request.method) {
             case 'POST':
                 if(!context.user.isAdmin) {
                     return new HashBrown.Http.Response('Only admins can change project settings', 403);
                 }
 
-                await project.setSettings(body, params.section);
+                await context.project.setSettings(body, params.section);
         
                 return new HashBrown.Http.Response('OK');
 
             case 'GET':
-                let settings = await project.getSettings(params.section);
+                let settings = await context.project.getSettings(params.section);
                
                 return new HashBrown.Http.Response(settings, 200, { 'Cache-Control': 'no-store' });
         }
@@ -250,15 +241,18 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             return new HashBrown.Http.Response(`You do not have access to project ${params.project}`, 403);
         }
         
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);
-        }
-
-        let environments = await project.getEnvironments();
+        let environments = await context.project.getEnvironments();
 
         return new HashBrown.Http.Response(environments, 200, { 'Cache-Control': 'no-store' });
+    }
+    
+    /**
+     * @example POST /api/projects/${project}/migrate?from=XXX&to=XXX { from: XXX, to: XXX }
+     */
+    static async migrateEnvironment(request, params, body, query, context) {
+        await context.project.migrateEnvironment(query.from || body.from, query.to || body.to);
+
+        return new HashBrown.Http.Response('OK');
     }
 
     /**
@@ -267,13 +261,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     static async newEnvironment(request, params, body, query, context) {
         let environment = query.name || body.name;
         
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);
-        }
-
-        await project.addEnvironment(environment, { from: query.from || body.from });
+        await context.project.addEnvironment(environment, { from: query.from || body.from });
 
         return new HashBrown.Http.Response('OK');
     }
@@ -282,13 +270,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET|POST|DELETE /api/projects/${project}/environments/${environment}
      */
     static async environment(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Project not found', 404);
-        }
-                
-        let settings = await project.getEnvironmentSettings(params.environment, params.section);
+        let settings = await context.project.getEnvironmentSettings(params.environment, params.section);
         
         switch(request.method) {
             case 'GET':
@@ -299,7 +281,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     return new HashBrown.Http.Response('Only admins can edit environments', 403);
                 }
                 
-                await project.setEnvironmentSettings(params.environment, body, params.section);
+                await context.project.setEnvironmentSettings(params.environment, body, params.section);
 
                 return new HashBrown.Http.Response('OK');
                 
@@ -308,7 +290,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                     return new HashBrown.Http.Response('Only admins can remove environments', 403);
                 }
 
-                await project.removeEnvironment(params.environment);
+                await context.project.removeEnvironment(params.environment);
 
                 return new HashBrown.Http.Response('OK');
         }
@@ -319,13 +301,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/{project}/backups/${timestamp}/restore
      */
     static async restoreBackup(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);
-        }
-        
-        await project.restoreBackup(params.timestamp);
+        await context.project.restoreBackup(params.timestamp);
 
         return new HashBrown.Http.Response('OK');
     }
@@ -334,13 +310,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/{project}/backups/new
      */
     static async newBackup(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Not found', 404);
-        }
-        
-        let timestamp = await project.createBackup();
+        let timestamp = await context.project.createBackup();
 
         return new HashBrown.Http.Response(timestamp);
     }
@@ -404,13 +374,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example GET /api/projects/{project}/users
      */
     static async users(request, params, body, query, context) {
-        let project = await HashBrown.Entity.Project.get(params.project);
-
-        if(!project) {
-            return new HashBrown.Http.Response('Project not found', 404);
-        }
-
-        let users = await project.getUsers();
+        let users = await context.project.getUsers();
     
         return new HashBrown.Http.Response(users, 200, { 'Cache-Control': 'no-store' });
     }
