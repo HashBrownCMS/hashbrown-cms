@@ -115,10 +115,13 @@ async function main() {
 
     // Perform migration tasks
     await HashBrown.Service.MigrationService.migrate();
+    
+    // Init locales
+    await HashBrown.Service.LocaleService.init();
 
     // Init plugins
     await HashBrown.Service.PluginService.init();
-
+    
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
     

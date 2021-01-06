@@ -14,10 +14,10 @@ _.div({class: 'resource-editor resource-editor--json-editor'},
         _.div({class: 'resource-editor__footer'},
             _.include(require('./inc/warning')),
             _.div({class: 'resource-editor__footer__actions'},
-                _.a({href: `#/${state.library}/${state.id}`, class: 'widget widget--button embedded'}, 'Basic'),
-                _.if(!model.isLocked,
-                    _.button({class: 'widget widget--button', name: 'save', onclick: _.onClickSave}, 'Save')
-                )
+                _.a({localized: true, href: `#/${state.library}/${state.id}`, class: 'widget widget--button embedded'}, 'Basic'),
+                !model.isLocked ? [
+                    _.button({localized: true, class: 'widget widget--button', name: 'save', onclick: _.onClickSave}, 'Save')
+                ] : null
             )
         )
     ]

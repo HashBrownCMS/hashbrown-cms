@@ -21,6 +21,18 @@ class PluginService {
             if(!HashBrown.Service.FileService.exists(indexPath)) { continue; }
 
             require(indexPath);
+
+            // Locales
+            let localeFiles = await HashBrown.Service.FileService.list(Path.join(plugin, 'i18n'));
+
+            for(let file of localeFiles) {
+                if(Path.extname(file) !== '.json') { continue; }
+
+                HashBrown.Service.LocaleService.appendSystemLocale(
+                    Path.basename(file, Path.extname(file)),
+                    require(file)
+                );
+            }
         }
     }
 

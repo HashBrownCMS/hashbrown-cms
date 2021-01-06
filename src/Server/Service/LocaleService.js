@@ -2,7 +2,7 @@
 
 const Path = require('path');
 
-let locales = [];
+let locales = {};
 
 /**
  * A helper for locales
@@ -11,28 +11,69 @@ let locales = [];
  */
 class LocaleService extends require('Common/Service/LocaleService') {
     /**
+     * Initialises the locales
+     */
+    static async init() {
+        let files = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'i18n'));
+
+        for(let file of files) {
+            if(Path.extname(file) !== '.json') { continue; }
+
+            locales[Path.basename(file, Path.extname(file))] = require(file);
+        }
+
+        locales['en'] = null;
+    }
+
+    /**
      * Gets a list of system locales
      *
      * @param {Boolean} includeNames
      *
      * @returns {Array} List of locale names
      */
-    static async getSystemLocales() {
-        if(locales.length < 1) {
-            let files = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'i18n'));
+    static getSystemLocales() {
+        let names = Object.keys(locales);
 
-            for(let file of files) {
-                if(Path.extname(file) !== '.json') { continue; }
+        names.sort();
 
-                locales.push(Path.basename(file, Path.extname(file)));
-            }
+        return names;
+    }
 
-            locales.push('en');
+    /**
+     * Gets the translation strings for a system locale
+     *
+     * @param {String} locale
+     *
+     * @return {Object} Translations
+     */
+    static getSystemLocale(locale) {
+        checkParam(locale, 'locale', String, true);
 
-            locales.sort();
+        return locales[locale] || {};
+    }
+
+    /**
+     * Appends translation strings to an existing locale
+     *
+     * @param {String} locale
+     * @param {Object} i18n
+     */
+    static appendSystemLocale(locale, i18n) {
+        checkParam(locale, 'locale', String, true);
+        checkParam(i18n, 'i18n', Object, true);
+
+        if(locale === 'en') { return; }
+
+        if(!locales[locale]) {
+            locales[locale] = {};
         }
 
-        return locales;
+        for(let key in i18n) {
+            if(locales[locale][key]) { continue; }
+
+            locales[locale][key] = i18n[key];
+        }
     }
 }
 

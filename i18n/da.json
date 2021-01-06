@@ -162,5 +162,7 @@
     "Where to deploy published content": "Hvortil udgivne filer skrives",
     "Where to query this publication from": "Hvorfra denne udgivelse kan nås",
     "Year": "År",
-    "You are not permitted to view this page": "Du har ikke adgang til denne side"
+    "You are not permitted to view this page": "Du har ikke adgang til denne side",
+    "No": "Nej",
+    "Yes": "Ja"
 }

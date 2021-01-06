@@ -36,19 +36,16 @@
     &__header {
         background-color: var(--color-decor-500);
         color: var(--color-decor-text);
-        display: flex;
-        align-items: flex-end;
         min-height: var(--size-widget-large);
         flex-shrink: 0;
-    
-        &__spacer {
-            flex-grow: 1;
-        }
-        
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end;
+
         &__title {
             line-height: var(--size-widget-large);
-            padding-right: var(--padding-large);
             flex-shrink: 0;
+            padding-right: var(--padding-large);
 
             &__icon {
                 display: inline-block;

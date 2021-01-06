@@ -17,7 +17,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                     _.span({class: `resource-editor__welcome__heading__icon fa fa-${state.icon}`})
                 ),
                 _.p({localized: true}, 'Click any item in the panel to view it.'),
-                _.p({localized: true}, 'Use the context menu (right click or the ', _.span({class: 'fa fa-ellipsis-v'}), ' button) to perform other actions.'),
+                _.p({localized: true}, 'Use the context menu (right click or the ⋮ button) to perform other actions.'),
                 _.h2({localized: true}, 'Actions'),
                 _.div({class: 'resource-editor__welcome__actions'},
                     _.button({localized: true, class: 'widget widget--button condensed', onclick: _.onClickNew, title: 'Upload new media'}, 'Upload media'),

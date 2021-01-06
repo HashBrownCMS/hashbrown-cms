@@ -12,7 +12,6 @@ _.div({class: 'resource-editor__header'},
             _.each(state.tabs, (alias, title) => 
                 _.a({localized: true, href: `#/${state.library}${state.id ? `/${state.id}` : ''}/${alias}`, class: `resource-editor__header__tab ${state.tab === alias ? 'active' : ''}`, onclick: (e) => _.onClickTab(alias)}, title)
             )
-        ),
-        _.div({class: 'resource-editor__header__spacer'}),
+        )
    ] : null
 )
