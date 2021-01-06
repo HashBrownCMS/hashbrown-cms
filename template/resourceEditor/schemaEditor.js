@@ -54,7 +54,7 @@ _.div({class: 'resource-editor resource-editor--schema-editor'},
                 _.field({localized: true, label: 'Fields'},
                     _.div({class: 'widget-group'},
                         _.label({localized: true, class: 'widget widget--label'}, 'Tab'),
-                        _.popup({value: state.tab, options: state.tabOptions, onchange: _.onSwitchTab})
+                        _.popup({disabled: model.isLocked, value: state.tab, options: state.tabOptions, onchange: _.onSwitchTab})
                     ),
                     _.div({class: 'widget widget--separator'}),
                     _.list({disabled: model.isLocked, readonly: true, value: state.properties, sortable: true, placeholder: 'field', onchange: _.onChangeFieldSorting, onclick: _.onClickEditField, onadd: _.onClickAddField})
