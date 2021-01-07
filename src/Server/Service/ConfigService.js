@@ -27,7 +27,8 @@ class ConfigService {
                 await HashBrown.Entity.Project.create(
                     definition.name || definition.id,
                     definition.id,
-                    definition.environments || []
+                    definition.environments || [],
+                    definition.locales || []
                 );
             }
         }

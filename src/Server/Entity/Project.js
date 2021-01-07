@@ -75,13 +75,15 @@ class Project extends require('Common/Entity/Project') {
      * @param {String} name
      * @param {String} id
      * @param {Array} environments
+     * @param {Array} locales
      *
      * @return {HashBrown.Entity.Project} Project
      */
-    static async create(name, id = '', environments = []) {
+    static async create(name, id = '', environments = [], locales = []) {
         checkParam(name, 'name', String, true);
         checkParam(id, 'id', String);
         checkParam(environments, 'environments', Array, true);
+        checkParam(locales, 'locales', Array, true);
 
         if(!id) {
             id = this.createId();
@@ -93,19 +95,28 @@ class Project extends require('Common/Entity/Project') {
             throw new Error(`Project with id "${id}" already exists`);
         }
 
-        let settings = { name: name };
+        // Ensure environments
+        if(!environments || environments.length < 1) {
+            environments = [ 'live' ];
+        }
 
+        // Ensure locales
+        if(!locales || locales.length < 1) {
+            locales = [ 'en' ];
+        }
+
+        // Define settings
+        let settings = { name: name, locales: locales };
+
+        // Insert into database
         await HashBrown.Service.DatabaseService.insertOne(
             id,
             'settings',
             settings
         );
 
+        // Add environments
         let project = this.new({ id: id, settings: settings });
-
-        if(!environments || environments.length < 1) {
-            environments = [ 'live' ];
-        }
 
         for(let environment of environments) {
             await project.addEnvironment(environment);

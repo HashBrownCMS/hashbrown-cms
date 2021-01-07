@@ -11,7 +11,8 @@ How to configure HashBrown for your needs
     {
       "id": "<project id>",
       "name" "<project name">,
-      "environments": [ "<environment name>" ]
+      "environments": [ "<environment name>" ],
+      "locales": [ "<locale name>" ]
     }
   ],
   "canAddProjects": true|false,
