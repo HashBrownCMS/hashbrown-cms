@@ -18,7 +18,11 @@ async function initProjects() {
         projectList.innerHTML = '';
 
         let projectIds = await HashBrown.Service.RequestService.request('get', 'projects/ids');
-       
+        let isSingle = projectIds && projectIds.length < 2;
+
+        projectList.classList.toggle('widget-grid', !isSingle);
+        projectList.classList.toggle('single', isSingle);
+
         for(let projectId of projectIds || []) {
             let projectEditor = HashBrown.Entity.View.ListItem.Project.new({
                 modelId: projectId

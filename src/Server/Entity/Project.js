@@ -4,6 +4,8 @@ const Path = require('path');
 
 /**
  * The project class
+ *
+ * @memebrof HashBrown.Entity
  */
 class Project extends require('Common/Entity/Project') {
     /**
@@ -12,20 +14,7 @@ class Project extends require('Common/Entity/Project') {
      * @return {Array} Project ids
      */
     static async listIds() {
-        let ids = await HashBrown.Service.DatabaseService.listDatabases();
-        let config = await HashBrown.Service.ConfigService.get('system');
-
-        if(config.isSingleProject) {
-            if(ids.length < 1) {
-                let project = await this.create('My project');
-
-                return [ project.id ];
-            }
-
-            return ids.slice(0, 1);
-        }
-
-        return ids;
+        return await HashBrown.Service.DatabaseService.listDatabases();
     }
 
     /**
@@ -85,12 +74,14 @@ class Project extends require('Common/Entity/Project') {
      *
      * @param {String} name
      * @param {String} id
+     * @param {Array} environments
      *
      * @return {HashBrown.Entity.Project} Project
      */
-    static async create(name, id = '') {
+    static async create(name, id = '', environments = []) {
         checkParam(name, 'name', String, true);
         checkParam(id, 'id', String);
+        checkParam(environments, 'environments', Array, true);
 
         if(!id) {
             id = this.createId();
@@ -110,7 +101,17 @@ class Project extends require('Common/Entity/Project') {
             settings
         );
 
-        return this.new({ id: id, settings: settings });
+        let project = this.new({ id: id, settings: settings });
+
+        if(!environments || environments.length < 1) {
+            environments = [ 'live' ];
+        }
+
+        for(let environment of environments) {
+            await project.addEnvironment(environment);
+        }
+
+        return project;
     }
 
     /**
@@ -662,22 +663,6 @@ class Project extends require('Common/Entity/Project') {
 
         environments.sort();
        
-        if(environments.length < 1) {
-            await HashBrown.Service.DatabaseService.insertOne(
-                this.id,
-                'settings',
-                {
-                    environment: 'live'
-                }
-            );
-
-            environments.push('live');
-        }
-        
-        if(config.isSingleEnvironment) {
-            return environments.slice(0, 1);
-        }
-
         return environments;
     }
 

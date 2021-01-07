@@ -46,7 +46,7 @@ _.div({class: 'list-item--project'},
                     ] : null
                 )
             ),
-            HashBrown.Client.context.user.isAdmin && !HashBrown.Client.context.config.system.isSingleEnvironment ? [
+            HashBrown.Client.context.user.isAdmin && HashBrown.Client.context.config.system.canAddEnvironments !== false ? [
                 _.button({localized: true, onclick: _.onClickAddEnvironment, disabled: model.settings.sync.enabled === true, title: 'Add environment', class: 'widget widget--button dashed embedded expanded'},
                     _.span({class: 'fa fa-plus'}),
                     'Add environment'

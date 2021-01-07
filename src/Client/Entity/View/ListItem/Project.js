@@ -55,7 +55,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
         let modal = HashBrown.Entity.View.Modal.ModalBase.new({
             model: {
                 heading: `Remove environment "${environmentName}"`,
-                message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.getName()}"?`
+                message: `Are you sure want to remove the environment "${environmentName}" from the project "${this.model.getName()}"?`,
             }
         })
         .on('ok', async () => {
@@ -65,7 +65,7 @@ class Project extends HashBrown.Entity.View.ListItem.ListItemBase {
                 this.update();
 
             } catch(e) {
-                modal.setErrorState(e);
+                UI.error(e);
 
             }
         });

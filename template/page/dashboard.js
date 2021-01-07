@@ -27,9 +27,9 @@ module.exports = (_, model) => `
             <div class="page--dashboard__body__container">
                 ${model.tab === 'projects' ? `
                     <div class="page--dashboard__projects">
-                        <div class="page--dashboard__projects__list ${model.context.config.system.isSingleProject ? 'single' : 'widget-grid'}">
+                        <div class="page--dashboard__projects__list widget-grid">
                         
-                            ${model.context.user.isAdmin && !model.context.config.system.isSingleProject ? `
+                            ${model.context.user.isAdmin && model.context.config.system.canAddProjects !== false ? `
                                 <button class="page--dashboard__projects__add widget widget--button dashed embedded expanded"><span class="fa fa-plus"></span>${_.t('Add project')}</button>
                             ` : ''}
                         </div>

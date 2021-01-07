@@ -6,9 +6,16 @@ How to configure HashBrown for your needs
 ### Using `/config/system.cfg`
 ```
 {
-  "rootUrl": "<used when hosting in a subdirectory, like /cms>"
-  "isSingleProject": true|false,
-  "isSingleEnvironment": true|false
+  "rootUrl": "/cms"     // Hosting HashBrown on a subpath
+  "projects": [         // Definiting standard projects 
+    {
+      "id": "<project id>",
+      "name" "<project name">,
+      "environments": [ "<environment name>" ]
+    }
+  ],
+  "canAddProjects": true|false,
+  "canAddEnvironments": true|false
 }
 ```
 

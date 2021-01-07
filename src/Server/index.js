@@ -121,7 +121,10 @@ async function main() {
 
     // Init plugins
     await HashBrown.Service.PluginService.init();
-    
+   
+    // Init config
+    await HashBrown.Service.ConfigService.init();
+
     // Start HTTP server
     let port = process.env.NODE_PORT || process.env.PORT || 8080;
     

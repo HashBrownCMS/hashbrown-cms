@@ -147,6 +147,15 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
                 if(!context.user || !context.user.isAdmin) {
                     return new HashBrown.Http.Response('Only admins can remove projects', 403);
                 }
+                
+                // Check if this project is specified in the config
+                if(request.method !== 'GET' && Array.isArray(context.config.system.projects)) {
+                    for(let definition of context.config.system.projects) {
+                        if(definition.id !== context.project.id) { continue; }
+                    
+                        return new HashBrown.Http.Response('This project was defined by the server admin and cannot be removed', 403);
+                    }
+                }
 
                 await context.project.remove();
                 
@@ -194,6 +203,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/new?name=XXX&id=XXX { name: XXX, id: XXX }
      */
     static async new(request, params, body, query, context) {
+        if(context.config.system.canAddProjects === false) {
+            return new HashBrown.Http.Response('Adding projects has been disabled by the admin', 403);
+        }
+
         let project = await HashBrown.Entity.Project.create(query.name || body.name, query.id || body.id);
 
         return new HashBrown.Http.Response(project);
@@ -259,6 +272,10 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      * @example POST /api/projects/${project}/environments/new?name=XXX&from=XXX { name: XXX, from: XXX }
      */
     static async newEnvironment(request, params, body, query, context) {
+        if(context.config.system.canAddEnvironments === false) {
+            return new HashBrown.Http.Response('Adding projects has been disabled by the admin', 403);
+        }
+        
         let environment = query.name || body.name;
         
         await context.project.addEnvironment(environment, { from: query.from || body.from });
@@ -271,7 +288,7 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
      */
     static async environment(request, params, body, query, context) {
         let settings = await context.project.getEnvironmentSettings(params.environment, params.section);
-        
+
         switch(request.method) {
             case 'GET':
                 return new HashBrown.Http.Response(settings);
@@ -288,6 +305,19 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
             case 'DELETE':
                 if(!context.user.isAdmin) {
                     return new HashBrown.Http.Response('Only admins can remove environments', 403);
+                }
+                
+                // Check if this project has this environment specified in the config
+                if(request.method !== 'GET' && Array.isArray(context.config.system.projects)) {
+                    for(let definition of context.config.system.projects) {
+                        if(
+                            definition.id !== context.project.id ||
+                            !Array.isArray(definition.environments) || 
+                            definition.environments.indexOf(params.environment) < 0
+                        ) { continue; }
+                    
+                        return new HashBrown.Http.Response('This environment was defined by the server admin and cannot be deleted', 403);
+                    }
                 }
 
                 await context.project.removeEnvironment(params.environment);

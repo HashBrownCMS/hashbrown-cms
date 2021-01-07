@@ -150,11 +150,17 @@
         &__list { 
             &.single {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
 
-                .list-item--project, .placeholder {
-                    min-width: 30rem;
+                > .widget--button {
+                    margin-top: var(--padding-medium);
+                }
+
+                > .list-item--project, > .placeholder, > .widget--button {
+                    width: 100%;
+                    max-width: 30rem;
                 
                     @include phone {
                         min-width: 100%;

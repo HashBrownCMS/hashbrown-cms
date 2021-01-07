@@ -13,6 +13,27 @@ let cache = {};
  */
 class ConfigService {
     /**
+     * Initialises the config
+     */
+    static async init() {
+        // Create config projects if needed
+        let projectIds = await HashBrown.Entity.Project.listIds();
+        let system = await this.get('system');
+
+        if(Array.isArray(system.projects)) {
+            for(let definition of system.projects) {
+                if(!definition.id || projectIds.indexOf(definition.id) > -1) { continue; }
+                
+                await HashBrown.Entity.Project.create(
+                    definition.name || definition.id,
+                    definition.id,
+                    definition.environments || []
+                );
+            }
+        }
+    }
+
+    /**
      * Sets a config section
      *
      * @param {String} name
