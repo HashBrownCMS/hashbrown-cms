@@ -2,7 +2,7 @@
 
 module.exports = (_, model) => `
 
-<title>${ model.title || 'HashBrown CMS' }</title>
+<title>${ model.title || 'HashBrown' }</title>
 
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
