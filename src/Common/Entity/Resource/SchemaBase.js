@@ -138,7 +138,7 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
         checkParam(childSchema, 'childSchema', HashBrown.Entity.Resource.SchemaBase, true);
         checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.SchemaBase, true);
 
-        let mergedSchema = parentSchema;
+        let mergedSchema = parentSchema.clone();
 
         // Recursive merge
         function merge(parentValues, childValues) {

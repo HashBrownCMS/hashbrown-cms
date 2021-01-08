@@ -28,6 +28,19 @@ class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
 
         super(params);
     }
+    
+    /**
+     * Clones this entity
+     *
+     * @returns {HashBrown.Entity.Resource.ResourceBase} Clone
+     */
+    clone() {
+        let data = this.getObject();
+
+        data.context = this.context;
+
+        return new this.constructor(data);
+    }
    
     /**
      * Gets an instance of this entity type

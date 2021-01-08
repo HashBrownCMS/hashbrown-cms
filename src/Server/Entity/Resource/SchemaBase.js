@@ -9,6 +9,15 @@ const Path = require('path');
  */
 class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     /**
+     * Structure
+     */
+    structure() {
+        super.structure();
+
+        this.def(String, 'baseId');
+    }
+    
+    /**
      * Creates a new instance of this entity type
      *
      * @param {HashBrown.Entity.Context} context
@@ -98,12 +107,8 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         if(!resource) { return null; }
 
         // Get parent fields, if specified
-        if(options.withParentFields && resource.parentId) {
-            let parent = await this.get(context, resource.parentId, options);
-           
-            if(parent) {
-                resource = this.merge(resource, parent);
-            }
+        if(options.withParentFields) {
+            await resource.getParentFields();
         }
      
         resource.context = context;
@@ -192,18 +197,36 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             }
 
             // Get parent fields, if specified
-            if(options.withParentFields && list[i].parentId) {
-                let parent = await this.get(context, list[i].parentId, options);
-               
-                if(parent) {
-                    list[i] = this.merge(list[i], parent);
-                }
+            if(options.withParentFields) {
+                await list[i].getParentFields();
             }
         }
 
         return list;
     }
-    
+   
+    /**
+     * Gets parent fields and determines the base id
+     */
+    async getParentFields() {
+        if(!this.parentId || this.parentId === 'fieldBase' || this.parentId === 'contentBase') {
+            this.baseId = this.id;
+            return;
+        }
+
+        let parentSchema = await this.constructor.get(this.context, this.parentId);
+       
+        while(parentSchema) {
+            this.constructor.merge(this, parentSchema);
+            
+            if(!parentSchema.parentId) { break; }
+
+            this.baseId = parentSchema.id;
+            
+            parentSchema = await this.constructor.get(this.context, parentSchema.parentId);
+        }
+    }
+
     /**
      * Saves the current state of this entity
      *
@@ -218,6 +241,25 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         for(let child of await this.getChildren()) {
             await child.save();
         }
+    }
+    
+    /**
+     * Gets the base type
+     *
+     * @return {HashBrown.Entity.Resource.Schemabase} Base schema
+     */
+    async getBaseSchema() {
+        if(!this.parentId) { return this.id; }
+
+        let baseSchema = this;
+        let parentSchema = await this.constructor.get(this.context, this.parentId);
+
+        while(parentSchema) {
+            baseSchema = parentSchema;
+            parentSchema = await this.constructor.get(this.context, parentSchema.parentId);
+        }
+
+        return baseSchema;
     }
    
     /**

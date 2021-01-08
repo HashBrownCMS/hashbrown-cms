@@ -238,8 +238,7 @@ class Project extends require('Common/Entity/Project') {
         if(
             !sync.project ||
             !sync.url ||
-            !sync.token ||
-            sync.project === this.id
+            !sync.token
         ) {
             throw new Error('Invalid sync settings');
         }

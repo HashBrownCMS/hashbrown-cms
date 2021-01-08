@@ -186,9 +186,11 @@ class Publication extends require('Common/Entity/Resource/Publication') {
             locale = locales[0] || 'en';
         }
 
-        let cache = await this.getCache(query);
+        if(!query.nocache) {
+            let cache = await this.getCache(query);
 
-        if(cache) { return cache; }
+            if(cache) { return cache; }
+        }
         
         let items = await HashBrown.Entity.Resource.Content.list(this.context);
         let result = [];
@@ -213,11 +215,11 @@ class Publication extends require('Common/Entity/Resource/Publication') {
                 if(!isDescendant) { continue; }
             }
            
-            let output = await this.processor.process(item, locale);
-
-            let isMatch = this.isQueryMatch(query, output);
+            let isMatch = this.isQueryMatch(query, item);
 
             if(!isMatch) { continue; }
+            
+            let output = await this.processor.process(item, locale);
 
             result.push(output);
         }

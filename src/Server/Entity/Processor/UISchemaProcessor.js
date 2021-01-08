@@ -20,33 +20,23 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     async check(value, schemaId, config, locale, excludeTypes) {
         if(value === null || value === undefined || value === '') { return null; }
 
-        // Ensure config
-        if(!config) { config = {}; }
-
-        // Ensure schema id
-        if(Array.isArray(value)) {
-            schemaId = 'array';
-        
-        } else if(config.struct) {
-            schemaId = 'struct';
-        
-        }
-        
         if(!schemaId) { return value; }
-
-        if(excludeTypes && excludeTypes.indexOf(schemaId) > -1) {
-            if(schemaId === 'array') { return []; }
-            if(schemaId === 'struct') { return {}; }
-
-            return null;
-        }
-
+        
         // Load schema
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, schemaId, { withParentFields: true });
 
         if(!schema) { return value; }
+        
+        if(excludeTypes && excludeTypes.indexOf(schema.baseId) > -1) {
+            if(schema.baseId === 'array') { return []; }
+            if(schema.baseId === 'struct') { return {}; }
 
-        // Merge schema config
+            return null;
+        }
+
+        // Ensure and merge schema config
+        if(!config) { config = {}; }
+        
         if(schema.config) {
             for(let k in schema.config) {
                 if(config[k]) { continue; }
@@ -58,7 +48,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         // Parse value
         let parsed = {};
 
-        switch(schemaId) {
+        switch(schema.baseId) {
             default:
                 parsed = value;
                 break;
