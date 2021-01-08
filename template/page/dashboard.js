@@ -48,7 +48,7 @@ module.exports = (_, model) => `
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        <h2 class="page--dashboard__server__info__heading">Info</h2>
+                                        <h2 class="page--dashboard__server__info__heading">System</h2>
                                     </td>
                                 </tr>
                             </thead>
