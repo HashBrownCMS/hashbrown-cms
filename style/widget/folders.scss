@@ -1,5 +1,9 @@
 .widget--folders {
     &__folder {
+        &:not(:last-child) {
+            margin-bottom: var(--padding-small);
+        }
+        
         &__inner {
             display: flex;
         }
@@ -37,15 +41,17 @@
         }
         
         &.active > &__inner > &__name {
-            background-color: var(--color-default-200);
+            background-color: var(--color-action-500);
+            color: var(--color-action-text);
         }
 
         &__children {
-            margin-left: 1rem;
+            margin-left: var(--padding-medium);
+            margin-top: var(--padding-small);
         }
 
         &__icon {
-            margin-right: 0.75rem;
+            margin-right: var(--padding-small);
         }
     }
 }

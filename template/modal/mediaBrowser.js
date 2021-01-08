@@ -25,11 +25,13 @@ _.div({class: 'modal modal--media-browser in'},
                     ] : null,
 
                     _.each(state.items, (i, item) =>
-                        _.button({class: 'modal--media-browser__item', 'data-folder': item.folder, title: item.name, onclick: (e) => _.onClickItem(item.id)},
-                            _.media({disabled: true, value: item, thumbnail: true})
+                        _.button({class: 'modal--media-browser__item', 'data-id': item.id, 'data-folder': item.folder, title: item.getName(), onclick: (e) => _.onClickItem(item.id)},
+                            _.span({class: `fa fa-file${item.isAudio() ? '-audio' : item.isVideo() ? '-video' : item.isImage() ? '-image' : ''}-o`}),
+                            item.getName()
                         )
                     )
-                )
+                ),
+                _.div({class: 'modal--media-browser__preview', name: 'preview'})
             ] : null
         ),
         _.div({localized: true, class: 'modal__footer'},
@@ -37,7 +39,8 @@ _.div({class: 'modal modal--media-browser in'},
                 _.button({localized: true, class: 'widget widget--button', onclick: _.onClickReset}, 'OK')
             
             ] : [
-                _.button({localized: true, class: 'widget widget--button', onclick: _.onClickUpload}, 'Upload')
+                _.button({localized: true, class: 'widget widget--button', onclick: _.onClickUpload}, 'Upload'),
+                _.button({localized: true, class: 'widget widget--button', disabled: true, name: 'select', onclick: _.onClickSelect}, 'Select')
             
             ]
         )

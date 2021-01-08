@@ -91,14 +91,38 @@ class MediaBrowser extends HashBrown.Entity.View.Modal.ModalBase {
     }
 
     /**
+     * Event: Click select
+     */
+    onClickSelect() {
+        if(!this.state.selectedItemId) { return; }
+
+        this.trigger('pick', this.state.selectedItemId);
+
+        this.close();
+    }
+
+    /**
      * Event: Click item
      *
      * @param {String} itemId
      */
     onClickItem(itemId) {
-        this.trigger('pick', itemId);
+        this.state.selectedItemId = itemId;
 
-        this.close();
+        for(let item of Array.from(this.element.querySelectorAll('.modal--media-browser__item') || [])) {
+            item.classList.toggle('selected', item.dataset.id === itemId);
+        }
+
+        this.namedElements.select.disabled = false;
+
+        this.namedElements.preview.innerHTML = '';
+
+        this.namedElements.preview.appendChild(new HashBrown.Entity.View.Widget.Media({
+            model: {
+                readonly: true,
+                value: itemId
+            }
+        }).element);
     }
 
     /**

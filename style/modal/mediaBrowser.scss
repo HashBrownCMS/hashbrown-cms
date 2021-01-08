@@ -17,25 +17,21 @@
         border-right: 1px solid var(--color-default-300);
         flex-basis: 20rem;
         flex-shrink: 0;
-
-        @include tablet {
-            flex-basis: 0;
-        }
+    }
+    
+    &__preview {
+        padding: 1rem;
+        border-left: 1px solid var(--color-default-300);
+        flex-basis: 20rem;
+        flex-shrink: 0;
     }
 
     &__items {
         flex-grow: 1;
-        padding: 0.5rem;
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-gap: 1rem;
+        padding: var(--padding-medium);
         min-height: 20rem;
-
-        &::after {
-            content: '';
-            display: block;
-            clear: both;
-        }
+        max-height: 70vh;
+        overflow-y: auto;
     }
 
     &__search {
@@ -46,53 +42,30 @@
     &__item {
         border: 0;
         background-color: transparent;
-        padding: 0;
+        line-height: var(--size-widget-small);
+        padding: 0 var(--padding-small);
         cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border-radius: var(--border-radius-small);
+        display: block;
+        width: 100%;
+        text-align: left;
+
+        &:not(:last-child) {
+            margin-bottom: var(--padding-small);
+        }
+
+        .fa {
+            margin-right: var(--padding-small);
+        }
 
         &:hover {
-            .widget--media__preview {
-                background-color: var(--color-action-500);
-
-                &__name {
-                    color: var(--color-action-text);
-                }
-            }
+            background-color: var(--color-default-200);
         }
 
-        @include tablet {
-            max-width: calc(100% / 2);
-        }
-
-        @include phone {
-            max-width: 100%;
-        }
-
-        &__media {
-            position: absolute;
-            max-height: calc(100% - 1rem);
-            max-width: calc(100% - 1rem);
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        &__name {
-            display: block;
-            padding: 0 0.5rem;
-            line-height: var(--size-widget-small);
-            position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            width: calc(100% - 2rem);
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            background-color: var(--color-default-100);
-            color: var(--color-default-text);
-            border-radius: var(--border-radius-small);
-        }
-
-        &:hover &__name {
+        &.selected {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
         }
