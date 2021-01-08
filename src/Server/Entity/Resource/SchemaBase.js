@@ -225,6 +225,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
             
             parentSchema = await this.constructor.get(this.context, parentSchema.parentId);
         }
+
+        if(!this.baseId) {
+            this.baseId = this.id;
+        }
     }
 
     /**
