@@ -97,12 +97,57 @@
     // Server
     &__server {
         &__info {
+            width: 100%;
             max-width: 40rem;
-            margin: 0 auto;
+            margin: 0 auto var(--padding-large) auto;
             padding: var(--padding-medium);
             border-radius: var(--border-radius-small);
             background-color: var(--color-default);
             box-shadow: var(--box-shadow);
+
+            tbody {
+                line-height: 2;
+
+                td:first-child {
+                    padding-right: var(--padding-large);
+                }
+            }
+
+            &__heading {
+                margin-top: 0;
+            }
+
+            &__plugin {
+                background-color: var(--color-default-200);
+                border-radius: var(--border-radius-small);
+                padding: var(--padding-medium);
+                position: relative;
+
+                .fa {
+                    margin-right: var(--padding-small);
+                }
+
+                &:not(:last-child) {
+                    margin-bottom: var(--padding-medium);
+                }
+
+                &__author {
+                    color: var(--color-default-400);
+                }
+
+                &__name {
+                    margin: 0;
+                }
+
+                &__version {
+                    color: var(--color-default-300);
+                    margin-left: var(--padding-small);
+                }
+
+                &__description {
+                    margin-bottom: 0; 
+                }
+            }
         }
     }
 

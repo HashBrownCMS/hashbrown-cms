@@ -213,6 +213,7 @@ class ViewController extends HashBrown.Controller.ControllerBase {
      */
     static async dashboard(request, params, body, query, context) {
         let themes = await HashBrown.Service.AppService.getThemes();
+        let plugins = await HashBrown.Service.PluginService.getPlugins();
 
         let uptime = {};
 
@@ -227,7 +228,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             context: context,
             app: require(Path.join(APP_ROOT, 'package.json')),
             uptime: uptime,
-            themes: themes
+            themes: themes,
+            plugins: plugins
         });
     }
 

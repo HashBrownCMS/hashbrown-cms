@@ -44,38 +44,60 @@ module.exports = (_, model) => `
 
                 ` : model.context.user.isAdmin && model.tab === 'server' ? `
                     <div class="page--dashboard__server">
+                        <table class="page--dashboard__server__info">
+                            <thead>
+                                <tr>
+                                    <td colspan="2">
+                                        <h2 class="page--dashboard__server__info__heading">Info</h2>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${_.t('Software')}</td>
+                                    <td>HashBrown v${model.app.version}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>${_.t('Platform')}</td>
+                                    <td>${model.os.type()}</td>
+                                </tr>
+
+                                ${_.each(model.os.cpus(), (i, cpu) => `
+                                    <tr>
+                                        <td>${_.t('CPU')} ${i + 1}</td>
+                                        <td>${cpu.model}</td>
+                                    </tr>
+                                `)}
+
+                                <tr>
+                                    <td>${_.t('Memory')}</td>
+                                    <td>${Math.round(model.os.freemem() / 1000000)}mb / ${Math.round(model.os.totalmem() / 1000000)}mb</td>
+                                </tr>
+
+                                <tr>
+                                    <td>${_.t('Load average')}</td>
+                                    <td>${Math.round(model.os.loadavg()[0] * 10000) / 10000}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>${_.t('Uptime')}</td>
+                                    <td>${model.uptime.days}d ${model.uptime.hours}h ${model.uptime.minutes}m</td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div class="page--dashboard__server__info">
-                            <div class="widget-group">
-                                <div class="widget widget--label small secondary">${_.t('Software')}</div>
-                                <div class="widget widget--label">HashBrown v${model.app.version}</div>
-                            </div>
+                            <h2 class="page--dashboard__server__info__heading">Plugins</h2>
+                            ${model.plugins.length < 1 ? `
+                                No plugins installed
 
-                            <div class="widget-group">
-                                <div class="widget widget--label small secondary">${_.t('Platform')}</div>
-                                <div class="widget widget--label">${model.os.type()}</div> 
-                            </div>
-
-                            ${_.each(model.os.cpus(), (i, cpu) => `
-                                <div class="widget-group">
-                                    <div class="widget widget--label small secondary">${_.t('CPU')} ${i + 1}</div>
-                                    <div class="widget widget--label">${cpu.model}</div>
+                            ` : _.each(model.plugins, (i, plugin) => `
+                                <div class="page--dashboard__server__info__plugin">
+                                    <h3 class="page--dashboard__server__info__plugin__name">${plugin.name}${plugin.version ? `<span class="page--dashboard__server__info__plugin__version">${plugin.version}</span>` : ``}</h3>
+                                    ${plugin.author ? `<p class="page--dashboard__server__info__plugin__author"><span class="fa fa-user-circle"></span> ${plugin.author}</p>` : ``}
+                                    ${plugin.description ? `<p class="page--dashboard__server__info__plugin__description">${plugin.description}</p>` : ``}
                                 </div>
                             `)}
-
-                            <div class="widget-group">
-                                <div class="widget widget--label small secondary">${_.t('Memory')}</div>
-                                <div class="widget widget--label">${Math.round(model.os.freemem() / 1000000)}mb / ${Math.round(model.os.totalmem() / 1000000)}mb</div>
-                            </div>
-
-                            <div class="widget-group">
-                                <div class="widget widget--label small secondary">${_.t('Load average')}</div>
-                                <div class="widget widget--label">${Math.round(model.os.loadavg()[0] * 10000) / 10000}</div>
-                            </div>
-
-                            <div class="widget-group">
-                                <div class="widget widget--label small secondary">${_.t('Uptime')}</div>
-                                <div class="widget widget--label">${model.uptime.days}d ${model.uptime.hours}h ${model.uptime.minutes}m</div>
-                            </div>
                         </div>
                     </div>
 

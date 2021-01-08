@@ -66,6 +66,8 @@ class AppService {
 
         themes = themes.concat(pluginThemes);
 
+        themes.sort();
+
         return themes;
     }
 }

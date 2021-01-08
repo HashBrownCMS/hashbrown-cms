@@ -60,6 +60,39 @@ class PluginService {
 
         return themes;
     }
+
+    /**
+     *  Gets a list of all plugins
+     *
+     *  @return {Array} Plugins
+     */
+    static async getPlugins() {
+        let path = Path.join(APP_ROOT, 'plugins');
+        let folders = await HashBrown.Service.FileService.list(path);
+
+        let plugins = [];
+
+        for(let plugin of folders) {
+            let packageData = {};
+            let packagePath = Path.join(plugin, 'package.json');
+
+            if(HashBrown.Service.FileService.exists(packagePath)) {
+                packageData = require(packagePath);
+            }
+
+            if(!packageData.name) {
+                packageData.name = Path.basename(plugin);
+            }
+
+            plugins.push(packageData);
+        }
+
+        plugins.sort((a, b) => {
+            return a.name > b.name ? -1 : 1;
+        });
+
+        return plugins;
+    }
 }
 
 module.exports = PluginService;
