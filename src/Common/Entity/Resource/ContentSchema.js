@@ -44,6 +44,28 @@ class ContentSchema extends HashBrown.Entity.Resource.SchemaBase {
     isDefaultTab(tabId) {
         return (!this.defaultTabId && tabId === 'meta') || this.defaultTabId === tabId;
     }
+        
+    /**
+     * Merges two sets of schema data
+     *
+     * @param {HashBrown.Entity.Resource.SchemaBase} parentSchema
+     */
+    merge(parentSchema) {
+        super.merge(parentSchema);
+
+        // Merge tabs
+        if(!this.tabs) { this.tabs = {}; }
+        if(!parentSchema.tabs) { parentSchema.tabs = {}; }
+       
+        for(let k in parentSchema.tabs) {
+            if(this.tabs[k]) { continue; }
+
+            this.tabs[k] = parentSchema.tabs[k];
+        }
+
+        // Set default tab id
+        this.defaultTabId = this.defaultTabId || parentSchema.defaultTabId;
+    }
 }
 
 module.exports = ContentSchema;

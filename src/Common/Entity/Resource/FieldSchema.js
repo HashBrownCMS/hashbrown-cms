@@ -57,6 +57,17 @@ class FieldSchema extends HashBrown.Entity.Resource.SchemaBase {
 
         recurse(config, this.config);
     }
+        
+    /**
+     * Merges two sets of schema data
+     *
+     * @param {HashBrown.Entity.Resource.SchemaBase} parentSchema
+     */
+    merge(parentSchema) {
+        super.merge(parentSchema);
+
+        this.editorId = this.editorId || parentSchema.editorId;
+    }
 }
 
 module.exports = FieldSchema;

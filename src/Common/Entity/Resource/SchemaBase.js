@@ -129,69 +129,45 @@ class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     /**
      * Merges two sets of schema data
      *
-     * @param {HashBrown.Entity.Resource.SchemaBase} childSchema
      * @param {HashBrown.Entity.Resource.SchemaBase} parentSchema
-     *
-     * @returns {HashBrown.Entity.Resource.SchemaBase} Merged Schema
      */
-    static merge(childSchema, parentSchema) {
-        checkParam(childSchema, 'childSchema', HashBrown.Entity.Resource.SchemaBase, true);
+    merge(parentSchema) {
         checkParam(parentSchema, 'parentSchema', HashBrown.Entity.Resource.SchemaBase, true);
 
-        let mergedSchema = parentSchema.clone();
+        parentSchema = parentSchema.clone();
 
-        // Recursive merge
+        // Use most recent updated date for cache invalidation purposes
+        if(parentSchema.updatedOn > this.updatedOn) {
+            this.updatedOn = parentSchema.updatedOn;
+        }
+
+        // Merge config
+        if(!this.config) { this.config = {}; }
+        if(!parentSchema.config) { parentSchema.config = {}; }
+
         function merge(parentValues, childValues) {
-            for(let k in childValues) {
-                if(typeof parentValues[k] === 'object' && typeof childValues[k] === 'object') {
+            for(let k in parentValues) {
+                if(parentValues[k] && parentValues[k].constructor === Object) {
+                    if(!childValues[k] || childValues[k].constructor !== Object) {
+                        childValues[k] = {};
+                    }
+
                     merge(parentValues[k], childValues[k]);
                 
-                } else if(childValues[k]) {
-                    parentValues[k] = childValues[k];
+                } else if(!childValues[k]) {
+                    childValues[k] = parentValues[k];
                 
                 }
             }
         }
 
-        // Overwrite common values 
-        mergedSchema.id = childSchema.id;
-        mergedSchema.name = childSchema.name;
-        mergedSchema.parentId = childSchema.parentId;
-        mergedSchema.icon = childSchema.icon || mergedSchema.icon;
-        mergedSchema.isLocked = childSchema.isLocked || false;
+        // Make sure parent fields come first
+        let thisConfig = this.config;
 
-        // Use most recent updated date for cache invalidation purposes
-        if(parentSchema.updatedOn > childSchema.updatedOn) {
-            mergedSchema.updatedOn = parentSchema.updatedOn;
-        } else {
-            mergedSchema.updatedOn = childSchema.updatedOn;
-        }
+        this.config = {};
 
-        // Merge config
-        if(!mergedSchema.config) { mergedSchema.config = {}; }
-        if(!childSchema.config) { childSchema.config = {}; }
-
-        merge(mergedSchema.config, childSchema.config);
-        
-        // Specific values for schema types
-        switch(mergedSchema.type) {
-            case 'field':
-                mergedSchema.editorId = childSchema.editorId || mergedSchema.editorId;
-                break;
-
-            case 'content':
-                // Merge tabs
-                if(!mergedSchema.tabs) { mergedSchema.tabs = {}; }
-                if(!childSchema.tabs) { childSchema.tabs = {}; }
-               
-                merge(mergedSchema.tabs, childSchema.tabs);
-
-                // Set default tab id
-                mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
-                break;
-        }
-
-        return mergedSchema;
+        merge(parentSchema.config, this.config);    
+        merge(thisConfig, this.config);    
     }
 }
 

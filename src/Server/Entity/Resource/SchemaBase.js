@@ -108,7 +108,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         // Get parent fields, if specified
         if(options.withParentFields) {
-            await resource.getParentFields();
+            await resource.mergeParentFields();
         }
      
         resource.context = context;
@@ -198,7 +198,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
             // Get parent fields, if specified
             if(options.withParentFields) {
-                await list[i].getParentFields();
+                await list[i].mergeParentFields();
             }
         }
 
@@ -206,10 +206,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
     }
    
     /**
-     * Gets parent fields and determines the base id
+     * Merges parent fields and determines the base id
      */
-    async getParentFields() {
-        if(!this.parentId || this.parentId === 'fieldBase' || this.parentId === 'contentBase') {
+    async mergeParentFields() {
+        if(!this.parentId) {
             this.baseId = this.id;
             return;
         }
@@ -217,7 +217,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
         let parentSchema = await this.constructor.get(this.context, this.parentId);
        
         while(parentSchema) {
-            this.constructor.merge(this, parentSchema);
+            this.merge(parentSchema);
             
             if(!parentSchema.parentId) { break; }
 

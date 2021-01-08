@@ -73,7 +73,7 @@ base.copyToClipboard = function copyToClipboard(string) {
  * Checks for updates
  */
 base.updateCheck = async function updateCheck() {
-    if(!IS_CLIENT) { return; }
+    if(!IS_CLIENT || !HashBrown.Client.context.user.isAdmin) { return; }
 
     let update = await HashBrown.Service.RequestService.customRequest('get', '/api/server/update/check');
     
