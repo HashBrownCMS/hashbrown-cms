@@ -57,10 +57,11 @@
             border: 1px solid var(--color-default-200);
             background-color: var(--color-default-200);
             
-            &:hover {
+            &:hover, &:focus {
                 border-color: var(--color-action-500);
                 background-color: var(--color-action-500);
                 color: var(--color-action-text);
+                outline: none;
             }
         }
 
@@ -125,9 +126,10 @@
         border: 0;
         cursor: pointer;
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
+            outline: none;
         }
     }
 }

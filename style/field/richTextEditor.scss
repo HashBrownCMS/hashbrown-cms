@@ -30,13 +30,18 @@
                 pointer-events: none;
             }
 
+            &:focus {
+                outline: none;
+            }
+
             &:not(.active) {
                 border-color: var(--color-default-300);
                 cursor: pointer;
 
-                &:hover {
+                &:hover, &:focus {
                     background-color: var(--color-action-500);
                     color: var(--color-action-text);
+                    outline: none;
                 }
             }
         }

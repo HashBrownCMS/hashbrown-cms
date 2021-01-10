@@ -6,7 +6,7 @@
     color: var(--color-default-text);
     background-color: var(--color-default-200);
     
-    &:hover {
+    &:hover, &:focus {
         background-color: var(--color-action-500);
         color: var(--color-action-text);
     }

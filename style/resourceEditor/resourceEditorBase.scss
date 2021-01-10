@@ -70,6 +70,10 @@
             font-weight: bold;
             margin-right: var(--padding-small);
 
+            &:focus {
+                outline: none;
+            }
+
             &.active {
                 background-color: var(--color-default-100);
                 color: var(--color-default-text);
@@ -81,7 +85,7 @@
                 background-color: var(--color-decor-600);
                 border-color: var(--color-decor-500);
 
-                &:hover {
+                &:hover, &:focus {
                     background-color: var(--color-action-500);
                     color: var(--color-action-text);
                 }

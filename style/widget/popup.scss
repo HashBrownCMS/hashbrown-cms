@@ -21,8 +21,9 @@
         color: var(--color-action-text);
         background-color: var(--color-action-500);
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-action-300);
+            outline: none;
         }
     }
     
@@ -31,8 +32,9 @@
         color: var(--color-decor-text);
         background-color: var(--color-decor-500);
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-decor-800);
+            outline: none;
         }
     }
 
@@ -67,8 +69,9 @@
             border-bottom-right-radius: 0;
         }
 
-        &:hover {
+        &:hover, &:focus {
             border-color: var(--color-action-500);
+            outline: none;
         }
 
         & > .fa:not(&__icon) {
@@ -102,9 +105,10 @@
         color: var(--color-default-text);
         background-color: var(--color-default-200);
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
+            outline: none;
         }
     }
 
@@ -122,8 +126,9 @@
             margin-right: var(--padding-small);;
         }
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-default-100);
+            outline: none;
         }
     }
 
@@ -141,8 +146,9 @@
         display: block;
         border-radius: var(--border-radius-medium);
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-default-100);
+            outline: none;
         }
     }
 
@@ -182,8 +188,9 @@
             line-height: var(--size-widget-small);
             padding: 0 var(--size-widget-small);
 
-            &:focus {
+            &:hover, &:focus {
                 border-color: var(--color-action-500);
+                outline: none;
             }
         }
 
@@ -317,9 +324,10 @@
             }
         }
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-action-500);
             color: var(--color-action-text);
+            outline: none;
         }
     }
         

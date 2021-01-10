@@ -116,6 +116,11 @@
         pointer-events: none;
     }
 
+    // Focus
+    &:focus {
+        outline: none;
+    }
+
     // Colour themes
     &.warn {
         background-color: var(--color-warn-500);

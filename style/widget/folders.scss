@@ -35,8 +35,9 @@
             text-align: left;
             border-radius: var(--border-radius-small);
             
-            &:hover {
+            &:hover, &:focus {
                 background-color: var(--color-default-100);
+                outline: none;
             }
         }
         

@@ -9,8 +9,6 @@ module.exports = (_, model) => `
     </head>
 
     <body class="page page--environment">
-        ${require('./inc/spinner')(_, model)}
-        
         <main class="page--environment__spaces">
             <input type="checkbox" autocomplete="off" class="page--environment__space--nav__toggle" id="page--environment__space--nav__toggle">
             <label class="page--environment__space--nav__switch" for="page--environment__space--nav__toggle"></label>

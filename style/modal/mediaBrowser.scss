@@ -79,8 +79,9 @@
             margin-right: var(--padding-small);
         }
 
-        &:hover {
+        &:hover, &:focus {
             background-color: var(--color-default-100);
+            outline: none;
         }
 
         &.selected {
