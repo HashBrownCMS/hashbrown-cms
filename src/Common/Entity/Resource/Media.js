@@ -49,7 +49,10 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         checkParam(params, 'params', Object);
 
         params = params || {};
-        
+       
+        // Sanity check for the folder
+        params.folder = '/' + (params.folder || '').split('/').filter(Boolean).join('/');
+
         super.adopt(params);
     }
     
