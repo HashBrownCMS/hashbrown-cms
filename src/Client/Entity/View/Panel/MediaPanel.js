@@ -146,9 +146,12 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     getParentItem(path) {
         if(!path) { return null; } 
 
+        let parts = path.split('/').filter(Boolean);
+
+        path = `/${parts.join('/')}/`;
+
         if(this.state.itemMap[path]) { return this.state.itemMap[path]; }
 
-        let parts = path.split('/').filter((x) => !!x);
         let folderName = parts.pop();
 
         if(!folderName) { return null; }

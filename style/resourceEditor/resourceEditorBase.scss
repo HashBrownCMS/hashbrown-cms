@@ -13,19 +13,19 @@
         @include spinner;
     }
 
-    &__welcome {
+    &__overview {
         padding: 4rem;
         margin-right: auto;
         max-width: 40rem;
 
         &__heading {
             &__icon {
-                margin-left: var(--padding-medium);
+                margin-right: var(--padding-medium);
             }
         }
 
         &__actions {
-            margin-top: var(-padding-large);
+            margin-top: var(--padding-large);
 
             .widget {
                 margin-bottom: var(--padding-medium);

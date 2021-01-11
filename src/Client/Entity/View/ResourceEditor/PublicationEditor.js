@@ -70,6 +70,21 @@ class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEdi
     }   
 
     /**
+     * Gets the overview actions
+     *
+     * @return {Array} Actions
+     */
+    getOverviewActions() {
+        return [
+            {
+                handler: () => this.onClickNew(),
+                description: 'Create a new publication',
+                name: 'New publication'
+            }
+        ];
+    }
+
+    /**
      * Event: Click start tour
      */
     async onClickStartTour() {

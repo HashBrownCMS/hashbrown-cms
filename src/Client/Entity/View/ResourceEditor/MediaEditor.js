@@ -49,6 +49,21 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
             });
         }
     }
+    
+    /**
+     * Gets the overview actions
+     *
+     * @return {Array} Actions
+     */
+    getOverviewActions() {
+        return [
+            {
+                name: 'Upload media',
+                handler: () => this.onClickNew(),
+                description: 'Upload new media'
+            }
+        ];
+    }
 
     /**
      * Event: Clicked start tour

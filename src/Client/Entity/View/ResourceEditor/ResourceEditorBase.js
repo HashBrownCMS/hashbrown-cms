@@ -26,8 +26,11 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         this.state.saveOptions = this.state.saveOptions || {};
         this.state.settings = this.state.settings || {};
 
+        if(this.state.name === 'welcome') {
+            this.state.actions = this.getOverviewActions();
+
         // Make sure the resource browser is collapsed on mobile
-        if(this.state.name !== 'welcome') {
+        } else {
             document.getElementById('page--environment__space--nav__toggle').checked = false;
         }
     }
@@ -53,7 +56,16 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
             _.div({class: 'resource-editor__footer'})
         );
     }
-    
+   
+    /**
+     * Gets the overview actions
+     *
+     * @return {Array} Actions
+     */
+    getOverviewActions() {
+        return [];
+    }
+
     /**
      * Checks whether this resource is currently being edited by someone else, and displays a warning if it is
      */

@@ -131,6 +131,25 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
     }
 
     /**
+     * Gets the overview actions
+     *
+     * @return {Array} Actions
+     */
+    getOverviewActions() {
+        return [
+            {
+                handler: () => this.onClickNew(),
+                description: 'Create new content',
+                name: 'New content'
+            },
+            {
+                description: 'Republish all content',
+                handler: () => this.onClickRepublishAllContent(),
+                name: 'Republish'
+            }
+        ];
+    }
+    /**
      * Gets a list of allowed alternative schemas
      *
      * @return {Array} Schema ids
@@ -166,13 +185,11 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
      * Event: Clicked republish all content
      */
     async onClickRepublishAllContent() {
-        this.namedElements.republish.classList.toggle('loading', true);
+        UI.notifySmall(`All content being republished, this could take a while...`, null, 3);
         
         await HashBrown.Service.RequestService.request('post', 'content/republish');
 
         UI.notifySmall(`All content republished successfully`, null, 3);
-        
-        this.namedElements.republish.classList.toggle('loading', false);
     }
 
     /**

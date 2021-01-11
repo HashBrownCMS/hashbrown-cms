@@ -11,19 +11,7 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
             )
         
         ] : state.tab === 'overview' ? [
-            _.div({class: 'resource-editor__welcome'},
-                _.h1({localized: true, class: 'resource-editor__welcome__heading'},
-                    state.title,
-                    _.span({class: `resource-editor__welcome__heading__icon fa fa-${state.icon}`})
-                ),
-                _.p({localized: true}, 'Click any item in the panel to view it.'),
-                _.p({localized: true}, 'Use the context menu (right click or the ⋮ button) to perform other actions.'),
-                _.h2({localized: true}, 'Actions'),
-                _.div({class: 'resource-editor__welcome__actions'},
-                    _.button({localized: true, class: 'widget widget--button condensed', onclick: _.onClickNew, title: 'Upload new media'}, 'Upload media'),
-                    _.button({localized: true, class: 'widget widget--button condensed hidden-phone', onclick: _.onClickStartTour, title: 'Start a tour of the UI'}, 'Quick tour')
-                )
-            )
+            _.include(require('./inc/overview'))
 
         ] : state.tab === 'settings' ? [
             _.field({localized: true, label: 'Public URL', description: 'The base URL from which the files will be publicly accessible'}, 
