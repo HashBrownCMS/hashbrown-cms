@@ -263,25 +263,38 @@ class Popup extends HashBrown.Entity.View.Widget.WidgetBase {
             parentElement = parentElement.parentElement;
         }
 
-        // Apply appropriate classes
-        if(this.model.role === 'context-menu') {
-            if(bounds.right > xMax - margin) {
-                menu.classList.add('right');
-            } else {
-                menu.classList.add('left');
-            }
+        // Override horizontal position
+        if(this.model.horizontal === 'left' || this.model.horizontal === 'right') {
+            menu.classList.add(this.model.horizontal);
+
+        // Calculate horizaontal position
         } else {
-            if(bounds.left < xMin + margin) {
-                menu.classList.add('left');
+            if(this.model.role === 'context-menu') {
+                if(bounds.right > xMax - margin) {
+                    menu.classList.add('right');
+                } else {
+                    menu.classList.add('left');
+                }
             } else {
-                menu.classList.add('right');
+                if(bounds.left < xMin + margin) {
+                    menu.classList.add('left');
+                } else {
+                    menu.classList.add('right');
+                }
             }
         }
-      
-        if(bounds.bottom > yMax - margin && bounds.top - bounds.height > yMin + margin) {
-            menu.classList.add('bottom');
+     
+        // Override vertical position
+        if(this.model.vertical === 'top' || this.model.vertical === 'bottom') {
+            menu.classList.add(this.model.vertical);
+
+        // Calculate vertical position
         } else {
-            menu.classList.add('top');
+            if(bounds.bottom > yMax - margin && bounds.top - bounds.height > yMin + margin) {
+                menu.classList.add('bottom');
+            } else {
+                menu.classList.add('top');
+            }
         }
       
         // Make final adjustment in case the menu is too tall for the screen

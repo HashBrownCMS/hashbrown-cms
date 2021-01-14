@@ -26,10 +26,10 @@ _.div({class: 'field--array-editor__items'},
 
         !model.isDisabled && state.canAddItems && Object.keys(state.schemaOptions).length > 0 ? [
             Object.keys(state.schemaOptions).length > 1 ? [
-                _.popup({class: 'field--array-editor__add', autocomplete: true, options: state.schemaOptions, icon: 'plus', label: _.t('Add item'), onchange: _.onClickAddItem})
+                _.popup({class: 'field--array-editor__add', horizontal: 'left', autocomplete: true, options: state.schemaOptions, icon: 'plus', label: _.t('Add item'), onchange: _.onClickAddItem})
             
             ] : [
-                _.button({localized: true, class: 'widget widget--button expanded default field--array-editor__add', onclick: _.onClickAddImpliedItem},
+                _.button({localized: true, class: 'widget widget--button default field--array-editor__add', onclick: _.onClickAddImpliedItem},
                     _.span({class: 'fa fa-plus'}),
                     'Add item'
                 )

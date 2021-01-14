@@ -214,6 +214,7 @@
         position: absolute;
         min-width: 14rem;
         width: 100%;
+        max-width: 30rem;
         display: flex;
         flex-direction: column;
         background-color: var(--color-default);
