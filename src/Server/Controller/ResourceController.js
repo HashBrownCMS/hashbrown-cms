@@ -197,8 +197,8 @@ i
                 return new HashBrown.Http.Response(resource, 200, { 'ETag': this.getETag([ resource ], params, query) });
                 
             case 'POST':
-                if(!context.user.hasScope(this.library)) {
-                    return new HashBrown.Http.Response('You do not have access to edit this resource', 403);
+                if(!context.user.hasScope(context.project.id, this.library)) {
+                    return new HashBrown.Http.Response(`You do not have access to edit this ${this.library} resource`, 403);
                 }
 
                 if(!resource) {
@@ -215,8 +215,8 @@ i
                 return new HashBrown.Http.Response(resource);
 
             case 'DELETE':
-                if(!context.user.hasScope(this.library)) {
-                    return new HashBrown.Http.Response('You do not have access to remove this resource', 403);
+                if(!context.user.hasScope(context.project.id, this.library)) {
+                    return new HashBrown.Http.Response(`You do not have access to remove this ${this.library} resource`, 403);
                 }
                 
                 await resource.remove(query);

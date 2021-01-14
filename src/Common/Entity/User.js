@@ -79,7 +79,7 @@ class User extends HashBrown.Entity.EntityBase {
     hasScope(projectId, scope = '') {
         checkParam(projectId, 'projectId', String, true);
         checkParam(scope, 'scope', String);
-        
+
         if(this.isAdmin) { return true; }
 
         if(!projectId) { return false; }
@@ -89,11 +89,7 @@ class User extends HashBrown.Entity.EntityBase {
             this.scopes[projectId] = [];
         }
 
-        if(!scope) { return true; }
-
-        if(this.scopes[projectId].length < 1) {
-            this.scopes[projectId] = [ 'content', 'media' ];
-        }
+        if(!scope || scope === 'content' || scope === 'media') { return true; }
 
         return this.scopes[projectId].indexOf(scope) > -1;
     }
