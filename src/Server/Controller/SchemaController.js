@@ -13,9 +13,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
         return {
             '/api/${project}/${environment}/schemas/icons': {
                 handler: this.icons,
-                user: {
-                    scope: 'schemas'
-                }
+                user: true,
             },
             ...super.routes
         };
