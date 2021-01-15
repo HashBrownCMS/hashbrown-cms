@@ -2,14 +2,20 @@
 
 A free and open-source headless CMS built with Node.js and MongoDB
 
-![HashBrown CMS](http://hashbrowncms.org/img/screenshot.jpg)
+![HashBrown CMS](https://hashbrowncms.org/img/screenshot.jpg)
+
+Multiple projects and environments are supported, so you only need one running CMS for all of your website needs
+
+![HashBrown CMS](https://hashbrowncms.org/img/diagram.svg)
 
 ## Getting started
 - [Guides](https://hashbrowncms.org/guides)
 - [API documentation](https://hashbrowncms.org/docs/api/)
 - [Developer documentation](https://hashbrowncms.org/docs/src/)
 
-## Docker
+## Running and installing
+
+### Docker
 
 The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags).
 
@@ -59,7 +65,7 @@ services:
             - "./storage/website/live/media:/srv/app/public/media" # Public directory for media files
 ```
 
-## Installing HashBrown
+### Installing
 
 First make sure you have these dependencies met:  
 - node.js
@@ -76,7 +82,7 @@ cd ./hashbrown-cms
 npm install
 ```
 
-## Running HashBrown
+### Running
 
 Building and starting the server for production:
 ```
@@ -103,7 +109,7 @@ Using nodemon:
 npm run watch:nodemon
 ```
 
-## Updating HashBrown
+### Updating
 
 To update the core HashBrown version and all of its dependencies:
 ```
